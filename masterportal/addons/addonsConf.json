@@ -1,0 +1,263 @@
+{
+  "exampleSearch": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/exampleSearch"
+  },
+  "gfiOnAddressGaz": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/gfiOnAddressGaz"
+  },
+  "waterRiskCheckSearch": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/waterRiskCheckSearch"
+  },
+  "mietenspiegelSearch": {
+    "type": "searchInterface",
+    "path": "searchInterfaces/mietenspiegelSearch"
+  },
+  "populationRequest": {
+    "type": "tool"
+  },
+  "planParken": {
+    "type": "tool"
+  },
+  "sdpDownload": {
+    "type": "tool",
+    "path": "sdpDownload"
+  },
+  "streetSmart": {
+    "type": "tool"
+  },
+  "vcOblique": {
+    "type": "tool",
+    "path": "vcOblique"
+  },
+  "bildungsatlas": {
+    "path":"gfiThemes/bildungsatlas",
+    "type": "gfiTheme"
+  },
+  "borisComponent": {
+    "type": "tool",
+    "path": "boris"
+  },
+  "combinedGfi": {
+    "path":"gfiThemes/combinedGfi",
+    "type": "gfiTheme"
+  },
+  "dataTable": {
+    "path":"gfiThemes/dataTable",
+    "type": "gfiTheme"
+  },
+  "dipas": {
+    "path":"gfiThemes/dipas",
+    "type": "gfiTheme"
+  },
+  "dipasNavigator": {
+    "path":"gfiThemes/dipasNavigator",
+    "type": "gfiTheme"
+  },
+  "dipasAnalyticsInsights": {
+    "path":"gfiThemes/dipasAnalyticsInsights",
+    "type": "gfiTheme"
+  },
+  "privateParking": {
+    "path":"gfiThemes/parking",
+    "type": "gfiTheme"
+
+  },
+  "schulinfo": {
+    "path":"gfiThemes/schulinfo",
+    "type": "gfiTheme"
+  },
+  "solaratlas": {
+    "path":"gfiThemes/solaratlas",
+    "type": "gfiTheme"
+  },
+  "sturmflut": {
+    "path":"gfiThemes/sturmflut",
+    "type": "gfiTheme"
+  },
+  "trafficCount": {
+    "path":"gfiThemes/trafficCount",
+    "type": "gfiTheme"
+  },
+  "trinkwasser": {
+    "path":"gfiThemes/trinkwasser",
+    "type": "gfiTheme"
+  },
+  "verkehrsstaerken": {
+    "path":"gfiThemes/verkehrsstaerken",
+    "type": "gfiTheme"
+  },
+  "verkehrsfunctions": {
+    "type": "javascript"
+  },
+  "valuationPrint": {
+    "type": "tool"
+  },
+  "commuterFlows": {
+    "type": "tool"
+  },
+  "waterRiskCheck": {
+    "type": "tool"
+  },
+  "floodRiskManagement": {
+    "type": "tool"
+  },
+  "mietenspiegelFormular": {
+    "type": "tool"
+  },
+  "sessionTool": {
+    "type": "tool"
+  },
+  "simulationTool": {
+    "type": "tool"
+  },
+  "bimFactory": {
+    "type": "tool"
+  },
+  "vpiDashboard": {
+    "type": "tool"
+  },
+  "geoMarker": {
+    "type": "tool"
+  },
+  "snippetFeatureInfo": {
+    "path": "filterSnippets/snippetFeatureInfo",
+    "type": "filterSnippet"
+  },
+  "snippetChart": {
+    "path": "filterSnippets/snippetChart",
+    "type": "filterSnippet"
+  },
+  "cesium3dTilesInspector": {
+    "type": "javascript"
+  },
+  "exampleControl": {
+    "path": "controls/exampleControl",
+    "type": "control"
+  },
+  "toggleMouseHover": {
+    "path": "controls/toggleMouseHover",
+    "type": "control"
+  },
+  "oktagonComponent": {
+    "type": "tool",
+    "path": "oktagon"
+  },
+  "quickResponseCode": {
+    "type": "tool"
+  },
+  "addLayerRemotely": {
+    "type": "tool"
+  },
+  "drawWithoutGui": {
+    "type": "javascript"
+   },
+  "districtSelector": {
+    "path": "cosi/DistrictSelector",
+    "type": "tool"
+  },
+  "districtFinder": {
+    "path": "cosi/DistrictFinder",
+    "type": "tool"
+  },
+  "accessibilityAnalysis": {
+    "path": "cosi/AccessibilityAnalysis",
+    "type": "tool"
+  },
+  "dashboard": {
+    "path":"cosi/Dashboard",
+    "type": "tool"
+  },
+  "colorCodeMap": {
+    "path":"cosi/ColorCodeMap",
+    "type": "tool"
+  },
+  "featuresList": {
+    "path":"cosi/FeaturesList",
+    "type": "tool"
+  },
+  "distanceScoreService": {
+    "path": "cosi/FeaturesList/service",
+    "type": "tool"
+  },
+  "polygonStyler": {
+    "path":"cosi/PolygonStyler",
+    "type": "tool"
+  },
+  "areaSelector": {
+    "path":"cosi/AreaSelector",
+    "type": "tool"
+  },
+  "templateAdmin": {
+    "path": "cosi/TemplateAdmin",
+    "type": "tool"
+  },
+  "templateManager": {
+    "path": "cosi/TemplateManager",
+    "type": "tool"
+  },
+  "saveSession": {
+    "path": "cosi/SaveSession",
+    "type": "tool"
+  },
+  "calculateRatio": {
+    "path": "cosi/CalculateRatio",
+    "type": "tool"
+  },
+  "dipasProjects": {
+    "path": "cosi/DipasProjects",
+    "type": "tool"
+  },
+  "reportingTool": {
+    "path": "cosi/ReportingTool",
+    "type": "tool"
+  },
+  "cosiFileImport": {
+    "path": "cosi/cosiFileImport",
+    "type": "tool"
+  },
+  "cosiPrintLayoutSelection": {
+    "path": "cosi/cosiPrintLayoutSelection",
+    "type": "vueComponent"
+  },
+   "waterRiskCheckSearchBar": {
+    "path": "waterRiskCheck/searchBar",
+    "type": "tool"
+  },
+  "potentialDamagedBuilding": {
+    "path": "heavyRain/potentialDamagedBuilding",
+    "type": "tool"
+  },
+  "updateRequirements": {
+    "path": "heavyRain/updateRequirements",
+    "type": "tool"
+  },
+  "projects": {
+    "path": "heavyRain/projects",
+    "type": "tool"
+  },
+  "geoAnalyze": {
+    "path": "geoAnalyze",
+    "type": "tool"
+  },
+  "tacticalMark": {
+    "type": "tool"
+  },
+  "fileImportAddon": {
+    "type": "tool"
+  },
+  "dataNarrator": {
+    "path": "dataNarrator",
+    "type": "tool"
+  },
+  "storyPlayer": {
+    "path": "storyTellingTool/storyPlayer",
+    "type": "tool"
+  },
+    "storyManager": {
+    "path": "storyTellingTool/storyManager",
+    "type": "tool"
+  }
+}

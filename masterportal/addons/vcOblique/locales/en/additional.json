@@ -1,0 +1,11 @@
+{
+  "modules": {
+    "vcOblique": {
+      "description": "View oblique aerial images for a position on the map",
+      "frameworkUndefined": "Oblique aerial view",
+      "frameworkUndefinedMessage": "An error has occurred while displaying the oblique aerial images. Please restart the application. If the error still occurs, please report it via Contact.",
+      "name": "Oblique aerial view  (2022)",
+      "sameOrigin": "The included website cannot be displayed. Please make sure that the included website is on the same server as the accessed portal."
+    }
+  }
+}

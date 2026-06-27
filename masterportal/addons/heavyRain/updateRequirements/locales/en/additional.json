@@ -1,0 +1,27 @@
+{
+  "modules": {
+    "updateRequirements": {
+      "title": "Update Requirements",
+      "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "reportInfoHeading": "Information about report",
+      "createMessage": "Create New Message",
+      "createFormTitle": "Capture message",
+      "createNewDescriptionFirst": "To create a new message, first draw the affected area as a polygon on the map. Afterwards, you can enter the related information in the form and save the message.",
+      "createNewDescriptionSecond": "This helps to report notes, changes, or errors in the map.",
+      "form": {
+        "name": "Name",
+        "initiator": "Initiator",
+        "typeOptional": "Type of entry (optional)",
+        "contact": "Contact person",
+        "commentOptional": "Comment/ description (optional)",
+        "infolinkOptional": "Info link (optional)",
+        "uploadOptional": "Upload image (optional)",
+        "pleaseSelect": "Please select"
+      },
+      "drawHeading": "Draw changes",
+      "cancelButtonLabel": "Cancel",
+      "saveButtonLabel": "Save",
+      "geometryEdit": "Edit geometry"
+    }
+  }
+}

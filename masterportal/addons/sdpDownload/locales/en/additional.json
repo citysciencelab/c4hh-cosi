@@ -1,0 +1,34 @@
+{
+  "modules": {
+    "sdpDownload": {
+      "description": "Download data tile by tile from the default data package",
+      "name": "SDP Download",
+      "selectFormat": "Which format do you like?",
+      "howToChooseTiles": "How would you like to choose the tiles?",
+      "downloadDataPackage": "Download data package",
+      "specialDownloads": "Special downloads",
+      "neuwerkDataPackage": "Neuwerk data package - please select the format above",
+      "scharhoernDataPackage": "Scharhörn data package - please select the format above",
+      "tileOverview310": "UTM tile overviews LS310",
+      "tileOverview320": "UTM tile overviews LS320",
+      "nasLabel": "NAS",
+      "nasDescription": "Download data in NAS format",
+      "dwg310Label": "DWG, location status 310 (short)",
+      "dwg310Description": "Download data in DWG format, location status: ETRS89, UTM projection",
+      "dwg320Label": "DWG, location status 320",
+      "dwg320Description": "Download data in DWG format, location status: ETRS89, Gauß-Krüger projection",
+      "jpgLabel": "JPG + JGW, situation status 310 (short)",
+      "jpgDescription": "Download data in JPG format, including JGW files in the lcoation status: ETRS89, UTM projection",
+      "pleaseSelectTiles": "Please select tiles!",
+      "tooManyTilesSelected": "The selection you made contains {{tilesCount}} tiles. You can download a maximum of  {{maxTiles}} tiles at a time. Please reduce your selection!",
+      "failedToDownload": "Unfortunately the data could not be downloaded!",
+      "details": "Details:",
+      "serviceNotResponding": "A required service is not responding.",
+      "alerts": {
+        "info": "Info",
+        "error": "Error",
+        "downloadError": "The layer: wfsRaster could not be loaded because the service is not responding. Please try again later. If the problem persists, please contact the operator of the service: wfsRaster"
+      }
+    }
+  }
+}

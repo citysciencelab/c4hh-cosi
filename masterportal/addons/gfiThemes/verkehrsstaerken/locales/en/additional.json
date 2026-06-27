@@ -1,0 +1,32 @@
+{
+    "modules": {
+        "tools": {
+            "gfi": {
+                "themes": {
+                    "verkehrsstaerken": {
+                        "kind": "Kind: {{kind}}",
+                        "table": "Table",
+                        "diagram": "Charts",
+                        "download": "Download",
+                        "DTV": "ADTV",
+                        "DTVTitle": "Average daily traffic volumes (Mon-Sun)",
+                        "DTVw": "ADTVw",
+                        "DTVwTitle": "Average weekday traffic volumes (Mon-Fri)",
+                        "carsPerDay": "ADTV (Car/24h)",
+                        "carsPerWeekday": "ADTVw (Car/24h)",
+                        "bikesPerDay": "ADTV (Bike/24h)",
+                        "bikesPerWeekday": "ADTVw (Bike/24h)",
+                        "HGVsPerWeek": "SOHF share in ADTVw (%)",
+                        "HGVsPerWeekTitle": "Share of heavy traffic in ADTVw",
+                        "constructionSiteInfluence": "Construction site influence",
+                        "withConstructionSiteInfluence": "with note",
+                        "category": "Category",
+                        "year": "Year",
+                        "note": "Note",
+                        "method": "Survey method"
+                    }
+                }
+            }
+        }
+    }
+}

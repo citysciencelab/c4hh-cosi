@@ -1,0 +1,90 @@
+{
+  "modules": {
+    "cosi": {
+        "reportingTool": {
+          "creatingReport": "Report is being created. Please wait.",
+          "reportSuccess": "The report has been successfully generated. The download will start automatically.",
+          "title": "Create report",
+          "toolInfoText": "This tool converts your current portal status directly into a structured report. All active technical data, statistics, and accessibility analyses are automatically recorded. An interactive stepper guides you through the individual chapters, where you can refine your selection for the report—including an appendix with legends and sources. For quick documentation, you can skip the detailed configuration on the first page to immediately output all portal contents in a complete document. Translated with DeepL.com (free version)",
+          "generateReport": "Complete and finish",
+          "printReport": "Download report",
+          "finishingUpReport": "Finishing up the report",
+          "infoText": "Your configuration is now complete. You can generate the final document with all selected content by clicking <strong> Download report </strong>. If you would like to make corrections to the chapters or your selection, click <strong> Back to edit view </strong> to return directly to your previous settings. If you would like to discard the current compilation and start again with the initial portal view, please select <strong> Create new report</strong>.",
+          "optionalComponents": "Optional components of the report to be exported",
+          "backToTemplate": "Back to edit view",
+          "infrastructureHint": "Note: If there are more than 10 institutions, no infrastructure data table is displayed.",
+          "generalSettings": "General",
+          "statisticalData": "Statistical data",
+          "showStatisticalData": "Show Statistical Data",
+          "hideStatisticalData": "Hide Statistical Data",
+          "subjectData": "Subject data",
+          "showSubjectData": "Show Subject Data",
+          "hideSubjectData": "Hide Subject Data",
+          "settings": "Settings",
+          "analyses": "Analyses",
+          "annex": "Annex and print",
+          "generalReportInformation": "General report information",
+          "addAdditionalInformation": "Add free text field",
+          "useMostRecentDataset": "Use most recent dataset",
+          "noLegendAvailable": "No legend available",
+          "legendLoadFailed": "Legend could not be loaded.",
+          "unknownLegendFormat": "Unknown legend format",
+          "frontPage": {
+            "withoutNeuwerk": {
+              "label": "Front page with map section"
+            },
+            "withNeuwerk": {
+              "label": "Front page with map section including Neuwerk",
+              "alert": "Neuwerk and Scharhörn are shown as separate maps."
+            },
+            "withoutFrontPage": {
+              "label": "No front page"
+            }
+          },
+          "label": {
+            "infrastructureTableLimitEnabled": "Should tables be excluded from the report if there are more than a certain number of institutions?",
+            "infrastructureTableLimit": "Maximum number of institutions to be included",
+            "headline": "Headline",
+            "freetext": "Text",
+            "selectedDistricts": "Selected Districts",
+            "title": "Title",
+            "author": "Author",
+            "frontPage": "Front Page",
+            "summedColumns": "Column name of the summed areas",
+            "selectedAreasName": "Selected Area",
+            "summariseStatisticalAreas": "Summarise areas",
+            "higherDistrictLevel": "Include the higher level of reference",
+            "statisticalAreas":"Select statistical areas",
+            "referenceYear": "Reference year",
+            "heading": "Heading",
+            "up": "Move up one position",
+            "down": "Move udown one position"
+          },
+          "alert": {
+            "noDataAlert": "There is no data available to create a report.",
+            "noStatisticalData": "There is no statistical data available for selection.",
+            "noStatisticalDataSelected": "No content has been selected. The report contains no statistical data.",
+            "noSubjectData": "There is no subject data available for selection.",
+            "noSubjectDataSelected": "No content has been selected. The report contains no subject data.",
+            "noAnalyses": "There are no analyses available for selection.",
+            "noAnalysesSelected": "No content has been selected. The report contains no analyses.",
+            "noAnnexSelected": "No content has been selected. The report contains no legend source notes.",
+            "errorDuringPrinting": "The report could not be generated. Please try again."
+          },
+           "button": {
+              "confirmAndNext": "Confirm and next",
+              "back": "back",
+              "printNow": "Skip all steps and print immediately",
+              "generateReport": "Generate report",
+              "downloadReport": "Download report",
+              "backToEditView": "Back to edit view",
+              "createNewReport": "Create new report"
+            },
+          "errors": {
+            "invalidReportTitle": "A maximum of {{reportTitleMaxLength}} characters are allowed",
+            "invalidSelectedAreasName": "A maximum of {{selectedAreasNameMaxLength}} characters are allowed"
+          }
+        }
+    }
+  }
+}

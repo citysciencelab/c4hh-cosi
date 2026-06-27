@@ -1,0 +1,52 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "dipasProjects": {
+                    "title": "DIPAS Projects",
+                    "summary": "With the help of the DIPAS tool you can visualize the contributions to DIPAS projects on the map.",
+                    "projectsHeadline": "All projects",
+                    "showProject": "Show project on the map",
+                    "showAllContributions": "View all posts",
+                    "contributionsHeadline": "All constributions",
+                    "categories": "Categories",
+                    "created": "Created on: ",
+                    "contributionType": "Contribution type",
+                    "numberOfComments": "Number of comments",
+                    "positiveVotes": "Positive votes",
+                    "negativeVotes": "Negative votes",
+                    "viewOriginalPost": "Open the original post",
+                    "backToProjects": "Back to projects",
+                    "noContributions": "There are no contributions.",
+                    "numberOfContribution": "There are {{ count }} contributions.",
+                    "owner": "Owner",
+                    "projectDescription": "Project description",
+                    "frozen": "frozen",
+                    "dormant": "dormant",
+                    "active": "active",
+                    "ascending": "Date: Ascending",
+                    "descending": "Date: Descending",
+                    "loading": "Loading projects...",
+                    "showContributions": "Show contributions on the map",
+                    "showHeatmap": "Show heatmap on the map",
+                    "styling": {
+                        "label": "Styling of the contributions:",
+                        "byProject": "by project",
+                        "byCategories": "by categories in project color spectrum",
+                        "byCategoriesRainbow": "by categories in rainbow spectrum",
+                        "byVoting": "by voting"
+                    },
+                    "contributions": "contributions",
+                    "zoomToProject": "Zoom to project area",
+                    "download": {
+                        "title": "Download results as geodata (GeoJSON)"
+                    },
+                    "polling": {
+                        "label": "Automatic Update",
+                        "help": "Load new contributions automatically."
+                    }
+                }
+            }
+        }
+    }
+}

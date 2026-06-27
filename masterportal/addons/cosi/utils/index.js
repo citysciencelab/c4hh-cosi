@@ -1,0 +1,45 @@
+import unifyString from "./unifyString";
+import getBoundingGeometry from "./getBoundingGeometry";
+import {calculateExtent} from "./features/calculateExtent";
+import calculateRatio from "./calculateRatio";
+import {setBBoxToGeom} from "./setBBoxToGeom";
+import {downloadBlobToFile} from "./downloadBlobToFile";
+import exportXlsx from "./exportXlsx";
+import getAvailableYears, {getLastAvailableYear} from "./getAvailableYears";
+import compensateLackingData from "./compensateLackingData";
+import intersect from "./array/intersect";
+import isEqual from "./array/isEqual";
+import describeFeatureTypeByLayerId from "./describeFeatureType";
+import downloadUtils from "./download";
+import geomUtils from "./geomUtils";
+import math from "./math";
+import {replaceValues} from "./modifyObject";
+import {getTimestamps, getTimestampRange} from "./timeline";
+import translateFeature from "./translateFeature";
+
+
+/**
+ * @description Bundles the CoSI Utils into one export
+ */
+export default {
+    unifyString,
+    getBoundingGeometry,
+    compensateLackingData,
+    calculateExtent,
+    calculateRatio,
+    setBBoxToGeom,
+    downloadBlobToFile,
+    exportXlsx,
+    getAvailableYears,
+    getLastAvailableYear,
+    intersect,
+    isEqual,
+    describeFeatureTypeByLayerId,
+    getTimestamps,
+    getTimestampRange,
+    replaceValues,
+    translateFeature,
+    math,
+    downloadUtils,
+    geomUtils
+};

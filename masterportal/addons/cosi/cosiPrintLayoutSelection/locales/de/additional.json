@@ -1,0 +1,12 @@
+{
+    "modules": {
+        "vueComponents": {
+            "cosiPrintLayoutSelection": {
+                "layoutVariant": "Art des Layouts",
+                "orientation": "Ausrichtung",
+                "pageSize": "DIN-Format",
+                "infoText": "Das einfache Layout enthält die Felder Titel, Untertitel und Ersteller. Das umfangreiche Layout umfasst darüber hinaus ein Freitextfeld für individuelle Ergänzungen sowie die Darstellung von Quellen."
+            }
+        }
+    }
+}

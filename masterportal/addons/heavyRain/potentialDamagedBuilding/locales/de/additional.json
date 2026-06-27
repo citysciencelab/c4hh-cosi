@@ -1,0 +1,50 @@
+{
+  "modules": {
+    "potentialDamagedBuilding": {
+      "title": "Schadenpotenzial Gebäude",
+      "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "headline": {
+         "buildingAttributes": "Gebäude - Attribute",
+         "buildingOverview": "Übersicht",
+         "updateData": "Daten aktualisieren - ",
+         "adjustedDamagePotentialClass": "Angepasste Schadenpotenzialklasse",
+         "lastUpdated": "Angepasstes Änderungsdatum",
+         "comment": "Kommentar",
+         "potentialDamagedInformation": "Informationen zum Schadenpotenzial - ",
+         "potentialDamagedClass": "Schadenpotenzialklasse",
+         "buildingFunction": "Gebäudefunktion",
+         "additionalBuildingFunction": "weitere Gebäudefunktion",
+         "additionalInformation": "weitere Informationen"
+      },
+      "label": {
+        "potentialDamagedClassCount": "bei diesem Gebäude wird das aktuelle Schadenspotenzial eingeschätzt auf eine",
+        "potentialDamagedClassUpdate": "die letzte Aktualisierung erfolgte am",
+        "potentialDamagedClassDerive": "ALKIS-basiert abgeleitet",
+        "potentialDamagedClassLastEntry": "die letzte Eingabe der angepassten Schadenpotenzialklasse ist",
+        "buildingKey": "der Gebäudeschlüssel aus ALKIS ist",
+        "builingFunction": "der Gebäudeschlüssel aus ALKIS ist",
+        "additionalBuilingKey": "der weitere Gebäudeschlüssel aus ALKIS ist",
+        "additionalBuilingFunction": "der weitere Gebäudeschlüssel aus ALKIS ist",
+        "earthSurface": "die Lage zur Erdoberfläche nach ALKIS ist",
+        "buildingConstructionType": "die Bauart des Gebäudes nach ALKIS ist",
+        "basementLevels": "die Anzahl der Untergeschosse des Gebäudes ist"
+      },
+       "popover": {
+        "damagePotentialClass": "Aktuell in der Berechnung der Risikoanalyse verwendete Schadenspotenzialklasse. Diese Angabe kann von der angepassten Schadenspotenzialklasse abweichen, wenn das Änderungsdatum (SK_anpDatum) jünger ist als das Aktualisierungsdatum.",
+        "updateDate": "Aktualisierungsdatum der Schadenspotenzialklasse für die aktuellsten Berechnungen der Risikoanalyse.",
+        "damagePotentialClassALKIS": "Hier wird die Schadenpotenzialklasse entsprechend der Methode im Anhang B unter Verwendung der ALKIS-Daten aufgeführt.",
+        "buildingKey": "Als Gebäudefunktion wird die zum Zeitpunkt der Erhebung der ALKIS-Daten vorherrschende funktionialen Nutzung des Gebäudes definiert.",
+        "additionalBuildingFunction": "Neben der funktionalen Nutzung können weitere Nutzungen vorliegen, die in der Schadenpotenzialklassen-Zuordnung einbezogen werden.",
+        "earthSurface": "Bei Objekten unter der Erdoberfläche ist dies entsprechend gekennzeichnet.",
+        "buildingConstructionType": "Bezeichnung des Bauteils. Bei der Bezeichnung sind insbesondere Keller gesondert aufgeführt.",
+        "basementLevels": "Hier wird angegeben, ob und wie viele Untergeschosse vorliegen."
+      },
+     "damagePotentialClass": "Schadenspotenzialklasse",
+     "adjustedDamagePotentialClassHint": "Die letzte Eingabe der ortsspezifischer Werte pro Objekt oder Fläche.",
+      "lastUpdatedHint": "Die letzte Anpassung wurde vorgenommen am: ",
+      "commentHint": "Angabe der zuständigen Dienststelle mit ggf. weiteren Erläuterungen",
+      "reset": "Zurücksetzen",
+      "save": "Speichern"
+    }
+  }
+}

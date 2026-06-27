@@ -1,0 +1,27 @@
+{
+  "modules": {
+    "updateRequirements": {
+      "title": "Aktualisierungsbedarfe",
+      "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "reportInfoHeading": "Informationen zur Meldung",
+      "createMessage": "Neue Meldung erstellen",
+      "createFormTitle": "Meldung erfassen",
+      "createNewDescriptionFirst": "Um eine neue Meldung zu erstellen, zeichnen Sie bitte zunächst das betroffene Gebiet als Fläche (Polygon) auf der Karte ein. Im Anschluss können Sie im Formular die zugehörigen Informationen eintragen und die Meldung speichern.",
+      "createNewDescriptionSecond": "So helfen Sie mit, Hinweise, Änderungen oder Fehler in der Karte zu melden.",
+      "form": {
+        "name": "Name",
+        "initiator": "Initiator",
+        "typeOptional": "Art der Angabe (optional)",
+        "contact": "Ansprechpartner",
+        "commentOptional": "Kommentar/ Beschreibung (optional)",
+        "infolinkOptional": "Infolink (optional)",
+        "uploadOptional": "Bild hochladen (optional)",
+        "pleaseSelect": "Bitte wählen"
+      },
+      "drawHeading": "Änderungen einzeichnen",
+      "cancelButtonLabel": "Vorgang abbrechen",
+      "saveButtonLabel": "Meldung speichern",
+      "geometryEdit": "Geometrie bearbeiten"
+    }
+  }
+}

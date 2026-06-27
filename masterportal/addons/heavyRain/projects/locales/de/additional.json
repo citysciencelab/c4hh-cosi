@@ -1,0 +1,45 @@
+{
+  "modules": {
+    "projects": {
+      "infoTitle": "Informationen zum Starkregenprojekt",
+      "title": "Starkregenprojekte",
+      "description": "Verwalten und zeichnen Sie Projekte zum Schutz vor Starkregenereignissen ein.",
+      "createProject": "Neues Projekt anlegen",
+      "editProject": "Projekt bearbeiten",
+      "cancelButtonLabel": "Vorgang abbrechen",
+      "saveButtonLabel": "Projekt speichern",
+      "drawTitle": "Objekt einzeichnen",
+      "detailsTitle": "Projektangaben hinzufügen",
+      "detailsDescription": "Bitte füllen Sie die folgenden Felder aus, um das Projekt zu beschreiben.",
+      "noProjects": "Noch keine Projekte vorhanden.",
+      "editAriaLabel": "Projekt bearbeiten",
+      "messages": {
+        "noGeometry": "Keine Geometrie für dieses Projekt hinterlegt.",
+        "geometryError": "Fehler beim Verarbeiten der Geometrie.",
+        "drawFirst": "Bitte zeichnen Sie erst ein Objekt auf der Karte!",
+        "nameRequired": "Bitte geben Sie einen Projektnamen ein!",
+        "saveSuccess": "Das neue Projekt wurde erfolgreich gespeichert!",
+        "updateSuccess": "Das Projekt wurde erfolgreich aktualisiert!"
+      },
+      "labels": {
+        "projectName": "Projektname",
+        "criteria": "Kriterien",
+        "createdBy": "Eingetragen von",
+        "startDate": "Baubeginn",
+        "endDate": "Bauende",
+        "source": "Quelle",
+        "contact": "Ansprechpartner",
+        "contactExt": "Kontakt extern",
+        "infolink": "Infolink",
+        "history": "Historie - Zeitpunkt und Meldungen",
+        "description": "Kurzbeschreibung / Art der Maßnahme",
+        "protectedAreas": "Bereiche, wo die Kriterien des Schutzniveau erreicht sind",
+        "fileUpload": "Datei hochladen (optional)",
+        "lastUpdate": "Aktualisierung"
+      }
+    },
+    "snackbar": {
+      "close": "Schließen"
+    }
+  }
+}

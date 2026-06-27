@@ -1,0 +1,142 @@
+{
+  "modules": {
+    "tools": {
+      "vpidashboard": {
+        "name": "VPI Dashboard",
+        "tabitems": {
+          "visitors": "Visitors",
+          "gender": "Genders",
+          "age": "Age Groups",
+          "origins": "Origins",
+          "distance": "Distance",
+          "compare": "Locations Comparison",
+          "info": "Informations",
+          "compare_dates": "Time Stamp Comparison",
+          "heatmap": "Heatmap"
+        },
+        "time": {
+          "months": [
+            "January",
+            "February",
+            "March",
+            "April",
+            "May",
+            "June",
+            "July",
+            "August",
+            "September",
+            "October",
+            "November",
+            "December"
+          ],
+          "days": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ]
+        },
+        "details": "Details",
+        "unique": {
+          "uniqueVisitors": "Visitors",
+          "dailyOverview": "Average of daily visitors in {{ month }} in {{ year }}",
+          "monthlyOverview": "Number of monthly visitors in {{ year }}",
+          "hourly": "Visitors on a defined period of time (hourly)",
+          "daily": "Visitors on a defined period of time (daily)",
+          "selectDate": "Please choose a date:",
+          "selectDateRange": "Please choose a date range:",
+          "selectedDateRange": "Daily visitors in the selected period",
+          "noValidDate": "No valid date / date range chosen",
+          "numberVisitorsHour": "Number of visitors per hour",
+          "numberVisitorsDay": "Number of visitors per day",
+          "chartTitleDay": "Data from {{dayName}}, {{dateValue}}",
+          "chartTitleDayRange": "Data from {{dateValueFrom}} to {{dateValueTo}}",
+          "avgVisitorsYear": "Total visits per year",
+          "avgVisitorsDay": "Ø visitors in {{ month }} {{ year }} on a",
+          "avgVisitorsMonth": "Number of visitors per month in {{ year }}",
+          "selectDataBase": "Choose base data for the graphic:",
+          "date": "Date",
+          "resetDate": "choose another date",
+          "noData": "(no data available)",
+          "days": "Days",
+          "months": "Months"
+        },
+        "compare": {
+          "selectLocationB": "Please choose a second location above or on the map"
+        },
+        "tab": {
+          "noData": "(no data yet available)",
+          "visitors": {
+            "mondayToSaturday": "Mo - Sa",
+            "sunday": "Su"
+          },
+          "gender": {
+            "chartTitle": "Gender structure in % per year",
+            "lineBarChartTitle": "Ø weekly gender structure per visitor per month in year {{year}}",
+            "male": "Male",
+            "female": "Female"
+          },
+          "origins": {
+            "hamburger": "Hamburger",
+            "pendler": "Commuters",
+            "touristen": "Tourists",
+            "chartTitle": "Ø weekly visitors per month",
+            "chartLabels": {
+              "residents": "Hamburger",
+              "commuters": "Commuters",
+              "overnightLocations": "Visitors per day and cities (cities / counties) (Top 10)*",
+              "numberVisitorsDayPostalCode": "Visitors per day and postal code / districts (Top 10)*",
+              "roamer": "Visitors international (Top 10)"
+            },
+            "cardLabels": {
+              "residentsPerWeek": "Ø Hamburger per week",
+              "commutersPerWeek": "Ø Commuters per week",
+              "touristsPerWeek": "Ø Tourists per week"
+            },
+            "footnote": {
+              "plz": "(*) Incl. overnight guests at the place of origin, postcode areas do not correspond to the district boundaries and may consist of several districts.",
+              "overnight": "Overnight locations: Hamburg residents and overnight guests in Hamburg, as well as day visitors and commuters outside Hamburg.",
+              "hamburger": "Includes overnight guests in Hamburg.",
+              "pendler": "Visitors from the metropolitan region.",
+              "touristen": "Visitors from Germany."
+            },
+            "highestValue": "highest value",
+            "otherValues": "other values"
+          },
+          "ageGroup": {
+            "chartTitle": "Age group in % per year (*)",
+            "pieChartTitle": "Age groups by year",
+            "footnote": "(*) People under 18 years are not displayed."
+          },
+          "compare": {
+            "dropdown": {
+              "gender": "Ø weekly gender structure per visitor",
+              "agegroup": "Ø weekly visitors per age group",
+              "visitortypes": "Ø weekly visitor types"
+            }
+          },
+          "heatmap": {
+            "headline": "Please choose the heatmap layer which shall be activated:",
+            "hourly": "Hourly",
+            "daily": "Daily",
+            "footnote": [
+              "In the map, the visitors of a day or an hour are displayed as a heatmap for all 124 grid cells of the city center.",
+              "red grid cell = high visitor volume,",
+              "white grid cell = low visitor volume.",
+              "Using the control console on the map, values for any given time can be selected with the arrow keys or the slider.",
+              "By selecting a grid cell, the daily and hourly values can also be displayed individually in the window on the right side."
+            ]
+          }
+        },
+        "locationSelectMenu": {
+          "menuPlaceholder": "Choose a location",
+          "firstLabel": "Location",
+          "secondLabel": "Location B"
+        }
+      }
+    }
+  }
+}

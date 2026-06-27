@@ -1,0 +1,65 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "dashboard": {
+                    "alertMessageNoData": "No areas have been selected yet. To display statistical data, please select at least one area. To do so, use the ‘Select area’ function.",
+                    "title": "Statistical Dashboard",
+                    "avgCol": "Average",
+                    "totalCol": "Total",
+                    "groupCol": "Group",
+                    "category": "Category",
+                    "dietailView": "View in detail",
+                    "timestamp": "Years",
+                    "year": "Year",
+                    "addFilter": "Add filter",
+                    "resetFilter": "reset",
+                    "closeFilter": "Close",
+                    "activeFilters": "Active filters",
+                    "search": "Search Table",
+                    "showLessFilters": "....show less",
+                    "showAllFilters": "....show more",
+                    "exportTable": "Export table",
+                    "exportTableTimeline": "Export all years",
+                    "exportFilename": "{{prefix}}_Dashboard-Table",
+                    "modifiedTooltip": "This datum has been altered by simulations",
+                    "moveColLeft": "Move column to the left",
+                    "moveColRight": "Move column to the right",
+                    "minimizeCol": "Hide column",
+                    "createCalc": "Create calculation",
+                    "nameCalc": "Name of the calculation",
+                    "datasetLabel": "Data set",
+                    "titleForCalculatedStatistic": "The values marked in red are calculated automatically",
+                    "tableDataParsingError": "An error occurred while reading the data",
+                    "calculationHint": "You can find the result at the bottom of the table in the category group Berechnungen",
+                    "startAnimation": "Start map animation",
+                    "stopAnimation": "Stop map animation",
+                    "tableRowMenu": {
+                        "expandTooltip": "Show/Hide all years",
+                        "visualize": "Show on the map",
+                        "visualizeTooltip": "Toggle map visualization on/off",
+                        "animate": "Animate over time",
+                        "districtName": "Show/Hide district names",
+                        "selection": "Selection",
+                        "selectA": "Set as field 'A'",
+                        "selectB": "Set as field 'B'",
+                        "cancelSelection": "Cancel selection",
+                        "calculate": "Calculate",
+                        "operation": "Operation",
+                        "add": "Add",
+                        "subtract": "Subtract",
+                        "multiply": "Multiply",
+                        "divide": "Divide",
+                        "dividePercent": "Share in percent",
+                        "sumUpSelected": "Sum up selected",
+                        "divideSelected": "Divide selected (each / B)",
+                        "charts": "Charts",
+                        "standardCharts": "Create bar- / line- / pie chart",
+                        "chartForMultipleRows": "Chart for selected rows",
+                        "correlationChart": "Create correlation / scatter chart"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,294 @@
+<script>
+import {mapMutations, mapGetters, mapActions} from "vuex";
+import SectionHeader from "../SectionHeader.vue";
+import JobExecutionInput from "./JobExecutionInput.vue";
+import AsyncWrapper from "../AsyncWrapper.vue";
+import ProcessSelect from "../Process/ProcessSelect.vue";
+
+export default {
+    name: "JobExecution",
+    components: {
+        AsyncWrapper,
+        SectionHeader,
+        ProcessSelect,
+        JobExecutionInput
+    },
+    data () {
+        return {
+            process: null,
+            executionValues: {},
+            requestState: {
+                loading: false,
+                error: null
+            },
+            executionRequestState: {
+                loading: false,
+                error: null
+            }
+        };
+    },
+    computed: {
+        ...mapGetters("Modules/SimulationTool", [
+            "selectedProcessId",
+            "simulationApiUrl"
+        ]),
+        ...mapGetters("Modules/Login", [
+            "accessToken",
+            "loggedIn"
+        ])
+    },
+    watch: {
+        selectedProcessId: function (newProcessId) {
+            if (newProcessId === null) {
+                this.process = null;
+                return;
+            }
+            this.fetchProcess(newProcessId);
+        }
+    },
+    mounted: function () {
+        if (this.selectedProcessId) {
+            this.fetchProcess(this.selectedProcessId);
+        }
+    },
+    methods: {
+        ...mapMutations("Modules/SimulationTool", [
+            "setSelectedJobId",
+            "setSelectedProcessId",
+            "setMode"
+        ]),
+        ...mapActions("Modules/SimulationTool", [
+            "fetchJobs"
+        ]),
+        /**
+         * Fetches a process from the simulation backend
+         * @param {String} processId
+         */
+        async fetchProcess (processId) {
+            let additionalHeaders = {};
+
+            if (this.loggedIn) {
+                additionalHeaders = {
+                    Authorization: `Bearer ${this.accessToken}`
+                };
+            }
+
+            try {
+                this.requestState.loading = true;
+                const response = await fetch(`${this.simulationApiUrl}/processes/${processId}`, {
+                        headers: {
+                            "Content-Type": "application/json",
+                            ...additionalHeaders
+                        }
+                    }),
+                    result = await response.json();
+
+                if (!response.ok) {
+                    this.requestState.error = result.error_message || response.status + ": unknown errror";
+                }
+                else {
+                    this.process = result;
+                    this.setDefaultExecutionValues(result);
+                }
+            }
+            catch (error) {
+                this.requestState.error = error;
+            }
+            finally {
+                this.requestState.loading = false;
+            }
+        },
+        setDefaultExecutionValues (result) {
+            this.executionValues = {};
+            Object.entries(result.inputs).forEach(([key, input]) => {
+                let defaultValue;
+
+                if (input.schema.default) {
+                    defaultValue = input.schema.default;
+                }
+                else if (input.schema.type === "boolean") {
+                    const required = input.schema.required || input.required || input.minOccurs > 0;
+
+                    if (required) {
+                        defaultValue = false;
+                    }
+                }
+                if (defaultValue) {
+                    this.executionValues[key] = defaultValue;
+                }
+            });
+            // if no default values are set check if there are example values
+            if (
+                Object.values(this.executionValues).length === 0 &&
+                Object.values(result.example.inputs).length > 0
+            ) {
+                this.executionValues = result.example.inputs;
+            }
+        },
+        updateExecutionValue (key, value) {
+            this.executionValues[key] = value;
+        },
+        resetExecutionValues (newInputsConfig = this.process.inputs) {
+            this.executionValues = {};
+            Object.entries(newInputsConfig).forEach(([key, input]) => {
+                if (input.schema.type === "array") {
+                    this.executionValues[key] = [""];
+                }
+            });
+        },
+        async execute (event) {
+            event.preventDefault();
+
+            const formIsValid = this.$refs.form.reportValidity();
+
+            if (formIsValid) {
+                const {
+                    job_name,
+                    ...inputs
+                } = this.executionValues;
+
+                let additionalHeaders = {};
+
+                if (this.loggedIn) {
+                    additionalHeaders = {
+                        Authorization: `Bearer ${this.accessToken}`
+                    };
+                }
+
+                try {
+                    this.executionRequestState.loading = true;
+                    const response = await fetch(`${this.simulationApiUrl}/processes/${this.selectedProcessId}/execution`, {
+                            method: "POST",
+                            body: JSON.stringify({
+                                job_name,
+                                inputs
+                            }),
+                            headers: {
+                                "Content-Type": "application/json",
+                                ...additionalHeaders
+                            }
+                        }),
+                        result = await response.json();
+
+                    if (!response.ok) {
+                        this.executionRequestState.error = result.error_message || response.status + ": unknown error";
+                    }
+                    else {
+                        this.resetExecutionValues();
+
+                        this.setMode("job-details");
+                        this.setSelectedJobId(result.jobID);
+                        if (!this.loggedIn && !localStorage.getItem("jobs")) {
+                            localStorage.setItem("jobs", result.jobID);
+                        }
+                        else if (!this.loggedIn) {
+                            localStorage.setItem("jobs", `${localStorage.getItem("jobs")},${result.jobID}`);
+                        }
+
+                        this.fetchJobs();
+                    }
+
+                }
+                catch (error) {
+                    this.executionRequestState.error = error;
+                }
+                finally {
+                    this.executionRequestState.loading = false;
+                }
+
+            }
+        }
+    }
+};
+</script>
+
+<template>
+    <div class="job-execution">
+        <SectionHeader
+            :title="$t('additional:modules.tools.simulationTool.newScenario')"
+            icon="bi-box-fill"
+        />
+        <h3>{{ $t('additional:modules.tools.simulationTool.model') }}: {{ process?.title }}</h3>
+        <ProcessSelect
+            v-if="!process"
+            @update:modelValue="(selectedProcessess) => {
+                setSelectedProcessId(selectedProcessess[0]?.id);
+            }"
+        />
+        <AsyncWrapper :async-state="requestState">
+            <form
+                ref="form"
+                class="execution-form"
+            >
+                <label for="name_input">{{ $t('additional:modules.tools.simulationTool.scenarioName') }}:</label>
+                <input
+                    id="name_input"
+                    v-model="executionValues.job_name"
+                    class="form-control"
+                    type="text"
+                    required
+                >
+                <h4>{{ $t('additional:modules.tools.simulationTool.inputParameters') }}</h4>
+                <div
+                    v-if="process"
+                    class="inputs"
+                >
+                    <template
+                        v-for="(input, key) in process.inputs"
+                        :key="`label_${key}`"
+                    >
+                        <label
+                            :title="input.description"
+                            :for="`input_${key}`"
+                        >
+                            {{ input.title }}:
+                        </label>
+                        <JobExecutionInput
+                            :input-key="key"
+                            :data="input"
+                            :value="executionValues[key]"
+                            @change="updateExecutionValue(key, $event)"
+                        />
+                    </template>
+                </div>
+
+                <AsyncWrapper :async-state="executionRequestState" />
+                <button
+                    class="btn btn-primary btn-lg"
+                    type="submit"
+                    @click="execute"
+                >
+                    <i class="bi bi-box-fill">&nbsp;</i>
+                    {{ $t('additional:modules.tools.simulationTool.executeScenario') }}
+                </button>
+            </form>
+        </AsyncWrapper>
+    </div>
+</template>
+
+<style lang="scss" scoped>
+    .job-execution {
+        max-height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+
+        .execution-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow: hidden;
+
+            .inputs {
+                display: flex;
+                flex-direction: column;
+                gap: 1rem;
+                overflow: auto;
+            }
+
+            button {
+                align-self: flex-end;
+            }
+        }
+    }
+</style>

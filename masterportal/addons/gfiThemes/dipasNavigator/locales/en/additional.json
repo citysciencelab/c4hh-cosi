@@ -1,0 +1,14 @@
+{
+    "addons": {
+        "gfiThemes": {
+            "dipasNavigator": {
+                "themes": "Themes",
+                "initiators": "Sender/s",
+                "contributions": "Contributions",
+                "comments": "Comments",
+                "documentation": "Documentation",
+                "range": "Duration"
+            }
+        }
+    }
+}

@@ -1,0 +1,30 @@
+{
+  "modules": {
+    "floodRiskManagement": {
+      "alertMessage": "The maximum number of parallel printouts has been exceeded.<br>Please try again once the creation of other printouts is complete.",
+      "button":{
+        "applyLabel": "Apply settings",
+        "downloadLabel": "Download",
+        "printLabel": "Create File"
+      },
+      "cycle": ". Cycle",
+      "description": "Flood hazard maps and flood risk maps",
+      "headline": {
+        "cycle": "Cycle",
+        "floodEvent": "Flood event",
+        "frequencyFloodEvents": "Frequency of flood events",
+        "mapType": "Map type"
+      },
+      "hintInfoScale": "If the selected print scale differs from the scale in the map window, can this lead to a different map layout in print.",
+      "information": "Information",
+      "informationText": "Different events and map types can be selected in this tool. The print function is used to create a pdf of the desired map in the selected map section and make it available for download. The selection in the print menu also controls the activation of the individual layers in the theme tree. Independently of this, the selection of layers in the theme tree can also be controlled individually. However, only the preconfigured, official hazard and risk maps are ever printed. Translated with DeepL.com (free version)",
+      "label": {
+        "autoAdjustScale": "Automatically adjust print scale",
+        "scaleLabel": "Printing scale"
+      },
+      "mapInformation": "Both maps show the structural flood protection facilities (e.g. dykes, private polders and flood protection walls) and their effect.",
+      "subtitle": "Flood hazard maps and flood risk maps",
+      "title": "Print map"
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+    "modules": {
+        "tools": {
+            "gfi": {
+                "themes":{
+                    "trafficCount": {
+                        "infoLabel": "Info",
+                        "dayLabel": "Tag",
+                        "weekLabel": "Woche",
+                        "yearLabel": "Jahr",
+                        "period": "Zeitraum",
+                        "number": "Anzahl",
+                        "totalSince": "Insgesamt seit",
+                        "sinceBeginningOfTheYear": "Seit Jahresbeginn",
+                        "overThePastYear": "Im Vorjahr",
+                        "onThePreviousDay": "Am Vortag",
+                        "workingDayAverage": "Mittlerer Werktag seit",
+                        "highestDay": "Stärkster Tag im Jahr",
+                        "highestWeek": "Stärkste Woche im Jahr",
+                        "highestMonth": "Stärkster Monat im Jahr",
+                        "dateLabel": "Datum",
+                        "clockLabel": "Uhr",
+                        "tableLabel": "Tabelle",
+                        "tableTitleDay": "Datum",
+                        "tableTitleWeek": "Woche",
+                        "tableTitleYear": "Jahr",
+                        "notice": "Aufgrund nicht verfügbarer Daten können Lücken im Diagramm und leere Tabellenzellen auftreten.",
+                        "lastupdateLabel": "Letzte Aktualisierung:",
+                        "autoUpdateNote": "Daten werden nicht automatisch aktualisiert.",
+                        "diagramLabel": "Diagramm",
+                        "calendarweek": "KW",
+                        "infraredsensor": "Infrarotsensor",
+                        "inductionLoop": "Induktionsschleife",
+                        "carLabel": "Kfz",
+                        "bicycleLabel": "Fahrrad",
+                        "heavyTrafficLabel": "Schwerverkehr",
+                        "idLabel": "ID:",
+                        "typeLabel": "Art: ",
+                        "meansOfTransportLabel": "Verkehrsmittel: ",
+                        "directionLabel": "Richtung:",
+                        "directionBoth": "beide",
+                        "carsHeaderSuffix": "Anzahl Kfz",
+                        "trucksHeaderSuffix": "Anzahl SV **",
+                        "yAxisTextDay": "Anzahl / {{minutes}} Min.",
+                        "yAxisTextWeek": "Anzahl / Tag",
+                        "yAxisTextYear": "Anzahl / Woche",
+                        "reset": "zurücksetzen",
+                        "holidaySign": "Feiertagseinfluss",
+                        "trucksStatus": "** SV-Anzahl (Beta-Status)",
+                        "downloads": "Downloads",
+                        "downloadsAll": "Alles herunterladen",
+                        "downloadsMin": "Intervall: 15 Minuten",
+                        "downloadsHour": "Intervall: 1 Stunde",
+                        "downloadsDay": "Intervall: 1 Tag",
+                        "downloadsWeek": "Intervall: 1 Woche",
+                        "error": {
+                            "dataNotAvailableA": "(nicht",
+                            "dataNotAvailableB": "empfangen)",
+                            "apiFunction": "Der Wert für \"{{category}}\" wurde wegen eines API-Fehlers nicht empfangen.",
+                            "apiGeneral": "Die gewünschten Daten wurden wegen eines API-Fehlers nicht korrekt empfangen.",
+                            "subscribeLastUpdate": "Das vom Sensor-Server erhaltene Datum der letzten Aktualisierung kann wegen eines API-Fehlers nicht ausgegeben werden."
+                        },
+                        "datepicker": {
+                            "months": ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"],
+                            "monthsShort": ["Jan", "Feb", "März", "Apr", "Mai", "Juni", "Juli", "Aug", "Sep", "Okt", "Nov", "Dez"],
+                            "weekdays": ["Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"],
+                            "weekdaysShort": ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+                        },
+                        "heavyTraffic": "(Schwerverkehr)",
+                        "totalTraffic": "(Kfz gesamt)",
+                        "isHeavyTrafficAvailableDesc": "Schwerverkehr vorhanden",
+                        "available": "Ja",
+                        "inavailable": "Nein"
+                    }
+                }
+            }
+        }
+    }
+}

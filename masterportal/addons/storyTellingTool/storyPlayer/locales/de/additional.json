@@ -1,0 +1,19 @@
+{
+    "modules": {
+        "storyPlayer": {
+            "name": "Story Wiedergabe",
+            "description": "Bitte eine Beschreibung einfügen.",
+            "tableOfContents": "Inhaltsverzeichnis",
+            "dipasPlayer": {
+              "closeTOC": "Inhaltsverzeichnis schließen",
+              "goToPrevStep": "Gehe zum vorherigen Schritt",
+              "goToNextStep": "Gehe zum nächsten Schritt",
+              "toggleTOC": "Öffne bzw. schließe das Inhaltsverzeichnis",
+              "openStoriesOverview": "Öffne die Übersicht aller Stories",
+              "screenToSmallMessage": "DIPAS_stories ist für diese Bildschirmgröße noch nicht optimiert. Bitte nach Möglichkeit einen größeren Bildschirm nutzen!",
+               "mobilePortraitMessage": "Nutzung im Querformat empfohlen."
+            },
+           "noPlayerAvailable": "Es ist kein vorhandener Story Player in displayType konfiguriert. Bitte füge einen gültigen Story Player hinzu, um die Story Widergabe zu nutzen."
+        }
+    }
+}

@@ -1,0 +1,53 @@
+
+  {
+    "modules": {
+        "tools": {
+            "cosi": {
+                "calculateRatio": {
+                    "title": "Versorgungsanalyse",
+                    "description": "Mit der Versorgungsanalyse können Sie die Abdeckung eines Gebietes mit einem bestimmten Einrichtungstyp / Infrastruktur ermitteln (s. 'Themen'). Sie können durch einen Klick auf 'Einrichtungen' auch mehrere statistische Werte verrechnen.",
+                    "subjectData": "Fachdaten",
+                    "statData": "Statistische Daten",
+                    "warningNoData": "Bisher wurden weder Gebiete noch Fachdaten ausgewählt. Wählen Sie bitte mindestens ein Gebiet und/oder Fachdatensatz aus. Um Gebiete auszuwählen, verwenden Sie die Funktion 'Gebiet auswählen'. Fachdaten können Sie auf der linken Seite unter 'Themen hinzufügen' auswählen.",
+                    "noFeaturesWarning": "Sie haben keine Gebiete als Grundlage für statistische Daten ausgewählt. Bitte laden Sie zuerst einige Gebiete über die Gebietsauswahl.",
+                    "noFacilitiesWarning": "Sie haben keine Themengebiete als Grundlage für Einrichtungsdaten ausgewählt. Bitte wählen Sie zuerst die gewünschten Themengebiete über das Hauptmenü aus.",
+                    "placeholderA": "Paramenter (Zähler) auswählen",
+                    "placeholderB": "Referenzwert (Nenner) auswählen",
+                    "noData": "Im Suchradius wurden leider keine Daten für den ausgewählten Einrichtungsparameter gefunden. Bitte wechseln Sie den Parameter oder erweitern Sie Ihre Gebietsauswahl.",
+                    "addedSelection": "Aufsummierte Auswahl",
+                    "visualizeMap": "Ausgewählten Datensatz auf Karte visualisieren",
+                    "visualizeChart": "Graph aus Datensatz erzeugen",
+                    "downloadOptions": "Download: Daten/Tabelle",
+                    "downloadGeoJson": "Download GeoJSON",
+                    "downloadGeoJsonTooltip": "Ergebnisse als Geodaten (GeoJSON) herunterladen",
+                    "downloadXlsx": "Download XLS",
+                    "downloadXlsxTooltip": "Ergebnisse als XLS herunterladen",
+                    "paginationPrev": "Vorherige Versorgungsanalyse auswählen",
+                    "paginationNext": "Nächste Versorgungsanalyse auswählen",
+                    "paginationDownloadAll": "Alle vorhandenen Versorgungsanalysen als XLS und GeoJson herunterladen",
+                    "paginationRemove": "Die ausgewählte Versorungsanalyse löschen",
+                    "paginationRemoveAll": "Alle Versorgungsanalysen im Werkzeug löschen",
+                    "calculate": "Berechnen",
+                    "calculateTooltip": "Datensätze berechnen",
+                    "reset": "Zurücksetzen",
+                    "resetTooltip": "Alle Eingaben zurücksetzen",
+                    "swapFields": "Datenfelder A und B tauschen",
+                    "addFactor": "Faktor (F) hinzufügen",
+                    "addFactorTooltip": "Fügen Sie einen Verrechnungsfaktor hinzu. Dieser Faktor wird in die Bedarfs- und Kapazitätsberechnung mit einkalkuliert. Wählen Sie beispielsweise einen Faktor von 0,1 bedeutet das, dass eine Entität des ausgewählten Themas pro 10 Entitäten der Vergleichsgruppe benötigt würde.",
+                    "switchFieldType": "Statistische Daten / Einrichtungsdaten wechseln",
+                    "calcPer": "berechnen pro",
+                    "ofData": "der Datengrundlage",
+                    "infoTooltip": "Werkzeuginformationen",
+                    "calculatedAnalyses": "Berechnete Versorgungsanalysen",
+                    "chart": "Diagramm",
+                    "factor": "Faktor",
+                    "parameter": "Parameter",
+                    "table": "Tabelle",
+                    "year": "Jahr",
+                    "yearsForStatisticalData": "Jahre für statistische Daten",
+                    "calculationType": "Berechnungsart"
+                }
+            }
+        }
+    }
+}

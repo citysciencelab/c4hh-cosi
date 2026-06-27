@@ -1,0 +1,78 @@
+{
+  "modules": {
+    "storyCreator": {
+      "storyNav": "Story",
+      "chapterNav": "Kapitel",
+      "title": "Story Creator",
+      "addChapter": "Kapitel hinzufügen",
+      "saveStory": "Story speichern",
+      "preview": "Vorschau",
+      "clearForm": "Eingaben leeren",
+      "noSettings": "Keine Fachdaten oder Ansichten festgelegt",
+      "numberOfChapters": "Kapitel",
+      "readOnly": "schreibgeschützt",
+      "previewNav": "Story-Vorschau",
+      "introText": "Dieses Werkzeug dient der Erstellung interaktiver, kartenbasierter Geschichten. Nach der Eingabe der allgemeinen Informationen, wie Name, Beschreibung, Autor und Titelbild, können darunter die einzelnen Kapitel flexibel hinzugefügt werden. Über die Schaltflächen am Seitenende lässt sich die Story in der Vorschau prüfen, speichern oder verwerfen.",
+      "labels": {
+        "storyTitle": "Story-Namen eingeben",
+        "storyDescription": "Beschreibung der Story (optional)",
+        "storyAuthor": "Autor der Story (optional)",
+        "fileDrop": "Datei hier ablegen",
+        "fileSelect": "oder Datei auswählen",
+        "alt": "Text für Barrierefreiheit",
+        "copyright": "Fotograf / Bildquelle",
+        "deleteChapter": "Kapitel löschen",
+        "playStory": "Story Abspielen",
+        "editStory": "Story bearbeiten",
+        "downloadStory": "Story herunterladen",
+        "wrongFormat": "Es sind nur Bilddateien (z. B. JPG, PNG) zulässig.",
+        "wrongFormatTitle": "Ungültiges Dateiformat",
+        "emptyChapter": "Es wurden noch keine Kapitel angelegt.",
+        "mapPosition": "Kartenposition"
+      },
+      "buttons": {
+          "confirm": "Übernehmen",
+          "discardImage": "Bild verwerfen",
+          "abort": "Abbrechen"
+      },
+      "headlines": {
+        "addImages": "Neues Bild hinzufügen",
+        "addTexts": "Neuen Text hinzufügen",
+        "chapterList": "Übersicht der Kapitel",
+        "addImageTitle": "Neues Titelbild hinzufügen",
+        "coverOfStory": "Titelbild der Story"
+      },
+      "chapter": {
+        "editChapter": "Kapitel bearbeiten",
+        "infoText": "Hier wird definiert, was in der fertigen Story zu sehen ist. Die Erstellung erfolgt in zwei Schritten: Zuerst werden Kartenausschnitt, Zoomstufe, Fachdaten und Werkzeuge festgelegt. Danach lassen sich im unteren Bereich die zugehörigen Texte und Medien einfügen.",
+        "mapTool": "Karteneinstellungen und Werkzeuge",
+        "mapPosition": "Kartenposition übernehmen",
+        "currentPosition": "Aktuelle Position auf der Karte",
+        "layerList": "Fachdaten einbinden (optional)",
+        "toolList": "Werkzeug öffnen (optional)",
+        "zoomLevel": "Zoomstufe",
+        "save": "Kapitel speichern",
+        "cancel": "abbrechen",
+        "successAlert": "Die Kartenposition wurde erfolgreich übernommen!",
+        "positionChangedHint": "Die Position entspricht nicht der aktuellen Ansicht der Karte.",
+        "addContent": "Inhalte hinzufügen",
+        "title": "Kapitelüberschrift eingeben",
+        "initialText": "Hier klicken, um eine Kapitelbeschreibung hinzuzufügen...",
+        "toolListPlaceholder": "Werkzeug auswählen...",
+        "layerListPlaceholder": "Layer auswählen..."
+      },
+      "addElementDropdown": {
+        "categories": {
+          "elements": "Elemente",
+          "media": "Medien"
+        },
+        "items": {
+          "text": "Text",
+          "separator": "Trennlinie",
+          "image": "Bild",
+          "video": "Video"
+        }
+      }
+    }
+  }
+}

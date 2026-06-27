@@ -1,0 +1,93 @@
+{
+    "type": [
+        "LineChart",
+        "BarChart",
+        "PieChart"
+    ],
+    "id": "ccm",
+    "name": "Stadtteile - Bevölkerung insgesamt",
+    "color": [
+        "#55eb34",
+        "rgb(14, 150, 240)",
+        "yellow"
+    ],
+    "data": {
+        "labels": [
+            "2012",
+            "2013",
+            "2014",
+            "2015",
+            "2016",
+            "2017",
+            "2018",
+            "2019",
+            "2020"
+        ],
+        "datasets": [
+            {
+                "label": "Fuhlsbüttel",
+                "data": [
+                    "12135.0",
+                    "12130.0",
+                    "12204.0",
+                    "12572.0",
+                    "12590.0",
+                    "12701.0",
+                    "13384.0",
+                    "13441.0",
+                    "13348.0"
+                ]
+            },
+            {
+                "label": "Groß Borstel",
+                "data": [
+                    "7969.0",
+                    "8086.0",
+                    "8013.0",
+                    "8769.0",
+                    "8459.0",
+                    "8499.0",
+                    "8734.0",
+                    "9284.0",
+                    "9642.0"
+                ]
+            },
+            {
+                "label": "Alsterdorf",
+                "data": [
+                    "13657.0",
+                    "13749.0",
+                    "14009.0",
+                    "14123.0",
+                    "14428.0",
+                    "15031.0",
+                    "15174.0",
+                    "15204.0",
+                    "15227.0"
+                ]
+            },
+            {
+                "label": "Ohlsdorf",
+                "data": [
+                    "15154.0",
+                    "15085.0",
+                    "15043.0",
+                    "15471.0",
+                    "15794.0",
+                    "16471.0",
+                    "16463.0",
+                    "16666.0",
+                    "16686.0"
+                ]
+            }
+        ]
+    },
+    "scaleLabels": [
+        "Bevölkerung insgesamt",
+        "Jahre"
+    ],
+    "source": "Kartenvisualisierungswerkzeug",
+    "beginAtZero": true,
+    "sub": false,
+    "cgid": "ccm-Stadtteile - Bevölkerung insgesamt"
+}

@@ -1,0 +1,443 @@
+[
+    {
+        "id": "Staatliche Schulen Hamburgs",
+        "layerId": "8712",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Schulen",
+        "group": "Bildung und Wissenschaft",
+        "featureType": "staatliche_schulen"
+    },
+    {
+        "id": "Alle Schulen Hamburgs",
+        "layerId": "1732",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Schulen",
+        "group": "Bildung und Wissenschaft",
+        "featureType": "hh_schulen_dwh"
+    },
+    {
+        "id": "Forschungseinrichtungen",
+        "layerId": "18810",
+        "url": "https://geodienste.hamburg.de/HH_WFS_hochschulen_forschungseinrichtungen",
+        "group": "Bildung und Wissenschaft",
+        "featureType": "forschungseinrichtungen"
+    },
+    {
+        "id": "Hochschulen",
+        "layerId": "16606",
+        "url": "https://geodienste.hamburg.de/MRH_WFS_Erreichbarkeitsanalysen_Ziele_Einrichtungen",
+        "group": "Bildung und Wissenschaft",
+        "featureType": "hochschulen"
+    },
+    {
+        "id": "Sportstätten",
+        "layerId": "12868",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Sportstaetten",
+        "group": "Kultur, Freizeit, Sport und Tourismus",
+        "featureType": "sportstaetten"
+    },
+    {
+        "id": "Öffentliche Bibliotheken",
+        "layerId": "19574",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Oeffentliche_Bibliotheken",
+        "group": "Kultur, Freizeit, Sport und Tourismus",
+        "featureType": "oeffentliche_bibs"
+    },
+    {
+        "id": "Allgemeiner Sozialer Dienst (ASD)",
+        "layerId": "20586",
+        "url": "https://geodienste.hamburg.de/HH_WFS_ASD",
+        "group": "Soziales",
+        "featureType": "standorte"
+    },
+    {
+        "id": "Angebote und Nutzung der Jugendsozialarbeit (JSA)",
+        "layerId": "18689",
+        "url": "https://geodienste.hamburg.de/HH_WFS_JSA",
+        "group": "Soziales",
+        "featureType": "einrichtungen"
+    },
+    {
+        "id": "Angebote und Nutzung der Offenen Kinder- und Jugendarbeit (OKJA)",
+        "layerId": "18722",
+        "url": "https://geodienste.hamburg.de/HH_WFS_OKJA",
+        "group": "Soziales",
+        "featureType": "einrichtungen"
+    },
+    {
+        "id": "Begegnungsstätten Ambulante Sozialpsychiatrie",
+        "layerId": "18322",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Ambulante_Sozialpsychatrie",
+        "group": "Soziales",
+        "featureType": "amb_sozialpsychatrie"
+    },
+    {
+        "id": "Beratungsstellen für Wohnungsnotfälle",
+        "layerId": "18189",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Wohnungsnotfaelle",
+        "group": "Soziales",
+        "featureType": "wohnungsnotfaelle"
+    },
+    {
+        "id": "Frauenberatung",
+        "layerId": "19381",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Frauenberatung_Hamburg",
+        "group": "Soziales",
+        "featureType": "frauenberatung_adressen"
+    },
+    {
+        "id": "Jugend Aktiv Plus",
+        "layerId": "19566",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Jugend_Aktiv_Plus",
+        "group": "Soziales",
+        "featureType": "jugend_aktiv_plus"
+    },
+    {
+        "id": "Kindertagesstätten",
+        "layerId": "753",
+        "url": "https://geodienste.hamburg.de/HH_WFS_KitaEinrichtung",
+        "group": "Soziales",
+        "featureType": "KitaEinrichtungen"
+    },
+    {
+        "id": "Sozialräumliche Integrationsnetzwerke (SIN)",
+        "layerId": "19571",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Sozialraeumliche_Integration_SIN",
+        "group": "Soziales",
+        "featureType": "sozialrauemliche_integration"
+    },
+    {
+        "id": "Übernachtungs- und Versorgungsangebote für Obdachlose und Wohnungslose",
+        "layerId": "18172",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Uebernachtungsangebote",
+        "group": "Soziales",
+        "featureType": "uebernachtungsangebote"
+    },
+    {
+        "id": "Freiwilligenagenturen",
+        "layerId": "19895",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Freiwilliges_Engagement",
+        "group": "Soziales",
+        "featureType": "freiwilligenagenturen"
+    },
+    {
+        "id": "Mehrgenerationenhäuser",
+        "layerId": "19896",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Freiwilliges_Engagement",
+        "group": "Soziales",
+        "featureType": "mehrgenerationenhaeuser"
+    },
+    {
+        "id": "Eltern-Kind-Zentrum",
+        "layerId": "19944",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Familien_Angebote",
+        "group": "Soziales",
+        "featureType": "eltern_kind_zentrum"
+    },
+    {
+        "id": "Elternlotsenprojekt",
+        "layerId": "19945",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Familien_Angebote",
+        "group": "Soziales",
+        "featureType": "elternlotsenprojekt"
+    },
+    {
+        "id": "Elternschule",
+        "layerId": "19946",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Familien_Angebote",
+        "group": "Soziales",
+        "featureType": "elternschule"
+    },
+    {
+        "id": "Familienteam",
+        "layerId": "19947",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Familien_Angebote",
+        "group": "Soziales",
+        "featureType": "familienteam"
+    },
+    {
+        "id": "Institutionelle Erziehungsberatung",
+        "layerId": "19948",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Familien_Angebote",
+        "group": "Soziales",
+        "featureType": "institutionelle_erziehungsberatung"
+    },
+    {
+        "id": "Kinder-Familienzentrum",
+        "layerId": "19949",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Familien_Angebote",
+        "group": "Soziales",
+        "featureType": "kinder_familienzentrum"
+    },
+    {
+        "id": "Konfessionelle Familienbildungsstätte",
+        "layerId": "19950",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Familien_Angebote",
+        "group": "Soziales",
+        "featureType": "konfessionelle_familienbildungsstaette"
+    },
+    {
+        "id": "Mütterzentrum",
+        "layerId": "19951",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Familien_Angebote",
+        "group": "Soziales",
+        "featureType": "muetterzentrum"
+    },
+    {
+        "id": "Sonstige Angebote für Familien",
+        "layerId": "19952",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Familien_Angebote",
+        "group": "Soziales",
+        "featureType": "sonstige"
+    },
+    {
+        "id": "Überregionale Beratungsstelle",
+        "layerId": "19953",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Familien_Angebote",
+        "group": "Soziales",
+        "featureType": "ueberregionale_beratungsstelle"
+    },
+    {
+        "id": "Gesundheitsberatung",
+        "layerId": "19861",
+        "url": "https://geodienste.hamburg.de/HH_WFS_beratungsstellen_sgb_ii",
+        "group": "Soziales",
+        "featureType": "gesundheitsberatung"
+    },
+    {
+        "id": "Lebenslagenberatung",
+        "layerId": "19862",
+        "url": "https://geodienste.hamburg.de/HH_WFS_beratungsstellen_sgb_ii",
+        "group": "Soziales",
+        "featureType": "lebenslagenberatung"
+    },
+    {
+        "id": "Schuldnerberatung",
+        "layerId": "19863",
+        "url": "https://geodienste.hamburg.de/HH_WFS_beratungsstellen_sgb_ii",
+        "group": "Soziales",
+        "featureType": "schuldnerberatung"
+    },
+    {
+        "id": "Abteilung Kitabetreuung",
+        "layerId": "19584",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Beratung_Kitabetreuung_Kitapflege",
+        "group": "Soziales",
+        "featureType": "abteilung_kitabetreuung"
+    },
+    {
+        "id": "Tagespflegebörse",
+        "layerId": "19585",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Beratung_Kitabetreuung_Kitapflege",
+        "group": "Soziales",
+        "featureType": "tagespflegeboerse"
+    },
+    {
+        "id": "Jobcenter",
+        "layerId": "19889",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Jobcenter_Jugendberufsagentur",
+        "group": "Soziales",
+        "featureType": "jobcenter"
+    },
+    {
+        "id": "Jugendberufsagentur",
+        "layerId": "19890",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Jobcenter_Jugendberufsagentur",
+        "group": "Soziales",
+        "featureType": "jugendberufsagentur"
+    },
+    {
+        "id": "W.I.R., work and integration for refugees",
+        "layerId": "19891",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Jobcenter_Jugendberufsagentur",
+        "group": "Soziales",
+        "featureType": "wir"
+    },
+    {
+        "id": "Integrierte Angebote",
+        "layerId": "19578",
+        "url": "https://geodienste.hamburg.de/HH_WFS_RV_Schule_Jugendhilfe",
+        "group": "Soziales",
+        "featureType": "integrierte_angebote"
+    },
+    {
+        "id": "Temporaere Lerngruppe",
+        "layerId": "19579",
+        "url": "https://geodienste.hamburg.de/HH_WFS_RV_Schule_Jugendhilfe",
+        "group": "Soziales",
+        "featureType": "temporaere_lerngruppe"
+    },
+    {
+        "id": "Begleitung Kinder",
+        "layerId": "19610",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Sozialraeumliche_Angebote_der_Jugend-_und_Familienhilfe",
+        "group": "Soziales",
+        "featureType": "begleitung_kinder"
+    },
+    {
+        "id": "Berufliche Unterstützung",
+        "layerId": "19611",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Sozialraeumliche_Angebote_der_Jugend-_und_Familienhilfe",
+        "group": "Soziales",
+        "featureType": "berufliche_unterstuetzung"
+    },
+    {
+        "id": "Familienrat",
+        "layerId": "19612",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Sozialraeumliche_Angebote_der_Jugend-_und_Familienhilfe",
+        "group": "Soziales",
+        "featureType": "familienrat"
+    },
+    {
+        "id": "Frühe Hilfen",
+        "layerId": "19613",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Sozialraeumliche_Angebote_der_Jugend-_und_Familienhilfe",
+        "group": "Soziales",
+        "featureType": "fruehe_hilfen"
+    },
+    {
+        "id": "Schulbezogene Angebote",
+        "layerId": "19614",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Sozialraeumliche_Angebote_der_Jugend-_und_Familienhilfe",
+        "group": "Soziales",
+        "featureType": "schulbezogene_angebote"
+    },
+    {
+        "id": "Amira - Beratung bei Diskriminierung",
+        "layerId": "20569",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Integrationsangebote_Zugewanderte",
+        "group": "Soziales",
+        "featureType": "amira"
+    },
+    {
+        "id": "Flüchtlingszentrum",
+        "layerId": "20570",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Integrationsangebote_Zugewanderte",
+        "group": "Soziales",
+        "featureType": "fluechtlingszentrum"
+    },
+    {
+        "id": "Weitere Integrationsangebote",
+        "layerId": "20571",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Integrationsangebote_Zugewanderte",
+        "group": "Soziales",
+        "featureType": "integrationsangebote_zugewanderte"
+    },
+    {
+        "id": "Integrationsangebote für Zugewanderte - alle",
+        "layerId": "20634",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Integrationsangebote_Zugewanderte",
+        "group": "Soziales",
+        "featureType": "v_integrationsangebote_zugewanderte_alle"
+    },
+    {
+        "id": "Wohnungsbauprojekte",
+        "layerId": "1567",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Wohnungsbauprojekte",
+        "group": "Infrastruktur, Bauen, Wohnen",
+        "featureType": "projekte"
+    },
+    {
+        "id": "Digitaler Grünpla​n",
+        "layerId": "1534",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Gruenplan",
+        "group": "Umwelt und Klima",
+        "featureType": "verzeichnis_oeffentlicher_gruenanlagen"
+    },
+    {
+        "id": "Krankenhäuser",
+        "layerId": "1711",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Krankenhaeuser",
+        "group": "Gesundheit",
+        "featureType": "krankenhaeuser_hh"
+    },
+    {
+        "id": "Corona Testzentren",
+        "layerId": "20674",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Corona_Testzentren",
+        "group": "Gesundheit",
+        "featureType": "testzentren"
+    },
+    {
+        "id": "Corona Testzentren (barrierefrei)",
+        "layerId": "20675",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Corona_Testzentren",
+        "group": "Gesundheit",
+        "featureType": "testzentren_barrierefrei"
+    },
+    {
+        "id": "Haltestellen",
+        "layerId": "16601",
+        "url": "https://geodienste.hamburg.de/MRH_WFS_Erreichbarkeitsanalysen_Ziele_Einrichtungen",
+        "group": "Nahversorgung (2017, Erreichbarkeitsanalysen MRH)",
+        "featureType": "haltestellen"
+    },
+    {
+        "id": "Bahnstationen",
+        "layerId": "16587",
+        "url": "https://geodienste.hamburg.de/MRH_WFS_Erreichbarkeitsanalysen_Ziele_Einrichtungen",
+        "group": "Nahversorgung (2017, Erreichbarkeitsanalysen MRH)",
+        "featureType": "bahnhoefe"
+    },
+    {
+        "id": "Supermärkte",
+        "layerId": "16589",
+        "url": "https://geodienste.hamburg.de/MRH_WFS_Erreichbarkeitsanalysen_Ziele_Einrichtungen",
+        "group": "Nahversorgung (2017, Erreichbarkeitsanalysen MRH)",
+        "featureType": "supermaerkte"
+    },
+    {
+        "id": "Apotheken",
+        "layerId": "16585",
+        "url": "https://geodienste.hamburg.de/MRH_WFS_Erreichbarkeitsanalysen_Ziele_Einrichtungen",
+        "group": "Nahversorgung (2017, Erreichbarkeitsanalysen MRH)",
+        "featureType": "apotheken"
+    },
+    {
+        "id": "Autobahnausfahrten",
+        "layerId": "12155",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Autobahnkilometrierung",
+        "group": "Nahversorgung (2017, Erreichbarkeitsanalysen MRH)",
+        "featureType": "Autobahnkilometrierung"
+    },
+    {
+        "id": "HVV Haltestellen",
+        "layerId": "5246",
+        "url": "https://geodienste.hamburg.de/wfs_hvv",
+        "group": "Transport und Verkehr",
+        "featureType": "geofoxdb_stations"
+    },
+    {
+        "id": "Park + Ride Anlagen",
+        "layerId": "2403",
+        "url": "https://geodienste.hamburg.de/HH_WFS_P_und_R",
+        "group": "Transport und Verkehr",
+        "featureType": "p_und_r"
+    },
+    {
+        "id": "Bike + Ride Parkplätze",
+        "layerId": "10882",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Bike_und_Ride",
+        "group": "Transport und Verkehr",
+        "featureType": "bike_und_ride"
+    },
+    {
+        "id": "Parkhäuser",
+        "layerId": "52",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Verkehr_opendata",
+        "group": "Transport und Verkehr",
+        "featureType": "verkehr_parkhaeuser"
+    },
+    {
+        "id": "StadtRAD Stationen",
+        "layerId": "6154",
+        "url": "https://geodienste.hamburg.de/HH_WFS_Stadtrad",
+        "group": "Transport und Verkehr",
+        "featureType": "stadtrad_stationen"
+    },
+    {
+        "id": "Elektro Ladestandorte",
+        "layerId": "46",
+        "url": "https://geodienste.hamburg.de/HH_WFS_EMobility",
+        "group": "Transport und Verkehr",
+        "featureType": "stromnetz_emobility"
+    }
+]

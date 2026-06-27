@@ -1,0 +1,32 @@
+{
+    "modules": {
+        "tools": {
+            "gfi": {
+                "themes":{
+                    "verkehrsstaerken": {
+                        "kind": "Art: {{kind}}",
+                        "table": "Tabelle",
+                        "diagram": "Diagramme",
+                        "download": "Download",
+                        "DTV": "DTV",
+                        "DTVTitle": "Durchschnittliche tägliche Verkehrsstärken (Mo-So)",
+                        "DTVw": "DTVw",
+                        "DTVwTitle": "Durchschnittliche werktägliche Verkehrsstärken (Mo-Fr)",
+                        "carsPerDay": "DTV (Kfz/24h)",
+                        "carsPerWeekday": "DTVw (Kfz/24h)",
+                        "bikesPerDay": "DTV (Rad/24h)",
+                        "bikesPerWeekday": "DTVw (Rad/24h)",
+                        "HGVsPerWeek": "SV-Anteil am DTVw (%)",
+                        "HGVsPerWeekTitle": "Schwerverkehrsanteil am DTVw",
+                        "constructionSiteInfluence": "Baustelleneinfluss",
+                        "withConstructionSiteInfluence": "mit Anmerkung",
+                        "category": "Kategorie",
+                        "year": "Jahr",
+                        "note": "Anmerkung",
+                        "method": "Erhebungsmethode"
+                    }
+                }
+            }
+        }
+    }
+}

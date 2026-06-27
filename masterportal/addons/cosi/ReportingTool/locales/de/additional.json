@@ -1,0 +1,90 @@
+{
+    "modules": {
+      "cosi": {
+          "reportingTool": {
+            "creatingReport": "Bericht wird erstellt. Bitte warten.",
+            "reportSuccess": "Der Bericht wurde erfolgreich generiert. Der Download startet automatisch.",
+            "title": "Bericht erstellen",
+            "toolInfoText": "Dieses Tool überführt Ihren aktuellen Portalzustand direkt in einen strukturierten Bericht. Alle aktiven Fachdaten, Statistischen Daten und Erreichbarkeitsanalysen werden dabei automatisch erfasst. Ein interaktiver Stepper führt Sie durch die einzelnen Kapitel, in denen Sie die Auswahl für den Bericht - inklusive Anhang mit Legenden und Quellen - individuell verfeinern können. Für eine schnelle Dokumentation lässt sich die detaillierte Konfiguration bereits auf der ersten Seite überspringen, um sofort alle Portalinhalte in einem vollständigen Dokument auszugeben.",
+            "generateReport": "Fertig und abschließen",
+            "printReport": "Bericht herunterladen",
+            "infoText": "Die Auswahl Ihrer Berichtsinhalte ist nun abgeschlossen. Sie können das Dokument mit allen gewählten Inhalten über <strong> Bericht herunterladen </strong> final generieren. Falls Sie noch Korrekturen an den Kapiteln oder der Auswahl vornehmen möchten, gelangen Sie über <strong> Zurück zur Bearbeitungsansicht </strong> direkt zu Ihren bisherigen Einstellungen. Möchten Sie die aktuelle Zusammenstellung verwerfen und mit der initialen Portalansicht neu beginnen, wählen Sie bitte <strong> Neuen Bericht erstellen </strong>.",
+            "finishingUpReport": "Abschluss der Berichterstellung",
+            "optionalComponents": "Optionale Bestandteile des auszugebenen Berichts:",
+            "backToTemplate": "Zurück zum ReportingTool",
+            "infrastructureHint": "Hinweis: Bei mehr als 10 Einrichtungen wird keine Infrastrukturdaten-Tabelle dargestellt.",
+            "generalSettings": "Allgemein",
+            "statisticalData": "Statistische Daten",
+            "showStatisticalData": "Statistische Daten einblenden",
+            "hideStatisticalData": "Statistische Daten ausblenden",
+            "subjectData": "Fachdaten",
+            "showSubjectData": "Fachdaten einblenden",
+            "hideSubjectData": "Fachdaten ausblenden",
+            "analyses": "Analysen",
+            "settings": "Einstellungen",
+            "annex": "Anhang und Drucken",
+            "generalReportInformation": "Allgemeine Berichtsangaben",
+            "addAdditionalInformation": "Freitextfeld hinzufügen",
+            "useMostRecentDataset": "Aktuellsten Datensatz verwenden",
+            "noLegendAvailable": "Keine Legende verfügbar",
+            "legendLoadFailed": "Legende kann nicht geladen werden",
+            "unknownLegendFormat": "Unbekanntes Legendenformat",
+            "frontPage": {
+              "withoutNeuwerk": {
+                "label": "Titelseite mit Kartenausschnitt"
+              },
+              "withNeuwerk": {
+                "label": "Titelseite mit Kartenausschnitt inkl. Neuwerk",
+                "alert": "Neuwerk und Scharhörn werden als separate Karten dargestellt."
+              },
+              "withoutFrontPage": {
+                "label": "Keine Titelseite"
+              }
+            },
+            "label": {
+              "infrastructureTableLimitEnabled": "Sollen Tabellen ab einer bestimmten Anzahl von Einrichtungen vom Bericht ausgenommen werden?",
+              "infrastructureTableLimit": "Maximale Anzahl an auszugebenen Einrichtungen",
+              "headline": "Überschrift",
+              "freetext": "Freitext",
+              "selectedDistricts": "Ausgewählte Gebiete",
+              "title": "Titel",
+              "author": "Ersteller:in",
+              "frontPage": "Titelseite",
+              "summedColumns": "Spaltenname der summierten Gebiete",
+              "selectedAreasName": "Ausgewähltes Gebiet",
+              "summariseStatisticalAreas": "Gebiete summieren",
+              "higherDistrictLevel": "Übergeordnete Bezugsebene miteinbeziehen",
+              "statisticalAreas":"Statistische Gebiete auswählen",
+              "referenceYear": "Bezugsjahr",
+              "heading": "Überschrift",
+              "up": "Eine Position nach oben verschieben",
+              "down": "Eine Position nach unten verschieben"
+            },
+            "alert": {
+              "noDataAlert": "Es sind keine Daten zum Erstellen eines Berichts vorhanden.",
+              "noStatisticalData": "Es sind keine statistischen Daten zum Auswählen vorhanden.",
+              "noStatisticalDataSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine statistischen Daten.",
+              "noSubjectData": "Es sind keine Fachdaten zum Auswählen vorhanden.",
+              "noSubjectDataSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Fachdaten.",
+              "noAnalyses": "Es sind keine Analysen zum Auswählen vorhanden.",
+              "noAnalysesSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Analysen.",
+              "noAnnexSelected": "Es wurden keine Inhalte ausgewählt. Der Bericht enthält keine Legende und keine Quellenangaben.",
+              "errorDuringPrinting": "Der Bericht konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
+            },
+            "button": {
+              "confirmAndNext": "Bestätigen und weiter",
+              "back": "zurück",
+              "printNow": "Alle Schritte überspringen und sofort drucken",
+              "generateReport": "Bericht erstellen",
+              "downloadReport": "Bericht herunterladen",
+              "backToEditView": "Zurück zur Bearbeitungsansicht",
+              "createNewReport": "Neuen Bericht erstellen"
+            },
+            "errors": {
+              "invalidReportTitle": "Es sind maximal {{reportTitleMaxLength}} Zeichen erlaubt",
+              "invalidSelectedAreasName": "Es sind maximal {{selectedAreasNameMaxLength}} Zeichen erlaubt"
+            }
+          }
+      }
+    }
+}

@@ -1,0 +1,9 @@
+{
+  "modules": {
+    "controls": {
+      "toggleMouseHover": {
+          "iconTitle": "Toggle Mousehover"
+      }
+    }
+  }
+}

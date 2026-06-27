@@ -1,0 +1,106 @@
+{
+    "styleId": "erreichbarkeitsanalyse",
+    "rules": [
+        {
+            "condition": {
+                "properties": {
+                    "index": 0
+                }
+            },
+            "style": {
+                "polygonStrokeColor": [
+                    255,
+                    255,
+                    255,
+                    1
+                ],
+                "polygonStrokeWidth": 1,
+                "polygonFillColor": [
+                    200,
+                    0,
+                    3,
+                    0.1
+                ]
+            }
+        },
+        {
+            "condition": {
+                "properties": {
+                    "index": 1
+                }
+            },
+            "style": {
+                "polygonStrokeColor": [
+                    255,
+                    255,
+                    255,
+                    1
+                ],
+                "polygonStrokeWidth": 1,
+                "polygonFillColor": [
+                    100,
+                    100,
+                    3,
+                    0.15
+                ]
+            }
+        },
+        {
+            "condition": {
+                "properties": {
+                    "index": 2
+                }
+            },
+            "style": {
+                "polygonStrokeColor": [
+                    255,
+                    255,
+                    255,
+                    1
+                ],
+                "polygonStrokeWidth": 1,
+                "polygonFillColor": [
+                    0,
+                    200,
+                    3,
+                    0.2
+                ]
+            }
+        },
+        {
+            "condition": {
+                "properties": {
+                    "index": "ref"
+                }
+            },
+            "style": {
+                "polygonStrokeColor": [
+                    180,
+                    165,
+                    165,
+                    0.8
+                ],
+                "polygonStrokeWidth": 3,
+                "polygonStrokeDash": [10, 8]
+            }
+        },
+        {
+            "style": {
+                "circleRadius": 6,
+                "circleStrokeColor": [
+                  16,
+                  87,
+                  186,
+                  1
+                ],
+                "circleStrokeWidth": 2,
+                "circleFillColor": [
+                  16,
+                  87,
+                  186,
+                  1
+                ]
+            }
+        }
+    ]
+}

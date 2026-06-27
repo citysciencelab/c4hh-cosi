@@ -1,0 +1,19 @@
+{
+  "modules": {
+    "planParken": {
+      "description": "Frage die Informationen zum öffentlichen und privaten Parken eines ausgewählten Gebietes in der Karte ab",
+      "name": "Flächenfilter",
+      "select": {
+        "info": "Abfrage der Informationen zum öffentlichen und privaten Parken in einem auszuwählenden Gebiet in der Freien und Hansestadt Hamburg",
+        "action": "Auswahl des Gebietes durch"
+      },
+      "result": {
+        "confidentialityHint": "Unter Berücksichtigung des Datenschutzes wurden folgende Werte berechnet:"
+      },
+      "errors": {
+        "errorTitle": "Fehler",
+        "requestException": "Datenabfrage fehlgeschlagen. "
+      }
+    }
+  }
+}

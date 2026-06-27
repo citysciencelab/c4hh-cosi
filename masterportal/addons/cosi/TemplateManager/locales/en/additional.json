@@ -1,0 +1,57 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "templateManager": {
+                    "title": "Templates",
+                    "importTemplate": "Import Template",
+                    "loadFromTemplate": "Load Template",
+                    "exportFromTemplate": "Export template in report",
+                    "infoLoadFromTemplates": "Load basic thematic configurations for specific types of analyses. You can find the data which will be loaded in the templates' overview. To load templates, areas must first be selected. Data can only be exported from templates once a template has been loaded.",
+                    "noInfo": "Not available.",
+                    "optionalComponents": "Optional components of the report to be exported",
+                    "infrastructureData": "Infrastructure Data:",
+                    "generateReport": "Generate Report",
+                    "backToTemplate": "Go back to template",
+                    "creatingReport": "Report is being created. Please wait.",
+                    "reportSuccess": "The report has been successfully generated. The download will start automatically.",
+                    "overview": "Overview",
+                    "export": "Export",
+                    "note": "Note: loaded templates cannot be edited.",
+                    "infrastructureHint": "Note: If there are more than 10 institutions, no infrastructure data table is displayed.",
+                    "label": {
+                      "created": "Created",
+                      "name": "Name",
+                      "description": "Description",
+                      "layers": "Subject Data",
+                      "districtLevel": "District Level",
+                      "selectedDistricts": "Selected Districts",
+                      "categories": "Statistical Data",
+                      "addTools": "Starting Tool",
+                      "calculations": "Calculations",
+                      "title": "Title",
+                      "selectedAreas": "Name of the selected areas",
+                      "author": "Author",
+                      "manageTemplate": "Manage Template",
+                      "enable": "enable",
+                      "disable": "disable"
+                    },
+                    "activeTool": "Active Tool",
+                    "errors": {
+                      "default": "File could not be loaded.",
+                      "invalid": "File could not be read.",
+                      "wrongFileFormat": "The file is not in the correct format.",
+                      "templateName": "One template with the name ",
+                      "isLoaded": "is already loaded.",
+                      "notAllowLoaded": "can not be loaded without selected district(s).",
+                      "attErr": " {{attribute}} node does not exist.",
+                      "invalidReportTitle": "A maximum of {{reportTitleMaxLength}} characters are allowed",
+                      "invalidSelectedAreasName": "A maximum of {{selectedAreasNameMaxLength}} characters are allowed",
+                      "invalidAuthor": "A maximum of {{authorMaxLength}} characters are allowed"
+                    },
+                    "chooseDistricts": "Please choose districts!"
+                }
+            }
+        }
+    }
+}

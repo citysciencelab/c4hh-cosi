@@ -1,0 +1,19 @@
+{
+  "modules": {
+    "storyManager": {
+      "title": "Story Manager",
+      "mainTitle": "Zentrale Übersicht für die Erstellung und Verwaltung interaktiver Kartengeschichten.",
+      "mainDescription": "Dieser Bereich ermöglicht den nahtlosen Einstieg in neue StoryTelling-Projekte durch die Verknüpfung von Geodaten, Texten und multimedialen Inhalten. Zudem bietet die Ansicht Zugriff auf alle bereits vorhandenen Stories sowie die Möglichkeit, bereits erstellte, fertige Storys unkompliziert in das System zu importieren.",
+      "createStoryTitle": "Neue Story erstellen",
+      "createStoryDescription": "Eine neue interaktive Story erstellen und Karten, Texte sowie Medien miteinander verknüpfen.",
+      "selectStoryTitle": "Story auswählen",
+      "selectStoryDescription": "Zum Ansehen oder Bearbeiten eine Story aus der Liste auswählen. Zudem steht eine Importfunktion zur Verfügung.",
+      "importButton": "Importieren",
+      "importErrorTitle": "Import fehlgeschlagen",
+      "importErrorText": "Es können nur ZIP-Dateien geladen werden, die mit dieser Anwendung erstellt wurden.",
+      "createdAt": "Erstellt am:",
+      "chapters": "Kapitel",
+      "emptyStory": "Es sind noch keine Stories vorhanden."
+    }
+  }
+}

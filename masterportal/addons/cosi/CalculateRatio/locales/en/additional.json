@@ -1,0 +1,52 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "calculateRatio": {
+                    "title": "Supply Analysis",
+                    "description": "With the coverage analysis you can determine the coverage of an area with a certain type of facility / infrastructure (see 'Topics').",
+                    "subjectData": "Subject Data",
+                    "statData": "Statistical Data",
+                    "warningNoData": "No areas or subject data have been selected yet. Please select at least one area and/or subject data set. To select areas, use the 'Select area' function. You can select subject data on the left-hand side under 'Add topics'.",
+                    "noFeaturesWarning": "You have not selected any areas as a basis for statistical data. Please load some areas first via the area selection.",
+                    "noFacilitiesWarning": "Sie haben keine Themengebiete als Grundlage für Einrichtungsdaten ausgewählt. Bitte wählen Sie zuerst die gewünschten Themengebiete über das Hauptmenü aus.",
+                    "placeholderA": "Select (counter) parameter",
+                    "placeholderB": "Select (denominator) reference value",
+                    "noData": "No data was found for the selected facility parameter in the search radius. Please change the parameter or expand your area selection",
+                    "addedSelection": "Sum of selection",
+                    "visualizeMap": "Visualize selected dataset in map",
+                    "visualizeChart": "generate chart from dataset",
+                    "downloadOptions": "Download: data/table",
+                    "downloadGeoJson": "Download GeoJSON",
+                    "downloadGeoJsonTooltip": "Download results as geodata (GeoJSON)",
+                    "downloadXlsx": "Download XLSX",
+                    "downloadXlsxTooltip": "Download results for Excel (XLSX)",
+                    "paginationPrev": "Switch to previous Supply Analysis",
+                    "paginationNext": "Switch to next Supply Analysis",
+                    "paginationDownloadAll": "Download all Supply Analysises as XLS and GeoJson",
+                    "paginationRemove": "Delete selected Supply Analysis",
+                    "paginationRemoveAll": "Delete all analysises in the tool",
+                    "calculate": "Calculate",
+                    "calculateTooltip": "Run calculation on datasets",
+                    "reset": "Reset",
+                    "resetTooltip": "Reset all settings",
+                    "swapFields": "Swap fields A and B",
+                    "addFactor": "Add Factor (F)",
+                    "addFactorTooltip": "Add multiplication factor",
+                    "switchFieldType": "Switch between statistical and facility data",
+                    "calcPer": "calculate per",
+                    "ofData": "of data",
+                    "infoTooltip": "Tool information",
+                    "calculatedAnalyses": "Calculated Ratio Analyses",
+                    "chart": "Chart",
+                    "factor": "Factor",
+                    "parameter": "Parameter",
+                    "table": "Table",
+                    "year": "Year",
+                    "yearsForStatisticalData": "Years for statistical data",
+                    "calculationType": "Calculation type"
+                }
+            }
+        }
+    }
+}

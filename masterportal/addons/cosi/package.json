@@ -1,0 +1,41 @@
+{
+  "name": "cosi",
+  "version": "1.2.0",
+  "description": "Planning Support Tool for Urban Infrastructures in Hamburg, based on Hamburg's UDP's database",
+  "title": "Cockpit Staedtische Infrastrukturen",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+  },
+  "scripts": {},
+  "dependencies": {
+    "@mdi/font": "^7.4.47",
+    "@turf/buffer": "^7.2.0",
+    "@turf/center-of-mass": "^7.2.0",
+    "@turf/helpers": "^7.2.0",
+    "@turf/intersect": "^7.2.0",
+    "@turf/simplify": "^7.2.0",
+    "@turf/truncate": "^7.2.0",
+    "@turf/union": "^7.2.0",
+    "chartjs-plugin-annotation": "3.1.0",
+    "d3-array": "^3.1.1",
+    "d3-color": "^3.0.1",
+    "d3-scale": "^4.0.2",
+    "d3-scale-chromatic": "^3.0.0",
+    "fake-indexeddb": "^3.1.7",
+    "file-saver": "^2.0.5",
+    "html2canvas": "^1.4.1",
+    "jszip": "^3.7.1",
+    "object-hash": "^2.1.1",
+    "pdfmake": "^0.2.20",
+    "tableify": "^1.1.1",
+    "turf-featurecollection": "^1.0.1",
+    "vue-chartjs": "^5.3.1",
+    "vue-draggable-next": "2.3.0",
+    "vue-inline-svg": "^2.1.0",
+    "vue-json-excel": "^0.3.0",
+    "vuetify": "3.11.x",
+    "xlsx": "^0.16.9"
+  }
+}

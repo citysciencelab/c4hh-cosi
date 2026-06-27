@@ -1,0 +1,79 @@
+{
+  "categories": {
+    "allgemeines": {
+      "name": "Allgemeines",
+      "description": "Hinweis allgemein; nicht spezifisch; wird von der Steuerungsstelle adressiert",
+      "departments": ["steuerungsstelle"]
+    },
+    "aussendienst": {
+      "name": "Außendienst",
+      "description": "Hinweis für den Außendienst/Gebietstopographen; Feldvergleich",
+      "departments": ["alkis_geotopographie", "atkis"]
+    },
+    "bauwerk": {
+      "name": "Bauwerk",
+      "description": "Hinweis mit Bezug auf ein 'Bauwerk'; Bei Verkehrsbezug ist ggf. die Kategorie 'Verkehrsdaten' zu wählen",
+      "departments": ["alkis_geotopographie", "atkis"]
+    },
+    "benennung": {
+      "name": "Benennung",
+      "description": "Hinweis über die Benennung von Straßen, Plätzen und anderen Verkehrsflächen",
+      "departments": ["alkis_liegenschaftsdaten", "atkis", "hh_sib", "kartographie", "steuerungsstelle"]
+    },
+    "gebaeude_abbruch": {
+      "name": "Gebäude - Abbruch",
+      "description": "Hinweis über einen Gebäudeabbruch; auch Teilabbruch",
+      "departments": ["alkis_liegenschaftsdaten"]
+    },
+    "gebaeude_neubau": {
+      "name": "Gebäude - Neubau",
+      "description": "Hinweis über einen Gebäudeneubau/-anbau; ein in ALKIS nicht vorhandenes fertiggestelltes Gebäude",
+      "departments": ["gebaeude"]
+    },
+    "gebaeude_v_a_w": {
+      "name": "Gebäude - v. A. w.",
+      "description": "Hinweis über einen Gebäudeneubau/-anbau; ein in ALKIS nicht vorhandenes fertiggestelltes Gebäude; Gebäude wird von Amts wegen nach ALKIS übernommen",
+      "departments": ["photogrammetrie"]
+    },
+    "datenerfassung_uav": {
+      "name": "Datenerfassung (UAV)",
+      "description": "Hinweis zu einem Befliegungswunsch mittels UAV",
+      "departments": ["fernerkundung"]
+    },
+    "gebaeude_attribute": {
+      "name": "Gebäude - Attribute",
+      "description": "Hinweis über die Veränderung eines bestehenden Gebäudes (z.B. Gebäudenutzung, Gebäudename, falsche Gebäudenummer, Aufstockung mit neuer Dachform)",
+      "departments": ["alkis_liegenschaftsdaten"]
+    },
+    "oeffentlich_rechtliche_und_sonstige_festlegungen": {
+      "name": "Öffentlich-rechtliche und sonstige Festlegungen",
+      "description": "Hinweis mit Bezug auf die 'Öffentlich-rechtlichen und sonstigen Festlegungen', welche im Liegenschaftskataster einen nachrichtlichen Charakter haben",
+      "departments": ["alkis_geotopographie", "alkis_liegenschaftsdaten", "atkis"]
+    },
+    "radverkehrsnetz": {
+      "name": "Radverkehrsnetz",
+      "description": "Hinweis über den Datensatz 'Radverkehrsnetz'",
+      "departments": ["hh_sib"]
+    },
+    "relief": {
+      "name": "Relief",
+      "description": "Hinweis über die Objektartengruppe 'Reliefformen' (u. a. 'Böschung, Kliff', 'Damm, Wall, Deich')",
+      "departments": ["alkis_geotopographie"]
+    },
+    "tatsaechliche_nutzung": {
+      "name": "Tatsächliche Nutzung",
+      "description": "Hinweis mit Bezug zur 'Tatsächlichen Nutzung'; Bei Verkehrsbezug ist ggf. die Kategorie 'Verkehrsdaten' zu wählen",
+      "departments": ["alkis_geotopographie", "atkis"]
+    },
+    "verkehrsdaten": {
+      "name": "Verkehrsdaten",
+      "description": "Hinweis mit Verkehrsbezug (u. a. Tatsächliche Nutzung, Bauwerke)",
+      "departments": ["alkis_geotopographie", "atkis", "hh_sib"]
+    },
+    "widmung_entwidmung": {
+      "name": "Widmung / Entwidmung",
+      "description": "Hinweis über Widmungen/Entwidmungen von Verkehrsflächen nach dem Hamburgischen Wegegesetz",
+      "departments": ["alkis_geotopographie", "alkis_liegenschaftsdaten", "atkis", "hh_sib", "kartographie", "steuerungsstelle"]
+    }
+  }
+}

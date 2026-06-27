@@ -1,0 +1,19 @@
+{
+  "modules": {
+    "planParken": {
+      "description": "Retrieve information about public and private parking in a selected area on the map",
+      "name": "Surface filter",
+      "select": {
+        "info": "Retrieving information on public and private parking in a selected area within the Free and Hanseatic City of Hamburg",
+        "action": "Selection of area by"
+      },
+      "result": {
+        "confidentialityHint": "The following values were calculated in accordance with data protection regulations:"
+      },
+      "errors": {
+        "errorTitle": "Error",
+        "requestException": "Request failed. "
+      }
+    }
+  }
+}

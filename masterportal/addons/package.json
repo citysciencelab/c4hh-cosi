@@ -1,0 +1,27 @@
+{
+  "name": "addons",
+  "version": "3.23.0",
+  "description": "Addons to the Masterportal of Landesbetrieb Geoinformation und Vermessung Freie und Hansestadt Hamburg",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+  },
+  "scripts": {
+    "versionHotfix": "npm version patch && npm run versionLatest && git tag -d lts && git push --tags -f --no-verify",
+    "versionMinor": "npm version minor && npm run versionLatest && git tag -d lts && git push --tags -f --no-verify",
+    "versionMajor": "npm version major && npm run versionLatest && git tag -d lts && git push --tags -f --no-verify",
+    "versionLatest": "git tag latest -f",
+    "postinstall": "cd sdpDownload && npm install && cd .. && cd vcOblique && npm install && cd .. && cd valuationPrint && npm install && cd .. && cd waterRiskCheck && npm install && cd .. && cd simulationTool && npm install && cd .. && cd shared/js/mapfishUtils && npm install && cd ../../../ && cd vpiDashboard && npm install && cd .. && cd gfiThemes/combinedGfi && npm i && cd ../.. && cd cosi && npm i && cd .. && cd storyTellingTool/storyCreator && npm i && cd ../.. && cd storyTellingTool/storyManager && npm i && cd ../..",
+    "prePushHook": "cd .. && npm run prePushHook",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
+  },
+  "engines": {
+    "node": ">=22.19.0 <23 || >=24 <25",
+    "npm": ">=10.9.3 <12"
+  },
+  "dependencies": {}
+}

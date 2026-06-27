@@ -1,0 +1,80 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "areaSelection": "Area Selection",
+                "districtFinder": {
+                    "title": "District Screening",
+                    "description": "First select the desired reference level on which the screening is to take place under “Limit areas”. You can then limit the areas of the reference level. Conditions can be added to create a new screening. Areas that match the conditions can then be accepted.",
+                    "newScreening": "Create new screening",
+                    "condition": "Condition",
+                    "conditions": "Conditions",
+                    "conditionsExport": "Export conditions",
+                    "created": "Created: ",
+                    "showDetails": "Show details",
+                    "hideDetails": "Hide details",
+                    "operators": {
+                        "or": "OR",
+                        "and": "AND"
+                    },
+                    "infoCombinedDistrict": "In the data provided by Statistikamt Nord, the smallest districts are only shown in combination with a larger neighbouring district. Therefore, the number of selected areas may differ from the number of areas found (in the text box). This applies to: ",
+                    "foundArea": "Found area",
+                    "foundAreas": "Found areas",
+                    "copyClipboard": "Copy to clipboard!",
+                    "comparison": {
+                        "equals": "equal to",
+                        "less": "less than",
+                        "greater": "greater than"
+                    },
+                    "importLatestData": "Actuality of the datasets.",
+                    "changeToLatestYear": "A newer data set was found and is being used.",
+                    "label": {
+                        "districtLevel": "Administrative Level",
+                        "year": "Year",
+                        "dataset": "Dataset",
+                        "referenceValue": "Reference Value",
+                        "rule": "Rule",
+                        "tolerance": "Tolerance +/-",
+                        "minimum": "Minimum",
+                        "meanValue": "Mean Value",
+                        "maximum": "Maximum",
+                        "type": "Type",
+                        "exportName": "Name",
+                        "exportAreas": "with selected areas",
+                        "valueType_absolute": "absolute",
+                        "valueType_relative": "relative",
+                        "latestData": "For all conditions, use the data from the most recent year available.",
+                        "linkConditions": "Link"
+                    },
+                    "button": {
+                        "addCondition": "Add condition",
+                        "confirm": "Confirm districts",
+                        "importConditions": "Import conditions",
+                        "import": "Import",
+                        "showMore": "....show more",
+                        "showLess": "....show less",
+                        "export": "Export"
+                    },
+                    "errors": {
+                        "invalid": "File could not be read.",
+                        "wrongFileFormat": "The file is not in the correct format.",
+                        "attErr": " {{attribute}} node does not exist.",
+                        "numErr": " Reference Value or Tolerance is not in number format under Id {{id}}",
+                        "relNumErr": " For a relative Attribute, the reference value or tolerance is only permitted between 0 and 100 under Id {{id}}",
+                        "relativErr": "For a relative Attribute, the reference value or tolerance is only permitted between 0 and 100."
+                    },
+                    "warnings": {
+                      "noDataset": "The selected data set is not available for this reference level."
+                    },
+                    "selector": {
+                        "title": "Limit districts",
+                        "subtitle": "Limit {{selectedScreeningLevelLabel}}",
+                        "label": {
+                          "level": "Reference level"
+                        }
+                    }
+                  }
+            }
+        }
+    }
+}

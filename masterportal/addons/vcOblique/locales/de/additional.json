@@ -1,0 +1,11 @@
+{
+  "modules": {
+    "vcOblique": {
+      "description": "Sieh dir Schrägluftbilder zu einer Position in der Karte an",
+      "frameworkUndefined": "Schrägluftbilder",
+      "frameworkUndefinedMessage": "Es ist ein Fehler bei der Anzeige der Schrägluftbilder aufgetreten. Starten Sie die Anwendung bitte erneut. Sollte der Fehler weiterhin auftreten melden Sie ihn bitte über Kontakt.",
+      "name": "Schrägluftbilder (2022)",
+      "sameOrigin": "Die eingebundene Website kann nicht angezeigt werden. Bitte stellen Sie sicher, dass sich die eingebundene Website auf dem selben Server wie das aufgerufene Portal befindet."
+    }
+  }
+}

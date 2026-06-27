@@ -1,0 +1,15 @@
+{
+  "modules": {
+    "getFeatureInfo": {
+      "themes": {
+        "schulinfo": {
+          "no": "No",
+          "yes": "Yes",
+          "favoriteicons": {
+            "adoptedTargetSchool": "Adopt school as a target"
+          }
+        }
+      }
+    }
+  }
+}

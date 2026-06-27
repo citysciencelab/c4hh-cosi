@@ -1,0 +1,479 @@
+{
+    "addons": {
+        "menu": {
+            "tools": {
+                "layerClusterToggler": "Schulstandorte (de)aktivieren"
+            }
+        },
+        "gfiThemes": {
+            "bildungsatlas": {
+                "quickHelp": {
+                    "search": {
+                        "title": "Regionaler Bildungsatlas - Hilfe",
+                        "searchForSchools": {
+                            "title": "Suche nach Schulstandorten",
+                            "infoA": "Um im Bildungsatlas nach Schulstandorten (z.B. über den Schulnamen) zu suchen müssen diese auf der Karte angezeigt werden.",
+                            "infoB": "<br>Nutzen folgende <b>Schnell-Aktivierung</b> für alle Schulstandorte in Hamburg: Schauen Sie unter dem Menü-Eintrag \"Werkzeuge\" nach dem Werkzeug <b>\"$t(additional:addons.menu.tools.layerClusterToggler)\"</b>. Mit einem Klick lassen sich hier alle Schulen an- und mit dem nächsten Klick wieder ausschalten. Haben Sie auf diese Weise alle Schulen aktiviert, können Sie nach Schulstandorten (z.B. über die Schulnamen) suchen."
+                        }
+                    }
+                },
+                "searchbarPlaceholder": "Suche nach Adresse, Bezirk, Stadtteil, Thema",
+                "general": {
+                    "tabData": "Daten",
+                    "tabInfo": "Info",
+                    "disclaimer": "g.F: geringe Fallzahlen. Die Werte konnten aus datenschutzrechtlichen Gründen nicht ausgewiesen werden oder das Gebiet ist unbewohnt.",
+                    "hint": "Sie können die Position des Fensters durch Drag & Drop ändern.",
+                    "loading": "lädt...",
+                    "loadingError": "Fehler"
+                },
+                "okja": {
+                    "typ_der_einrichtung": "Typ der Einrichtung",
+                    "durchsch_stammnutzer": "Durchschnittliche Anzahl der Stammnutzer*innen",
+                    "angebotsstunden_pro_jahr": "Angebotsstunden pro Jahr",
+                    "table": {
+                        "title": "Angebote für Zielgruppen",
+                        "kinder_0_bis_unter3_jahre": "Kinder von 0 bis unter 3 Jahre",
+                        "kinder_3_bis_unter_6_jahre": "Kinder von 3 bis unter 6 Jahre",
+                        "kinder_6_bis_unter_10_jahre": "Kinder von 6 bis unter 10 Jahre",
+                        "kinder_10_bis_unter_14_jahre": "Kinder von 10 bis unter 14 Jahre",
+                        "jugendliche_14_bis_unter_18_jahre": "Jugendliche von 14 bis unter 18 Jahre",
+                        "junge_erwachsene_18_bis_unter_27_jahre": "Junge Erwachsene von 18 bis unter 27 Jahre",
+                        "Ja": "Ja",
+                        "Nein": "Nein"
+                    },
+                    "piechart_opening": {
+                        "title": "Verteilung der Öffnungszeiten",
+                        "weekdaysAfternoon": "Wochentags Nachmittags",
+                        "weekdaysEvening": "Wochentags Abends",
+                        "weekendsAfternoon": "Wochenende Nachmittags",
+                        "weekendsEvening": "Wochenende Abends"
+                    },
+                    "piechart_offers": {
+                        "title": "Verteilung der inhaltlichen Ausrichtung des Angebots",
+                        "allgemeine_und_soziale_bildung": "Allgemeine und Soziale Bildung",
+                        "politische_bildung": "Politische Bildung",
+                        "kulturelle_bildung": "Kulturelle Bildung",
+                        "naturkundliche_bildung": "Naturkundliche Bildung",
+                        "technische_bildung": "Technische Bildung",
+                        "interkulturelle_arbeit_und_integration": "Interkulturelle Arbeit und Integration",
+                        "sport_spiel_geselligkeit": "Sport, Spiel und Geselligkeit",
+                        "erzieherischer_kinder_und_jugendschutz": "Erzieherischer Kinder- und Jugendschutz",
+                        "jugendsozialarbeit": "Jugendsozialarbeit",
+                        "gesundheitsfoerderung": "Gesundheitsförderung",
+                        "sonstige_gruppenangebote": "Sonstige Gruppenangebote",
+                        "foerderung_der_medienkompetenz": "Förderung der Medienkompetenz"
+                    },
+                    "info": {
+                        "title": "Angebote der offenen Kinder- und Jugendarbeit",
+                        "textA": "Die Offene Kinder- und Jugendarbeit (OKJA) ist ein Teilbereich der Kinder- und Jugendhilfe und umfasst in der Regel kostenfreie, pädagogisch begleitete und offene Angebote für Kinder und Jugendliche und teilweise für junge Erwachsene. Dazu gehören u.a. Interessengruppenangebote, ein offener Bereich für Begegnungen mit Gleichaltrigen, Veranstaltungen, Ferienprogramme und Freizeiten. Inhaltlich orientieren sich die Angebote an den Interessen der jungen Menschen: Sie reichen deshalb beispielsweise von Medienarbeit und musischer Bildung über gemeinsames Kochen, Bewegungsangebote, Spiele bis hin zu Unterstützung bei Problemen in der Familie oder beim Übergang ins Arbeitsleben. Das spezifische Merkmal der OKJA liegt in der Unterstützung eigener Initiativen von jungen Menschen durch Mitbestimmung und Mitgestaltung und darin zur Selbstbestimmung zu befähigen und zur gesellschaftlichen Mitverantwortung und zu sozialem Engagement hinzuführen. Die OKJA hat einen gesetzlich festgehaltenen außerschulischen Bildungsauftrag und bietet vielfältige Lern- und Erfahrungsfelder an, in denen junge Menschen ihre kognitiven, sozialen und emotionalen Fähigkeiten und Stärken erproben und erweitern können.",
+                        "textB": "Die Karte zeigt die Einrichtungen der Offenen Kinder- und Jugendarbeit im Jahr 2015. Beim Klicken auf einen Standort werden im Datenblatt der Name und die Adresse der jeweiligen Einrichtung angezeigt.",
+                        "textC": "Durch die Aktivierung weiterer Kennzahlen und nach Klicken auf einen Standort können im Datenblatt Einzelheiten sichtbar gemacht werden. Abrufbar sind Zielgruppen, Öffnungs- bzw. Angebotszeiten sowie die inhaltliche Ausrichtung (Legende aktivieren!) der Angebote."
+                    }
+                },
+                "fluechtlinge": {
+                    "capacity": "Kapazität",
+                    "place": "Plätze",
+                    "remark": "Bemerkung",
+                    "info": {
+                        "ea_bestehend": "<h6>Zentrale Erstaufnahmestellen (ZEA)</h6>\n<p>Die Länder sind aufgrund bundesrechtlicher Bestimmungen verpflichtet, zentrale Einrichtungen für die Erstaufnahme Asylsuchender vorzuhalten (§ 44 AsylVfG); Asylbewerber sind in der Regel verpflichtet, bis zu längstens sechs Monaten in diesen Einrichtungen zu wohnen (§ 47 AsylVfG). Die Zuständigkeit für die aufenthalts- und die leistungsrechtliche Sachbearbeitung in der Zentralen Erstaufnahmeeinrichtung liegt in Hamburg bei der Behörde für Inneres und Sport.</p>\n<p>Die zentrale Anlaufstelle für die Flüchtlinge befindet seit Juni 2014 in der Harburger Poststraße. Neben weiteren Standorten auf Hamburger Stadtgebiet wird eine Einrichtung des Landes Mecklenburg-Vorpommern in Nostorf/Horst mitgenutzt. Zwischen der Behörde für Inneres und Sport und dem Innenministerium des Landes Mecklenburg-Vorpommern besteht seit 2006 eine Zusammenarbeit in Bezug auf die Erstunterbringung von Asylbewerbern und anderen ausländischen Flüchtlingen.</p>\n<h6>Zum Verfahren:</h6>\n<p>In der Harburger Poststraße verbleiben die Bewohner in der Regel nur für eine kurze Zeit, da es sich hier um die Anlaufstelle handelt. Sie werden zeitnah im Rahmen des bundesweiten Verteilungsverfahrens nach einem Verteilungsschlüssel entweder anderen Bundesländern zugewiesen oder im Falle des Verbleibs in Hamburg an andere Standorte der zentralen Erstaufnahmeeinrichtung weitergeleitet. Sollten die Asylsuchenden einem anderen Bundesland zugewiesen werden, erhalten sie von der Anlaufstelle eine Fahrkarte zur Fahrt zum vorgeschriebenen Zielort.</p>",
+                        "perspektive_wohnen_bestehend": "<h6>Folgeunterbringung</h6>\n<p>Die Länder sind aufgrund bundesrechtlicher Bestimmungen verpflichtet, zentrale Einrichtungen für die Erstaufnahme Asylsuchender vorzuhalten (§ 44 AsylVfG); Asylbewerber sind in der Regel verpflichtet, bis zu längstens sechs Monaten in diesen Einrichtungen zu wohnen (§ 47 AsylVfG). Die Zuständigkeit für die aufenthalts- und die leistungsrechtliche Sachbearbeitung in der Zentralen Erstaufnahmeeinrichtung liegt in Hamburg bei der Behörde für Inneres und Sport.</p>",
+                        "oeru_bestehend": "<h6>Flüchtlingsunterkünfte mit der Perspektive Wohnen</h6>\n<p>Der Senat hat ein Konzept zur Errichtung von Flüchtlingsunterkünften mit der Perspektive Wohnen beschlossen, die im Standard des sozialen Wohnungsbaus errichtet werden sollen.</p>\n<p>Die Wohnungen werden mit eigenen Bädern und Küchen ohne Abstriche vom aktuellen Baustandard errichtet. Maßstab für Wohnungsgrößen und -ausstattung sind die geltenden Standards des öffentlich geförderten Wohnungsbaus, dabei sollen die Wohnungen im 1. Förderweg mit einer Mietpreis- und Belegungsbindung von 15 bis 30 Jahren errichtet werden.</p>\n<p>Ziel ist es, die geplanten öffentlichen Unterkünfte im Standard des öffentlich geförderten Wohnungsbaus grundsätzlich durch private Investoren errichten zu lassen. Die Flächen werden vorrangig an bestandshaltende Investoren vergeben, dazu zählen sowohl Genossenschaften als auch bestandshaltende freie Wohnungsunternehmen. In jedem Fall wird geprüft, ob auch die SAGA GWG die Entwicklung übernehmen kann.</p>\n<p>Vorgesehen sind zwei Nutzungsphasen: Die Wohnungen werden zunächst als Flüchtlingsunterkünfte in der Folgeunterbringung genutzt, d.h. mit deutlich mehr Personen belegt als in regulären Wohnungen üblich. So sind bei bis zu 800 Wohnungen je Fläche und einer sehr engen Belegung mit durchschnittlich mindestens fünf Personen pro Wohnung für die Dauer der öffentlich-rechtlichen Unterbringung jeweils ca. 4.000 Flüchtlingsplätze möglich.</p>\n<p>Genehmigt werden die Flüchtlingsunterkünfte mit der Perspektive Wohnen auf Grundlage der planungsrechtlichen Erleichterungen im Baugesetzbuch für Flüchtlinge und Asylbegehrende. Die Gebäude werden im Rahmen der Genehmigung im vollen Umfang auf alle Standards der Hamburgischen Bauordnung geprüft.</p>\n<p>Fördern und wohnen AöR (f&w) wird mit dem Eigentümer einen Pacht- oder Generalmietvertrag für einen Zeitraum von 15 Jahren abschließen und die errichteten Wohngebäude als öffentliche Unterkunft selbständig betreiben. Nach Ablauf der 15 Jahre stehen die Wohnungen dauerhaft dem Wohnungsmarkt und damit weiten Kreisen der Bevölkerung zur Verfügung. Ab diesem Zeitpunkt werden jeweils ca. 2.000 Bewohnerinnen und Bewohner in den Quartieren wohnen.</p>\n<p>Zudem ist vorgesehen, zügig Planrecht für Wohnungsbau auf den Flächen zu schaffen, damit bereits deutlich vor Ablauf des für die Unterkunft vorgesehenen Zeitraums von 15 Jahren für einzelne Wohnungen oder Baublöcke auch reguläre Mietverträge abgeschlossen werden können. So können sukzessive auch Haushalte integriert werden, die keinen Flüchtlingsstatus haben.</p>"
+                    }
+                },
+                "schulentlassene": {
+                    "title": {
+                        "anteil_sus_abi": "Anteil der Schulentlassenen mit Abitur/Fachhochschulreife, mittlerem Schulabschluss sowie mit erstem allgemeinbildenden Schulabschluss",
+                        "anteil_sus_ohneabschluss": "Anteil der Schulentlassenen ohne ersten allgemeinbildenen Schulabschluss"
+                    },
+                    "general": {
+                        "district": "Bezirk"
+                    },
+                    "barchart": {
+                        "title": {
+                            "anteil_sus_abi": "Anteil \"Abi/FH\" im Zeitverlauf",
+                            "anteil_sus_ohneabschluss": "Anteil \"ohne Abschluss\" im Zeitverlauf"
+                        }
+                    },
+                    "linechart": {
+                        "title": "Anzahl verschiedener Abschlüsse je 1000 unter 18-Jährigen",
+                        "labelABI": "Abi/FH: Abitur/Fachhochschulreife",
+                        "labelMSA": "MSA: mittlerer Schulabschluss",
+                        "labelESA": "ESA: erster allgemeinbildender Schulabschluss",
+                        "labelOSA": "oSA: ohne ersten allgemeinbildenden Schulabschluss",
+                        "labelGesamt": "Anzahl aller Schulentlassenen"
+                    },
+                    "info": {
+                        "titleAbi": "Anteil der Schulentlassenen mit Abitur/Fachhochschulreife",
+                        "textAbi": "Zur Berechnung dieser Kennzahl wurden sowohl die Abiturientinnen und Abiturienten als auch diejenigen Schülerinnen und Schüler berücksichtigt, die den schulischen Teil der Fachhochschulreife erworben haben. Berücksichtigt wurden nur Schülerinnen und Schüler, die diese Abschlüsse an einer allgemeinbildenden Schule* erworben haben. Die Bezugsgröße für die Schülerinnen und Schüler ist jeweils der Wohnort. Die Anteilsberechnung erfolgt auf Grundlage aller Schulentlassenen allgemeinbildender Schulen im jeweiligen Gebiet.",
+                        "titleOsa": "Anteil der Schulentlassenen ohne ersten allgemeinbildenden Schulabschluss*",
+                        "textOsa": "Diese Zahl enthält auch Schülerinnen und Schüler mit sonderpädagogischem Förderbedarf. Ein erheblicher Teil dieser Schülerinnen und Schüler erreicht infolge der jeweiligen Lernbeeinträchtigungen keinen ersten allgemeinbildenden oder höherwertigen Schulabschluss.",
+                        "titleA": "Anzahl verschiedener Abschlüsse je 1000 unter 18-Jährigen",
+                        "textA": "Die Kennzahl gibt die Anzahl aller Schulentlassenen, sowie die erworbenen Abschlussarten auf 1000 unter 18-Jährigen im Stadtteil/Sozialraum an. Diese Darstellung ermöglicht zusätzlich zu den Abschlussquoten eine bessere Vergleichbarkeit der Schulabschlüsse über die Zeit im betreffenden Stadtteil bzw. Sozialraum.",
+                        "titleB": "Keine oder zu geringe Fallzahlen:",
+                        "textB": "Die Kennzahlen werden nur in Gebieten ausgewiesen, in denen mindestens 30 Schulentlassene wohnen. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt.",
+                        "footer": "*) Allgemeinbildende Schulen vermitteln im Primarbereich die Grundlagen für eine weiterführende Bildung, im Sekundarbereich I und II eine allgemeine Grundbildung bzw. vertiefte Allgemeinbildung. Zu den allgemeinbildenden Schulen der im Bildungsatlas abgebildeten Primarstufe und der Sekundarstufe I gehören in Hamburg Grundschulen, Stadtteilschulen, Gymnasien sowie Sonderschulen."
+                    }
+                },
+                "balkendiagrammwanderungen": {
+                    "title": "Anzahl der Zu- bzw. Fortzüge (+/-) der unter 6-Jährigen je 100 Kinder unter 6 Jahren",
+                    "table": {
+                        "statgeb": "Im Statistischen Gebiet",
+                        "sozialraum": "In {{- sozialraum_name}}",
+                        "stadtteil": "In {{- stadtteil_name}}",
+                        "ausUmland": "Anteil der Zuzüge aus dem Umland",
+                        "insUmland": "Anteil der Fortzüge ins Umland"
+                    },
+                    "barchart": {
+                        "title": "Kennzahl im Zeitverlauf"
+                    }
+                },
+                "balkendiagramm": {
+                    "title": {
+                        "anzahl_sus_primarstufe": "Anzahl der Schülerinnen und Schüler an Grundschulen",
+                        "anzahl_sus_sekundarstufe": "Anzahl der Schülerinnen und Schüler in der Sekundarstufe I",
+                        "anteil_sus_gymnasien": "Anteil der Schülerinnen und Schüler an Gymnasien in der Sekundarstufe I",
+                        "anteil_sus_stadtteilschulen": "Anteil der Schülerinnen und Schüler an Stadtteilschulen in der Sekundarstufe I",
+                        "anteil_sus_sonderschulen": "Anteil der Schülerinnen und Schüler an Sonderschulen in der Sekundarstufe I",
+                        "anzahl_u18": "Anzahl der unter 18-Jährigen",
+                        "anzahl_u3": "Anzahl der unter 3-Jährigen",
+                        "anzahl_3_5": "Anzahl der 3 bis 5-Jährigen",
+                        "anzahl_6_9": "Anzahl der 6 bis 9-Jährigen",
+                        "anzahl_10_15": "Anzahl der 10 bis 15-Jährigen",
+                        "anteil_u18": "Anteil der unter 18-Jährigen",
+                        "anteil_u3": "Anteil der unter 3-Jährigen",
+                        "anteil_3_5": "Anteil der 3 bis 5-Jährigen",
+                        "anteil_6_9": "Anteil der 6 bis 9-Jährigen",
+                        "anteil_10_15": "Anteil der 10 bis 15-Jährigen",
+                        "migrhintergrund_u18": "Anteil der unter 18-Jährigen mit Migrationshintergrund",
+                        "migrhintergrund_u3": "Anteil der unter 3-Jährigen mit Migrationshintergrund",
+                        "migrhintergrund_3_5": "Anteil der 3 bis 5-Jährigen mit Migrationshintergrund",
+                        "migrhintergrund_6_9": "Anteil der 6 bis 9-Jährigen mit Migrationshintergrund",
+                        "migrhintergrund_10_15": "Anteil der 10 bis 15-Jährigen mit Migrationshintergrund",
+                        "nicht_dt_spr_kl1": "Anteil der Kinder in Klassenstufe 1 mit nicht-deutscher Familiensprache",
+                        "kinder_vorschulischer_sf": "Anteil der Kinder in vorschulischer Sprachförderung",
+                        "alleinerz_u18": "Anteil der unter 18-Jährigen in Haushalten von Alleinerziehenden",
+                        "alleinerz_u6": "Anteil der unter 6-Jährigen in Haushalten von Alleinerziehenden",
+                        "alleinerz_u10": "Anteil der 6 bis unter 10-Jährigen in Haushalten von Alleinerziehenden",
+                        "alleinerz_u16": "Anteil der 10 bis unter 16-Jährigen in Haushalten von Alleinerziehenden",
+                        "hilfebeduerftige_u15": "Anteil der unter 15-Jährigen Hilfebedürftigen",
+                        "betr_quote_3_schuleintritt_proz": "Betreuungsquote der 3- bis unter 6,5-Jährigen",
+                        "betr_quote_4_proz": "Betreuungsquote der 4-Jährigen",
+                        "betr_quote_unter3_proz": "Betreuungsquote der unter 3-Jährigen",
+                        "betr_quote_2_proz": "Betreuungsquote der 2-Jährige",
+                        "anteil_unter3_fam_proz": "Anteil der betreuten unter 3-Jährigen mit nicht-deutscher Familiensprache",
+                        "anteil_3_schuleintritt_fam_proz": "Anteil der betreuten 3- bis unter 6,5-Jährigen mit nicht-deutscher Familiensprache",
+                        "anteil_nutzer_bevölkerung_6_9": "Nutzung der JMS-Angebote der 6- bis 9-Jährigen",
+                        "anteil_nutzer_bevölkerung_10_15": "Nutzung der JMS-Angebote der 10- bis 15-Jährigen",
+                        "anzahl_nutzer_6_9": "Nutzung der JMS-Angebote der 6- bis 9-Jährigen",
+                        "anteil_nutzer_10_15": "Nutzung der JMS-Angebote der 10- bis 15-Jährigen"
+                    },
+                    "general": {
+                        "district": "Bezirk",
+                        "statisticalarea": "Statistisches Gebiet"
+                    },
+                    "barchart": {
+                        "title": "Kennzahl im Zeitverlauf"
+                    },
+                    "info": {
+                        "anzahl_sus_primarstufe": {
+                            "title": "Schülerinnen und Schüler der Jahrgänge 1 bis 4",
+                            "text": "Für diese Kennzahl wurden sowohl alle Schülerinnen und Schüler der Hamburger Grundschulen als auch die Schülerinnen und Schüler der Primarstufen* der Hamburger Sonderschulen erfasst. Bezugsgröße ist der Wohnort der Schüler."
+                        },
+                        "anzahl_sus_sekundarstufe": {
+                            "title": "Schülerinnen und Schüler ab Jahrgang 5",
+                            "text": "Die Kennzahl berücksichtigt alle Schülerinnen und Schüler der weiterführenden Schulen in Hamburg. Dies umfasst die Schulformen Stadtteilschule, Gymnasium, Sonderschule und die verbliebenen 6-jährigen Grundschulen."
+                        },
+                        "anteil_sus_gymnasien": {
+                            "title": "Anteil der Schülerinnen und Schüler an Gymnasien",
+                            "text": "Für die Berechnung des Anteils der Schülerinnen und Schüler an Gymnasien wurden nur die Schülerinnen und Schüler der Sekundarstufe I* berücksichtigt. Die Bezugsgröße für die Anteilsberechnung sind alle Schülerinnen und Schüler der Sekundarstufe I."
+                        },
+                        "anteil_sus_stadtteilschulen": {
+                            "title": "Anteil der Schülerinnen und Schüler an Stadtteilschulen",
+                            "text": "Für die Berechnung des Anteils der Schülerinnen und Schüler an Stadtteilschulen wurden nur die Schülerinnen und Schüler der Sekundarstufe I* berücksichtigt. Die Bezugsgröße für die Anteilsberechnung sind alle Schülerinnen und Schüler der Sekundarstufe I."
+                        },
+                        "anteil_sus_sonderschulen": {
+                            "title": "Anteil der Schülerinnen und Schüler an Sonderschulen",
+                            "text": "Für die Berechnung des Anteils der Schülerinnen und Schüler an Sonderschulen** wurden nur die Schülerinnen und Schüler der Sekundarstufe I* berücksichtigt. Die Bezugsgröße für die Anteilsberechnung sind alle Schülerinnen und Schüler der Sekundarstufe I."
+                        },
+                        "migrhintergrund": {
+                            "title": "Kinder und Jugendliche mit Migrationshintergrund nach Altersgruppen",
+                            "text": "Bei den hier dargestellten Kennzahlen zur Anzahl und zu den Anteilen der Kinder und Jugendlichen mit Migrationshintergrund in Hamburg handelt es sich nicht um statistische Ergebnisse im Sinne einer Erhebung, sondern um Schätzungen aufgrund statistischer Berechnungen durch das Statistikamt Nord. Sie beruhen auf einem anonymisierten Sonderabzug aus dem Melderegister mit dem Stichtag 31.12.2017. Die lediglich bei ihrer Reederei gemeldeten Seeleute und Binnenschiffer wurden nicht eingezogen, ebenso nicht die am Nebenwohnsitz gemeldeten Personen. Zu der Bevölkerung mit Migrationshintergrund gehören:"
+                        },
+                        "migrhintergrund_1": {
+                            "list": "die ausländische Bevölkerung"
+                        },
+                        "migrhintergrund_2": {
+                            "list": "alle ab 1950 von außerhalb Deutschlands Zugewanderten unabhängig von ihrer Nationalität. Dazu zählen auch die in Deutschland geborenen eingebürgerten früheren Ausländerinnen und Ausländer sowie in Deutschland Geborene mit deutscher Staatsangehörigkeit, bei denen sich der Migrationshintergrund aus der Migrationserfahrung der Eltern oder eines Elternteils ableitet"
+                        },
+                        "migrhintergrund_3": {
+                            "list": "die (deutschen) Kinder ausländischer Eltern, die die Bedingungen für das Optionsmodell erfüllen."
+                        },
+                        "nicht_dt_spr_kl1": {
+                            "title": "Anteil der Kinder in Klassenstufe 1 mit nicht-deutscher Familiensprache",
+                            "text": "Bei der Ermittlung der Kinder mit nicht-deutscher Familiensprache in Klassenstufe 1 wurden Kinder mit einer nicht-deutschen Erstsprache berücksichtigt. Damit sind alle Kinder erfasst, die zuhause überwiegend eine andere Sprache als Deutsch sprechen. Erfasst wurden alle Kinder der Klassenstufe 1 sowohl der Grund- als auch der Sonderschulen. Die Fälle „ohne Angabe“ bei der Angabe zur Erstsprache wurden in dieser Berechnung zu den deutschsprechenden Kindern gezählt. Auf Grund der Staatsangehörigkeit wird davon ausgegangen, dass es sich bei fehlenden Angaben zur Familiensprache überwiegend um Fälle mit deutscher Familiensprache handelt. Bezugsgröße der Berechnung ist der Wohnort der Kinder."
+                        },
+                        "alleinerz": {
+                            "title": "Berechnungsgrundlage",
+                            "text": "Bei der Darstellung der Anteile der unter sechsjährigen Kinder in alleinerziehenden Haushalten an allen Kindern dieser Altersgruppe wurde zur Berechnung der Anteile der Kinder von Alleinerziehenden ein anonymisierter Sonderabzug aus dem Melderegister herangezogen."
+                        },
+                        "hilfebeduerftige_u15": {
+                            "title": "Nicht erwerbsfähigen Hilfebedürftigen (überwiegend Kinder unter 15 Jahre):",
+                            "text": "Der Indikator gekennzeichnet den Anteil der nichterwerbsfähigen Hilfebedürftigen an der Bevölkerung unter 15 Jahren in einem Gebiet. Bei nichterwerbsfähigen Personen handelt es sich mehrheitlich (ca. 97 %) um Kinder, die aufgrund ihres Alters von unter 15 Jahren als nicht erwerbsfähig gelten. Die Kennzahl weist darauf hin, wie stark ein Gebiet von Kinder- und Jugendarmut betroffen ist."
+                        },
+                        "gebiet2011": {
+                            "title": "Gebietsveränderungen 2011",
+                            "text": "Am 1.1.2011 gab es in Hamburg eine Veränderung der Gebietszuschnitte bei den statistischen Gebieten und den Stadtteilen. Für die Darstellung der Zeitreihe im Datenblatt auf Ebene der statistischen Gebiete wurden die Daten aus den alten Gebietseinheiten den entsprechenden neuen Gebietseinheiten ab 2011 zugewiesen. Auf Ebene der Stadtteile wurden die Zahlen der 2011 zu Hamm zusammengelegten Stadtteile Hamm-Süd, Hamm-Mitte und Hamm-Nord auch in der Zeitreihe zu dem heutigen Gebiet von Hamm zusammengefasst. Die Neugründung von Neuallermöhe 2011 aus den Stadtteilen Allermöhe und Bergedorf führt in der Darstellung von Zeitreihen auf Stadtteilebene zu größeren Sprüngen in den betroffenen Gebieten."
+                        },
+                        "fallzahlen": {
+                            "anzahl_sus_primarstufe": {
+                                "title": "Keine oder zu geringe Fallzahlen",
+                                "text": "Die Anzahl der Schülerinnen und Schüler in der Primarstufe wird nur in Gebieten ausgewiesen, in denen mindestens 3 Kinder dieser Altersgruppe leben. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                            },
+                            "anzahl_sus_sekundarstufe": {
+                                "title": "Keine oder zu geringe Fallzahlen",
+                                "text": "Die Anzahl der Schülerinnen und Schüler in der Sekundarstufe I* wird nur in Gebieten ausgewiesen, in denen mindestens 3 Kinder dieser Altersgruppe leben. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                            },
+                            "anteil_sus_gymnasien": {
+                                "title": "Keine oder zu geringe Fallzahlen",
+                                "text": "Der Anteil der Schülerinnen und Schüler an Gymnasien wird nur in Gebieten ausgewiesen, in denen mindestens 30 Schülerinnen und Schüler der Sekundarstufe I wohnen. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                            },
+                            "anteil_sus_stadtteilschulen": {
+                                "title": "Keine oder zu geringe Fallzahlen",
+                                "text": "Der Anteil der Schülerinnen und Schüler an Stadtteilschulen wird nur in Gebieten ausgewiesen, in denen mindestens 30 Schülerinnen und Schüler der Sekundarstufe I wohnen. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                            },
+                            "anteil_sus_sonderschulen": {
+                                "title": "Keine oder zu geringe Fallzahlen",
+                                "text": "Der Anteil der Schülerinnen und Schüler an Sonderschulen wird nur in Gebieten ausgewiesen, in denen mindestens 30 Schülerinnen und Schüler der Sekundarstufe I wohnen. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                            },
+                            "anzahl_bev": {
+                                "title": "Keine oder zu geringe Fallzahlen",
+                                "text": "Die Anzahl der Kinder nach Altersgruppen wird aus datenschutzrechtlichen Gründen nur ausgewiesen, sofern in einem Gebiet mindestens drei Kinder der jeweiligen Altersgruppe wohnen. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                            },
+                            "anteil_bev": {
+                                "title": "Keine oder zu geringe Fallzahlen",
+                                "text": "Die Anteile der Kinder nach Altersgruppen werden nur ausgewiesen, sofern in einem Gebiet mindestens 30 Personen wohnen. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                            },
+                            "migrhintergrund": {
+                                "title": "Keine oder zu geringe Fallzahlen",
+                                "text": "Die Anteile der Kinder nach Altersgruppen sind nur dann ausgewiesen, sofern in einem Gebiet mindestens drei Kinder mit dem Merkmal Migrationshintergrund und insgesamt mindestens 30 Personen der betrachteten Altersgruppe wohnen. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                            },
+                            "nicht_dt_spr_kl1": {
+                                "title": "Keine oder zu geringe Fallzahlen",
+                                "text": "Die Anteile der Kinder der Klassenstufe 1 mit nicht-deutscher Familiensprache sind nur dann ausgewiesen, sofern in einem Gebiet mindestens 30 Kinder der betrachteten Klassenstufe wohnen. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                            },
+                            "alleinerz": {
+                                "title": "Keine oder zu geringe Fallzahlen",
+                                "text": "Die Anteile der Kinder von Alleinerziehenden nach Altersgruppen sind aus Gründen der statistischen Geheimhaltung nur in Gebieten ausgewiesen, in denen mindestens 30 Kinder und Jugendliche unter 18 Jahren in Haushalten von Alleinerziehenden leben, und in denen in der jeweils betrachteten Altersgruppe mindestens drei Kinder bei Alleinerziehenden aufwachsen. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                            },
+                            "hilfebeduerftige_u15": {
+                                "title": "Zusammengefasste Gebiete mit keinen oder zu geringen Fallzahlen",
+                                "text": "Um die statistische Geheimhaltung zu garantieren, wurden für die Anteilsberechnungen einige aneinandergrenzende Stadtteile, die besonders wenig Fallzahlen (unter drei Kinder in der Altersgruppe) aufwiesen, zusammengefasst. Dieses betraf besonders die Stadtteile mit geringen Bevölkerungszahlen in der Umgebung des Hafens und den Vier- und Marschlanden. Aus datenschutzrechtlichen Gründen wurden die Anteilswerte nur für die Verwaltungseinheiten berechnet, in denen die Anzahl der unter 15-Jährigen mindestens 30 Personen beträgt. Insgesamt konnten 101 Kinder und Jugendliche unter 15 Jahren nicht einem Gebiet zugeordnet werden."
+                            }
+                        },
+                        "hint": {
+                            "anzahl_sus_primarstufe": {
+                                "title": "*) Primarstufe",
+                                "text": "Die Jahrgangsstufen 1 bis 4."
+                            },
+                            "anzahl_sus_sekundarstufe": {
+                                "title": "*) Sekundarstufe",
+                                "text": "Die Jahrgangsstufen 5 bis 10 bilden die Sekundarstufe I, die Jahrgangsstufen 11 bis 13 die Sekundarstufe II."
+                            },
+                            "anteil_sus_sonderschulen": {
+                                "title": "**) Sonderschulen",
+                                "text": "Seit der Umsetzung inklusiver Bildung an Hamburgs Schulen umfassen die Sonderschulen nur noch die speziellen Sonderschulen. Diese sind entsprechend dem Förderbedarf ihrer Schülerinnen und Schüler in ihrer Arbeit auf die Förderschwerpunkte Hören und Kommunikation, Sehen, geistige Entwicklung und körperliche und motorische Entwicklung ausgerichtet. Die Angebote der früheren Förder- und Sprachheilschulen, die vor 2012 auch zu den Sonderschulen zählten, wurden gemeinsam mit den Angeboten der Regionalen Beratungs- und Unterstützungsstellen (REBUS) 2012 in den Regionalen Bildungs- und Beratungszentren (ReBBZ) zu einem Angebot zusammengeführt. Im Rahmen der seit dem Schuljahr 2011/12 umgesetzten Inklusion an den Hamburger Schulen können Schülerinnen und Schülern mit sonderpädagogischem Förderbedarf sowohl an speziellen Sonderschulen und regionalen Bildungs- und Beratungszentren als auch integrativ an allgemeinen Schulen beschult werden."
+                            }
+                        },
+                        "kita": {
+                            "betr_quote_3_schuleintritt_proz": {
+                                "title": "Betreuungsquote der 3- bis unter 6,5-Jährigen in den Stadtteilen",
+                                "text": "Es wird der Anteil der Kinder von 3 bis unter 6,5 Jahren berechnet. Bis 2018 wurde die Betreuungsquote der Kinder von 3 bis unter 6 Jahren ausgewiesen. Bei der Betrachtung der Zeitreihen muss dieser Unterschied mitbedacht werden."
+                            },
+                            "anteil_3_schuleintritt_fam_proz": {
+                                "title": "Kinder mit einer nicht-deutscher Familiensprache",
+                                "text": "Bei der Beantragung eines Kita-Gutscheins geben die Eltern an, welche Sprache überwiegend in der Familie gesprochen wird. Weitere Sprachen, die möglicherweise auch in der Familie gesprochen werden, werden dabei nicht erfasst."
+                            },
+                            "anteil_unter3_fam_proz": {
+                                "title": "Kinder mit einer nicht-deutscher Familiensprache",
+                                "text": "Bei der Beantragung eines Kita-Gutscheins geben die Eltern an, welche Sprache überwiegend in der Familie gesprochen wird. Weitere Sprachen, die möglicherweise auch in der Familie gesprochen werden, werden dabei nicht erfasst."
+                            },
+                            "kinder_vorschulischer_sf": {
+                                "title": "Vorschulische Sprachförderung nach Stadtteil",
+                                "text": "Additive Sprachförderung im Vorschulalter*. Bei der Berechnung wurden sowohl Kinder berücksichtigt, die in der Vorschule gefördert werden, als auch solche, die in der Kita additive Sprachförderung erhalten. Berechnet wurden die Anteile auf Grundlage der Bevölkerungsdaten der 5-Jährigen (Melderegister, Statistikamt Nord), da die Kinder bei der Inanspruchnahme der vorschulischen Sprachförderung im Durchschnitt fünf Jahre alt sind. Die Werte sind als Näherungswerte zu verstehen, da eine altersgenaue Berechnung nicht möglich ist."
+                            },
+                            "hoher_anteil_migrhintergrund_u6": {
+                                "title": "Überdurchschnittlicher Anteil Kinder mit Migrationshintergrund",
+                                "text": "Auf der Karte hervorgehoben werden nur die statistischen Gebiete, in denen die Anteile der unter 6-jährigen Kinder mit Migrationshintergrund* mehr als eine Standardabweichung** vom gesamtstädtischen Mittelwert abweichen und damit als überdurchschnittlich hohe Werte eingestuft werden."
+                            },
+                            "hoher_anteil_nicht_dt_spr_kl1": {
+                                "title": "Überdurchschnittlich hoher Anteil der Kinder in Klassenstufe 1, die zuhause nicht Deutsch sprechen",
+                                "text": "Auf der Karte hervorgehoben werden nur die statistischen Gebiete, in denen die Anteile der Kinder der Klassenstufe 1 mit einer nicht-deutschen Familiensprache mehr als eine Standardabweichung* vom gesamtstädtischen Mittelwert abweichen und damit als überdurchschnittlich hohe Werte eingestuft werden."
+                            },
+                            "betreuungsquote": {
+                                "betr_quote_3_schuleintritt_proz": {
+                                    "title": "Betreuungsquote",
+                                    "text": "Bei der Betreuungsquote der unter 3- bis unter 6,5-Jährigen werden in den Daten nur diejenigen Kinder erfasst, die ein Betreuungsangebot (Kita oder Tagespflege) im Rahmen des Kita-Gutschein-Systems* (einschließlich stadteigene Kitas) in Anspruch nehmen. Außerdem erfasst sind unter 6,5-Jährige, die die Vorschulklasse (VSK) besuchen. Stichtag der Kita- und der VSK-Daten ist der 01.03. des Berichtsjahres."
+                                },
+                                "betr_quote_4_proz": {
+                                    "title": "Betreuungsquote der 4-Jährigen in den Stadtteilen",
+                                    "text": "Bei der Betreuungsquote der 4-Jährigen werden nur diejenigen Kinder erfasst, die ein Betreuungsangebot (Kita oder Tagespflege) im Rahmen des Kita-Gutschein-Systems* (einschließlich der stadteigenen Kitas) in Anspruch nehmen. Stichtag der Kita-Daten ist der 01.03. des Berichtsjahres."
+                                },
+                                "betr_quote_unter3_proz": {
+                                    "title": "Betreuungsquote der unter 3-Jährigen in den Stadtteilen",
+                                    "text": "Bei der Betreuungsquote der unter 3-Jährigen werden nur diejenigen Kinder erfasst, die ein Betreuungsangebot (Kita oder Tagespflege) im Rahmen des Kita-Gutschein-Systems* (einschließlich stadteigene Kitas) in Anspruch nehmen. Stichtag der Kita-Daten ist der 01.03. des Berichtsjahres."
+                                },
+                                "betr_quote_2_proz": {
+                                    "title": "Betreuungsquote der 2-Jährigen in den Stadtteilen",
+                                    "text": "Bei der Betreuungsquote der 2-Jährigen werden nur diejenigen Kinder erfasst, die ein Betreuungsangebot (Kita oder Tagespflege) im Rahmen des Kita-Gutschein-Systems (einschließlich der stadteigene Kitas) in Anspruch nehmen. Stichtag der Berechnungen ist der 01.03. des Berichtsjahres."
+                                },
+                                "anteil_3_schuleintritt_fam_proz": {
+                                    "title": "Anteil der betreuten 3- bis unter 6,5-Jährigen Kinder, die zu Hause überwiegend eine andere Sprache als deutsch sprechen",
+                                    "text": "Es wird wird der Anteil der Kinder von 3 bis unter 6,5 Jahren berechnet an allen betreuten Kindern von 3- bis unter 6,5 Jahren berechnet. Bis 2018 wurde der Anteil der Kinder von 3 bis unter 6 Jahren ausgewiesen. Bei der Betrachtung der Zeitreihen muss dieser Unterschied mitbedacht werden. Stichtag der Kita- und der VSK-Daten ist der 01.03. des Berichtsjahres."
+                                },
+                                "anteil_unter3_fam_proz": {
+                                    "title": "Anteil der betreuten Kinder unter 3 Jahren im Stadtteil, die zu Hause überwiegend eine andere Sprache als deutsch sprechen",
+                                    "text": "Es wird der Anteil der Kinder von unter 3 Jahren mit nicht-deutscher Familiensprache an allen betreuten Kindern unter 3 Jahren berechnet. Stichtag der Kita-Daten ist der 01.03. des Berichtsjahres."
+                                }
+                            },
+                            "berechnungsgrundlage": {
+                                "betr_quote_3_schuleintritt_proz": {
+                                    "title": "Berechnungsgrundlage",
+                                    "text": "Für die Berechnung der Anteile der Betreuungsquoten der 3- bis 6,5-Jährigen wurden Bevölkerungsdaten aus dem Melderegister verwendet. Die Daten aus dem Melderegister sind gegenüber den Bevölkerungsdaten der amtlichen Statistik leicht überschätzt. Entsprechend sind die berechneten Betreuungsquoten leicht unterschätzt. Stichtag der Bevölkerungsdaten ist der 31.12. des Vorjahres (Bsp.: Kita- und VSK-Daten mit Stichtag 01.03.2022 und Bevölkerungsdaten mit Stichtag 31.12.2021)."
+                                },
+                                "betr_quote_4_proz": {
+                                    "title": "Berechnungsgrundlage",
+                                    "text": "Für die Berechnung der Anteile der Betreuungsquoten der 4-Jährigen wurden Bevölkerungsdaten aus dem Melderegister verwendet. Die Daten aus dem Melderegister sind gegenüber den Bevölkerungsdaten der amtlichen Statistik leicht überschätzt. Entsprechend sind die berechneten Betreuungsquoten leicht unterschätzt. Stichtag der Bevölkerungsdaten ist der 31.12. des Vorjahres (Bsp.: Kita-Daten mit Stichtag 01.03.2022 und Bevölkerungsdaten mit Stichtag 31.12.2021)."
+                                },
+                                "betr_quote_unter3_proz": {
+                                    "title": "Berechnungsgrundlage",
+                                    "text": "Für die Berechnung der Anteile der Betreuungsquoten der unter 3-Jährigen wurden Bevölkerungsdaten aus dem Melderegister verwendet. Die Daten aus dem Melderegister sind gegenüber den Bevölkerungsdaten der amtlichen Statistik leicht überschätzt. Entsprechend sind die berechneten Betreuungsquoten minimal unterschätzt. Stichtag der Bevölkerungsdaten ist der 31.12. des Vorjahres (Bsp.: Kita-Daten mit Stichtag 01.03.2022 und Bevölkerungsdaten mit Stichtag 31.12.2021)."
+                                },
+                                "betr_quote_2_proz": {
+                                    "title": "Berechnungsgrundlage",
+                                    "text": "Für die Berechnung der Anteile der Betreuungsquoten der 2-Jährigen wurden Bevölkerungsdaten aus dem Melderegister verwendet. Die Daten aus dem Melderegister sind gegenüber den Bevölkerungsdaten der amtlichen Statistik leicht überschätzt. Auf der Ebene von gesamt Hamburg und gemessen an den fortgeschriebenen Daten aus dem Zensus 2011 stellt die Überschätzung für die 2-Jährigen rund +0,62 % dar. Entsprechend sind die berechneten Betreuungsquoten minimal unterschätzt. Stichtag der Bevölkerungsdaten ist der 31.12. des Vorjahres (Bsp.: Kita-Daten mit Stichtag 01.03.2022 und Bevölkerungsdaten mit Stichtag 31.12.2021)."
+                                },
+                                "hoher_anteil_nicht_dt_spr_kl1": {
+                                    "title": "Kinder mit nicht-deutscher Familiensprache",
+                                    "text": "Bei der Beantragung eines Kita-Gutscheins geben die Eltern an, welche Sprache überwiegend in der Familie gesprochen wird. Weitere Sprachen, die möglicherweise auch in der Familie gesprochen werden, werden dabei nicht erfasst."
+                                }
+                            },
+                            "fallzahlen": {
+                                "betr_quote_3_schuleintritt_proz": {
+                                    "title": "Keine oder zu geringe Fallzahlen",
+                                    "text": "Die Anteile der betreuten 3- bis 6,5-Jährigen Kinder sind nur in Gebieten ausgewiesen, in denen mindestens 30 Kinder in dieser Altersgruppe leben. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt. Werte aus der Insel Neuwerk wurden dem Stadtteil Finkenwerder zugeordnet."
+                                },
+                                "betr_quote_4_proz": {
+                                    "title": "Keine oder zu geringe Fallzahlen",
+                                    "text": "Die Anteile der betreuten 4-jährigen Kinder sind nur in Gebieten ausgewiesen, in denen mindestens 30 Kinder in dieser Altersgruppe leben. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt. Werte aus der Insel Neuwerk wurden dem Stadtteil Finkenwerder zugeordnet."
+                                },
+                                "betr_quote_unter3_proz": {
+                                    "title": "Keine oder zu geringe Fallzahlen",
+                                    "text": "Die Anteile der betreuten unter 3-jährigen Kinder sind nur in Gebieten ausgewiesen, in denen mindestens 30 Kinder in dieser Altersgruppe leben. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt. Werte aus der Insel Neuwerk wurden dem Stadtteil Finkenwerder zugeordnet."
+                                },
+                                "betr_quote_2_proz": {
+                                    "title": "Keine oder zu geringe Fallzahlen",
+                                    "text": "Die Anteile der betreuten 2-Jährigen Kinder sind nur in Gebieten ausgewiesen, in denen mindestens 30 Kinder in dieser Altersgruppe leben. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                                },
+                                "anteil_3_schuleintritt_fam_proz": {
+                                    "title": "Keine oder zu geringe Fallzahlen",
+                                    "text": "Die Anteile der betreuten 3- bis unter 6,5-Jährigen Kinder mit nicht-deutscher Familiensprache an allen betreuten Kindern sind nur in Gebieten ausgewiesen, in denen mindestens 10 Kinder in frühkindlicher Betreuung sind. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                                },
+                                "anteil_unter3_fam_proz": {
+                                    "title": "Keine oder zu geringe Fallzahlen",
+                                    "text": "Die Anteile der betreuten unter 3-Jährigen Kinder mit nicht-deutscher Familiensprache an allen betreuten Kindern sind nur in Gebieten ausgewiesen, in denen mindestens 10 Kinder in frühkindlicher Betreuung sind. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt."
+                                },
+                                "kinder_vorschulischer_sf": {
+                                    "title": "Keine oder zu geringe Fallzahlen",
+                                    "text": "Die Anteile der Kinder in vorschulischer Sprachförderung sind nur in Gebieten ausgewiesen, in denen mindestens 30 Kinder in der Altersgruppe der 5-Jährigen leben. In Gebieten, in denen es nach diesem Kriterium zu geringe oder gar keine Fallzahlen gibt, werden keine Werte angezeigt und die Flächen grau eingefärbt. Werte von Finkenwerder, Kleiner Grasbrook und Neuwerk wurden zusammengefasst."
+                                },
+                                "hoher_anteil_migrhintergrund_u6": {
+                                    "title": "Kinder unter 6 Jahren mit Migrationshintergrund",
+                                    "text": "Bei den hier dargestellten Kennzahlen zur Anzahl und Anteilen der unter 6-jährigen Kinder mit Migrationshintergrund in Hamburg handelt es sich nicht um statistische Ergebnisse im Sinne einer Erhebung, sondern um Schätzungen aufgrund statistischer Berechnungen durch das Statistikamt Nord. Sie beruhen auf einem anonymisierten Sonderabzug aus dem Melderegister mit dem Stichtag 31.12.2012. Die lediglich bei ihrer Reederei gemeldeten Seeleute und Binnenschiffer wurden nicht eingezogen, ebenso nicht die am Nebenwohnsitz gemeldeten Personen. Zu der Bevölkerung mit Migrationshintergrund gehören die ausländische Bevölkerung sowie alle ab 1950 von außerhalb Deutschlands Zugewanderten unabhängig von ihrer Nationalität. Dazu zählen auch die in Deutschland geborenen eingebürgerten früheren Ausländerinnen und Ausländer sowie in Deutschland Geborene mit deutscher Staatsangehörigkeit, bei denen sich der Migrationshintergrund aus der Migrationserfahrung der Eltern oder eines Elternteils ableitet. Außerdem gehören zu dieser Gruppe seit 2000 auch die (deutschen) Kinder ausländischer Eltern, die die Bedingungen für das Optionsmodell erfüllen. Nicht zur Bevölkerung mit Migrationshintergrund zählen Flüchtlinge und Vertriebene in Folge des Zweiten Weltkriegs. Trotz einiger methodisch bedingter Einschränkungen ermöglicht das standardisierte Verfahren MigraPro – ein Gemeinschaftsprojekt des KOSIS-Verbunds im Rahmen der deutschen Städtestatistik – eine realitätsnahe Beschreibung der Anzahl der Personen mit Migrationshintergrund sowie ihrer Herkunftsländer."
+                                }
+                            },
+                            "leistungsarten": {
+                                "betr_quote_3_schuleintritt_proz": {
+                                    "title": "Leistungsarten Elementarbereich",
+                                    "text": "Im Hamburger Kita-Gutschein-System* erhalten Eltern einen geldwerten Gutschein für die Betreuung ihrer Kinder entweder in einer Kindertagesstätte oder in der Tagespflege. Die Eltern erhalten je nach Bedarf Gutscheine mit unterschiedlichen Stundenumfängen, die direkt in einer Kita eingelöst werden können. Für die Kindertagespflege erfolgt eine Leistungsbewilligung erst dann, wenn eine geeignete Tagespflegeperson nachgewiesen oder vermittelt werden konnte. Unter Leistungsart erfasst wird der Stundenumfang der eingelösten Kita-Gutscheine (5/6/8/10/12 Stunden pro Tag) sowie der Anteil der eingelösten Gutscheine für die Tagespflege (alle Umfänge von unter 10 Stunden bis über 41 Stunden pro Woche zusammengefasst). Weitere Kategorien sind Kita-Gutscheine im Rahmen der Eingliederungshilfe für Kinder mit Behinderung und der Besuch einer Vorschulklasse. Die Bezugsgröße ist der Wohnort der betreuten Kinder."
+                                },
+                                "betr_quote_4_proz": {
+                                    "title": "Leistungsarten Elementarbereich",
+                                    "text": "Im Hamburger Kita-Gutschein-System* erhalten Eltern einen geldwerten Gutschein für die Betreuung ihrer Kinder entweder in einer Kindertagesstätte oder in der Tagespflege. Die Eltern erhalten je nach Bedarf Gutscheine mit unterschiedlichen Stundenumfängen, die direkt in einer Kita eingelöst werden können. Für die Kindertagespflege erfolgt eine Leistungsbewilligung erst dann, wenn eine geeignete Tagespflegeperson nachgewiesen oder vermittelt werden konnte. Unter Leistungsart gefasst wird der Stundenumfang der eingelösten Kita-Gutscheine (4/5/6/8/10/12 Stunden pro Tag) sowie der Anteil der eingelösten Gutscheine für die Tagespflege (alle Umfänge von unter 10 Stunden bis über 41 Stunden pro Woche zusammengefasst)."
+                                },
+                                "betr_quote_unter3_proz": {
+                                    "title": "Leistungsarten Krippe",
+                                    "text": "Im Hamburger Kita-Gutschein-System* erhalten Eltern einen geldwerten Gutschein für die Betreuung ihrer Kinder entweder in einer Kindertagesstätte oder in der Tagespflege. Die Eltern erhalten je nach Bedarf Gutscheine mit unterschiedlichen Stundenumfängen, die direkt in einer Kita eingelöst werden können. Für die Kindertagespflege erfolgt eine Leistungsbewilligung erst dann, wenn eine geeignete Tagespflegeperson nachgewiesen oder vermittelt werden konnte. Unter Leistungsart gefasst wird der Stundenumfang der eingelösten Kita-Gutscheine (4/5/6/8/10/12 Stunden pro Tag) sowie der Anteil der eingelösten Gutscheine für die Tagespflege (alle Umfänge von unter 10 Stunden bis über 41 Stunden pro Woche zusammengefasst)."
+                                }
+                            },
+                            "gutscheinsystem": {
+                                "title": "*) Kita-Gutschein-System",
+                                "text": "Frühkindliche Bildungs- und Betreuungsangebote werden in Hamburg über das sogenannte „Kita-Gutschein-System“ sowie weitere bezuschusste Betreuungsangebote vorgehalten. Die Eltern erhalten gemäß ihres Rechtsanspruchs geldwerte Gutscheine für den entsprechenden Betreuungsumfang. Die Eltern suchen sich selbst eine Einrichtung mit einem passenden Angebot aus, lösen dort den Gutschein ein und schließen mit dem Kita-Träger einen Betreuungsvertrag. Der Kita-Träger bekommt für die betreuten Kinder mit einem Gutschein die Kosten im vollen Umfang erstattet."
+                            },
+                            "gutscheinsystem_1": {
+                                "text": "Die Betreuungsangebote im Kita-Gutscheinsystem werden überwiegend von freien Trägern gemacht, die ihre Angebote dezentral, selbständig und eigenverantwortlich planen. Die Betreuungsangebote umfassen die Krippenbetreuung (Kinder unter 3 Jahren) sowie den Elementarbereich (3 Jahre bis Einschulung). Die Hortbetreuung für bereits eingeschulte Kinder ist bis August 2013 schrittweise in den Bereich der ganztägigen Bildung und Betreuung an Schulen überführt worden."
+                            },
+                            "gutscheinsystem_2": {
+                                "text": "Seit August 2013 haben alle Kinder in Hamburg nach Vollendung des ersten Lebensjahres einen allgemeinen und bedarfsunabhängigen Rechtsanspruch auf eine fünfstündige Betreuung täglich inklusive Mittagessen in einer Kita. Alternativ können Kinder für diesen Stundenumfang auf Wunsch der Eltern auch eine Betreuung in Kindertagespflege in Anspruch nehmen. Für eine umfangreichere Betreuung besteht überdies nach wie vor der seit August 2006 gültige bedarfsabhängige Rechtsanspruch für jedes Kind bis zum vollendeten 14. Lebensjahr. Dieser gilt für eine Betreuung in dem Umfang, in dem die Eltern aufgrund einer Berufstätigkeit oder Ausbildung die Betreuung ihres Kindes nicht selbst übernehmen können (bis zu zwölf Stunden täglich). Kinder mit einem dringlichen sozialpädagogischen Förderbedarf haben Anspruch auf eine bedarfsgerechte Kindertagesbetreuung."
+                            },
+                            "hint": {
+                                "kinder_vorschulischer_sf": {
+                                    "title": "*) Additive Sprachförderung im Vorschulalter:",
+                                    "text": "Seit dem Schuljahr 2003/04 wird in den Hamburger Grundschulen das „Vorstellungsverfahren Viereinhalbjähriger“ durchgeführt, bei dem alle Kinder eineinhalb Jahre vor Einschulung mit ihren Eltern in eine Schule in Wohnortnähe zu einem verbindlichen Vorstellungsgespräch eingeladen werden. Im Mittelpunkt des Gesprächs, das von der Schulleitung bzw. Lehrkräften der Schule geführt wird, stehen die Überprüfung des Entwicklungsstandes des Kindes und – insbesondere im Falle eines deutlich verzögerten bzw. besonders fortgeschrittenen Entwicklungsstandes – die Beratung der Eltern hinsichtlich möglicher Maßnahmen zur Entwicklungs- bzw. Begabungsförderung. Der diagnostische Schwerpunkt liegt auf dem Sprachentwicklungsstand, da diesem eine zentrale Bedeutung für die weitere Lernentwicklung der Kinder im Vorschulalter und beim Übergang in die Schule zukommt. Für Kinder mit „ausgeprägtem Förderbedarf“ in der Sprachentwicklung besteht seit dem Schuljahr 2005/06 die Verpflichtung zum Besuch einer Vorschulklasse oder einer Kita und zur Teilnahme an einer zusätzlichen, also „additiven“ Sprachförderung (vgl. HmbSG §28a (2))."
+                                },
+                                "hoher_anteil_migrhintergrund_u6": {
+                                    "text": "*) Bei den hier dargestellten Kennzahlen zur Anzahl und zu den Anteilen der Kinder und Jugendlichen mit Migrationshintergrund in Hamburg handelt es sich nicht um statistische Ergebnisse im Sinne einer Erhebung, sondern um Schätzungen aufgrund statistischer Berechnungen durch das Statistikamt Nord. Sie beruhen auf einem anonymisierten Sonderabzug aus dem Melderegister mit dem Stichtag 31.12.2015. Die lediglich bei ihrer Reederei gemeldeten Seeleute und Binnenschiffer wurden nicht eingezogen, ebenso nicht die am Nebenwohnsitz gemeldeten Personen. Zu der Bevölkerung mit Migrationshintergrund gehören:"
+                                },
+                                "hoher_anteil_migrhintergrund_u6_1": {
+                                    "list": "die ausländische Bevölkerung"
+                                },
+                                "hoher_anteil_migrhintergrund_u6_2": {
+                                    "list": "alle ab 1950 von außerhalb Deutschlands Zugewanderten unabhängig von ihrer Nationalität. Dazu zählen auch die in Deutschland geborenen eingebürgerten früheren Ausländerinnen und Ausländer sowie in Deutschland Geborene mit deutscher Staatsangehörigkeit, bei denen sich der Migrationshintergrund aus der Migrationserfahrung der Eltern oder eines Elternteils ableitet"
+                                },
+                                "hoher_anteil_migrhintergrund_u6_3": {
+                                    "list": "die (deutschen) Kinder ausländischer Eltern, die die Bedingungen für das Optionsmodell erfüllen."
+                                },
+                                "hoher_anteil_migrhintergrund_u6_4": {
+                                    "text": "Nicht zur Bevölkerung mit Migrationshintergrund zählen Flüchtlinge und Vertriebene in Folge des Zweiten Weltkriegs. Trotz einiger methodisch bedingter Einschränkungen ermöglicht das standardisierte Verfahren MigraPro – ein Gemeinschaftsprojekt des KOSIS-Verbunds im Rahmen der deutschen Städtestatistik – eine realitätsnahe Beschreibung der Anzahl der Personen mit Migrationshintergrund sowie ihrer Herkunftsländer."
+                                },
+                                "hoher_anteil_migrhintergrund_u6_5": {
+                                    "text": "**) Die Standardabweichung ist ein statistisches Maß für die Streuung der Einzelwerte um ihr gemeinsames arithmetisches Mittel."
+                                },
+                                "hoher_anteil_nicht_dt_spr_kl1": {
+                                    "text": "*) Die Standardabweichung ist ein statistisches Maß für die Streuung der Einzelwerte um ihr gemeinsames arithmetisches Mittel."
+                                }
+                            }
+                        },
+                        "jugendmusikschulen_anteil": {
+                            "title": "Anteil der Kinder und Jugendlichen im Stadtteil, die Angebote der Jugendmusikschule nutzen",
+                            "text": "Die Karte bildet den Anteil der Nutzerinnen und Nutzer der Jugendmusikschulen an allen Kindern und Jugendlichen im Stadtteil in der jeweiligen Altersgruppe ab. Dargestellt werden die Nutzerinnen und Nutzer, die den kostenpflichtigen Unterricht der Jugendmusikschule oder die Kooperationsangebote im Vor- und Nachmittagsunterricht nutzen. Die Kennzahl stellt dar, inwieweit Kinder und Jugendliche in den verschiedenen Stadtteilen den gebührenpflichtigen Unterricht der Jugendmusikschule in Anspruch nehmen."
+                        },
+                        "jugendmusikschulen_anzahl": {
+                            "title": "Anzahl der Kinder und Jugendlichen im Stadtteil, die Angebote der Jugendmusikschule nutzen",
+                            "text": "Die Karte bildet die Anzahl der Nutzerinnen und Nutzer der Jugendmusikschulen an allen Kindern und Jugendlichen im Stadtteil in der jeweiligen Altersgruppe ab. Dargestellt werden die Nutzerinnen und Nutzer, die den kostenpflichtigen Unterricht der Jugendmusikschule oder die Kooperationsangebote im Vor- und Nachmittagsunterricht nutzen. Die Kennzahl stellt dar, inwieweit Kinder und Jugendliche in den verschiedenen Stadtteilen den gebührenpflichtigen Unterricht der Jugendmusikschule in Anspruch nehmen."
+                        }
+                    }
+                },
+                "schulenWohnort": {
+                    "title": "Anzahl der Schülerinnen und Schüler im statistischen Gebiet in der Primarstufe:",
+                    "statgeb": "Statistisches Gebiet",
+                    "countInArea": "Anzahl der Schülerinnen und Schüler im statistischen Gebiet in der",
+                    "hintMobile": "In der mobilen Ansicht ist keine Abfrage der Schülerzahlen möglich.",
+                    "info": {
+                        "primary": "<h6>Schulwahl am Wohnort :</h6><p>In der Karte dargestellt sind Schulen mit Primarstufe (Grundschulen, Stadtteilschulen mit integrierter Grundschule und Sonderschulen), die von Schülerinnen und Schülern eines von Ihnen ausgewählten Gebiets besucht werden. Durch Auswahl eines statistischen Gebiets werden die besuchten Schulen größenproportional angezeigt. Die absolute Anzahl an Schülerinnen und Schüler eines Gebietes, die in der Primarstufe sind, wird im Datenblatt durch Klicken auf die Schule angezeigt.</p><p><b>ACHTUNG:</b> Bei Schulen mit mehreren Zweigstellen wurden die Schülerzahlen aller Zweigstellen addiert und am Hauptstandort der Schule angezeigt. Das gilt auch für die ReBBZ.</p><p>Nicht ausgewiesen werden statistische Gebiete, in denen insgesamt weniger als 5 Schülerinnen und Schüler der Primarstufe wohnen.</p>",
+                        "secondary": "<h6>Schulwahl am Wohnort :</h6><p>In der Karte dargestellt sind Schulen mit der Sekundarstufe I (Stadtteilschulen, Gymnasien, Sonderschulen), die von Schülerinnen und Schülern eines von Ihnen ausgewählten Gebiets besucht werden. Durch Auswahl eines statistischen Gebiets werden die besuchten Schulen größenproportional angezeigt. Die absolute Anzahl an Schülerinnen und Schüler eines Gebietes, die in der Sekundarstufe I sind, wird im Datenblatt durch Klicken auf die Schule angezeigt.</p><p><b>ACHTUNG:</b> Bei Schulen mit mehreren Zweigstellen wurden die Schülerzahlen aller Zweigstellen addiert und am Hauptstandort der Schule angezeigt. Das gilt auch für die ReBBZ.</p><p>Nicht ausgewiesen werden statistische Gebiete, in denen insgesamt weniger als 5 Schülerinnen und Schüler der Sekundarstufe I wohnen.</p>"
+                    }
+                },
+                "SchulenEinzugsGebiete": {
+                    "address": "Adresse",
+                    "totalCount": "Gesamtzahl der Schüler*innen:",
+                    "primaryCount": "davon in der Primarstufe:",
+                    "secondaryCount": "davon in der Sekundarstufe I:",
+                    "countInArea": "The count of students in statistischen Gebiet in",
+                    "hintText": "Zur Abfrage der Schülerzahlen bewegen Sie den Mauszeiger auf ein Gebiet.",
+                    "hintMobile": "In der mobilen Ansicht ist keine Abfrage der Schülerzahlen möglich.",
+                    "info": "<h6><b>Einzugsgebiete :</b></h6><p>Dargestellt werden die Anteile der Schülerinnen und Schüler der angeklickten Schule nach Wohnort. Dabei können Grundschulen, Sonderschulen (Primarstufe) sowie Stadtteilschulen mit integrierter Grundschule angeklickt werden. Ist ein statistisches Gebiet um die angeklickte Schule beispielsweise dunkel eingefärbt, bedeutet dies, dass ein hoher Anteil der Schülerinnen und Schüler dieser Schule in diesem dunkel eingefärbten Gebiet wohnen. Durch Hovern auf ein eingefärbtes statistisches Gebiet wird die Anzahl der Schülerinnen und Schüler angezeigt, die in diesem Gebiet wohnen und die angeklickte Schule besuchen.</p><p>ACHTUNG: Bei Schulen mit mehreren Zweigstellen wurden die Schülerzahlen aller Zweigstellen addiert und am Hauptstandort der Schule angezeigt. Das gilt auch für die ReBBZ.</p><p>Nicht ausgewiesen werden statistische Gebiete, in denen insgesamt weniger als 5 Schülerinnen und Schüler der Primarstufe wohnen.</p>"
+                }
+            }
+        }
+    }
+}

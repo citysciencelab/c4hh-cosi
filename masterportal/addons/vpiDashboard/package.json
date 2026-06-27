@@ -1,0 +1,15 @@
+{
+    "name": "vpi-dashboard",
+    "version": "1.0.0",
+    "description": "visitor frequency dashboard",
+    "license": "MIT",
+    "repository": {
+      "type": "git",
+      "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+    },
+    "scripts": {},
+    "dependencies": {
+      "vue-slider-component": "^4.1.0-beta.7"
+    }
+  }
+  

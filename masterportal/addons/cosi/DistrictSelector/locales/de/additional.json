@@ -1,0 +1,37 @@
+{
+    "modules": {
+          "cosi": {
+              "districtSelector": {
+                  "additionalInfoLayersHelp": "Mithilfe der Switcher können Sie zusätzliche Layer zur Orientierung einblenden. Die Layer können ebenfalls über den Themenbaum ein- und ausgeschaltet werden.",
+                  "additionalLayer": "Hilfsebenen einblenden",
+                  "area": "Gebiet",
+                  "areaTooSmall": "Für das ausgewählte Gebiet können keine Einwohner berechnet werden, da es zu klein ist. Bitte wählen Sie ein größeres Gebiet aus.",
+                  "areaTooBig": "Für das ausgewählte Gebiet können keine Einwohner berechnet werden, da es zu groß ist. Bitte wählen Sie ein kleineres Gebiet aus.",
+                  "areaTooFewAddresses": "Für das ausgewählte Gebiet können keine Einwohner berechnet werden, da es weniger als drei Adressen in Hamburg umfasst. Bitte wählen Sie ein größeres Gebiet aus.",
+                  "bufferHeader": "Puffer festlegen",
+                  "bufferLabel": "Puffer[m]",
+                  "buttonConfirm": "Gebiete bestätigen",
+                  "deleteButtonArea": "Gebiet löschen",
+                  "description": "Bitte wählen Sie auf der Karte ein oder mehrere Gebiete aus, um Ihr Planungsgebiet festzulegen. Alternativ können Sie auch die Auswahllisten nutzen. Danach haben Sie die Option, das ausgewählte Gebiet für die Fachdaten anzupassen.",
+                  "districtLevel": "Bezugsebene",
+                  "drawHeader": "Gebiet zeichnen",
+                  "drawLabel": "Flächenauswahl der Gebiete",
+                  "fileUploadFormat": "unterstütztes Datei-Format: GeoJSON",
+                  "help": "Vor Beginn der Analyse/Planung können Sie hier ein Planungsgebiet auswählen. Die empirischen Daten werden für diese Gebiete geladen. Alternativ können Sie über das Werkzeug <strong>&quot;Vergleichbare Gebiete ermitteln&quot;</strong> Gebiete nach bestimmten Parametern auswählen. Mit dem <strong>Puffer</strong> können Sie wählen in welchem Radius um das gewählte Gebiet ausgewählte Einrichtungen angezeigt werden. Die Analysefunktionen werden davon nicht beeinflusst.",
+                  "importFileFormatError": "Die hochgeladene Datei hat nicht das erwartete Format. Bitte laden Sie eine GeoJSON-Datei hoch.",
+                  "importFileValidError": "Die hochgeladene Datei ist keine valide GeoJSON Datei. Bitte überprüfen Sie die Datei und versuchen Sie es erneut.",
+                  "importHeader": "Gebiet importieren",
+                  "population": "Einwohner",
+                  "populationNotAvailable": "Einwohnerdaten sind nicht verfügbar.",
+                  "populationProcessingFailed": "Die Einwohnerdaten konnten nicht korrekt verarbeitet werden.",
+                  "resetArea": "Gebiet zurücksetzen",
+                  "selectedAreas": "Ausgewählte Gebiete",
+                  "statisticalData": "Statistische Daten",
+                  "subjectData": "Fachdaten",
+                  "tabLabelOne": "Gebiete für Statistische Daten",
+                  "tabLabelTwo": "Gebiete für Fachdaten bearbeiten",
+                  "title": "Gebiet auswählen"
+              }
+          }
+    }
+}

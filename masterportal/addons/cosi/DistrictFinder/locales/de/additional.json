@@ -1,0 +1,80 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "areaSelection": "Gebietsauswahl",
+                "districtFinder": {
+                    "title": "Gebiete Screening",
+                    "description": "Wählen Sie zuerst die gewünschte Bezugsebene aus, auf der das Screening erfolgen soll. Anschließend können Sie die Gebiete der Bezugsebene eingrenzen. Um ein neues Screening zu erstellen, müssen Bedingungen hinzugefügt werden. Gebiete, die den Bedingungen entsprechen können anschließend übernommen werden.",
+                    "newScreening": "Neues Screening anlegen",
+                    "condition": "Bedingung",
+                    "conditions": "Bedingungen",
+                    "conditionsExport": "Bedingungen exportieren",
+                    "created": "erstellt: ",
+                    "showDetails": "Details einblenden",
+                    "hideDetails": "Details ausblenden",
+                    "operators": {
+                        "or": "ODER",
+                        "and": "UND"
+                    },
+                    "infoCombinedDistrict": "In den Datenlieferungen des Statistikamtes Nord werden die kleinsten Stadtteile nur in Kombination mit einem größeren angrenzenden Stadtteil ausgewiesen. Daher kann die Zahl der ausgewählten Gebiete von der Zahl der gefundenen Gebiete (im Textkasten) abweichen. Dies betrifft: ",
+                    "foundArea": "Gefundenes Gebiet",
+                    "foundAreas": "Gefundene Gebiete",
+                    "copyClipboard": "In Zwischenablage kopiert!",
+                    "comparison": {
+                        "equals": "gleich",
+                        "less": "kleiner als",
+                        "greater": "größer als"
+                    },
+                    "importLatestData": "Aktualität der Datensätze",
+                    "changeToLatestYear": "Ein neuerer Datensatz wurde gefunden und wird verwendet.",
+                    "label": {
+                        "districtLevel": "Bezugsrahmen",
+                        "year": "Jahr",
+                        "dataset": "Datensatz",
+                        "referenceValue": "Referenzwert",
+                        "rule": "Regel",
+                        "tolerance": "Toleranz +/-",
+                        "minimum": "Minimum",
+                        "meanValue": "Mittelwert",
+                        "maximum": "Maximum",
+                        "type": "Typ",
+                        "exportName": "Name",
+                        "exportAreas": "mit ausgewählten Gebieten",
+                        "valueType_absolute": "absolut",
+                        "valueType_relative": "relativ",
+                        "latestData": "Für alle Bedingungen die Daten aus dem aktuellsten verfügbaren Jahr verwenden.",
+                        "linkConditions": "Verknüpfung"
+                    },
+                    "button": {
+                        "addCondition": "Bedingung hinzufügen",
+                        "confirm": "Gebiete übernehmen",
+                        "importConditions": "Bedingungen importieren",
+                        "import": "Importieren",
+                        "showMore": "....mehr anzeigen",
+                        "showLess": "....weniger anzeigen",
+                        "export": "Exportieren"
+                    },
+                    "errors": {
+                        "invalid": "Datei konnte nicht gelesen werden.",
+                        "wrongFileFormat": "Die Datei hat nicht das richtige Format.",
+                        "attErr": " {{attribute}} Tag existiert nicht.",
+                        "numErr": " Referenzwert oder Toleranz ist nicht im Zahlenformat unter Id {{id}}",
+                        "relNumErr": " Bei einem relativen Attribut ist der Referenzwert oder die Toleranz nur zwischen 0 und 100 unter Id {{id}} zulässig",
+                        "relativErr": "Bei einem relativen Attribut ist der Referenzwert oder die Toleranz nur zwischen 0 und 100 zulässig."
+                    },
+                    "warnings": {
+                        "noDataset": "Der ausgewählte Datensatz ist für diese Bezugsebene nicht vorhanden."
+                    },
+                    "selector": {
+                        "title": "Gebiete eingrenzen",
+                        "subtitle": "{{selectedScreeningLevelLabel}} eingrenzen",
+                        "label": {
+                            "level": "Bezugsebene"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,43 @@
+{
+    "modules": {
+        "tools": {
+            "tacticalMark": {
+                "title": "Taktische Zeichen",
+                "damageImage": "Schadensbilder",
+                "resources": "Ressourcen",
+                "damageAccount": "Damage Account",
+                "damageAccounts": "Damage Accounts",
+                "edit": "Icons bearbeiten",
+                "iconSetting": "Icon setzen",
+                "iconDelete": "Löschen",
+                "iconDeleteAll": "Alles löschen",
+                "iconEdit": "Bearbeiten",
+                "iconMove": "Verschieben",
+                "iconToggleAllVisibility": "Alles ein-/ausblenden",
+                "iconDownload": "Herunterladen",
+                "format": "Format",
+                "filenameLabel": "Dateiname",
+                "saveFile": "Speichern",
+                "setFileName": "Bitte Dateiname angeben",
+                "category": "Kategorie",
+                "tabs": {
+                    "dmg": "Schadensbilder",
+                    "rsc": "Ressourcen",
+                    "dma": "Damage Accounts"
+                },
+                "groups": {
+                    "danger": "Gefahr",
+                    "person": "Person",
+                    "damage": "Schaden",
+                    "animal": "Tier",
+                    "unit": "Einheit",
+                    "task": "Fachaufgabe",
+                    "command": "Führung",
+                    "logistics": "Logistik",
+                    "measure": "Maßnahme",
+                    "location": "Stelle"
+                }
+            }
+        }
+    }
+}

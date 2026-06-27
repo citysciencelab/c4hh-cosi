@@ -1,0 +1,58 @@
+{
+    "Portalconfig": {
+        "menu": {
+            "tools": {
+                "children": {
+                    "featuresList": {
+                        "name": "translate#additional:modules.tools.cosi.featuresList.title",
+                        "icon": "bi-apple"
+                    },
+                    "timeSeriesAnalyse": {
+                        "name": "translate#additional:modules.tools.cosi.featuresList.title"
+                    }
+                }
+            }
+        }
+    },
+    "Themenconfig": {
+        "Fachdaten": {
+            "Ordner": [{
+                "Titel": "Fachdaten - Analyse / Simulation",
+                "isFolderSelectable": false,
+                "Ordner": [{
+                    "Titel": "Bildung und Wissenschaft",
+                    "isFolderSelectable": false,
+                    "Layer": [{
+                        "id": "1234",
+                        "name": "Mein Layer",
+                        "styleId": "1234",
+                        "searchField": [
+                          "schulname",
+                          "schulform",
+                          "kapitelbezeichnung"
+                        ],
+                        "isFacility": true,
+                        "alwaysOnTop": true,
+                        "numericalValues": [{
+                          "id": "anzahl_schueler",
+                          "name": "Schülerzahl"
+                        }],
+                        "mouseHoverField": [
+                          "schulname",
+                          "kapitelbezeichnung"
+                        ],
+                        "addressField": ["adresse_strasse_hausnr", "adresse_ort"],
+                        "additionalValues": [{
+                            "id": "heute",
+                            "name": "Heute"
+                        },
+                        {
+                            "id": "morgen",
+                            "name": "Morgen"
+                        }]
+                    }]
+                }]
+            }]
+        }
+    }
+}

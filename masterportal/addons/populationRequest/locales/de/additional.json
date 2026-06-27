@@ -1,0 +1,38 @@
+{
+  "modules": {
+    "populationRequest": {
+      "description": "Frage die Anzahl der Einwohner innerhalb eines ausgewählten Gebietes in der Karte ab",
+      "name": "Einwohneranzahl abfragen",
+      "switchOffFilter": "Filter ausschalten",
+      "select": {
+        "info": "Die Abfrage der Einwohnerzahl ist sowohl für die Freie Hansestadt Hamburg als auch für die Metropolregion Hamburg möglich.",
+        "action": "Auswahl des Gebietes durch",
+        "showRasterLayer": "Raster Layer anzeigen (ab 1: 100.000)",
+        "showAlkisAdresses": "ALKIS Adressen anzeigen (ab 1: 10.000)"
+      },
+      "result": {
+        "confidentialityHint": "Unter Berücksichtigung der Geheimhaltung wurde folgender Wert berechnet",
+        "confidentialityHintSmallValues": "Aus Datenschutzgründen werden kleine Fallzahlen unter 3 verändert.",
+        "populationFHH": "Einwohnerzahl in Hamburg",
+        "populationMRH": "Einwohnerzahl in der Metropolregion ohne Hamburg",
+        "areaSize": "Größe der abgefragten Fläche",
+        "hint": "Hinweis",
+        "dataSourceKey": "Datenquelle",
+        "dataSourceValue": "Einwohner mit Hauptwohnsitz, Melderegister",
+        "dataSourceLinktext": "Weitere Informationen",
+        "dataSourceFHHKey": "Datenquelle Hamburg",
+        "dataSourceFHHValue": "Einwohner mit Hauptwohnsitz, Melderegister",
+        "dataSourceFHHLinktext": "Weitere Informationen",
+        "sourceAreaOutside": "Teile des Suchgebiets liegen außerhalb der Grenzen der Metropolregion Hamburg und wurden für die Ermittlung der Einwohnerzahl nicht berücksichtigt.",
+        "dataSourceMRHKey": "Datenquelle Metropolregion ohne Hamburg",
+        "dataSourceMRHValue": "Bevölkerung insgesamt im 100 Meter-Gitter.",
+        "dataSourceMRHLinktext": "Weitere Informationen"
+      },
+      "errors": {
+        "errorTitle": "Fehler",
+        "requestException": "Datenabfrage fehlgeschlagen. ",
+        "layerIdCantBeLoaded": "Der Layer mit der ID: {{layerId}} konnte nicht geladen werden, da dieser im Portal nicht zur Verfügung steht!"
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+    "modules": {
+        "cosi": {
+            "saveSession": {
+                "title": "Save and load Session",
+                "save": "Save",
+                "saveToFile": "Save file",
+                "load": "Load",
+                "loadFromFile": "Load file",
+                "dropFile": "Select file",
+                "loadLast": "Restore last session?",
+                "clear": "Clear cached session",
+                "newSession": "New Session",
+                "saveToLocalStorageError": "The session could not be saved. You can find the error message by pressing the F12 key. Please contact your administrator with this information.",
+                "loadFromLocalStorageError": "The last session could not be loaded. You can find the error message by pressing the F12 key. Please contact your administrator with this information.",
+                "quickSave": "Quick Save",
+                "quickSaveDescription": "Save sessions in your browser (e.g., Edge, Firefox). These can be reloaded when you start CoSI by clicking the 'Load last session' button. <br>\nIf your browser history or cache is cleared, this memory will be lost! Only one session can be stored at a time.",
+                "localSave": "local Save",
+                "localSaveDescription": "Please note that not all data and actions can be saved. Generally, saving refers to the area and topic selection, analysis, and simulation results. Please refer to the instructions to find out which data can be saved.",
+                "sessionError": "The file could not be read. Please repeat the process with another file.",
+                "currentWorkStatus": "Save current work status",
+                "currentWorkStatusFromFile": "Load work status from file",
+                "sessionName": "Name",
+                "saveAsFile": "Save as file",
+                "loadedWorkingStatus": "Loaded working status",
+                "created": "Created:",
+                "succesLoadingFile": "Work status successfully loaded: "
+            }
+        }
+    }
+}

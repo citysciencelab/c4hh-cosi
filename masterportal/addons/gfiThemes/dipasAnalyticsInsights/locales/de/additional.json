@@ -1,0 +1,11 @@
+{
+    "addons": {
+        "gfiThemes": {
+            "dipasAnalyticsInsights": {
+                "title": "DIPAS Beiträge",
+                "categories_one": "Kategorie",
+                "categories_other": "Kategorien"
+            }
+        }
+    }
+}

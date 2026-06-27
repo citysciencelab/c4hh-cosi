@@ -1,0 +1,148 @@
+{
+    "modules": {
+        "geoMarker": {
+            "name": "GeoMarker",
+            "description": "Anwendung für Informationen, die der Laufendhaltung der Geobasisdaten dienen.",
+            "screenshot": {
+              "altImage": "Screenshot",
+              "noImageAvailable": "No Screenshot available.",
+              "buttonCreate": "Create screenshot",
+              "buttonPreview": "Show screenshot preview",
+              "buttonDelete": "Delete screenshot"
+            },
+            "geoMarkerForm": {
+                "removeAttachment": "Remove file",
+                "attachmentWarning": "Only PDF, PNG, JPEG and ZIP files are allowed.",
+                "attachmentWarningTitle": "Unsupported File Type",
+                "category": "Category",
+                "reminderDate": "Enable notification on",
+                "infoTitle": "Info",
+                "descriptionLabel": "Description:",
+                "attachmentTitle": "Additional documents",
+                "gemisNoEditInfo": "GEMIS-Datensatz, keine Bearbeitung möglich",
+                "departmentsTitle": "Departments",
+                "departmentClosedLabel": "Closed",
+                "departmentClosedNoDateSet": "Closed date unknown",
+                "selectedDepartmentsTitle": "Selected departments",
+                "save": "Save",
+                "cancel": "Cancel",
+                "edit": "Edit",
+                "createAnotherGeoMarker": "Create another GeoMarker",
+                "downloadAttachment": "Download Attachment",
+                "successMessageAfterUpdate": "GeoMarker is successfully updated",
+                "successMessageAfterSave": "GeoMarker with Id {{id}} is successfully created.",
+                "geoMarkerClosedAt": "GeoMarker closed at",
+                "featureIsLocked": {
+                  "header": "Editing not possible",
+                  "text": "The selected GeoMarker is currently edited by some else and is locked."
+                },
+                "geomHasChanged": {
+                  "header": "Changed geometry!",
+                  "text": "The position of the GeoMarker has changed. You see the new position in the map. (blue circle)"
+                },
+                "isSaving": "GeoMarker is being saved...",
+                "isLoading": "Data are loaded from the server ..."
+            },
+            "status": {
+                "offen": "open",
+                "inaktiv": "inactiv",
+                "geschlossen": "closed"
+            },
+            "tabs": {
+                "tabNew": {
+                    "label": "New"
+                },
+                "tabFilter": {
+                    "label": "Filter"
+                },
+                "tabList": {
+                    "label": "List"
+                }
+            },
+            "GeoMakerList": {
+                "tableNoData": "No GeoMarkers selected for display.",
+                "selectedGeoMarkerWithId": "GeoMarker with Id {{id}} is selected",
+                "table": {
+                    "id": "ID",
+                    "quelle": "Source",
+                    "kategorie": "Category",
+                    "status": "State",
+                    "beschreibung": "Description",
+                    "zeitstempel": "Created",
+                    "aktion": "Show",
+                    "aktionButtonLabel": "GeoMarker details"
+                },
+                "button": {
+                    "openVcOblique": "Open oblique aerial images",
+                    "openPanorama": " Open 360° panorama",
+                    "centerMapOnGeoMarker": "Center map on GeoMarker",
+                    "zoomToGeoMarker": "Zoom to GeoMarker",
+                    "hideList": "Toggle GeoMarker List",
+                    "moveGeoMarker": "Move GeoMarker"
+                },
+                "updateMessage": "The GeoMarker has been moved. Please save the GeoMarker to apply the change."
+
+            },
+            "filter": {
+                "isFiltering": "Please be patient, the GeoMarkers are beeing filtered right now ...",
+                "countGeoMarker": "GeoMarker",
+                "urlFilterPrefix": "Filter",
+                "permalink": "Permalink",
+                "graphicalSelect": {
+                  "title": "Select GeoMarker on map using",
+                  "filterButtonTitle": "Show spatial filter",
+                  "filterButtonActiveTitle": "Hide spatial filter",
+                  "filterButtonResetTitle": "Reset spatial filter"
+                },
+                "departments": {
+                  "label": "Department(s)",
+                  "placeholder": "Select department(s)"
+                },
+                "status": {
+                  "label": "Status",
+                  "placeholder": "Select status"
+                },
+                "categories": {
+                  "label": "Category",
+                  "placeholder": "Select one or more categories"
+                },
+                "description": {
+                  "label": "Description",
+                  "placeholder": "Description"
+                },
+                "comment": {
+                  "label": "Comment of the department(s)",
+                  "placeholder": "Comment of the department(s)"
+                },
+                "source": {
+                  "label": "Source",
+                  "placeholder": "Source"
+                },
+                "geoMarkerID": {
+                  "label": "GeoMarker ID",
+                  "placeholder": "GeoMarker ID"
+                },
+                "dates": {
+                  "from": {
+                    "label": "From",
+                    "placeholder": "From"
+                  },
+                  "to": {
+                    "label": "To",
+                    "placeholder": "To"
+                  },
+                  "labels": {
+                    "created": "Date range of creation",
+                    "closed": "Date range of closed by department(s)",
+                    "review": "Date range of review by department(s)"
+                  }
+                },
+                "buttons": {
+                  "filter": "filter",
+                  "list": "in list",
+                  "restore": "restore"
+                }
+            }
+        }
+    }
+}

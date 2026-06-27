@@ -1,0 +1,378 @@
+<script>
+import TrafficCountCompDiagram from "./TrafficCountCompDiagram.vue";
+import TrafficCountCompTable from "./TrafficCountCompTable.vue";
+import TrafficCountCheckbox from "./TrafficCountCheckbox.vue";
+import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
+import dayjs from "dayjs";
+import advancedFormat from "dayjs/plugin/advancedFormat";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import DatePicker from "vue-datepicker-next";
+import "vue-datepicker-next/index.css";
+import {addMissingDataYear} from "../utils/addMissingData.js";
+import {hasHolidayInWeek} from "../../../../src/shared/js/utils/calendar.js";
+import {mapGetters, mapMutations} from "vuex";
+
+dayjs.extend(advancedFormat);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
+
+export default {
+    name: "TrafficCountYear",
+    components: {
+        TrafficCountCompDiagram,
+        TrafficCountCompTable,
+        TrafficCountCheckbox,
+        DatePicker
+    },
+    props: {
+        api: {
+            type: Object,
+            required: true
+        },
+        thingId: {
+            type: [Number, String],
+            required: true
+        },
+        meansOfTransport: {
+            type: String,
+            required: true
+        },
+        reset: {
+            type: Boolean,
+            required: true
+        },
+        holidays: {
+            type: Array,
+            required: true
+        },
+        checkGurlittInsel: {
+            type: Boolean,
+            required: true
+        },
+        activeTab: {
+            type: Boolean,
+            required: true
+        }
+    },
+    data () {
+        return {
+            tab: "year",
+            apiData: [],
+            dates: [],
+
+            // props for diagram
+            setTooltipValue: (tooltipItem) => {
+                // add 3 days to match thursdays
+                const objMoment = dayjs(tooltipItem.datetime, "YYYY-MM-DD HH:mm:ss").add(3, "day");
+                let postfix = "";
+
+                if (tooltipItem?.dataset?.isSVAvailable) {
+                    postfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+                }
+                else if (tooltipItem?.dataset?.isKfzAvailable) {
+                    postfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.totalTraffic");
+                }
+
+                return this.$t("additional:modules.tools.gfi.themes.trafficCount.calendarweek") + " " + objMoment.format("WW") + " / " + objMoment.format("YYYY") + ": " + thousandsSeparator(tooltipItem.raw) + postfix;
+            },
+            yAxisTicks: 8,
+            renderLabelXAxis: (datetime) => {
+                // add 3 days to match thursdays
+                const objMoment = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").add(3, "day");
+
+                return this.$t("additional:modules.tools.gfi.themes.trafficCount.calendarweek") + objMoment.format("WW");
+            },
+            renderLabelYAxis: (yValue) => {
+                return thousandsSeparator(yValue);
+            },
+            descriptionYAxis: this.$t("additional:modules.tools.gfi.themes.trafficCount.yAxisTextYear"),
+            renderLabelLegend: (datetime) => {
+                return dayjs(datetime, "YYYY-MM-DD HH:mm:ss").add(4, "day").format("YYYY");
+            },
+            renderPointStyle: (meansOfTransports, datetime, forLegend = false) => {
+                if (forLegend) {
+                    return meansOfTransports === "Anzahl_Schwerverkehr" ? "triangle" : "circle";
+                }
+                const pointStyle = [],
+                    format = "YYYY-MM-DD";
+
+                for (let i = 0; i < datetime.length; i++) {
+                    if (hasHolidayInWeek(datetime[i], this.holidays, format)) {
+                        pointStyle.push("star");
+                    }
+                    else if (meansOfTransports === "Anzahl_Schwerverkehr") {
+                        pointStyle.push("triangle");
+                    }
+                    else {
+                        pointStyle.push("circle");
+                    }
+                }
+
+                return pointStyle;
+            },
+            renderPointSize: (datetime) => {
+                const pointSize = [],
+                    format = "YYYY-MM-DD";
+
+                for (let i = 0; i < datetime.length; i++) {
+                    if (hasHolidayInWeek(datetime[i], this.holidays, format)) {
+                        pointSize.push(6);
+                    }
+                    else {
+                        pointSize.push(2);
+                    }
+                }
+
+                return pointSize;
+            },
+            // props for table
+            tableTitle: this.$t("additional:modules.tools.gfi.themes.trafficCount.tableTitleYear"),
+            setColTitle: datetime => {
+                return this.$t("additional:modules.tools.gfi.themes.trafficCount.calendarweek") + dayjs(datetime, "YYYY-MM-DD HH:mm:ss").format("WW");
+            },
+            setRowTitle: (meansOfTransports, datetime) => {
+                // datetime is the monday of the week - so we have to add 3 days to get the thursday of the week
+                const txt = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").add(3, "day").format("YYYY");
+
+                if (meansOfTransports === "Anzahl_Schwerverkehr" && this.meansOfTransport === "Anzahl_Kfz") {
+                    return txt + " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.heavyTraffic");
+                }
+                else if (meansOfTransports === "Anzahl_Kfz" && this.meansOfTransport === "Anzahl_Schwerverkehr") {
+                    return txt + " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.totalTraffic");
+                }
+
+                return txt;
+            },
+            setFieldValue: value => {
+                return thousandsSeparator(value);
+            },
+            yearInterval: "1-Woche",
+            diagramYear: "diagramYear",
+            tableYear: "tableYear",
+            showMultiData: false,
+            meansOfTransportKey: [this.meansOfTransport]
+        };
+    },
+    computed: {
+        ...mapGetters("Modules/TrafficCount", [
+            "activeTabId"
+        ])
+    },
+    watch: {
+        reset () {
+            this.initializeDates();
+        },
+        dates: {
+            handler (value) {
+                this.yearDatepickerValueChanged(value);
+            },
+            deep: true
+        },
+        activeTab () {
+            if (this.activeTab && this.activeTabId !== "year") {
+                this.setActiveTabId("year");
+            }
+        }
+    },
+    mounted () {
+        this.initializeDates();
+    },
+    methods: {
+        ...mapMutations("Modules/TrafficCount", [
+            "setActiveTabId"
+        ]),
+        /**
+         * Initializes the calendar / resets the date.
+         * @returns {void}
+         */
+        initializeDates () {
+            this.dates = [this.checkGurlittInsel ? dayjs().subtract(1, "day").toDate() : dayjs().toDate()];
+        },
+        /**
+         * Function is initially triggered and on update
+         * @param   {Date} dates an unsorted array of first day date of selected year
+         * @fires   Alerting#RadioTriggerAlertAlert
+         * @returns {void}
+         */
+        yearDatepickerValueChanged: function (dates) {
+            const api = this.api,
+                thingId = this.thingId,
+                meansOfTransport = this.meansOfTransport,
+                timeSettings = [];
+
+            if (!Array.isArray(dates) || dates.length === 0) {
+                this.apiData = [];
+            }
+            else {
+                [...dates].sort((earlyDate, lateDate) => {
+                    // Showing earlier date first
+                    return earlyDate - lateDate;
+                }).forEach(date => {
+                    timeSettings.push({
+                        interval: this.yearInterval,
+                        // subtract 3 days to savely include the first thursday of january into the interval, as the first calendar week always includes the first thursday of january
+                        from: dayjs(date).startOf("year").subtract(3, "day").format("YYYY-MM-DD"),
+                        // add 3 days to savely include the last thursday of december into the interval, as the last calendar week always includes the last thursday of december
+                        until: dayjs(date).endOf("year").add(3, "day").format("YYYY-MM-DD"),
+                        selectedYear: dayjs(date).format("YYYY")
+                    });
+                });
+
+                api.updateDataset(thingId, meansOfTransport, timeSettings, datasets => {
+                    if (meansOfTransport === "Anzahl_Kfz" || meansOfTransport === "Anzahl_Schwerverkehr") {
+                        const otherTransport = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "Anzahl_Kfz";
+
+                        api.updateDataset(thingId, otherTransport, timeSettings, otherDatasets => {
+                            if (Array.isArray(otherDatasets)) {
+                                otherDatasets.forEach((transportData, idx) => {
+                                    const from = typeof timeSettings[idx] === "object" ? timeSettings[idx].selectedYear : "";
+
+                                    Object.keys(transportData).forEach(transportKey => {
+                                        datasets[idx][transportKey] = addMissingDataYear(from, otherDatasets[idx][transportKey]);
+                                    });
+                                });
+                            }
+                        }, errormsg => {
+                            console.warn("The data received from api are incomplete:", errormsg);
+                        });
+                    }
+
+                    if (Array.isArray(datasets)) {
+                        datasets.forEach((transportData, idx) => {
+                            const from = typeof timeSettings[idx] === "object" ? timeSettings[idx].selectedYear : "";
+
+                            Object.keys(transportData).forEach(transportKey => {
+                                datasets[idx][transportKey] = addMissingDataYear(from, datasets[idx][transportKey]);
+                            });
+                        });
+                    }
+
+                    this.apiData = datasets;
+                }, errormsg => {
+                    this.apiData = [];
+
+                    console.warn("The data received from api are incomplete:", errormsg);
+                    this.$store.dispatch("Alerting/addSingleAlert", {
+                        content: this.$t("additional:modules.tools.gfi.themes.trafficCount.error.apiGeneral"),
+                        category: "Info"
+                    });
+                });
+            }
+        },
+
+        /**
+         * Checks if the a date should be disabled.
+         * @param {Date} date The date in question.
+         * @param {Date[]} currentDates The list of selected dates.
+         * @returns {Boolean} true if disabled, false if enabled.
+         */
+        isDateDisabled (date, currentDates) {
+            if (!(date instanceof Date)) {
+                return true;
+            }
+            let startMoment = dayjs().startOf("year").subtract(10, "year");
+
+            const endDate = this.checkGurlittInsel ? dayjs().subtract(1, "day") : dayjs(),
+                startYear = parseInt(startMoment.format("YYYY"), 10),
+                question = dayjs(date);
+
+            if (this.checkGurlittInsel) {
+                if (startYear < 2014) {
+                    startMoment = startMoment.add(2014 - startYear, "year");
+                }
+            }
+            else if (startYear < 2020) {
+                startMoment = startMoment.add(2020 - startYear, "year");
+            }
+
+            startMoment = startMoment.subtract(1, "year");
+
+            if (Array.isArray(currentDates) && currentDates.length >= 5) {
+                for (let i = 0; i < 5; i++) {
+                    if (question.isSame(dayjs(currentDates[i]))) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            return question.isSameOrBefore(startMoment) || question.isSameOrAfter(endDate);
+        },
+        /**
+         * Set the means of transport key for diagram and table
+         * @param {String[]} keys means of transport key.
+         * @returns {void}
+         */
+        setMeansOfTransportKey (keys) {
+            this.meansOfTransportKey = keys;
+        }
+    }
+};
+</script>
+
+<template>
+    <div v-if="activeTab">
+        <div
+            id="yearDateSelector"
+            class="dateSelector"
+        >
+            <DatePicker
+                v-model:value="dates"
+                aria-label="Datum"
+                placeholder="Datum"
+                type="year"
+                format="YYYY"
+                :multiple="true"
+                :disabled-date="isDateDisabled"
+                title-format="YYYY"
+                :lang="$t('common:libraries.vue-datepicker-next.lang', {returnObjects: true})"
+            />
+        </div>
+        <TrafficCountCheckbox
+            :current-means-of-transport="meansOfTransport"
+            :last-means-of-transport-key="meansOfTransportKey"
+            :table-diagram-id="diagramYear"
+            @setMeansOfTransportKey="setMeansOfTransportKey"
+        />
+        <div id="diagramYear">
+            <TrafficCountCompDiagram
+                :api-data="apiData"
+                :set-tooltip-value="setTooltipValue"
+                :y-axis-ticks="yAxisTicks"
+                :render-label-x-axis="renderLabelXAxis"
+                :render-label-y-axis="renderLabelYAxis"
+                :description-y-axis="descriptionYAxis"
+                :render-label-legend="renderLabelLegend"
+                :render-point-style="renderPointStyle"
+                :render-point-size="renderPointSize"
+                :active-tab="activeTab"
+                :current-means-of-transport="meansOfTransport"
+                :means-of-transport-key="meansOfTransportKey"
+            />
+        </div>
+        <TrafficCountCheckbox
+            :table-diagram-id="tableYear"
+        />
+        <div id="tableYear">
+            <TrafficCountCompTable
+                :holidays="holidays"
+                :current-tab-id="tab"
+                :api-data="apiData"
+                :table-title="tableTitle"
+                :set-col-title="setColTitle"
+                :set-row-title="setRowTitle"
+                :set-field-value="setFieldValue"
+                :means-of-transport-key="meansOfTransportKey"
+            />
+        </div>
+    </div>
+</template>
+
+<style lang="scss">
+#yearDateSelector {
+    .mx-input {
+        border-radius: 0px;
+    }
+}
+</style>

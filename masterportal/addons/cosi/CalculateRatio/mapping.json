@@ -1,0 +1,281 @@
+[
+    {
+        "group": "Bildung und Wissenschaft",
+        "layer": [
+            {
+                "id": "Öffentliche Schulen Hamburgs",
+                "numericalValues": [
+                    { "id": "anzahl_schueler",
+                        "name": "Schülerzahl"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "group": "Kultur, Freizeit, Sport und Tourismus",
+        "layer": [
+            {
+                "id": "Hamburg aktiv",
+                "numericalValues": []
+            },
+            {
+                "id": "Sportstätten",
+                "numericalValues": []
+            },
+            {
+                "id": "Öffentliche Bibliotheken",
+                "numericalValues": [
+                    { "id": "medienanzahl",
+                        "name": "Medienanzahl"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "group": "Soziales - Angebote des Freiwilligen Engagements",
+        "layer": [
+            {
+                "id": "Freiwilligenagenturen",
+                "numericalValues": []
+            },
+            {
+                "id": "Mehrgenerationenhäuser",
+                "numericalValues": []
+            }
+        ]
+    },
+    {
+        "group": "Soziales - Angebote für Familien in Hamburg",
+        "layer": [
+            {
+                "id": "Eltern-Kind-Zentrum",
+                "numericalValues": []
+            },
+            {
+                "id": "Elternlotsenprojekt",
+                "numericalValues": []
+            },
+            {
+                "id": "Elternschule",
+                "numericalValues": []
+            },
+            {
+                "id": "Familienteam",
+                "numericalValues": []
+            },
+            {
+                "id": "Institutionelle Erziehungsberatung",
+                "numericalValues": []
+            },
+            {
+                "id": "Kinder-Familienzentrum",
+                "numericalValues": []
+            },
+            {
+                "id": "Konfessionelle Familienbildungsstätte",
+                "numericalValues": []
+            },
+            {
+                "id": "Mütterzentrum",
+                "numericalValues": []
+            },
+            {
+                "id": "Sonstige Angebote für Familien",
+                "numericalValues": []
+            },
+            {
+                "id": "Überregionale Beratungsstelle",
+                "numericalValues": []
+            }
+        ]
+    },
+    {
+        "group": "Soziales - Beratungsstellen für kommunale Leistungen nach §16a SGB II",
+        "layer": [
+            {
+                "id": "Gesundheitsberatung",
+                "numericalValues": []
+            },
+            {
+                "id": "Lebenslagenberatung",
+                "numericalValues": []
+            },
+            {
+                "id": "Schuldnerberatung",
+                "numericalValues": []
+            }
+        ]
+    },
+    {
+        "group": "Soziales - Beratung zur Kindertagesbetreuung und Kindertagespflege",
+        "layer": [
+            {
+                "id": "Abteilung Kitabetreuung",
+                "numericalValues": []
+            },
+            {
+                "id": "Tagespflegebörse",
+                "numericalValues": []
+            }
+        ]
+    },
+    {
+        "group": "Soziales - Jobcenter, Jugendberufsagentur-Standorte",
+        "layer": [
+            {
+                "id": "Jobcenter",
+                "numericalValues": []
+            },
+            {
+                "id": "Jugendberufsagentur",
+                "numericalValues": []
+            },
+            {
+                "id": "W.I.R., work and integration for refugees",
+                "numericalValues": []
+            }
+        ]
+    },
+    {
+        "group": "Soziales - Rahmenvereinbarung (RV) Schule -Jugendhilfe",
+        "layer": [
+            {
+                "id": "Integrierte Angebote",
+                "numericalValues": []
+            },
+            {
+                "id": "Temporaere Lerngruppe",
+                "numericalValues": []
+            }
+        ]
+    },
+    {
+        "group": "Soziales - Sozialräumliche Angebote der Jugend- und Familienhilfe (SAJF)",
+        "layer": [
+            {
+                "id": "Begleitung Kinder",
+                "numericalValues": []
+            },
+            {
+                "id": "Berufliche Unterstützung",
+                "numericalValues": []
+            },
+            {
+                "id": "Familienrat",
+                "numericalValues": []
+            },
+            {
+                "id": "Frühe Hilfen",
+                "numericalValues": []
+            },
+            {
+                "id": "Schulbezogene Angebote",
+                "numericalValues": []
+            }
+        ]
+    },
+    {
+        "group": "Soziales - Weitere Angebote",
+        "layer": [
+            {
+                "id": "Angebote und Nutzung der Jugendsozialarbeit (JSA)",
+                "numericalValues": []
+            },
+            {
+                "id": "Angebote und Nutzung der Offenen Kinder- und Jugendarbeit (OKJA)",
+                "numericalValues": []
+            },
+            {
+                "id": "Begegnungsstätten Ambulante Sozialpsychiatrie",
+                "numericalValues": []
+            },
+            {
+                "id": "Beratungsstellen für Wohnungsnotfälle",
+                "numericalValues": []
+            },
+            {
+                "id": "Frauenberatung",
+                "numericalValues": []
+            },
+            {
+                "id": "Jugend Aktiv Plus",
+                "numericalValues": []
+            },
+            {
+                "id": "Kindertagesstätten",
+                "numericalValues": []
+            },
+            {
+                "id": "Sozialräumliche Integrationsnetzwerke (SIN)",
+                "numericalValues": []
+            },
+            {
+                "id": "Übernachtungs- und Versorgungsangebote für Obdachlose und Wohnungslose",
+                "numericalValues": []
+            }
+        ]
+    },
+    {
+        "group": "Umwelt und Klima",
+        "layer": [
+            {
+                "id": "Digitaler Grünpla​n",
+                "numericalValues": [
+                    { "id": "flaeche_ha",
+                        "name": "Fläche in Hektar"
+                    },
+                    {
+                        "id": "flaeche_qm",
+                        "name": "Fläche in m²"
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        "group": "Nahversorgung (2017, Erreichbarkeitsanalysen MRH)",
+        "layer": [
+            {
+                "id": "Haltestellen",
+                "numericalValues": [
+                    {
+                        "id": "linien",
+                        "name": "Verkehrslinien"
+                    }
+                ]
+            },
+            {
+                "id": "Bahnstationen",
+                "numericalValues": [
+                    {
+                        "id": "linien",
+                        "name": "Verkehrslinien"
+                    }
+                ]
+            },
+            {
+                "id": "Supermärkte",
+                "numericalValues": []
+            },
+            {
+                "id": "Apotheken",
+                "numericalValues": []
+            },
+            {
+                "id": "Autobahnausfahrten",
+                "numericalValues": []
+            }
+        ]
+    },
+    {
+        "group": "Gesundheit",
+        "layer": [
+            {
+                "id": "Corona Testzentren",
+                "numericalValues": []
+            }
+        ]
+    }
+]

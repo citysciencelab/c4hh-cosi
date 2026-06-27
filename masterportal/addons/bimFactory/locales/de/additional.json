@@ -1,0 +1,62 @@
+{
+    "modules": {
+        "bimfactory": {
+            "name": "BIMFabrikHH",
+            "description": "Umwandlung von GIS-Daten ins IFC-Format",
+            "startPage": {
+                "headline": {
+                    "message": "Die {title} ist eine Entwicklung der Stadt Hamburg im Rahmen des Projektes {link}.",
+                    "title": "BIMFabrikHH",
+                    "linkTitle": "Connected Urban Twins (CUT)",
+                    "linkHref": "https://www.connectedurbantwins.de/"
+                },
+                "description": "Geobasisdaten wie DGM, Stadtmodelle usw. sind eine wichtige Grundlage für die Grundlagenermittlung im Bauwesen. Diese Daten liegen oft als GIS-Daten vor. Um die BIM-Methode umzusetzen, ist eine Umwandlung dieser Daten ins IFC-Format erforderlich. Daher wird angestrebt Geobasisdaten aus heterogenen Formaten im IFC-Format mit relevanten Informationen bereitzustellen.",
+                "advantagesTitle": "Vorteile sind:",
+                "advantages": {
+                    "list": [
+                        "Wiederholende Prozesse werden durch diese Automatisierung vereinfacht und standardisiert.",
+                        "Ressourcen werden gespart.",
+                        "BIM-Nutzung in der FHH wird verbreitet.",
+                        "Usability im Masterportal wird verbessert.",
+                        "Eine Anwendung für alle."
+                    ]
+                },
+                "conceptAlt": "Konzept der BIMFabrikHH",
+                "workflows": {
+                    "title": "Verfügbare Workflows",
+                    "select": "Bitte Workflow wählen!"
+                }
+            },
+            "workflow": {
+                "headerImageAlt": "Titelbild für \"{{workflowTitle}}\"",
+                "backToStart": "Zurück zur Startseite",
+                "buttons": {
+                    "back": "voriger Schritt",
+                    "next": "nächster Schritt"
+                },
+                "components": {
+                    "filter": {
+                        "select": "Auswahl des Gebietes durch",
+                        "numberSelectedTiles": "Tiles ausgewählt",
+                        "numberFilteredElement": "Einträge",
+                        "noDataAvailable": "Für die Auswahl sind keine Daten vorhanden",
+                        "filterNote": "Bitte den Filter Button klicken",
+                        "message3D": "Im 3D Modus kann kein Umring gezeichnet werden. Bitte zum Zeichnen in den 2D Modus wechseln.",
+                        "message3DTitle": "3D Modus umschalten"
+                    },
+                    "submit": {
+                        "openIfcInBimViewer": "IFC-Datei im BIM Viewer öffnen",
+                        "openIfcLink": "IFC-Datei herunterladen",
+                        "filterMissingNote": "Bitte ein Gebiet einzeichnen bzw. den Filter Button klicken",
+                        "generalErrorIntroText": "Es wurden ein oder mehrere Fehler gefunden.",
+                        "timeOutMessage": "Die Zeit von 10 Minuten wurde überschritten und der Prozess abgebrochen."
+                    },
+                    "inputerrors": {
+                        "errorMessage": "Meldung: "
+                    }
+
+                }
+            }
+        }
+    }
+}

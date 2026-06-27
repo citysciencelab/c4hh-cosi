@@ -1,0 +1,19 @@
+{
+  "modules": {
+      "addLayerRemotely": {
+        "geojson": {
+          "alertTitleSuccess": "Layer erfolgreich hinzugefügt",
+          "alreadyAdded": "Der Layer des übergebenen GeoJSON wurde bereits hinzugefügt.",
+          "completeMessage": "Der Layer des übergebenen GeoJSON wurde dem Themenbaum hinzugefügt und kann über <b>Themen hinzufügen</b> ausgewählt werden!",
+          "errorTitle": "Layer konnte nicht hinzugefügt werden",
+          "layerNotFound": "addLayerRemotely: Es konnte kein Layer mit der ID {{layerId}} gefunden werden, um auf die Features zu zoomen."
+        },
+        "wms": {
+          "alertTitleSuccess": "Layer erfolgreich hinzugefügt",
+          "alreadyAdded": "Die Layer des angeforderten WMS wurden bereits hinzugefügt.",
+          "completeMessage": "Die Layer des angeforderten WMS wurden dem Themenbaum hinzugefügt und können über <b>Themen hinzufügen</b> ausgewählt werden!",
+          "errorTitle": "Layer konnte nicht hinzugefügt werden"
+        }
+      }
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "modules": {
+    "projects": {
+      "infoTitle": "Information about the heavy rain project",
+      "title": "Heavy Rain Projects",
+      "description": "Manage and draw projects for protection against heavy rain events.",
+      "createProject": "Create new project",
+      "editProject": "Edit project",
+      "cancelButtonLabel": "Cancel process",
+      "saveButtonLabel": "Save project",
+      "drawTitle": "Draw object",
+      "detailsTitle": "Add project details",
+      "detailsDescription": "Please fill in the following fields to describe the project.",
+      "noProjects": "No projects available yet.",
+      "editAriaLabel": "Edit project",
+      "messages": {
+        "noGeometry": "No geometry stored for this project.",
+        "geometryError": "Error processing the geometry.",
+        "drawFirst": "Please draw an object on the map first!",
+        "nameRequired": "Please enter a project name!",
+        "saveSuccess": "The new project has been saved successfully!",
+        "updateSuccess": "The project has been updated successfully!"
+      },
+      "labels": {
+        "projectName": "Project name",
+        "criteria": "Criteria",
+        "createdBy": "Created by",
+        "startDate": "Construction start",
+        "endDate": "Construction end",
+        "source": "Source",
+        "contact": "Contact",
+        "contactExt": "External contact",
+        "infolink": "Info link",
+        "history": "History - time and messages",
+        "description": "Short description / Type of measure",
+        "protectedAreas": "Areas where protection level criteria are met",
+        "fileUpload": "Upload file (optional)",
+        "lastUpdate": "Last update"
+      }
+    },
+    "snackbar": {
+      "close": "Close"
+    }
+  }
+}

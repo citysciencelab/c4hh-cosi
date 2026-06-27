@@ -1,0 +1,42 @@
+{
+  "modules": {
+    "valuationPrint": {
+      "description": "Zeige Informationen zur Wertermittlung an",
+      "title": "Flurstücksbericht",
+      "removeButton": "Entfernen",
+      "startButton": "Starten",
+      "parcel": "Flurstück:",
+      "district": "Gemarkung:",
+      "messageListTitle": "Statusverlauf",
+      "parcelListTitle": "Ausgewählte Flurstücke",
+      "generateReport": "Bericht generieren",
+      "infoGenerateReport": "Durch Klick auf Starten können Sie zum ausgewählten Flurstück einen PDF-Bericht erzeugen lassen. Der Vorgang kann einige Minuten in Anspruch nehmen. Anschließend werden Ihnen im unteren Bereich die erzeugten Dateien zum Download zur Verfügung gestellt.",
+      "urlListTitle": "Download-Links",
+      "urlTitleForOneReport": "Bericht herunterladen",
+      "pdfInTheMaking": "PDF wird erstellt.",
+      "pleaseWait": "Bitte warten ...",
+      "pdfError": "Fehler beim Erzeugen der PDF.",
+      "pdfSuccess": "PDF wurde erstellt.",
+      "report": "WANDA Bericht",
+      "parcelReport": "Flurstücksbericht",
+      "imageInTheMaking": "{{imageName}} wird erstellt.",
+      "imageSuccess": "{{imageName}} wurde erstellt.",
+      "imageError": "Fehler beim Erzeugen vom {{imageName}}.",
+      "downloadAll": "Alle Herunterladen",
+      "download": "Herunterladen",
+      "cancel": "Abbrechen",
+      "number": "Geschäftszeichen:",
+      "address": "Adresse:",
+      "modalTitle": "Anlagen zum A1 Karten Anlagenverzeichnis",
+      "specificationReport": "A1 Karten Anlagenverzeichnis",
+      "placeholder": "Bitte auswählen",
+      "formError": {
+        "missingDocumentName": "Bitte Dokumentnamen eingeben.",
+        "missingAddress": "Bitte eine Adresse auswählen oder eingeben."
+      },
+      "select": "Aus-/abwählen",
+      "selectAll": "Alle für den Bericht auswählen",
+      "deselectAll": "Alle für den Bericht abwählen"
+    }
+  }
+}

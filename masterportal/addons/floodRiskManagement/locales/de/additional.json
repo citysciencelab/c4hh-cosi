@@ -1,0 +1,30 @@
+{
+  "modules": {
+    "floodRiskManagement": {
+      "alertMessage": "Die maximale Anzahl an parallel ausgeführten Ausdrucken ist überschritten.<br>Bitte versuchen Sie es erneut sobald die Erstellung anderer Ausdrucke abgeschlossen ist.",
+      "button":{
+        "applyLabel": "Einstellungen anwenden",
+        "downloadLabel": "Herunterladen",
+        "printLabel": "Karte erstellen"
+      },
+      "cycle": ". Zyklus",
+      "description": "Hochwassergefahrenkarten und Hochwasserrisikokarten drucken",
+      "headline": {
+        "cycle": "Berichtszyklus",
+        "floodEvent": "Hochwasserereignis",
+        "frequencyFloodEvents": "Häufigkeit der Hochwasserereignisse",
+        "mapType": "Kartentyp"
+      },
+      "hintInfoScale": "Wenn der ausgewählte Druckmaßstab vom Maßstab im Kartenfenster abweicht, kann dies zu einem veränderten Kartenlayout im Druck führen.",
+      "information": "Informationen",
+      "informationText": "In diesem Tool lassen sich verschiedene Ereignisse und Kartentypen auswählen. Über die Druckfunktion wird ein pdf der gewünschten Karte im gewählten Kartenausschnitt erstellt und zum Download bereitgestellt. Die Auswahl im Druckmenü steuert gleichzeitig die Aktivierung der einzelnen Layer im Themenbaum. Unabhängig davon kann die Auswahl der Layer im Themenbaum auch individuell gesteuert werden. Zum Druck kommen jedoch immer nur die vorkonfigurierten, offiziellen Gefahren- und Risikokarten.",
+      "label": {
+        "autoAdjustScale": "Druckmaßstab automatisch anpassen",
+        "scaleLabel": "Druckmaßstab"
+      },
+      "mapInformation": "In beiden Karten sind die baulichen Hochwasserschutzanlagen (zum Beispiel Deiche, private Polder und Hochwasserschutzwände) und ihre Wirkung erkennbar.",
+      "subtitle": "Hochwassergefahrenkarten und Hochwasserrisikokarten",
+      "title": "Karte drucken"
+    }
+  }
+}

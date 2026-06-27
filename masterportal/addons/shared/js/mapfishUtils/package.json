@@ -1,0 +1,14 @@
+{
+  "name": "mapfish-utils",
+  "version": "1.0.0",
+  "description": "Mapfish Utils",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+  },
+  "scripts": {},
+  "dependencies": {
+    "@turf/buffer": "^7.2.0"
+  }
+}

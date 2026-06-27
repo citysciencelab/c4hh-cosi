@@ -1,0 +1,29 @@
+{
+    "modules": {
+          "CommuterFlows": {
+              "title": "Pendlerströme",
+              "description": "Visualisiere Pendlerströme",
+              "select": "Bitte auswählen",
+              "labelDistrict": "Landkreis/kreisfreie Stadt",
+              "selectCity": "Stadt/Gemeinde auswählen",
+              "labelCity": "Stadt/Gemeinde",
+              "checkName": "Namen anzeigen",
+              "checkNumber": "Werte anzeigen",
+              "checkBeams": "Linien anzeigen",
+              "checkAnimation": "Animation anzeigen",
+              "buttonStart": "Start",
+              "buttonStop": "Stop",
+              "selectOut": "Auspendler",
+              "selectIn": "Einpendler",
+              "tooltipOut": "Anzahl Beschäftigter (sozialversicherungspflichtig), die im ausgewählten Gebiet wohnen und in die angezeigten Gebiete pendeln.",
+              "tooltipIn": "Anzahl Beschäftigter (sozialversicherungspflichtig), die im ausgewählten Gebiet arbeiten und aus den angezeigten Gebieten pendeln.",
+              "buttonLess": "{{listChunk}} weniger",
+              "buttonMore": "{{listChunk}} weitere",
+              "buttonAll": "Alle laden",
+              "linkMoreInfo": "Weitere Informationen",
+              "buttonReset": "$t(additional:modules.CommuterFlows.title) zurücksetzen",
+              "labelPeople": "Personen",
+              "noDataset": "Keine pendelnden Personen bekannt!"
+          }
+  }
+}

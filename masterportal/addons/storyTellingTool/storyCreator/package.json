@@ -1,0 +1,10 @@
+{
+    "name": "story-telling-tool-story-creator",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "dependencies": {
+        "@tiptap/starter-kit": "^2.27.1",
+        "@tiptap/vue-3": "^2.27.1"
+    }
+}

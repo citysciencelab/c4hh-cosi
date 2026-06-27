@@ -1,0 +1,150 @@
+{
+  "statData": [
+    {
+      "expandable": false,
+      "icon": "bi bi-pencil",
+      "key": "textArea",
+      "multiple": true,
+      "name": "Freitext",
+      "tag": null
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-card-heading",
+      "key": "heading",
+      "multiple": true,
+      "name": "Überschrift",
+      "tag": null
+    },
+    {
+      "expandable": true,
+      "expandableLabelShow": "additional:modules.cosi.reportingTool.showStatisticalData",
+      "expandableLabelHide": "additional:modules.cosi.reportingTool.hideStatisticalData",
+      "icon": "bi bi-file-earmark-ruled",
+      "key": "statDataOverview",
+      "multiple": false,
+      "name": "Statistische Datenübersicht",
+      "tag": "Statistische Daten",
+      "tagBackgroundColor": "#008DCB",
+      "tagFontColor": "#FFFFFF",
+      "tagIcon":"bi bi-bar-chart"
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-bar-chart",
+      "key": "statDataCharts",
+      "multiple": false,
+      "name": "Datenvisualisierung",
+      "tag": "Statistische Daten",
+      "tagBackgroundColor": "#008DCB",
+      "tagFontColor": "#FFFFFF",
+      "tagIcon":"bi bi-bar-chart"
+    }
+  ],
+  "subjectData": [
+    {
+      "expandable": false,
+      "icon": "bi bi-pencil",
+      "key": "textArea",
+      "multiple": true,
+      "name": "Freitext",
+      "tag": null
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-card-heading",
+      "key": "heading",
+      "multiple": true,
+      "name": "Überschrift",
+      "tag": null
+    },
+    {
+      "expandable": true,
+      "expandableLabelShow": "additional:modules.cosi.reportingTool.showSubjectData",
+      "expandableLabelHide": "additional:modules.cosi.reportingTool.hideSubjectData",
+      "icon": "bi bi-file-earmark-ruled",
+      "key": "subjectDataTable",
+      "multiple": false,
+      "name": "Auflistung",
+      "tag": "Fachdaten",
+      "tagBackgroundColor": "#EB8A3E",
+      "tagFontColor": "#FFFFFF",
+      "tagIcon":"bi bi-layers"
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-map",
+      "key": "subjectDataMap",
+      "multiple": false,
+      "name": "Kartendarstellung",
+      "tag": "Fachdaten",
+      "tagBackgroundColor": "#EB8A3E",
+      "tagFontColor": "#FFFFFF",
+      "tagIcon":"bi bi-layers"
+    }
+  ],
+  "analyses": [
+    {
+      "items": [],
+      "expandable": false,
+      "icon": "bi bi-geo",
+      "key": "accessibilityAnalyses",
+      "multiple": false,
+      "name": "Erreichbarkeitsanalysen",
+      "tag": "Erreichbarkeitsanalysen",
+      "tagBackgroundColor": "#43A047",
+      "tagFontColor": "#FFFFFF",
+      "tagIcon":"bi bi-geo"
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-pencil",
+      "key": "textArea",
+      "multiple": true,
+      "name": "Freitext",
+      "tag": null
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-card-heading",
+      "key": "heading",
+      "multiple": true,
+      "name": "Überschrift",
+      "tag": null
+    }
+  ],
+  "annex": [
+    {
+      "expandable": false,
+      "icon": "bi bi-pencil",
+      "key": "textArea",
+      "multiple": true,
+      "name": "Freitext",
+      "tag": null
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-card-heading",
+      "key": "heading",
+      "multiple": true,
+      "name": "Überschrift",
+      "tag": null
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-list-stars",
+      "key": "legend",
+      "multiple": false,
+      "name": "Legende",
+      "tag": null
+    },
+    {
+      "expandable": false,
+      "icon": "bi bi-journals",
+      "key": "sources",
+      "multiple": false,
+      "name": "Quellenangaben",
+      "tag": null
+    }
+  ]
+}

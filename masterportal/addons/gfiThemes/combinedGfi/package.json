@@ -1,0 +1,15 @@
+{
+  "name": "gfi-themes-combined-gfi",
+  "version": "1.0.0",
+  "description": "combinedGfi",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+  },
+  "dependencies": {
+    "@turf/buffer": "^7.2.0",
+    "@turf/boolean-contains": "^7.2.0",
+    "@turf/boolean-intersects": "^7.2.0"
+  }
+}

@@ -1,0 +1,12 @@
+addons.md
+__example__addonsConf.json
+exampleAddon
+node_modules
+sdpDownload/node_modules/*
+cosi/node_modules/*
+qr/node_modules/*
+.history
+.vscode
+.idea
+.DS_Store
+vpiDashboard/config.local.js

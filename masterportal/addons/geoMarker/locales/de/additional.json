@@ -1,0 +1,147 @@
+{
+    "modules": {
+        "geoMarker": {
+            "name": "GeoMarker",
+            "description": "Anwendung für Informationen, die der Laufendhaltung der Geobasisdaten dienen.",
+            "screenshot": {
+              "altImage": "Screenshot",
+              "noImageAvailable": "Kein Screenshot vorhanden.",
+              "buttonCreate": "Screenshot erzeugen",
+              "buttonPreview": "Vorschau des Screenshots ansehen",
+              "buttonDelete": "Screenshot löschen"
+            },
+            "geoMarkerForm": {
+                "removeAttachment": "Datei entfernen",
+                "attachmentWarning": "Nur PDF-, PNG-, JPEG- und ZIP-Dateien sind erlaubt.",
+                "attachmentWarningTitle": "Nicht unterstützter Dateityp",
+                "category": "Kategorie",
+                "reminderDate": "Aktiviere Meldung am",
+                "infoTitle": "Info",
+                "descriptionLabel": "Beschreibung:",
+                "attachmentTitle": "Zusätzliche Dokumente",
+                "gemisNoEditInfo": "GEMIS-Datensatz, keine Bearbeitung möglich",
+                "departmentsTitle": "Abteilungen",
+                "departmentClosedLabel": "Geschlossen",
+                "departmentClosedNoDateSet": "Schließdatum unbekannt",
+                "selectedDepartmentsTitle": "Ausgewählte Abteilungen",
+                "save": "Speichern",
+                "cancel": "Abbrechen",
+                "edit": "Bearbeiten",
+                "createAnotherGeoMarker": "Weiteren GeoMarker anlegen",
+                "downloadAttachment": "Anhang herunterladen",
+                "successMessageAfterUpdate": "GeoMarker ist erfolgreich aktualisiert",
+                "successMessageAfterSave": "GeoMarker mit Id {{id}} ist erfolgreich erstellt.",
+                "geoMarkerClosedAt": "GeoMarker geschlossen am",
+                "featureIsLocked": {
+                  "header": "Bearbeiten nicht möglich",
+                  "text": "Der ausgewählte GeoMarker wird gerade durch jemand anderen bearbeitet und ist gesperrt."
+                },
+                "geomHasChanged": {
+                  "header": "Geänderte Geometrie!",
+                  "text": "Die Position des GeoMarkers wurde verändert. Sie sehen die neue Position in der Karte. (Blauer Kreis)"
+                },
+                "isSaving": "GeoMarker wird gespeichert...",
+                "isLoading": "Daten werden vom Server geholt..."
+            },
+            "status": {
+                "offen": "offen",
+                "inaktiv": "inaktiv",
+                "geschlossen": "geschlossen"
+            },
+            "tabs": {
+                "tabNew": {
+                    "label": "Neu"
+                },
+                "tabFilter": {
+                    "label": "Filter"
+                },
+                "tabList": {
+                    "label": "Liste"
+                }
+            },
+            "GeoMakerList": {
+                "tableNoData": "Keine GeoMarker zum Anzeigen ausgewählt.",
+                "selectedGeoMarkerWithId": "GeoMarker mit der Id {{id}} ausgewählt",
+                "table": {
+                    "id": "ID",
+                    "quelle": "Quelle",
+                    "kategorie": "Kategorie",
+                    "status": "Status",
+                    "beschreibung": "Beschreibung",
+                    "zeitstempel": "Erstellt",
+                    "aktion": "Zeigen",
+                    "aktionButtonLabel": "Details zum GeoMarker"
+                },
+                "button": {
+                    "openVcOblique": "Schrägluftbilder öffnen",
+                    "openPanorama": " 360° Panorama öffnen",
+                    "centerMapOnGeoMarker": "Karte auf GeoMarker zentrieren",
+                    "zoomToGeoMarker": "Auf GeoMarker zoomen",
+                    "hideList": "GeoMarker-Liste umschalten",
+                    "moveGeoMarker": "GeoMarker verschieben"
+                },
+                "updateMessage": "Der GeoMarker wurde verschoben. Bitte speichern Sie den GeoMarker, um die Änderung zu übernehmen."
+            },
+            "filter": {
+                "isFiltering": "Bitte etwas Geduld, die GeoMarker werden gerade gefiltert ...",
+                "countGeoMarker": "GeoMarker",
+                "urlFilterPrefix": "Filter",
+                "permalink": "Permalink",
+                "graphicalSelect": {
+                  "title": "Auswahl der GeoMarker in der Karte durch",
+                  "filterButtonTitle": "Zeige räuml. Filter",
+                  "filterButtonActiveTitle": "Räuml. Filter ausblenden",
+                  "filterButtonResetTitle": "Räuml. Filter zurücksetzen"
+                },
+                "departments": {
+                  "label": "Abteilung(en)",
+                  "placeholder": "Abteilung(en) wählen"
+                },
+                "status": {
+                  "label": "Status",
+                  "placeholder": "Status wählen"
+                },
+                "categories": {
+                  "label": "Kategorie(n)",
+                  "placeholder": "Kategorie(n) wählen"
+                },
+                "description": {
+                  "label": "Beschreibung",
+                  "placeholder": "Beschreibung"
+                },
+                "comment": {
+                  "label": "Bemerkung der Abteilung(en)",
+                  "placeholder": "Bemerkung der Abteilung(en)"
+                },
+                "source": {
+                  "label": "Quelle",
+                  "placeholder": "Quelle"
+                },
+                "geoMarkerID": {
+                  "label": "GeoMarker ID",
+                  "placeholder": "GeoMarker ID"
+                },
+                "dates": {
+                  "from": {
+                    "label": "Von",
+                    "placeholder": "Von"
+                  },
+                  "to": {
+                    "label": "Bis",
+                    "placeholder": "Bis"
+                  },
+                  "labels": {
+                    "created": "Erfassungszeitraum",
+                    "closed": "GeoMarker geschlossen der Abteilung(en)",
+                    "review": "Wiedervorlagedatum der Abteilung(en)"
+                  }
+                },
+                "buttons": {
+                  "filter": "filtern",
+                  "list": "in Liste",
+                  "restore": "zurücksetzen"
+                }
+            }
+        }
+    }
+}

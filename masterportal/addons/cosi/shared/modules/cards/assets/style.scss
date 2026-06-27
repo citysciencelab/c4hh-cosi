@@ -1,0 +1,46 @@
+.card {
+    border-radius: $badge-border-radius;
+    .card-body {
+        border-radius: calc($badge-border-radius - 1px);
+        .label {
+            color: adjust-color($dark_grey, $lightness: 15%);
+            font-size: $font-size-base * 0.9;
+        }
+        .text {
+            font-size: $font-size-base;
+        }
+    }
+    &.hoverable :hover {
+        background-color: $light_blue;
+    }
+    .btn-close {
+        width: 0.4em;
+        height: 0.4em;
+        margin-top: 4px;
+        margin-right: 4px;
+    }
+}
+
+.card-active {
+    border-color: $secondary;
+    color: $secondary;
+    outline: 1px solid $secondary;
+    i {
+        color: $secondary;
+    }
+}
+
+.card-hover:hover {
+    cursor: pointer;
+    background-color: $light_blue;
+    i {
+        color: $secondary;
+    }
+}
+
+.card-selected {
+    background-color: $light_blue;
+    i {
+        color: $secondary;
+    }
+}

@@ -1,0 +1,50 @@
+{
+  "modules": {
+    "potentialDamagedBuilding": {
+      "title": "Potential damaged buildings",
+      "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "headline": {
+         "buildingAttributes": "Building attributes",
+         "buildingOverview": "Overview",
+         "updateData": "Update Data - ",
+         "adjustedDamagePotentialClass": "adjusted damage potential class",
+         "lastUpdated": "Last updated",
+         "comment": "Comment",
+         "potentialDamagedInformation": "Information on the potential for damage - ",
+         "potentialDamagedClass": "Schadenpotenzialklasse",
+         "buildingFunction": "Building function",
+         "additionalBuildingFunction": "additional building function",
+         "additionalInformation": "additional Information"
+      },
+      "label": {
+        "potentialDamagedClassCount": "The current risk of damage to this building is estimated at",
+        "potentialDamagedClassUpdate": "Last updated on",
+        "potentialDamagedClassDerive": "Derived from ALKIS",
+        "potentialDamagedClassLastEntry": "The last entry for the adjusted damage potential class is",
+        "buildingKey": "the ALKIS building ID is:",
+        "builingFunction": "the ALKIS building key is:",
+        "additionalBuilingKey": "the additional ALKIS building ID is:",
+        "additionalBuilingFunction": "the additional ALKIS building key is:",
+        "earthSurface": "the orientation relative to the Earth's surface according to ALKIS is",
+        "buildingConstructionType": "the building's construction type according to ALKIS is",
+        "basementLevels": "the number of basement levels in the building is"
+      },
+      "popover": {
+        "damagePotentialClass": "The damage potential class currently used in the risk analysis calculation. This value may differ from the adjusted damage potential class if the modification date is more recent than the update date.",
+        "updateDate": "Update date of the damage potential class for the most recent risk analysis calculations.",
+        "damagePotentialClassALKIS": "The potential damage class is listed here in accordance with the method described in Appendix B, using ALKIS data.",
+        "buildingKey": "The building function is defined as the primary use of the building at the time the ALKIS data was collected.",
+        "additionalBuildingFunction": "In addition to functional use, there may be other uses that are taken into account in the damage potential class assignment.",
+        "earthSurface": "For objects located below ground level, this is indicated accordingly.",
+        "buildingConstructionType": "Description of the building component. In the description, basements are listed separately.",
+        "basementLevels": "This section indicates whether there are any basement levels and, if so, how many."
+      },
+      "damagePotentialClass": "Damage Potential Class",
+      "adjustedDamagePotentialClassHint": "The final entry of location-specific values for each property or area.",
+      "lastUpdatedHint": "Adjusted on: ",
+      "commentHint": "Indication of the responsible department, with additional explanations if necessary",
+      "reset": "Reset",
+      "save": "Save"
+    }
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "modules": {
+    "storyCreator": {
+      "storyNav": "Story",
+      "chapterNav": "Chapter",
+      "title": "Story Creator",
+      "addChapter": "Add Chapter",
+      "saveStory": "Save story",
+      "preview": "Preview",
+      "clearForm": "Clear form",
+      "noSettings": "No technical data or map positions have been defined",
+      "numberOfChapters": "Chapter",
+      "readOnly": "Read-only",
+      "previewNav": "Story preview",
+      "introText": "This tool is designed for creating interactive, map-based stories. After entering general information such as the name, description, author, and cover image, you can flexibly add individual chapters below. Using the buttons at the bottom of the page, you can preview, save, or discard the story.",
+      "labels": {
+        "storyTitle": "Enter story name",
+        "storyDescription": "Story description (optional)",
+        "storyAuthor": "Author of the story (optional)",
+        "fileDrop": "Drop file here",
+        "fileSelect": "or select file",
+        "alt": "Accessibility text",
+        "copyright": "Photo credit",
+        "deleteChapter": "Delete chapter ",
+        "playStory": "Play story",
+        "editStory": "Edit story",
+        "downloadStory": "Download story",
+        "wrongFormat": "Only image files (e.g. JPG, PNG) are permitted.",
+        "wrongFormatTitle": "Invalid file format",
+        "emptyChapter": "No chapters have been created yet.",
+        "mapPosition": "Map position"
+      },
+      "buttons": {
+          "confirm": "Confirm",
+          "discardImage": "Discard image",
+          "abort": "Abort"
+      },
+      "headlines": {
+        "addImages": "Add new image",
+        "addTexts": "Add new text",
+        "chapterList": "List of Chapters",
+        "addImageTitle": "Add new title image",
+        "coverOfStory": "Cover photo for the story"
+      },
+      "chapter": {
+        "editChapter": "Edit chapter",
+        "infoText": "This is where you define what will appear in the final story. The process involves two steps: First, you specify the map section, zoom level, feature data, and tools. Then, in the lower section, you can insert the corresponding text and media.",
+        "mapTool": "Map settings and tools",
+        "mapPosition": "Apply map position",
+        "currentPosition": "Current map position",
+        "layerList": "Layers to include (optional)",
+        "toolList": "Tool to open (optional)",
+        "zoomLevel": "Zoom level",
+        "save": "Save chapter",
+        "cancel": "Cancel",
+        "successAlert": "The map position has been successfully saved!",
+        "positionChangedHint": "The location does not match the current view of the map.",
+        "addContent": "Add content",
+        "title": "Enter chapter title",
+        "initialText": "Click here to add a chapter description...",
+        "toolListPlaceholder": "Select tool...",
+        "layerListPlaceholder": "Select layers..."
+      },
+      "addElementDropdown": {
+        "categories": {
+          "elements": "Elements",
+          "media": "Media"
+        },
+        "items": {
+          "text": "Text",
+          "separator": "Separator",
+          "image": "Image",
+          "video": "Video"
+        }
+      }
+    }
+  }
+}

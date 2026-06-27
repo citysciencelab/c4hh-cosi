@@ -1,0 +1,61 @@
+{
+    "modules": {
+        "bimfactory": {
+            "name": "BIMFabrikHH",
+            "description": "Conversion of GIS data into IFC format",
+            "startPage": {
+                "headline": {
+                    "message": "The {title} is a development of the City of Hamburg as part of the {link} project.",
+                    "title": "BIMFabrikHH",
+                    "linkTitle": "Connected Urban Twins (CUT)",
+                    "linkHref": "https://www.connectedurbantwins.de/"
+                },
+                "description": "Basic geodata such as DTMs, city models, etc. are an important basis for basic determination in the construction industry. This data is often available as GIS data. In order to implement the BIM method, this data must be converted into IFC format. The aim is therefore to provide geodata from heterogeneous formats in IFC format with relevant information.",
+                "advantagesTitle": "Advantages are:",
+                "advantages": {
+                    "list": [
+                        "Repetitive processes are simplified and standardized by this automation.",
+                        "Resources are saved.",
+                        "BIM use in the FHH is spread.",
+                        "Usability in the master portal is improved.",
+                        "One application for all."
+                    ]
+                },
+                "conceptAlt": "Concept of BIMFabrikHH",
+                "workflows": {
+                    "title": "Available workflows",
+                    "select": "Please choose a workflow!"
+                }
+            },
+            "workflow": {
+                "headerImageAlt": "Header image for \"{{workflowTitle}}\"",
+                "backToStart": "Back to startpage",
+                "buttons": {
+                    "back": "previous step",
+                    "next": "next step"
+                },
+                "components": {
+                    "filter": {
+                        "select": "Selection of the area by",
+                        "numberSelectedTiles": "Tiles selected",
+                        "numberFilteredElement": "datasets",
+                        "noDataAvailable": "There is no data available for the selected area",
+                        "filterNote": "Please click on the filter button",
+                        "message3D": "In 3D mode, no outline can be drawn. Please switch to 2D mode.",
+                        "message3DTitle": "Switch 3D mode"
+                    },
+                    "submit": {
+                        "openIfcInBimViewer": "Open IFC file in BIM Viewer",
+                        "openIfcLink": "Download IFC file",
+                        "filterMissingNote": "Please draw an area on the map or click the filter button",
+                        "generalErrorIntroText": "One or more errors were found.",
+                        "timeOutMessage": "The time limit of 10 minutes was exceeded and the process was aborted."
+                    },
+                    "inputerrors": {
+                        "errorMessage": "Message: "
+                    }
+                }
+            }
+        }
+    }
+}

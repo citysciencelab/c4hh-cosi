@@ -1,0 +1,19 @@
+{
+    "modules": {
+        "storyPlayer": {
+            "name": "Story Player",
+            "description": "Please insert a description.",
+            "tableOfContents": "Table of Contents",
+            "dipasPlayer": {
+              "closeTOC": "Close the table of contents",
+              "goToPrevStep": "Go to the previous step",
+              "goToNextStep": "Go to the next step",
+              "toggleTOC": "Toggle the table of contents",
+              "openStoriesOverview": "Open the overview of all stories",
+              "screenToSmallMessage": "DIPAS_stories has not been optimized for this screen size yet. Please use a bigger screen if possible!",
+              "mobilePortraitMessage": "Usage in landscape mode recommended."
+            },
+            "noPlayerAvailable": "No existing story player is configured for displayType. Please add a story player to use the story narration."
+        }
+    }
+}

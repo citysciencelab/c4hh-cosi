@@ -1,0 +1,37 @@
+{
+    "modules": {
+        "cosi": {
+            "districtSelector": {
+                "additionalInfoLayersHelp": "You can display additional info layers as guidance by clicking the Switcher. The layers can also be toggled using the layer tree.",
+                "additionalLayer": "Show Guidelayers",
+                "area": "Area",
+                "areaTooSmall": "Population cannot be calculated for the selected area because it is too small. Please select a larger area.",
+                "areaTooBig": "Population cannot be calculated for the selected area because it is too large. Please select a smaller area.",
+                "areaTooFewAddresses": "Population cannot be calculated for the selected area because it contains fewer than three addresses in Hamburg. Please select a larger area.",
+                "bufferHeader": "Set Buffer",
+                "bufferLabel": "Buffer[m]",
+                "buttonConfirm": "Confirm Areas",
+                "deleteButtonArea": "Delete Area",
+                "description": "Please select one or more areas on the map to define your planning area. Alternatively, you can also use the selection lists. Afterwards, you have the option to adjust the selected area for the subject data.",
+                "districtLevel": "Administrative Level",
+                "drawHeader": "Draw Area",
+                "drawLabel": "Selection of the areas",
+                "fileUploadFormat": "supported file format: GeoJSON",
+                "help": "Before starting the analysis / planning, you can select a planning area here. The empirical data will be loaded for these areas. Alternatively, you can use the <strong>\"District Query\"</strong> tool to select areas according to specific parameters. With the <strong>buffer</strong> you can choose in which radius around the selected area selected facilities are displayed. The analysis functions are not affected by this.",
+                "importFileFormatError": "The uploaded file does not have the expected format. Please upload a GeoJSON file.",
+                "importFileValidError": "The uploaded file is not a valid GeoJSON file. Please check the file and try again.",
+                "importHeader": "Import Area",
+                "population": "Population",
+                "populationNotAvailable": "Population data are not available.",
+                "populationProcessingFailed": "Population data could not be processed.",
+                "resetArea": "Reset Area",
+                "selectedAreas": "Selected Areas",
+                "statisticalData": "Statistical Data",
+                "subjectData": "Subject Data",
+                "tabLabelOne": "Areas for Statistical Data",
+                "tabLabelTwo": "Edit Areas for Subject Data",
+                "title": "Select Area"
+            }
+        }
+    }
+}

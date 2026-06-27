@@ -1,0 +1,57 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "templateManager": {
+                    "title": "Vorlagen",
+                    "importTemplate": "Vorlage importieren",
+                    "loadFromTemplate": "Vorlage laden",
+                    "exportFromTemplate": "Vorlage in Bericht exportieren",
+                    "infoLoadFromTemplates": "Laden Sie eine thematische Basis-Konfiguration für fachspezifische Analysen. Welche Inhalte durch die Vorlage geladen werden entnehmen Sie der Vorlagenübersicht. Um Vorlagen zu laden müssen vorher Gebiete ausgewählt werden. Das Exportieren von Daten aus Vorlagen kann erst dann erfolgen, wenn eine Vorlage geladen ist.",
+                    "noInfo": "Nicht vorhanden",
+                    "optionalComponents": "Optionale Bestandteile des auszugebenen Berichts:",
+                    "infrastructureData": "Infrastrukturdaten:",
+                    "generateReport": "Bericht generieren",
+                    "backToTemplate": "Zurück zur Vorlage",
+                    "creatingReport": "Bericht wird erstellt. Bitte warten.",
+                    "reportSuccess": "Der Bericht wurde erfolgreich generiert. Der Download startet automatisch.",
+                    "overview": "Übersicht",
+                    "export": "Exportieren",
+                    "note": "Hinweis: geladene Vorlagen können nicht bearbeitet werden.",
+                    "infrastructureHint": "Hinweis: Bei mehr als 10 Einrichtungen wird keine Infrastrukturdaten-Tabelle dargestellt.",
+                    "label": {
+                      "created": "Erstellt",
+                      "name": "Name",
+                      "description": "Beschreibung",
+                      "layers": "Fachdaten",
+                      "districtLevel": "Bezugsrahmen",
+                      "selectedDistricts": "Ausgewählte Gebiete",
+                      "categories": "Statistische Daten",
+                      "addTool": "Starter Werkzeug",
+                      "calculations": "Berechnungen",
+                      "title": "Titel",
+                      "selectedAreas": "Name der ausgewählten Gebiete",
+                      "author": "Ersteller:in",
+                      "manageTemplate": "Vorlagen verwalten",
+                      "enable": "geladen",
+                      "disable": "nicht geladen"
+                    },
+                    "activeTool": "Aktive Werkzeuge",
+                    "errors": {
+                      "default": "Datei konnte nicht geladen werden.",
+                      "invalid": "Datei konnte nicht gelesen werden.",
+                      "wrongFileFormat": "Die Datei hat nicht das richtige Format.",
+                      "templateName": "Eine Vorlage mit dem Namen ",
+                      "isLoaded": "ist bereits geladen.",
+                      "notAllowLoaded": "kann ohne ausgewählte Gebiete nicht geladen werden.",
+                      "attErr": " {{attribute}} Tag existiert nicht.",
+                      "invalidReportTitle": "Es sind maximal {{reportTitleMaxLength}} Zeichen erlaubt",
+                      "invalidSelectedAreasName": "Es sind maximal {{selectedAreasNameMaxLength}} Zeichen erlaubt",
+                      "invalidAuthor": "Es sind maximal {{authorMaxLength}} Zeichen erlaubt"
+                    },
+                    "chooseDistricts": "Bitte Gebiete auswählen!"
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,171 @@
+[{
+    "scope": "Barmbek-Süd",
+    "paramA_val": 35880,
+    "paramB_val": 18658,
+    "relation": 1.923035695144174,
+    "capacity": 35880,
+    "need": 18658,
+    "coverage": 192.3035695144174,
+    "mirrorCoverage": 100,
+    "weightedRelation": 1.923035695144174,
+    "data": {
+        "name": "Barmbek-Süd",
+        "faktorf_A": 1,
+        "perCalc_A": 1,
+        "type_A": "feature",
+        "paramA_val": {
+            "2012": 32284,
+            "2013": 32782,
+            "2014": 33116,
+            "2015": 33681,
+            "2016": 34792,
+            "2017": 35218,
+            "2018": 35438,
+            "2019": 35828,
+            "2020": 35880
+        },
+        "paramA_calc": {
+            "2012": 32284,
+            "2013": 32782,
+            "2014": 33116,
+            "2015": 33681,
+            "2016": 34792,
+            "2017": 35218,
+            "2018": 35438,
+            "2019": 35828,
+            "2020": 35880
+        },
+        "incompleteDatasets_A": 0,
+        "faktorf_B": 1,
+        "perCalc_B": 1,
+        "type_B": "feature",
+        "paramB_val": {
+            "2012": 17069,
+            "2013": 17311,
+            "2014": 17473,
+            "2015": 17687,
+            "2016": 18194,
+            "2017": 18398,
+            "2018": 18442,
+            "2019": 18637,
+            "2020": 18658
+        },
+        "paramB_calc": {
+            "2012": 17069,
+            "2013": 17311,
+            "2014": 17473,
+            "2015": 17687,
+            "2016": 18194,
+            "2017": 18398,
+            "2018": 18442,
+            "2019": 18637,
+            "2020": 18658
+        },
+        "incompleteDatasets_B": 0
+    }
+}, {
+    "scope": "Winterhude",
+    "paramA_val": 56382,
+    "paramB_val": 29748,
+    "relation": 1.8953206938281566,
+    "capacity": 56382,
+    "need": 29748,
+    "coverage": 189.53206938281566,
+    "mirrorCoverage": 100,
+    "weightedRelation": 1.8953206938281566,
+    "data": {
+        "name": "Winterhude",
+        "faktorf_A": 1,
+        "perCalc_A": 1,
+        "type_A": "feature",
+        "paramA_val": {
+            "2012": 50845,
+            "2013": 51549,
+            "2014": 52441,
+            "2015": 54302,
+            "2016": 54826,
+            "2017": 55651,
+            "2018": 55900,
+            "2019": 55492,
+            "2020": 56382
+        },
+        "paramA_calc": {
+            "2012": 50845,
+            "2013": 51549,
+            "2014": 52441,
+            "2015": 54302,
+            "2016": 54826,
+            "2017": 55651,
+            "2018": 55900,
+            "2019": 55492,
+            "2020": 56382
+        },
+        "incompleteDatasets_A": 0,
+        "faktorf_B": 1,
+        "perCalc_B": 1,
+        "type_B": "feature",
+        "paramB_val": {
+            "2012": 27253,
+            "2013": 27534,
+            "2014": 27981,
+            "2015": 28867,
+            "2016": 29195,
+            "2017": 29530,
+            "2018": 29532,
+            "2019": 29354,
+            "2020": 29748
+        },
+        "paramB_calc": {
+            "2012": 27253,
+            "2013": 27534,
+            "2014": 27981,
+            "2015": 28867,
+            "2016": 29195,
+            "2017": 29530,
+            "2018": 29532,
+            "2019": 29354,
+            "2020": 29748
+        },
+        "incompleteDatasets_B": 0
+    }
+}, {
+    "scope": "Gesamt",
+    "paramA_val": 92262,
+    "paramB_val": 48406,
+    "relation": 1.9060033880097509,
+    "capacity": 92262,
+    "need": 48406,
+    "coverage": 190.60033880097509,
+    "mirrorCoverage": 100,
+    "weightedRelation": 1.9060033880097509,
+    "data": {
+        "faktorf_A": 1,
+        "faktorf_B": 1,
+        "perCalc_A": 1,
+        "perCalc_B": 1,
+        "incompleteDatasets_A": 0,
+        "incompleteDatasets_B": 0,
+        "datasets_A": null,
+        "datasets_B": null
+    }
+}, {
+    "scope": "Durchschnitt",
+    "paramA_val": 46131,
+    "paramB_val": 24203,
+    "relation": 1.9060033880097509,
+    "capacity": 46131,
+    "need": 24203,
+    "coverage": 190.60033880097509,
+    "mirrorCoverage": 100,
+    "weightedRelation": 1.9060033880097509,
+    "data": {
+        "faktorf_A": 1,
+        "faktorf_B": 1,
+        "perCalc_A": 1,
+        "perCalc_B": 1,
+        "incompleteDatasets_A": 0,
+        "incompleteDatasets_B": 0,
+        "datasets_A": null,
+        "datasets_B": null
+    }
+}]

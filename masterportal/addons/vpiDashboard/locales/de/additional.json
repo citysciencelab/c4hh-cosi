@@ -1,0 +1,142 @@
+{
+  "modules": {
+    "tools": {
+      "vpidashboard": {
+        "name": "VPI Dashboard",
+        "tabitems": {
+          "visitors": "Besucher",
+          "gender": "Geschlechter",
+          "age": "Altersklassen",
+          "origins": "Herkunft",
+          "distance": "Entfernung",
+          "compare": "Standorte Vergleichen",
+          "info": "Informationen",
+          "compare_dates": "Zeitpunkte Vergleichen",
+          "heatmap": "Heatmap"
+        },
+        "time": {
+          "months": [
+            "Januar",
+            "Februar",
+            "März",
+            "April",
+            "Mai",
+            "Juni",
+            "Juli",
+            "August",
+            "September",
+            "Oktober",
+            "November",
+            "Dezember"
+          ],
+          "days": [
+            "Montag",
+            "Dienstag",
+            "Mittwoch",
+            "Donnerstag",
+            "Freitag",
+            "Samstag",
+            "Sonntag"
+          ]
+        },
+        "details": "Details",
+        "unique": {
+          "uniqueVisitors": "Besucher",
+          "dailyOverview": "Durchschnittliche tägliche Besucher im {{ month }} im Jahr {{ year }}",
+          "monthlyOverview": "Anzahl der monatlichen Besucher im Jahr {{ year }}",
+          "hourly": "Besucher einer bestimmten Zeitspanne (stündlich)",
+          "daily": "Besucher einer bestimmten Zeitspanne (täglich)",
+          "selectDate": "Bitte ein Datum wählen:",
+          "selectDateRange": "Bitte einen Zeitraum wählen:",
+          "selectedDateRange": "Tägliche Besucher im gewählten Zeitraum",
+          "noValidDate": "Kein gültiger Zeitpunkt / Zeitraum ausgewählt",
+          "numberVisitorsHour": "Anzahl Besucher pro Stunde",
+          "numberVisitorsDay": "Anzahl Besucher pro Tag",
+          "chartTitleDay": "Daten von {{dayName}}, den {{dateValue}}",
+          "chartTitleDayRange": "Daten vom {{dateValueFrom}} bis zum {{dateValueTo}}",
+          "avgVisitorsYear": "Anzahl der Besucher pro Jahr",
+          "avgVisitorsDay": "Ø Besucher im {{ month }} {{ year }} an einem",
+          "avgVisitorsMonth": "Anzahl der Besucher pro Monat im Jahr {{ year }}",
+          "selectDataBase": "Datengrundlage für Grafik auswählen:",
+          "date": "Datum",
+          "resetDate": "anderes Datum wählen",
+          "noData": "(keine Daten verfügbar)",
+          "days": "Tage",
+          "months": "Monate"
+        },
+        "compare": {
+          "selectLocationB": "Bitte wählen Sie oben oder auf der Karte einen zweiten Standort aus"
+        },
+        "tab": {
+          "noData": "(Daten noch nicht verfügbar)",
+          "visitors": {
+            "mondayToSaturday": "Mo - Sa",
+            "sunday": "So"
+          },
+          "gender": {
+            "chartTitle": "Geschlechterstruktur je Besucher in % pro Jahr",
+            "lineBarChartTitle": "Ø wöchentliche Geschlechterstruktur je Besucher pro Monat im Jahr {{year}}",
+            "male": "männlich",
+            "female": "weiblich"
+          },
+          "origins": {
+            "hamburger": "Hamburger",
+            "pendler": "Pendler",
+            "touristen": "Touristen",
+            "chartTitle": "Ø wöchentliche Besucher pro Monat",
+            "chartLabels": {
+              "residents": "Hamburger",
+              "commuters": "Pendler",
+              "overnightLocations": "Besucher pro Tag nach Städten / Landkreisen (Top 10)*",
+              "numberVisitorsDayPostalCode": "Besucher pro Tag nach PLZ / Stadtteilen (Top 10)*",
+              "roamer": "Besucher International (Top 10)"
+            },
+            "cardLabels": {
+              "residentsPerWeek": "Ø Hamburger pro Woche",
+              "commutersPerWeek": "Ø Pendler pro Woche",
+              "touristsPerWeek": "Ø Touristen pro Woche"
+            },
+            "footnote": {
+              "plz": "(*) Inkl. Übernachtungsgäste am Herkunftsort, Postleitzahlengebiete entsprechen nicht den Stadtteilgrenzen und können sich aus mehreren Stadtteilen zusammensetzen.",
+              "overnight": "Hinweis: \"Übernachtungsorte: Hamburger und Übernachtungsgäste in Hamburg sowie Tagesbesucher und Pendler außerhalb Hamburgs.\"",
+              "hamburger": "Übernachtungsgäste in Hamburg",
+              "pendler": "Besucher aus der Metropolregion",
+              "touristen": "Besucher aus Deutschland"
+            },
+            "highestValue": "höchster Wert",
+            "otherValues": "sonstige Werte"
+          },
+          "ageGroup": {
+            "chartTitle": "Altersklasse in % pro Jahr (*)",
+            "pieChartTitle": "Altersklassen pro Jahr",
+            "footnote": "(*) Unter 18 Jährige werden nicht erfasst."
+          },
+          "compare": {
+            "dropdown": {
+              "gender": "Ø wöchentliche Geschlechterstruktur je Besucher",
+              "agegroup": "Ø wöchentliche Besucher je Altersklasse",
+              "visitortypes": "Ø wöchentliche Besuchertypen"
+            }
+          },
+          "heatmap": {
+            "headline": "Wählen Sie aus, welchen Heatmap-Layer Sie aktivieren möchten:",
+            "hourly": "Stündlich",
+            "daily": "Täglich",
+            "footnote": [
+              "In der Karte werden die Besucher eines Tages oder einer Stunde für alle 124 Gitterzellen der Innenstadt als Heatmap angezeigt.",
+              "rote Gitterzelle = Besucheraufkommen hoch,",
+              "weiße Gitterzelle = Besucheraufkommen niedrig.",
+              "Über die Bedienkonsole auf der Karte lassen sich mit den Pfeiltasten oder dem Schieberegler Werte für einen beliebigen Zeitpunkte auswählen.",
+              "Durch Auswahl einer Gitterzelle lassen sich die Tages- und Stundenwerte auch im Fenster auf der rechten Seite einzeln angezeigt."
+            ]
+          }
+        },
+        "locationSelectMenu": {
+            "menuPlaceholder": "Standort auswählen",
+            "firstLabel": "Standort",
+            "secondLabel": "Standort B"
+        }
+      }
+    }
+  }
+}

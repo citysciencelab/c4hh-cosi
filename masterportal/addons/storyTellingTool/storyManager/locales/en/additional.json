@@ -1,0 +1,19 @@
+{
+  "modules": {
+    "storyManager": {
+      "title": "Story Manager",
+      "mainTitle": "Central overview for creating and managing interactive map stories.",
+      "mainDescription": "This area enables a seamless start into new StoryTelling projects by linking spatial data, texts, and multimedia content. In addition, the view provides access to all existing stories as well as the option to easily import already created stories into the system.",
+      "createStoryTitle": "Create new story",
+      "createStoryDescription": "Create a new interactive story and link maps, texts, and media.",
+      "selectStoryTitle": "Select story",
+      "selectStoryDescription": "Select a story from the list to view or edit it. An import function is also available.",
+      "importButton": "Import",
+      "importErrorTitle": "Import failed",
+      "importErrorText": "Only ZIP files created with this application can be loaded.",
+      "createdAt": "Created on:",
+      "chapters": "Chapters",
+      "emptyStory": "There are no stories yet."
+    }
+  }
+}

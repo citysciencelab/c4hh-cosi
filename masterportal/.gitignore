@@ -14,8 +14,9 @@
 styleguide
 .history
 
-addons/*
-!addons/readme.txt
+# addons/ is VENDORED into this repo (self-contained) — do NOT ignore it.
+# Upstream ignores `addons/*` (treats addons as externally supplied); we track
+# the source instead. node_modules under addons/ stays ignored via addons/.gitignore.
 
 bowerupdate.log
 build
