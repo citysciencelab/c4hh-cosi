@@ -59,6 +59,29 @@ services:
       - default
       - dokploy-network
     labels:
+      # ── Traefik routing (Dokploy's reverse proxy) ─────────────────────────
+      # Dokploy's Compose deploys do NOT get Traefik router labels auto-injected
+      # — its Domains UI is unreliable for compose (a flat "404 page not found"
+      # from Traefik = no router matched the host, vs a 502 which would mean the
+      # router exists but the backend is unreachable). So declare the router HERE.
+      # Set PORTAL_DOMAIN in the Dokploy Environment tab (e.g. cosi.care4.hamburg);
+      # leave it unset for local `docker compose up` — with no Traefik around these
+      # labels are inert.
+      - traefik.enable=true
+      # HTTPS router + automatic Let's Encrypt cert (Dokploy's resolver is named
+      # "letsencrypt"; its entrypoints are "web" :80 and "websecure" :443).
+      - "traefik.http.routers.cosi-portal-websecure.rule=Host(`${PORTAL_DOMAIN:-localhost}`)"
+      - traefik.http.routers.cosi-portal-websecure.entrypoints=websecure
+      - traefik.http.routers.cosi-portal-websecure.tls=true
+      - traefik.http.routers.cosi-portal-websecure.tls.certresolver=letsencrypt
+      - traefik.http.routers.cosi-portal-websecure.service=cosi-portal
+      # HTTP router → redirect everything to HTTPS.
+      - "traefik.http.routers.cosi-portal-web.rule=Host(`${PORTAL_DOMAIN:-localhost}`)"
+      - traefik.http.routers.cosi-portal-web.entrypoints=web
+      - traefik.http.routers.cosi-portal-web.middlewares=cosi-portal-https
+      - traefik.http.middlewares.cosi-portal-https.redirectscheme.scheme=https
+      # Backend: the portal's nginx listens on 80 inside the container.
+      - traefik.http.services.cosi-portal.loadbalancer.server.port=80
       # Container is on two networks now; tell Traefik which one to dial.
       - traefik.docker.network=dokploy-network
 

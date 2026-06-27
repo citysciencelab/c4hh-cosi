@@ -67,21 +67,33 @@ that (self-contained, no host-side pre-steps):
 1. **New → Compose**, point it at this repo, compose path `docker-compose.yml`.
 2. **Environment** tab: paste the vars you want to override from `.env.example`
    (Dokploy writes them as the root `.env`, which also feeds the Valhalla
-   service). At minimum consider `PORTAL_PORT`; set `OSM_EXTRACT_URL` /
-   `BUILD_TRANSIT` here if you don't want the Hamburg+transit defaults.
-3. **Deploy.** First build: the portal image (`npm` install + Vite build, heavy —
+   service). At minimum set:
+   - **`PORTAL_DOMAIN`** = your public hostname (e.g. `cosi.care4.hamburg`) — this
+     is what wires up Traefik routing + the TLS cert (see below).
+   - **`PORTAL_PORT`** = a free host port (Dokploy's Traefik already binds 8080).
+   - Optionally `OSM_EXTRACT_URL` / `BUILD_TRANSIT` if you don't want the
+     Hamburg+transit defaults.
+3. Point `PORTAL_DOMAIN`'s DNS **A record at the Dokploy server** (Let's Encrypt
+   needs it to resolve before it can issue the cert).
+4. **Deploy.** First build: the portal image (`npm` install + Vite build, heavy —
    see *Resource needs*) and Valhalla's first tile build run once.
-4. **Domains** → add a domain → service `portal`, container port `80`, HTTPS on.
-   The compose already attaches `portal` to `dokploy-network` and sets
-   `traefik.docker.network=dokploy-network`, so Traefik can reach it. (Without
-   that, a Compose app gets the route labels but no network → `404 page not
-   found` and a self-signed cert — Dokploy issue #3200.) **Redeploy** after
-   adding/changing a domain — labels only apply on redeploy.
+
+**Routing/TLS is handled by Traefik labels in `docker-compose.yml`, not the
+Domains tab.** Dokploy's Domains UI does *not* reliably inject Traefik labels for
+Compose services (you get a flat `404 page not found` and a self-signed cert —
+Dokploy issues [#3222], [#3435], [#3161]). So the compose declares the router
+itself and attaches `portal` to `dokploy-network`; you just supply `PORTAL_DOMAIN`.
+**Leave the Domains tab empty** (a UI domain on the same host would create a
+duplicate/conflicting router). After changing `PORTAL_DOMAIN`, **redeploy** —
+labels only apply on redeploy.
+
+[#3222]: https://github.com/Dokploy/dokploy/issues/3222
+[#3435]: https://github.com/Dokploy/dokploy/issues/3435
+[#3161]: https://github.com/Dokploy/dokploy/issues/3161
 
 > **Don't publish host port 8080 on Dokploy.** Dokploy's own Traefik already
-> binds 8080; set `PORTAL_PORT` to a free port in the Environment tab (or rely on
-> the domain and ignore the host publish) or the deploy fails with
-> `Bind for 0.0.0.0:8080 failed: port is already allocated`.
+> binds 8080; set `PORTAL_PORT` to a free port in the Environment tab or the
+> deploy fails with `Bind for 0.0.0.0:8080 failed: port is already allocated`.
 
 Persistence: Valhalla tiles live in the named volume `valhalla_tiles`, so they
 survive redeploys (no rebuild). `gtfs_feeds/` is re-fetched on a clean redeploy
