@@ -12,13 +12,21 @@
 ### Changed
  - The following packages have been updated:
    - dependencies:
-      - gfiThemes/combinedGfi:
+      - Cosi, gfiThemes, sdpDownload, mapFishUtils, simulationTool, valuationPrint, WaterRiskCheck:
         - @turf/buffer: ^7.2.0 to ^7.3.5
-        - @turf/boolean-contains: ^7.2.0 to ^7.3.5
-        - @turf/boolean-intersects": ^7.2.0 to ^7.3.5
-      - sdpDownload: 
-        - @turf/helpers": ^7.2.0 to ^7.3.5
-        - @turf/intersect": ^7.2.0 to ^7.3.5
+        - @turf/center-of-mass: ^7.2.0 to ^7.3.5
+        - @turf/helpers: ^7.2.0 to ^7.3.5
+        - @turf/intersect: ^7.2.0 to ^7.3.5
+        - @turf/points-within-polygon: ^7.2.0 to ^7.3.5
+        - @turf/simplify: ^7.2.0 to ^7.3.5
+        - @turf/truncate: ^7.2.0 to ^7.3.5
+        - @turf/union: ^7.2.0 to ^7.3.5
+        - d3-array: ^3.1.1 to ^3.2.4
+        - d3-color: ^3.0.1 to ^3.1.0
+        - d3-scale-chromatic: ^3.0.0 to ^3.1.0
+        - jszip: ^3.7.1 to ^3.10.1
+        - lodash: ^4.17.21 to ^4.18.1
+        - vue-chartjs: ^5.3.1 to ^5.3.3
 - vcOblique: Replaced iframe-resizer package with CSS-based iframe sizing.
 - package.json: postinstall script detects package.json files automatically and does not fail, if one of the installs fails.
 
