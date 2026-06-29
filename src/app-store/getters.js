@@ -190,7 +190,14 @@ export default {
             content = content.concat(subSections);
         });
         getters.menuFromConfig("secondaryMenu").sections?.forEach(subSections => {
-            content = content.concat(subSections);
+            subSections.forEach(subsubSec => {
+                if (subsubSec?.type === "folder") {
+                    content = content.concat(subsubSec?.elements);
+                }
+                else {
+                    content = content.concat([subsubSec]);
+                }
+            });
         });
         if (getters.controlsConfig.startModule?.mainMenu) {
             content = content.concat(getters.controlsConfig.startModule.mainMenu);

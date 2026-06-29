@@ -29,6 +29,7 @@
 - GraphicalSelect: Implemented debounce of the slider input to increase reliability of presented data and decrease the amount of requests.
 - Accessibility: Changed lists of CoordToolkit and BaselayerSwitcher to make it more readable for screen readers and added an eslint rule to enforce the right list implementations.
 - ESLint: The linter now also checks `.mjs` files. Existing lint issues in `.mjs` files have been fixed.
+- configuredModules: The modules under folder of sections should also be parsed into configuredModules
 
 ### Deprecated
 
