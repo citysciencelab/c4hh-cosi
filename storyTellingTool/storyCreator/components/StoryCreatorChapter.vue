@@ -159,6 +159,10 @@ export default {
          */
         selectedLayer: {
             handler (val) {
+                const layers = mapCollection.getMap("2D")?.getLayers();
+
+                this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
+
                 if (!Array.isArray(val)) {
                     return;
                 }
