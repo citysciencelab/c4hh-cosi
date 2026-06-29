@@ -34,7 +34,8 @@
       "buttons": {
           "confirm": "Confirm",
           "discardImage": "Discard image",
-          "abort": "Abort"
+          "discardStory": "Discard story",
+          "discardChanges": "Discard changes"
       },
       "headlines": {
         "addImages": "Add new image",

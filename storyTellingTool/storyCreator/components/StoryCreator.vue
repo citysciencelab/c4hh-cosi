@@ -486,17 +486,14 @@ export default {
                     :interaction="() => saveStory()"
                 />
                 <FlatButton
-                    :icon="'bi-x-circle'"
-                    :secondary="true"
-                    :aria-label="$t('additional:modules.storyCreator.clearForm')"
-                    :text="$t('additional:modules.storyCreator.clearForm')"
-                    :interaction="() => clearForm()"
-                />
-                <FlatButton
                     :icon="'bi-arrow-left-circle'"
                     :secondary="true"
-                    :aria-label="$t('additional:modules.storyCreator.buttons.abort')"
-                    :text="$t('additional:modules.storyCreator.buttons.abort')"
+                    :aria-label="story?.title
+                        ? $t('additional:modules.storyCreator.buttons.discardChanges')
+                        : $t('additional:modules.storyCreator.buttons.discardStory')"
+                    :text="story?.title
+                        ? $t('additional:modules.storyCreator.buttons.discardChanges')
+                        : $t('additional:modules.storyCreator.buttons.discardStory')"
                     :interaction="() => $emit('abort-editing')"
                 />
             </div>

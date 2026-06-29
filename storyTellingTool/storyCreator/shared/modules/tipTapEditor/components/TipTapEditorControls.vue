@@ -24,8 +24,22 @@ export default {
             aria-label="First group"
         >
             <button
-                aria-label="bold"
+                aria-label="normal text"
                 class="btn btn-primary rounded-start-3"
+                :class="{
+                    'is-active': editor?.isActive('paragraph')
+                        && !editor?.isActive('heading')
+                        && !editor?.isActive('bulletList')
+                        && !editor?.isActive('bold')
+                        && !editor?.isActive('italic')
+                }"
+                @click="editor?.chain().focus().setParagraph().unsetAllMarks().run()"
+            >
+                <strong>T</strong>
+            </button>
+            <button
+                aria-label="bold"
+                class="btn btn-primary"
                 :class="{ 'is-active': editor?.isActive('bold') }"
                 :disabled="!editor?.can().chain().focus().toggleBold().run()"
                 @click="editor?.chain().focus().toggleBold().run()"

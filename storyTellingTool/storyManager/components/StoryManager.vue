@@ -98,17 +98,16 @@ export default {
                 });
             }
 
-            const entry = {story: storySnapshot, imageAssetsById: imageAssetsSnapshot};
+            const entry = {story: storySnapshot, imageAssetsById: imageAssetsSnapshot},
+                updatedList = [...this.storyList];
 
             if (typeof this.currentStoryIndex === "number") {
-                const updatedList = [...this.storyList];
-
                 updatedList[this.currentStoryIndex] = entry;
-                this.setStoryList(updatedList);
             }
-            else {
-                this.setStoryList([...this.storyList, entry]);
+             else {
+                updatedList.unshift(entry);
             }
+            this.setStoryList(updatedList);
             this.setCurrentStoryIndex(undefined);
             this.currentView = "manager";
         },

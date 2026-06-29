@@ -179,7 +179,7 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                 wrapper.vm.onSaveStory(storySnapshot, imageAssetsSnapshot);
 
                 expect(store.state.Modules.StoryManager.storyList.length).to.equal(3);
-                expect(store.state.Modules.StoryManager.storyList[2]).to.deep.equal({
+                expect(store.state.Modules.StoryManager.storyList[0]).to.deep.equal({
                     story: storySnapshot,
                     imageAssetsById: imageAssetsSnapshot
                 });

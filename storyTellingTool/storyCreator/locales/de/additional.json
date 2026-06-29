@@ -34,7 +34,8 @@
       "buttons": {
           "confirm": "Übernehmen",
           "discardImage": "Bild verwerfen",
-          "abort": "Abbrechen"
+          "discardStory": "Story verwerfen",
+          "discardChanges": "Änderungen verwerfen"
       },
       "headlines": {
         "addImages": "Neues Bild hinzufügen",

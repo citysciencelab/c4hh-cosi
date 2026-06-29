@@ -4,6 +4,9 @@
             "name": "Story Wiedergabe",
             "description": "Bitte eine Beschreibung einfügen.",
             "tableOfContents": "Inhaltsverzeichnis",
+            "goToPrevStep": "Zum vorherigen Kapitel gehen",
+            "goToNextStep": "Zum nächsten Kapitel gehen",
+            "numberOfChapters": "Kapitel {{current}} von {{total}}",
             "dipasPlayer": {
               "closeTOC": "Inhaltsverzeichnis schließen",
               "goToPrevStep": "Gehe zum vorherigen Schritt",

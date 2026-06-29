@@ -232,7 +232,12 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             },
             global: {
                 mocks: {
-                    $t: key => key,
+                    $t: (key, params) => {
+                        if (key === "additional:modules.storyPlayer.numberOfChapters" && params) {
+                            return `Kapitel ${params.current} von ${params.total}`;
+                        }
+                        return key;
+                    },
                     mapCollection: {
                         getMap: sinon.stub().returns({
                             getView: sinon.stub().returns({
@@ -469,11 +474,9 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 wrapper.vm.currentChapterIndex = 1;
                 await wrapper.vm.$nextTick();
 
-                const chevronUp = wrapper.find(".chevron-up .bi-arrow-up");
-                const chevronDown = wrapper.find(".chevron-down .bi-arrow-down");
+                const buttons = wrapper.findAllComponents({name: "IconButton"});
 
-                expect(chevronUp.exists()).to.be.true;
-                expect(chevronDown.exists()).to.be.true;
+                expect(buttons.length).to.equal(2);
             });
 
             it("should hide chevrons at step boundaries", async () => {
@@ -493,11 +496,13 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 const goNextSpy = sinon.spy(wrapper.vm, "goToNextStep");
                 const goPrevSpy = sinon.spy(wrapper.vm, "goToPreviousStep");
 
-                await wrapper.find(".chevron-down .btn-chevron").trigger("click");
-                expect(goNextSpy.called).to.be.true;
+                const buttons = wrapper.findAllComponents({name: "IconButton"});
 
-                await wrapper.find(".chevron-up .btn-chevron").trigger("click");
-                expect(goPrevSpy.called).to.be.true;
+                await buttons.at(1).props("interaction")();
+                expect(goNextSpy.calledOnce).to.be.true;
+
+                await buttons.at(0).props("interaction")();
+                expect(goPrevSpy.calledOnce).to.be.true;
 
                 goNextSpy.restore();
                 goPrevSpy.restore();

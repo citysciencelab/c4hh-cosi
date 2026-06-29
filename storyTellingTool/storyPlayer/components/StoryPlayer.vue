@@ -114,6 +114,7 @@ export default {
         if (!Object.keys(this.storyConf).length) {
             await this.getFixedStoryList(this.fixedStoryPath, this.fixedStoryName);
         }
+        this.toolBodyScrollTop = 0;
 
         this.scrollerSetup();
 
@@ -137,10 +138,13 @@ export default {
         const toolBody = document.getElementById("mp-body-secondaryMenu");
 
         this.$nextTick(() => {
-            if (toolBody && this.toolBodyScrollTop > 0) {
-                toolBody.scrollTop = this.toolBodyScrollTop;
-            }
+            this.scrollerSetup();
+            this.currentIndex = -1;
+            this.currentChapterIndex = 0;
+            this.toolBodyScrollTop = 0;
+
             if (toolBody) {
+                toolBody.scrollTop = 0;
                 toolBody.addEventListener("scroll", this.handleToolBodyScroll);
             }
         });
@@ -471,8 +475,7 @@ export default {
             });
         },
         scrollerSetup () {
-            const stepRefs = Array.isArray(this.$refs.stepper) ? this.$refs.stepper : [this.$refs.stepper],
-                stepElements = stepRefs.filter(step => step && step.classList);
+            const stepElements = Array.from(document.querySelectorAll("#story-player .stepper"));
 
             if (stepElements.length === 0) {
                 return;
@@ -500,8 +503,6 @@ export default {
             // intersectionRatios tell you how much of each observed element is currently visible,
             // so it can be decided which one is “active”.
             const intersectionRatios = new Array(stepElements.length).fill(0),
-                minVisibleRatio = 0.15,
-                switchDelta = 0.12,
                 applyActiveStep = (activeIndex) => {
                     const step = stepElements[activeIndex];
 
@@ -531,10 +532,10 @@ export default {
             if (this.currentChapterIndex >= 0 && this.currentChapterIndex < stepElements.length) {
                 applyActiveStep(this.currentChapterIndex);
             }
+            const scroller = document.getElementById("mp-body-secondaryMenu");
 
             this._stepObserver = new IntersectionObserver(
                 (entries) => {
-                    // Update intersection ratios for all steps
                     entries.forEach(entry => {
                         const idx = stepElements.indexOf(entry.target);
 
@@ -543,35 +544,34 @@ export default {
                         }
                     });
 
-                    // Find the step with the highest intersection ratio
-                    let maxRatio = 0,
-                        activeIndex = -1;
+                    const scrollerRect = scroller.getBoundingClientRect(),
+                        viewportCenter = scrollerRect.top + scrollerRect.height / 2;
 
-                    // find which step is most visible in the viewport and mark it as the "active" step.
-                    intersectionRatios.forEach((ratio, idx) => {
-                        if (ratio > maxRatio) {
-                            maxRatio = ratio;
+                    let activeIndex = -1,
+                        minDistance = Infinity;
+
+                    stepElements.forEach((step, idx) => {
+                        const rect = step.getBoundingClientRect();
+
+                        if (rect.bottom < 0 || rect.top > window.innerHeight) {
+                            return;
+                        }
+
+                        const center = rect.top + rect.height / 2;
+                        const distance = Math.abs(center - viewportCenter);
+
+                        if (distance < minDistance) {
+                            minDistance = distance;
                             activeIndex = idx;
                         }
                     });
 
-                    if (activeIndex === -1 || maxRatio < minVisibleRatio) {
-                        return;
-                    }
-
-                    const currentRatio = this.currentIndex >= 0
-                            ? intersectionRatios[this.currentIndex]
-                            : 0,
-                        shouldSwitch = this.currentIndex === -1
-                            || activeIndex === this.currentIndex
-                            || maxRatio >= currentRatio + switchDelta;
-
-                    if (shouldSwitch) {
+                    if (activeIndex !== -1 && activeIndex !== this.currentIndex) {
                         applyActiveStep(activeIndex);
                     }
                 },
                 {
-                    root: null,
+                    root: scroller,
                     threshold: thresholds
                 }
             );
@@ -608,7 +608,7 @@ export default {
                 {{ storyConf.title }}
             </h4>
             <span class="number-of-chapters">
-                Kapitel {{ currentChapterIndex + 1 }} von {{ storyConf.chapters.length }}
+                {{ $t('additional:modules.storyPlayer.numberOfChapters', { current: currentChapterIndex + 1, total: storyConf.chapters.length }) }}
             </span>
         </div>
         <div
@@ -616,33 +616,40 @@ export default {
         >
             <div
                 ref="coverCard"
-                class="card cover-card"
+                class="card cover-card mb-5 border-0 shadow-sm rounded-3 d-flex flex-column"
+                :class="{
+                    'has-image justify-content-start': coverImagePath && coverImagePath.length,
+                    'justify-content-center': !coverImagePath || !coverImagePath.length
+                }"
             >
                 <img
                     v-if="coverImagePath && coverImagePath.length"
                     :src="coverImagePath"
-                    class="card-img-top"
+                    class="card-img-top cover-image"
                     :alt="storyConf.coverImageAlt"
                 >
                 <div class="text-end">
                     <small
-                        v-if="storyConf.coverImageCopyright"
+                        v-if="storyConf.imageCopyright"
                         class="text-muted copyright me-2 mt-1"
                     >
-                        &copy; {{ storyConf.coverImageCopyright }}
+                        &copy; {{ storyConf.imageCopyright }}
                     </small>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-4 p-md-5 d-flex flex-column justify-content-center align-items-start text-start">
                     <h4
                         v-if="storyConf.title"
-                        class="story-title"
+                        class="story-title fw-black mb-4"
                     >
                         {{ storyConf.title }}
                     </h4>
                     <div
                         class="d-flex align-items-center gap-2 mb-2 author-block"
                     >
-                        <i class="bi bi-person-circle fs-4 me-1" />
+                        <i
+                            v-if="storyConf.author"
+                            class="bi bi-person-circle fs-4 me-1"
+                        />
                         <div class="d-flex flex-column justify-content-center">
                             <small
                                 class="author-name"
@@ -664,68 +671,85 @@ export default {
                     </p>
                 </div>
             </div>
+
             <div
                 class="storyTitle"
                 tabindex="0"
             >
                 <div
                     v-for="(chapter, index) in storyConf.chapters"
-                    ref="stepper"
-                    :key="chapter.title"
-                    class="stepper"
-                    :class="{firstStep: index === 0, lastStep: index === storyConf.chapters.length - 1}"
+                    :key="chapter.title + index"
                 >
                     <div
-                        v-if="index === currentChapterIndex && currentChapterIndex > 0"
-                        class="chevron-navigation chevron-up"
+                        v-if="index === currentChapterIndex && index > 0"
+                        class="chevron-navigation chevron-up mb-3"
                     >
-                        <button
-                            class="btn btn-chevron"
-                            :aria-label="`Zum vorherigen Schritt (${currentChapterIndex})`"
-                            @click="goToPreviousStep"
-                        >
-                            <i class="bi bi-arrow-up" />
-                        </button>
+                        <IconButton
+                            class="me-5 btn-light"
+                            :class-array="['chevron']"
+                            :aria="$t('additional:modules.storyCreator.goToPrevStep')"
+                            icon="bi bi-chevron-up"
+                            :title="$t('additional:modules.storyCreator.goToPrevStep')"
+                            :interaction="() => goToPreviousStep()"
+                        />
                     </div>
-                    <h2 v-if="chapter.title">
-                        {{ chapter.title }}
-                    </h2>
-
                     <div
-                        class="story-player-content"
+                        class="card mb-4 stepper mx-4 rounded"
+                        :class="{
+                            firstStep: index === 0,
+                            lastStep: index === storyConf.chapters.length - 1,
+                            active: index === currentChapterIndex
+                        }"
                     >
                         <div
-                            v-for="(item, itemIndex) in chapter.content"
-                            :key="'content-' + itemIndex"
+                            ref="stepper"
+                            class="card-body"
                         >
-                            <div v-if="item.type === 'image'">
-                                <img
-                                    :src="imageAssetsById?.[item.id]?.objectURL"
-                                    :alt="item.attrs?.alt"
-                                    class="rounded w-100 d-block mb-2"
+                            <h5
+                                v-if="chapter.title"
+                                class="card-title px-4 pt-4 pb-3"
+                            >
+                                {{ chapter.title }}
+                            </h5>
+                            <div class="story-player-content card-text">
+                                <div
+                                    v-for="(item, itemIndex) in chapter.content"
+                                    :key="'content-' + itemIndex"
                                 >
-                                <div class="text-end small text-muted">
-                                    <span v-if="item.attrs?.copyright">© {{ item.attrs.copyright }}</span>
+                                    <div v-if="item.type === 'image'">
+                                        <img
+                                            :src="imageAssetsById?.[item.id]?.objectURL"
+                                            :alt="item.attrs?.alt"
+                                            class="rounded w-100 d-block mb-2"
+                                        >
+                                        <div class="text-end small text-muted">
+                                            <span v-if="item.attrs?.copyright">© {{ item.attrs.copyright }}</span>
+                                        </div>
+                                    </div>
+                                    <div
+                                        v-else-if="item.type === 'doc'"
+                                        v-html="tipTapJsonToHtml(item)"
+                                    />
                                 </div>
                             </div>
-                            <div
-                                v-else-if="item.type === 'doc'"
-                                v-html="tipTapJsonToHtml(item)"
-                            />
                         </div>
                     </div>
                     <div
-                        v-if="index === currentChapterIndex && currentChapterIndex < storyConf.chapters.length - 1"
-                        class="chevron-navigation chevron-down"
+                        v-if="index === currentChapterIndex && index < storyConf.chapters.length - 1"
+                        class="chevron-navigation"
                     >
-                        <button
-                            class="btn btn-chevron"
-                            :aria-label="`Zum nächsten Schritt (${currentChapterIndex + 2})`"
-                            @click="goToNextStep"
-                        >
-                            <i class="bi bi-arrow-down" />
-                        </button>
+                        <IconButton
+                            class="me-5 btn-light"
+                            :class-array="['chevron']"
+                            :aria="$t('additional:modules.storyCreator.goToPrevStep')"
+                            icon="bi bi-chevron-down"
+                            :title="$t('additional:modules.storyCreator.goToPrevStep')"
+                            :interaction="() => goToNextStep()"
+                        />
                     </div>
+                    <div
+                        class="scroll-space"
+                    />
                 </div>
             </div>
         </div>
@@ -747,10 +771,12 @@ export default {
     .sticky-top {
         z-index: 1050;
     }
+
     .sticky-title {
         color: $secondary;
         font-family: $font_family_accent;
     }
+
     .number-of-chapters {
         color: $dark_grey;
     }
@@ -763,45 +789,53 @@ export default {
                 max-width: 100%;
             }
         }
+    }
 
-        img {
-            max-width: 100%;
-        }
+    .storyTitle::after {
+        content: "";
+        display: block;
+        height: 30vh;
     }
 
     .cover-card {
-        min-height: 82vh;
-        height: 82vh;
-        max-height: 82vh;
+        min-height: 85vh;
         width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        box-sizing: border-box;
-        overflow: hidden;
+        background-color: $white;
+        transition: all 0.3s ease-in-out;
 
-        .card-img-top {
-            flex: 1 1 0;
-            min-height: 150px;
-            max-height: 60vh;
-            width: 100%;
-            object-fit: cover;
-            transition: max-height 0.3s;
+        .story-title {
+            font-size: 2.5rem;
+            font-family: $font_family_accent;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: $secondary;
         }
-        .card-body {
-            flex: 0 0 auto;
-            overflow-y: auto;
-            min-height: 0;
+
+        .card-text {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: $dark_grey;
+            max-width: 650px;
+        }
+
+        &.has-image {
+            .story-title {
+                font-size: $font_size_huge;
+            }
+
+            .cover-image {
+                height: 50vh;
+                max-height: 50vh;
+                width: 100%;
+                object-fit: cover;
+            }
         }
     }
 }
 
 .player {
-    --h1Size: 1.875rem;
-    --h2Size: 1.5rem;
-    --pSize: 1rem;
-
     width: var(--initialToolWidth);
+
     @media (max-width: 767px) {
         width: var(--initialToolWidthMobile);
     }
@@ -809,93 +843,42 @@ export default {
     display: flex;
     flex-direction: column;
     flex: 1;
-    overflow-x: hidden;
     overflow-y: auto;
 
     .story-title {
         font-family: $font_family_accent;
     }
 
+    .chevron-navigation {
+        display: flex;
+        justify-content: center;
+        padding: 8px 0;
+
+        .chevron {
+            background-color: $white;
+            border: 1px solid $dark_grey;
+
+            &:hover {
+                background-color: $light_blue;
+            }
+
+            &:active {
+                background-color: $dark_blue;
+                color: $white;
+            }
+        }
+    }
+
     .stepper {
-        min-height: 500px;
-        margin: 20px 10px;
-        background-color: rgb(240, 240, 240);
+        min-height: auto;
+        padding: 2rem;
         opacity: 0.4;
         border: 1px solid #e0e0e0;
-        border-radius: 12px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         overflow: hidden;
         position: relative;
         scroll-margin-top: 50px;
         transition: all 0.3s ease-in-out;
-
-        .chevron-navigation {
-            display: flex;
-            justify-content: center;
-            padding: 8px 0;
-
-            .btn-chevron {
-                background-color: #fff;
-                border: 1px solid #000;
-                border-radius: 50%;
-                color: #000;
-                cursor: pointer;
-                padding: 0;
-                width: 35px;
-                height: 35px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.3s ease;
-
-                .bi {
-                    font-size: 20px;
-                    line-height: 1;
-                }
-
-                &:hover {
-                    background-color: #f5f5f5;
-                    transform: scale(1.08);
-                }
-
-                &:active {
-                    transform: scale(0.95);
-                }
-            }
-        }
-
-        .chevron-up {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .chevron-down {
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        >figure {
-            >img {
-                width: 100%;
-                object-fit: cover;
-            }
-
-            figcaption {
-                text-align: right;
-                padding: 0 10px 0 0;
-                font-size: 0.75rem;
-            }
-        }
-
-        h2 {
-            padding: 16px 20px 10px;
-            color: var(--DipasColorsFont, #212529);
-            font-size: var(--h2Size);
-            text-transform: none;
-            font-weight: bold;
-            hyphens: auto;
-        }
-
-        &.lastStep{
-            margin-bottom: 60vh;
-        }
 
         .story-player-content {
             overflow: auto;
@@ -906,85 +889,6 @@ export default {
                     padding-bottom: 10px;
                 }
 
-                h3 {
-                    font-size: 1.25rem;
-                    line-height: 1.5rem;
-                    color: var(--DipasColorsFont, #212529);
-                    border-bottom: none;
-                    margin: 0;
-                }
-
-                p {
-                    font-size: var(--pSize);
-                    margin-right: 0;
-                    line-height: 1.5rem;
-                }
-
-                figure {
-                    img {
-                        object-fit: contain;
-                        object-position: top;
-                        width: 100%;
-                        height: auto;
-                        max-height: 50vh;
-                    }
-
-                    figcaption {
-                        text-align: right;
-                        font-size: 0.75rem;
-                    }
-                }
-
-                .paragraph_image_position_image_left {
-                    display: flow-root;
-                    .field_image {
-                        figure {
-                            float: left;
-                            padding: 0.313rem 0.625rem 0 0;
-                            width: 45%;
-                            height: 100%;
-
-                            img {
-                                max-width: 100%;
-                                max-height: 100%;
-                                height: auto;
-                                width: auto;
-                            }
-
-                            figcaption {
-                                font-size: 0.75rem;
-                                text-align: right;
-                                line-height: 1rem;
-                            }
-                        }
-                    }
-                }
-
-                .paragraph_image_position_image_right {
-                    display: flow-root;
-                    .field_image {
-                        figure {
-                            float: right;
-                            padding: 0.313rem 0 0 0.625rem;
-                            width: 45%;
-                            height: 100%;
-
-                            img {
-                                max-width: 100%;
-                                max-height: 100%;
-                                height: auto;
-                                width: auto;
-                            }
-
-                            figcaption {
-                                font-size: 0.75rem;
-                                text-align: right;
-                                line-height: 1rem;
-                            }
-                        }
-                    }
-                }
-
                 iframe {
                     width: 100%;
                     height: 100%;
@@ -993,10 +897,14 @@ export default {
         }
 
         &.active {
-            background-color: #ffffff;
+            background-color: $white;
             opacity: 1;
             box-shadow: 0 8px 11px 2px rgba(0, 0, 0, 0.15);
         }
+    }
+
+    .scroll-space {
+        height: 5vh;
     }
 }
 </style>

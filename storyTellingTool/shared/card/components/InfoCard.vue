@@ -229,14 +229,13 @@ export default {
     overflow: visible;
     border: 0.5px solid $light_grey;
     transition: box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    &:hover {
+        border-color: $secondary;
+        box-shadow: 0 0 0 3px rgba($secondary, 0.3);
+    }
 
     &.is-editable {
         cursor: pointer;
-
-        &:hover {
-            border-color: $secondary;
-            box-shadow: 0 0 0 3px rgba($secondary, 1) inset;
-        }
     }
 }
 .drag-handle {
