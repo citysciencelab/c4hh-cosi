@@ -963,8 +963,8 @@
     "subjectlayer": {
       "elements": [
         {
-          "id": [ "20472", "20478","20479", "20480", "20481", "20482" ],
-          "name": "Gruppe Freizeitrouten und Radfernwege (6 WFS Layer)",
+          "id": ["20609", "20610", "20612"],
+          "name": "Gruppe Freizeitrouten und Radfernwege (3 WFS Layer)",
           "typ": "GROUP",
           "styleId": "4515",
           "visibility": true,
@@ -975,7 +975,7 @@
           "styleId": "47",
           "name": "##O+++O## Ich sollte NIEMALS im Themenbaum sichtbar sein (isNeverVisibleInTree)!",
           "isNeverVisibleInTree": true
-       },
+        },
         {
           "id": "10220",
           "name": "Dauerzählstellen (Rad) Hamburg",
