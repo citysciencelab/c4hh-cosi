@@ -22,7 +22,6 @@ export default {
     props: {},
     data () {
         return {
-            primaryDataCount: this.getDetailsForSelectedInstanceId?.primaryData?.length ?? 0,
             showSpinner: false,
             showPreviewModal: false,
             previewImage: null
@@ -30,8 +29,8 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
-            "selectedInstanceId",
-            "getDetailsForSelectedInstanceId",
+            "selectedDetail",
+            "findDatasetInAttributes",
             "getNameForArchiveId",
             "getDataProtectionClassForArchiveId",
             "progressNow",
@@ -44,30 +43,31 @@ export default {
                 preview: this.getTableDatasets().some(d => d.hasPreview),
                 download: true
             };
+        },
+        primaryDataCount () {
+            return this.getDetailsForSelectedDetail?.primaryData?.length ?? 0;
+        },
+        getDetailsForSelectedDetail () {
+            return this.findDatasetInAttributes(this.selectedDetail.instanceId, this.selectedDetail.primaryDataId);
         }
     },
     watch: {
-        selectedInstanceId (newValue) {
-            if (newValue && !this.getDetailsForSelectedInstanceId?.primaryData) {
+        selectedDetail (newValue) {
+            if (newValue?.instanceId && !this.getDetailsForSelectedDetail?.primaryData) {
                 this.showSpinner = true;
-                this.fetchPrimarydata({archiveId: this.getDetailsForSelectedInstanceId?.archiveId, instanceId: newValue}).finally(() => {
+                this.fetchPrimarydata({
+                    archiveId: this.getDetailsForSelectedDetail?.archiveId,
+                    instanceId: newValue.instanceId,
+                    primaryDataIds: [newValue.primaryDataId]
+                }).finally(() => {
                     this.showSpinner = false;
                 });
             }
-        },
-        getDetailsForSelectedInstanceId: {
-            handler () {
-                if (this.getDetailsForSelectedInstanceId?.primaryData) {
-                    this.primaryDataCount = this.getDetailsForSelectedInstanceId?.primaryData.length;
-                }
-            },
-            immediate: true,
-            deep: true
         }
     },
     methods: {
         ...mapMutations("Modules/LzsResearchClient", [
-            "setSelectedInstanceId"
+            "setSelectedDetail"
         ]),
         ...mapActions("Modules/LzsResearchClient", [
             "fetchPrimarydata",
@@ -75,11 +75,17 @@ export default {
             "downloadSelectedFiles"
         ]),
         returnToResultTab () {
-            this.setSelectedInstanceId(null);
+            this.setSelectedDetail({
+                instanceId: null,
+                primaryDataId: null
+            });
             this.setCurrentTab("tabResult");
         },
         returnToSearchTab () {
-            this.setSelectedInstanceId(null);
+            this.setSelectedDetail({
+                instanceId: null,
+                primaryDataId: null
+            });
             this.setCurrentTab("tabSearch");
         },
         /**
@@ -88,8 +94,9 @@ export default {
          * @returns {String[]} - Array of strings to be used as table headers.
          */
         getTableHeaders () {
-            const headers = this.getDetailsForSelectedInstanceId?.primaryData ? this.getDetailsForSelectedInstanceId?.primaryData[0].primarydataAttributes.map(p => p.key) : [],
-                attributeNames = (this.getDetailsForSelectedInstanceId?.attributes || []).map(attr => attr.name),
+            const details = this.getDetailsForSelectedDetail,
+                headers = details?.primaryData ? details?.primaryData[0].primarydataAttributes.map(p => p.key) : [],
+                attributeNames = (details?.attributes || []).map(attr => attr.name),
                 filteredHeaders = headers
                     .filter(header => !attributeNames.includes(header))
                     .map((header) => {
@@ -116,9 +123,10 @@ export default {
          */
         getTableDatasets () {
             const results = [],
-                instanceAttributeNames = (this.getDetailsForSelectedInstanceId?.attributes || []).map(attr => attr.name);
+                details = this.getDetailsForSelectedDetail,
+                instanceAttributeNames = (details?.attributes || []).map(attr => attr.name);
 
-            this.getDetailsForSelectedInstanceId?.primaryData?.forEach(dataset => {
+            details?.primaryData?.forEach(dataset => {
                 const attributes = [];
 
                 dataset.primarydataAttributes.forEach(attribute => {
@@ -138,7 +146,8 @@ export default {
                 results.push(
                     {
                         attributes: attributes,
-                        instanceId: dataset.primaryDataId,
+                        instanceId: details?.instanceId,
+                        primaryDataId: dataset.primaryDataId,
                         hasPreview: ["TIFF", "JP2"].includes(dataset.geoFileFormat) // are there other formats, that allow a preview?
                     }
                 );
@@ -148,11 +157,11 @@ export default {
         },
         /**
          * Downloads the preview picture from the server and opens the modal to show the preview if there is one available
-         * @param {String} - Primary data identifier to request preview for.
+         * @param {String} selectedDetail - The selected detail object containing instanceId and primaryDataId of the detail to request preview for.
          */
-        async showPreview (primaryDatasetId) {
+        async showPreview (selectedDetail) {
             this.showSpinner = true;
-            this.previewImage = await this.downloadPreview({archiveId: this.getDetailsForSelectedInstanceId?.archiveId, instanceId: this.selectedInstanceId, primaryDataId: primaryDatasetId});
+            this.previewImage = await this.downloadPreview({archiveId: this.getDetailsForSelectedDetail?.archiveId, instanceId: selectedDetail.instanceId, primaryDataId: selectedDetail.primaryDataId});
             this.showSpinner = false;
 
             if (this.previewImage) {
@@ -161,16 +170,16 @@ export default {
         },
         /**
          * Downloads the dataset from the server
-         * @param {String} - Primary data identifier to download the dataset for.
+         * @param {String} primaryDataId - Primary data identifier to download the dataset for.
          */
-        downloadDataset (primaryDatasetId) {
+        downloadDataset (primaryDataId) {
             this.showSpinner = true;
 
-            const onlySelectedPrimaryData = JSON.parse(JSON.stringify(this.getDetailsForSelectedInstanceId || {})),
+            const onlySelectedPrimaryData = JSON.parse(JSON.stringify(this.getDetailsForSelectedDetail || {})),
                 filenamesToAddToDownload = this.placeholderDataClassList?.[onlySelectedPrimaryData?.archiveId]?.FILES_TO_ADD_TO_SINGLE_DOWNLOAD;
 
             onlySelectedPrimaryData.primaryData = (onlySelectedPrimaryData.primaryData || []).filter(
-                p => p.primaryDataId === primaryDatasetId ||
+                p => p.primaryDataId === primaryDataId ||
                 (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename))
             );
 
@@ -182,7 +191,7 @@ export default {
             }, 4000);
         },
         download () {
-            this.downloadSelectedFiles(this.getDetailsForSelectedInstanceId);
+            this.downloadSelectedFiles(this.getDetailsForSelectedDetail);
         },
         /**
          * Returns the translated label for an attribute key, falling back to the raw attribute name if no translation exists.
@@ -202,24 +211,24 @@ export default {
         <h4> {{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.title") }} </h4>
 
         <table
-            v-if="getDetailsForSelectedInstanceId"
+            v-if="getDetailsForSelectedDetail"
             class="datasetInfoTable"
         >
             <tbody>
                 <tr>
                     <td>{{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.datasetInfoTable.archive") }}</td>
 
-                    <td>{{ getNameForArchiveId(getDetailsForSelectedInstanceId?.archiveId) }}</td>
+                    <td>{{ getNameForArchiveId(getDetailsForSelectedDetail?.archiveId) }}</td>
                 </tr>
 
                 <tr>
                     <td>{{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.datasetInfoTable.datasetProtectionClass") }}</td>
 
-                    <td>{{ getDataProtectionClassForArchiveId(getDetailsForSelectedInstanceId?.archiveId)?.name }}</td>
+                    <td>{{ getDataProtectionClassForArchiveId(getDetailsForSelectedDetail?.archiveId)?.name }}</td>
                 </tr>
 
                 <tr
-                    v-for="(attribute, index) in getDetailsForSelectedInstanceId?.attributes"
+                    v-for="(attribute, index) in (getDetailsForSelectedDetail?.attributes || [])"
                     :id="`detail-tablerow-${index}`"
                     :key="index"
                 >
@@ -253,7 +262,7 @@ export default {
 
             <TabResultTable
                 v-if="primaryDataCount > 0"
-                :table-index="`details-table-${selectedInstanceId}`"
+                :table-index="`details-table-${selectedDetail.primaryDataId || selectedDetail.instanceId}`"
                 :table-header="getTableHeaders()"
                 :table-datasets="getTableDatasets()"
                 :show-buttons="showTableButtons"

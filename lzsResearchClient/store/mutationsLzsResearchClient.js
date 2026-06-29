@@ -1,6 +1,7 @@
 import {generateSimpleMutations} from "@shared/js/utils/generators";
 import searchBarMutations from "./searchBar/mutationsSearchBar.js";
 import stateLzsResearchClient from "./stateLzsResearchClient.js";
+import getters from "./gettersLzsResearchClient.js";
 
 const mutations = {
     /**
@@ -31,15 +32,19 @@ const mutations = {
      * @param {Object} primaryDataObj - The new data object to be added or updated.
      */
     addPrimaryDataToInstance (state, primaryDataObj) {
-        const instanceDataset = state.searchAttributeResponse?.filter((datasets) => {
-            return datasets.instanceId === primaryDataObj.instanceId;
-        });
+        const {instanceId, primaryDataId} = primaryDataObj.selectedDetail,
+            selectedDataset = getters.findDatasetInAttributes(state)(instanceId, primaryDataId);
 
-        if (instanceDataset && instanceDataset.length > 0) {
-            instanceDataset.forEach(dataset => {
-                dataset.primaryData = primaryDataObj.primaryData;
-            });
+        if (!selectedDataset) {
+            return;
         }
+
+        const filenamesToAddToDownload = state.placeholderDataClassList?.[selectedDataset.archiveId]?.FILES_TO_ADD_TO_SINGLE_DOWNLOAD;
+
+        selectedDataset.primaryData = (primaryDataObj.primaryData || []).filter(
+            p => !primaryDataId || (p.primaryDataId === primaryDataId) ||
+            (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename))
+        );
     },
     /**
      * Adds the fetched dossier data into the existing data class object.
@@ -60,43 +65,21 @@ const mutations = {
         }
     },
     /**
-     * Filter the given search response so only the first entry for each unique instanceId remains,
-     * preserve the original order, and store the result in state.searchAttributeResponse.
-     *
-     * @param {Object} state - Vuex state object.
-     * @param {Array<Object>} searchResponse - Array of result objects; each object must contain an instanceId property.
-     * @returns {void}
-     */
-    setSearchAttributeResponseWithUniqueInstanceIds (state, searchResponse) {
-        const uniqueInstanceSearchAttributeResponse = (() => {
-            const seen = new Set();
-
-            return searchResponse.filter(item => {
-                if (seen.has(item.instanceId)) {
-                    return false;
-                }
-                seen.add(item.instanceId);
-                return true;
-            });
-        })();
-
-        state.searchAttributeResponse = uniqueInstanceSearchAttributeResponse;
-    },
-    /**
      * Updates the checked state on a dataset within searchAttributeResponse and attributesToDownload.
      * Adds the dataset to attributesToDownload if it is not already present.
      * @param {Object} state - The current state object.
      * @param {String} instanceId - The instanceId of the dataset to update.
+     * @param {String} primaryDataId - The primaryDataId of the dataset to update (optional).
      * @param {Boolean} checked - The new checked value.
      * @returns {void}
      */
-    setCheckedForInstanceId (state, {instanceId, checked}) {
-        const dataset = state.searchAttributeResponse?.find(d => d.instanceId === instanceId);
+    setCheckedForInstanceId (state, {instanceId, primaryDataId, checked}) {
+        const dataset = getters.findDatasetInAttributes(state)(instanceId, primaryDataId);
 
         if (dataset) {
             dataset.checked = checked;
 
-            const alreadyInDownload = state.attributesToDownload.find(d => d.instanceId === instanceId);
+            const alreadyInDownload = getters.findDatasetInDownload(state)(instanceId, primaryDataId);
 
             if (alreadyInDownload) {
                 alreadyInDownload.checked = checked;
@@ -106,7 +89,7 @@ const mutations = {
             }
         }
         else {
-            const datasetInDownload = state.attributesToDownload.find(d => d.instanceId === instanceId);
+            const datasetInDownload = getters.findDatasetInDownload(state)(instanceId, primaryDataId);
 
             if (datasetInDownload) {
                 datasetInDownload.checked = checked;

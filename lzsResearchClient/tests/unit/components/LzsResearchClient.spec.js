@@ -30,7 +30,8 @@ describe("addons/lzsResearchClient/tests/unit/LzsResearchClient.spec.js", () => 
                                 progressNow: () => -1,
                                 currentProgressValue: () => "",
                                 searchAttributeResponse: () => null,
-                                selectedInstanceId: () => null
+                                // TODO: add instanceId and primaryDataId
+                                selectedDetail: () => null
                             },
                             mutations: {
                                 setShowLoadingSpinner (state, payload) {

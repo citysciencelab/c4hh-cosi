@@ -182,7 +182,7 @@ describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", (
 
             wrapper.vm.geomIsShownBy = refName;
 
-            wrapper.vm.syncGeomToInstance("id1");
+            wrapper.vm.syncGeomToInstance({instanceId: "id1"});
 
             expect(hideGeomFake.calledOnce).to.be.true;
         });
@@ -200,7 +200,7 @@ describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", (
 
             wrapper.vm.geomIsShownBy = refName;
 
-            wrapper.vm.syncGeomToInstance("id1");
+            wrapper.vm.syncGeomToInstance({instanceId: "id1"});
 
             expect(hideGeomFake.called).to.be.false;
         });

@@ -98,6 +98,7 @@ export default {
             if (dataset) {
                 this.setCheckedForInstanceId({
                     instanceId: dataset.instanceId,
+                    primaryDataId: dataset.primaryDataId,
                     checked: Boolean(dataset.checked)
                 });
                 return;
@@ -106,6 +107,7 @@ export default {
             this.sortedData.forEach((entry) => {
                 this.setCheckedForInstanceId({
                     instanceId: entry.instanceId,
+                    primaryDataId: entry.primaryDataId,
                     checked: Boolean(entry.checked)
                 });
             });
@@ -114,17 +116,19 @@ export default {
          * Toggles the dataset's geometry on the map and marks it as currently shown if it was not before.
          * Emits "showGeom" to notify parents.
          * If the dataset already contains geometry it is shown immediately, otherwise the geometry is fetched first.
-         * @param {Object} dataset - Dataset object containing instanceId, archiveId and optional geom.
+         * @param {Object} dataset - Dataset object containing instanceId, archiveId and optional geom and primaryDataId.
          * @returns {void}
          */
         toggleDatasetPositionInMap (dataset) {
-            if (this.geoRefShown && this.currentlyShownGeorefId === dataset.instanceId) {
+            const georefId = dataset.primaryDataId || dataset.instanceId;
+
+            if (this.geoRefShown && this.currentlyShownGeorefId === georefId) {
                 this.clearGeomIndicator();
                 this.clearGeom();
                 return;
             }
 
-            this.currentlyShownGeorefId = dataset.instanceId;
+            this.currentlyShownGeorefId = georefId;
             this.$emit("clearOtherGeom", this.tableIndex);
 
             if (dataset.geom) {
@@ -132,14 +136,10 @@ export default {
             }
             else {
                 this.fetchGeometryForInstanceId({
-                    "dataclassId": dataset.archiveId,
-                    "dataclassInstanceId": dataset.instanceId,
+                    "archiveId": dataset.archiveId,
+                    "instanceId": dataset.instanceId,
                     "srs": 25832
-                }).then(() => {
-                    const geom = this.tableDatasets.filter((datasets) => {
-                        return datasets.instanceId === dataset.instanceId;
-                    })[0].geom;
-
+                }).then((geom) => {
                     if (geom) {
                         this.showGeomOnLayer(geom);
                     }
@@ -486,7 +486,7 @@ export default {
                                 'listAction',
                                 'georefButton',
                                 datasetIndex % 2 !== 0 ? 'button-dark-background' : '',
-                                dataset.instanceId === currentlyShownGeorefId ? 'isShownGeometry' : ''
+                                (dataset.primaryDataId || dataset.instanceId) === currentlyShownGeorefId ? 'isShownGeometry' : ''
                             ]"
                             :style="cssVars"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.showPositionInMap')"
@@ -500,26 +500,26 @@ export default {
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.goToDetails')"
                             icon="bi-arrow-right-circle"
-                            @click="$emit('openDetails', dataset.instanceId)"
+                            @click="$emit('openDetails', dataset)"
                         />
                     </td>
 
-                    <td v-if="showButtons.preview">
+                    <td v-if="showButtons.preview && dataset.primaryDataId">
                         <IconButton
                             v-if="dataset.hasPreview"
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.showPreview')"
                             icon="bi-image"
-                            @click="$emit('showPreview', dataset.instanceId)"
+                            @click="$emit('showPreview', dataset)"
                         />
                     </td>
 
-                    <td v-if="showButtons.download">
+                    <td v-if="showButtons.download && dataset.primaryDataId">
                         <IconButton
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.download')"
                             icon="bi-file-earmark-arrow-down"
-                            @click="$emit('download', dataset.instanceId)"
+                            @click="$emit('download', dataset.primaryDataId)"
                         />
                     </td>
                 </tr>

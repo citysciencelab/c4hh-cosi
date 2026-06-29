@@ -35,7 +35,7 @@ export default {
             "currentProgressValue",
             "progressNow",
             "searchAttributeResponse",
-            "selectedInstanceId"
+            "selectedDetail"
         ]),
         progressBarWidthClass () {
             return `width: ${this.progressNow}%;`;
@@ -200,7 +200,7 @@ export default {
             }
 
             if (newTabId === "tabDetails") {
-                tabResult?.syncGeomToInstance(this.selectedInstanceId);
+                tabResult?.syncGeomToInstance(this.selectedDetail);
             }
 
             if (newTabId === "tabSearch") {

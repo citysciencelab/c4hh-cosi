@@ -40,18 +40,6 @@ const getters = {
         return result?.highestActiveDataclassVersion?.epsgcode !== null;
     },
     /**
-     * Searches the object in the search result, according to the stored selectedInstanceId.
-     * @param {Object} state - The Vuex state object.
-     * @returns {function(): Object | null} - A function that returns the data object for the stored selectedInstanceId, otherwise null.
-     */
-    getDetailsForSelectedInstanceId: state => {
-        const result = state.searchAttributeResponse?.find((datasets) => {
-            return datasets.instanceId === state.selectedInstanceId;
-        });
-
-        return result;
-    },
-    /**
      * Returns the dossierIds for a given archive ID from the state's dataClassList.
      * @param {Object} state - The Vuex state object.
      * @returns {function(string): array} - A function that takes an archiveId and returns the corresponding dossierIds, or an empty array if not found.
@@ -74,6 +62,31 @@ const getters = {
         });
 
         return result?.highestActiveDataclassVersion?.dossierData?.[dossierId] ?? false;
+    },
+    /** Returns the dataset object from searchAttributeResponse that matches the given instanceId and primaryDataId.
+     * @param {Object} state - The Vuex state object.
+     * @param {String} instanceId - The instanceId of the dataset to find in searchAttributeResponse.
+     * @param {String} primaryDataId - The primaryDataId of the dataset to find in searchAttributeResponse (optional).
+     * @returns {function(): Object | null} - A function that returns the dataset object from searchAttributeResponse for the given instanceId and primaryDataId, otherwise null.
+     */
+    findDatasetInAttributes: state => (instanceId, primaryDataId) => {
+        return state.searchAttributeResponse?.find((dataset) => {
+            return (dataset.instanceId === instanceId)
+                && (!primaryDataId || dataset.primaryDataId === primaryDataId);
+        });
+    },
+    /**
+     * Returns the dataset object from attributesToDownload that matches the given instanceId and primaryDataId.
+     * @param {Object} state - The Vuex state object.
+     * @param {String} instanceId - The instanceId of the dataset to find in attributesToDownload.
+     * @param {String} primaryDataId - The primaryDataId of the dataset to find in attributesToDownload (optional).
+     * @returns {Object | undefined} - The dataset object from attributesToDownload that matches the given instanceId and primaryDataId, otherwise null.
+     */
+    findDatasetInDownload: state => (instanceId, primaryDataId) => {
+        return state.attributesToDownload?.find(d => {
+            return (d.instanceId === instanceId)
+            && (!primaryDataId || d.primaryDataId === primaryDataId);
+        });
     }
 };
 

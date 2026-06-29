@@ -48,19 +48,19 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/LzsResearchClient", [
-            "setSelectedInstanceId"
+            "setSelectedDetail"
         ]),
         ...mapActions("Modules/LzsResearchClient", [
             "downloadSelectedFiles"
         ]),
         /**
          * Called after click on one table row to show details for this primary dataset
-         * @param {String} datasetInstanceId - the instance id of the dataset to show details for
+         * @param {String} selectedDetail - The selected detail object containing instanceId and primaryDataId to show details for
          * @returns {void}
          */
-        openDetails (datasetInstanceId) {
+        openDetails (selectedDetail) {
             this.setCurrentTab("tabDetails");
-            this.setSelectedInstanceId(datasetInstanceId);
+            this.setSelectedDetail(selectedDetail);
         },
         returnToSearchTab () {
             this.setCurrentTab("tabSearch");
@@ -77,8 +77,8 @@ export default {
         showGeomAgain () {
             this.$refs.archiveList?.showGeomAgain();
         },
-        syncGeomToInstance (datasetInstanceId) {
-            this.$refs.archiveList?.syncGeomToInstance(datasetInstanceId);
+        syncGeomToInstance (selectedDetail) {
+            this.$refs.archiveList?.syncGeomToInstance(selectedDetail);
         },
         download () {
             this.downloadSelectedFiles(this.searchAttributeResponse);

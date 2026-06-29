@@ -306,16 +306,16 @@ export default {
         },
         /**
          * Hides the geometry layer if it does not belong to the given dataset. Used when arriving at the details tab.
-         * @param {String} datasetInstanceId - The instance id of the dataset whose details are being shown.
+         * @param {String} selectedDetail - The selected detail object containing instanceId and primaryDataId of the detail that is being shown.
          * @returns {void}
          */
-        syncGeomToInstance (datasetInstanceId) {
+        syncGeomToInstance (selectedDetail) {
             const geomTable = this.$refs[this.geomIsShownBy]?.[0];
 
             if (!geomTable) {
                 return;
             }
-            if (geomTable.currentlyShownGeorefId !== datasetInstanceId) {
+            if (geomTable.currentlyShownGeorefId !== (selectedDetail.primaryDataId || selectedDetail.instanceId)) {
                 geomTable.hideGeom();
             }
         },
@@ -375,11 +375,20 @@ export default {
         },
         /**
          * Passes the openDetails event from the TabResultTable up to the parent.
-         * @param {String} datasetInstanceId - the instance id of the dataset to show details for
+         * @param {String} dataset - the dataset to show details for
          * @returns {void}
          */
-        onOpenDetails (datasetInstanceId) {
-            this.$emit("openDetails", datasetInstanceId);
+        onOpenDetails (dataset) {
+            this.$emit("openDetails", {instanceId: dataset.instanceId, primaryDataId: dataset.primaryDataId});
+        },
+        /**
+         * Returns the translated label for an attribute key, falling back to the raw attribute name if no translation exists.
+         * @param {String} key - The attribute key to translate.
+         * @param {String} fallback - The raw attribute name to use if no translation is found.
+         * @returns {String} The translated label or the fallback value.
+         */
+        getTranslationForAttributeWrapper (key, fallback) {
+            return getTranslationForAttribute(key, fallback);
         }
     }
 };
@@ -453,7 +462,7 @@ export default {
                                     :options="getAttributesToGroupBy(step)"
                                     name="select-box"
                                     :multiple="false"
-                                    :placeholder="$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${step.attributeToGroupBy.toLowerCase()}`)"
+                                    :placeholder="getTranslationForAttributeWrapper(`additional:modules.lzsResearchClient.tabs.tabSearch.${step.attributeToGroupBy.toLowerCase()}`, step.attributeToGroupBy)"
                                     :show-labels="false"
                                     open-direction="bottom"
                                     :hide-selected="false"
@@ -464,12 +473,12 @@ export default {
                                     @select="changeGroupBy(index)"
                                 >
                                     <template #singleLabel="props">
-                                        <span>{{ $t(`additional:modules.lzsResearchClient.tabs.tabSearch.${props.option.toLowerCase()}`) }}</span>
+                                        <span>{{ getTranslationForAttributeWrapper(`additional:modules.lzsResearchClient.tabs.tabSearch.${props.option.toLowerCase()}`, props.option) }}</span>
                                     </template>
                                     <template #option="props">
                                         <div class="attribute-option-wrapper">
                                             <span :class="`attribute-check-icon ${props.option === step.attributeToGroupBy ? 'bi bi-check2' : ''}`" />
-                                            <span>{{ $t(`additional:modules.lzsResearchClient.tabs.tabSearch.${props.option.toLowerCase()}`) }}</span>
+                                            <span>{{ getTranslationForAttributeWrapper(`additional:modules.lzsResearchClient.tabs.tabSearch.${props.option.toLowerCase()}`, props.option) }}</span>
                                         </div>
                                     </template>
                                 </Multiselect>
@@ -481,7 +490,7 @@ export default {
                             :id="`${idPrefix}-group-item-${index}-${groupIndex}`"
                             :key="`${groupIndex}-${groupByRenderKeys[index] || 0}`"
                             class="group-step"
-                            :title="$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${step.attributeToGroupBy.toLowerCase()}`) + ' ' + groupValue"
+                            :title="getTranslationForAttributeWrapper(`additional:modules.lzsResearchClient.tabs.tabSearch.${step.attributeToGroupBy.toLowerCase()}`, step.attributeToGroupBy) + ' ' + groupValue"
                             :is-open="openAllAccordions"
                             :coloured-header="true"
                         >

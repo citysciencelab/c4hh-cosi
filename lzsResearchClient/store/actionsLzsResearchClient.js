@@ -86,6 +86,7 @@ export default {
                     searchAttributeResponse.push({
                         archiveId: element.dataclassId,
                         instanceId: element.dataclassinstanceId,
+                        primaryDataId: null,
                         attributes: element.dataclassinstanceAttributeArr
                             .filter(attr => attr.type !== "P")
                             .map(attr => ({...attr, id: attr.name})),
@@ -94,7 +95,7 @@ export default {
                     });
                 });
 
-                commit("setSearchAttributeResponseWithUniqueInstanceIds", searchAttributeResponse);
+                state.searchAttributeResponse = searchAttributeResponse;
 
                 result = true;
 
@@ -164,24 +165,34 @@ export default {
         let result = false;
 
         await axios.post(url, payload)
-            .then(function (response) {
+            .then(async function (response) {
                 const searchAttributeResponse = [];
+
+                const instanceIds = await response.data.foundItems?.map(item => item.dklInstanceId) || [];
+                const instanceIdIsUnique = instanceIds.length === new Set(instanceIds).size;
+
 
                 response.data.foundItems.forEach(element => {
                     const inDownload = state.attributesToDownload.find(d => d.instanceId === element.dklInstanceId);
 
+                    const filteredAttributes = instanceIdIsUnique
+                        ? element.dklAttributeList
+                            .filter(attr => attr.type !== "P")
+                        : element.dklAttributeList
+                            .filter(attr => attr.id.toLowerCase() !== "dateityp");
+                    const mappedAttributes = filteredAttributes.map(attr => ({...attr, name: attr.id}));
+
                     searchAttributeResponse.push({
                         archiveId: element.dklId,
                         instanceId: element.dklInstanceId,
-                        attributes: element.dklAttributeList
-                            .filter(attr => attr.type !== "P")
-                            .map(attr => ({...attr, name: attr.id})),
+                        primaryDataId: element.primarydataPictureId,
+                        attributes: mappedAttributes,
                         geom: element.featuregeometrie?.features[0]?.geometry,
                         checked: inDownload ? inDownload.checked : false
                     });
                 });
 
-                commit("setSearchAttributeResponseWithUniqueInstanceIds", searchAttributeResponse);
+                state.searchAttributeResponse = searchAttributeResponse;
 
                 result = true;
 
@@ -199,9 +210,10 @@ export default {
      * @param {Object} payload
      * @param {String} payload.archiveId - Archive identifier to request primarydata for.
      * @param {String} payload.instanceId - Instance identifier to request primarydata for.
+     * @param {Array} payload.primaryDataIds - Array of primary data identifiers to request primarydata for.
      */
     async fetchPrimarydata ({state, commit, dispatch}, payload) {
-        const {archiveId, instanceId} = payload,
+        const {archiveId, instanceId, primaryDataIds} = payload,
             params = {
                 Token: state.requestToken,
                 f: "json",
@@ -211,10 +223,12 @@ export default {
 
         await axios.get(url)
             .then(function (response) {
-                commit("addPrimaryDataToInstance", {
-                    instanceId: instanceId,
-                    primaryData: response?.data
-                });
+                for (const primaryDataId of primaryDataIds) {
+                    commit("addPrimaryDataToInstance", {
+                        selectedDetail: {instanceId: instanceId, primaryDataId: primaryDataId},
+                        primaryData: response?.data
+                    });
+                }
             }).catch(function (error) {
                 dispatch("axiosErrorHandling", error);
             });
@@ -249,14 +263,14 @@ export default {
     /**
      * Download the preview picture for a given primaryDataId and add it to the store.
      * Return already stored preview picture if available for the given primaryDataId
-     * @param {Object} context - Vuex action context (state, dispatch).
+     * @param {Object} context - Vuex action context (state, getters, dispatch).
      * @param {Object} payload
      * @param {String} payload.archiveId - Archive identifier to request preview for.
      * @param {String} payload.instanceId - Instance identifier to request preview for.
      * @param {String} payload.primaryDataId - Primary data identifier to request preview for.
      * @returns {Binary} - preview picture or null
      */
-    async downloadPreview ({state, dispatch}, payload) {
+    async downloadPreview ({state, getters, dispatch}, payload) {
         const {archiveId, instanceId, primaryDataId} = payload,
             params = {
                 Token: state.requestToken,
@@ -264,22 +278,21 @@ export default {
                 preventCache: Date.now()
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}/${primaryDataId}/${params.preventCache}/contentpreview`, params),
-            existingInstanceData = state.searchAttributeResponse?.filter((datasets) => {
-                return datasets.instanceId === instanceId;
-            }),
-            existingPrimaryData = existingInstanceData ? existingInstanceData[0].primaryData?.filter((primary) => {
-                return primary.primaryDataId === primaryDataId;
-            }) : [];
 
-        if (existingPrimaryData && existingPrimaryData.length === 1 && existingPrimaryData[0].previewData) {
-            return existingPrimaryData[0].previewData;
+            selectedDataset = getters.findDatasetInAttributes(instanceId, primaryDataId),
+            existingPrimaryData = selectedDataset?.primaryData?.find(p => p.primaryDataId === primaryDataId);
+
+        if (existingPrimaryData && existingPrimaryData.previewData) {
+            return existingPrimaryData.previewData;
         }
 
         return axios.get(url, {responseType: "blob"})
             .then(function (response) {
                 const blobURL = window.URL.createObjectURL(response.data);
 
-                existingPrimaryData[0].previewData = blobURL;
+                if (existingPrimaryData) {
+                    existingPrimaryData.previewData = blobURL;
+                }
 
                 return blobURL;
             }).catch(function (error) {
@@ -292,13 +305,18 @@ export default {
      *
      * @param {Object} context - Vuex action context (state).
      * @param {Object} payload
-     * @param {String} payload.dataclassId - Archive identifier to download the dataset for.
-     * @param {String} payload.dataclassInstanceId - Instance identifier to download the dataset for.
+     * @param {String} payload.archiveId - Archive identifier to download the dataset for.
+     * @param {String} payload.instanceId - Instance identifier to download the dataset for.
      * @param {String} payload.srs - CRS to get the geometry.
      * @returns {Object} - information on the geometry of the instance, containing coordinates, type and crs
      */
     async fetchGeometryForInstanceId ({state, dispatch}, payload) {
-        const params = {
+        const convertedPayload = {
+                dataclassId: payload.archiveId,
+                dataclassInstanceId: payload.instanceId,
+                srs: payload.srs
+            },
+            params = {
                 Token: state.requestToken,
                 f: "json",
                 preventCache: Date.now()
@@ -306,14 +324,14 @@ export default {
             url = buildEndpointUrl(`${state.apiBasePath}/rest/geodatamanagement/dataclassinstance/computeenvelope`, params);
         let result = null;
 
-        await axios.post(url, payload)
+        await axios.post(url, convertedPayload)
             .then(function (response) {
-                const existingInstanceData = state.searchAttributeResponse?.filter((datasets) => {
-                    return datasets.instanceId === payload.dataclassInstanceId;
+                const existingInstanceData = state.searchAttributeResponse?.find((dataset) => {
+                    return dataset.instanceId === payload.instanceId;
                 });
 
                 if (existingInstanceData) {
-                    existingInstanceData[0].geom = response.data;
+                    existingInstanceData.geom = response.data;
                     result = response.data;
                 }
             }).catch(function (error) {
@@ -364,7 +382,7 @@ export default {
      *
      * Behavior:
      * - Accepts a single item or an array of items describing search results
-     *      (e.g. state.searchAttributeResponse or getters.getDetailsForSelectedInstanceId)
+     *      (e.g. state.searchAttributeResponse or getters.getDetailsForSelectedDetail)
      * - Ensures primaryData for each item exists (dispatches fetchPrimarydata when missing).
      * - Builds a flat list of file URLs with target path parts and known sizes (contentFileLength).
      * - Downloads files in parallel while reporting incremental progress to state.progressNow
@@ -391,30 +409,47 @@ export default {
             selectedFiles = [filesToDownload];
         }
 
-        // collect flat list of files with target path and url
-        const files = [],
-            numberResultsWithoutPrimaryData = selectedFiles.filter((file) => !file.primaryData).length;
-
-        let countResultsWithoutPrimaryData = 0;
-
         state.errorMessage = "";
         state.progressNow = 0;
         state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.start");
+
+        // Group selected files by archiveId and instanceId to fetch primaryData in batches
+        const groupedByInstance = new Map();
+
+        for (const item of selectedFiles) {
+            if (!item.primaryData) {
+                const key = `${item.archiveId}_${item.instanceId}`;
+
+                if (!groupedByInstance.has(key)) {
+                    groupedByInstance.set(key, {archiveId: item.archiveId, instanceId: item.instanceId, items: []});
+                }
+                groupedByInstance.get(key).items.push(item);
+            }
+        }
+
+        const numberGroups = groupedByInstance.size;
+        let countGroups = 0;
+
+        for (const {archiveId, instanceId, items} of groupedByInstance.values()) {
+            const archiveName = getters.getNameForArchiveId(archiveId) || i18next.t("additional:modules.lzsResearchClient.zipAndDownload.withoutArchive");
+
+            state.progressNow = ++countGroups / numberGroups * 20;
+            state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.fetchPrimaryData", {archiveName: archiveName});
+
+            await dispatch("fetchPrimarydata", {
+                archiveId: archiveId,
+                instanceId: instanceId,
+                primaryDataIds: items.map(i => i.primaryDataId)
+            });
+        }
+
+        // collect flat list of files with target path and url
+        const files = [];
 
         for (const item of selectedFiles) {
             const archiveName = getters.getNameForArchiveId(item.archiveId) || i18next.t("additional:modules.lzsResearchClient.zipAndDownload.withoutArchive"),
                 jahrgangAttr = item.attributes.find(a => a.id === "JAHRGANG"),
                 jahrgang = jahrgangAttr ? String(jahrgangAttr.value) : i18next.t("additional:modules.lzsResearchClient.zipAndDownload.withoutYear");
-
-            if (!item.primaryData) {
-                state.progressNow = ++countResultsWithoutPrimaryData / numberResultsWithoutPrimaryData * 20;
-                state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.fetchPrimaryData", {archiveName: archiveName});
-
-                await dispatch("fetchPrimarydata", {
-                    archiveId: item.archiveId,
-                    instanceId: item.instanceId
-                });
-            }
 
             (item.primaryData || []).forEach(dataset => {
                 files.push(

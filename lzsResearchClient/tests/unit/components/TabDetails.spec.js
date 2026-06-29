@@ -126,14 +126,19 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
                                 // to be used later
                             }),
                             getters: {
-                                getDetailsForSelectedInstanceId: () => details,
+                                findDatasetInAttributes: () => () => details,
                                 getNameForArchiveId: () => (id) => {
                                     return id;
                                 },
                                 getDataProtectionClassForArchiveId: () => (id) => {
                                     return id + " Öffentlich";
                                 },
-                                selectedInstanceId: () => "abc",
+                                selectedDetail: () => {
+                                    return {
+                                        instanceId: "abc",
+                                        primaryDataId: "def"
+                                    };
+                                },
                                 progressNow: () => -1,
                                 currentProgressValue: () => ""
                             }
