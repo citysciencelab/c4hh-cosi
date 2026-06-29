@@ -91,6 +91,7 @@ git push
 ## Forks
 
 * **External developers** are not team members and do not receive write permission to the repository. Please **[fork](https://bitbucket.org/geowerkstatt-hamburg/masterportal/fork)** the `dev` branch for your development.
+* [From July 1, 2026 Bitbucket deprecated the option of forked repositories outside the parent workspace](https://community.atlassian.com/forums/Bitbucket-articles/Deprecation-of-Forked-Repositories-Outside-the-Parent-Workspace/ba-p/3155743)
 * Commit and push to your fork. From the fork, a pull request targeting the `dev` branch may be opened.
 * Please also fix bugs targeting the `dev` branch
     - Please indicate in the pull request if the bug should be published as a hotfix.. Please note our **[hints regarding versioning](versioning.md)**.
@@ -99,6 +100,9 @@ git push
 
 ## Pull Requests
 
+* [From July 1, 2026 Bitbucket deprecated the option of forked repositories outside the parent workspace](https://community.atlassian.com/forums/Bitbucket-articles/Deprecation-of-Forked-Repositories-Outside-the-Parent-Workspace/ba-p/3155743)
+    * External contributors can contact the product care team via [geodatenanwendungen@gv.hamburg.de](mailto:geodatenanwendungen@gv.hamburg.de) for further pull request steps.
+    * Members or service providers of the Implementierungspartnerschaft Masterportal can relate to the workflow described here: [Workflow for contributors of the Implementierungspartnerschaft](https://lgv-hamburg.atlassian.net/jira/software/c/projects/IPM/boards/254?selectedIssue=IPM-145)
 * Commits pushed to branches may only reach the `dev` branch via pull requests.
 * **External developers** set their PR's reviewer to **[geowerkstatt](https://bitbucket.org/geowerkstatt)**. This is a technical user that will note the team members.
 * The review is done by at least one team member. The reviewer checks the pull request based on the Definition of Done. Errors or comments may be added directly to the code or as comments within the pull request.

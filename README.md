@@ -68,5 +68,9 @@ New LTS minor versions (based on the current version 3 development branch) are r
     * Hints if your contribution contains adopted external code
     * Unit tests for new functions or updated tests for bugfixes
 
+* [From July 1, 2026 Bitbucket deprecated the option of forked repositories outside the parent workspace](https://community.atlassian.com/forums/Bitbucket-articles/Deprecation-of-Forked-Repositories-Outside-the-Parent-Workspace/ba-p/3155743)
+    * External contributors can contact the product care team via [geodatenanwendungen@gv.hamburg.de](mailto:geodatenanwendungen@gv.hamburg.de) for further pull request steps.
+    * Members or service providers of the Implementierungspartnerschaft Masterportal can relate to the workflow described here: [Workflow for contributors of the Implementierungspartnerschaft](https://lgv-hamburg.atlassian.net/jira/software/c/projects/IPM/boards/254?selectedIssue=IPM-145)
+
 #### Contributor License Agreement
 * Your contribution will be under [MIT License](./License.txt)
