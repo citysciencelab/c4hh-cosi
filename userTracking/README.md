@@ -10,9 +10,11 @@ This addon integrates [Matomo](https://matomo.org/) (formerly Piwik) analytics i
 - **Custom Dimensions**: Supports assigning custom dimension values per session (e.g. a unique session UUID).
 - **Initial Page View**: Optionally tracks a page view event on initialization.
 
-## Tracked Events
+## Tracked Interactions
 
-The following user interactions are tracked automatically:
+### Events
+
+The following user interactions are tracked as Matomo events automatically:
 
 | Category | Action | Description |
 |----------|--------|-------------|
@@ -22,6 +24,19 @@ The following user interactions are tracked automatically:
 | `MapMode` | Mapmode switched | The map was switched between 2D and 3D mode. |
 | `Menu` | Menuitem clicked | A menu item was opened (excluding GFI, search bar, and layer selection). |
 | `Print` | 2D/3D printjob created | A print job was submitted, including the selected layout. |
+
+### Page Views
+
+In addition to events, the following interactions are tracked as Matomo page views with a synthetic URL reflecting the current portal state:
+
+| Trigger | Description |
+|---------|-------------|
+| Menu item opened | Tracks a page view for each component displayed in the main or secondary menu, including GFI and layer information panels. |
+| Menu navigated back | Tracks a page view when the user navigates one step back in the menu history. |
+| Menu closed | Tracks a page view when the menu is closed via the X button. |
+| Layer selection folder opened | Tracks a page view when the user navigates into a folder inside the layer selection ("Themen hinzufügen"). |
+| Layer selection breadcrumb clicked | Tracks a page view when the user navigates back via the breadcrumb in the layer selection. |
+| Search input changed | Tracks a page view when the search bar input changes (debounced). |
 
 ## Installation
 
@@ -56,6 +71,9 @@ const Config = {
 const Config = {
     // ...
     userTracking: {
+        global: {
+            privacy: ["allowInputTracking"]
+        },
         matomo: {
             siteId: "1",
             trackerUrl: "https://your-matomo-instance.example.com/matomo.php",
@@ -66,7 +84,8 @@ const Config = {
                 "respectDoNotTrack"
             ],
             customDimension: [
-                "spaSession"
+                {name: "spaSession", id: 1},
+                {name: "portal", id: 2}
             ]
         }
     }
@@ -82,11 +101,19 @@ const Config = {
 | `trackerScriptUrl` | `String` | yes | The URL of the Matomo JavaScript library (e.g. `matomo.js`). |
 | `trackInitialView` | `Boolean` | no | If `true`, a page view event is tracked immediately on initialization. Defaults to `false`. |
 | `privacy` | `String[]` | no | List of privacy settings to apply. See [Privacy Settings](#privacy-settings). |
-| `customDimension` | `String[]` | no | List of custom dimension settings to apply. See [Custom Dimensions](#custom-dimensions). |
+| `customDimension` | `Object[]` | no | List of custom dimension settings to apply. Each entry must have a `name` (String) and an `id` (Number) matching the dimension ID configured in Matomo. See [Custom Dimensions](#custom-dimensions). |
 
 ### Privacy Settings
 
-The following values are supported in the `privacy` array:
+The following values are supported in the `privacy` object (global) and array (Matomo):
+
+#### Globally
+
+| Key | Values | Description |
+|-----|--------|-------------|
+| `allowInputTracking` | true, false | Allows tracking of input from the user (e. g. in the search bar). |
+
+#### Matomo
 
 | Value | Description |
 |-------|-------------|
@@ -97,11 +124,13 @@ The following values are supported in the `privacy` array:
 | `noAbTesting` | Disables the Matomo A/B Testing plugin. |
 | `noFormAnalytics` | Disables the Matomo Form Analytics plugin. |
 | `noHeatmap` | Disables the Matomo Heatmap & Session Recording plugin. |
+| `useRandomUserIdForSession` | Sets a random UUID as the Matomo user ID for the current session. Requires the `crypto` API to be available in the browser. |
 
 ### Custom Dimensions
 
-The following values are supported in the `customDimension` array:
+The following values are supported in the `name` field of a `customDimension` entry:
 
 | Value | Description |
 |-------|-------------|
-| `spaSession` | Sets a random UUID as custom dimension 1 at startup. This allows grouping all events within a single portal session in Matomo. Requires the `crypto` API to be available in the browser. |
+| `portal` | Sets the last path segment of the current URL (e.g. `fhh-atlas`) as the custom dimension value. Useful for identifying which portal configuration is being used. |
+| `spaSession` | Sets a random UUID at startup. This allows grouping all events within a single portal session in Matomo. Requires the `crypto` API to be available in the browser. |

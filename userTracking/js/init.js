@@ -1,6 +1,6 @@
-import store from "../../src/app-store/index.js";
+import store from "../../../src/app-store/index.js";
+import {actionCallback} from "./actionCallback.js";
 import {configCommands} from "./configCommands.js";
-import {handleTrackedAction} from "./actionHandler.js";
 
 /**
  * Initializes user tracking based on the global "Config" object.
@@ -21,7 +21,7 @@ export function initializeUserTracking () {
         }
 
         if (isAvailable) {
-            store.subscribeAction({after: (action) => handleTrackedAction(store, action)});
+            store.subscribeAction({after: (action) => actionCallback(store, action)});
         }
     }
 }
@@ -34,14 +34,24 @@ export function initializeUserTracking () {
  * @param {String} config.siteId ID of the Matomo site to track.
  * @param {String} config.trackerScriptUrl URL of the Matomo JavaScript library.
  * @param {String} config.trackerUrl URL of the Matomo tracking endpoint.
- * @param {String[]} [config.customDimension] List of custom dimension setting keys to apply.
+ * @param {Object[]} [config.customDimension] List of custom dimension settings to apply. Each entry must have a `name` (String) and an `id` (Number).
  * @param {String[]} [config.privacy] List of privacy setting keys to apply.
  * @param {Boolean} [config.trackInitialView] Whether to track a page view on initialization.
  * @returns {Boolean} true, if tracking script has been added and false if script url is missing.
  */
 export function initializeMatomo (config) {
+    if (!config.siteId) {
+        console.error("The config 'siteId' is missing.");
+        return false;
+    }
+
     if (!config.trackerScriptUrl) {
         console.error("The config 'trackerScriptUrl' is missing.");
+        return false;
+    }
+
+    if (!config.trackerUrl) {
+        console.error("The config 'trackerUrl' is missing.");
         return false;
     }
 
@@ -49,15 +59,22 @@ export function initializeMatomo (config) {
     window._paq.push(["setTrackerUrl", config.trackerUrl]);
     window._paq.push(["setSiteId", config.siteId]);
 
-    ["privacy", "customDimension"].forEach(category => {
-        config[category]?.forEach(setting => {
-            if (configCommands[category].has(setting)) {
-                configCommands[category].get(setting)();
-            }
-            else {
-                console.warn(`Unknown Matomo ${category} setting: ${setting}`);
-            }
-        });
+    config.privacy?.forEach((setting) => {
+        if (configCommands.privacy.has(setting)) {
+            configCommands.privacy.get(setting)();
+        }
+        else {
+            console.warn(`Unknown Matomo privacy-setting: ${setting}`);
+        }
+    });
+
+    config.customDimension?.forEach((setting) => {
+        if (configCommands.customDimension.has(setting.name)) {
+            configCommands.customDimension.get(setting.name)(setting.id);
+        }
+        else {
+            console.warn(`Unknown Matomo customDimension-setting: ${setting}`);
+        }
     });
 
     if (config.trackInitialView) {
@@ -74,5 +91,3 @@ export function initializeMatomo (config) {
 
     return true;
 }
-
-initializeUserTracking();

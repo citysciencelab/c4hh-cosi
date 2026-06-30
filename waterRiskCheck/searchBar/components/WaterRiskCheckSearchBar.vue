@@ -171,7 +171,7 @@ export default {
                         this.setShowAllResults(false);
                         this.setShowSearchResultsInTree(false);
                         this.setCurrentActionEvent("");
-                        this.navigateBack(this.currentSide);
+                        this.navigateBack({side: this.currentSide});
                     }
                 }
                 if (newVal === "layerSelection" && this.addLayerButtonSearchActive === true) {
