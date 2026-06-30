@@ -48,14 +48,11 @@ export default {
                 });
             }
             else if (state.timeSlider.active) {
-                let currentLayerConf = rootGetters.layerConfigById(state.timeSlider.currentLayerId),
-                    visLayerConf = layerConfig.find(layerConf => layerConf.id === currentLayerConf.id);
+                const currentLayerConf = rootGetters.layerConfigById(state.timeSlider.currentLayerId),
+                    visLayerConf = layerConfig.find(layerConf => layerConf.id === currentLayerConf?.id),
+                    layerSwiperActive = rootGetters["Modules/LayerSwiper/active"];
 
-                if (rootGetters["Modules/LayerSwiper/targetLayer"]) {
-                    currentLayerConf = rootGetters.layerConfigById(rootGetters["Modules/LayerSwiper/targetLayer"].get("id"));
-                    visLayerConf = layerConfig.find(layerConf => layerConf.id === currentLayerConf.id);
-                }
-                if (!visLayerConf) {
+                if (!visLayerConf && !layerSwiperActive) {
                     commit("setTimeSliderActive", {
                         active: false,
                         currentLayerId: "",
@@ -69,6 +66,22 @@ export default {
         }, {deep: true});
     },
     /**
+     * Deactivates the LayerSwiper: resets render listeners on both layers and clears the swiper state.
+     * @param {Object} context the vuex context
+     * @param {Object} context.commit the commit
+     * @param {Object} context.state the state
+     * @returns {void}
+     */
+    deactivateLayerSwiper ({commit, state}) {
+        const secondLayerId = state.timeSlider.currentLayerId + state.layerAppendix;
+
+        resetRenderListeners(layerCollection.getLayerById(secondLayerId));
+        resetRenderListeners(layerCollection.getLayerById(state.timeSlider.currentLayerId));
+        commit("Modules/LayerSwiper/setActive", false, {root: true});
+        commit("Modules/LayerSwiper/setSourceLayerId", null, {root: true});
+        commit("Modules/LayerSwiper/setTargetLayerId", null, {root: true});
+    },
+    /**
      * Toggles the LayerSwiper.
      * If the LayerSwiper is deactivated, the second layer is deactivated and removed from the ModelList.
      * @param {Object} context the vuex context
@@ -80,13 +93,18 @@ export default {
      * @returns {void}
      */
     async toggleSwiper ({commit, state, getters, dispatch, rootGetters}, id) {
-        commit("Modules/LayerSwiper/setActive", !rootGetters["Modules/LayerSwiper/active"], {root: true});
+        const wasLayerSwiperActive = rootGetters["Modules/LayerSwiper/active"];
 
-        const secondId = id.endsWith(state.layerAppendix) ? id : id + state.layerAppendix,
-            layerId = rootGetters["Modules/LayerSwiper/active"] ? id : secondId,
-            layer = layerCollection.getLayerById(layerId);
+        commit("Modules/LayerSwiper/setActive", !wasLayerSwiperActive, {root: true});
 
-        if (rootGetters["Modules/LayerSwiper/active"]) {
+        const isSecondLayer = id.endsWith(state.layerAppendix),
+            baseLayerId = isSecondLayer ? id.replace(state.layerAppendix, "") : id,
+            secondId = baseLayerId + state.layerAppendix,
+            layerId = wasLayerSwiperActive ? secondId : baseLayerId,
+            layer = layerCollection.getLayerById(layerId),
+            dimensionValue = layer?.getLayerSource?.().getParams?.()[getters.defaultDimensionName] ?? getters.defaultValue;
+
+        if (!wasLayerSwiperActive) {
             const {name, time, url, level, layers, version, parentId, gfiAttributes, featureCount} = layer.attributes,
                 originalZIndex = layer.attributes.zIndex,
                 secondLayerZIndex = typeof originalZIndex === "number" ? originalZIndex + 1 : undefined;
@@ -100,7 +118,7 @@ export default {
                 }, {root: true});
             }
 
-            commit("Modules/LayerSwiper/setSourceLayerId", id, {root: true});
+            commit("Modules/LayerSwiper/setSourceLayerId", baseLayerId, {root: true});
             commit("Modules/LayerSwiper/setTargetLayerId", secondId, {root: true});
 
             if (!layerCollection.getLayerById(secondId)) {
@@ -150,33 +168,40 @@ export default {
                     }]
                 }, {root: true});
             }
+
+            const secondLayer = layerCollection.getLayerById(secondId);
+
+            secondLayer?.updateTime?.(secondId, getters.defaultDimensionName, dimensionValue);
         }
         else {
             const targetLayer = layerCollection.getLayerById(secondId),
-                sourceLayer = layerCollection.getLayerById(id);
+                sourceLayer = layerCollection.getLayerById(baseLayerId),
+                remainingLayer = isSecondLayer ? sourceLayer : targetLayer,
+                remainingDimensionValue = remainingLayer?.getLayerSource?.().getParams?.()[getters.defaultDimensionName] ?? dimensionValue;
 
             resetRenderListeners(targetLayer);
             resetRenderListeners(sourceLayer);
 
-            // If the button of the "original" window is clicked, it is assumed, that the time value selected in the added window is desired to be further displayed.
-            if (!id.endsWith(state.layerAppendix)) {
-                const dimensionValue = layer.getLayerSource().getParams()[getters.defaultDimensionName],
-                    {transparency} = layer.attributes,
-                    origLayer = layerCollection.getLayerById(id);
+            if (!isSecondLayer && sourceLayer) {
+                const {transparency} = layer?.attributes || {};
 
-                origLayer.updateTime(id, getters.defaultDimensionName, dimensionValue);
+                sourceLayer.updateTime?.(baseLayerId, getters.defaultDimensionName, dimensionValue);
 
                 dispatch("replaceByIdInLayerConfig", {
                     layerConfigs: [{
-                        id: id,
+                        id: baseLayerId,
                         layer: {
-                            id: id,
+                            id: baseLayerId,
                             transparency: transparency
                         }
                     }]
                 }, {root: true});
-                commit("setTimeSliderDefaultValue", dimensionValue);
             }
+
+            if (remainingDimensionValue) {
+                commit("setTimeSliderDefaultValue", remainingDimensionValue);
+            }
+
             dispatch("replaceByIdInLayerConfig", {
                 layerConfigs: [{
                     id: secondId,

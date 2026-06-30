@@ -31,6 +31,7 @@
 - FeatureLister/NavTab: Disabled tabs are now non-interactive, and native nav-link tab markup is prevented by lint rules in favor of the shared NavTab component.
 - Filter: A bug has been fixed that prevented the geometry filter from working with multipolygons.
 - Menu: Fixed a bug on mobile, where the close button disappeared behind input fields.
+- WMSTime: Fixed deleting WMS-Time layers in compare mode, which kept the remaining layer, LayerSwiper und TimeSlider in a broken state.
 
 ---
 
