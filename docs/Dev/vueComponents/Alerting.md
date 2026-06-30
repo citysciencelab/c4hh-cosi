@@ -107,6 +107,13 @@ In the `"restrictedAlerts"` object alerts only for specific portals may be speci
 Within `"alerts"`, alerts may be defined as previously defined. Each alert holds an ID for reference, which is its respective key in the `"alerts"` object.
 
 
+### Display order of alerts
+
+Alerts are displayed in the order in which they are listed in the `"alerts"` section. This way the person creating the hints can decide which hint is more important and arrange the order accordingly.
+
+For example: For the Boris portal there is a very important alert that is only relevant for Boris. In addition, a global alert is added for all portals, which is, however, less important in the context of the Boris portal. By controlling the order of the entries in the `"alerts"` section, the responsible person can decide for each individual case and arrange the hints appropriately.
+
+
 Besides the central loading of alerts with an own alerting json. Alerts can defined within the `config.json` with the parameter `Portalconfig.alerts`. If such a parameter is set, the module will create the alerts. Multiple alerts are allowed by default. This allows to customize the initial alerts of a single portal.
 
 Configuration of alerts within config.json example:
