@@ -79,6 +79,14 @@
           "separator": "Separator",
           "image": "Image",
           "video": "Video"
+        },
+        "feature": {
+          "title": "Title",
+          "description": "Description (optional)",
+          "editAttribute": "Edit attribute",
+          "remove": "Remove",
+          "cancel": "Discard feature",
+          "save": "Save Feature"
         }
       }
     }

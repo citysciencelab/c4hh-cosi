@@ -1,28 +1,137 @@
 <script>
-import {mapGetters} from "vuex";
+import beautifyKey from "@shared/js/utils/beautifyKey.js";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import InputText from "@shared/modules/inputs/components/InputText.vue";
+import {isEmailAddress} from "@shared/js/utils/isEmailAddress.js";
+import {isHTML} from "@shared/js/utils/isHTML.js";
+import {isImage, isWebLink} from "@shared/js/utils/urlHelper.js";
+import isObject from "@shared/js/utils/isObject.js";
+import {isPhoneNumber, getPhoneNumberAsWebLink} from "@shared/js/utils/isPhoneNumber.js";
+import {mapActions, mapGetters} from "vuex";
+import {translateKeyWithPlausibilityCheck} from "@shared/js/utils/translateKeyWithPlausibilityCheck.js";
 
 export default {
     name: "StoryCreatorAddFeatureCard",
-
+    components: {
+        FlatButton,
+        InputText
+    },
+    props: {
+        /**
+         * The selected layer lists
+         * @type {Object[]}
+         */
+         selectedLayers: {
+            type: Array,
+            required: false,
+            default: () => []
+        }
+    },
     emits: ["click:close", "addContent"],
-
     data () {
         return {
-            content: null
+            attributes: null,
+            content: null,
+            currentFeature: null,
+            description: "",
+            layerName: "",
+            title: ""
         };
     },
-
     computed: {
-        ...mapGetters(["visibleSubjectDataLayerConfigs"]),
+        ...mapGetters(["layerConfigById"]),
+        ...mapGetters("Maps", ["clickCoordinate"]),
+        ...mapGetters("Modules/StoryManager", ["gfiFeatures"])
+    },
+    watch: {
+        /**
+         * Watches of click coordinate to collect the feature
+         * @returns {void}
+         */
+        clickCoordinate: {
+            handler () {
+                this.collectGfiFeatures();
+            },
+            deep: true
+        },
+        /**
+         * Watches of current feature
+         * @param {ol/Feature} val - The current feature.
+         * @returns {void}
+         */
+        currentFeature: {
+            handler (val) {
+                if (!val) {
+                    this.removePointMarker();
+                }
+            },
+            deep: true
+        },
+        /**
+         * Watches of gfi features.
+         * @param {ol/Feature[]} val - The gfi features.
+         * @returns {void}
+         */
+         gfiFeatures: {
+            handler (val) {
+                this.removePointMarker();
+                this.currentFeature = val?.[0];
+
+                if (this.currentFeature) {
+                    this.placingPointMarker(this.clickCoordinate);
+                }
+
+                this.layerName = this.layerConfigById(this.currentFeature?.getLayerId())?.name || "";
+                this.attributes = this.currentFeature?.getProperties();
+            },
+            deep: true
+        },
+        /**
+         * Watches of the selected subject layers.
+         * @returns {void}
+         */
+         selectedLayers (val) {
+            if (!val.length || val.some(layer => layer.layerId !== this.currentFeature?.getLayerId())) {
+                this.currentFeature = null;
+            }
+        }
+
+    },
+    beforeUnmount () {
+        this.removePointMarker();
+    },
+    methods: {
+        ...mapActions("Maps", ["placingPointMarker", "removePointMarker"]),
+        ...mapActions("Modules/StoryManager", ["collectGfiFeatures"]),
+        beautifyKey,
+        isWebLink,
+        isImage,
+        isPhoneNumber,
+        getPhoneNumberAsWebLink,
+        isEmailAddress,
+        isHTML,
+        translateKeyWithPlausibilityCheck,
 
         /**
-         * Returns true if there is at least one visible subject layer that is not a 3D layer, otherwise false.
-         * @returns {Boolean} Returns true if there is at least one visible subject layer that is not a 3D layer, otherwise false.
+         * Checks if it has pipe
+         * @param {String} value string to check.
+         * @returns {Boolean} whether the given value includes a pipe.
          */
-        existsVisibleSubjectLayer () {
-            return this.visibleSubjectDataLayerConfigs
-                .filter(layer => !layer.is3DLayer)
-                .length > 0;
+         hasPipe: function (value) {
+            return typeof value === "string" && value.includes("|");
+        },
+
+        /**
+         * Delete one element from attribute object.
+         * @param {String} key key of the element.
+         * @returns {void}
+         */
+        removeAttribute (key) {
+            if (!isObject(this.attributes) || !Object.prototype.hasOwnProperty.call(this.attributes, key)) {
+                return;
+            }
+
+            delete this.attributes[key];
         }
     }
 };
@@ -44,10 +153,138 @@ export default {
                 @click="$emit('click:close')"
             />
         </div>
-        <div class="bg-white rounded-3 p-4 d-flex flex-column align-items-center text-center justify-content-center">
-            <div class="d-flex flex-column align-items-center text-center">
-                <i class="bi bi-geo-alt-fill fs-1 mb-3" />
-                <template v-if="existsVisibleSubjectLayer">
+        <div v-if="currentFeature">
+            <div class="bg-white rounded-3 p-4">
+                <div class="row no-gutters mb-3">
+                    <div class="small">
+                        Layer
+                    </div>
+                    <div>
+                        {{ layerName }}
+                    </div>
+                </div>
+                <InputText
+                    id="storyTitle"
+                    v-model="title"
+                    :label="$t('additional:modules.storyCreator.addElementDropdown.feature.title')"
+                    :placeholder="$t('additional:modules.storyCreator.addElementDropdown.feature.title')"
+                    class="mb-4"
+                />
+                <InputText
+                    id="storyDescription"
+                    v-model="description"
+                    :label="$t('additional:modules.storyCreator.addElementDropdown.feature.description')"
+                    :placeholder="$t('additional:modules.storyCreator.addElementDropdown.feature.description')"
+                    html-type="textarea"
+                    class="mb-4"
+                />
+                <div class="row no-gutters mb-3">
+                    <h6>
+                        {{ $t("additional:modules.storyCreator.addElementDropdown.feature.editAttribute") }}
+                    </h6>
+                    <div
+                        class="table-wrapper"
+                    >
+                        <table class="table">
+                            <tbody v-if="attributes">
+                                <tr
+                                    v-for="(value, key) in attributes"
+                                    :key="key"
+                                >
+                                    <td
+                                        class="font-bold firstCol"
+                                    >
+                                        <span>
+                                            {{ beautifyKey(translateKeyWithPlausibilityCheck(key, v => $t(v))) }}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            class="btn-close ms-2"
+                                            :aria-label="$t('additional:modules.storyCreator.addElementDropdown.feature.remove')"
+                                            @click="removeAttribute(key)"
+                                        />
+                                    </td>
+                                    <td v-if="isWebLink(value) && !isImage(value)">
+                                        <a
+                                            :href="value"
+                                            target="_blank"
+                                        >Link</a>
+                                    </td>
+                                    <td v-else-if="isWebLink(value) && isImage(value)">
+                                        <a
+                                            :href="value"
+                                            target="_blank"
+                                        >
+                                            <img
+                                                class="gfi-theme-images-image"
+                                                :alt="$t('common:modules.getFeatureInfo.themes.default.imgAlt')"
+                                                :src="value"
+                                            >
+                                        </a>
+                                    </td>
+                                    <td v-else-if="isHTML(value)">
+                                        <div v-html="value" />
+                                    </td>
+                                    <td v-else-if="isPhoneNumber(value)">
+                                        <a :href="getPhoneNumberAsWebLink(value)">{{ value }}</a>
+                                    </td>
+                                    <td v-else-if="isEmailAddress(value)">
+                                        <a :href="`mailto:${value}`">{{ value }}</a>
+                                    </td>
+                                    <td
+                                        v-else-if="Array.isArray(value)"
+                                        v-html="value.join('<br>')"
+                                    />
+                                    <td v-else-if="hasPipe(value)">
+                                        <p
+                                            v-for="(splitValue, splitKey) in value.split('|')"
+                                            :key="splitKey"
+                                        >
+                                            {{ splitValue }}
+                                        </p>
+                                    </td>
+                                    <td
+                                        v-else-if="typeof value === 'string' && value.includes('<br>')"
+                                        v-html="value"
+                                    />
+                                    <td v-else>
+                                        {{ value }}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center gap-2 mt-4">
+                <FlatButton
+                    id="save"
+                    class="mb-3"
+                    :icon="'bi-save'"
+                    :text="$t('additional:modules.storyCreator.addElementDropdown.feature.save')"
+                    :title="$t('additional:modules.storyCreator.addElementDropdown.feature.save')"
+                    :interaction="() => {}"
+                />
+                <FlatButton
+                    id="cancel"
+                    class="mb-4"
+                    :icon="'bi-x-lg'"
+                    :text="$t('additional:modules.storyCreator.addElementDropdown.feature.cancel')"
+                    :title="$t('additional:modules.storyCreator.addElementDropdown.feature.cancel')"
+                    :secondary="true"
+                    :interaction="() => currentFeature = null"
+                />
+            </div>
+        </div>
+        <div
+            v-if="!currentFeature || !selectedLayers.length"
+            class="bg-white rounded-3 p-4 d-flex align-items-center text-center"
+        >
+            <div class="d-flex flex-column align-items-center text-center w-100">
+                <i
+                    class="bi bi-geo-alt-fill fs-1 mb-3"
+                />
+                <template v-if="selectedLayers.length && !currentFeature">
                     <strong class="mb-2">{{ $t("additional:modules.storyCreator.chapter.noFeatureLinked") }}</strong>
                     <p
                         class="text-muted mb-0 px-2 px-md-5"
@@ -57,7 +294,7 @@ export default {
                     <div class="dot-flashing my-3" />
                 </template>
                 <p
-                    v-else
+                    v-else-if="!selectedLayers.length"
                     class="text-muted mb-0"
                 >
                     {{ $t("additional:modules.storyCreator.chapter.noSubjectLayerHint") }}
@@ -68,6 +305,31 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+    .small {
+        font-size: $font-size-sm;
+    }
+    .table {
+        tr {
+            position: relative;
+            button {
+                position: absolute;
+                top: 10px;
+                right: 0px;
+                width: 20px;
+                cursor: pointer;
+                display: none;
+                font-size: 10px;
+            }
+            &:hover {
+                button {
+                    display: block;
+                }
+            }
+            td:last-child {
+                padding-right: 10px;
+            }
+        }
+    }
     .dot-flashing {
         position: relative;
         width: 6px;

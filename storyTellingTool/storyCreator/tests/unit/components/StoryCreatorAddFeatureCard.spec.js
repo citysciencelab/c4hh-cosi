@@ -1,8 +1,9 @@
+import {beforeEach} from "vitest";
 import {config, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
+import sinon from "sinon";
 import StoryCreatorAddFeatureCard from "../../../components/StoryCreatorAddFeatureCard.vue";
-import {beforeEach} from "vitest";
 
 config.global.mocks.$t = key => key;
 
@@ -11,13 +12,46 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
 
     beforeEach(() => {
         store = createStore({
+            namespaced: true,
+            modules: {
+                Modules: {
+                    namespaced: true,
+                    modules: {
+                        StoryManager: {
+                            namespaced: true,
+                            getters: {
+                                gfiFeatures: (state) => state.gfiFeatures
+                            },
+                            actions: {
+                                collectGfiFeatures: () => sinon.spy()
+                            },
+                            state: {
+                                gfiFeatures: null
+                            }
+                        }
+                    }
+                },
+                Maps: {
+                    namespaced: true,
+                    getters: {
+                        clickCoordinate: () => sinon.stub()
+                    },
+                    actions: {
+                        placingPointMarker: sinon.spy(),
+                        removePointMarker: sinon.spy()
+                    }
+                }
+            },
             getters: {
-                visibleSubjectDataLayerConfigs: () => []
+                layerConfigById: () => sinon.stub()
             }
         });
         wrapper = shallowMount(StoryCreatorAddFeatureCard, {
             global: {
                 plugins: [store]
+            },
+            props: {
+                selectedLayers: []
             }
         });
     });
@@ -36,68 +70,56 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
             expect(wrapper.emitted("click:close")).to.have.lengthOf(1);
         });
 
-        it("should render addFeatureDescription and loading dots if a visible non-3D subject layer exists", () => {
-            store = createStore({
-                    getters: {
-                        visibleSubjectDataLayerConfigs: () => [{is3DLayer: false}]
-                    }
-                });
-            wrapper = shallowMount(StoryCreatorAddFeatureCard, {
-                global: {
-                    plugins: [store]
-                }
-            });
-
-            expect(wrapper.text()).to.include("additional:modules.storyCreator.chapter.addFeatureDescription");
-            expect(wrapper.find(".dot-flashing").exists()).to.be.true;
+        it("should render the geo icon", () => {
+            expect(wrapper.find(".bi-geo-alt-fill").exists()).to.be.true;
         });
 
-        it("should render noSubjectLayerHint if no visible non-3D subject layer exists", () => {
-            store = createStore({
-                    getters: {
-                        visibleSubjectDataLayerConfigs: () => [{is3DLayer: true}]
-                    }
-                });
+        it("should render the noSubjectLayerHint text", () => {
+            expect(wrapper.find(".text-muted").text()).to.equal("additional:modules.storyCreator.chapter.noSubjectLayerHint");
+        });
+
+        it("should render the addFeatureDescription text", () => {
             wrapper = shallowMount(StoryCreatorAddFeatureCard, {
                 global: {
                     plugins: [store]
+                },
+                props: {
+                    selectedLayers: [{layerId: "1"}]
                 }
             });
 
-            expect(wrapper.text()).to.include("additional:modules.storyCreator.chapter.noSubjectLayerHint");
-            expect(wrapper.find(".dot-flashing").exists()).to.be.false;
+            expect(wrapper.find(".text-muted").text()).to.equal("additional:modules.storyCreator.chapter.addFeatureDescription");
+        });
+
+        it("should render the InputText component", async () => {
+            await wrapper.setData({currentFeature: {}});
+
+            expect(wrapper.findComponent({name: "InputText"}).exists()).to.be.true;
+            expect(wrapper.findAllComponents({name: "InputText"}).length).to.equal(2);
+        });
+
+        it("should render a table", async () => {
+            await wrapper.setData({currentFeature: {id: "1"}});
+
+            expect(wrapper.find(".table").exists()).to.be.true;
         });
     });
 
-    describe("Computed Properties", () => {
-        it("should set computed existsVisibleSubjectLayer to true if at least one visible non-3D layer exists", () => {
-            store = createStore({
-                    getters: {
-                        visibleSubjectDataLayerConfigs: () => [{is3DLayer: true}, {is3DLayer: false}]
-                    }
-                });
-            wrapper = shallowMount(StoryCreatorAddFeatureCard, {
-                global: {
-                    plugins: [store]
-                }
+    describe("Methods", () => {
+        describe("removeAttribute", () => {
+            it("should not delete any element", async () => {
+                await wrapper.setData({attributes: {id: "1", text: "text"}});
+
+                wrapper.vm.removeAttribute("key");
+                expect(wrapper.vm.attributes).to.deep.equal({id: "1", text: "text"});
             });
 
-            expect(wrapper.vm.existsVisibleSubjectLayer).to.be.true;
-        });
+            it("should delete one element", async () => {
+                await wrapper.setData({attributes: {id: "1", text: "text"}});
 
-        it("should set computed existsVisibleSubjectLayer to false if only 3D layers exist", () => {
-            store = createStore({
-                    getters: {
-                        visibleSubjectDataLayerConfigs: () => [{is3DLayer: true}]
-                    }
-                });
-            wrapper = shallowMount(StoryCreatorAddFeatureCard, {
-                global: {
-                    plugins: [store]
-                }
+                wrapper.vm.removeAttribute("text");
+                expect(wrapper.vm.attributes).to.deep.equal({id: "1"});
             });
-
-            expect(wrapper.vm.existsVisibleSubjectLayer).to.be.false;
         });
     });
 });

@@ -11,6 +11,7 @@
  * @property {String} fixedStoryPath the relative path in portalconfigs to contain fixed stories.
  * @property {String[]} fixedStoryFiles the fixed story files name.
  * @property {Boolean} fixedStoryLoaded check if fixed story is load.
+ * @property {Object[]} [gfiFeatures=[]] temporary array for features at click to be moved to gfi module.
  * @property {ol/layer[]} originalLayerConfig the original layer configs.
  * @property {Object[]} storyList List entries with story and image assets.
  * @property {Object} subjectLayerCategory - The subject layer category for layer selection.
@@ -21,13 +22,13 @@ const state = {
     name: "additional:modules.storyManager.title",
     icon: "bi-file-plus",
     hasMouseMapInteractions: true,
-
     enableCreator: true,
     enableImport: true,
     currentStoryIndex: undefined,
     fixedStoryPath: "./assets",
     fixedStoryFiles: [],
     fixedStoryLoaded: false,
+    gfiFeatures: null,
     originalLayerConfig: undefined,
     storyList: [],
     subjectLayerCategory: {

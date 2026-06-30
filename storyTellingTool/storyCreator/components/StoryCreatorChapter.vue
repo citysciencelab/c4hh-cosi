@@ -77,7 +77,7 @@ export default {
             confirmedZoomlevel: "",
             layerList: [],
             toolList: [],
-            selectedLayer: [],
+            selectedLayers: [],
             selectedTool: "",
             showAlert: false,
             title: this.$t("additional:modules.storyCreator.chapter.title")
@@ -157,7 +157,7 @@ export default {
          * @param {Object[]} layers - The selected layer objects object in array.
          * @returns {void}
          */
-        selectedLayer: {
+        selectedLayers: {
             handler (val) {
                 const layers = mapCollection.getMap("2D")?.getLayers();
 
@@ -249,7 +249,7 @@ export default {
             map.un("moveend", this.updatePositionFromMap);
         }
 
-        this.resetLayerConfig(this.selectedLayer);
+        this.resetLayerConfig(this.selectedLayers);
     },
     methods: {
         ...mapActions(["addOrReplaceLayer", "updateLayerConfigs"]),
@@ -279,7 +279,7 @@ export default {
             layers.forEach(layer => {
                 const layerConf = this.layerConfigById(layer.get("id"));
 
-                if (layerConf && !layerConf?.baselayer && !this.selectedLayer.some(sl => sl.layerId === layer.get("id"))) {
+                if (layerConf && !layerConf?.baselayer && !this.selectedLayers.some(sl => sl.layerId === layer.get("id"))) {
                     this.addOrReplaceLayer({
                         layerId: layer.get("id"),
                         visibility: false
@@ -370,7 +370,7 @@ export default {
             this.confirmedZoomlevel = chapter.map.zoomLevel || "";
             this.zoomlevel = chapter.map.zoomLevel || "";
 
-            this.selectedLayer = Array.isArray(chapter.map.layers)
+            this.selectedLayers = Array.isArray(chapter.map.layers)
                 ? this.layerList.filter(layer => chapter.map.layers.includes(layer.layerId))
                 : [];
 
@@ -573,7 +573,7 @@ export default {
          */
         saveChapter () {
             const baseLayerId = this.selectedBaseLayer?.id,
-                subjectLayerIds = this.selectedLayer.map(layer => layer.layerId),
+                subjectLayerIds = this.selectedLayers.map(layer => layer.layerId),
                 layers = baseLayerId ? [baseLayerId, ...subjectLayerIds] : subjectLayerIds;
 
             const chapter = {
@@ -638,7 +638,7 @@ export default {
          * @returns {void}
          */
         resetLayerConfig () {
-            this.selectedLayer = [];
+            this.selectedLayers = [];
             this.updateLayerConfigs(this.originalLayerConfig);
         },
         /**
@@ -760,7 +760,7 @@ export default {
                 </label>
                 <Multiselect
                     id="layer-list"
-                    v-model="selectedLayer"
+                    v-model="selectedLayers"
                     :placeholder="$t('additional:modules.storyCreator.chapter.layerListPlaceholder')"
                     :aria-label="$t('additional:modules.storyCreator.chapter.layerList')"
                     label="label"
@@ -965,6 +965,7 @@ export default {
             <StoryCreatorAddFeatureCard
                 v-else-if="isAddingContentType('feature')"
                 class="mt-2"
+                :selected-layers="selectedLayers"
                 @click:close="closeContentEditor"
             />
         </AccordionItem>

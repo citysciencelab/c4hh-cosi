@@ -436,7 +436,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     title: "Neues Testkapitel",
                     confirmedCoordinate: [123, 456],
                     confirmedZoomlevel: 2,
-                    selectedLayer: [{layerId: 1}, {layerId: 2}],
+                    selectedLayers: [{layerId: 1}, {layerId: 2}],
                     selectedTool: {toolId: "testTool"},
                     content: []
                 });
@@ -465,7 +465,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     title: "Geändertes Kapitel 2",
                     confirmedCoordinate: [999, 888],
                     confirmedZoomlevel: 10,
-                    selectedLayer: [],
+                    selectedLayers: [],
                     selectedTool: "",
                     content: [{type: "text", text: "Neuer Inhalt"}]
                 });
@@ -493,7 +493,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     content: [],
                     confirmedCoordinate: [123, 456],
                     confirmedZoomlevel: 2,
-                    selectedLayer: [],
+                    selectedLayers: [],
                     selectedTool: ""
                 });
 
@@ -614,13 +614,13 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
         });
 
         describe("resetLayerConfig ", () => {
-            it("should set the selectedLayer to be empty array", async () => {
+            it("should set the selectedLayers to be empty array", async () => {
                 await wrapper.setData({
-                    selectedLayer: [{layerId: 1}]
+                    selectedLayers: [{layerId: 1}]
                 });
 
                 await wrapper.vm.resetLayerConfig([{layerId: 1}]);
-                expect(wrapper.vm.selectedLayer.length).to.be.equal(0);
+                expect(wrapper.vm.selectedLayers.length).to.be.equal(0);
             });
         });
     });

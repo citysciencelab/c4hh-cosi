@@ -79,6 +79,14 @@
           "separator": "Trennlinie",
           "image": "Bild",
           "video": "Video"
+        },
+        "feature": {
+          "title": "Überschrift",
+          "description": "Beschreibung (optional)",
+          "editAttribute": "Attribute bearbeiten",
+          "remove": "Löschen",
+          "cancel": "Feature verwerfen",
+          "save": "Feature verknüpfen"
         }
       }
     }
