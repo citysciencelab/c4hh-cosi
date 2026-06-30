@@ -838,13 +838,13 @@ export default {
             :is-open="true"
             :title="$t('additional:modules.storyCreator.chapter.addContent')"
         >
-            <div class="chapter-title mt-4 mb-3 p-2 h5">
+            <div class="chapter-title mt-4 mb-3 px-2 py-0 rounded-3">
                 <input
-                    v-model="title"
-                    class="w-100 bg-transparent border-0"
-                    style="outline: none;"
+                    v-model.trim="title"
+                    class="form-control-plaintext w-100 fs-5 outline-none-fallback"
                     :placeholder="$t('additional:modules.storyCreator.chapter.title')"
                     :aria-label="$t('additional:modules.storyCreator.chapter.title')"
+                    @blur="title = title || $t('additional:modules.storyCreator.chapter.title')"
                 >
             </div>
             <Draggable
@@ -1190,7 +1190,6 @@ export default {
 }
 
 .chapter-title {
-    font-family: $font_family_accent;
     color: $dark_grey;
     &:hover {
         outline-color: $light_grey;

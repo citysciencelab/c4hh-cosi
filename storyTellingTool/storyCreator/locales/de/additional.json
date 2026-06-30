@@ -14,7 +14,7 @@
       "previewNav": "Story-Vorschau",
       "introText": "Dieses Werkzeug dient der Erstellung interaktiver, kartenbasierter Geschichten. Nach der Eingabe der allgemeinen Informationen, wie Name, Beschreibung, Autor und Titelbild, können darunter die einzelnen Kapitel flexibel hinzugefügt werden. Über die Schaltflächen am Seitenende lässt sich die Story in der Vorschau prüfen, speichern oder verwerfen.",
       "labels": {
-        "storyname": "Storyname",
+        "storyname": "Story-Name",
         "storyTitle": "Story-Namen eingeben",
         "storyDescription": "Beschreibung der Story (optional)",
         "storyAuthor": "Autor der Story (optional)",

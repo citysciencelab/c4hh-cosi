@@ -379,10 +379,11 @@ export default {
             </p>
             <InputText
                 id="storyTitle"
-                v-model="title"
+                v-model.trim="title"
                 :label="$t('additional:modules.storyCreator.labels.storyTitle')"
-                :placeholder="$t('additional:modules.storyCreator.labels.storyTitle')"
+                :placeholder="$t('additional:modules.storyCreator.labels.storyname')"
                 class="mb-3"
+                @blur="title = title || $t('additional:modules.storyCreator.labels.storyname')"
             />
             <InputText
                 id="storyDescription"
@@ -483,7 +484,6 @@ export default {
                     :aria-label="$t('additional:modules.storyCreator.saveStory')"
                     :text="$t('additional:modules.storyCreator.saveStory')"
                     :interaction="() => saveStory()"
-                    :disabled="!title.trim()"
                 />
                 <FlatButton
                     :icon="'bi-x-circle'"
