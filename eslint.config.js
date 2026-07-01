@@ -383,25 +383,25 @@ export default [
                     message: "Native nav tabs with class \"nav-link\" are not allowed. Use <NavTab> instead."
                 },
 
-                // 5) Disallow nav-link literals inside dynamic :class expressions.
+                // 4) Disallow nav-link literals inside dynamic :class expressions.
                 {
                     selector: "VElement[name='a']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='nav-link']), VElement[name='a']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='nav-link']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='nav-link']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='nav-link'])",
                     message: "Native nav tabs with class \"nav-link\" are not allowed. Use <NavTab> instead."
                 },
 
-                // 6) Disallow native accordion buttons with static class="accordion-button".
+                // 5) Disallow native accordion buttons with static class="accordion-button".
                 {
                     selector: "VElement[name='button']:has(VAttribute[directive=false][key.name='class'][value.value=/\\baccordion-button\\b/])",
                     message: "Native <button class=\"accordion-button\"> is not allowed. Use <AccordionItem> instead."
                 },
 
-                // 7) Disallow accordion-button literals inside dynamic :class expressions.
+                // 6) Disallow accordion-button literals inside dynamic :class expressions.
                 {
                     selector: "VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='accordion-button']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='accordion-button'])",
                     message: "Native <button> with class \"accordion-button\" is not allowed. Use <AccordionItem> instead."
                 },
 
-                // 8) Disallow <li> without proper parent (ol, ul, menu, or template)
+                // 7) Disallow <li> without proper parent (ol, ul, menu, or template)
                 {
                     selector: "VElement[name='li']:not([parent.name='ol']):not([parent.name='ul']):not([parent.name='menu']):not([parent.name='template']):not([parent.name='transitiongroup'])",
                     message: "<li> must be a direct child of <ol>, <ul>, <menu>, or <template>. Using other parents violates accessibility standards. Vue's <TransitionGroup> is allowed when it renders as a list container (<ul> or <ol>)."
