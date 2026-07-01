@@ -304,6 +304,7 @@ export default {
                 preventCache: Date.now()
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/geodatamanagement/dataclassinstance/computeenvelope`, params);
+        let result = null;
 
         await axios.post(url, payload)
             .then(function (response) {
@@ -313,12 +314,13 @@ export default {
 
                 if (existingInstanceData) {
                     existingInstanceData[0].geom = response.data;
+                    result = response.data;
                 }
-
-                return response.data;
             }).catch(function (error) {
                 dispatch("axiosErrorHandling", error);
             });
+
+        return result;
     },
     axiosErrorHandling ({state}, error) {
         if (error.response) {

@@ -140,7 +140,9 @@ export default {
                         return datasets.instanceId === dataset.instanceId;
                     })[0].geom;
 
-                    this.showGeomOnLayer(geom);
+                    if (geom) {
+                        this.showGeomOnLayer(geom);
+                    }
                 });
             }
         },
