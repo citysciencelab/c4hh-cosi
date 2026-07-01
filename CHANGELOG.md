@@ -4,8 +4,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-07-01 v3.24.0
 
 ### Added
 - Vue-directive: Added a vue-directive "bs-tooltip.js" to handle Bootstrap-Tooltips.
@@ -13,7 +12,7 @@
 - WMS-Time: Added Parameters `displayFormat` and `displayTimezone` to format the timestamp label in the TimeSlider.
 - The following packages have been added:
     - dependencies:
-        -     @stylistic/eslint-plugin: ^5.10.0
+        - @stylistic/eslint-plugin: ^5.10.0
 - WFS-T: possibility to set default values for WFS feature properties
 
 ### Changed
@@ -30,8 +29,6 @@
 - Accessibility: Changed lists of CoordToolkit and BaselayerSwitcher to make it more readable for screen readers and added an eslint rule to enforce the right list implementations.
 - ESLint: The linter now also checks `.mjs` files. Existing lint issues in `.mjs` files have been fixed.
 - configuredModules: The modules under folder of sections should also be parsed into configuredModules
-
-### Deprecated
 
 ### Removed
 - The following packages have been removed:
