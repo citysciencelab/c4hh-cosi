@@ -128,7 +128,6 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                             state: () => ({
                                 imageAssetsById: {},
                                 showLoadingSpinner: false,
-                                autoplay: true,
                                 fixedStoryPath: "",
                                 fixedStoryName: "",
                                 originalLayerConfig: undefined,
@@ -145,7 +144,6 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                             getters: {
                                 imageAssetsById: state => state.imageAssetsById,
                                 showLoadingSpinner: state => state.showLoadingSpinner,
-                                autoplay: state => state.autoplay,
                                 fixedStoryPath: (state) => state.fixedStoryPath,
                                 fixedStoryName: (state) => state.fixedStoryName,
                                 originalLayerConfig: (state) => state.originalLayerConfig,
@@ -211,7 +209,8 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             },
             actions: {
                 addLayerToLayerConfig: () => sinon.stub(),
-                addOrReplaceLayer: () => sinon.stub()
+                addOrReplaceLayer: () => sinon.stub(),
+                updateLayerConfigs: () => sinon.stub()
             }
         });
 

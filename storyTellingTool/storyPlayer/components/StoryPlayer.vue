@@ -11,16 +11,6 @@ export default {
     components: {
         IconButton
     },
-    props: {
-        isMobileDevice: {
-            type: Boolean,
-            default: false
-        },
-        screenOrientationType: {
-            type: String,
-            default: screen.orientation?.type
-        }
-    },
     data () {
         return {
             currentIndex: -1,
@@ -37,7 +27,6 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/StoryPlayer", [
-            "autoplay",
             "description",
             "duration",
             "fixedStoryName",
@@ -55,7 +44,6 @@ export default {
             "supportedMapModes"
         ]),
         ...mapGetters([
-            "layerConfigsByAttributes",
             "allLayerConfigs",
             "layerConfigById"
         ]),
@@ -81,9 +69,6 @@ export default {
          */
         coverImagePath () {
             return this.imageAssetsById?.[this.storyConf.imageSrc]?.objectURL || "";
-        },
-        isMobilePortrait () {
-            return this.isMobileDevice && this.screenOrientationType.startsWith("portrait");
         }
     },
     watch: {
@@ -97,15 +82,6 @@ export default {
         }
     },
     created () {
-        const breakpoint = "(max-width: 768px)",
-            mediaQuery = window.matchMedia(breakpoint),
-            isMobile = mediaQuery.matches,
-            orientationCheck = this.screenOrientationType?.startsWith("landscape");
-
-        if (isMobile && orientationCheck) {
-            this.applyMobileLandscapeLayout();
-        }
-
         if (typeof this.originalLayerConfig === "undefined") {
             this.setOriginalLayerConfig(JSON.parse(JSON.stringify(this.allLayerConfigs)));
         }
@@ -134,28 +110,22 @@ export default {
             this.coverCardObserver.observe(coverCard);
         }
     },
-    activated () {
+    beforeUnmount () {
+        if (this.coverCardObserver) {
+            this.coverCardObserver.disconnect();
+        }
+        // Disconnect previous observer if exists
+        if (this._stepObserver) {
+            this._stepObserver.disconnect();
+        }
+        // Remove scroll event listener
         const toolBody = document.getElementById("mp-body-secondaryMenu");
 
         this.$nextTick(() => {
-            this.scrollerSetup();
             this.currentIndex = -1;
             this.currentChapterIndex = 0;
             this.toolBodyScrollTop = 0;
-
-            if (toolBody) {
-                toolBody.scrollTop = 0;
-                toolBody.addEventListener("scroll", this.handleToolBodyScroll);
-            }
         });
-    },
-    deactivated () {
-        // Handle KeepAlive visibility. Triggered if component is deactivated
-        const heading = document.getElementById("mp-menu-navigation-secondaryMenu"),
-            toolBody = document.getElementById("mp-body-secondaryMenu");
-
-        heading?.style?.removeProperty("display");
-        toolBody.setAttribute("style", this.originalToolBodyStyle || "");
 
         // Remove scroll event listener
         if (toolBody) {
@@ -163,19 +133,9 @@ export default {
 
             toolBody.scrollTop = 0;
         }
-
-        // remove the close button if GFI is opened
-        document.getElementById("mp-menu-header-close-button-secondaryMenu")?.setAttribute("style", "display: none;");
-        document.getElementById("mp-menu-navigation-reset-button-secondaryMenu")?.setAttribute("style", "display: none;");
-
         this.deactivateSubjectLayer();
         this.updateLayerConfigs(this.originalLayerConfig);
         this.deactivateTool();
-    },
-    beforeUnmount () {
-        if (this.coverCardObserver) {
-            this.coverCardObserver.disconnect();
-        }
     },
     methods: {
         ...mapMutations("Modules/StoryPlayer", [
@@ -189,7 +149,6 @@ export default {
             "setIcon",
             "setOriginalLayerConfig",
             "setStoryConf",
-            "setAutoplay",
             "setMode"
         ]),
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
@@ -208,10 +167,6 @@ export default {
          * @returns {void}
          */
         activateTool (toolId) {
-            if (this.isMobilePortrait) {
-                return;
-            }
-
             const toolMenuSide = this.storyPlayerMenuSide === "mainMenu" ? "secondaryMenu" : "mainMenu",
                 toolKey = toolId.charAt(0).toUpperCase() + toolId.slice(1),
                 module = this.$store.state.Modules && this.$store.state.Modules[toolKey],
@@ -343,7 +298,7 @@ export default {
                 else {
                     const map = mapCollection.getMap("2D"),
                         mapView = typeof map?.getView === "function" ? map.getView() : undefined,
-                        zoomLevel = this.isMobilePortrait ? this.currentChapter.map.zoomLevel - 1 : this.currentChapter.map.zoomLevel;
+                        zoomLevel = this.currentChapter.map.zoomLevel;
 
                     if (mapView) {
                         setTimeout(() => {
@@ -408,7 +363,7 @@ export default {
                 return this.currentChapter.map.center;
             }
 
-            const zoomLevel = this.isMobilePortrait ? this.currentChapter.map.zoomLevel - 1 : this.currentChapter.map.zoomLevel,
+            const zoomLevel = this.currentChapter.map.zoomLevel,
                 targetResolution = mapView?.getResolutionForZoom(zoomLevel),
                 rightPadding = this.expanded("secondaryMenu")
                     ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
@@ -419,13 +374,6 @@ export default {
                 offsetPixels = (rightPadding - leftPadding) / 2,
                 center = this.currentChapter.map.center;
 
-            if (this.isMobilePortrait) {
-                const mapHeight = map.getTargetElement().getBoundingClientRect().top,
-                    verticalOffsetPixels = (mapHeight / 2) + 50,
-                    offsetY = verticalOffsetPixels * targetResolution;
-
-                return [center[0], center[1] - offsetY];
-            }
 
             const offsetX = offsetPixels * targetResolution;
 
@@ -612,7 +560,7 @@ export default {
             </span>
         </div>
         <div
-            class="d-flex w-100 player"
+            class="d-flex w-100 flex-column player"
         >
             <div
                 ref="coverCard"
@@ -682,7 +630,7 @@ export default {
                 >
                     <div
                         v-if="index === currentChapterIndex && index > 0"
-                        class="chevron-navigation chevron-up mb-3"
+                        class="d-flex justify-content-center mb-3 p-2"
                     >
                         <IconButton
                             class="me-5 btn-light"
@@ -736,7 +684,7 @@ export default {
                     </div>
                     <div
                         v-if="index === currentChapterIndex && index < storyConf.chapters.length - 1"
-                        class="chevron-navigation"
+                        class="d-flex justify-content-center py-2"
                     >
                         <IconButton
                             class="me-5 btn-light"
@@ -840,32 +788,24 @@ export default {
         width: var(--initialToolWidthMobile);
     }
 
-    display: flex;
-    flex-direction: column;
-    flex: 1;
+    overflow-x: hidden;
     overflow-y: auto;
 
     .story-title {
         font-family: $font_family_accent;
     }
 
-    .chevron-navigation {
-        display: flex;
-        justify-content: center;
-        padding: 8px 0;
+    .chevron {
+        background-color: $white;
+        border: 1px solid $dark_grey;
 
-        .chevron {
-            background-color: $white;
-            border: 1px solid $dark_grey;
+        &:hover {
+            background-color: $light_blue;
+        }
 
-            &:hover {
-                background-color: $light_blue;
-            }
-
-            &:active {
-                background-color: $dark_blue;
-                color: $white;
-            }
+        &:active {
+            background-color: $dark_blue;
+            color: $white;
         }
     }
 

@@ -28,7 +28,6 @@ const state = {
     icon: "bi-book",
 
     // Addon state
-    autoplay: false,
     duration: 1000,
     fixedStoryName: null,
     fixedStoryPath: null,
