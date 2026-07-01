@@ -3,8 +3,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-07-01 v3.24.0
 
 ### Added
 - PlanParken: Added a new addon `planParken` to analyze parking spaces in an area.
@@ -13,8 +12,6 @@
 
 ### Changed
 - Boris: Changed list structures to reflect accessibility rules
-
-### Deprecated
 
 ### Removed
 
