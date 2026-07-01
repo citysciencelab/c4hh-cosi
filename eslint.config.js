@@ -383,12 +383,6 @@ export default [
                     message: "Native nav tabs with class \"nav-link\" are not allowed. Use <NavTab> instead."
                 },
 
-                // 4) Disallow dynamic class bindings that include nav-link.
-                {
-                    selector: "VElement[name='a']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'][value.value=/\\bnav-link\\b/]), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'][value.value=/\\bnav-link\\b/])",
-                    message: "Native nav tabs with class \"nav-link\" are not allowed. Use <NavTab> instead."
-                },
-
                 // 5) Disallow nav-link literals inside dynamic :class expressions.
                 {
                     selector: "VElement[name='a']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='nav-link']), VElement[name='a']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='nav-link']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='nav-link']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='nav-link'])",
@@ -425,12 +419,6 @@ export default [
             "vue/no-deprecated-delete-set": "off",
             "vue/no-deprecated-model-definition": "off",
             "jsdoc/ts-no-empty-object-type": "off"
-        }
-    },
-    {
-        files: navTabLegacyExcludedFiles,
-        rules: {
-            "vue/no-restricted-syntax": "off"
         }
     },
     {
