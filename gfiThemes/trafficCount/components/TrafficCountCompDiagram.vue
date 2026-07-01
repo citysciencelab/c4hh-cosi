@@ -237,20 +237,55 @@ export default {
                             pointBackgroundColor: color,
                             pointRadius: 3,
                             pointStyleLegend: "star"
-                        };
+                        },
+                        checkIsHoliday = typeof callbackRenderPointStyle === "function",
+                        checkSize = typeof callbackRenderPointSize === "function";
 
                     datasets.push({
                         label: datetimes.length > 0 && typeof callbackRenderLabelLegend === "function" ? callbackRenderLabelLegend(datetimes[0]) + postfix : "",
                         data: typeof dataObj[meansOfTransport] !== "undefined" ? Object.values(dataObj[meansOfTransport]) : [],
                         backgroundColor: color,
                         borderColor: color,
-                        spanGaps: false,
+                        spanGaps: true,
+                        tension: 0,
                         fill: false,
                         borderWidth: 2,
                         borderDash: isComplementaryDataset ? [2, 2] : [],
-                        pointRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
-                        pointHoverRadius: datetimes.length > 0 && typeof callbackRenderPointSize === "function" ? callbackRenderPointSize(datetimes) : 2,
-                        pointStyle: datetimes.length > 0 && typeof callbackRenderPointStyle === "function" ? callbackRenderPointStyle(meansOfTransport, datetimes) : "",
+                        pointStyle: (context) => {
+                            const datetime = datetimes[context?.dataIndex],
+                                isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
+
+                            return isHoliday ? "star" : "circle";
+                        },
+                        pointRadius: (context) => {
+                            const datetime = datetimes[context?.dataIndex],
+                                isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
+
+                            if (!isHoliday) {
+                                return 0;
+                            }
+                            return checkSize ? callbackRenderPointSize([datetime]) : 4;
+                        },
+                        pointHoverRadius: (context) => {
+                            const datetime = datetimes[context?.dataIndex],
+                                isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star"),
+                                baseSize = checkSize && datetime ? callbackRenderPointSize([datetime]) : 3,
+                                safeBaseSize = typeof baseSize === "number" && !isNaN(baseSize) ? baseSize : 3;
+
+                            return isHoliday ? safeBaseSize + 7 : safeBaseSize + 3;
+                        },
+                        pointHoverBackgroundColor: (context) => {
+                            const datetime = datetimes[context?.dataIndex],
+                                isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
+
+                            return isHoliday ? color : "#FFFFFF";
+                        },
+                        pointHoverBorderWidth: (context) => {
+                            const datetime = datetimes[context?.dataIndex],
+                                isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
+
+                            return isHoliday ? 4 : 3;
+                        },
                         pointStyleLegend: this.createCanvasPointStyleLegend(color, isComplementaryDataset),
                         datetimes,
                         isSVAvailable: meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz",
@@ -346,10 +381,27 @@ export default {
                 data,
                 options: {
                     maintainAspectRatio: false,
-                    elements: {
-                        line: {
-                            tension: 0.35
+                    interaction: {
+                        mode: "index",
+                        intersect: false,
+                        axis: "x"
+                    },
+                    events: ["mousemove", "mouseout", "click", "touchstart", "touchmove"],
+                    transitions: {
+                        active: {
+                            animation: {
+                                duration: 300,
+                                easing: "easeOutQuad",
+                                properties: ["x", "y", "radius", "backgroundColor"]
+                            }
                         }
+                    },
+                    elements: {
+                        point: {
+                            radius: 10,
+                            hoverRadius: 10,
+                            hitRadius: 20
+                    }
                     },
                     plugins: {
                         title: {
@@ -359,6 +411,9 @@ export default {
                             display: true,
                             labels: {
                                 usePointStyle: true,
+                                boxWidth: 14,
+                                boxHeight: 14,
+                                padding: 20,
                                 generateLabels: chart => {
                                     const chartData = chart.data,
                                         legends = Array.isArray(chartData.datasets) ? chartData.datasets.map((dataset, i) => {
@@ -384,23 +439,37 @@ export default {
                                 fontColorLegend: options.fontColorLegend
                             },
                             position: "bottom",
-                            align: "start"
+                            align: "center"
                         },
                         tooltip: {
-                            bodyColor: options.colorTooltipFont,
-                            backgroundColor: options.colorTooltipBack,
-                            yAlign: "bottom",
-                            titleAlign: "center",
-                            bodyAlign: "center",
-                            external: (tooltip) => {
-                                if (!tooltip) {
-                                    return;
-                                }
-                                // disable displaying the color box;
-                                tooltip.displayColors = false;
+                            enabled: true,
+                            mode: "index",
+                            intersect: false,
+                            backgroundColor: "#ffffff",
+                            bodyColor: "#1e293b",
+                            borderColor: "#94a3b8",
+                            borderWidth: 1.5,
+                            cornerRadius: 8,
+                            caretSize: 6,
+                            caretPadding: 12,
+                            padding: {top: 10, bottom: 10, left: 14, right: 14
                             },
+                            boxWidth: 16,
+                            boxHeight: 4,
+                            boxPadding: 8,
+                            usePointStyle: false,
                             callbacks: {
-                                // use label callback to return the desired label
+                                labelColor: function (context) {
+                                    const dataset = context.dataset,
+                                        isDashed = dataset.borderDash && dataset.borderDash.length > 0;
+
+                                    return {
+                                        borderColor: dataset.borderColor,
+                                        backgroundColor: isDashed ? "transparent" : dataset.borderColor,
+                                        borderWidth: 2,
+                                        borderDash: dataset.borderDash || []
+                                    };
+                                },
                                 label: (tooltipItem, chartJsData) => {
                                     if (
                                         typeof chartJsData === "object"
@@ -417,49 +486,42 @@ export default {
 
                                     return options.setTooltipValue(tooltipItem);
                                 },
-                                // remove title
                                 title: () => {
                                     return false;
                                 }
-                            }
+                    }
                         }
                     },
                     hover: {
-                        mode: "nearest",
-                        intersect: true,
-                        onHover: function (e) {
-                            const point = this.getElementAtEvent(e);
+                        mode: "index",
+                        intersect: false,
+                        onHover: function (e, elements, chart) {
+                            const target = e.native?.target ?? e.target,
+                                activePoints = chart.getElementsAtEventForMode(e, "index", {intersect: false}, false);
 
-                            if (point.length) {
-                                e.target.style.cursor = "pointer";
+                            if (!target) {
+                                return;
                             }
-                            else {
-                                e.target.style.cursor = "default";
-                            }
+
+                            target.style.cursor = activePoints.length ? "pointer" : "default";
                         }
                     },
                     scales: {
                         x: {
                             display: true,
                             beginAtZero: true,
-                            ticks: {
-                                fontSize: options.fontSizeGraph,
-                                fontColor: options.fontColorGraph,
-                                autoSkip: true,
-                                callback: (xValue) => {
-                                    return options.renderLabelXAxis(data.labels[xValue]);
-                                }
-                            },
                             grid: {
-                                display: true,
-                                border: {
-                                    display: true
-                                },
-                                drawOnChartArea: false
+                                display: false
                             },
-                            title: {
-                                display: Boolean(options.descriptionXAxis),
-                                text: options.descriptionXAxis
+                            ticks: {
+                                callback: (value, index) => {
+                                    const totalLabels = data.labels.length;
+
+                                    if (totalLabels > 7 && index % 2 !== 0) {
+                                        return "";
+                                    }
+                                    return options.renderLabelXAxis(data.labels[index]);
+                                }
                             }
                         },
                         y: {
@@ -502,13 +564,9 @@ export default {
 
 <style lang="scss" scoped>
     .charts {
-        position: relative;
-        min-width: 0;
-        display: block;
-        canvas {
-            width: 100%;
-            height: auto;
-        }
+       position: relative;
+        width: 100%;
+        height: 400px;
     }
 </style>
 
