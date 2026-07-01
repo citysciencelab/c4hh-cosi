@@ -506,6 +506,98 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             });
         });
 
+        describe("handleFeature", () => {
+            it("should add a feature when editor index points to add position", async () => {
+                const feature = {
+                    title: "title",
+                    description: "description",
+                    layerId: "1",
+                    featureId: "1",
+                    coordinate: [0, 0],
+                    attributes: {}
+                };
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "feature",
+                        index: 0
+                    },
+                    content: []
+                });
+
+                await wrapper.vm.handleFeature(feature);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "feature",
+                        attrs: {
+                            title: "title",
+                            description: "description",
+                            layerId: "1",
+                            featureId: "1",
+                            coordinate: [0, 0],
+                            attributes: {}
+                        }
+                    }
+                ]);
+            });
+
+            it("should edit an existing feature when editor index points to an existing item", async () => {
+                const feature = {
+                    title: "",
+                    content: [],
+                    confirmedCoordinate: [123, 456],
+                    confirmedZoomlevel: 2,
+                    selectedLayers: [],
+                    selectedTool: ""
+                };
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "feature",
+                        index: 0
+                    },
+                    content: [
+                        {
+                            type: "feature",
+                            attrs: {
+                                title: "",
+                                content: [],
+                                confirmedCoordinate: [123, 456],
+                                confirmedZoomlevel: 2,
+                                selectedLayers: [],
+                                selectedTool: ""
+                            }
+                        }
+                    ]
+                });
+
+                await wrapper.vm.handleFeature(feature);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "feature",
+                        attrs: {
+                            title: "",
+                            content: [],
+                            confirmedCoordinate: [123, 456],
+                            confirmedZoomlevel: 2,
+                            selectedLayers: [],
+                            selectedTool: ""
+                        }
+                    }
+                ]);
+            });
+        });
+
         describe("handleImage", () => {
             it("should add an image when editor index points to add position", async () => {
                 const image = {

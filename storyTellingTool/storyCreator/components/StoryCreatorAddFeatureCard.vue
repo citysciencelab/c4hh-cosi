@@ -17,6 +17,11 @@ export default {
         InputText
     },
     props: {
+        initialContent: {
+            type: [Object, null],
+            required: false,
+            default: null
+        },
         /**
          * The selected layer lists
          * @type {Object[]}
@@ -27,7 +32,7 @@ export default {
             default: () => []
         }
     },
-    emits: ["click:close", "addContent"],
+    emits: ["addFeature", "click:close"],
     data () {
         return {
             attributes: null,
@@ -35,7 +40,8 @@ export default {
             currentFeature: null,
             description: "",
             layerName: "",
-            title: ""
+            title: "",
+            zoomlevel: ""
         };
     },
     computed: {
@@ -44,6 +50,19 @@ export default {
         ...mapGetters("Modules/StoryManager", ["gfiFeatures"])
     },
     watch: {
+        /**
+         * Watches of the attributes, if it is null, the pointmarker will be removed.
+         * @param {Object} val - The attribute object.
+         * @returns {void}
+         */
+        attributes: {
+            handler (val) {
+                if (!val) {
+                    this.removePointMarker();
+                }
+            },
+            deep: true
+        },
         /**
          * Watches of click coordinate to collect the feature
          * @returns {void}
@@ -81,13 +100,45 @@ export default {
                     this.placingPointMarker(this.clickCoordinate);
                 }
 
+                this.coordinate = this.clickCoordinate;
                 this.layerName = this.layerConfigById(this.currentFeature?.getLayerId())?.name || "";
                 this.attributes = this.currentFeature?.getProperties();
+                this.title = this.getDefaultTitle();
+                this.zoomlevel = mapCollection.getMapView("2D").getZoom();
             },
             deep: true
         },
         /**
+         * Watches of the initial content and assign the attributes.
+         * @param {Object} val - The initial content.
+         * @returns {void}
+         */
+        initialContent: {
+            handler (val) {
+                if (!val) {
+                    return;
+                }
+
+                const content = JSON.parse(JSON.stringify(val))?.attrs;
+
+                this.attributes = content?.attributes;
+                this.coordinate = content?.coordinate;
+                this.description = content?.description;
+                this.featureId = content?.featureId;
+                this.layerId = content?.layerId;
+                this.layerName = this.layerConfigById(content?.layerId)?.name;
+                this.title = content?.title;
+                this.zoomlevel = content?.zoomlevel;
+
+                this.zoomToCoordinates({center: this.coordinate, zoom: this.zoomLevel});
+                this.placingPointMarker(content?.coordinate);
+            },
+            deep: true,
+            immediate: true
+        },
+        /**
          * Watches of the selected subject layers.
+         * @param {Object[]} val - The selected layers.
          * @returns {void}
          */
          selectedLayers (val) {
@@ -101,7 +152,7 @@ export default {
         this.removePointMarker();
     },
     methods: {
-        ...mapActions("Maps", ["placingPointMarker", "removePointMarker"]),
+        ...mapActions("Maps", ["placingPointMarker", "removePointMarker", "zoomToCoordinates"]),
         ...mapActions("Modules/StoryManager", ["collectGfiFeatures"]),
         beautifyKey,
         isWebLink,
@@ -113,6 +164,23 @@ export default {
         translateKeyWithPlausibilityCheck,
 
         /**
+         * Gets the default title with feature id.
+         * @returns {String} the default title.
+         */
+        getDefaultTitle () {
+            return this.currentFeature?.getId();
+        },
+
+        /**
+         * Gets the title if it is empty
+         * @param {String} val title
+         * @returns {String} the non-empty title.
+         */
+        getTitle (val) {
+            return val || this.getDefaultTitle() || JSON.parse(JSON.stringify(this.initialContent))?.attrs.title;
+        },
+
+        /**
          * Checks if it has pipe
          * @param {String} value string to check.
          * @returns {Boolean} whether the given value includes a pipe.
@@ -122,7 +190,7 @@ export default {
         },
 
         /**
-         * Delete one element from attribute object.
+         * Deletes one element from attribute object.
          * @param {String} key key of the element.
          * @returns {void}
          */
@@ -132,6 +200,24 @@ export default {
             }
 
             delete this.attributes[key];
+        },
+
+        /**
+         * Saves the feature attributes
+         * @returns {void}
+         */
+        saveFeature () {
+            const featureObj = {
+                title: this.title,
+                description: this.description,
+                layerId: this.currentFeature?.getLayerId() || this.layerId,
+                featureId: this.getDefaultTitle(),
+                coordinate: this.coordinate,
+                attributes: this.attributes,
+                zoomlevel: this.zoomlevel
+            };
+
+            this.$emit("addFeature", featureObj);
         }
     }
 };
@@ -153,7 +239,7 @@ export default {
                 @click="$emit('click:close')"
             />
         </div>
-        <div v-if="currentFeature">
+        <div v-if="attributes">
             <div class="bg-white rounded-3 p-4">
                 <div class="row no-gutters mb-3">
                     <div class="small">
@@ -165,14 +251,15 @@ export default {
                 </div>
                 <InputText
                     id="storyTitle"
-                    v-model="title"
+                    v-model.trim="title"
                     :label="$t('additional:modules.storyCreator.addElementDropdown.feature.title')"
                     :placeholder="$t('additional:modules.storyCreator.addElementDropdown.feature.title')"
                     class="mb-4"
+                    @blur="title = getTitle(title)"
                 />
                 <InputText
                     id="storyDescription"
-                    v-model="description"
+                    v-model.trim="description"
                     :label="$t('additional:modules.storyCreator.addElementDropdown.feature.description')"
                     :placeholder="$t('additional:modules.storyCreator.addElementDropdown.feature.description')"
                     html-type="textarea"
@@ -263,7 +350,7 @@ export default {
                     :icon="'bi-save'"
                     :text="$t('additional:modules.storyCreator.addElementDropdown.feature.save')"
                     :title="$t('additional:modules.storyCreator.addElementDropdown.feature.save')"
-                    :interaction="() => {}"
+                    :interaction="() => saveFeature()"
                 />
                 <FlatButton
                     id="cancel"
@@ -272,19 +359,19 @@ export default {
                     :text="$t('additional:modules.storyCreator.addElementDropdown.feature.cancel')"
                     :title="$t('additional:modules.storyCreator.addElementDropdown.feature.cancel')"
                     :secondary="true"
-                    :interaction="() => currentFeature = null"
+                    :interaction="() => attributes = null"
                 />
             </div>
         </div>
         <div
-            v-if="!currentFeature || !selectedLayers.length"
+            v-if="!attributes || !selectedLayers.length"
             class="bg-white rounded-3 p-4 d-flex align-items-center text-center"
         >
             <div class="d-flex flex-column align-items-center text-center w-100">
                 <i
                     class="bi bi-geo-alt-fill fs-1 mb-3"
                 />
-                <template v-if="selectedLayers.length && !currentFeature">
+                <template v-if="selectedLayers.length && !attributes">
                     <strong class="mb-2">{{ $t("additional:modules.storyCreator.chapter.noFeatureLinked") }}</strong>
                     <p
                         class="text-muted mb-0 px-2 px-md-5"

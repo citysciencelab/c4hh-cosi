@@ -38,7 +38,8 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
                     },
                     actions: {
                         placingPointMarker: sinon.spy(),
-                        removePointMarker: sinon.spy()
+                        removePointMarker: sinon.spy(),
+                        zoomToCoordinates: sinon.spy()
                     }
                 }
             },
@@ -51,7 +52,8 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
                 plugins: [store]
             },
             props: {
-                selectedLayers: []
+                selectedLayers: [],
+                initialContent: undefined
             }
         });
     });
@@ -92,20 +94,61 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
         });
 
         it("should render the InputText component", async () => {
-            await wrapper.setData({currentFeature: {}});
+            await wrapper.setData({attributes: {}});
 
             expect(wrapper.findComponent({name: "InputText"}).exists()).to.be.true;
             expect(wrapper.findAllComponents({name: "InputText"}).length).to.equal(2);
         });
 
         it("should render a table", async () => {
-            await wrapper.setData({currentFeature: {id: "1"}});
+            await wrapper.setData({attributes: {id: "1"}});
 
             expect(wrapper.find(".table").exists()).to.be.true;
+        });
+
+        it("should render the FlatButton component", async () => {
+            await wrapper.setData({attributes: {}});
+
+            expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
+            expect(wrapper.findAllComponents({name: "FlatButton"}).length).to.equal(2);
         });
     });
 
     describe("Methods", () => {
+        describe("getTitle", () => {
+            it("should return the default title", () => {
+                expect(wrapper.vm.getTitle("title")).to.equal("title");
+            });
+
+            it("should call the function getDefaultTitle", () => {
+                const spyGetDefaultTitle = sinon.spy(wrapper.vm, "getDefaultTitle");
+
+                wrapper.vm.getTitle(null);
+
+                expect(spyGetDefaultTitle.calledOnce).to.be.true;
+            });
+
+            it("should return the title from initial content", () => {
+                wrapper = shallowMount(StoryCreatorAddFeatureCard, {
+                    global: {
+                        plugins: [store]
+                    },
+                    props: {
+                        selectedLayers: [{layerId: "1"}],
+                        initialContent: {
+                            attrs: {
+                                title: "title"
+                            }
+                        }
+                    }
+                });
+
+                sinon.spy(wrapper.vm, "getDefaultTitle");
+
+                expect(wrapper.vm.getTitle(null)).to.equal("title");
+            });
+        });
+
         describe("removeAttribute", () => {
             it("should not delete any element", async () => {
                 await wrapper.setData({attributes: {id: "1", text: "text"}});
@@ -119,6 +162,14 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
 
                 wrapper.vm.removeAttribute("text");
                 expect(wrapper.vm.attributes).to.deep.equal({id: "1"});
+            });
+        });
+
+        describe("saveFeature", () => {
+            it("should emit the function addFeature", async () => {
+                wrapper.vm.saveFeature();
+                await wrapper.vm.$nextTick();
+                expect(wrapper.emitted()).to.have.property("addFeature");
             });
         });
     });

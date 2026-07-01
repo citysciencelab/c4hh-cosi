@@ -330,6 +330,13 @@ export default {
             if (this.isContentEditorOpen) {
                 return;
             }
+            if (type === "feature") {
+                const layerId = this.content[index].attrs?.layerId;
+
+                if (!this.selectedLayers.some(layer => layer.layerId === layerId)) {
+                    this.selectedLayers.push(...this.layerList.filter(layer => layer.layerId === layerId));
+                }
+            }
             this.openContentEditor = {
                 type,
                 index
@@ -590,6 +597,29 @@ export default {
             };
 
             this.$emit("save-chapter", chapter);
+        },
+        /**
+         * Handles image add/edit by writing it to the content array and closing the open editor.
+         * @param {Object} image - The image object containing id, alt, copyright, and objectURL.
+         * @returns {void}
+         */
+         handleFeature (feature) {
+            if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
+                const editIndex = this.openContentEditor.index;
+
+                this.content.splice(editIndex, 1, {
+                    type: "feature",
+                    attrs: feature
+                });
+            }
+            else {
+                this.content.push({
+                    type: "feature",
+                    attrs: feature
+                });
+            }
+
+            this.closeContentEditor();
         },
         /**
          * Handles image add/edit by writing it to the content array and closing the open editor.
@@ -941,6 +971,49 @@ export default {
                                 <div v-html="tipTapJsonToHtml(element)" />
                             </div>
                         </div>
+                        <div
+                            v-else-if="element.type === 'feature'"
+                            class="chapter-content-item__wrapper"
+                        >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
+                            <StoryCreatorAddFeatureCard
+                                v-if="isEditingContentItem(index)"
+                                class="mt-2"
+                                :initial-content="element"
+                                :selected-layers="selectedLayers"
+                                @addFeature="handleFeature"
+                                @click:close="closeContentEditor"
+                            />
+                            <div
+                                v-else
+                                class="p-4 rounded-3 chapter-content-item__preview"
+                                :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
+                                role="button"
+                                tabindex="0"
+                                @click="openContentEditorForEdit(index, 'feature')"
+                                @keydown.enter="openContentEditorForEdit(index, 'feature')"
+                                @keydown.space.prevent="openContentEditorForEdit(index, 'feature')"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-2 chapter-content-item__close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
+                                <FlatButton
+                                    :id="'feature' + index"
+                                    class="mb-3"
+                                    :icon="'bi-geo-alt-fill'"
+                                    :text="element.attrs.title"
+                                    :title="element.attrs.title"
+                                    :interaction="() => {}"
+                                />
+                            </div>
+                        </div>
                     </div>
                 </template>
             </Draggable>
@@ -968,6 +1041,7 @@ export default {
                 v-else-if="isAddingContentType('feature')"
                 class="mt-2"
                 :selected-layers="selectedLayers"
+                @addFeature="handleFeature"
                 @click:close="closeContentEditor"
             />
         </AccordionItem>
