@@ -114,6 +114,10 @@ export default {
 
 <style lang="scss" scoped>
 
+.nav-tabs {
+border: 0;
+}
+
 .feature-lister-list {
     margin-bottom: 0;
     display: contents;
@@ -122,10 +126,7 @@ export default {
 .panel-heading {
     color: $dark_grey;
     cursor: default;
-    border-left: 1px solid $light_grey;
-    border-right: 1px solid $light_grey;
     padding: 10px 15px;
-    border-bottom: 1px solid transparent;
     font-weight: bold;
 }
 
