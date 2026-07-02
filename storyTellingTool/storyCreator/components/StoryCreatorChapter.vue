@@ -376,7 +376,9 @@ export default {
 
             if (Array.isArray(chapter.map.layers)) {
                 chapter.map.layers.forEach(layerId => {
-                    this.applyLayerVisibility({id: layerId});
+                    if (this.allBaselayerConfigs.some(layer => layer.id === layerId)) {
+                        this.applyLayerVisibility({id: layerId});
+                    }
                 });
             }
 
