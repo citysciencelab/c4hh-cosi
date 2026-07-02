@@ -2,6 +2,7 @@
     "modules": {
         "storyPlayer": {
             "name": "Story Wiedergabe",
+            "close": "schließen",
             "description": "Bitte eine Beschreibung einfügen.",
             "tableOfContents": "Inhaltsverzeichnis",
             "goToPrevStep": "Zum vorherigen Kapitel gehen",

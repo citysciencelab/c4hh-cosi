@@ -1,28 +1,36 @@
 <script>
 import axios from "axios";
 import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import Overlay from "ol/Overlay.js";
+import StoryPlayerFeature from "./StoryPlayerFeature.vue";
 import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/tipTapJsonToHtml";
 
 export default {
     name: "StoryPlayer",
     components: {
-        IconButton
+        FlatButton,
+        IconButton,
+        StoryPlayerFeature
     },
     data () {
         return {
             currentIndex: -1,
             currentChapterIndex: 0,
-            loadedContent: null,
+            featureAttributes: null,
+            interval: null,
             isHovering: null,
             isChangeFrom3D: false,
-            showMode: "",
-            interval: null,
-            toolBodyScrollTop: 0,
+            loadedContent: null,
+            overlay: null,
             scroller: null,
-            showStickyHeader: false
+            showMode: "",
+            showStickyHeader: false,
+            toolBodyScrollTop: 0
         };
     },
     computed: {
@@ -79,6 +87,8 @@ export default {
         currentChapterIndex () {
             this.deactivateSubjectLayer();
             this.loadChapter();
+            this.removePointMarker();
+            mapCollection.getMap("2D").removeOverlay(this.overlay);
         }
     },
     created () {
@@ -136,6 +146,7 @@ export default {
         this.deactivateSubjectLayer();
         this.updateLayerConfigs(this.originalLayerConfig);
         this.deactivateTool();
+        this.closePopup();
     },
     methods: {
         ...mapMutations("Modules/StoryPlayer", [
@@ -153,7 +164,7 @@ export default {
         ]),
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapMutations("Menu", ["setExpandedBySide"]),
-        ...mapActions("Maps", ["changeMapMode"]),
+        ...mapActions("Maps", ["changeMapMode", "placingPointMarker", "removePointMarker", "zoomToCoordinates"]),
         ...mapActions(["addLayerToLayerConfig", "addOrReplaceLayer", "replaceByIdInLayerConfig", "updateLayerConfigs"]),
         ...mapActions("Menu", ["changeCurrentComponent", "resetMenu"]),
 
@@ -174,6 +185,14 @@ export default {
 
             this.setExpandedBySide({expanded: true, side: toolMenuSide});
             this.changeCurrentComponent({type: toolId, side: toolMenuSide, props: {name}});
+        },
+        /**
+         * Closes the popup overlay and remove the point marker.
+         * @returns {void}
+         */
+        closePopup () {
+            this.removePointMarker();
+            mapCollection.getMap("2D").removeOverlay(this.overlay);
         },
         /**
          * Deactivates current subject layers from tree and map.
@@ -397,6 +416,8 @@ export default {
             if (this.currentChapterIndex > 0) {
                 this.currentChapterIndex -= 1;
                 this.scrollToActiveStep();
+                this.removePointMarker();
+                mapCollection.getMap("2D").removeOverlay(this.overlay);
             }
         },
         /**
@@ -407,7 +428,31 @@ export default {
             if (this.currentChapterIndex < this.storyConf.chapters.length - 1) {
                 this.currentChapterIndex += 1;
                 this.scrollToActiveStep();
+                this.removePointMarker();
+                mapCollection.getMap("2D").removeOverlay(this.overlay);
             }
+        },
+        /**
+         * Opens the popup window to show the feature atrributes.
+         * @param {Object} val the attributes of the feature.
+         * @returns {void}
+         */
+        openFeaturePopup (val) {
+            if (!isObject(val)) {
+                return;
+            }
+
+            this.placingPointMarker(val?.coordinate);
+            this.zoomToCoordinates({center: val?.coordinate, zoom: val?.zoomlevel});
+            this.featureAttributes = val;
+            this.overlay = new Overlay({
+                    element: this.$refs.storyPlayerFeature,
+                    positioning: "bottom-center",
+                    offset: [0, -10]
+                });
+
+            mapCollection.getMap("2D").addOverlay(this.overlay);
+            this.overlay.setPosition(val?.coordinate);
         },
         /**
          * Scrolls the step into view
@@ -676,8 +721,21 @@ export default {
                                     </div>
                                     <div
                                         v-else-if="item.type === 'doc'"
+                                        class="mb-3"
                                         v-html="tipTapJsonToHtml(item)"
                                     />
+                                    <div
+                                        v-else-if="item.type === 'feature'"
+                                    >
+                                        <FlatButton
+                                            :id="'feature' + itemIndex"
+                                            class="mb-3"
+                                            :icon="'bi-geo-alt-fill'"
+                                            :text="item.attrs.title"
+                                            :title="item.attrs.title"
+                                            :interaction="() => openFeaturePopup(item.attrs)"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -709,6 +767,14 @@ export default {
             :icon-array="['bi-arrow-up fs-3']"
             @click="scrollToTop"
         />
+        <div ref="storyPlayerFeature">
+            <StoryPlayerFeature
+                v-if="featureAttributes"
+                :key="featureAttributes?.title"
+                :feature-attributes="featureAttributes"
+                @closePopup="closePopup"
+            />
+        </div>
     </div>
 </template>
 

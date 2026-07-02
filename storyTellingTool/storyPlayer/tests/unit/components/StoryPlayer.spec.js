@@ -8,9 +8,23 @@ import StoryPlayer from "../../../components/StoryPlayer.vue";
 describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
     let wrapper,
         store,
+        map,
         originalXMLHttpRequest,
         originalIntersectionObserver,
         originalScrollIntoView;
+
+    beforeAll(() => {
+        map = {
+            id: "ol",
+            mode: "2D",
+            addOverlay: sinon.spy(),
+            getLayers: sinon.spy(),
+            removeOverlay: sinon.spy()
+        };
+
+        mapCollection.clear();
+        mapCollection.addMap(map, "2D");
+    });
 
     beforeEach(() => {
         // Save original XMLHttpRequest
@@ -172,7 +186,9 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 Maps: {
                     namespaced: true,
                     actions: {
-                        changeMapMode: sinon.stub()
+                        changeMapMode: sinon.stub(),
+                        placingPointMarker: sinon.spy(),
+                        removePointMarker: sinon.spy()
                     },
                     getters: {
                         mode: () => "2D"
@@ -364,6 +380,16 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
 
             expect(floatingButton.exists()).to.be.true;
         });
+
+        it("should not render StoryPlayerFeature component", () => {
+            expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.false;
+        });
+
+        it("should render StoryPlayerFeature component", async () => {
+            await wrapper.setData({featureAttributes: {}});
+
+            expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.true;
+        });
     });
 
     describe("Methods", () => {
@@ -505,6 +531,54 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
 
                 goNextSpy.restore();
                 goPrevSpy.restore();
+            });
+        });
+
+        describe("openFeaturePopup", () => {
+            it("should not call placingPointMarker and zoomToCoordinates", () => {
+                const placingPointMarkerSpy = sinon.spy(wrapper.vm, "placingPointMarker"),
+                    zoomToCoordinatesSpy = sinon.spy(wrapper.vm, "zoomToCoordinates");
+
+                wrapper.vm.openFeaturePopup(null);
+                expect(placingPointMarkerSpy.called).to.be.false;
+                expect(zoomToCoordinatesSpy.called).to.be.false;
+
+                wrapper.vm.openFeaturePopup(0);
+                expect(placingPointMarkerSpy.called).to.be.false;
+                expect(zoomToCoordinatesSpy.called).to.be.false;
+
+                wrapper.vm.openFeaturePopup([]);
+                expect(placingPointMarkerSpy.called).to.be.false;
+                expect(zoomToCoordinatesSpy.called).to.be.false;
+
+                wrapper.vm.openFeaturePopup(true);
+                expect(placingPointMarkerSpy.called).to.be.false;
+                expect(zoomToCoordinatesSpy.called).to.be.false;
+
+                wrapper.vm.openFeaturePopup("");
+                expect(placingPointMarkerSpy.called).to.be.false;
+                expect(zoomToCoordinatesSpy.called).to.be.false;
+
+                wrapper.vm.openFeaturePopup(undefined);
+                expect(placingPointMarkerSpy.called).to.be.false;
+                expect(zoomToCoordinatesSpy.called).to.be.false;
+            });
+
+            it("should call placingPointMarker and zoomToCoordinates", () => {
+                const placingPointMarkerSpy = sinon.spy(wrapper.vm, "placingPointMarker"),
+                    zoomToCoordinatesSpy = sinon.spy(wrapper.vm, "zoomToCoordinates");
+
+                wrapper.vm.openFeaturePopup({});
+                expect(placingPointMarkerSpy.called).to.be.true;
+                expect(zoomToCoordinatesSpy.called).to.be.true;
+            });
+
+            it("should render StoryPlayerFeature component", async () => {
+                await wrapper.setData({featureAttributes: undefined});
+                expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.false;
+
+                await wrapper.vm.openFeaturePopup({});
+                expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.true;
             });
         });
     });

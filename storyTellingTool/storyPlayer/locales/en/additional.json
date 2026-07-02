@@ -2,6 +2,7 @@
     "modules": {
         "storyPlayer": {
             "name": "Story Player",
+            "close": "Close",
             "description": "Please insert a description.",
             "tableOfContents": "Table of Contents",
             "goToPrevStep": "Go to the previous chapter",
