@@ -15,6 +15,7 @@
  * @property {ol/layer[]} originalLayerConfig the original layer configs.
  * @property {Object[]} storyList List entries with story and image assets.
  * @property {Object} subjectLayerCategory - The subject layer category for layer selection.
+ * @property {String[]} [toolStoryWhitelist=[]] - List of tool type IDs to show in the StoryCreator tool selector. Empty array means all configured tools are shown.
  */
 const state = {
     id: "storyManager",
@@ -24,6 +25,7 @@ const state = {
     hasMouseMapInteractions: true,
     enableCreator: true,
     enableImport: true,
+    toolStoryWhitelist: ["measure", "coordToolkit", "legend", "scaleSwitcher", "shareView", "draw_old"],
     currentStoryIndex: undefined,
     fixedStoryPath: "./assets",
     fixedStoryFiles: [],

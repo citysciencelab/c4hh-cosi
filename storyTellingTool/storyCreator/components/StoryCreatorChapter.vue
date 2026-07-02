@@ -85,7 +85,7 @@ export default {
     },
     computed: {
         ...mapGetters(["allLayerConfigs", "allBaselayerConfigs", "visibleBaselayerConfigs", "configuredModules", "layerConfigById"]),
-        ...mapGetters("Modules/StoryManager", ["originalLayerConfig", "subjectLayerCategory"]),
+        ...mapGetters("Modules/StoryManager", ["originalLayerConfig", "subjectLayerCategory", "toolStoryWhitelist"]),
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
          * @returns {Boolean} True if position or zoom has changed, otherwise false.
@@ -540,8 +540,12 @@ export default {
                 return [];
             }
             let toolList = [];
+            const whitelist = Array.isArray(this.toolStoryWhitelist) ? this.toolStoryWhitelist : [];
 
             modules.forEach(val => {
+                if (whitelist.length > 0 && !whitelist.includes(val?.type)) {
+                    return;
+                }
                 const capModuleName = val?.type.charAt(0).toUpperCase() + val?.type.slice(1),
                       key = typeof store.getters["Modules/" + capModuleName + "/name"] !== "undefined" ? store.getters["Modules/" + capModuleName + "/name"] : capModuleName;
 

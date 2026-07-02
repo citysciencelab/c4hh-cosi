@@ -31,7 +31,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                 imageAssetsById: (state) => state.imageAssetsById,
                                 originalLayerConfig: (state) => state.originalLayerConfig,
                                 story: (state) => state.story,
-                                subjectLayerCategory: (state) => state.subjectLayerCategory
+                                subjectLayerCategory: (state) => state.subjectLayerCategory,
+                                toolStoryWhitelist: (state) => state.toolStoryWhitelist
                             },
                             mutations: {
                                 removeImageAsset (state, id) {
@@ -64,7 +65,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                 story: {
                                     chapters: []
                                 },
-                                subjectLayerCategory: {}
+                                subjectLayerCategory: {},
+                                toolStoryWhitelist: []
                             }
                         },
                         LayerTree: {
