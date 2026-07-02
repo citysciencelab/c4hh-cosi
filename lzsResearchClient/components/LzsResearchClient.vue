@@ -22,7 +22,8 @@ export default {
             modalDismissed: false,
             newSearchPerformed: false,
             tabWatcherAttached: false,
-            unwatchTabContainer: null
+            unwatchTabContainer: null,
+            initialMenuWidth: "25%"
         };
     },
     computed: {
@@ -35,7 +36,11 @@ export default {
             "currentProgressValue",
             "progressNow",
             "searchAttributeResponse",
-            "selectedDetail"
+            "selectedDetail",
+            "menuWidthOnStart"
+        ]),
+        ...mapGetters("Menu", [
+            "currentMenuWidth"
         ]),
         progressBarWidthClass () {
             return `width: ${this.progressNow}%;`;
@@ -136,6 +141,9 @@ export default {
 
         // Call handleTabChange to ensure the correct state is set for the active tab when the component is activated.
         this.handleTabChange(tabContainerRef, tabContainerRef.activeTabIdLocal, "tabSearch");
+
+        this.initialMenuWidth = this.currentMenuWidth(this.$attrs.side);
+        this.setCurrentMenuWidth({side: this.$attrs.side, width: this.menuWidthOnStart});
     },
     /**
      * Triggered if component is deactivated.
@@ -159,6 +167,8 @@ export default {
         if (tabResult) {
             tabResult.hideGeom();
         }
+
+        this.setCurrentMenuWidth({side: this.$attrs.side, width: this.initialMenuWidth});
     },
     methods: {
         ...mapActions("Modules/LzsResearchClient", [
@@ -170,6 +180,7 @@ export default {
             "setProgressNow",
             "setCurrentProgressValue"
         ]),
+        ...mapMutations("Menu", ["setCurrentMenuWidth"]),
         hideErrorMessage () {
             this.setErrorMessage("");
         },

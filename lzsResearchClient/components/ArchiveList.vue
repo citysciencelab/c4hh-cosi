@@ -5,7 +5,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import Multiselect from "vue-multiselect";
 import TabResultTable from "./TabResultTable.vue";
-import {getTranslationForAttribute} from "../utils/translationHelpers";
+import {getTranslationForAttribute, capitalizeString} from "../utils/translationHelpers";
 
 export default {
     name: "ArchiveList",
@@ -222,6 +222,8 @@ export default {
                 headers = headers.filter(a => a !== step.attributeToGroupBy);
             }
 
+            headers = headers.map(header => capitalizeString(header));
+
             this.additionalHeaders.forEach((header) => {
                 if (!this.archiveHasGeoref(step.archiveId) && header === this.$t("additional:modules.lzsResearchClient.tabs.archiveList.table.headers.position")) {
                     return;
@@ -388,7 +390,7 @@ export default {
          * @returns {String} The translated label or the fallback value.
          */
         getTranslationForAttributeWrapper (key, fallback) {
-            return getTranslationForAttribute(key, fallback);
+            return capitalizeString(getTranslationForAttribute(key, fallback));
         }
     }
 };
@@ -547,6 +549,7 @@ export default {
                 border-radius: 999px;
                 background: #fff;
                 font-weight: bold;
+                font-family: $font_family_accent;
                 margin-left: 1rem;
             }
         }

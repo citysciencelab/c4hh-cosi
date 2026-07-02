@@ -6,7 +6,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
 import {roundFileSizeToFixed} from "../utils/zipHelpers";
-import {getTranslationForAttribute} from "../utils/translationHelpers";
+import {getTranslationForAttribute, capitalizeString} from "../utils/translationHelpers";
 
 export default {
     name: "TabDetails",
@@ -100,7 +100,7 @@ export default {
                   filteredHeaders = headers
                       .filter(header => !attributeNames.includes(header))
                       .map((header) => {
-                          return getTranslationForAttribute(`additional:modules.lzsResearchClient.tabs.tabDetails.${header.toLowerCase()}`, header);
+                          return capitalizeString(getTranslationForAttribute(`additional:modules.lzsResearchClient.tabs.tabDetails.${header.toLowerCase()}`, header));
                       });
 
             filteredHeaders.push(this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"));
@@ -200,7 +200,7 @@ export default {
          * @returns {String} The translated label or the fallback value.
          */
         getTranslationForAttributeWrapper (key, fallback) {
-            return getTranslationForAttribute(key, fallback);
+            return capitalizeString(getTranslationForAttribute(key, fallback));
         }
     }
 };
@@ -329,6 +329,7 @@ export default {
             border-radius: 999px;
             background: #fff;
             font-weight: bold;
+            font-family: $font_family_accent;
             margin-left: 1rem;
         }
     }

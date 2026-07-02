@@ -185,8 +185,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
         expect(lengthOfDatasets + numberOfAdditionalButtons).to.equal(lengthOfHeaders);
         expect(wrapper.vm.getTableHeaders()).to.deep.equal(
             [
-                "AKTENHINWEIS",
-                "SEITENNUMMER",
+                "Aktenhinweis",
+                "Seitennummer",
                 "additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB",
                 "additional:modules.lzsResearchClient.tabs.archiveList.table.headers.preview",
                 "additional:modules.lzsResearchClient.tabs.archiveList.table.headers.download"
@@ -218,8 +218,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
         expect(lengthOfDatasets + numberOfAdditionalButtons).to.equal(lengthOfHeaders);
         expect(wrapper.vm.getTableHeaders()).to.deep.equal(
             [
-                "AKTENHINWEIS",
-                "SEITENNUMMER",
+                "Aktenhinweis",
+                "Seitennummer",
                 "additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB",
                 "additional:modules.lzsResearchClient.tabs.archiveList.table.headers.download"
             ]

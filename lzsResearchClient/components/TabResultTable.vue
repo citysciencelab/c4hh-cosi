@@ -417,31 +417,36 @@ export default {
                         @click.stop="toggleAllRows(!headerChecked)"
                         @keypress.stop="toggleAllRows(!headerChecked)"
                     >
-                        <input
-                            id="header-checkbox"
-                            type="checkbox"
-                            :checked="headerChecked"
-                            @change="(evt) => toggleAllRows(evt.target.checked)"
-                        >
+                        <div class="th-content">
+                            <input
+                                id="header-checkbox"
+                                type="checkbox"
+                                :checked="headerChecked"
+                                @change="(evt) => toggleAllRows(evt.target.checked)"
+                            >
+                        </div>
                     </th>
                     <th
                         v-for="(attrName, attrIndex) in tableHeader"
                         :key="attrName"
                         :class="`th-item-${attrName}`"
                     >
-                        <span>
-                            {{ attrName }}
-                        </span>
+                        <div
+                            class="th-content"
+                            :title="attrName"
+                        >
+                            <span class="th-title">{{ attrName }}</span>
 
-                        <span
-                            v-if="attrIndex < sortableHeaderCount"
-                            class="sortable-icon mt-1"
-                            role="button"
-                            tabindex="0"
-                            :class="getIconClassForSorting(attrIndex)"
-                            @click.stop="changeSorting(attrIndex)"
-                            @keypress.stop="changeSorting(attrIndex)"
-                        />
+                            <span
+                                v-if="attrIndex < sortableHeaderCount"
+                                class="sortable-icon mt-1"
+                                role="button"
+                                tabindex="0"
+                                :class="getIconClassForSorting(attrIndex)"
+                                @click.stop="changeSorting(attrIndex)"
+                                @keypress.stop="changeSorting(attrIndex)"
+                            />
+                        </div>
                     </th>
                 </tr>
             </thead>
@@ -472,12 +477,17 @@ export default {
                         @click.stop="showCheckboxes ? toggleOneRow(dataset, !dataset.checked) : undefined"
                         @keypress.stop="showCheckboxes ? toggleOneRow(dataset, !dataset.checked) : undefined"
                     >
-                        {{
-                            (dataset.attributes.find(a => (a.id || a.name) === attrName) || {}).value || ''
-                        }}
+                        <span class="td-content">
+                            {{
+                                (dataset.attributes.find(a => (a.id || a.name) === attrName) || {}).value || ''
+                            }}
+                        </span>
                     </td>
 
-                    <td v-if="showButtons.georef">
+                    <td
+                        v-if="showButtons.georef"
+                        class="action-col"
+                    >
                         <IconButton
                             v-if="hasGeoRef"
                             :class-array="[
@@ -495,7 +505,10 @@ export default {
                         />
                     </td>
 
-                    <td v-if="showButtons.details">
+                    <td
+                        v-if="showButtons.details"
+                        class="action-col"
+                    >
                         <IconButton
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.goToDetails')"
@@ -504,7 +517,10 @@ export default {
                         />
                     </td>
 
-                    <td v-if="showButtons.preview && dataset.primaryDataId">
+                    <td
+                        v-if="showButtons.preview && dataset.primaryDataId"
+                        class="action-col"
+                    >
                         <IconButton
                             v-if="dataset.hasPreview"
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
@@ -514,7 +530,10 @@ export default {
                         />
                     </td>
 
-                    <td v-if="showButtons.download && dataset.primaryDataId">
+                    <td
+                        v-if="showButtons.download && dataset.primaryDataId"
+                        class="action-col"
+                    >
                         <IconButton
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
                             :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.download')"
@@ -533,19 +552,47 @@ export default {
 .TabResultTable {
     table {
         width: 100%;
+        table-layout: fixed;
+        border-collapse: collapse;
+        overflow: hidden;
 
         th {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+
             &:first-child {
                 padding-left: 1rem;
             }
             span.sortable-icon {
                 cursor: pointer;
                 margin: 0 0 0 0.5rem;
+                flex: 0 0 auto;
 
                 &:hover {
                     background-color: $light_grey_hover;
                 }
             }
+
+            .th-content {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                white-space: nowrap;
+            }
+
+            .th-title {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                display: inline-block;
+                flex: 0 1 auto;
+                min-width: 0;
+                font-family: $font_family_accent;
+            }
+
+            padding-right: 0.5rem;
         }
 
         tr {
@@ -566,6 +613,29 @@ export default {
             td:first-child {
                 padding-left: 1rem;
             }
+        }
+
+        td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 0;
+        }
+
+        .td-content {
+            display: block;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .action-col {
+            width: 3rem;
+            max-width: 3rem;
+            min-width: 3rem;
+            text-align: center;
+            white-space: nowrap;
         }
     }
 

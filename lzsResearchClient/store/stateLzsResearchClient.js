@@ -21,6 +21,7 @@ import stateSearchBar from "./searchBar/stateSearchBar.js";
  * @property {String} zipFileName - name part of the created zip file name, will be extended by '.zip'
  * @property {Number} maxDownloadMB - maximal allowed size of files to select for download in MB (default 500, set -1 to skip max size check)
  * @property {Number} maxResultValueCount - maximal number of results to be requested from server in attributive search (default 25)
+ * @property {String} menuWidthOnStart - percentage of width for sidebar when opening this addon initially (default '40%')
 
  * Addon state
  * @property {Boolean} showLoadingSpinner - Show loading spinner or not
@@ -67,6 +68,7 @@ const state = {
     zipFileName: "GeoDataDepot-Download",
     maxDownloadMB: 500,
     maxResultValueCount: 25,
+    menuWidthOnStart: "40%",
 
     // Addon state
     showLoadingSpinner: false,
