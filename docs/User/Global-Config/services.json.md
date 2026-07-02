@@ -778,7 +778,7 @@ Settings related to layer metadata.
 
 All metadata of the layer data is referenced here. By clicking the "i" button in the layer tree, the information is retrieved by the CSW interface and shown to the user.
 For this, the **[rest-services.json](rest-services.json.md)** has to provide the URL of the metadata catalog resp. its CSW interface.
-The values *kategorie_opendata*, *kategorie_inspire*, and *kategorie_organisation* are used for layer categorization if the **[config.json](../Portal-Config/config.json.md)** has `tree.type` set to `"default"`.
+The values *kategorie_opendata*, *kategorie_inspire*, and *kategorie_organisation* are used for layer categorization if the **[config.json](../Portal-Config/config.json.md)** has `tree.type` set to `"auto"`.
  It is also possible to retrieve metadata with a getMetaData request. In this case, additional information can be displayedn/activate. To remove the "i" button altogether, explicitly set `"datasets": false`.
 
 | Name | Required | Type | Default | Description |
