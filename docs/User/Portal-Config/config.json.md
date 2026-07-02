@@ -5672,7 +5672,7 @@ A group layer is created that contains all layers of the specified ids.
 
 ```json
 {
-    "id": [ "27926", "1711", "18104"],
+    "id": [ "27926", "1711"],
     "typ": "GROUP",
     "name": "Group OAF, WFS, SensorThings",
     "visibility": false,
@@ -5687,11 +5687,6 @@ A group layer is created that contains all layers of the specified ids.
             "id": "1711",
             "styleId": "1711",
             "typ": "WFS"
-        },
-        {
-            "id": "18104",
-            "styleId": "18104",
-            "typ": "SensorThings"
         }
     ]
 }

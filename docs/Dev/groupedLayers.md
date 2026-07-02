@@ -86,7 +86,7 @@ A group with 3 layers with different `types` with `children`, in which e.g. the 
 
 ```json
 { 
-    "id": [ "27926", "1711", "18104"], 
+    "id": [ "27926", "1711"], 
     "typ": "GROUP",
     "name": "Gruppe OAF, WFS, SensorThings",
     "visibility": false,
@@ -102,11 +102,6 @@ A group with 3 layers with different `types` with `children`, in which e.g. the 
             "id": "1711",
             "styleId": "1711",
             "typ": "WFS"
-        },
-        {
-            "id": "18104",
-            "styleId": "18104",
-            "typ": "SensorThings"
         }
     ]
 }

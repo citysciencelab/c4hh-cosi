@@ -5658,7 +5658,7 @@ Es wird ein Gruppenlayer erzeugt, der alle Layer der angegeben ids enthält. Sie
 
 ```json
 {
-    "id": [ "27926", "1711", "18104"],
+    "id": [ "27926", "1711"],
     "typ": "GROUP",
     "name": "Gruppe OAF, WFS, SensorThings",
     "visibility": false,
@@ -5673,11 +5673,6 @@ Es wird ein Gruppenlayer erzeugt, der alle Layer der angegeben ids enthält. Sie
             "id": "1711",
             "styleId": "1711",
             "typ": "WFS"
-        },
-        {
-            "id": "18104",
-            "styleId": "18104",
-            "typ": "SensorThings"
         }
     ]
 }

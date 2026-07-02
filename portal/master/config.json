@@ -1199,13 +1199,6 @@
           "gfiTheme": "schulinfo"
         },
         {
-          "id": "18104",
-          "styleId": "18104",
-          "name": "Anzahl frei verfügbarer E-Lastenräder je StadtRad-Station",
-          "typ": "SensorThings",
-          "visibility": false
-        },
-        {
           "id": "20625.90024",
           "styleId": "200_300_400_600_anzahl_sus_primarstufe",
           "name": "Schüler*innen nach Sozialräumen (1 bis 4)",
