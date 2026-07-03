@@ -16,6 +16,7 @@
 ### Removed
 
 ### Fixed
+-Issue \#1630: Fixed parseMissingKeyHandler misinterpreting decimal numbers as time values (e.g. "0.58 m" became "0:58 m"). The time format replacement now requires two-digit hours only.
 
 ---
 
