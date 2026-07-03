@@ -51,6 +51,7 @@
     - Fixed a bug that showed "show more" button on certain zoom sizes and refactored how LayerPills width is calculated.
     - Layers with showInLayerTree set to false are now consistently hidden from LayerPills.
 - OAF-Layer: Fixed legend entries being incomplete or changing on zoom. The legend now shows all style-rule-defined entries regardless of the currently loaded features in the map view.
+- Filter: Fix setting filter rules from URL Parameters.
 
 ---
 
@@ -108,7 +109,6 @@
 - SearchBar: Fixed duplicated results with URL Parameter `QUERY`.
 - LayerInformation: Fixed CSS scope.
 - GetFeatureInfo: Fixed the display of the table view.
-- Filter: Fix setting filter rules from URL Parameters.
 - Draw_old: Marked `importDrawLayer` as dynamic to prevent it from being included in generated share links and causing errors in parametrized URLs.
 
 ---
