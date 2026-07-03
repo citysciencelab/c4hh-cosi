@@ -1,4 +1,5 @@
 <script>
+import {markRaw} from "vue";
 import {mapGetters, mapMutations, mapActions} from "vuex";
 import mutations from "../store/mutationsOrientation.js";
 import ControlIcon from "../../components/ControlIcon.vue";
@@ -6,6 +7,10 @@ import PoiChoice from "./poi/PoiChoice.vue";
 import PoiOrientation from "./poi/PoiOrientation.vue";
 import Geolocation from "ol/Geolocation.js";
 import Overlay from "ol/Overlay.js";
+import Feature from 'ol/Feature.js';
+import VectorSource from 'ol/source/Vector.js';
+import VectorLayer from 'ol/layer/Vector.js';
+import {Fill, Stroke, Style} from "ol/style.js";
 import proj4 from "proj4";
 import * as Proj from "ol/proj.js";
 import {Circle, LineString} from "ol/geom.js";
@@ -32,13 +37,16 @@ export default {
     data () {
         return {
             firstGeolocation: true, // flag to check if it's the first time
-            marker: new Overlay({
+            marker: markRaw(new Overlay({
                 positioning: "center-center",
                 stopEvent: false
-            }),
+            })),
             tracking: false,
             isGeolocationDenied: false,
-            isGeoLocationPossible: false
+            isGeoLocationPossible: false,
+            accuracyFeature: markRaw(new Feature()),
+            accuracyLayer: null,
+            accuracySource: null
         };
     },
     computed: {
@@ -55,7 +63,8 @@ export default {
             "showPoi",
             "showPoiChoice",
             "showPoiIcon",
-            "zoomMode"
+            "zoomMode",
+            "showAccuracy",
         ]),
         ...mapGetters("Maps", ["projection"]),
         ...mapGetters(["visibleLayerConfigs"]),
@@ -91,10 +100,66 @@ export default {
         this.addElement();
         this.checkWFS();
     },
+    beforeUnmount () {
+        this.clearAccuracyGeometry();
+        this.removeAccuracyLayer();
+    },
     methods: {
         ...mapMutations("Controls/Orientation", Object.keys(mutations)),
         ...mapActions("Maps", ["zoomToCoordinates"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
+
+        initAccuracyLayer () {
+            if (this.accuracyLayer !== null) {
+                return;
+            }
+
+            this.accuracySource = markRaw(new VectorSource());
+            this.accuracySource.addFeature(this.accuracyFeature);
+            this.accuracyLayer = markRaw(new VectorLayer({
+                id: "orientation_accuracy_layer",
+                source: this.accuracySource,
+                style: new Style({
+                    fill: new Fill({
+                        color: "rgba(100, 100, 255, 0.2)"
+                    }),
+                    stroke: new Stroke({
+                        color: "#0000ff",
+                        width: 2
+                    })
+                }),
+                zIndex: 9999
+            }));
+            mapCollection.getMap("2D").addLayer(this.accuracyLayer);
+        },
+
+        updateAccuracyGeometry () {
+            if (!this.showAccuracy || this.geolocation === null) {
+                return;
+            }
+            const accuracyGeometry = this.geolocation.getAccuracyGeometry();
+
+            if (!accuracyGeometry) {
+                return;
+            }
+
+            this.accuracyFeature.setGeometry(accuracyGeometry.clone().transform("EPSG:4326", this.projection.getCode()));
+        },
+
+        clearAccuracyGeometry () {
+            if (this.geolocation) {
+                this.geolocation.un("change:accuracyGeometry", this.updateAccuracyGeometry);
+            }
+            this.accuracyFeature.setGeometry(null);
+        },
+
+        removeAccuracyLayer () {
+            if (this.accuracyLayer !== null) {
+                mapCollection.getMap("2D").removeLayer(this.accuracyLayer);
+                this.accuracyLayer = null;
+                this.accuracySource = null;
+            }
+        },
 
         setIsGeoLocationPossible () {
             this.isGeoLocationPossible = window.location.protocol === "https:" || ["localhost", "127.0.0.1"].indexOf(window.location.hostname);
@@ -127,12 +192,17 @@ export default {
             else if (this.isGeolocationDenied === false) {
                 mapCollection.getMap("2D").addOverlay(this.marker);
                 if (this.geolocation === null) {
-                    geolocation = new Geolocation({tracking: true, projection: Proj.get("EPSG:4326")});
+                    geolocation = new Geolocation({tracking: true, projection: Proj.get("EPSG:4326"), trackingOptions: {enableHighAccuracy: true}});
                     this.setGeolocation(geolocation);
                 }
                 else {
                     geolocation = this.geolocation;
                     this.positioning();
+                }
+                if (this.showAccuracy) {
+                    this.initAccuracyLayer();
+                    geolocation.on("change:accuracyGeometry", this.updateAccuracyGeometry);
+                    this.updateAccuracyGeometry();
                 }
 
                 geolocation.on("change", this.positioning);
@@ -152,10 +222,13 @@ export default {
             const geolocation = this.geolocation;
 
             geolocation.setTracking(false); // for FireFox - cannot handle geolocation.un(...)
+            geolocation.un("change", this.positioning);
             geolocation.un("error", this.onError, this);
+            geolocation.un("change:accuracyGeometry", this.updateAccuracyGeometry);
             if (this.tracking === false || this.firstGeolocation === false) {
                 this.removeOverlay();
             }
+            this.clearAccuracyGeometry();
 
             this.tracking = false;
             this.setGeolocation(null);
@@ -292,6 +365,8 @@ export default {
             else {
                 console.error("The configured zoomMode: " + zoomMode + " does not exist. Please use the params 'once' or 'always'!");
             }
+
+            this.updateAccuracyGeometry();
 
             this.$store.dispatch("Maps/removePointMarker");
         },
