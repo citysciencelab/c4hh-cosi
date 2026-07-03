@@ -16,9 +16,16 @@ const getters = {
     currentLocale (___, __, _, rootGetters) {
         let locale = rootGetters["Modules/Language/currentLocale"];
         const supportedLanguages = ["en", "pt", "de"];
+        let storageLocale = "";
 
-        if (locale === "" && localStorage.i18nextLng && supportedLanguages.includes(localStorage.i18nextLng)) {
-            switch (localStorage.i18nextLng) {
+        if (typeof localStorage !== "undefined") {
+            storageLocale = typeof localStorage.getItem === "function"
+                ? localStorage.getItem("i18nextLng")
+                : localStorage.i18nextLng;
+        }
+
+        if (locale === "" && storageLocale && supportedLanguages.includes(storageLocale)) {
+            switch (storageLocale) {
                 case "en":
                     locale = "en-US";
                     break;
