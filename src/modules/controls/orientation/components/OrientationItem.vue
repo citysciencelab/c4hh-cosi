@@ -48,8 +48,7 @@ export default {
             isGeolocationDenied: false,
             isGeoLocationPossible: false,
             accuracyFeature: createAccuracyFeature(),
-            accuracyLayer: null,
-            accuracySource: null
+            accuracyLayer: null
         };
     },
     computed: {
@@ -104,51 +103,29 @@ export default {
         this.checkWFS();
     },
     beforeUnmount () {
-        this.clearAccuracyGeometry();
-        this.removeAccuracyLayer();
+        clearAccuracyGeometryUtil({
+            accuracyFeature: this.accuracyFeature,
+            geolocation: this.geolocation,
+            listener: this.onAccuracyGeometryChange
+        });
+        removeAccuracyLayerUtil({
+            accuracyLayer: this.accuracyLayer,
+            map: mapCollection.getMap("2D")
+        });
+        this.accuracyLayer = null;
     },
     methods: {
         ...mapMutations("Controls/Orientation", Object.keys(mutations)),
         ...mapActions("Maps", ["zoomToCoordinates"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
 
-        initAccuracyLayer () {
-            const {accuracyLayer, accuracySource} = initAccuracyLayerUtil({
-                accuracyFeature: this.accuracyFeature,
-                accuracyLayer: this.accuracyLayer,
-                map: mapCollection.getMap("2D")
-            });
-
-            this.accuracyLayer = accuracyLayer;
-            if (accuracySource !== null) {
-                this.accuracySource = accuracySource;
-            }
-        },
-
-        updateAccuracyGeometry () {
+        onAccuracyGeometryChange () {
             updateAccuracyGeometryUtil({
                 accuracyFeature: this.accuracyFeature,
                 geolocation: this.geolocation,
                 projectionCode: this.projection.getCode(),
                 showAccuracy: this.showAccuracy
             });
-        },
-
-        clearAccuracyGeometry () {
-            clearAccuracyGeometryUtil({
-                accuracyFeature: this.accuracyFeature,
-                geolocation: this.geolocation,
-                listener: this.updateAccuracyGeometry
-            });
-        },
-
-        removeAccuracyLayer () {
-            removeAccuracyLayerUtil({
-                accuracyLayer: this.accuracyLayer,
-                map: mapCollection.getMap("2D")
-            });
-            this.accuracyLayer = null;
-            this.accuracySource = null;
         },
 
         setIsGeoLocationPossible () {
@@ -194,13 +171,19 @@ export default {
         unbindGeolocationListeners (geolocation) {
             geolocation.un("change", this.positioning);
             geolocation.un("error", this.onError, this);
-            geolocation.un("change:accuracyGeometry", this.updateAccuracyGeometry);
+            geolocation.un("change:accuracyGeometry", this.onAccuracyGeometryChange);
         },
 
         bindGeolocationListeners (geolocation) {
             if (this.showAccuracy) {
-                this.initAccuracyLayer();
-                geolocation.on("change:accuracyGeometry", this.updateAccuracyGeometry);
+                const {accuracyLayer} = initAccuracyLayerUtil({
+                    accuracyFeature: this.accuracyFeature,
+                    accuracyLayer: this.accuracyLayer,
+                    map: mapCollection.getMap("2D")
+                });
+
+                this.accuracyLayer = accuracyLayer;
+                geolocation.on("change:accuracyGeometry", this.onAccuracyGeometryChange);
             }
 
             geolocation.on("change", this.positioning);
@@ -214,7 +197,7 @@ export default {
                 this.positioning();
             }
             if (this.showAccuracy) {
-                this.updateAccuracyGeometry();
+                this.onAccuracyGeometryChange();
             }
             this.tracking = true;
         },
@@ -257,7 +240,11 @@ export default {
             if (this.tracking === false || this.firstGeolocation === false) {
                 this.removeOverlay();
             }
-            this.clearAccuracyGeometry();
+            clearAccuracyGeometryUtil({
+                accuracyFeature: this.accuracyFeature,
+                geolocation,
+                listener: this.onAccuracyGeometryChange
+            });
 
             this.tracking = false;
         },
@@ -394,7 +381,7 @@ export default {
                 console.error("The configured zoomMode: " + zoomMode + " does not exist. Please use the params 'once' or 'always'!");
             }
 
-            this.updateAccuracyGeometry();
+            this.onAccuracyGeometryChange();
 
             this.$store.dispatch("Maps/removePointMarker");
         },

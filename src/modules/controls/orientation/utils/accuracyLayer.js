@@ -11,7 +11,7 @@ export function createAccuracyFeature () {
 
 export function initAccuracyLayer ({accuracyFeature, accuracyLayer, map}) {
     if (accuracyLayer !== null) {
-        return {accuracyLayer, accuracySource: null};
+        return {accuracyLayer};
     }
 
     const accuracyFillColor = getPrimaryColor(0.15);
@@ -35,7 +35,7 @@ export function initAccuracyLayer ({accuracyFeature, accuracyLayer, map}) {
     accuracySource.addFeature(accuracyFeature);
     map.addLayer(nextAccuracyLayer);
 
-    return {accuracyLayer: nextAccuracyLayer, accuracySource};
+    return {accuracyLayer: nextAccuracyLayer};
 }
 
 export function updateAccuracyGeometry ({showAccuracy, geolocation, projectionCode, accuracyFeature}) {
