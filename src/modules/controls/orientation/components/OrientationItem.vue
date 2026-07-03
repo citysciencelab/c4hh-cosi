@@ -173,13 +173,7 @@ export default {
             this.marker.setElement(document.querySelector("#geolocation_marker"));
         },
 
-        /**
-         * Tracking the geo position
-         * @returns {void}
-         */
-        track () {
-            let geolocation = null;
-
+        canStartTracking () {
             const inIframe = window.self !== window.top,
                   iFrameGeolocationEnabled = this.iFrameGeolocationEnabled === true;
 
@@ -188,41 +182,73 @@ export default {
                     category: "error",
                     content: `<strong>${this.$t("common:modules.controls.orientation.iFrameGeolocationError")}`
                 });
+                return false;
             }
-            else if (this.isGeolocationDenied === false) {
-                mapCollection.getMap("2D").addOverlay(this.marker);
-                if (this.geolocation === null) {
-                    geolocation = markRaw(new Geolocation({tracking: false, projection: Proj.get("EPSG:4326"), trackingOptions: {enableHighAccuracy: true}}));
-                    this.setGeolocation(geolocation);
-                }
-                else {
-                    geolocation = this.geolocation;
-                }
-
-                geolocation.un("change", this.positioning);
-                geolocation.un("error", this.onError, this);
-                geolocation.un("change:accuracyGeometry", this.updateAccuracyGeometry);
-
-                if (this.showAccuracy) {
-                    this.initAccuracyLayer();
-                    geolocation.on("change:accuracyGeometry", this.updateAccuracyGeometry);
-                }
-
-                geolocation.on("change", this.positioning);
-                geolocation.on("error", this.onError);
-                geolocation.setTracking(true);
-
-                if (geolocation.getPosition()) {
-                    this.positioning();
-                }
-                if (this.showAccuracy) {
-                    this.updateAccuracyGeometry();
-                }
-                this.tracking = true;
-            }
-            else {
+            if (this.isGeolocationDenied !== false) {
                 this.onError();
+                return false;
             }
+            return true;
+        },
+
+        ensureGeolocationInstance () {
+            if (this.geolocation === null) {
+                const geolocation = markRaw(new Geolocation({tracking: false, projection: Proj.get("EPSG:4326"), trackingOptions: {enableHighAccuracy: true}}));
+
+                this.setGeolocation(geolocation);
+                return geolocation;
+            }
+            return this.geolocation;
+        },
+
+        unbindGeolocationListeners (geolocation) {
+            geolocation.un("change", this.positioning);
+            geolocation.un("error", this.onError, this);
+            geolocation.un("change:accuracyGeometry", this.updateAccuracyGeometry);
+        },
+
+        bindGeolocationListeners (geolocation) {
+            if (this.showAccuracy) {
+                this.initAccuracyLayer();
+                geolocation.on("change:accuracyGeometry", this.updateAccuracyGeometry);
+            }
+
+            geolocation.on("change", this.positioning);
+            geolocation.on("error", this.onError, this);
+        },
+
+        startTrackingSession (geolocation) {
+            geolocation.setTracking(true);
+
+            if (geolocation.getPosition()) {
+                this.positioning();
+            }
+            if (this.showAccuracy) {
+                this.updateAccuracyGeometry();
+            }
+            this.tracking = true;
+        },
+
+        stopTrackingSession (geolocation) {
+            geolocation.setTracking(false); // for FireFox - cannot handle geolocation.un(...)
+            this.unbindGeolocationListeners(geolocation);
+        },
+
+        /**
+         * Tracking the geo position
+         * @returns {void}
+         */
+        track () {
+            if (!this.canStartTracking()) {
+                return;
+            }
+
+            mapCollection.getMap("2D").addOverlay(this.marker);
+            const geolocation = this.ensureGeolocationInstance();
+
+            this.unbindGeolocationListeners(geolocation);
+            this.bindGeolocationListeners(geolocation);
+            this.startTrackingSession(geolocation);
         },
 
         /**
@@ -232,10 +258,12 @@ export default {
         untrack () {
             const geolocation = this.geolocation;
 
-            geolocation.setTracking(false); // for FireFox - cannot handle geolocation.un(...)
-            geolocation.un("change", this.positioning);
-            geolocation.un("error", this.onError, this);
-            geolocation.un("change:accuracyGeometry", this.updateAccuracyGeometry);
+            if (!geolocation) {
+                this.tracking = false;
+                return;
+            }
+
+            this.stopTrackingSession(geolocation);
             if (this.tracking === false || this.firstGeolocation === false) {
                 this.removeOverlay();
             }
