@@ -11,16 +11,22 @@ import {nextTick} from "vue";
 
 config.global.mocks.$t = key => key;
 
-
 describe("src/modules/filter/components/GeometryFilter.vue", () => {
     let wrapper = null,
         sandbox,
-        store;
-
-    const stubChangeCurrentMouseMapInteractionsComponent = sinon.stub();
+        store,
+        stubChangeCurrentMouseMapInteractionsComponent,
+        map;
 
     beforeEach(() => {
         sandbox = sinon.createSandbox();
+        stubChangeCurrentMouseMapInteractionsComponent = sandbox.stub();
+        map = {
+            id: "ol",
+            mode: "2D",
+            removeLayer: sandbox.stub()
+        };
+        mapCollection.addMap(map, "2D");
         store = createStore({
             namespaced: true,
             modules: {
@@ -71,6 +77,10 @@ describe("src/modules/filter/components/GeometryFilter.vue", () => {
     });
 
     afterEach(() => {
+        if (wrapper) {
+            wrapper.unmount();
+            wrapper = null;
+        }
         sandbox.restore();
     });
 

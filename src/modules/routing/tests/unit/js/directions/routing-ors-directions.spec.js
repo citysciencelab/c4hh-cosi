@@ -9,7 +9,7 @@ import {fetchRoutingOrsDirections, getRoutingDirectionsSettingsUrl, routingOrsPr
 
 describe("src/modules/routing/js/directions/routing-ors-directions.js", () => {
     let service;
-    const originWindow = global.window;
+    const originStoreGetter = store.getters;
 
     beforeEach(() => {
         service = "https://tmp";
@@ -19,15 +19,13 @@ describe("src/modules/routing/js/directions/routing-ors-directions.js", () => {
                 return {url: service};
             }
         };
-        global.window = {
-            location: {
-                origin: "https://origin"
-            }
-        };
+        sinon.stub(window, "location").value({
+            origin: "https://origin"
+        });
     });
 
     afterEach(() => {
-        global.window = originWindow;
+        store.getters = originStoreGetter;
     });
 
     describe("should fetchRoutingOrsDirections", () => {

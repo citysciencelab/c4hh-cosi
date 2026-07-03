@@ -16,6 +16,7 @@ import Layer2dVectorSensorThings from "@core/layers/js/layer2dVectorSensorThings
 
 describe("src/core/js/layers/layer2dVectorSensorThings.js", () => {
     let origDispatch,
+        origGetters,
         attributes,
         errorStub,
         sensorThingsLayer,
@@ -46,6 +47,7 @@ describe("src/core/js/layers/layer2dVectorSensorThings.js", () => {
 
         mapCollection.addMap(map, "2D");
         origDispatch = store.dispatch;
+        origGetters = store.getters;
     });
 
     beforeEach(() => {
@@ -83,6 +85,7 @@ describe("src/core/js/layers/layer2dVectorSensorThings.js", () => {
 
     afterEach(() => {
         store.dispatch = origDispatch;
+        store.getters = origGetters;
     });
 
     describe("createLayer", () => {

@@ -1,5 +1,6 @@
 import axios from "axios";
 import store from "@appstore/index.js";
+import state from "@modules/routing/store/stateRouting.js";
 import {expect} from "chai";
 import sinon from "sinon";
 import {RoutingGeosearchResult} from "@modules/routing/js/classes/routing-geosearch-result.js";
@@ -39,6 +40,9 @@ describe("src/modules/routing/js/geosearch/routing-specialWfs-geosearch.js", () 
       </gml:featureMember>
     </wfs:FeatureCollection>`;
 
+    const originStoreGetter = store.getters,
+        originGeosearch = structuredClone(state.geosearch);
+
     beforeEach(() => {
         sinon.stub(console, "error").callsFake(sinon.spy());
         sinon.stub(i18next, "t").callsFake((...args) => args);
@@ -46,11 +50,15 @@ describe("src/modules/routing/js/geosearch/routing-specialWfs-geosearch.js", () 
             restServiceById: () => ({url: "tmp"}),
             directionsWaypointsSource: () => []
         };
-        store.state.Modules.Routing.geosearch.propertyNames = ["ms:LABEL_TEXT"];
-        store.state.Modules.Routing.geosearch.typeName = "ms:strasse_nr";
-        store.state.Modules.Routing.geosearch.geometryName = "ms:msGeometry";
+        state.geosearch.propertyNames = ["ms:LABEL_TEXT"];
+        state.geosearch.typeName = "ms:strasse_nr";
+        state.geosearch.geometryName = "ms:msGeometry";
     });
 
+    afterEach(() => {
+        store.getters = originStoreGetter;
+        state.geosearch = structuredClone(originGeosearch);
+    });
 
     describe("should fetchRoutingSpecialWfsGeosearch", () => {
         it("should process result correct", async () => {
@@ -120,8 +128,8 @@ describe("src/modules/routing/js/geosearch/routing-specialWfs-geosearch.js", () 
               </gml:featureMember>
             </wfs:FeatureCollection>`;
 
-            store.state.Modules.Routing.geosearch.labelProperty = "ms:CUSTOM_LABEL";
-            store.state.Modules.Routing.geosearch.propertyNames = ["ms:LABEL_TEXT", "ms:CUSTOM_LABEL"];
+            state.geosearch.labelProperty = "ms:CUSTOM_LABEL";
+            state.geosearch.propertyNames = ["ms:LABEL_TEXT", "ms:CUSTOM_LABEL"];
 
             makeWFSRequestStub.resolves({
                 status: 200,

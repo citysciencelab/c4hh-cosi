@@ -6,11 +6,18 @@ import sinon from "sinon";
 
 describe("src/modules/menu/js/menuUrlParams.js", () => {
     const dispatchCalls = {};
+    const originStoreGetter = store.getters,
+        originStoreDispatch = store.dispatch;
 
     beforeEach(() => {
         store.dispatch = (arg1, arg2) => {
             dispatchCalls[arg1] = arg2 !== undefined ? arg2 : "called";
         };
+    });
+
+    afterEach(() => {
+        store.getters = originStoreGetter;
+        store.dispatch = originStoreDispatch;
     });
 
     describe("setAttributesToComponent", () =>{

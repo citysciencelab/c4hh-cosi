@@ -1,4 +1,5 @@
 import store from "@appstore/index.js";
+import state from "@modules/routing/store/stateRouting.js";
 import {expect} from "chai";
 import sinon from "sinon";
 import {
@@ -6,6 +7,8 @@ import {
 } from "@modules/routing/js/geosearch/routing-elastic-geosearch.js";
 describe("src/modules/routing/js/geosearch/routing-elastic-geosearch.js", () => {
     let service;
+    const originStoreGetter = store.getters,
+        originGeosearch = structuredClone(state.geosearch);
 
     beforeEach(() => {
         service = "https://service";
@@ -15,10 +18,14 @@ describe("src/modules/routing/js/geosearch/routing-elastic-geosearch.js", () => 
                 return {url: service};
             })
         };
-        store.state.Modules.Routing.geosearch = {
+        state.geosearch = {
             serviceId: {
                 url: "http://serviceId.url"
             }};
+    });
+    afterEach(() => {
+        store.getters = originStoreGetter;
+        state.geosearch = structuredClone(originGeosearch);
     });
     describe("getRoutingElasticUrl", () => {
         it("test params", () => {

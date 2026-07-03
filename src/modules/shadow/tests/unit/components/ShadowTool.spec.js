@@ -11,10 +11,12 @@ config.global.mocks.$i18next = {
 
 describe("src/modules/shadowTool/components/ShadowTool.vue", () => {
     let map3D,
-        store;
+        store,
+        originalCesium;
 
     beforeAll(() => {
         mapCollection.clear();
+        originalCesium = global.Cesium;
 
         global.Cesium = {};
         global.Cesium.ShadowMode = {
@@ -82,6 +84,10 @@ describe("src/modules/shadowTool/components/ShadowTool.vue", () => {
         });
     });
 
+
+    afterAll(() => {
+        global.Cesium = originalCesium;
+    });
 
     describe("shadow tool", () => {
         it("component has checkbox,date picker, time and date slider", () => {

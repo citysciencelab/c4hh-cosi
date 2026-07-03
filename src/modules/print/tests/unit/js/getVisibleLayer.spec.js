@@ -8,6 +8,7 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
     let layers,
         layer1,
         layer2,
+        origGetters,
         origCommit,
         origDispatch;
 
@@ -28,6 +29,7 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
         mapCollection.addMap(map, "2D");
         origDispatch = store.dispatch;
         origCommit = store.commit;
+        origGetters = store.getters;
     });
 
     beforeEach(() => {
@@ -63,6 +65,7 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
     afterEach(() => {
         store.dispatch = origDispatch;
         store.commit = origCommit;
+        store.getters = origGetters;
     });
 
     describe("getVisibleLayer.js", function () {

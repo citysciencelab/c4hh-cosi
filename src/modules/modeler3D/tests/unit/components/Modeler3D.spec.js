@@ -119,6 +119,7 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
 
     let store,
         wrapper,
+        originalCesium,
         updateUISpy,
         movePolygonSpy,
         movePolylineSpy,
@@ -126,6 +127,7 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
 
 
     beforeAll(() => {
+        originalCesium = global.Cesium;
         if (!document.getElementById("map")) {
             document.body.innerHTML = `
               <div id="app"></div>
@@ -294,6 +296,7 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }
+        global.Cesium = originalCesium;
     });
 
     it("renders Modeler3D with import view", async () => {

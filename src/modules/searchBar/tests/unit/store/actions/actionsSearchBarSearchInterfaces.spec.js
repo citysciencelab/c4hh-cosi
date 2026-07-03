@@ -10,10 +10,10 @@ const {
     search
 } = actions;
 
-
 describe("src/modules/searchBar/store/actions/actionsSearchBarSearchInterfaces.js", () => {
     let commit,
         dispatch;
+    const originStoreGetter = store.getters;
 
     beforeEach(() => {
         commit = sinon.spy();
@@ -24,6 +24,9 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchInterfaces.j
         };
     });
 
+    afterEach(() => {
+        store.getters = originStoreGetter;
+    });
 
     describe("instantiateSearchInterfaces", () => {
         it("should instantiate the gazetteer search interface", () => {

@@ -1,25 +1,24 @@
 import {expect} from "chai";
+import sinon from "sinon";
 import {getIconUrl} from "@shared/js/utils/convertFeaturesToKml.js";
 import * as constants from "@modules/draw_old/store/constantsDraw.js";
 
 describe("src/shared/js/utils/convertFeaturesToKml.js", () => {
-    let assetsPathOrig,
-        originOrig;
+    let assetsPathOrig;
 
     beforeAll(() => {
         assetsPathOrig = global.MASTERPORTAL_ASSETS_PATH;
-        originOrig = window.location.origin;
-        global.window = {
-            location: {
-                origin: "https://localhost:8080"
-            }
-        };
+    });
+
+    beforeEach(() => {
+        sinon.stub(window, "location").value({
+            origin: "https://localhost:8080"
+        });
         global.MASTERPORTAL_ASSETS_PATH = "/src/assets/img";
     });
 
     afterAll(() => {
         global.MASTERPORTAL_ASSETS_PATH = assetsPathOrig;
-        window.location.origin = originOrig;
     });
 
     describe("getIconUrl", () => {

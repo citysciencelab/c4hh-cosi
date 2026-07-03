@@ -1,5 +1,11 @@
 import sinon from "sinon";
 import {expect} from "chai";
+import {vi} from "vitest";
+
+vi.mock("@modules/routing/components/Isochrones/IsochronesItem.vue", () => ({default: {}}));
+vi.mock("@modules/routing/components/Directions/DirectionsItem.vue", () => ({default: {}}));
+vi.mock("@modules/routing/components/TSR/TsrItem.vue", () => ({default: {}}));
+
 import actionsIsochrones from "@modules/routing/store/isochrones/actionsIsochrones.js";
 import Feature from "ol/Feature.js";
 import Point from "ol/geom/Point.js";

@@ -3,12 +3,22 @@ import getters from "@modules/modeler3D/store/gettersModeler3D.js";
 import Modeler3DState from "@modules/modeler3D/store/stateModeler3D.js";
 
 describe("src/modules/tools/modeler3D/store/gettersModeler3D.js", () => {
-    let state;
+    let state,
+        originalCesium;
 
     describe("getters Modeler3D", () => {
+        beforeAll(() => {
+            originalCesium = global.Cesium;
+        });
+
         beforeEach(() => {
             state = Modeler3DState;
         });
+
+        afterEach(() => {
+            global.Cesium = originalCesium;
+        });
+
         it("returns the model name from id", () => {
             state.importedModels = [{id: "someId", name: "someName"}];
 

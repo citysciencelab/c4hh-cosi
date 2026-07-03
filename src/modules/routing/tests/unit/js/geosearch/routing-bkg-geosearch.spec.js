@@ -14,9 +14,10 @@ import {
 
 describe("src/modules/routing/js/geosearch/routing-bkg-geosearch.js", () => {
     let service;
-    const originWindow = global.window,
-        originStoreGetter = {...store.getters},
-        originStoreState = {...store.state};
+    const originStoreGetter = store.getters,
+        originGeosearch = structuredClone(state.geosearch),
+        originGeosearchReverse = structuredClone(state.geosearchReverse),
+        originDirectionsSettings = structuredClone(state.directionsSettings);
 
     beforeEach(() => {
         service = "https://service";
@@ -26,33 +27,32 @@ describe("src/modules/routing/js/geosearch/routing-bkg-geosearch.js", () => {
                 return {url: service};
             })
         };
-        store.state.Modules.Routing.geosearchReverse = {
+        state.geosearchReverse = {
             serviceId: {
                 url: "http://serviceId.url"
             },
             distance: "1000"
         };
-        store.state.Modules.Routing.geosearch = {
+        state.geosearch = {
             serviceId: {
                 url: "http://serviceId.url"
             },
             limit: 1000,
             bbox: {"CAR": "10,20,30,40"}
         };
-        store.state.Modules.Routing.directionsSettings = {
+        state.directionsSettings = {
             speedProfile: "CAR"
         };
-        global.window = {
-            location: {
-                origin: "https://origin"
-            }
-        };
+        sinon.stub(window, "location").value({
+            origin: "https://origin"
+        });
     });
 
     afterEach(() => {
-        global.window = originWindow;
         store.getters = originStoreGetter;
-        store.replaceState(originStoreState);
+        state.geosearch = structuredClone(originGeosearch);
+        state.geosearchReverse = structuredClone(originGeosearchReverse);
+        state.directionsSettings = structuredClone(originDirectionsSettings);
     });
 
     describe("should fetchRoutingBkgGeosearch", () => {
@@ -231,7 +231,7 @@ describe("src/modules/routing/js/geosearch/routing-bkg-geosearch.js", () => {
     });
     describe("should checkConfiguredBbox", () => {
         it("should process result as false with no configuration", () => {
-            store.state.Modules.Routing.directionsSettings = {};
+            state.directionsSettings = {};
             const result = checkConfiguredBbox();
 
             expect(result).to.be.false;

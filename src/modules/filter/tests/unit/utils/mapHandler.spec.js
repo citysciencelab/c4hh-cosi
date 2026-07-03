@@ -9,6 +9,7 @@ import Layer2dVectorTile from "@core/layers/js/layer2dVectorTile.js";
 describe("src/modules/filter/utils/mapHandler.js", () => {
     let lastError = false,
         onerror = null;
+    const originStoreGetter = store.getters;
 
     /**
      * Creates a MapHandler instance with default handlers, which can be overridden or extended
@@ -89,6 +90,9 @@ describe("src/modules/filter/utils/mapHandler.js", () => {
             },
             determineZIndex: () => 1
         };
+    });
+    afterEach(() => {
+        store.getters = originStoreGetter;
     });
     describe("constructor", () => {
         it("should pipe an error if function getLayerByLayerId is missing with the given handlers", () => {

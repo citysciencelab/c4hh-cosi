@@ -12,10 +12,9 @@ beforeAll(function () {
 });
 
 describe("src/shared/js/utils/getGfiFeaturesByTileFeature.js", () => {
-    let layerConfigByIdOrig;
+    const originStoreGetter = store.getters;
 
     beforeEach(() => {
-        layerConfigByIdOrig = store.getters.layerConfigById;
         store.getters = {
             layerConfigById: () => {
                 return {
@@ -28,7 +27,7 @@ describe("src/shared/js/utils/getGfiFeaturesByTileFeature.js", () => {
     });
 
     afterEach(() => {
-        store.getters.layerConfigById = layerConfigByIdOrig;
+        store.getters = originStoreGetter;
     });
 
     describe("getLayerModelFromTileFeature", () => {

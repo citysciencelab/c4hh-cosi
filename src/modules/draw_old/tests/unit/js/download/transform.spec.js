@@ -12,6 +12,9 @@ import proj4 from "proj4";
 
 
 describe("src/modules/draw/js/download/transform.js", () => {
+    const originStoreGetter = store.getters,
+        originStoreDispatch = store.dispatch;
+
     beforeEach(() => {
 
         store.getters = {
@@ -21,6 +24,11 @@ describe("src/modules/draw/js/download/transform.js", () => {
         };
         store.dispatch = sinon.spy();
         proj4.defs("EPSG:25832", "+title=ETRS89/UTM 32N +proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs");
+    });
+
+    afterEach(() => {
+        store.getters = originStoreGetter;
+        store.dispatch = originStoreDispatch;
     });
 
 

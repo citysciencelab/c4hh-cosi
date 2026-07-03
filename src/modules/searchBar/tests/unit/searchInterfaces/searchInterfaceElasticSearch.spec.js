@@ -10,6 +10,7 @@ import store from "@appstore/index.js";
 describe("src/modules/searchBar/searchInterfaces/searchInterfaceElasticSearch.js", () => {
     let SearchInterface1 = null,
         checkConfigSpy;
+    const originStoreGetter = store.getters;
 
 
     beforeAll(() => {
@@ -47,6 +48,10 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceElasticSearch.js
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
+    });
+
+    afterAll(() => {
+        store.getters = originStoreGetter;
     });
 
     describe("prototype", () => {

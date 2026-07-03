@@ -79,7 +79,12 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
         validateInputSpy,
         initHeightLayerSpy,
         transformCoordinatesFromToSpy,
-        positionClickedSpy;
+        positionClickedSpy,
+        originalCesium;
+
+    beforeAll(() => {
+        originalCesium = global.Cesium;
+    });
 
     beforeEach(() => {
         isMobile = false;
@@ -142,6 +147,14 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
             }
         };
         copyStub = sinon.stub(navigator.clipboard, "writeText").resolves(text);
+    });
+
+    afterEach(() => {
+        if (wrapper) {
+            wrapper.unmount();
+            wrapper = null;
+        }
+        global.Cesium = originalCesium;
     });
 
     it("renders CoordToolkit without height field", () => {

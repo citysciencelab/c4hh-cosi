@@ -9,7 +9,9 @@ import state from "@modules/routing/store/stateRouting.js";
 
 describe("src/modules/routing/js/directions/routing-ors-directions.js", () => {
     let service;
-    const originWindow = window;
+    const originStoreGetter = store.getters,
+        originIsochronesSettings = structuredClone(state.isochronesSettings),
+        originIsochrones = state.Isochrones;
 
     beforeEach(() => {
         service = "https://tmp";
@@ -17,15 +19,24 @@ describe("src/modules/routing/js/directions/routing-ors-directions.js", () => {
         store.getters = {
             restServiceById: () => ({url: service})
         };
-        global.window = {
-            location: {
-                origin: "https://origin"
-            }
+        state.isochronesSettings = structuredClone(originIsochronesSettings);
+        state.Isochrones = {
+            settings: state.isochronesSettings
         };
+        sinon.stub(window, "location").value({
+            origin: "https://origin"
+        });
     });
 
     afterEach(() => {
-        global.window = originWindow;
+        store.getters = originStoreGetter;
+        state.isochronesSettings = structuredClone(originIsochronesSettings);
+        if (typeof originIsochrones === "undefined") {
+            delete state.Isochrones;
+        }
+        else {
+            state.Isochrones = originIsochrones;
+        }
     });
 
     describe("should fetchRoutingOrsIsochrones", () => {

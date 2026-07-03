@@ -72,9 +72,9 @@ describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
                                 }
                             },
                             getters: {
+                                bufferRadius: (state) => state.bufferRadius ?? 0,
                                 selectOptions: (state) => state.selectOptions,
-                                bufferRadius: (state) => state.bufferRadius,
-                                savedUrl: (state) => state.savedUrl
+                                savedUrl: (state) => state.savedUrl ?? null
                             }
                         }
                     }

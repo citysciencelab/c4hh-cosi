@@ -6,7 +6,8 @@ import initialState from "@modules/wmsTime/store/stateWmsTime.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 
 describe("src/modules/wmsTime/store/actionsWmsTime.js", () => {
-    let commit, dispatch, getters, rootGetters, state, map, updateTimeSpy;
+    let commit, dispatch, getters, rootGetters, state, map, updateTimeSpy,
+        originalInnerWidth;
 
     beforeAll(() => {
         mapCollection.clear();
@@ -23,9 +24,13 @@ describe("src/modules/wmsTime/store/actionsWmsTime.js", () => {
         updateTimeSpy = sinon.spy();
         commit = sinon.spy();
         dispatch = sinon.spy();
+        originalInnerWidth = window.innerWidth;
+        Object.defineProperty(window, "innerWidth", {configurable: true, writable: true, value: 1000});
         getters = {
             currentTimeSliderObject: {keyboardMovement: 5},
-            defaultDimensionName: "TIME"
+            defaultDimensionName: "TIME",
+            windowWidth: 900,
+            minWidth: false
         };
         rootGetters = {
             "Modules/LayerSwiper/active": false,
@@ -69,6 +74,9 @@ describe("src/modules/wmsTime/store/actionsWmsTime.js", () => {
         });
     });
 
+    afterEach(() => {
+        Object.defineProperty(window, "innerWidth", {configurable: true, writable: true, value: originalInnerWidth});
+    });
 
     describe("toggleSwiper", () => {
         beforeEach(() => {

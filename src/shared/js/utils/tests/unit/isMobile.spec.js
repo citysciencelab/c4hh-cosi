@@ -2,28 +2,26 @@ import isMobile from "@shared/js/utils/isMobile.js";
 import {expect} from "chai";
 
 describe("src/shared/js/utils/isMobile.js", () => {
-    let localWindow;
+    let originalInnerWidthDescriptor;
 
     beforeAll(() => {
-        localWindow = global.window;
+        originalInnerWidthDescriptor = Object.getOwnPropertyDescriptor(window, "innerWidth");
     });
 
-    afterAll(() => {
-        global.window = localWindow;
+    afterEach(() => {
+        if (originalInnerWidthDescriptor) {
+            Object.defineProperty(window, "innerWidth", originalInnerWidthDescriptor);
+        }
     });
 
     it("should return true if window.innerwidth < 768", () => {
-        global.window = {
-            innerWidth: 500
-        };
+        Object.defineProperty(window, "innerWidth", {value: 500, configurable: true});
 
         expect(isMobile()).to.be.true;
     });
 
     it("should return true if window.innerwidth > 768", () => {
-        global.window = {
-            innerWidth: 1024
-        };
+        Object.defineProperty(window, "innerWidth", {value: 1024, configurable: true});
 
         expect(isMobile()).to.be.false;
     });

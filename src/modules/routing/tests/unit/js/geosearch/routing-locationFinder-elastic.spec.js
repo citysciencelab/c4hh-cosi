@@ -1,5 +1,6 @@
 import axios from "axios";
 import store from "@appstore/index.js";
+import state from "@modules/routing/store/stateRouting.js";
 import {expect} from "chai";
 import sinon from "sinon";
 import {RoutingGeosearchResult} from "@modules/routing/js/classes/routing-geosearch-result.js";
@@ -7,6 +8,8 @@ import {fetchRoutingElasticGeosearch} from "@modules/routing/js/geosearch/routin
 
 describe("src/modules/routing/js/geosearch/routing-locationFinder-elastic.js", () => {
     let service;
+    const originStoreGetter = store.getters,
+        originGeosearch = structuredClone(state.geosearch);
 
     beforeEach(() => {
         service = "https://service";
@@ -14,9 +17,13 @@ describe("src/modules/routing/js/geosearch/routing-locationFinder-elastic.js", (
         store.getters = {
             restServiceById: () => ({url: service})
         };
-        store.state.Modules.Routing.geosearch.epsg = "25832";
+        state.geosearch.epsg = "25832";
     });
 
+    afterEach(() => {
+        store.getters = originStoreGetter;
+        state.geosearch = structuredClone(originGeosearch);
+    });
 
     describe("should fetchRoutingElasticGeosearch", () => {
         it("should process result correct", async () => {

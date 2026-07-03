@@ -1,26 +1,17 @@
 import {expect} from "chai";
+import sinon from "sinon";
 
 import globalUrlParams from "../../../js/globalUrlParams.js";
 
 describe("src/core/urlParams/js/globalUrlParams.js", () => {
-    let origWindow;
-
-    beforeAll(() => {
-        origWindow = global.window;
-    });
-
-    afterEach(() => {
-        global.window = origWindow;
-    });
 
     describe("getConfigJsPath", () => {
         it("configjs with local path is read", () => {
-            global.window = {
-                location: {
-                    search: "?configjs=../otherPortal/config.js",
-                    href: "https://example.com/portal/path/?configjs=../otherPortal/config.js"
-                }
-            };
+            sinon.stub(window, "location").value({
+                search: "?configjs=../otherPortal/config.js",
+                href: "https://example.com/portal/path/?configjs=../otherPortal/config.js",
+                origin: "https://example.com"
+            });
             const configPath = globalUrlParams.getConfigJsPath();
 
             expect(configPath).to.be.not.null;
@@ -28,12 +19,11 @@ describe("src/core/urlParams/js/globalUrlParams.js", () => {
         });
 
         it("configjs as full url is read", () => {
-            global.window = {
-                location: {
-                    search: "?configjs=https://geoportal-hamburg.de/config.js",
-                    href: "https://example.com/portal/path/?configjs=https://geoportal-hamburg.de/config.js"
-                }
-            };
+            sinon.stub(window, "location").value({
+                search: "?configjs=https://geoportal-hamburg.de/config.js",
+                href: "https://example.com/portal/path/?configjs=https://geoportal-hamburg.de/config.js",
+                origin: "https://example.com"
+            });
             const configPath = globalUrlParams.getConfigJsPath();
 
             expect(configPath).to.be.not.null;
@@ -41,23 +31,22 @@ describe("src/core/urlParams/js/globalUrlParams.js", () => {
         });
 
         it("configjs is not read", () => {
-            global.window = {
-                location: {
-                    search: "?configjson=../otherPortal/config.json",
-                    href: "https://example.com/portal/path/?configjs=../otherPortal/config.js"
-                }
-            };
+            sinon.stub(window, "location").value({
+                search: "?configjson=../otherPortal/config.json",
+                href: "https://example.com/portal/path/?configjson=../otherPortal/config.json",
+                origin: "https://example.com"
+            });
             const configPath = globalUrlParams.getConfigJsPath();
 
             expect(configPath).to.be.null;
         });
 
         it("no urlparams", () => {
-            global.window = {
-                location: {
-                    href: "https://example.com/portal/path/"
-                }
-            };
+            sinon.stub(window, "location").value({
+                search: "",
+                href: "https://example.com/portal/path/",
+                origin: "https://example.com"
+            });
             const configPath = globalUrlParams.getConfigJsPath();
 
             expect(configPath).to.be.null;

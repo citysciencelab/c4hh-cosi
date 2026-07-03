@@ -9,10 +9,12 @@ import store from "@appstore/index.js";
 
 describe("src/core/js/maps/maps.js", () => {
     let load3DScriptSpy,
-        origGetters;
+        origGetters,
+        originalCesium;
 
     beforeAll(() => {
         origGetters = store.getters;
+        originalCesium = global.Cesium;
     });
 
     beforeEach(() => {
@@ -39,6 +41,7 @@ describe("src/core/js/maps/maps.js", () => {
     });
 
     afterEach(() => {
+        global.Cesium = originalCesium;
         store.getters = origGetters;
     });
 

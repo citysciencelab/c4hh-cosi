@@ -13,13 +13,14 @@ describe("src/App.vue", () => {
         wrapper,
         actions,
         initializeMapsSpy;
+    const originMatchMedia = window.matchMedia;
 
     beforeEach(() => {
         window.matchMedia = () => ({
             addEventListener: sinon.stub(),
             removeEventListener: sinon.stub()
         });
-        initializeMapsSpy = sinon.spy(maps, "initializeMaps");
+        initializeMapsSpy = sinon.stub(maps, "initializeMaps");
         sinon.stub(urlParamsHandler, "startProcessUrlParams");
         actions = {
             extendLayers: sinon.spy(),
@@ -72,6 +73,7 @@ describe("src/App.vue", () => {
     });
 
     afterEach(() => {
+        window.matchMedia = originMatchMedia;
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }

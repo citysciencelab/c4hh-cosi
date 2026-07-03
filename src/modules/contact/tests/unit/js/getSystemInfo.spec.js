@@ -1,20 +1,14 @@
 import {expect} from "chai";
+import sinon from "sinon";
 
 import getSystemInfo from "@modules/contact/js/getSystemInfo.js";
 
 describe("src/modules/contact/js/getSystemInfo", function () {
-    const originWindow = global.window;
-
     beforeEach(() => {
-        global.window = {
-            location: {
-                origin: "https://example.com",
-                href: "https://example.com/portal/path/"
-            }};
-    });
-
-    afterAll(() => {
-        global.window = originWindow;
+        sinon.stub(window, "location").value({
+            origin: "https://example.com",
+            href: "https://example.com/portal/path/"
+        });
     });
 
     it("returns values from global variables", function () {

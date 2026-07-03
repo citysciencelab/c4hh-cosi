@@ -10,11 +10,13 @@ describe("src/core/js/layers/layer3dTileset.js", () => {
     let attributes,
         fromUrlSpy,
         warn,
+        origCesium,
         origGetters,
         origDispatch,
         style;
 
     beforeAll(() => {
+        origCesium = global.Cesium;
         origGetters = store.getters;
         origDispatch = store.dispatch;
     });
@@ -49,7 +51,7 @@ describe("src/core/js/layers/layer3dTileset.js", () => {
     });
 
     afterEach(() => {
-        global.Cesium = null;
+        global.Cesium = origCesium;
         store.getters = origGetters;
         store.dispatch = origDispatch;
     });

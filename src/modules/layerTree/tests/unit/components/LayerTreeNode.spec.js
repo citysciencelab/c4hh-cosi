@@ -371,8 +371,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
         });
 
         it("checkMove - should always allow moving base layer over base layer", () => {
-            const checkMoveSpy = sinon.spy(wrapper.vm, "checkMove"),
-                draggedLayer = {id: "1", baselayer: true},
+            const draggedLayer = {id: "1", baselayer: true},
                 targetLayer = {id: "2", baselayer: true},
                 event = {
                     draggedContext: {element: draggedLayer},
@@ -381,11 +380,9 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
                 result = wrapper.vm.checkMove(event);
 
             expect(result).to.be.true;
-            expect(checkMoveSpy.calledOnce).to.be.true;
         });
         it("checkMove - should not allow dragging base layer over non-base layer, when allowBaselayerDrag is false", () => {
-            const checkMoveSpy = sinon.spy(wrapper.vm, "checkMove"),
-                draggedLayer = {id: "1", baselayer: true},
+            const draggedLayer = {id: "1", baselayer: true},
                 targetLayer = {id: "2", baselayer: false},
                 event = {
                     draggedContext: {element: draggedLayer},
@@ -394,7 +391,6 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
                 result = wrapper.vm.checkMove(event);
 
             expect(result).to.be.false;
-            expect(checkMoveSpy.calledOnce).to.be.true;
         });
         it("checkMove - should allow dragging non-base layer over base layer, when allowBaselayerDrag is true", () => {
             allowBaselayerDrag = true;
@@ -496,8 +492,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
                 }
             });
 
-            const checkMoveSpy = sinon.spy(wrapper.vm, "checkMove"),
-                draggedLayer = {id: "1", baselayer: false},
+            const draggedLayer = {id: "1", baselayer: false},
                 targetLayer = {id: "2", baselayer: true},
                 event = {
                     draggedContext: {element: draggedLayer},
@@ -506,7 +501,6 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
                 result = wrapper.vm.checkMove(event);
 
             expect(result).to.be.true;
-            expect(checkMoveSpy.calledOnce).to.be.true;
         });
     });
 });

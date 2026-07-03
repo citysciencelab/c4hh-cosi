@@ -11,6 +11,7 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceKomootPhoton.js"
     let SearchInterface1 = null,
         searchResults = [],
         checkConfigSpy;
+    const originStoreGetter = store.getters;
 
     beforeAll(() => {
         checkConfigSpy = sinon.spy(SearchInterface.prototype, "checkConfig");
@@ -72,6 +73,10 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceKomootPhoton.js"
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
+    });
+
+    afterAll(() => {
+        store.getters = originStoreGetter;
     });
 
     describe("prototype", () => {
