@@ -111,9 +111,6 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                 },
                 Maps: {
                     namespaced: true,
-                    getters: {
-                        projection: () => null
-                    },
                     actions: {
                         addInteraction: sinon.stub(),
                         removeInteraction: sinon.stub(),
