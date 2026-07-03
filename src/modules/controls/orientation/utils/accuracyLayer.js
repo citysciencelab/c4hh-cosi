@@ -3,6 +3,7 @@ import Feature from "ol/Feature.js";
 import VectorSource from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector.js";
 import {Fill, Stroke, Style} from "ol/style.js";
+import {getPrimaryColor} from "@shared/js/utils/colors.js";
 
 export function createAccuracyFeature () {
     return markRaw(new Feature());
@@ -13,16 +14,18 @@ export function initAccuracyLayer ({accuracyFeature, accuracyLayer, map}) {
         return {accuracyLayer, accuracySource: null};
     }
 
-    const accuracySource = markRaw(new VectorSource()),
-        nextAccuracyLayer = markRaw(new VectorLayer({
+    const accuracyFillColor = getPrimaryColor(0.15);
+    const accuracyStrokeColor = getPrimaryColor(0.9);
+    const accuracySource = markRaw(new VectorSource());
+    const nextAccuracyLayer = markRaw(new VectorLayer({
             id: "orientation_accuracy_layer",
             source: accuracySource,
             style: new Style({
                 fill: new Fill({
-                    color: "rgba(100, 100, 255, 0.2)"
+                    color: accuracyFillColor
                 }),
                 stroke: new Stroke({
-                    color: "#0000ff",
+                    color: accuracyStrokeColor,
                     width: 2
                 })
             }),
