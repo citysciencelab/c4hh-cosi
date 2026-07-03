@@ -7,15 +7,18 @@ import PoiChoice from "./poi/PoiChoice.vue";
 import PoiOrientation from "./poi/PoiOrientation.vue";
 import Geolocation from "ol/Geolocation.js";
 import Overlay from "ol/Overlay.js";
-import Feature from 'ol/Feature.js';
-import VectorSource from 'ol/source/Vector.js';
-import VectorLayer from 'ol/layer/Vector.js';
-import {Fill, Stroke, Style} from "ol/style.js";
 import proj4 from "proj4";
 import * as Proj from "ol/proj.js";
 import {Circle, LineString} from "ol/geom.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import isObject from "@shared/js/utils/isObject.js";
+import {
+    clearAccuracyGeometry as clearAccuracyGeometryUtil,
+    createAccuracyFeature,
+    initAccuracyLayer as initAccuracyLayerUtil,
+    removeAccuracyLayer as removeAccuracyLayerUtil,
+    updateAccuracyGeometry as updateAccuracyGeometryUtil
+} from "../utils/accuracyLayer.js";
 
 /**
  * Orientation control that allows the user to locate themselves on the map.
@@ -44,7 +47,7 @@ export default {
             tracking: false,
             isGeolocationDenied: false,
             isGeoLocationPossible: false,
-            accuracyFeature: markRaw(new Feature()),
+            accuracyFeature: createAccuracyFeature(),
             accuracyLayer: null,
             accuracySource: null
         };
@@ -110,55 +113,42 @@ export default {
         ...mapActions("Alerting", ["addSingleAlert"]),
 
         initAccuracyLayer () {
-            if (this.accuracyLayer !== null) {
-                return;
-            }
+            const {accuracyLayer, accuracySource} = initAccuracyLayerUtil({
+                accuracyFeature: this.accuracyFeature,
+                accuracyLayer: this.accuracyLayer,
+                map: mapCollection.getMap("2D")
+            });
 
-            this.accuracySource = markRaw(new VectorSource());
-            this.accuracySource.addFeature(this.accuracyFeature);
-            this.accuracyLayer = markRaw(new VectorLayer({
-                id: "orientation_accuracy_layer",
-                source: this.accuracySource,
-                style: new Style({
-                    fill: new Fill({
-                        color: "rgba(100, 100, 255, 0.2)"
-                    }),
-                    stroke: new Stroke({
-                        color: "#0000ff",
-                        width: 2
-                    })
-                }),
-                zIndex: 9999
-            }));
-            mapCollection.getMap("2D").addLayer(this.accuracyLayer);
+            this.accuracyLayer = accuracyLayer;
+            if (accuracySource !== null) {
+                this.accuracySource = accuracySource;
+            }
         },
 
         updateAccuracyGeometry () {
-            if (!this.showAccuracy || this.geolocation === null) {
-                return;
-            }
-            const accuracyGeometry = this.geolocation.getAccuracyGeometry();
-
-            if (!accuracyGeometry) {
-                return;
-            }
-
-            this.accuracyFeature.setGeometry(accuracyGeometry.clone().transform("EPSG:4326", this.projection.getCode()));
+            updateAccuracyGeometryUtil({
+                accuracyFeature: this.accuracyFeature,
+                geolocation: this.geolocation,
+                projectionCode: this.projection.getCode(),
+                showAccuracy: this.showAccuracy
+            });
         },
 
         clearAccuracyGeometry () {
-            if (this.geolocation) {
-                this.geolocation.un("change:accuracyGeometry", this.updateAccuracyGeometry);
-            }
-            this.accuracyFeature.setGeometry(null);
+            clearAccuracyGeometryUtil({
+                accuracyFeature: this.accuracyFeature,
+                geolocation: this.geolocation,
+                listener: this.updateAccuracyGeometry
+            });
         },
 
         removeAccuracyLayer () {
-            if (this.accuracyLayer !== null) {
-                mapCollection.getMap("2D").removeLayer(this.accuracyLayer);
-                this.accuracyLayer = null;
-                this.accuracySource = null;
-            }
+            removeAccuracyLayerUtil({
+                accuracyLayer: this.accuracyLayer,
+                map: mapCollection.getMap("2D")
+            });
+            this.accuracyLayer = null;
+            this.accuracySource = null;
         },
 
         setIsGeoLocationPossible () {
