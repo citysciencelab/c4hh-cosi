@@ -162,7 +162,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             const draggableWrapper = wrapper.findComponent({name: "Draggable"});
 
             expect(draggableWrapper.exists()).to.be.true;
-            expect(draggableWrapper.props("itemKey")).to.equal("id");
+            expect(draggableWrapper.attributes("item-key")).to.equal("id");
             expect(draggableWrapper.props("modelValue")).to.deep.equal(content);
         });
 

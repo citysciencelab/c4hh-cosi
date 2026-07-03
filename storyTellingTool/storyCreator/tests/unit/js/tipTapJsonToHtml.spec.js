@@ -4,9 +4,14 @@ import {beforeEach, describe, it, vi} from "vitest";
 import {generateHTML} from "@tiptap/core";
 import tipTapJsonToHtml from "../../../shared/modules/tipTapEditor/js/tipTapJsonToHtml.js";
 
-vi.mock("@tiptap/core", () => ({
-    generateHTML: sinon.stub()
-}));
+vi.mock("@tiptap/core", async (importOriginal) => {
+    const actual = await importOriginal();
+
+    return {
+        ...actual,
+        generateHTML: sinon.stub()
+    };
+});
 
 describe("addons/storyCreator/shared/modules/tipTapEditor/js/tipTapJsonToHtml", () => {
     beforeEach(async () => {
