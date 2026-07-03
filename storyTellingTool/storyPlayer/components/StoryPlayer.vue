@@ -128,6 +128,7 @@ export default {
         if (this._stepObserver) {
             this._stepObserver.disconnect();
         }
+        this._detectActiveStep = null;
         // Remove scroll event listener
         const toolBody = document.getElementById("mp-body-secondaryMenu");
 
@@ -171,6 +172,16 @@ export default {
         tipTapJsonToHtml,
         handleToolBodyScroll (event) {
             this.toolBodyScrollTop = event.target.scrollTop;
+            // When scrolled all the way to the top, deactivate all chapters.
+            if (event.target.scrollTop === 0 && this.currentIndex >= 0) {
+                document.querySelectorAll("#story-player .stepper").forEach(s => s.classList.remove("active"));
+                this.currentIndex = -1;
+                this.deactivateTool();
+                return;
+            }
+            if (this._detectActiveStep) {
+                this._detectActiveStep();
+            }
         },
         /**
          * Activates a tool
@@ -507,8 +518,21 @@ export default {
                     step.classList.add("active");
 
                     if (this.currentIndex !== activeIndex) {
+                        const prevChapterIndex = this.currentChapterIndex;
+
                         this.currentIndex = activeIndex;
                         this.currentChapterIndex = activeIndex;
+
+                        // If currentChapterIndex didn't change (e.g. chapter 0 which is
+                        // also the initial value), the watcher won't fire.
+                        // Trigger tools/layers/position manually in that case.
+                        if (prevChapterIndex === activeIndex) {
+                            this.deactivateSubjectLayer();
+                            this.loadChapter();
+                            this.removePointMarker();
+                            mapCollection.getMap("2D").removeOverlay(this.overlay);
+                        }
+                        // else: watcher on currentChapterIndex handles it.
 
                         // Handle iframe aspect ratio and progress
                         const iframeElement = step.querySelector("iframe"),
@@ -522,10 +546,40 @@ export default {
                     }
                 };
 
-            if (this.currentChapterIndex >= 0 && this.currentChapterIndex < stepElements.length) {
-                applyActiveStep(this.currentChapterIndex);
-            }
             const scroller = document.getElementById("mp-body-secondaryMenu");
+
+            // Shared detection logic — stored on the instance so handleToolBodyScroll
+            // can also call it when the IntersectionObserver doesn't fire (e.g. when
+            // all short chapters are fully visible at the same time).
+            this._detectActiveStep = () => {
+                const scrollerRect = scroller.getBoundingClientRect(),
+                    viewportCenter = scrollerRect.top + scrollerRect.height / 2;
+
+                let activeIndex = -1,
+                    minDistance = Infinity;
+
+                stepElements.forEach((step, idx) => {
+                    const rect = step.getBoundingClientRect();
+
+                    if (rect.bottom < scrollerRect.top || rect.top > scrollerRect.bottom) {
+                        return;
+                    }
+
+                    const center = rect.top + rect.height / 2;
+                    const distance = Math.abs(center - viewportCenter);
+
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        activeIndex = idx;
+                    }
+                });
+
+                const isNearCenter = minDistance <= scrollerRect.height / 2;
+
+                if (activeIndex !== -1 && isNearCenter && activeIndex !== this.currentIndex) {
+                    applyActiveStep(activeIndex);
+                }
+            };
 
             this._stepObserver = new IntersectionObserver(
                 (entries) => {
@@ -537,31 +591,7 @@ export default {
                         }
                     });
 
-                    const scrollerRect = scroller.getBoundingClientRect(),
-                        viewportCenter = scrollerRect.top + scrollerRect.height / 2;
-
-                    let activeIndex = -1,
-                        minDistance = Infinity;
-
-                    stepElements.forEach((step, idx) => {
-                        const rect = step.getBoundingClientRect();
-
-                        if (rect.bottom < 0 || rect.top > window.innerHeight) {
-                            return;
-                        }
-
-                        const center = rect.top + rect.height / 2;
-                        const distance = Math.abs(center - viewportCenter);
-
-                        if (distance < minDistance) {
-                            minDistance = distance;
-                            activeIndex = idx;
-                        }
-                    });
-
-                    if (activeIndex !== -1 && activeIndex !== this.currentIndex) {
-                        applyActiveStep(activeIndex);
-                    }
+                    this._detectActiveStep();
                 },
                 {
                     root: scroller,
@@ -691,7 +721,7 @@ export default {
                         :class="{
                             firstStep: index === 0,
                             lastStep: index === storyConf.chapters.length - 1,
-                            active: index === currentChapterIndex
+                            active: index === currentChapterIndex && currentIndex >= 0
                         }"
                     >
                         <div
