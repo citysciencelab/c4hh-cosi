@@ -1,4 +1,4 @@
-import {config, mount} from "@vue/test-utils";
+import {config, mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
@@ -11,7 +11,7 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
         iconString = "bi-list";
 
     it("should render an accordion", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
                 props: {id: "id", title, icon: iconString}
             }),
             accordion = wrapper.find(".accordion");
@@ -19,35 +19,35 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
         expect(accordion.exists()).to.be.true;
     });
     it("should render a title", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id", title, icon: iconString}
         });
 
         expect(wrapper.find(".accordion-button").text()).to.be.equal("My Title");
     });
     it("should render an icon", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id", title, icon: iconString}
         });
 
         expect(wrapper.find(".bi-list").exists()).to.be.true;
     });
     it("should be opened initially if isOpen is true", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id", title, icon: iconString, isOpen: true}
         });
 
         expect(wrapper.find(".show").exists()).to.be.true;
     });
     it("should be initially closed if isOpen is not set", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id", title, icon: iconString}
         });
 
         expect(wrapper.find(".show").exists()).to.be.false;
     });
     it("should render heading as div by default", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id-default-heading", title, icon: iconString}
         });
 
@@ -57,7 +57,7 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
         expect(heading.element.tagName).to.equal("DIV");
     });
     it("should apply ps-0 by default when colouredHeader and useIndentation are false", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id-padding-default", title, icon: iconString}
         });
 
@@ -67,7 +67,7 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
         expect(button.classes()).to.not.include("rounded");
     });
     it("should remove ps-0 when useIndentation is true", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id-padding-custom", title, icon: iconString, useIndentation: true}
         });
 
@@ -77,7 +77,7 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
         expect(button.classes()).to.not.include("ps-0");
     });
     it("should apply rounded when colouredHeader is true", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id-padding-coloured", title, icon: iconString, colouredHeader: true}
         });
 
@@ -87,7 +87,7 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
         expect(button.classes()).to.not.include("ps-0");
     });
     it("should apply rounded when colouredHeader is true even with useIndentation", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id-padding-coloured-indent", title, icon: iconString, colouredHeader: true, useIndentation: true}
         });
 
@@ -97,7 +97,7 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
         expect(button.classes()).to.not.include("ps-0");
     });
     it("should use me-3 as default icon margin class", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id-icon-default-margin", title, icon: iconString}
         });
 
@@ -107,7 +107,7 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
         expect(icon.classes()).to.include("me-3");
     });
     it("should use configured iconMarginEnd class", async () => {
-        const wrapper = mount(AccordionItem, {
+        const wrapper = shallowMount(AccordionItem, {
             props: {id: "id-icon-custom-margin", title, icon: iconString, iconMarginEnd: "me-2"}
         });
 
@@ -121,7 +121,7 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
         const headingLevels = ["h1", "h2", "h3", "h4", "h5", "h6"];
 
         for (const level of headingLevels) {
-            const wrapper = mount(AccordionItem, {
+            const wrapper = shallowMount(AccordionItem, {
                 props: {id: `id-heading-${level}`, title, icon: iconString, headingLevel: level}
             });
 

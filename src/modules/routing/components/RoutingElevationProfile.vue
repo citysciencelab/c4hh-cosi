@@ -78,9 +78,10 @@ export default {
         /**
          * Draws chart in canvas
          * @param {Object} canvas element to draw chart inside
+         * @param {Function} [ChartConstructor=Chart] Chart constructor to use; defaults to the imported Chart class. Override in tests to inject a spy.
          * @returns {void}
          */
-        drawChart (canvas) {
+        drawChart (canvas, ChartConstructor = Chart) {
             // create chart for elevation profile
             let borderColor = "",
                 backgroundColor = "";
@@ -93,7 +94,7 @@ export default {
                 borderColor = this.tsrSettings.styleElevationProfile.profileColor;
                 backgroundColor = this.tsrSettings.styleElevationProfile.profileFillColor;
             }
-            const chart = new Chart(canvas, {
+            const chart = new ChartConstructor(canvas, {
                 type: "line",
                 data: {
                     labels: this.distances,

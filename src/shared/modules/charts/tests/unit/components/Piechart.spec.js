@@ -1,5 +1,6 @@
 import {shallowMount, config} from "@vue/test-utils";
 import {expect} from "chai";
+import "../../../../../../../devtools/tests/chartMocks.js";
 import ChartJs from "chart.js/auto";
 import {nextTick} from "vue";
 import PiechartItem from "@shared/modules/charts/components/PiechartItem.vue";
@@ -7,7 +8,8 @@ import PiechartItem from "@shared/modules/charts/components/PiechartItem.vue";
 config.global.mocks.$t = key => key;
 
 describe("src/share-components/charts/components/PiechartItem.vue", () => {
-    let wrapper;
+    let wrapper,
+        doughnut;
 
     beforeEach(() => {
         wrapper = shallowMount(PiechartItem, {
@@ -19,27 +21,7 @@ describe("src/share-components/charts/components/PiechartItem.vue", () => {
                 givenOptions: {}
             }
         });
-    });
-
-    describe("mounted", () => {
-        it("should create an instance of ChartJS when mounted", () => {
-            nextTick(() => {
-                expect(wrapper.vm.chart).to.be.an.instanceof(ChartJs);
-            });
-        });
-        it("should create a chart of type pie when mounted", () => {
-            nextTick(() => {
-                expect(wrapper.vm.chart.config.type).to.equal("pie");
-            });
-        });
-        it("should create a canvas element in its component", () => {
-            nextTick(() => {
-                expect(wrapper.find("canvas").exists()).to.be.true;
-            });
-        });
-    });
-    describe("mounted as doughnut", () => {
-        const doughnut = shallowMount(PiechartItem, {
+        doughnut = shallowMount(PiechartItem, {
             propsData: {
                 data: {
                     labels: [],
@@ -49,16 +31,35 @@ describe("src/share-components/charts/components/PiechartItem.vue", () => {
                 diagramType: "doughnut"
             }
         });
+    });
 
-        it("should create an instance of ChartJS when mounted", () => {
-            nextTick(() => {
-                expect(wrapper.vm.chart).to.be.an.instanceof(ChartJs);
-            });
+    afterEach(() => {
+        wrapper.unmount();
+        doughnut.unmount();
+    });
+
+    describe("mounted", () => {
+        it("should create an instance of ChartJS when mounted", async () => {
+            await nextTick();
+            expect(wrapper.vm.chart).to.be.an.instanceof(ChartJs);
         });
-        it("should create a chart of type pie when mounted", () => {
-            nextTick(() => {
-                expect(doughnut.vm.chart.config.type).to.equal("doughnut");
-            });
+        it("should create a chart of type pie when mounted", async () => {
+            await nextTick();
+            expect(wrapper.vm.chart.config.type).to.equal("pie");
+        });
+        it("should create a canvas element in its component", async () => {
+            await nextTick();
+            expect(wrapper.find("canvas").exists()).to.be.true;
+        });
+    });
+    describe("mounted as doughnut", () => {
+        it("should create an instance of ChartJS when mounted", async () => {
+            await nextTick();
+            expect(doughnut.vm.chart).to.be.an.instanceof(ChartJs);
+        });
+        it("should create a chart of type pie when mounted", async () => {
+            await nextTick();
+            expect(doughnut.vm.chart.config.type).to.equal("doughnut");
         });
         it("should create a canvas element in its component", () => {
             expect(doughnut.find("canvas").exists()).to.be.true;

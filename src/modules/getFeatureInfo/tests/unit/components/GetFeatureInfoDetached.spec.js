@@ -129,7 +129,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
 
 
     it("should have a title", () => {
-        const wrapper = mount(DetachedTemplate, {
+        const wrapper = shallowMount(DetachedTemplate, {
             propsData: {
                 feature
             },
@@ -149,7 +149,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
 
     describe("Page Counter", () => {
         it("should show page counter when showPageNumber is true and totalFeatures > 1", () => {
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature,
                     pagerIndex: 1,
@@ -172,7 +172,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
         });
 
         it("should not show page counter when showPageNumber is false", () => {
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature,
                     pagerIndex: 1,
@@ -194,7 +194,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
         });
 
         it("should not show page counter when totalFeatures is 1", () => {
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature,
                     pagerIndex: 0,
@@ -216,7 +216,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
         });
 
         it("should show correct counter for first page", () => {
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature,
                     pagerIndex: 0,
@@ -238,7 +238,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
         });
 
         it("should show correct counter for last page", () => {
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature,
                     pagerIndex: 4,
@@ -260,7 +260,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
         });
 
         it("should compute showCounter correctly", () => {
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature,
                     pagerIndex: 0,
@@ -282,7 +282,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
         });
 
         it("should compute pageCounterText correctly", () => {
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature,
                     pagerIndex: 2,
@@ -324,7 +324,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
     });
 
     it("should set 'isContentHtml' to true", async () => {
-        const wrapper = mount(DetachedTemplate, {
+        const wrapper = shallowMount(DetachedTemplate, {
             propsData: {
                 feature: {
                     getTheme: () => "default",
@@ -350,7 +350,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
     });
 
     it("should not set 'isContentHtml' to true", async () => {
-        const wrapper = mount(DetachedTemplate, {
+        const wrapper = shallowMount(DetachedTemplate, {
             propsData: {
                 feature
             },
@@ -370,7 +370,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
 
     describe("Lifecycle Hooks", () => {
         it("should emit 'updateFeatureDone' in updated hook if isUpdated is true", async () => {
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 props: {
                     feature: {
                         getTheme: () => "DefaultTheme",
@@ -1032,7 +1032,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
 
     describe("Sticky Header Feature", () => {
         it("should not apply sticky classes when stickyHeader is false", () => {
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature
                 },
@@ -1091,7 +1091,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
                 }
             });
 
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature
                 },
@@ -1150,7 +1150,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
                 }
             });
 
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature
                 },
@@ -1208,7 +1208,7 @@ describe("src/modules/getFeatureInfo/components/GetFeatureInfoDetached.vue", () 
                 }
             });
 
-            const wrapper = mount(DetachedTemplate, {
+            const wrapper = shallowMount(DetachedTemplate, {
                 propsData: {
                     feature
                 },

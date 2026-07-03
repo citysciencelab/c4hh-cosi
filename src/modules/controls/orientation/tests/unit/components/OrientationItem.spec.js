@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {config, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import OrientationItemComponent from "@modules/controls/orientation/components/OrientationItem.vue";
@@ -56,7 +56,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
 
 
     it("renders the Orientation component", () => {
-        const wrapper = mount(OrientationItemComponent, {
+        const wrapper = shallowMount(OrientationItemComponent, {
             global: {
                 plugins: [store]
             }});
@@ -67,7 +67,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     });
 
     it("renders the Orientation button", () => {
-        const wrapper = mount(OrientationItemComponent, {
+        const wrapper = shallowMount(OrientationItemComponent, {
             global: {
                 plugins: [store]
             }});
@@ -76,7 +76,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     });
 
     it("will not render the Poi Orientation button", () => {
-        const wrapper = mount(OrientationItemComponent, {
+        const wrapper = shallowMount(OrientationItemComponent, {
             global: {
                 plugins: [store]
             }});
@@ -85,7 +85,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     });
 
     it("will union the array", () => {
-        const wrapper = mount(OrientationItemComponent, {
+        const wrapper = shallowMount(OrientationItemComponent, {
                 global: {
                     plugins: [store]
                 }}),
@@ -168,7 +168,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
             ];
 
         it("getVectorFeaturesInCircle returns all features", () => {
-            const wrapper = mount(OrientationItemComponent, {
+            const wrapper = shallowMount(OrientationItemComponent, {
                 global: {
                     plugins: [store]
                 }});
@@ -180,7 +180,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         });
         it("getVectorFeaturesInCircle returns only filtered features", () => {
             onlyFilteredFeatures = true;
-            const wrapper = mount(OrientationItemComponent, {
+            const wrapper = shallowMount(OrientationItemComponent, {
                 global: {
                     plugins: [store]
                 }});
@@ -192,7 +192,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         });
         it("getVectorFeaturesInCircle returns only features in extent", () => {
             let returnedFeatures = "";
-            const wrapper = mount(OrientationItemComponent, {
+            const wrapper = shallowMount(OrientationItemComponent, {
                 global: {
                     plugins: [store]
                 }});
