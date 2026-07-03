@@ -9,6 +9,15 @@
 ### Added
 
 ### Changed
+ - The following packages have been updated:
+   - dependencies:
+      - gfiThemes/combinedGfi:
+        - @turf/buffer: ^7.2.0 to ^7.3.5
+        - @turf/boolean-contains: ^7.2.0 to ^7.3.5
+        - @turf/boolean-intersects": ^7.2.0 to ^7.3.5
+      - sdpDownload: 
+        - @turf/helpers": ^7.2.0 to ^7.3.5
+        - @turf/intersect": ^7.2.0 to ^7.3.5
 
 ### Deprecated
 
