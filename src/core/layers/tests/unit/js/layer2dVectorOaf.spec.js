@@ -10,6 +10,7 @@ import webgl from "@core/layers/js/webglRenderer.js";
 import store from "@appstore/index.js";
 import {oaf} from "@masterportal/masterportalapi/src/index.js";
 import Layer2dVectorOaf from "@core/layers/js/layer2dVectorOaf.js";
+import Layer2dVector from "@core/layers/js/layer2dVector.js";
 
 describe("src/core/js/layers/layer2dVectorOaf.js", () => {
     let attributes,
@@ -43,6 +44,8 @@ describe("src/core/js/layers/layer2dVectorOaf.js", () => {
     });
 
     beforeEach(() => {
+        // Set prototype of Layer2dVectorOaf to Layer2dVector to avoid errors in tests
+        Object.setPrototypeOf(Layer2dVectorOaf.prototype, Layer2dVector.prototype);
         attributes = {
             id: "id",
             name: "oafTestLayer",

@@ -7,6 +7,7 @@ import VectorSource from "ol/source/Vector.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import webgl from "@core/layers/js/webglRenderer.js";
 import Layer2dVectorWfs from "@core/layers/js/layer2dVectorWfs.js";
+import Layer2dVector from "@core/layers/js/layer2dVector.js";
 
 describe("src/core/js/layers/layer2dVectorWfs.js", () => {
     let attributes,
@@ -34,6 +35,8 @@ describe("src/core/js/layers/layer2dVectorWfs.js", () => {
     beforeEach(() => {
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
+        // Set prototype of Layer2dVectorWfs to Layer2dVector to avoid errors in tests
+        Object.setPrototypeOf(Layer2dVectorWfs.prototype, Layer2dVector.prototype);
         attributes = {
             id: "id",
             name: "wfsTestLayer",

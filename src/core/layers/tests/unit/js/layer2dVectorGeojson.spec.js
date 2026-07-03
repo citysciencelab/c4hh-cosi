@@ -9,6 +9,7 @@ import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.j
 import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createStyle.js";
 import getGeometryTypeFromService from "@masterportal/masterportalapi/src/vectorStyle/lib/getGeometryTypeFromService.js";
 import Layer2dVectorGeojson from "@core/layers/js/layer2dVectorGeojson.js";
+import Layer2dVector from "@core/layers/js/layer2dVector.js";
 import webgl from "@core/layers/js/webglRenderer.js";
 
 describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
@@ -38,6 +39,8 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
     });
 
     beforeEach(() => {
+        // Set prototype of Layer2dVectorGeojson to Layer2dVector to avoid errors in tests
+        Object.setPrototypeOf(Layer2dVectorGeojson.prototype, Layer2dVector.prototype);
         attributes = {
             id: "id",
             name: "geojsonTestLayer",
