@@ -35,6 +35,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
                                 showPoi: sinon.stub(),
                                 showPoiChoice: sinon.stub(),
                                 showPoiIcon: sinon.stub(),
+                                showAccuracy: () => false,
                                 zoomMode: sinon.stub(),
                                 onlyFilteredFeatures: () => onlyFilteredFeatures
                             }

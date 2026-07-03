@@ -66,7 +66,7 @@ export default {
             "showPoiChoice",
             "showPoiIcon",
             "zoomMode",
-            "showAccuracy",
+            "showAccuracy"
         ]),
         ...mapGetters("Maps", ["projection"]),
         ...mapGetters(["visibleLayerConfigs"]),
