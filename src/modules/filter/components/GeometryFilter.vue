@@ -457,13 +457,28 @@ export default {
          * Checks the number of rings of the polygon and gets only the interior ring as a polygon.
          * If there are more than two rings, the exterior linear ring is available at index 0 and the interior rings at index 1 and beyond
          * @param {ol/Polygon} geometry - Polygon.
-         * @returns {ol/Polygon} The interior ring as a polygon.
+         * @returns {(ol/Polygon|ol/MultiPolygon)} The interior ring as a polygon or multipolygon.
          */
         getInnerPolygon (geometry) {
-            if (geometry.getLinearRingCount() > 1) {
-                return new Polygon([geometry.getLinearRings()[1].getCoordinates()]);
+            const ringCount = geometry.getLinearRingCount();
+
+            if (ringCount <= 1) {
+                return null;
             }
-            return new Polygon([geometry.getLinearRings()[0].getCoordinates()]);
+
+            const innerRings = geometry.getLinearRings().slice(1);
+
+            if (innerRings.length === 1) {
+                return new Polygon([
+                    innerRings[0].getCoordinates()
+                ]);
+            }
+
+            return new MultiPolygon(
+                innerRings.map(ring => [
+                    ring.getCoordinates()
+                ])
+            );
         },
 
         /**

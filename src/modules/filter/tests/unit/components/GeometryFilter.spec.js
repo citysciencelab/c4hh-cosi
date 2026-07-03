@@ -6,7 +6,7 @@ import sinon from "sinon";
 import Draw from "ol/interaction/Draw.js";
 import {Vector as VectorLayer} from "ol/layer.js";
 import Feature from "ol/Feature.js";
-import {Polygon, LineString} from "ol/geom.js";
+import {Polygon, LineString, MultiPolygon} from "ol/geom.js";
 import {nextTick} from "vue";
 
 config.global.mocks.$t = key => key;
@@ -285,6 +285,82 @@ describe("src/modules/filter/components/GeometryFilter.vue", () => {
                     results = wrapper.vm.prepareAdditionalGeometries(additionalGeometries);
 
                 expect(results[0]).to.have.all.keys("type", "feature", "name", "innerPolygon");
+            });
+        });
+
+        describe("getInnerPolygon", () => {
+            it("should return null if the given polygon has no inner rings", () => {
+                const geometry = new Polygon([
+                        [
+                            [0, 0],
+                            [0, 10],
+                            [10, 10],
+                            [10, 0],
+                            [0, 0]
+                        ]
+                    ]),
+                    innerPolygon = wrapper.vm.getInnerPolygon(geometry);
+
+                expect(innerPolygon).to.be.null;
+            });
+
+            it("should return a polygon if the given polygon has one inner ring", () => {
+                const innerRing = [
+                        [2, 2],
+                        [2, 4],
+                        [4, 4],
+                        [4, 2],
+                        [2, 2]
+                    ],
+                    geometry = new Polygon([
+                        [
+                            [0, 0],
+                            [0, 10],
+                            [10, 10],
+                            [10, 0],
+                            [0, 0]
+                        ],
+                        innerRing
+                    ]),
+                    innerPolygon = wrapper.vm.getInnerPolygon(geometry);
+
+                expect(innerPolygon).to.be.instanceOf(Polygon);
+                expect(innerPolygon.getCoordinates()).to.deep.equal([innerRing]);
+            });
+
+            it("should return a multi polygon if the given polygon has multiple inner rings", () => {
+                const firstInnerRing = [
+                        [2, 2],
+                        [2, 4],
+                        [4, 4],
+                        [4, 2],
+                        [2, 2]
+                    ],
+                    secondInnerRing = [
+                        [6, 6],
+                        [6, 8],
+                        [8, 8],
+                        [8, 6],
+                        [6, 6]
+                    ],
+                    geometry = new Polygon([
+                        [
+                            [0, 0],
+                            [0, 10],
+                            [10, 10],
+                            [10, 0],
+                            [0, 0]
+                        ],
+                        firstInnerRing,
+                        secondInnerRing
+                    ]),
+                    innerPolygon = wrapper.vm.getInnerPolygon(geometry);
+
+                expect(innerPolygon).to.be.instanceOf(MultiPolygon);
+                expect(innerPolygon.getCoordinates()).to.deep.equal([
+                    [firstInnerRing],
+                    [secondInnerRing]
+                ]);
             });
         });
 
