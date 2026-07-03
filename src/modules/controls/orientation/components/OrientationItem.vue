@@ -192,21 +192,32 @@ export default {
             else if (this.isGeolocationDenied === false) {
                 mapCollection.getMap("2D").addOverlay(this.marker);
                 if (this.geolocation === null) {
-                    geolocation = new Geolocation({tracking: true, projection: Proj.get("EPSG:4326"), trackingOptions: {enableHighAccuracy: true}});
+                    geolocation = markRaw(new Geolocation({tracking: false, projection: Proj.get("EPSG:4326"), trackingOptions: {enableHighAccuracy: true}}));
                     this.setGeolocation(geolocation);
                 }
                 else {
                     geolocation = this.geolocation;
-                    this.positioning();
                 }
+
+                geolocation.un("change", this.positioning);
+                geolocation.un("error", this.onError, this);
+                geolocation.un("change:accuracyGeometry", this.updateAccuracyGeometry);
+
                 if (this.showAccuracy) {
                     this.initAccuracyLayer();
                     geolocation.on("change:accuracyGeometry", this.updateAccuracyGeometry);
-                    this.updateAccuracyGeometry();
                 }
 
                 geolocation.on("change", this.positioning);
                 geolocation.on("error", this.onError);
+                geolocation.setTracking(true);
+
+                if (geolocation.getPosition()) {
+                    this.positioning();
+                }
+                if (this.showAccuracy) {
+                    this.updateAccuracyGeometry();
+                }
                 this.tracking = true;
             }
             else {
@@ -231,7 +242,6 @@ export default {
             this.clearAccuracyGeometry();
 
             this.tracking = false;
-            this.setGeolocation(null);
         },
 
         /**
