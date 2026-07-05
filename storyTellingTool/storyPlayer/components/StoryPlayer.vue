@@ -930,6 +930,44 @@ export default {
                     height: 100%;
                 }
             }
+
+            strong, b {
+                font-family: $font_family_accent;
+            }
+
+            p {
+                font-size: $font-size-base;
+            }
+
+            p:empty {
+                min-height: 1em;
+            }
+
+            p:empty::before {
+                content: "\00a0";
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-family: $font_family_accent;
+                text-transform: unset;
+                border: 0;
+                color: $dark_grey;
+                line-height: 1.1;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            h3 {
+                font-size: 1.1rem;
+            }
         }
 
         &.active {
