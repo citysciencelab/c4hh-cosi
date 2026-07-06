@@ -47,6 +47,8 @@ export default {
             tracking: false,
             isGeolocationDenied: false,
             isGeoLocationPossible: false,
+            heading: null,
+            previousPosition: null,
             accuracyFeature: createAccuracyFeature(),
             accuracyLayer: null
         };
@@ -62,6 +64,7 @@ export default {
             "poiDistances",
             "poiMode",
             "poiModeCurrentPositionEnabled",
+            "showDirection",
             "showPoi",
             "showPoiChoice",
             "showPoiIcon",
@@ -72,6 +75,17 @@ export default {
         ...mapGetters(["visibleLayerConfigs"]),
         poiDistancesLocal () {
             return this.poiDistances === true ? [500, 1000, 2000] : this.poiDistances;
+        },
+        markerDirectionStyle () {
+            if (!this.showDirection || !Number.isFinite(this.heading)) {
+                return {};
+            }
+
+            const headingInDegree = (this.heading * 180 / Math.PI + 360) % 360;
+
+            return {
+                "--marker-heading-angle": `${headingInDegree}deg`
+            };
         }
     },
     watch: {
@@ -205,6 +219,54 @@ export default {
         stopTrackingSession (geolocation) {
             geolocation.setTracking(false); // for FireFox - cannot handle geolocation.un(...)
             this.unbindGeolocationListeners(geolocation);
+            this.heading = null;
+            this.previousPosition = null;
+        },
+
+        /**
+         * Calculates the movement heading from two geolocation points.
+         * @param {Number[]|null} previousPosition previous geolocation position as [lon, lat].
+         * @param {Number[]|null} currentPosition current geolocation position as [lon, lat].
+         * @returns {Number|null} heading in radians clockwise from north.
+         */
+        calculateHeadingFromPositions (previousPosition, currentPosition) {
+            if (!Array.isArray(previousPosition) || !Array.isArray(currentPosition)) {
+                return null;
+            }
+
+            const [lon1, lat1] = previousPosition,
+                [lon2, lat2] = currentPosition,
+                toRad = degree => degree * Math.PI / 180,
+                lon1Rad = toRad(lon1),
+                lat1Rad = toRad(lat1),
+                lon2Rad = toRad(lon2),
+                lat2Rad = toRad(lat2),
+                deltaLon = lon2Rad - lon1Rad,
+                y = Math.sin(deltaLon) * Math.cos(lat2Rad),
+                x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLon),
+                bearing = Math.atan2(y, x),
+                normalizedBearing = (bearing + 2 * Math.PI) % (2 * Math.PI);
+
+            if (!Number.isFinite(normalizedBearing) || Math.abs(deltaLon) < 1e-12 && Math.abs(lat2Rad - lat1Rad) < 1e-12) {
+                return null;
+            }
+
+            return normalizedBearing;
+        },
+
+        /**
+         * Returns heading from geolocation sensor and falls back to movement bearing.
+         * @param {Number|null|undefined} nativeHeading heading from Geolocation API.
+         * @param {Number[]|null} previousPosition previous geolocation position as [lon, lat].
+         * @param {Number[]|null} currentPosition current geolocation position as [lon, lat].
+         * @returns {Number|null} heading in radians clockwise from north.
+         */
+        resolveHeading (nativeHeading, previousPosition, currentPosition) {
+            if (Number.isFinite(nativeHeading)) {
+                return nativeHeading;
+            }
+
+            return this.calculateHeadingFromPositions(previousPosition, currentPosition);
         },
 
         /**
@@ -354,9 +416,15 @@ export default {
          */
         positioning () {
             const position = this.geolocation.getPosition(),
-                  firstGeolocation = this.firstGeolocation,
-                  zoomMode = this.zoomMode,
-                  centerPosition = proj4(proj4("EPSG:4326"), proj4(this.projection.getCode()), position);
+                firstGeolocation = this.firstGeolocation,
+                zoomMode = this.zoomMode,
+                centerPosition = proj4(proj4("EPSG:4326"), proj4(this.projection.getCode()), position),
+                resolvedHeading = this.resolveHeading(this.geolocation.getHeading(), this.previousPosition, position);
+
+            if (Number.isFinite(resolvedHeading)) {
+                this.heading = resolvedHeading;
+            }
+            this.previousPosition = Array.isArray(position) ? [...position] : null;
 
             // setting the center position
             this.setPosition(centerPosition);
@@ -423,7 +491,7 @@ export default {
                 this.$store.dispatch("Maps/removePointMarker");
                 mapCollection.getMap("2D").addOverlay(this.marker);
                 if (this.geolocation === null) {
-                    geolocation = new Geolocation({tracking: true, projection: Proj.get("EPSG:4326")});
+                    geolocation = new Geolocation({tracking: true, enableHighAccuracy: true, projection: Proj.get("EPSG:4326")});
                     this.setGeolocation(geolocation);
                 }
                 else {
@@ -615,6 +683,15 @@ export default {
             id="geolocation_marker"
             class="geolocation_marker"
         >
+            <span
+                v-if="showDirection && Number.isFinite(heading)"
+                class="geolocation_marker_direction_anchor"
+                :style="markerDirectionStyle"
+            >
+                <i
+                    class="bi-caret-up-fill geolocation_marker_direction"
+                />
+            </span>
             <i :class="iconGeolocationMarker" />
         </span>
         <ControlIcon
@@ -653,9 +730,30 @@ export default {
         }
     }
     .geolocation_marker {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         color: $dark_blue;
-        padding: 1px;
+        padding: 2px;
         border-radius: 50%;
-        font-size: 1.4rem;
+        font-size: 1.9rem;
+        text-shadow: 0 0 2px rgba(255, 255, 255, 0.9);
+    }
+    .geolocation_marker_direction {
+        display: inline-block;
+        color: $dark_blue;
+        font-size: 1rem;
+        line-height: 1;
+        pointer-events: none;
+        text-shadow: 0 0 2px rgba(255, 255, 255, 0.9);
+    }
+    .geolocation_marker_direction_anchor {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -102%) rotate(var(--marker-heading-angle, 0deg));
+        transform-origin: 50% 100%;
+        pointer-events: none;
     }
 </style>

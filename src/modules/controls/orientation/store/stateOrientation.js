@@ -20,6 +20,7 @@
  * @property {Boolean} showPoiChoice Wether poi choice is activated.
  * @property {Boolean} showPoiIcon Wether to show the poi icon.
  * @property {Boolean} showAccuracy Wether to show the accuracy circle which is displayed around the marker.
+ * @property {Boolean} showDirection Wether to show the direction arrow with the marker.
  */
 const state = {
     iconGeolocate: "geo-alt",
@@ -41,7 +42,8 @@ const state = {
     showPoi: false,
     showPoiChoice: false,
     showPoiIcon: false,
-    showAccuracy: false
+    showAccuracy: false,
+    showDirection: false
 };
 
 export default state;

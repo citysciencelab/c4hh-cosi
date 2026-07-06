@@ -9,6 +9,7 @@ import layerCollection from "@core/layers/js/layerCollection.js";
 describe("src/modules/controls/orientation/components/OrientationItem.vue", () => {
     let store,
         onlyFilteredFeatures = false,
+        showDirection = false,
         iconGeolocationMarker;
     const mockAlertingActions = {
         addSingleAlert: sinon.stub()
@@ -16,6 +17,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
 
     beforeEach(() => {
         iconGeolocationMarker = "bi-crosshair";
+        showDirection = false;
         store = createStore({
             namespaced: true,
             modules: {
@@ -35,6 +37,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
                                 showPoi: sinon.stub(),
                                 showPoiChoice: sinon.stub(),
                                 showPoiIcon: sinon.stub(),
+                                showDirection: () => showDirection,
                                 showAccuracy: () => false,
                                 zoomMode: sinon.stub(),
                                 onlyFilteredFeatures: () => onlyFilteredFeatures
@@ -94,6 +97,51 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
             arr = [3, 4, 5, 6, 7];
 
         expect(wrapper.vm.union(arr1, arr2, (obj1, obj2) => obj1 === obj2)).to.deep.equal(arr);
+    });
+
+    it("creates marker direction style from heading", () => {
+        showDirection = true;
+        const wrapper = mount(OrientationItemComponent, {
+            global: {
+                plugins: [store]
+            }});
+
+        wrapper.vm.heading = Math.PI / 2;
+
+        expect(wrapper.vm.markerDirectionStyle.transform).to.include("rotate(90deg)");
+    });
+
+    it("calculates fallback heading from movement", () => {
+        const wrapper = mount(OrientationItemComponent, {
+            global: {
+                plugins: [store]
+            }});
+
+        const heading = wrapper.vm.calculateHeadingFromPositions([0, 0], [1, 0]);
+
+        expect(heading).to.be.closeTo(Math.PI / 2, 0.001);
+    });
+
+    it("prefers native heading if available", () => {
+        const wrapper = mount(OrientationItemComponent, {
+            global: {
+                plugins: [store]
+            }});
+
+        const heading = wrapper.vm.resolveHeading(1.2, [0, 0], [1, 0]);
+
+        expect(heading).to.equal(1.2);
+    });
+
+    it("uses fallback heading if native heading missing", () => {
+        const wrapper = mount(OrientationItemComponent, {
+            global: {
+                plugins: [store]
+            }});
+
+        const heading = wrapper.vm.resolveHeading(null, [0, 0], [1, 0]);
+
+        expect(heading).to.be.closeTo(Math.PI / 2, 0.001);
     });
     describe("OrientationItem.vue methods", () => {
         const centerPosition = [0, 0],
