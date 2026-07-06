@@ -17,6 +17,7 @@ import stateSearchBar from "./searchBar/stateSearchBar.js";
  * @property {String} placeholderJsonPath - Path placeholder.json file in portalconfigs.
  * @property {Object} placeholderDataClassList - Placeholder data class list from placeholder.json
  * @property {Number} minScaleValue - minimal scale value for search in map extent (e.g. 5000 for 1 : 5.000)
+ * @property {Number} maxGeometryArea - maximum area allowed for polygons in geometric search (in squaremeter, default 16 km² = 16000000 m²)
  * @property {String} zipFileName - name part of the created zip file name, will be extended by '.zip'
  * @property {Number} maxDownloadMB - maximal allowed size of files to select for download in MB (default 500, set -1 to skip max size check)
  * @property {Number} maxResultValueCount - maximal number of results to be requested from server in attributive search (default 25)
@@ -62,7 +63,7 @@ const state = {
     hasMouseMapInteractions: true,
     apiBasePath: "",
     minScaleValue: 5000,
-    maxGeometryArea: 4000000,
+    maxGeometryArea: 16000000,
     zipFileName: "GeoDataDepot-Download",
     maxDownloadMB: 500,
     maxResultValueCount: 25,

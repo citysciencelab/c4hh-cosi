@@ -569,7 +569,7 @@ export default {
         async onSelectedArchiveIdsChange (archiveId, event) {
             this.setErrorMessage("");
             const checked = event.target.checked,
-                layerConfig = this.placeholderDataClassList[archiveId]?.LAYERCONFIG;
+                layerConfig = this.placeholderDataClassList?.[archiveId]?.LAYERCONFIG;
 
             if (checked) {
                 if (!this.selectedArchiveIds.includes(archiveId)) {
@@ -1152,7 +1152,7 @@ export default {
          */
         removeArchiveLayers () {
             this.selectedArchiveIds.forEach(archiveId => {
-                const layerConfig = this.placeholderDataClassList[archiveId].LAYERCONFIG;
+                const layerConfig = this.placeholderDataClassList?.[archiveId]?.LAYERCONFIG;
 
                 if (layerConfig && layerConfig.id) {
                     this.replaceByIdInLayerConfig({
