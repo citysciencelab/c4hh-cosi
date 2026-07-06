@@ -177,10 +177,12 @@ export default {
      * @param {Object} param.getters the getters
      * @param {Object} param.state the state
      * @param {Object} param.rootGetters the rootGetters
-     * @param {String} side Side on which the navigation action occurred.
+     * @param {Object} payload the payload
+     * @param {String} payload.side Side on which the navigation action occurred.
+     * @param {Boolean} [payload.doNotTrack] Additional flag for user tracking observing this action.
      * @returns {void}
      */
-    navigateBack ({commit, dispatch, getters, state, rootGetters}, side) {
+    navigateBack ({commit, dispatch, getters, state, rootGetters}, {side}) {
         const actionEvent = rootGetters["Modules/SearchBar/currentActionEvent"];
 
         nextTick(() => {
@@ -261,7 +263,7 @@ export default {
         else {
             commit("Modules/SearchBar/setSearchResultsActive", false, {root: true});
             commit("Modules/SearchBar/setShowSearchResultsInTree", false, {root: true});
-            dispatch("Modules/LayerSelection/navigateBack", null, {root: true});
+            dispatch("Modules/LayerSelection/navigateBack", {doNotTrack: true}, {root: true});
         }
         commit("switchToPreviousComponent", side);
     },

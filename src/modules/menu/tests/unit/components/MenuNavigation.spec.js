@@ -133,7 +133,7 @@ describe("src/core/menu/navigation/components/MenuNavigation.vue", () => {
 
         await navigation.trigger("click");
         expect(navigateBackSpy.calledOnce).to.be.true;
-        expect(navigateBackSpy.firstCall.args[1]).to.be.equals("mainMenu");
+        expect(navigateBackSpy.firstCall.args[1].side).to.be.equals("mainMenu");
 
     });
 
@@ -147,7 +147,7 @@ describe("src/core/menu/navigation/components/MenuNavigation.vue", () => {
 
         await navigation.trigger("click");
         expect(navigateBackSpy.calledOnce).to.be.true;
-        expect(navigateBackSpy.firstCall.args[1]).to.be.equals("secondaryMenu");
+        expect(navigateBackSpy.firstCall.args[1].side).to.be.equals("secondaryMenu");
 
     });
 

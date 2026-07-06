@@ -52,15 +52,23 @@ const Config = {
         changeLanguageOnStartWhen: ["querystring", "localStorage", "htmlTag"]
     },
     userTracking: {
+        global: {
+            privacy: {
+                "allowInputTracking": true
+            }
+        },
         matomo: {
-            customDimension: ["spaSession"],
+            customDimension: [
+                {id: 1, name: "portal"}
+            ],
             privacy: [
                 "noAbTesting",
                 "noCookies",
                 "noFormAnalytics",
                 "noHeatmap",
                 "noReferrerUrl",
-                "respectDoNotTrack"
+                "respectDoNotTrack",
+                "useRandomUserIdForSession"
             ],
             siteId: "237",
             trackerScriptUrl: "https://matomo.be-on.de/matomo.js",

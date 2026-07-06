@@ -155,7 +155,7 @@ export default {
                         this.setShowAllResults(false);
                         this.setShowSearchResultsInTree(false);
                         this.setCurrentActionEvent("");
-                        this.navigateBack(this.currentSide);
+                        this.navigateBack({side: this.currentSide, doNotTrack: true});
                     }
                 }
                 if (newVal === "layerSelection" && this.addLayerButtonSearchActive === true) {
@@ -264,7 +264,7 @@ export default {
             }
             else if (currentComponentType === "layerSelection") {
                 if (this.searchInputValue?.length === 0) {
-                    this.navigateBack(this.currentSide);
+                    this.navigateBack({side: this.currentSide, doNotTrack: true});
                     this.startLayerSelectionSearch(this.currentSide);
                     this.startSearch();
                 }
