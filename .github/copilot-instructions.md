@@ -1,7 +1,7 @@
 # GitHub Copilot Instructions — Masterportal
 
 ## Project Overview
-Masterportal (v3.23.0) is an open-source web geoportal toolkit built on **Vue 3 + Vuex 4 + OpenLayers + Cesium**. It provides a configurable GIS portal framework maintained by Geowerkstatt Hamburg. The codebase is large: 50+ core modules, 40+ addons, 10 supported languages. There is no automated CI pipeline — all validation must be run locally via `npm run prePushHook` before pushing.
+Masterportal is an open-source web geoportal toolkit built on **Vue 3 + Vuex 4 + OpenLayers + Cesium**. It provides a configurable GIS portal framework maintained by Geowerkstatt Hamburg. The codebase is large: 50+ core modules, 40+ addons, 10 supported languages. There is no automated CI pipeline — all validation must be run locally via `npm run prePushHook` before pushing.
 
 ---
 
@@ -62,9 +62,14 @@ src/modules/myModule/
     actionsMyModule.js    gettersMyModule.js
     mutationsMyModule.js  stateMyModule.js
     indexMyModule.js      constantsMyModule.js  (if needed)
+  js/                     (optional, for utility functions)
+    utility.js
   tests/unit/
     components/MyModule.spec.js
-    store/actionsMyModule.spec.js  gettersMyModule.spec.js  mutationsMyModule.spec.js
+    store/
+      actionsMyModule.spec.js  gettersMyModule.spec.js  mutationsMyModule.spec.js
+    js/                   (if js/ folder exists)
+      utility.spec.js
 ```
 
 ---
@@ -75,14 +80,14 @@ src/modules/myModule/
 ```js
 // ✅ correct
 import actions from "@modules/featureLister/store/actionsFeatureLister.js";
-import Comp    from "@shared/modules/accordion/components/AccordionItem.vue";
-import Draw    from "ol/interaction/Draw.js";
+import Comp from "@shared/modules/accordion/components/AccordionItem.vue";
+import Draw from "ol/interaction/Draw.js";
 
 // ❌ wrong — ESLint error
 import actions from "@modules/featureLister/store/actionsFeatureLister";
-import Draw    from "ol/interaction/Draw";
+import Draw from "ol/interaction/Draw";
 ```
-Always use the path aliases (`@appstore`, `@shared`, `@core`, `@modules`, `@plugins`) — never deep relative paths (`../../../`). Alias imports require `.js` or `.vue`. Relative imports require `.js`, `.vue`, `.json`, `.css`, `.scss`, or `.sass`.
+Prefer the path aliases (`@appstore`, `@shared`, `@core`, `@modules`, `@plugins`) over deep relative paths where available. Alias imports require `.js` or `.vue`. Relative imports require `.js`, `.vue`, `.json`, `.css`, `.scss`, or `.sass`. Note: style files (`.css`, `.scss`, `.sass`) must always be imported relatively, as the alias rule only permits `.js` and `.vue`.
 
 ### General code rules
 - `no-console` — only `console.warn()` and `console.error()` are allowed
@@ -102,15 +107,15 @@ Always use the path aliases (`@appstore`, `@shared`, `@core`, `@modules`, `@plug
 - See `.github/instructions/vue-conventions.instructions.md` for the full shared component inventory and SCSS rules.
 
 ### Test files
-- `vitest/no-focused-tests` — `test.only()`, `it.only()`, `describe.only()` are **forbidden**
+- `vitest/no-focused-tests` — `test.only()`, `it.only()`, `describe.only()` are **forbidden** (ESLint error)
 
 ---
 
 ## Other Required Conventions
 - **JSDoc**: Required on every `function` declaration, class method, and class declaration (arrow functions exempt). See `.github/instructions/module-conventions.instructions.md` for examples.
-- **i18n**: Never hardcode text. Use `$t('common:modules.myModule.key')` in templates, `i18next.t(...)` in JS. Add keys to all 10 locale files (`locales/{de,en,es,it,nl,platt,pt,ru,tr,ua}/common.json`). Fallback language: German.
+- **i18n**: Never hardcode text. Use `$t('common:modules.myModule.key')` in templates, `i18next.t(...)` in JS. Add keys to at least German and English locale files (`locales/de/common.json`, `locales/en/common.json`). Fallback language: German.
 - **Tests**: `**/*.spec.js` under `tests/unit/`. Use **chai** + **vitest** + **sinon**. Each function needs a positive and a negative test. See `.github/instructions/test-conventions.instructions.md` for setup patterns.
-- **Changelog**: Every change needs an entry in `CHANGELOG.md` under `## Unreleased` (`Added`, `Changed`, `Deprecated`, `Removed`, or `Fixed`). Plain English only.
+- **Changelog**: Every user-visible or behavioral change needs an entry in `CHANGELOG.md` under `## Unreleased` (`Added`, `Changed`, `Deprecated`, `Removed`, or `Fixed`). Plain English only. Pure housekeeping (JSDoc, test additions, internal refactoring without behavior change) does not require an entry.
 
 ---
 
@@ -118,7 +123,7 @@ Always use the path aliases (`@appstore`, `@shared`, `@core`, `@modules`, `@plug
 Addons live in `addons/` — a **co-located independent Git repository** (not a submodule; has its own `.git/` directory and a separate remote at `bitbucket.org/geowerkstatt-hamburg/addons.git`). Addon changes must be committed and pushed to the addons remote independently from the main repo. It has its own `package.json` and `CHANGELOG.md`. Three steps to add one:
 1. Create `addons/{name}/` with `index.js`, `components/`, `store/`, `locales/`
 2. Register in `addons/addonsConf.json`: `"myAddon": { "type": "tool" }` (add `"path"` only when the folder name differs from the key)
-3. Activate per portal: add the key to `Config.addons` in `portal/{name}/config.js`
+3. Activate per portal: add the key to `Config.addons` in `portal/{name}/config.js`. The key must also be registered in `addons/addonsConf.json`.
 
 **Addon types**: `tool`, `gfiTheme`, `searchInterface`, `control`, `javascript`, `vueComponent`. The `index.js` default export for `tool`/`control`/`gfiTheme` is `{ component, store, locales }`. For `searchInterface`: `{ [key]: interfaceInstance }`.
 
@@ -132,8 +137,6 @@ Addons live in `addons/` — a **co-located independent Git repository** (not a 
 Each portal lives in `portal/{name}/` (`auto`, `basic`, `master`) with two distinct config files — do not confuse them:
 - **`config.js`** — runtime globals: `Config.addons` (active addon list), `Config.layerConf`, `Config.restConf`, `Config.styleConf`, OIDC/login settings. This file sets Node-level globals.
 - **`config.json`** — UI layout: menus, map settings, module configuration, layer tree structure.
-
-To activate an addon in a portal, add its key to `Config.addons` in `portal/{name}/config.js`. The key must also be registered in `addons/addonsConf.json`.
 
 ---
 

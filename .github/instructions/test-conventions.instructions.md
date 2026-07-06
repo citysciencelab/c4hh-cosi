@@ -5,7 +5,7 @@ applyTo: "**/*.spec.js"
 # Test Conventions — Masterportal
 
 ## Stack
-- **Vitest** — test runner (`describe`, `it`, `beforeEach`, `afterEach`)
+- **Vitest** — test runner (`describe`, `it`, `beforeEach`, `afterEach`, `beforeAll`, `afterAll`)
 - **Chai** — assertions (`expect`)
 - **Sinon** — stubs, spies, fakes
 - **@vue/test-utils** — Vue component mounting (`shallowMount`, `mount`)
@@ -15,9 +15,17 @@ applyTo: "**/*.spec.js"
 ```js
 // ESLint error — vitest/no-focused-tests
 it.only(...)
-test.only(...)
 describe.only(...)
 ```
+
+## Discouraged — Technical Debt
+```js
+// Do not add new skip calls — fix the test instead or delete it
+it.skip(...)
+describe.skip(...)
+```
+
+Existing `.skip` calls are known technical debt. Do not add new ones. When touching a file that contains `.skip`, remove it and either fix the test or delete it.
 
 ## Action / Getter / Mutation Test Skeleton
 
@@ -53,18 +61,16 @@ describe("src/modules/myModule/store/actionsMyModule", () => {
 
 ```js
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import MyModuleComponent from "@modules/myModule/components/MyModule.vue";
 
-// Mock i18next — always add this at file level for components
-config.global.mocks.$t = key => key;
-
 describe("src/modules/myModule/components/MyModule.vue", () => {
-    let store, wrapper;
+    let store, wrapper, isActive;
 
     beforeEach(() => {
+        isActive = true;
         store = createStore({
             modules: {
                 Modules: {
@@ -74,7 +80,7 @@ describe("src/modules/myModule/components/MyModule.vue", () => {
                             namespaced: true,
                             getters: {
                                 myProp: () => "someValue",
-                                active: () => true
+                                active: () => isActive
                             },
                             actions: {
                                 myAction: sinon.stub()
@@ -85,7 +91,6 @@ describe("src/modules/myModule/components/MyModule.vue", () => {
                         }
                     }
                 },
-                // Add other top-level modules your component dispatches to:
                 Alerting: {
                     namespaced: true,
                     actions: {addSingleAlert: sinon.stub()}
@@ -98,9 +103,7 @@ describe("src/modules/myModule/components/MyModule.vue", () => {
     });
 
     afterEach(() => {
-        if (wrapper) {
-            wrapper.unmount();
-        }
+        // cleanup if needed (e.g., global variables set in beforeEach)
     });
 
     it("renders the component", () => {
@@ -111,17 +114,7 @@ describe("src/modules/myModule/components/MyModule.vue", () => {
     });
 
     it("does not render when inactive", () => {
-        // override getter for this test
-        store = createStore({
-            modules: {
-                Modules: {
-                    namespaced: true,
-                    modules: {
-                        MyModule: {namespaced: true, getters: {active: () => false}}
-                    }
-                }
-            }
-        });
+        isActive = false;
         wrapper = shallowMount(MyModuleComponent, {
             global: {plugins: [store]}
         });
@@ -133,8 +126,7 @@ describe("src/modules/myModule/components/MyModule.vue", () => {
 ## Key Rules
 
 - **Each function needs a positive test** (valid input produces expected output) **and a negative test** (invalid input: `undefined`, `[]`, `{}`, `""`, `null`)
-- **Always call `sinon.restore()`** in `afterEach` — sinon stubs on imported modules persist between tests within the same file when `isolate: false` is set in vitest config
-- **`config.global.mocks.$t = key => key`** — add at file level for all component tests; prevents i18n errors
+- **`config.global.mocks.$t = key => key`** — no longer necessary; existing usages are known technical debt. Do not add to new tests; remove when touching a file that contains it.
 - Use `shallowMount` by default; use `mount` only when child component rendering is explicitly under test
 - Mock only what the component actually uses — do not replicate the entire real store
 - Global variables (`Config`, `i18next`, `mapCollection`) are available in the jsdom environment as properties of `globalThis`. Assign them directly and clean up in `afterEach`:
@@ -145,23 +137,31 @@ describe("src/modules/myModule/components/MyModule.vue", () => {
   ```
   Do **not** use `sinon.stub(global, 'Config')` — it throws if the property is non-configurable or does not exist on the target object.
 
-## Test File Location
+## Test File Location & Global Setup
+
+Test files are discovered automatically — place them mirroring the source structure:
 
 ```
 src/modules/myModule/tests/unit/
-  components/MyModule.spec.js      ← component tests (PascalCase, matches component filename)
-  store/
-    actionsMyModule.spec.js
-    gettersMyModule.spec.js
-    mutationsMyModule.spec.js
-
-addons/myAddon/tests/              ← addon tests (flat, no tests/unit/ subfolder)
-  components/MyAddon.spec.js
-  store/actionsMyAddon.spec.js
+addons/myAddon/tests/unit/
+  ├── components/
+  │   └── MyComponent.spec.js      ← tests for MyComponent.vue
+  ├── store/
+  │   ├── actionsMyModule.spec.js  ← tests for actions
+  │   ├── gettersMyModule.spec.js  ← tests for getters
+  │   └── mutationsMyModule.spec.js ← tests for mutations
+  └── js/                          ← tests for utility functions (if js/ folder exists)
+      └── utility.spec.js
 ```
 
-Test files are auto-discovered by two patterns defined in `devtools/vitest.config.js`:
-- `src/**/*.spec.js` — all core module tests
-- `addons/**/*.spec.js` — all addon tests
+The test file structure **mirrors** the source structure: one test file per source file.
 
-The `applyTo` pattern in this file's frontmatter (`**/*.spec.js`) intentionally covers both locations.
+
+Every test also has access to these global mocks (from `devtools/tests/vitest.setup.js`) — do not replicate in individual test files:
+
+- **`config.global.mocks.$t` and `config.global.mocks.t`** — set for all components; old tests may still add these per-file (technical debt — remove when touching a file)
+- **`enableAutoUnmount`** — `wrapper.unmount()` in `afterEach` is therefore optional but not harmful
+- **`i18next` and `i18next-vue`** — globally mocked via `vi.mock()`
+- **`fetch`** — throws an error if not mocked; always stub `fetch` in tests that trigger it
+- **`ResizeObserver`**, **`CanvasPattern`**, **`window.matchMedia`** — polyfilled
+- **`Cesium`** — globally mocked

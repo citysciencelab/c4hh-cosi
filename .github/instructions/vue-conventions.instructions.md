@@ -56,18 +56,16 @@ Always prefer shared components over building custom equivalents. Available in `
 
 ```html
 <style lang="scss" scoped>
-@import 'variables'; // Vite alias → src/assets/css/variables.scss; only when Bootstrap/theming variables are needed
-
 .my-module {
-    // use BEM or module-prefixed class names
+    // module-prefixed class names
 }
 </style>
 ```
 
 - Use `scoped` on every `<style>` tag
-- Import `variables` using the bare alias (`@import 'variables'`) — the `~` tilde prefix is webpack-era syntax and must **not** be used with Vite
-- The alias `variables` is registered in `devtools/vite.config.js`; import it only when Bootstrap theming variables or shared mixins are needed
-- Class names must be prefixed with the module name or use BEM notation to avoid global leakage (rule A.3.9)
+- **Never** write `@import 'variables'` — it causes errors in Vite; Bootstrap theming variables and shared mixins are available automatically via the Vite config
+- Class names must be prefixed with the module name to avoid global leakage (rule A.3.9)
+- Use `rem` for sizes, not `px` — ensures proper scaling with user font-size settings
 - No absolute `width`/`height` values where avoidable — prefer responsive units
 
 ## Accessibility (vuejs-accessibility plugin)

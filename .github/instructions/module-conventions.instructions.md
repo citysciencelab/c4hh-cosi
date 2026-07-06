@@ -19,12 +19,16 @@ src/modules/myModule/
     stateMyModule.js
     indexMyModule.js          ← wires store together
     constantsMyModule.js      ← optional, for enums/constants
+  js/                         ← optional, for utility functions
+    utility.js
   tests/unit/
     components/MyModule.spec.js
     store/
       actionsMyModule.spec.js
       gettersMyModule.spec.js
       mutationsMyModule.spec.js
+    js/                       ← tests for utility functions (if js/ folder exists)
+      utility.spec.js
 ```
 
 ## Store Wiring — `indexMyModule.js`
@@ -36,7 +40,7 @@ import getters from "./gettersMyModule.js";
 import state from "./stateMyModule.js";
 
 export default {
-    namespaced: true,
+    namespaced: true, // always true — scopes getters/actions/mutations under "Modules/MyModule/..."
     state,
     mutations,
     actions,
@@ -84,8 +88,11 @@ export default getters;
 const state = {
     type: "myModule",
     name: "common:modules.myModule.name",
+    description: "common:modules.myModule.description",
     icon: "bi-example",
-    active: false
+    supportedDevices: ["Desktop", "Mobile"],
+    supportedMapModes: ["2D"],
+    hasMouseMapInteractions: true  // only if interactions with map/mouse are required
     // add module-specific properties here
 };
 
@@ -106,7 +113,19 @@ Every `function` declaration, class method, and class declaration requires a JSD
 async function loadFeatures ({commit, dispatch}, layerId) {
     // ...
 }
+
+/**
+ * Formats a coordinate pair as a human-readable string.
+ * @param {number} lon Longitude value.
+ * @param {number} lat Latitude value.
+ * @returns {string} The formatted coordinate string, e.g. "53.55°N 10.00°E".
+ */
+function formatCoordinate (lon, lat) {
+    // ...
+}
 ```
+
+When `@returns` is not `void`, always include a description of what is returned.
 
 ## Internationalization (A.7)
 
@@ -120,10 +139,10 @@ $t('common:modules.myModule.someLabel')
 i18next.t("common:modules.myModule.someLabel")
 ```
 
-Add every new key to **all 10** locale files:
-`locales/de/common.json`, `locales/en/common.json`, `locales/es/common.json`, `locales/it/common.json`, `locales/nl/common.json`, `locales/platt/common.json`, `locales/pt/common.json`, `locales/ru/common.json`, `locales/tr/common.json`, `locales/ua/common.json`
+Add every new key to **at least German and English** locale files:
+`locales/de/common.json`, `locales/en/common.json`
 
-The fallback language is German (`de`). At minimum always fill `de` and `en`.
+Other languages (`es`, `it`, `nl`, `platt`, `pt`, `ru`, `tr`, `ua`) can be added but are not required.
 
 ## Additional ESLint Rules Active in Modules
 

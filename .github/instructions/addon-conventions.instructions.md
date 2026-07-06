@@ -15,7 +15,7 @@ To run the full CI gate: `npm run prePushHook` from the **main repo root** (cove
 
 ## Addon Registration — three required steps
 
-1. **Create** `addons/{name}/` with the structure below.
+1. **Create** `addons/{name}/` with the structure described in the **Folder Structure** section below.
 2. **Register** in `addons/addonsConf.json`:
    ```json
    "myAddon": { "type": "tool" }
@@ -67,17 +67,25 @@ addons/myAddon/               ← tool / control / gfiTheme
     actionsMyAddon.js    gettersMyAddon.js
     mutationsMyAddon.js  stateMyAddon.js
     indexMyAddon.js
+  js/                   ← optional, for utility functions
+    utility.js
   locales/
-    de/additional.json   ← NOT common.json
+    de/additional.json   ← namespace: $t("additional:myAddon.key")
     en/additional.json
-  tests/                 ← note: tests/ (flat), not tests/unit/
+  tests/unit/
     components/MyAddon.spec.js
-    store/actionsMyAddon.spec.js
+    store/
+      actionsMyAddon.spec.js
+      gettersMyAddon.spec.js
+      mutationsMyAddon.spec.js
+    js/                ← if js/ folder exists
+      utility.spec.js
   index.js
 
 addons/searchInterfaces/mySearch/    ← searchInterface
   js/searchInterfaceMySearch.js
-  tests/
+  tests/unit/
+    js/searchInterfaceMySearch.spec.js
   index.js
 ```
 
