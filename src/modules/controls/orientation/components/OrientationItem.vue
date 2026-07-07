@@ -9,9 +9,6 @@ import Geolocation from "ol/Geolocation.js";
 import Overlay from "ol/Overlay.js";
 import proj4 from "proj4";
 import * as Proj from "ol/proj.js";
-import {Circle, LineString} from "ol/geom.js";
-import layerCollection from "@core/layers/js/layerCollection.js";
-import isObject from "@shared/js/utils/isObject.js";
 import {
     clearAccuracyGeometry as clearAccuracyGeometryUtil,
     createAccuracyFeature,
@@ -19,6 +16,7 @@ import {
     removeAccuracyLayer as removeAccuracyLayerUtil,
     updateAccuracyGeometry as updateAccuracyGeometryUtil
 } from "../utils/accuracyLayer.js";
+import {getVectorFeaturesInCircle as getVectorFeaturesInCircleUtil} from "../utils/poiFeatureSearch.js";
 
 /**
  * Orientation control that allows the user to locate themselves on the map.
@@ -529,115 +527,12 @@ export default {
          * @return {ol/feature} Array of ol.features list
          */
         getVectorFeaturesInCircle (layerConfigs, distance, centerPosition) {
-            const circle = new Circle(centerPosition, distance),
-                  circleExtent = circle.getExtent(),
-                  visibleWFSLayers = [];
-
-            layerConfigs.forEach(layerConfig => {
-                if (layerConfig.typ === "WFS" && layerConfig.visibility) {
-                    const layer = layerCollection.getLayerById(layerConfig.id);
-
-                    if (layer) {
-                        visibleWFSLayers.push(layer);
-                    }
-                }
+            return getVectorFeaturesInCircleUtil({
+                layerConfigs,
+                distance,
+                centerPosition,
+                onlyFilteredFeatures: this.onlyFilteredFeatures
             });
-            let featuresAll = [],
-                features = [];
-
-            visibleWFSLayers.forEach(layer => {
-                let preparedFeatures,
-                    filteredFeatures = [];
-
-                if (layer.getLayerSource()) {
-                    features = layer.getLayerSource().getFeaturesInExtent(circleExtent);
-                    filteredFeatures = features.filter(feat => {
-                        return (isObject(feat.getStyle()) && feat.getStyle().getImage() !== null) || (typeof feat.getStyle() === "function" && feat.getStyle()(feat) !== null);
-                    });
-                    if (this.onlyFilteredFeatures === true) {
-                        features = filteredFeatures;
-                    }
-                    preparedFeatures = features.filter((feat) => {
-                        const dist = this.getDistance(feat, centerPosition);
-
-                        return dist <= distance;
-                    });
-
-                    preparedFeatures.forEach(function (feat) {
-                        Object.assign(feat, {
-                            styleId: layer.get("styleId"),
-                            layerName: layer.get("name"),
-                            nearbyTitleText: this.getNearbyTitleText(feat, layer.get("nearbyTitle")),
-                            dist2Pos: this.getDistance(feat, centerPosition)
-                        });
-                    }, this);
-                    featuresAll = this.union(preparedFeatures, featuresAll, function (obj1, obj2) {
-                        return obj1 === obj2;
-                    });
-                }
-            }, this);
-
-            return featuresAll;
-        },
-
-        /**
-         * Computes the union of the passed-in arrays: the list of unique items, in order, that are present in one or more of the arrays.
-         * @param  {Array} arr1 the first array
-         * @param  {Array} arr2 the second array
-         * @param  {Function} equalityFunc to compare objects
-         * @returns {Array} the union of the two arrays
-         */
-        union (arr1, arr2, equalityFunc) {
-            const union = arr1.concat(arr2);
-            let i = 0,
-                j = 0;
-
-            for (i = 0; i < union.length; i++) {
-                for (j = i + 1; j < union.length; j++) {
-                    if (equalityFunc(union[i], union[j])) {
-                        union.splice(j, 1);
-                        j--;
-                    }
-                }
-            }
-            return union;
-        },
-
-        /**
-         * Getting the distance from center position
-         * @param  {ol/feature} feat Feature
-         * @param {Number[]} centerPosition the center position
-         * @return {Number} dist the distance
-         */
-        getDistance (feat, centerPosition) {
-            const closestPoint = feat.getGeometry().getClosestPoint(centerPosition),
-                  line = new LineString([closestPoint, centerPosition]);
-
-            return Math.round(line.getLength());
-        },
-
-        /**
-         * Getting the attributes for the list of nearby features
-         * @param {ol/Feature} feat Feature
-         * @param {(String|String[])} nearbyTitle the attribute(s) of features to show in the nearby list
-         * @return {String[]} the text of nearbyTitle
-         */
-        getNearbyTitleText (feat, nearbyTitle) {
-            if (typeof nearbyTitle === "string" && feat.get(nearbyTitle) !== undefined) {
-                return [feat.get(nearbyTitle)];
-            }
-            else if (Array.isArray(nearbyTitle)) {
-                const nearbyTitleText = [];
-
-                nearbyTitle.forEach(attr => {
-                    if (feat.get(attr) !== undefined) {
-                        nearbyTitleText.push(feat.get(attr));
-                    }
-                });
-
-                return nearbyTitleText;
-            }
-            return [];
         }
     }
 

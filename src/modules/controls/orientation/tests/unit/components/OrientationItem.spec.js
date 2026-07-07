@@ -4,6 +4,10 @@ import {expect} from "chai";
 import sinon from "sinon";
 import OrientationItemComponent from "@modules/controls/orientation/components/OrientationItem.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
+import {
+    getVectorFeaturesInCircle,
+    union
+} from "@modules/controls/orientation/utils/poiFeatureSearch.js";
 
 
 describe("src/modules/controls/orientation/components/OrientationItem.vue", () => {
@@ -57,6 +61,10 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         });
     });
 
+    afterEach(() => {
+        sinon.restore();
+    });
+
 
     it("renders the Orientation component", () => {
         const wrapper = shallowMount(OrientationItemComponent, {
@@ -88,15 +96,11 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     });
 
     it("will union the array", () => {
-        const wrapper = shallowMount(OrientationItemComponent, {
-                global: {
-                    plugins: [store]
-                }}),
-            arr1 = [3, 3, 4],
+        const arr1 = [3, 3, 4],
             arr2 = [5, 6, 7],
             arr = [3, 4, 5, 6, 7];
 
-        expect(wrapper.vm.union(arr1, arr2, (obj1, obj2) => obj1 === obj2)).to.deep.equal(arr);
+        expect(union(arr1, arr2, (obj1, obj2) => obj1 === obj2)).to.deep.equal(arr);
     });
 
     it("creates marker direction style from heading", () => {
@@ -202,7 +206,12 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
             let returnedFeatures = "";
 
             sinon.stub(layerCollection, "getLayerById").returns(wfsLayer);
-            returnedFeatures = wrapper.vm.getVectorFeaturesInCircle(layerConfigs, distance, centerPosition);
+            returnedFeatures = getVectorFeaturesInCircle({
+                layerConfigs,
+                distance,
+                centerPosition,
+                onlyFilteredFeatures
+            });
             expect(returnedFeatures.length).to.be.equals(2);
         });
         it("getVectorFeaturesInCircle returns only filtered features", () => {
@@ -214,7 +223,12 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
             let returnedFeatures = "";
 
             sinon.stub(layerCollection, "getLayerById").returns(wfsLayer);
-            returnedFeatures = wrapper.vm.getVectorFeaturesInCircle(layerConfigs, distance, centerPosition);
+            returnedFeatures = getVectorFeaturesInCircle({
+                layerConfigs,
+                distance,
+                centerPosition,
+                onlyFilteredFeatures
+            });
             expect(returnedFeatures.length).to.be.equals(1);
         });
         it("getVectorFeaturesInCircle returns only features in extent", () => {
@@ -225,7 +239,12 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
                 }});
 
             sinon.stub(layerCollection, "getLayerById").returns(wfsLayer);
-            returnedFeatures = wrapper.vm.getVectorFeaturesInCircle(layerConfigs, 15, centerPosition);
+            returnedFeatures = getVectorFeaturesInCircle({
+                layerConfigs,
+                distance: 15,
+                centerPosition,
+                onlyFilteredFeatures
+            });
             expect(returnedFeatures.length).to.be.equals(1);
         });
     });
