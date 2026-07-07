@@ -736,18 +736,17 @@ export default {
         align-items: center;
         justify-content: center;
         color: $dark_blue;
-        padding: 2px;
+        padding: 1px;
         border-radius: 50%;
-        font-size: 1.9rem;
-        text-shadow: 0 0 2px rgba(255, 255, 255, 0.9);
+        font-size: 1.4rem;
     }
     .geolocation_marker_direction {
         display: inline-block;
         color: $dark_blue;
         font-size: 1rem;
         line-height: 1;
+        padding-bottom: 0.7rem;
         pointer-events: none;
-        text-shadow: 0 0 2px rgba(255, 255, 255, 0.9);
     }
     .geolocation_marker_direction_anchor {
         position: absolute;

@@ -26,7 +26,7 @@ const state = {
     iconGeolocate: "geo-alt",
     iconGeolocatePOI: "record-circle",
     iconGeolocationMarker: "bi-circle-fill",
-    iconDirectionArrow: "bi-caret-up-fill",
+    iconDirectionArrow: "bi-triangle-fil",
     poiDistances: [],
     supportedDevices: ["Desktop", "Mobile"],
     supportedMapModes: ["2D", "3D"],
