@@ -59,6 +59,7 @@ export default {
             "iconGeolocate",
             "iconGeolocatePOI",
             "iconGeolocationMarker",
+            "iconDirectionArrow",
             "iFrameGeolocationEnabled",
             "onlyFilteredFeatures",
             "poiDistances",
@@ -689,7 +690,7 @@ export default {
                 :style="markerDirectionStyle"
             >
                 <i
-                    class="bi-caret-up-fill geolocation_marker_direction"
+                    :class="iconDirectionArrow + ' geolocation_marker_direction'"
                 />
             </span>
             <i :class="iconGeolocationMarker" />
