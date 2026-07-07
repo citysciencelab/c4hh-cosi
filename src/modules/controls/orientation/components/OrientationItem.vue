@@ -234,19 +234,17 @@ export default {
             if (!Array.isArray(previousPosition) || !Array.isArray(currentPosition)) {
                 return null;
             }
-
-            const [lon1, lat1] = previousPosition,
-                [lon2, lat2] = currentPosition,
-                toRad = degree => degree * Math.PI / 180,
-                lon1Rad = toRad(lon1),
-                lat1Rad = toRad(lat1),
-                lon2Rad = toRad(lon2),
-                lat2Rad = toRad(lat2),
-                deltaLon = lon2Rad - lon1Rad,
-                y = Math.sin(deltaLon) * Math.cos(lat2Rad),
-                x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLon),
-                bearing = Math.atan2(y, x),
-                normalizedBearing = (bearing + 2 * Math.PI) % (2 * Math.PI);
+            const [lon1, lat1] = previousPosition;
+            const [lon2, lat2] = currentPosition;
+            const lon1Rad = lon1 * Math.PI / 180;
+            const lat1Rad = lat1 * Math.PI / 180;
+            const lon2Rad = lon2 * Math.PI / 180;
+            const lat2Rad = lat2 * Math.PI / 180;
+            const deltaLon = lon2Rad - lon1Rad;
+            const y = Math.sin(deltaLon) * Math.cos(lat2Rad);
+            const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLon);
+            const bearing = Math.atan2(y, x);
+            const normalizedBearing = (bearing + 2 * Math.PI) % (2 * Math.PI);
 
             if (!Number.isFinite(normalizedBearing) || Math.abs(deltaLon) < 1e-12 && Math.abs(lat2Rad - lat1Rad) < 1e-12) {
                 return null;
