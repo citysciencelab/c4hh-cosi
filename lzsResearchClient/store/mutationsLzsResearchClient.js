@@ -65,44 +65,41 @@ const mutations = {
         }
     },
     /**
-     * Updates the checked state on a dataset within searchAttributeResponse and attributesToDownload.
-     * Adds the dataset to attributesToDownload if it is not already present.
+     * Updates the checked state on a dataset within searchAttributeResponse.
      * @param {Object} state - The current state object.
      * @param {String} instanceId - The instanceId of the dataset to update.
      * @param {String} primaryDataId - The primaryDataId of the dataset to update (optional).
      * @param {Boolean} checked - The new checked value.
+     * @param {Boolean} checkInstance - Switch if the instance data or the primary dataset shall be checked.
      * @returns {void}
      */
-    setCheckedForInstanceId (state, {instanceId, primaryDataId, checked}) {
-        const dataset = getters.findDatasetInAttributes(state)(instanceId, primaryDataId);
+    setCheckedForDataset (state, {instanceId, primaryDataId, checked, checkInstance = true}) {
+        // nothing to do if we're asked to un-/check a primary dataset but no id was provided
+        if (!checkInstance && !primaryDataId) {
+            return;
+        }
 
-        if (dataset) {
+        // datasets from attributive search do not have a "primaryDataId" in the instance data object
+        // when a dataset on the detail tab, reached via the attributive search, shall be un-/checked,
+        //  the getter "findDatasetInAttributes" must not be fed with the given primaryDataId
+        const dataset = getters.findDatasetInAttributes(state)(instanceId, primaryDataId) || getters.findDatasetInAttributes(state)(instanceId, null);
+
+        if (!dataset) {
+            return;
+        }
+
+        if (checkInstance) {
             dataset.checked = checked;
-
-            const alreadyInDownload = getters.findDatasetInDownload(state)(instanceId, primaryDataId);
-
-            if (alreadyInDownload) {
-                alreadyInDownload.checked = checked;
-            }
-            else {
-                state.attributesToDownload.push(dataset);
-            }
+            return;
         }
-        else {
-            const datasetInDownload = getters.findDatasetInDownload(state)(instanceId, primaryDataId);
 
-            if (datasetInDownload) {
-                datasetInDownload.checked = checked;
-            }
+        const primaryDataset = dataset.primaryData?.find((data) => {
+            return data.primaryDataId === primaryDataId;
+        });
+
+        if (primaryDataset) {
+            primaryDataset.checked = checked;
         }
-    },
-    /**
-     * Remove unchecked datasets from attributesToDownload to remove unnecessary datasets from the download list.
-     * @param {Object} state - The current state object.
-     * @returns {void}
-     * */
-    removeUncheckedFromAttributesToDownload (state) {
-        state.attributesToDownload = state.attributesToDownload.filter(d => d.checked);
     }
 };
 

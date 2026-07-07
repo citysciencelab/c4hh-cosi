@@ -62,7 +62,6 @@ export default {
     },
     /**
      * Search dataclass instances by attribute payload and commit results.
-     * If the dataset from the search response is already in attributesToDownload, the checked state from attributesToDownload will be used. Otherwise, it will be set to false.
      * @param {object} context - Vuex action context (state, commit, dispatch).
      * @param {object} payload - Search payload sent to the API.
      */
@@ -81,8 +80,6 @@ export default {
                 const searchAttributeResponse = [];
 
                 response.data.forEach(element => {
-                    const inDownload = state.attributesToDownload.find(d => d.instanceId === element.dataclassinstanceId);
-
                     searchAttributeResponse.push({
                         archiveId: element.dataclassId,
                         instanceId: element.dataclassinstanceId,
@@ -91,7 +88,7 @@ export default {
                             .filter(attr => attr.type !== "P")
                             .map(attr => ({...attr, id: attr.name})),
                         geom: null,
-                        checked: inDownload ? inDownload.checked : false
+                        checked: false
                     });
                 });
 
@@ -148,7 +145,6 @@ export default {
     },
     /**
      * Send a geometry-based search request.
-     * If the dataset from the search response is already in attributesToDownload, the checked state from attributesToDownload will be used. Otherwise, it will be set to false.
      * @param {object} context - Vuex action context (state).
      * @param {object} payload - Search payload including geometry and attributes.
      * @returns {Promise} Axios response from the search API.
@@ -173,8 +169,6 @@ export default {
 
 
                 response.data.foundItems.forEach(element => {
-                    const inDownload = state.attributesToDownload.find(d => d.instanceId === element.dklInstanceId);
-
                     const filteredAttributes = instanceIdIsUnique
                         ? element.dklAttributeList
                             .filter(attr => attr.type !== "P")
@@ -188,7 +182,7 @@ export default {
                         primaryDataId: element.primarydataPictureId,
                         attributes: mappedAttributes,
                         geom: element.featuregeometrie?.features[0]?.geometry,
-                        checked: inDownload ? inDownload.checked : false
+                        checked: false
                     });
                 });
 
@@ -213,7 +207,7 @@ export default {
      * @param {Array} payload.primaryDataIds - Array of primary data identifiers to request primarydata for.
      */
     async fetchPrimarydata ({state, commit, dispatch}, payload) {
-        const {archiveId, instanceId, primaryDataIds} = payload,
+        const {archiveId, instanceId} = payload,
             params = {
                 Token: state.requestToken,
                 f: "json",
@@ -223,6 +217,13 @@ export default {
 
         await axios.get(url)
             .then(function (response) {
+                const primaryDataIds = response?.data?.map(p => p.primaryDataId) || [];
+
+                commit("addPrimaryDataToInstance", {
+                    selectedDetail: {instanceId: instanceId},
+                    primaryData: response?.data
+                });
+
                 for (const primaryDataId of primaryDataIds) {
                     commit("addPrimaryDataToInstance", {
                         selectedDetail: {instanceId: instanceId, primaryDataId: primaryDataId},
@@ -421,16 +422,15 @@ export default {
                 const key = `${item.archiveId}_${item.instanceId}`;
 
                 if (!groupedByInstance.has(key)) {
-                    groupedByInstance.set(key, {archiveId: item.archiveId, instanceId: item.instanceId, items: []});
+                    groupedByInstance.set(key, {archiveId: item.archiveId, instanceId: item.instanceId});
                 }
-                groupedByInstance.get(key).items.push(item);
             }
         }
 
         const numberGroups = groupedByInstance.size;
         let countGroups = 0;
 
-        for (const {archiveId, instanceId, items} of groupedByInstance.values()) {
+        for (const {archiveId, instanceId} of groupedByInstance.values()) {
             const archiveName = getters.getNameForArchiveId(archiveId) || i18next.t("additional:modules.lzsResearchClient.zipAndDownload.withoutArchive");
 
             state.progressNow = ++countGroups / numberGroups * 20;
@@ -438,8 +438,7 @@ export default {
 
             await dispatch("fetchPrimarydata", {
                 archiveId: archiveId,
-                instanceId: instanceId,
-                primaryDataIds: items.map(i => i.primaryDataId)
+                instanceId: instanceId
             });
         }
 

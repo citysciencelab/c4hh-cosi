@@ -75,13 +75,7 @@
                 },
                 "tabResult": {
                     "label": "Results",
-                    "numberOfResults": "Number of results:",
-                    "toDownload": "Go to download"
-                },
-                "tabDownload": {
-                    "label": "Download",
-                    "numberOfResults": "Number of pre-selected results:",
-                    "downloadButtonLabel": "Download"
+                    "numberOfResults": "Number of results:"
                 },
                 "archiveList": {
                     "toggleAccordions": {
@@ -89,6 +83,7 @@
                         "closeAll": "Close all"
                     },
                     "selectAll": "Select all",
+                    "selectAllAriaLabel": "Select all for download",
                     "groupByLabel": "Group by",
                     "selectOptionLabel": "Select option",
                     "table": {
@@ -102,7 +97,8 @@
                         "download": "Download",
                         "preview": "Preview"
                       }
-                    }
+                    },
+                    "loading": "Loading dataset {{current}} of {{total}} ..."
                 }
             },
             "zipAndDownload": {

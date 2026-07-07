@@ -75,13 +75,7 @@
                 },
                 "tabResult": {
                     "label": "Ergebnisse",
-                    "numberOfResults": "Anzahl der gefundenen Datensätze:",
-                    "toDownload": "Weiter zum Download"
-                },
-                "tabDownload": {
-                    "label": "Download",
-                    "numberOfResults": "Anzahl der vorselektierten Datensätze:",
-                    "downloadButtonLabel": "Downloaden"
+                    "numberOfResults": "Anzahl der gefundenen Datensätze:"
                 },
                 "archiveList": {
                     "toggleAccordions": {
@@ -89,6 +83,7 @@
                         "closeAll": "Alles zuklappen"
                     },
                     "selectAll": "Alles auswählen",
+                    "selectAllAriaLabel": "Alles auswählen zum Download",
                     "groupByLabel": "Gruppieren nach",
                     "selectOptionLabel": "Option selektieren",
                     "table": {
@@ -102,7 +97,8 @@
                         "download": "Download",
                         "preview": "Vorschau"
                       }
-                    }
+                    },
+                    "loading": "Lade Datensatz {{current}} von {{total}} ..."
                 }
             },
             "zipAndDownload": {

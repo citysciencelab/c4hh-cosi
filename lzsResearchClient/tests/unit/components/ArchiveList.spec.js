@@ -8,10 +8,11 @@ import Component from "../../../components/ArchiveList.vue";
 
 describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", () => {
     let wrapper,
-        store;
+        store,
+        mockDatasets;
 
     beforeEach(() => {
-        const mockDatasets = reactive([
+        mockDatasets = reactive([
             {"archiveId": "DKL_3DSTADT_LOD1", "instanceId": "id1", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "6232", "type": "I"}]},
             {"archiveId": "DKL_3DSTADT_LOD1", "instanceId": "id2", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "4835", "type": "I"}]},
             {"archiveId": "test", "instanceId": "id3", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "1000", "type": "I"}]},
@@ -22,7 +23,7 @@ describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", (
 
         const TabResultTableStub = {
             name: "TabResultTable",
-            props: ["tableIndex", "tableHeader", "tableDatasets", "hasGeoRef", "showCheckboxes", "showButtons"],
+            props: ["tableIndex", "tableHeader", "tableDatasets", "hasGeoRef", "showButtons"],
             template: "<div class='table-stub' />",
             data () {
                 return {
@@ -62,7 +63,8 @@ describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", (
                                 },
                                 archiveHasGeoref: () => (id) => {
                                     return id === "test";
-                                }
+                                },
+                                progressNow: () => -1
                             }
                         }
                     }
@@ -166,6 +168,43 @@ describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", (
         expect(wrapper.vm.getAttributesToGroupBy(archives[1])).to.have.lengthOf(2);
         // archive testOneColumn has only 1 instance-specific column in this test, therefore nothing to "group by"
         expect(wrapper.vm.getAttributesToGroupBy(archives[2])).to.have.lengthOf(0);
+    });
+
+    it("should enable download button only when one or more table rows are checked", async () => {
+        expect(wrapper.vm.somethingCheckedForDownload).to.be.false;
+
+        const downloadButton = wrapper.find("#tabResultDownloadButton");
+
+        expect(downloadButton.exists()).to.be.true;
+        expect(downloadButton.attributes("disabled")).to.be.equal("true");
+
+        // check only one dataset => button should be enabled
+        mockDatasets[0].checked = true;
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.somethingCheckedForDownload).to.be.true;
+        expect(downloadButton.exists()).to.be.true;
+        expect(downloadButton.attributes("disabled")).to.be.equal("false");
+
+        // check all datasets => button should be enabled
+        mockDatasets.forEach((data) => {
+            data.checked = true;
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.somethingCheckedForDownload).to.be.true;
+        expect(downloadButton.exists()).to.be.true;
+        expect(downloadButton.attributes("disabled")).to.be.equal("false");
+
+        // uncheck all datasets => button should be disabled again
+        mockDatasets.forEach((data) => {
+            data.checked = false;
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.somethingCheckedForDownload).to.be.false;
+        expect(downloadButton.exists()).to.be.true;
+        expect(downloadButton.attributes("disabled")).to.be.equal("true");
     });
 
     describe("syncGeomToInstance", async () => {

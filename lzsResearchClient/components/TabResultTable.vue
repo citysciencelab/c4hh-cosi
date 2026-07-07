@@ -30,11 +30,6 @@ export default {
             required: false,
             default: false
         },
-        showCheckboxes: {
-            type: Boolean,
-            required: false,
-            default: true
-        },
         showButtons: {
             type: Object,
             required: false,
@@ -48,7 +43,7 @@ export default {
             }
         }
     },
-    emits: ["openDetails", "showPreview", "download", "clearOtherGeom", "showGeomAgain"],
+    emits: ["openDetails", "showPreview", "download", "clearOtherGeom", "showGeomAgain", "primaryDataFetched", "toggleAllRowsOnThisTable"],
     data () {
         return {
             currentSorting: {
@@ -83,34 +78,43 @@ export default {
     },
     methods: {
         ...mapActions("Modules/LzsResearchClient", [
-            "fetchGeometryForInstanceId"
+            "fetchGeometryForInstanceId",
+            "fetchPrimarydata"
         ]),
         ...mapMutations("Modules/LzsResearchClient", [
-            "setCheckedForInstanceId"
+            "setCheckedForDataset"
         ]),
         /**
-         * Pushes "checked" values back into searchAttributeResponse and attributesToDownload using instanceId.
+         * Pushes "checked" values back into searchAttributeResponse using instanceId and primaryDataId.
          * If a single dataset is provided, only that one is synced; otherwise all datasets in sortedData are synced.
          * @param {Object} dataset - Optional single dataset to sync.
          * @returns {void}
          */
-        syncCheckedToStore (dataset) {
-            if (dataset) {
-                this.setCheckedForInstanceId({
-                    instanceId: dataset.instanceId,
-                    primaryDataId: dataset.primaryDataId,
-                    checked: Boolean(dataset.checked)
-                });
-                return;
-            }
+        async syncCheckedToStore (dataset) {
+            const relevantData = dataset ? [dataset] : this.sortedData,
+                  fetchedInstanceIds = new Set();
 
-            this.sortedData.forEach((entry) => {
-                this.setCheckedForInstanceId({
+            const promises = relevantData.map(async (entry) => {
+                this.setCheckedForDataset({
                     instanceId: entry.instanceId,
                     primaryDataId: entry.primaryDataId,
-                    checked: Boolean(entry.checked)
+                    checked: Boolean(entry.checked),
+                    checkInstance: Boolean(entry.archiveId)
                 });
+
+                if (entry.checked && !entry.primaryData && entry.archiveId && !fetchedInstanceIds.has(entry.instanceId)) {
+                    fetchedInstanceIds.add(entry.instanceId);
+
+                    await this.fetchPrimarydata({
+                        instanceId: entry.instanceId,
+                        archiveId: entry.archiveId
+                    });
+
+                    this.$emit("primaryDataFetched");
+                }
             });
+
+            await Promise.all(promises);
         },
         /**
          * Toggles the dataset's geometry on the map and marks it as currently shown if it was not before.
@@ -384,12 +388,22 @@ export default {
         /** Toggles the checked state of all datasets in the table and syncs the changes to the store.
          * @param {Boolean} changeTo - Is the new checked value for the table.
          */
-        toggleAllRows (changeTo) {
+        async toggleAllRows (changeTo) {
+            const checkedUniqueInstanceIdsWithoutPrimaryData = [...new Set(
+                this.sortedData
+                    .filter(dataset => !dataset.primaryData)
+                    .map(dataset => dataset.instanceId)
+            )];
+
+            if (changeTo && checkedUniqueInstanceIdsWithoutPrimaryData.length > 0) {
+                this.$emit("toggleAllRowsOnThisTable", checkedUniqueInstanceIdsWithoutPrimaryData.length);
+            }
+
             this.sortedData.forEach(dataset => {
                 dataset.checked = changeTo;
             });
 
-            this.syncCheckedToStore();
+            await this.syncCheckedToStore();
         },
         /** Toggles the checked state of a single dataset and syncs the change to the store.
          * @param {Object} dataset - The dataset for which the checked state should be toggled.
@@ -413,7 +427,7 @@ export default {
             <thead>
                 <tr>
                     <th
-                        v-if="showCheckboxes"
+                        class="resultTableHeaderCheckboxWrapper"
                         @click.stop="toggleAllRows(!headerChecked)"
                         @keypress.stop="toggleAllRows(!headerChecked)"
                     >
@@ -422,7 +436,6 @@ export default {
                                 id="header-checkbox"
                                 type="checkbox"
                                 :checked="headerChecked"
-                                @change="(evt) => toggleAllRows(evt.target.checked)"
                             >
                         </div>
                     </th>
@@ -459,7 +472,7 @@ export default {
                     :data-dataset-index="datasetIndex"
                 >
                     <td
-                        v-if="showCheckboxes"
+                        class="resultTableCheckboxWrapper"
                         @click.stop="toggleOneRow(dataset, !dataset.checked)"
                         @keypress.stop="toggleOneRow(dataset, !dataset.checked)"
                     >
@@ -467,15 +480,14 @@ export default {
                             :id="`checkbox-${datasetIndex}`"
                             type="checkbox"
                             :checked="dataset.checked"
-                            @change="(evt) => toggleOneRow(dataset, evt.target.checked)"
                         >
                     </td>
                     <td
                         v-for="attrName in sortedData[0].attributes.map(a => a.id || a.name)"
                         :key="attrName"
                         :class="`td-item-${attrName}`"
-                        @click.stop="showCheckboxes ? toggleOneRow(dataset, !dataset.checked) : undefined"
-                        @keypress.stop="showCheckboxes ? toggleOneRow(dataset, !dataset.checked) : undefined"
+                        @click.stop="toggleOneRow(dataset, !dataset.checked)"
+                        @keypress.stop="toggleOneRow(dataset, !dataset.checked)"
                     >
                         <span class="td-content">
                             {{

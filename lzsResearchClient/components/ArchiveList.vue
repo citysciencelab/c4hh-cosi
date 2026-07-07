@@ -1,8 +1,9 @@
 <script>
-import {mapGetters} from "vuex";
+import {mapGetters, mapActions} from "vuex";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import Multiselect from "vue-multiselect";
 import TabResultTable from "./TabResultTable.vue";
 import {getTranslationForAttribute, capitalizeString} from "../utils/translationHelpers";
@@ -14,6 +15,7 @@ export default {
         FlatButton,
         Multiselect,
         SwitchInput,
+        SpinnerItem,
         TabResultTable
     },
     props: {
@@ -52,13 +54,17 @@ export default {
             openAllAccordions: true,
             geomIsShownBy: null,
             groupedResultsForAllSteps: {},
-            groupBySelections: {}
+            groupBySelections: {},
+            showSpinner: false,
+            fetchProgressCount: 0,
+            fetchProgressTotal: 0
         };
     },
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
             "getNameForArchiveId",
-            "archiveHasGeoref"
+            "archiveHasGeoref",
+            "progressNow"
         ]),
         /**
          * Computes a list of unique archive IDs from the datasets and determines the attribute to group by for each archive.
@@ -114,6 +120,13 @@ export default {
          */
         selectAllIsChecked () {
             return this.checkedArchives.length > 0 && this.checkedArchives.every(Boolean);
+        },
+        /**
+         * True when any dataset is checked.
+         * @returns {Boolean} - Whether any of the datasets is checked.
+         */
+        somethingCheckedForDownload () {
+            return this.datasets.some(data => data.checked);
         }
     },
     watch: {
@@ -123,9 +136,17 @@ export default {
             },
             deep: true,
             immediate: true
+        },
+        fetchProgressCount (newVal) {
+            if (newVal === this.fetchProgressTotal) {
+                this.showSpinner = false;
+            }
         }
     },
     methods: {
+        ...mapActions("Modules/LzsResearchClient", [
+            "downloadSelectedFiles"
+        ]),
         /**
          * Returns a sorted list of unique group values for a given archive.
          * The grouping is based on the attribute specified in archiveData.attributeToGroupBy.
@@ -234,6 +255,12 @@ export default {
 
             return headers;
         },
+        /**
+         * Returns a deep copy of the showTableButtons object
+         *  set georef button to false if the archive has no georef
+         * @param {Object} step - An object containing archiveId and attributeToGroupBy.
+         * @returns {Object} - Information on which buttons shall be shown in the table
+         */
         getTableButtons (step) {
             const localTableButtons = JSON.parse(JSON.stringify(this.showTableButtons));
 
@@ -323,19 +350,41 @@ export default {
         },
         /** Toggles the checked state of all datasets in all tables.
          * @param {Boolean} changeTo - Is the new checked value for the SelectAll-Switch.
+         * @returns {void}
          */
-        toggleAllTables (changeTo) {
-            const tableRefPrefix = `${this.idPrefix}-table-`;
+        async toggleAllTables (changeTo) {
+            const tableRefPrefix = `${this.idPrefix}-table-`,
+                  promises = [];
 
+            this.fetchProgressCount = 0;
+            this.fetchProgressTotal = this.datasets.filter(d => changeTo && !d.primaryData && d.archiveId).length;
+
+            this.showSpinner = true;
             Object.keys(this.$refs).forEach((refTable) => {
                 if (refTable.startsWith(tableRefPrefix)) {
-                    this.$refs[refTable]?.[0]?.toggleAllRows(changeTo);
+                    promises.push(this.$refs[refTable]?.[0]?.toggleAllRows(changeTo));
                 }
             });
+
+            await Promise.all(promises.filter(Boolean));
+            this.fetchProgressCount = 0;
+            this.fetchProgressTotal = 0;
+            this.showSpinner = false;
+        },
+        /**
+         * Reacts on toggle of all datasets in one table, starts the spinner to wait for fetching all primary data
+         * @param {Number} countOfPrimaryDataToFetch - count of primary data datasets to wait for.
+         * @returns {void}
+         */
+        async toggleAllInOneTable (countOfPrimaryDataToFetch) {
+            this.fetchProgressCount = 0;
+            this.fetchProgressTotal = countOfPrimaryDataToFetch;
+            this.showSpinner = true;
         },
         /** Toggles the checked state of all datasets in a specific archive.
          * @param {Number} index - The index of the archive to toggle.
          * @param {Boolean} changeTo - Is the new checked value for this archive.
+         * @returns {void}
          */
         toggleAllTablesInArchive (index, changeTo) {
             const tableRefPrefix = `${this.idPrefix}-table-${index}`;
@@ -391,6 +440,13 @@ export default {
          */
         getTranslationForAttributeWrapper (key, fallback) {
             return capitalizeString(getTranslationForAttribute(key, fallback));
+        },
+        /**
+         * Starts the download for the files of all datasets that are checked in the tables.
+         * @returns {void}
+         */
+        downloadChecked () {
+            this.downloadSelectedFiles(this.datasets.filter(data => data.checked));
         }
     }
 };
@@ -398,6 +454,17 @@ export default {
 
 <template>
     <div class="ArchiveList">
+        <div
+            v-if="showSpinner"
+            class="loadingSpinner"
+        >
+            <SpinnerItem
+                custom-class="spinner"
+                class="ms-3"
+            />
+            <p> {{ $t("additional:modules.lzsResearchClient.tabs.archiveList.loading", {current: fetchProgressCount, total: fetchProgressTotal}) }}</p>
+        </div>
+
         <div class="archiveListHeaderLine">
             <p class="numberOfResults">
                 {{ numberOfResultsLabel }}
@@ -411,14 +478,23 @@ export default {
                 @click="openAllAccordions = !openAllAccordions"
             />
         </div>
-        <div class="switch-container">
+        <div class="downloadHandlingContainer">
             <SwitchInput
                 v-if="numberOfResults > 0"
                 id="idSelectAllSwitch"
-                :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.selectAll')"
+                :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.selectAllAriaLabel')"
                 :label="$t('additional:modules.lzsResearchClient.tabs.archiveList.selectAll')"
                 :checked="selectAllIsChecked"
                 :interaction="(evt) => toggleAllTables(evt.target.checked)"
+            />
+
+            <FlatButton
+                v-if="numberOfResults > 0"
+                id="tabResultDownloadButton"
+                :disabled="progressNow >= 0 || !somethingCheckedForDownload"
+                :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
+                :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
+                @click="downloadChecked()"
             />
         </div>
 
@@ -506,6 +582,8 @@ export default {
                                 @openDetails="onOpenDetails"
                                 @clearOtherGeom="clearGeomAndGeomIndicator"
                                 @showGeomAgain="showGeomAgain"
+                                @primaryDataFetched="fetchProgressCount++"
+                                @toggleAllRowsOnThisTable="toggleAllInOneTable"
                             />
                         </AccordionItem>
                     </div>
@@ -521,6 +599,8 @@ export default {
                             @openDetails="onOpenDetails"
                             @clearOtherGeom="clearGeomAndGeomIndicator"
                             @showGeomAgain="showGeomAgain"
+                            @primaryDataFetched="fetchProgressCount++"
+                            @toggleAllRowsOnThisTable="toggleAllInOneTable"
                         />
                     </div>
                 </AccordionItem>
@@ -534,6 +614,30 @@ export default {
 <style lang="scss" scoped>
 
 .ArchiveList {
+    div.loadingSpinner {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.7);
+        z-index: 3;
+
+        div.spinner {
+            width: 4rem;
+            height: 4rem;
+        }
+
+        p {
+            background-color: white;
+            white-space: pre-line;
+            padding: 1.5rem;
+        }
+    }
+
     div.archiveListHeaderLine {
         display: flex;
         gap: 1rem;
@@ -567,8 +671,15 @@ export default {
         }
     }
 
-    div.switch-container {
+    div.downloadHandlingContainer {
         margin-bottom: 0.5rem;
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+
+        button#tabResultDownloadButton {
+            margin-bottom: 0;
+        }
     }
 
     div.accordion-container {

@@ -6,7 +6,6 @@ import TabContainer from "@shared/modules/tabs/components/TabContainer.vue";
 import TabDetails from "./TabDetails.vue";
 import TabResult from "./TabResult.vue";
 import TabSearch from "./TabSearch.vue";
-import TabDownload from "./TabDownload.vue";
 import ConfirmModal from "@shared/modules/modals/components/ConfirmModal.vue";
 
 export default {
@@ -77,15 +76,6 @@ export default {
                     ref: "tabDetails",
                     label: this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.label"),
                     component: TabDetails,
-                    propsForTabContent: {},
-                    renderComponent: true
-                },
-                {
-                    id: "tabDownload",
-                    contentId: "tabDownloadContent",
-                    ref: "tabDownload",
-                    label: this.$t("additional:modules.lzsResearchClient.tabs.tabDownload.label"),
-                    component: TabDownload,
                     propsForTabContent: {},
                     renderComponent: true
                 }

@@ -74,19 +74,6 @@ const getters = {
             return (dataset.instanceId === instanceId)
                 && (!primaryDataId || dataset.primaryDataId === primaryDataId);
         });
-    },
-    /**
-     * Returns the dataset object from attributesToDownload that matches the given instanceId and primaryDataId.
-     * @param {Object} state - The Vuex state object.
-     * @param {String} instanceId - The instanceId of the dataset to find in attributesToDownload.
-     * @param {String} primaryDataId - The primaryDataId of the dataset to find in attributesToDownload (optional).
-     * @returns {Object | undefined} - The dataset object from attributesToDownload that matches the given instanceId and primaryDataId, otherwise null.
-     */
-    findDatasetInDownload: state => (instanceId, primaryDataId) => {
-        return state.attributesToDownload?.find(d => {
-            return (d.instanceId === instanceId)
-            && (!primaryDataId || d.primaryDataId === primaryDataId);
-        });
     }
 };
 

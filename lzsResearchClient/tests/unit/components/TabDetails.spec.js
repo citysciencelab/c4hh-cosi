@@ -39,6 +39,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
             "primaryData": [
                 {
                     "objectId": "40bdee17-be4c-2cbd-4878-7b306fa5b10f",
+                    "checked": false,
                     "georeferencePrimarydata": null,
                     "primarydataAttributes": [
                         {
@@ -76,6 +77,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
                 },
                 {
                     "objectId": "47d0abac-e072-6cfe-5e05-afb7eb930a43",
+                    "checked": false,
                     "georeferencePrimarydata": null,
                     "primarydataAttributes": [
                         {
@@ -140,7 +142,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
                                     };
                                 },
                                 progressNow: () => -1,
-                                currentProgressValue: () => ""
+                                currentProgressValue: () => "",
+                                placeholderDataClassList: () => null
                             }
                         }
                     }
@@ -226,5 +229,104 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
         );
         expect(wrapper.vm.getTableDatasets()[0].hasPreview).to.be.false;
         expect(wrapper.vm.getTableDatasets()[1].hasPreview).to.be.false;
+    });
+
+    it("should enable download button only when one or more table rows are checked", async () => {
+        expect(wrapper.vm.somethingCheckedForDownload).to.be.false;
+
+        const downloadButton = wrapper.find("#tabDetailsDownloadButton");
+
+        expect(downloadButton.exists()).to.be.true;
+        expect(downloadButton.attributes("disabled")).to.be.equal("true");
+
+        // check only one dataset => button should be enabled
+        details.primaryData[0].checked = true;
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.somethingCheckedForDownload).to.be.true;
+        expect(downloadButton.exists()).to.be.true;
+        expect(downloadButton.attributes("disabled")).to.be.equal("false");
+
+        // check all datasets => button should be enabled
+        details.primaryData.forEach((data) => {
+            data.checked = true;
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.somethingCheckedForDownload).to.be.true;
+        expect(downloadButton.exists()).to.be.true;
+        expect(downloadButton.attributes("disabled")).to.be.equal("false");
+
+        // uncheck all datasets => button should be disabled again
+        details.primaryData.forEach((data) => {
+            data.checked = false;
+        });
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.somethingCheckedForDownload).to.be.false;
+        expect(downloadButton.exists()).to.be.true;
+        expect(downloadButton.attributes("disabled")).to.be.equal("true");
+    });
+
+    describe("getAllFilesForDownload", () => {
+        it("should return correct subset of datasets for download single dataset", async () => {
+            let dataForDownload = wrapper.vm.getAllFilesForDownload("FE3C518992558A0237BF6183D30A0DECD2F8E40B2289D58C68A7223E2E84FA40");
+
+            expect(dataForDownload).to.be.an("object");
+            expect(dataForDownload.primaryData).to.be.an("array").to.have.length(1);
+            expect(dataForDownload.primaryData[0].contentFilename).to.equal("147202141649100003.tif");
+
+            dataForDownload = wrapper.vm.getAllFilesForDownload();
+            expect(dataForDownload).to.be.an("object");
+            expect(dataForDownload.primaryData).to.be.an("array").to.have.length(0);
+        });
+
+        it("should return correct subset of datasets for checking all datasets", async () => {
+            // check all datasets => all should be contained in files for download
+            details.primaryData.forEach((data) => {
+                data.checked = true;
+            });
+            await wrapper.vm.$nextTick();
+
+            const dataForDownload = wrapper.vm.getAllFilesForDownload();
+
+            expect(dataForDownload).to.be.an("object");
+            expect(dataForDownload.primaryData).to.be.an("array").to.have.length(2);
+            expect(dataForDownload.primaryData[0].primaryDataId).to.equal("FB8305947897840444B93EB9FC3DF46C2B854A4B9DCDA659027250D4DA190D21");
+            expect(dataForDownload.primaryData[1].primaryDataId).to.equal("FE3C518992558A0237BF6183D30A0DECD2F8E40B2289D58C68A7223E2E84FA40");
+        });
+
+        it("should return correct subset of datasets for checking no datasets", async () => {
+            // uncheck all datasets => none should be contained in files for download
+            details.primaryData.forEach((data) => {
+                data.checked = false;
+            });
+            await wrapper.vm.$nextTick();
+
+            const dataForDownload = wrapper.vm.getAllFilesForDownload();
+
+            expect(dataForDownload).to.be.an("object");
+            expect(dataForDownload.primaryData).to.be.an("array").to.have.length(0);
+        });
+
+        it("should return correct subset of datasets for nonsens intut", async () => {
+            let dataForDownload = wrapper.vm.getAllFilesForDownload(null);
+
+            expect(dataForDownload).to.be.an("object");
+            expect(dataForDownload.primaryData).to.be.an("array").to.have.length(0);
+
+            dataForDownload = wrapper.vm.getAllFilesForDownload(123);
+            expect(dataForDownload).to.be.an("object");
+            expect(dataForDownload.primaryData).to.be.an("array").to.have.length(0);
+
+            dataForDownload = wrapper.vm.getAllFilesForDownload("abc");
+            expect(dataForDownload).to.be.an("object");
+            expect(dataForDownload.primaryData).to.be.an("array").to.have.length(0);
+
+            dataForDownload = wrapper.vm.getAllFilesForDownload(false);
+            expect(dataForDownload).to.be.an("object");
+            expect(dataForDownload.primaryData).to.be.an("array").to.have.length(0);
+
+        });
     });
 });

@@ -55,7 +55,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
                         [0, 1]
                     ],
                     type: "Polygon"
-                }
+                },
+                checked: false
             },
             {
                 instanceId: "dataset2",
@@ -76,7 +77,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
                 geom: {
                     coordinates: [0, 1],
                     type: "Point"
-                }
+                },
+                checked: false
             }
         ];
 
@@ -107,7 +109,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
                                 fetchGeometryForInstanceId: () => Promise.resolve()
                             },
                             mutations: {
-                                setCheckedForInstanceId: () => sinon.stub()
+                                setCheckedForDataset: () => sinon.stub()
                             }
                         }
                     }
@@ -328,25 +330,26 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
 
     it("checking both datasets changes the checked state of the header checkbox", async () => {
         const headerCheckbox = wrapper.find("thead input[type='checkbox']"),
-            checkboxes = wrapper.findAll("tbody input[type='checkbox']");
+            checkboxes = wrapper.findAll("tbody input[type='checkbox']"),
+            checkboxesWrapper = wrapper.findAll("tbody td.resultTableCheckboxWrapper");
 
         expect(headerCheckbox.element.checked).to.be.false;
         expect(checkboxes[0].element.checked).to.be.false;
         expect(checkboxes[1].element.checked).to.be.false;
 
-        await checkboxes[0].setChecked();
+        await checkboxesWrapper[0].trigger("click");
 
         expect(headerCheckbox.element.checked).to.be.false;
         expect(checkboxes[0].element.checked).to.be.true;
         expect(checkboxes[1].element.checked).to.be.false;
 
-        await checkboxes[1].setChecked();
+        await checkboxesWrapper[1].trigger("click");
 
         expect(headerCheckbox.element.checked).to.be.true;
         expect(checkboxes[0].element.checked).to.be.true;
         expect(checkboxes[1].element.checked).to.be.true;
 
-        await checkboxes[0].setChecked(false);
+        await checkboxesWrapper[0].trigger("click");
 
         expect(headerCheckbox.element.checked).to.be.false;
         expect(checkboxes[0].element.checked).to.be.false;
@@ -355,23 +358,27 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
 
     it("checking the header checkbox changes the checked state of all datasets", async () => {
         const headerCheckbox = wrapper.find("thead input[type='checkbox']"),
+            headerCheckboxWrapper = wrapper.find("thead th.resultTableHeaderCheckboxWrapper"),
             checkboxes = wrapper.findAll("tbody input[type='checkbox']");
 
         expect(headerCheckbox.element.checked).to.be.false;
         expect(checkboxes[0].element.checked).to.be.false;
         expect(checkboxes[1].element.checked).to.be.false;
 
-        await headerCheckbox.setChecked();
+        await headerCheckboxWrapper.trigger("click");
 
         expect(headerCheckbox.element.checked).to.be.true;
         expect(checkboxes[0].element.checked).to.be.true;
         expect(checkboxes[1].element.checked).to.be.true;
+        expect(wrapper.emitted("toggleAllRowsOnThisTable")).to.be.an("array").with.lengthOf(1);
+        expect(wrapper.emitted("toggleAllRowsOnThisTable")[0]).to.deep.equal([2]);
 
-        await headerCheckbox.setChecked(false);
+        await headerCheckboxWrapper.trigger("click");
 
         expect(headerCheckbox.element.checked).to.be.false;
         expect(checkboxes[0].element.checked).to.be.false;
         expect(checkboxes[1].element.checked).to.be.false;
+        expect(wrapper.emitted("toggleAllRowsOnThisTable")).to.be.an("array").with.lengthOf(1);
     });
 
     describe("hideGeom", () => {

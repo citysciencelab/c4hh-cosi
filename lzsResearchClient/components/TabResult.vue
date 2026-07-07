@@ -1,5 +1,5 @@
 <script>
-import {mapGetters, mapMutations, mapActions} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 import ArchiveList from "./ArchiveList.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {TAB_SET_CURRENT} from "@shared/modules/tabs/components/TabContainer.vue";
@@ -29,13 +29,6 @@ export default {
             "progressNow"
         ]),
         /**
-         * Counts the number of datasets currently in the list.
-         * @returns {Number} - Count of dataset objects
-         */
-        numberOfResults () {
-            return this.searchAttributeResponse.length;
-        },
-        /**
          * Additional table headers added after sortable headers.
          * @returns {String[]} - Array of header labels.
          */
@@ -50,9 +43,6 @@ export default {
         ...mapMutations("Modules/LzsResearchClient", [
             "setSelectedDetail"
         ]),
-        ...mapActions("Modules/LzsResearchClient", [
-            "downloadSelectedFiles"
-        ]),
         /**
          * Called after click on one table row to show details for this primary dataset
          * @param {String} selectedDetail - The selected detail object containing instanceId and primaryDataId to show details for
@@ -65,9 +55,6 @@ export default {
         returnToSearchTab () {
             this.setCurrentTab("tabSearch");
         },
-        toDownload () {
-            this.setCurrentTab("tabDownload");
-        },
         clearGeomAndGeomIndicator (newGeomIsShownBy = null) {
             this.$refs.archiveList?.clearGeomAndGeomIndicator(newGeomIsShownBy);
         },
@@ -79,9 +66,6 @@ export default {
         },
         syncGeomToInstance (selectedDetail) {
             this.$refs.archiveList?.syncGeomToInstance(selectedDetail);
-        },
-        download () {
-            this.downloadSelectedFiles(this.searchAttributeResponse);
         }
     }
 };
@@ -105,21 +89,6 @@ export default {
                 :aria-label="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
                 :text="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
                 @click="returnToSearchTab()"
-            />
-
-            <FlatButton
-                v-if="numberOfResults > 0"
-                :disabled="progressNow >= 0"
-                :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
-                :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
-                @click="download()"
-            />
-
-            <FlatButton
-                :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabResult.toDownload')"
-                :text="$t('additional:modules.lzsResearchClient.tabs.tabResult.toDownload')"
-                :disabled="!searchAttributeResponse.some(d => d.checked)"
-                @click="toDownload()"
             />
         </div>
     </div>

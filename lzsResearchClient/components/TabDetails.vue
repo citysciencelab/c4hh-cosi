@@ -49,6 +49,9 @@ export default {
         },
         getDetailsForSelectedDetail () {
             return this.findDatasetInAttributes(this.selectedDetail.instanceId, this.selectedDetail.primaryDataId);
+        },
+        somethingCheckedForDownload () {
+            return this.getDetailsForSelectedDetail?.primaryData?.some(p => p.checked);
         }
     },
     watch: {
@@ -57,8 +60,7 @@ export default {
                 this.showSpinner = true;
                 this.fetchPrimarydata({
                     archiveId: this.getDetailsForSelectedDetail?.archiveId,
-                    instanceId: newValue.instanceId,
-                    primaryDataIds: [newValue.primaryDataId]
+                    instanceId: newValue.instanceId
                 }).finally(() => {
                     this.showSpinner = false;
                 });
@@ -148,7 +150,8 @@ export default {
                         attributes: attributes,
                         instanceId: details?.instanceId,
                         primaryDataId: dataset.primaryDataId,
-                        hasPreview: ["TIFF", "JP2"].includes(dataset.geoFileFormat) // are there other formats, that allow a preview?
+                        hasPreview: ["TIFF", "JP2"].includes(dataset.geoFileFormat), // are there other formats, that allow a preview?
+                        checked: dataset.checked
                     }
                 );
             });
@@ -169,29 +172,48 @@ export default {
             }
         },
         /**
+         * Returns all datasets that are checked or match the given primaryDataId
+         *  and adds datasets contained in "filenamesToAddToDownload"
+         * @param {String} primaryDataId - Primary data identifier to download the dataset for.
+         * @returns {Object} The dataset object containing all datasets relevant for download.
+         */
+        getAllFilesForDownload (primaryDataId) {
+            const onlySelectedPrimaryData = JSON.parse(JSON.stringify(this.getDetailsForSelectedDetail || {})),
+                  filenamesToAddToDownload = this.placeholderDataClassList?.[onlySelectedPrimaryData?.archiveId]?.FILES_TO_ADD_TO_SINGLE_DOWNLOAD;
+
+            onlySelectedPrimaryData.primaryData = (onlySelectedPrimaryData.primaryData || []).filter(p => {
+                if (primaryDataId) {
+                    return p.primaryDataId === primaryDataId ||
+                        (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename));
+                }
+
+                return p.checked ||
+                    (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename));
+            });
+
+            return onlySelectedPrimaryData;
+        },
+        /**
          * Downloads the dataset from the server
          * @param {String} primaryDataId - Primary data identifier to download the dataset for.
+         * @returns {void}
          */
         downloadDataset (primaryDataId) {
             this.showSpinner = true;
 
-            const onlySelectedPrimaryData = JSON.parse(JSON.stringify(this.getDetailsForSelectedDetail || {})),
-                  filenamesToAddToDownload = this.placeholderDataClassList?.[onlySelectedPrimaryData?.archiveId]?.FILES_TO_ADD_TO_SINGLE_DOWNLOAD;
-
-            onlySelectedPrimaryData.primaryData = (onlySelectedPrimaryData.primaryData || []).filter(
-                p => p.primaryDataId === primaryDataId ||
-                    (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename))
-            );
-
-            this.downloadSelectedFiles(onlySelectedPrimaryData);
+            this.downloadSelectedFiles(this.getAllFilesForDownload(primaryDataId));
 
             // Hide spinner with timeout because the download is made with a fake link. There is no possibility to 'wait' for it.
             setTimeout(() => {
                 this.showSpinner = false;
             }, 4000);
         },
-        download () {
-            this.downloadSelectedFiles(this.getDetailsForSelectedDetail);
+        /**
+         * Downloads all checked datasets from the server
+         * @returns {void}
+         */
+        downloadChecked () {
+            this.downloadSelectedFiles(this.getAllFilesForDownload());
         },
         /**
          * Returns the translated label for an attribute key, falling back to the raw attribute name if no translation exists.
@@ -241,11 +263,22 @@ export default {
 
         <hr>
 
-        <p class="numberOfResults">
-            {{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.numberOfResults") }}
+        <div class="tableHeaderDetailsTable">
+            <p class="numberOfResults">
+                {{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.numberOfResults") }}
 
-            <span>{{ primaryDataCount }}</span>
-        </p>
+                <span>{{ primaryDataCount }}</span>
+            </p>
+
+            <FlatButton
+                v-if="primaryDataCount > 0"
+                id="tabDetailsDownloadButton"
+                :disabled="progressNow >= 0 || !somethingCheckedForDownload"
+                :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
+                :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
+                @click="downloadChecked()"
+            />
+        </div>
 
         <div class="contentDetailsTableContainer">
             <div
@@ -266,32 +299,25 @@ export default {
                 :table-header="getTableHeaders()"
                 :table-datasets="getTableDatasets()"
                 :show-buttons="showTableButtons"
-                :show-checkboxes="false"
                 @showPreview="showPreview"
                 @download="downloadDataset"
             />
         </div>
 
-        <FlatButton
-            v-if="primaryDataCount > 0"
-            :disabled="progressNow >= 0"
-            :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
-            :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
-            @click="download()"
-        />
+        <div class="buttonRowDetailsContainer">
+            <FlatButton
+                id="backToListButton"
+                :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabDetails.backButtonLabel')"
+                :text="$t('additional:modules.lzsResearchClient.tabs.tabDetails.backButtonLabel')"
+                @click="returnToResultTab()"
+            />
 
-        <FlatButton
-            id="backToListButton"
-            :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabDetails.backButtonLabel')"
-            :text="$t('additional:modules.lzsResearchClient.tabs.tabDetails.backButtonLabel')"
-            @click="returnToResultTab()"
-        />
-
-        <FlatButton
-            :aria-label="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
-            :text="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
-            @click="returnToSearchTab()"
-        />
+            <FlatButton
+                :aria-label="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
+                :text="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
+                @click="returnToSearchTab()"
+            />
+        </div>
 
         <ModalItem
             :show-modal="showPreviewModal"
@@ -310,7 +336,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-//@import "~variables";
 
 #TabDetails {
     margin-top: 1rem;
@@ -320,8 +345,6 @@ export default {
     }
 
     p.numberOfResults {
-        margin-top: 1rem;
-
         span {
             display: inline-block;
             padding: 0.1rem 1rem;
@@ -359,6 +382,12 @@ export default {
             white-space: pre-line;
             padding: 1.5rem;
         }
+    }
+
+    div.buttonRowDetailsContainer,
+    div.tableHeaderDetailsTable {
+        display: flex;
+        justify-content: space-between;
     }
 }
 
