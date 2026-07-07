@@ -787,8 +787,7 @@ export default {
             <v-main>
                 <ToolInfo
                     :url="readmeUrl"
-                    :locale="currentLocale"
-                    :is-open="false"
+                    :summary="$t('additional:modules.tools.cosi.dashboard.description')"
                 />
                 <AlertMessage
                     v-if="selectedDistrictNames.length === 0"

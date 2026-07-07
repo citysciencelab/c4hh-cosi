@@ -3,6 +3,7 @@
         "tools": {
             "cosi": {
                 "dashboard": {
+                  "description": "With this function, statistical data such as demographics, household sizes or population for selected areas as well as comparison data at the level of district, borough and overall Hamburg are displayed. In addition, diagrams and time series can be created, ratios and correlations analyzed and data exported.",
                     "alertMessageNoData": "No areas have been selected yet. To display statistical data, please select at least one area. To do so, use the ‘Select area’ function.",
                     "title": "Statistical Dashboard",
                     "avgCol": "Average",

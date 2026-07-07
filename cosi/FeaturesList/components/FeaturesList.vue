@@ -676,7 +676,7 @@ export default {
     <div>
         <ToolInfo
             :url="readmeUrl"
-            :locale="currentLocale"
+            :summary="$t('additional:modules.tools.cosi.featuresList.description')"
         />
         <v-app id="features-list-wrapper">
             <FeaturesListToolbar

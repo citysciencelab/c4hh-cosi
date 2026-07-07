@@ -190,7 +190,7 @@ export default {
         </v-card-title>
         <v-card-text>
             <ToolInfo
-                :summary="'Die Entfernung (Fußweg) zur nächstgelegenen ausgewählten Einrichtung wird berechnet. Werden mehrere Einrichtungen ausgewählt, wird die Entfernung gemittelt.'"
+                :summary="'Mit diesem Werkzeug können Sie die Entfernung (Fußweg) zur nächstgelegenen ausgewählten Einrichtung berechnen. Bei der Auswahl mehrerer Einrichtungen wird die durchschnittliche Entfernung berechnet.'"
             />
             <v-row
                 dense
