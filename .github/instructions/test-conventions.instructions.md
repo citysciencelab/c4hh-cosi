@@ -25,7 +25,7 @@ it.skip(...)
 describe.skip(...)
 ```
 
-Existing `.skip` calls are known technical debt. Do not add new ones. When touching a file that contains `.skip`, remove it and either fix the test or delete it.
+Existing `.skip` calls are known technical debt. Do not add new ones.
 
 ## Action / Getter / Mutation Test Skeleton
 

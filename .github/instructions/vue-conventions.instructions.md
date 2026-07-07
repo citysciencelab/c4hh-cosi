@@ -63,7 +63,7 @@ Always prefer shared components over building custom equivalents. Available in `
 ```
 
 - Use `scoped` on every `<style>` tag
-- **Never** write `@import 'variables'` — it causes errors in Vite; Bootstrap theming variables and shared mixins are available automatically via the Vite config
+- **Never** write `@import 'variables'` or `@import "~variables";` — both cause errors in Vite; Bootstrap theming variables and shared mixins are available automatically via the Vite config
 - Class names must be prefixed with the module name to avoid global leakage (rule A.3.9)
 - Use `rem` for sizes, not `px` — ensures proper scaling with user font-size settings
 - No absolute `width`/`height` values where avoidable — prefer responsive units
