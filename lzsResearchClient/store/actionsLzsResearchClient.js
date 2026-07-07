@@ -1,7 +1,7 @@
 import searchBarActions from "./searchBar/actions/actionsSearchBar.js";
 import axios from "axios";
 import {buildEndpointUrl} from "../utils/buildEndpointUrl";
-import {saveAs, fetchWithProgress, setNested, buildFileInformationObject, getHumanReadableFileSize} from "../utils/zipHelpers";
+import {saveAs, fetchWithProgress, setNested, calcProgress, buildFileInformationObject, getHumanReadableFileSize} from "../utils/zipHelpers";
 import {zip} from "fflate/browser";
 
 export default {
@@ -394,27 +394,32 @@ export default {
      * @async
      * @param {Object} context - Vuex action context.
      * @param {Object} context.state - Vuex state (used for progress and configuration).
-     * @param {Function} context.getters - Vuex getters (used to derive archive names).
+     * @param {Object} context.getters - Vuex getters (used to derive archive names).
      * @param {Function} context.dispatch - Vuex dispatch (used to fetch missing primaryData).
      * @param {Object|Object[]} filesToDownload - Single result item or array of result items to download.
      * @returns {Promise<void>} Resolves when the ZIP has been created and download triggered.
      */
     async downloadSelectedFiles ({state, getters, dispatch}, filesToDownload) {
-        if (typeof filesToDownload !== "object") {
+        if (!filesToDownload || typeof filesToDownload !== "object") {
             return;
         }
 
-        let selectedFiles = filesToDownload;
+        const selectedFiles = Array.isArray(filesToDownload) ? filesToDownload : [filesToDownload];
 
-        if (!Array.isArray(filesToDownload)) {
-            selectedFiles = [filesToDownload];
-        }
+        // Progress phase boundaries
+        // 0..20 = fetching primaryData
+        // 20..80 = downloading files
+        // 80..90 = building nested structure
+        // 90..100 = zipping
+        // 100 = done
+        const phaseEnd = {fetch: 20, download: 80, setNested: 90, done: 100};
 
         state.errorMessage = "";
         state.progressNow = 0;
         state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.start");
 
         // Group selected files by archiveId and instanceId to fetch primaryData in batches
+        // Skip items that already have primaryData loaded.
         const groupedByInstance = new Map();
 
         for (const item of selectedFiles) {
@@ -427,20 +432,32 @@ export default {
             }
         }
 
-        const numberGroups = groupedByInstance.size;
-        let countGroups = 0;
+        const totalInstances = groupedByInstance.size;
+        let completedInstances = 0;
 
-        for (const {archiveId, instanceId} of groupedByInstance.values()) {
-            const archiveName = getters.getNameForArchiveId(archiveId) || i18next.t("additional:modules.lzsResearchClient.zipAndDownload.withoutArchive");
+        await Promise.all(
+            [...groupedByInstance.values()].map(
+                ({archiveId, instanceId}) => dispatch("fetchPrimarydata", {
+                    archiveId,
+                    instanceId
+                }).then(() => {
+                    const current = ++completedInstances;
 
-            state.progressNow = ++countGroups / numberGroups * 20;
-            state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.fetchPrimaryData", {archiveName: archiveName});
+                    state.progressNow = calcProgress({
+                        value: current,
+                        total: totalInstances,
+                        start: 0,
+                        end: phaseEnd.fetch
+                    });
+                    state.currentProgressValue = i18next.t(
+                        "additional:modules.lzsResearchClient.zipAndDownload.progress.fetchPrimaryData",
+                        {current: current, total: totalInstances}
+                    );
+                })
+            )
+        );
 
-            await dispatch("fetchPrimarydata", {
-                archiveId: archiveId,
-                instanceId: instanceId
-            });
-        }
+        state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.fetchDossierData");
 
         // collect flat list of files with target path and url
         const files = [];
@@ -480,41 +497,40 @@ export default {
         }
 
         // add the metadata (in backend it is called 'dossier') to each archive, affected by the downloaded files
-        const archiveIdsInDownload = [...new Set(files.map(file => file.archiveId))];
+        const archiveDossierPairs = [...new Set(files.map(file => file.archiveId))]
+            .flatMap(archiveId => getters
+                .getDossierIdsForArchiveId(archiveId)
+                .map(dossierId => ({
+                    archiveId,
+                    dossierId
+                }))
+            );
 
-        for (const archiveId of archiveIdsInDownload) {
-            const dossierIds = getters.getDossierIdsForArchiveId(archiveId),
+        // fetch dossier data in parallel for each archive/dossier pair if not already present in the store
+        await Promise.all(
+            archiveDossierPairs
+                .filter(({archiveId, dossierId}) => !getters.getDossierDataForArchiveId(archiveId, dossierId))
+                .map(({archiveId, dossierId}) => dispatch("fetchDossierInformation", {archiveId, dossierId}))
+        );
+
+        for (const {archiveId, dossierId} of archiveDossierPairs) {
+            const dossierData = getters.getDossierDataForArchiveId(archiveId, dossierId),
                 archiveName = getters.getNameForArchiveId(archiveId);
 
-            for (const dossierId of dossierIds) {
-                let dossierData = getters.getDossierDataForArchiveId(archiveId, dossierId);
-
-                if (!dossierData) {
-                    await dispatch("fetchDossierInformation", {
-                        archiveId: archiveId,
-                        dossierId: dossierId
-                    });
-
-                    dossierData = getters.getDossierDataForArchiveId(archiveId, dossierId);
-                }
-
-                if (dossierData) {
-                    files.push(
-                        buildFileInformationObject(
-                            dossierData.contentFilename || "metadata-file",
-                            `${state.apiBasePath}/rest/dossier/${dossierId}/content`,
-                            50000, // no content file size given for dossiers, use an estimated file size (50 kB)
-                            archiveId,
-                            archiveName,
-                            i18next.t("additional:modules.lzsResearchClient.zipAndDownload.metadataFolderName"),
-                            state.requestToken
-                        )
-                    );
-                }
+            if (dossierData) {
+                files.push(
+                    buildFileInformationObject(
+                        dossierData.contentFilename || "metadata-file",
+                        `${state.apiBasePath}/rest/dossier/${dossierId}/content`,
+                        50000, // no content file size given for dossiers, use an estimated file size (50 kB)
+                        archiveId,
+                        archiveName,
+                        i18next.t("additional:modules.lzsResearchClient.zipAndDownload.metadataFolderName"),
+                        state.requestToken
+                    )
+                );
             }
         }
-
-        state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.downloading");
 
         // total known bytes from contentFileLength
         const knownTotalBytes = files.reduce((s, f) => s + (f.size || 0), 0);
@@ -526,16 +542,19 @@ export default {
                     maxFileSize: getHumanReadableFileSize(state.maxDownloadMB * 1e6),
                     sumFileSize: getHumanReadableFileSize(knownTotalBytes)
                 });
-            state.progressNow = 100;
+            state.progressNow = phaseEnd.done;
             state.currentProgressValue = "";
             return;
         }
 
+        state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.downloading");
+
         // per-file last-seen bytes
         const lastSeen = new Map();
-        let downloadedBytes = 0;
+        let downloadedBytes = 0,
+            completedFiles = 0;
 
-        // fetch files in parallel, update global progress using knownTotalBytes
+        // fetch files in parallel, update global progress using knownTotalBytes or completedFiles as fallback
         const fetched = await Promise.all(files.map(async file => {
             try {
                 const data = await fetchWithProgress(file.url, (loaded) => {
@@ -546,19 +565,14 @@ export default {
 
                     if (knownTotalBytes > 0) {
                         downloadedBytes += delta;
-                        // allocate 0..80% for download phase
-                        state.progressNow = Math.min(80, Math.floor((downloadedBytes / knownTotalBytes) * 80));
-                        state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.downloadingFile", {fileName: file.pathParts.join("/"), interpolation: {escapeValue: false}});
+                        state.progressNow = calcProgress({
+                            value: downloadedBytes,
+                            total: knownTotalBytes,
+                            start: phaseEnd.fetch,
+                            end: phaseEnd.download
+                        });
                     }
                 });
-
-                // if no known sizes, approximate by file-count when a file finishes
-                if (knownTotalBytes === 0) {
-                    const finishedCount = Array.from(lastSeen.values()).filter(v => v > 0).length;
-
-                    state.progressNow = Math.floor((finishedCount / files.length) * 80);
-                    state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.downloadingFile", {fileName: file.pathParts.join("/"), interpolation: {escapeValue: false}});
-                }
 
                 return {
                     pathParts: file.pathParts,
@@ -572,20 +586,34 @@ export default {
                     err
                 };
             }
+            finally {
+                const current = ++completedFiles;
+
+                if (knownTotalBytes === 0) {
+                    state.progressNow = calcProgress({
+                        value: current,
+                        total: files.length,
+                        start: phaseEnd.fetch,
+                        end: phaseEnd.download
+                    });
+                }
+
+                state.currentProgressValue = i18next.t(
+                    "additional:modules.lzsResearchClient.zipAndDownload.progress.downloadingFile",
+                    {current, total: files.length}
+                );
+            }
         }));
 
         // build nested object structure required by fflate.zip
         const nested = {};
 
-        fetched.forEach(item => {
-            if (item.err) {
-                return; // skip failed files
-            }
-            setNested(nested, item.pathParts, item.data);
-        });
+        fetched
+            .filter(item => !item.err) // skip failed files
+            .forEach(item => setNested(nested, item.pathParts, item.data));
 
         // eslint-disable-next-line require-atomic-updates
-        state.progressNow = 85;
+        state.progressNow = phaseEnd.setNested;
         // eslint-disable-next-line require-atomic-updates
         state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.zipping");
 
@@ -593,7 +621,7 @@ export default {
         zip(nested, {}, (err, data) => {
             if (err) {
                 state.errorMessage = err.message || String(err);
-                state.progressNow = 100;
+                state.progressNow = phaseEnd.done;
                 state.currentProgressValue = "";
                 return;
             }
@@ -607,7 +635,7 @@ export default {
                 state.zipFileName + ".zip"
             );
 
-            state.progressNow = 100;
+            state.progressNow = phaseEnd.done;
             state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.done");
         });
     }

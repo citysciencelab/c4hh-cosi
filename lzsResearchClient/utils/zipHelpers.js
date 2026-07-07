@@ -119,6 +119,27 @@ function setNested (obj, parts, value) {
 }
 
 /**
+ * Calculate a progress value between start and end based on the ratio of value to total.
+ *
+ * @param {Object} props - Properties for progress calculation.
+ * @param {number} props.value - Current progress value (e.g. bytes downloaded).
+ * @param {number} props.total - Total value corresponding to 100% progress (e.g. total bytes).
+ * @param {number} props.start - Starting progress value (e.g. 0 or previous phase end).
+ * @param {number} props.end - Ending progress value (e.g. phase end or 100%).
+ * @returns {number} Calculated progress value between start and end.
+ */
+function calcProgress (props) {
+    const {value, total, start, end} = props;
+
+    if (!total) {
+        return start;
+    }
+    const ratio = Math.max(0, Math.min(1, value / total));
+
+    return start + Math.floor(ratio * (end - start));
+}
+
+/**
  * Build a file information object used for archive creation and downloads.
  *
  * Creates a sanitized filename (replaces back/forward slashes), builds a download URL
@@ -215,6 +236,7 @@ export {
     saveAs,
     fetchWithProgress,
     setNested,
+    calcProgress,
     buildFileInformationObject,
     getHumanReadableFileSize,
     roundFileSizeToFixed

@@ -4,7 +4,8 @@ import {setNested,
     buildFileInformationObject,
     saveAs, fetchWithProgress,
     getHumanReadableFileSize,
-    roundFileSizeToFixed} from "../../../utils/zipHelpers";
+    roundFileSizeToFixed,
+    calcProgress} from "../../../utils/zipHelpers";
 
 /**
  * Run only utils tests via command:
@@ -521,6 +522,32 @@ describe("addons/lzsResearchClient/utils/zipHelpers", () => {
             expect(roundFileSizeToFixed("2136548.410", true)).to.equal("2136548.41");
 
             global.i18next = prevI18next;
+        });
+    });
+
+    describe("calcProgress", () => {
+        it("should return start when total is 0", () => {
+            const result = calcProgress({value: 50, total: 0, start: 10, end: 100});
+
+            expect(result).to.equal(10);
+        });
+
+        it("should return start when value is negative", () => {
+            const result = calcProgress({value: -10, total: 100, start: 10, end: 100});
+
+            expect(result).to.equal(10);
+        });
+
+        it("should return end when value is greater than total", () => {
+            const result = calcProgress({value: 150, total: 100, start: 10, end: 100});
+
+            expect(result).to.equal(100);
+        });
+
+        it("should calculate progress correctly", () => {
+            const result = calcProgress({value: 50, total: 100, start: 20, end: 70});
+
+            expect(result).to.equal(45);
         });
     });
 });

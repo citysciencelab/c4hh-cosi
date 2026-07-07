@@ -109,11 +109,12 @@
               "withoutYear": "ohne Jahrgang",
               "metadataFolderName": "Metadaten",
               "progress": {
-                "start": "Beginne Daten zu sammeln und das ZIP zu erzeugen ...",
-                "fetchPrimaryData": "Hole Infos über Dateien zu {{ archiveName }} ...",
+                "start": "Download vorbereiten ...",
+                "fetchPrimaryData": "{{ current }} von {{ total }} Dateien abgerufen ...",
+                "fetchDossierData": "Metadaten abrufen ...",
                 "downloading": "Dateien herunterladen ...",
                 "sumFileSizeError": "Die summierte Dateigröße ist größer als {{ maxFileSize }} (nämlich {{ sumFileSize }}). Das kann nicht auf einmal heruntergeladen werden.",
-                "downloadingFile": "Lade {{ fileName }}",
+                "downloadingFile": "{{ current }} von {{ total }} Dateien heruntergeladen ...",
                 "zipping": "Erzeuge das ZIP ...",
                 "done": "Erledigt!"
               }

@@ -109,12 +109,13 @@
               "withoutYear": "unknown year",
               "metadataFolderName": "Metadata",
               "progress": {
-                "start": "Start collecting data and creating zip ...",
-                "fetchPrimaryData": "Getting info on files for {{ archiveName }} ...",
+                "start": "Preparing download...",
+                "fetchPrimaryData": "{{ current }} of {{ total }} files fetched...",
+                "fetchDossierData": "Fetching metadata...",
                 "downloading": "Downloading files...",
                 "sumFileSizeError": "The total file size {{ sumFileSize }} exceeds {{ maxFileSize }}. This cannot be downloaded at once.",
-                "downloadingFile": "Downloading {{ fileName }}",
-                "zipping": "Now building the zip...",
+                "downloadingFile": "{{ current }} of {{ total }} files downloaded...",
+                "zipping": "Building the zip...",
                 "done": "Done!"
               }
             }
