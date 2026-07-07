@@ -412,7 +412,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import 'variables';
+
 .plan-parken {
     position: relative;
     overflow-y: visible;

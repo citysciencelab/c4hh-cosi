@@ -472,7 +472,6 @@ export default {
 </template>
 
 <style lang="scss">
-    @import "../../utils/variables.scss";
     #chart-generator-win {
         height: 675px;
     }

@@ -211,9 +211,6 @@ export default {
 
 
 <style lang="scss" scoped>
-    @import "~variables";
-    @import "../../utils/variables.scss";
-
     .list {
         ul {
             display:flex;

@@ -815,7 +815,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "/src/assets/css/variables";
 
 .add-statistic button {
     color: $secondary;
@@ -887,7 +886,4 @@ export default {
 </style>
 
 <style lang="scss">
-@import "/src/assets/css/mixins.scss";
-@import "/src/assets/css/variables";
-
 </style>

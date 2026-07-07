@@ -244,7 +244,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "/src/assets/css/variables";
+
 .table-wrapper {
     margin-top: 5px;
     margin-bottom: 10px;

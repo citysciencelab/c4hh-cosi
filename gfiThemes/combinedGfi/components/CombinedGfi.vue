@@ -524,7 +524,6 @@ export default {
 </template>
 
 <style scoped lang="scss">
-@import 'variables';
 
 .button-group {
     display: flex;

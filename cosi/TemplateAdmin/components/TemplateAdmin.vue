@@ -329,8 +329,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "/src/assets/css/mixins.scss";
-@import "/src/assets/css/variables";
 
 .nav-tabs .nav-link.active {
     color: $light_blue;
