@@ -245,9 +245,6 @@
   "tacticalMark": {
     "type": "tool"
   },
-  "fileImportAddon": {
-    "type": "tool"
-  },
   "dataNarrator": {
     "path": "dataNarrator",
     "type": "tool"
