@@ -108,7 +108,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
 
         wrapper.vm.heading = Math.PI / 2;
 
-        expect(wrapper.vm.markerDirectionStyle.transform).to.include("rotate(90deg)");
+        expect(wrapper.vm.markerDirectionStyle["--marker-heading-angle"]).to.equal("90deg");
     });
 
     it("calculates fallback heading from movement", () => {
