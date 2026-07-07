@@ -265,7 +265,7 @@ export default {
             }
 
             const layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource(),
-                olFeatures = ConvertFeature.geoJsonToOpenlayers(features);
+                  olFeatures = ConvertFeature.geoJsonToOpenlayers(features);
 
             layerSource.addFeatures(olFeatures);
         },

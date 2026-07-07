@@ -182,7 +182,7 @@ export default {
          */
         reset (feature) {
             const layerStatisticAreas = this.getLayerStatisticAreas(feature),
-                layerSchools = this.getLayerSchools();
+                  layerSchools = this.getLayerSchools();
 
             this.showAllFeatures(layerStatisticAreas);
 
@@ -228,11 +228,11 @@ export default {
          */
         getLayerSchools () {
             const modelAttributes = {"name": this.layerNameCorrelation[this.featureType]},
-                /**
-                 * conf as {Object} - a simple object {id, ...} with config parameters (see config.json -> Themenconfig)
-                 * conf is the config of the module based on config.json Themenconfig found by name (see defaults.layerNameCorrelation) choosen by themeType
-                 */
-                conf = Radio.request("Parser", "getItemByAttributes", modelAttributes);
+                  /**
+                   * conf as {Object} - a simple object {id, ...} with config parameters (see config.json -> Themenconfig)
+                   * conf is the config of the module based on config.json Themenconfig found by name (see defaults.layerNameCorrelation) choosen by themeType
+                   */
+                  conf = Radio.request("Parser", "getItemByAttributes", modelAttributes);
             let layer = Radio.request("ModelList", "getModelByAttributes", modelAttributes);
 
             if (!layer && conf && conf?.id) {
@@ -272,7 +272,7 @@ export default {
          */
         getFeatureIds (schools, statGeb_Nr) {
             const featureIds = [],
-                schoolAssoc = {};
+                  schoolAssoc = {};
 
             if (!Array.isArray(schools)) {
                 return featureIds;
@@ -291,7 +291,7 @@ export default {
                     if (Array.isArray(value) && value.length) {
                         value.forEach(data => {
                             const id = data.get("schule_id"),
-                                schoolList = Object.prototype.hasOwnProperty.call(schoolAssoc, id) ? schoolAssoc[id] : false;
+                                  schoolList = Object.prototype.hasOwnProperty.call(schoolAssoc, id) ? schoolAssoc[id] : false;
 
                             if (Array.isArray(schoolList)) {
                                 schoolList.forEach(school => {
@@ -342,8 +342,8 @@ export default {
          */
         getActiveSchoolLayer: function () {
             const statGeb_Nr = this.statgeb_id,
-                layerSchools = this.getLayerSchools(),
-                schools = layerSchools ? layerSchools.get("layer").getSource().getFeatures() : [];
+                  layerSchools = this.getLayerSchools(),
+                  schools = layerSchools ? layerSchools.get("layer").getSource().getFeatures() : [];
 
             this.layerSchools = layerSchools;
             this.featureIds = this.getFeatureIds(schools, statGeb_Nr);

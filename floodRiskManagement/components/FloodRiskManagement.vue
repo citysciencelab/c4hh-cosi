@@ -314,11 +314,11 @@ export default {
          */
         async scaleChanged (event) {
             const scale = parseInt(event.target.value, 10),
-                resolution = {
-                    "scale": scale,
-                    "mapSize": mapCollection.getMap("2D").getSize(),
-                    "printMapSize": this.layoutMapInfo
-                };
+                  resolution = {
+                      "scale": scale,
+                      "mapSize": mapCollection.getMap("2D").getSize(),
+                      "printMapSize": this.layoutMapInfo
+                  };
 
             this.setIsScaleSelectedManually(true);
             this.getOptimalResolution(resolution);

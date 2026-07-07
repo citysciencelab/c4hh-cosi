@@ -165,8 +165,8 @@ export default {
          */
         downloadName () {
             const date = dayjs(new Date()).format("YYYY-MM-DD"),
-                fileName = this.reportTitle ? this.reportTitle : this.reportName,
-                prepareName = fileName.replace(/(?:\.(?![^.]+$)|[^\w.])+/g, "-");
+                  fileName = this.reportTitle ? this.reportTitle : this.reportName,
+                  prepareName = fileName.replace(/(?:\.(?![^.]+$)|[^\w.])+/g, "-");
 
             return prepareName + "-" + date + ".pdf";
         },
@@ -206,7 +206,7 @@ export default {
             }
 
             const cards = [],
-                cardType = this.categoryMapping.analyses.find(al => al.key === "accessibilityAnalyses");
+                  cardType = this.categoryMapping.analyses.find(al => al.key === "accessibilityAnalyses");
 
             cardType.items.forEach(item => {
                 cards.push({...cardType, name: item.inputs.title, id: uniqueId("reporting-tool-card-")});
@@ -343,9 +343,9 @@ export default {
 
             return options.map(option => {
                 const baseKey = "additional:modules.cosi.reportingTool.frontPage." + option.value,
-                    label = this.$t(baseKey + ".label"),
-                    alertKey = baseKey + ".alert",
-                    alert = option.value === "withNeuwerk" ? this.$t(alertKey) : undefined;
+                      label = this.$t(baseKey + ".label"),
+                      alertKey = baseKey + ".alert",
+                      alert = option.value === "withNeuwerk" ? this.$t(alertKey) : undefined;
 
                 return {
                     ...option,
@@ -411,7 +411,7 @@ export default {
          */
         getLegendEntries (legendObj) {
             const defaultImageScale = 1,
-                entries = Array.isArray(legendObj?.legend) ? legendObj.legend : [];
+                  entries = Array.isArray(legendObj?.legend) ? legendObj.legend : [];
 
             return entries
                 .map(entry => {
@@ -420,8 +420,8 @@ export default {
                     }
 
                     const label = entry?.name ?? "",
-                        graphic = entry?.graphic ?? null,
-                        imageScale = Number.isFinite(entry?.imageScale) ? entry.imageScale : defaultImageScale;
+                          graphic = entry?.graphic ?? null,
+                          imageScale = Number.isFinite(entry?.imageScale) ? entry.imageScale : defaultImageScale;
 
                     return {label, graphic, imageScale};
                 })
@@ -437,8 +437,8 @@ export default {
          */
         async addLegendFromStore () {
             const defaultLayerTitlePrefix = "Layer ",
-                legends = Array.isArray(this.legends) ? this.legends : [],
-                sortedLegends = legends.slice().sort((a, b) => (a?.position ?? 0) - (b?.position ?? 0));
+                  legends = Array.isArray(this.legends) ? this.legends : [],
+                  sortedLegends = legends.slice().sort((a, b) => (a?.position ?? 0) - (b?.position ?? 0));
 
             if (legends.length === 0) {
                 return;
@@ -448,8 +448,8 @@ export default {
 
             for (let layerIndex = 0; layerIndex < sortedLegends.length; layerIndex++) {
                 const legendObj = sortedLegends[layerIndex],
-                    title = legendObj?.name || `${defaultLayerTitlePrefix}${layerIndex + 1}`,
-                    entries = this.getLegendEntries(legendObj);
+                      title = legendObj?.name || `${defaultLayerTitlePrefix}${layerIndex + 1}`,
+                      entries = this.getLegendEntries(legendObj);
 
                 this.pdf.addHeadline(title);
 
@@ -481,28 +481,28 @@ export default {
          */
         async addLegendEntryToPdf (graphic, label, layerIndex, entryIndex, imageScale = 1) {
             const baseIconSize = 26,
-                minEffectiveScale = 0.85,
-                maxEffectiveScale = 1.1,
-                minIconSize = 12,
-                svgExtraSize = 4,
-                iconColumnExtraWidth = 14,
-                textFontSize = 10,
-                textLineHeight = 1.1,
-                textMargin = [4, 6, 0, 0],
-                rowMargin = [0, 2, 0, 2],
-                imageKeyPrefix = "legend-",
-                svgDataUrlPrefix = "data:image/svg+xml",
-                imageDataUrlPrefix = "data:image/",
-                httpUrlRegex = /^https?:\/\//,
-                scale = Number.isFinite(imageScale) ? imageScale : 1,
-                effectiveScale = Math.max(minEffectiveScale, Math.min(maxEffectiveScale, scale)),
-                size = Math.max(minIconSize, Math.round(baseIconSize * effectiveScale)),
-                svgSize = size + svgExtraSize,
-                imageKey = `${imageKeyPrefix}${layerIndex}-${entryIndex}`,
-                isString = typeof graphic === "string",
-                isSvgDataUrl = isString && graphic.startsWith(svgDataUrlPrefix),
-                isAnyImageDataUrl = isString && graphic.startsWith(imageDataUrlPrefix),
-                isHttpUrl = isString && httpUrlRegex.test(graphic);
+                  minEffectiveScale = 0.85,
+                  maxEffectiveScale = 1.1,
+                  minIconSize = 12,
+                  svgExtraSize = 4,
+                  iconColumnExtraWidth = 14,
+                  textFontSize = 10,
+                  textLineHeight = 1.1,
+                  textMargin = [4, 6, 0, 0],
+                  rowMargin = [0, 2, 0, 2],
+                  imageKeyPrefix = "legend-",
+                  svgDataUrlPrefix = "data:image/svg+xml",
+                  imageDataUrlPrefix = "data:image/",
+                  httpUrlRegex = /^https?:\/\//,
+                  scale = Number.isFinite(imageScale) ? imageScale : 1,
+                  effectiveScale = Math.max(minEffectiveScale, Math.min(maxEffectiveScale, scale)),
+                  size = Math.max(minIconSize, Math.round(baseIconSize * effectiveScale)),
+                  svgSize = size + svgExtraSize,
+                  imageKey = `${imageKeyPrefix}${layerIndex}-${entryIndex}`,
+                  isString = typeof graphic === "string",
+                  isSvgDataUrl = isString && graphic.startsWith(svgDataUrlPrefix),
+                  isAnyImageDataUrl = isString && graphic.startsWith(imageDataUrlPrefix),
+                  isHttpUrl = isString && httpUrlRegex.test(graphic);
 
             if (!this.pdf.images) {
                 this.pdf.images = {};
@@ -523,7 +523,7 @@ export default {
             }
             else if (isHttpUrl) {
                 const lowerUrl = graphic.toLowerCase(),
-                    isLikelySvgUrl = lowerUrl.includes(".svg") || lowerUrl.includes("image/svg");
+                      isLikelySvgUrl = lowerUrl.includes(".svg") || lowerUrl.includes("image/svg");
 
                 try {
                     if (isLikelySvgUrl) {
@@ -575,9 +575,9 @@ export default {
          */
         decodeSvgDataUrl (dataUrl) {
             const isString = typeof dataUrl === "string",
-                commaIndex = isString ? dataUrl.indexOf(",") : -1,
-                hasPayload = commaIndex !== -1,
-                payload = hasPayload ? dataUrl.slice(commaIndex + 1) : null;
+                  commaIndex = isString ? dataUrl.indexOf(",") : -1,
+                  hasPayload = commaIndex !== -1,
+                  payload = hasPayload ? dataUrl.slice(commaIndex + 1) : null;
 
             if (!hasPayload) {
                 return null;
@@ -734,7 +734,7 @@ export default {
             cards.forEach(card => {
                 if (card.key === "accessibilityAnalyses") {
                     const analysis = card.items.find(item => item.inputs.title === card.name),
-                        needsPageBreak = analysisCount > 0;
+                          needsPageBreak = analysisCount > 0;
 
                     this.addAccessibilityAnalysis(analysis, needsPageBreak);
 
@@ -805,11 +805,11 @@ export default {
          */
         addAccessibilityAnalysis (analysis, needsPageBreak) {
             const inputs = {"Verkehrsmittel": this.transportTypeMapping[analysis.inputs.transportType],
-                [analysis.inputs.scaleUnit === "time" ? "Zeit" : "Entfernung"]: analysis.inputs[analysis.inputs.scaleUnit] + " min",
-                ... analysis.inputs.useTravelTimeIndex && {
-                    "Reisezeitindex": analysis.inputs.travelTimeIndex,
-                    "Tageszeit": analysis.inputs.travelTime + ":00 Uhr"},
-                "Einwohner": analysis.inputs.einwohner
+                            [analysis.inputs.scaleUnit === "time" ? "Zeit" : "Entfernung"]: analysis.inputs[analysis.inputs.scaleUnit] + " min",
+                            ... analysis.inputs.useTravelTimeIndex && {
+                                "Reisezeitindex": analysis.inputs.travelTimeIndex,
+                                "Tageszeit": analysis.inputs.travelTime + ":00 Uhr"},
+                            "Einwohner": analysis.inputs.einwohner
             };
 
             if (needsPageBreak) {
@@ -895,11 +895,11 @@ export default {
          */
         addStatsToReport (items) {
             const itemGroups = items.map(item => item.category),
-                filteredMappingByCategories = this.initMapping.filter(obj => itemGroups.includes(obj.value)),
-                groupedMapping = Object.groupBy(filteredMappingByCategories, (obj) => obj.group),
-                pdf = this.pdf,
-                printedYear = this.statisticalYear || items[0].years[0],
-                selectedDistrictLabels = this.getSelectedDistrictLabels(this.selectedDistrictLevel.districts, this.selectedDistrictNames);
+                  filteredMappingByCategories = this.initMapping.filter(obj => itemGroups.includes(obj.value)),
+                  groupedMapping = Object.groupBy(filteredMappingByCategories, (obj) => obj.group),
+                  pdf = this.pdf,
+                  printedYear = this.statisticalYear || items[0].years[0],
+                  selectedDistrictLabels = this.getSelectedDistrictLabels(this.selectedDistrictLevel.districts, this.selectedDistrictNames);
 
             let additionalPara = {pageOrientation: "portrait"};
 
@@ -914,15 +914,15 @@ export default {
 
             this.selectedStatGroups.forEach((group) => {
                 const districtCols = this.getStatCols(this.selectedDistrictLevel, this.selectedDistrictNames, []),
-                    columns = [group, ...districtCols],
-                    body = [columns];
+                      columns = [group, ...districtCols],
+                      body = [columns];
 
                 groupedMapping[group].forEach(mappingObject => {
                     if (this.statsFeatureFilter.length > 0 && !this.statsFeatureFilter.includes(mappingObject.value)) {
                         return;
                     }
                     const statFeature = items.find((item) => item.category === mappingObject.value),
-                        row = [];
+                          row = [];
 
                     columns.forEach((col, index) => {
                         const numberOptions = statFeature.valueType === "relative" ? {
@@ -961,16 +961,16 @@ export default {
          */
         async addReferencesToReport (items) {
             const rows = [],
-                headers = ["Datensatz", "datenverantwortliche Stelle", "Datenstand"],
-                list = Array.isArray(items) ? items : [],
-                unified = [],
-                seenCategories = new Set(),
-                body = [],
-                bodyWithHeader = [];
+                  headers = ["Datensatz", "datenverantwortliche Stelle", "Datenstand"],
+                  list = Array.isArray(items) ? items : [],
+                  unified = [],
+                  seenCategories = new Set(),
+                  body = [],
+                  bodyWithHeader = [];
 
             for (const item of list) {
                 const layerId = item?.layerId,
-                    meta = layerId ? await this.getMetaForLayerId(layerId) : undefined;
+                      meta = layerId ? await this.getMetaForLayerId(layerId) : undefined;
 
                 if (!meta) {
                     continue;
@@ -1030,16 +1030,16 @@ export default {
             }
 
             const raw = rawLayerList?.getLayerWhere?.({id: layerId}),
-                dataset = raw?.datasets?.[0],
-                cswUrl = dataset?.csw_url,
-                mdId = dataset?.md_id;
+                  dataset = raw?.datasets?.[0],
+                  cswUrl = dataset?.csw_url,
+                  mdId = dataset?.md_id;
 
             if (cswUrl && mdId) {
                 try {
                     const metadata = await getCswRecordById.getRecordById(cswUrl, mdId),
-                        provider = metadata?.getContact() || metadata?.getOwner() || metadata?.getPublisher(),
-                        providerName = provider?.name || "-",
-                        date = this.formatAsOf(metadata?.getRevisionDate());
+                          provider = metadata?.getContact() || metadata?.getOwner() || metadata?.getPublisher(),
+                          providerName = provider?.name || "-",
+                          date = this.formatAsOf(metadata?.getRevisionDate());
 
                     return {providerName, date};
                 }
@@ -1085,16 +1085,16 @@ export default {
             }
 
             const imageName = "overviewMap",
-                feature = this.selectedFeatures.length > 1 ? unionFeatures(this.selectedFeatures) : this.selectedFeatures[0],
-                template = typeof feature !== "undefined" ?
-                    this.getObjectCopyWithoutReference(baseProportionTemplate) :
-                    this.getObjectCopyWithoutReference(baseFixedTemplateForHamburg),
-                {downloadURL: overviewImageUrl, bbox} = await this.prepareImage(feature, template, this.projection.getCode(), imageName, mapfishServerConfig, "A4 Hochformat").catch(error => console.error(error)),
-                headline = this.reportTitle ? this.reportTitle.trim() : "Übersichtskarte",
-                {imageHeight, imageWidth} = frontPageValue === "withNeuwerk" ? {imageHeight: 400, imageWidth: 510} : {imageHeight: 500, imageWidth: 500},
-                imageOptions = frontPageValue === "withNeuwerk" ? {width: imageWidth, height: imageHeight, alignment: "center"} : {fit: [imageWidth, imageHeight], alignment: "center"},
-                minimap = await this.addOverViewPageMinimap(template, bbox, "miniMap", "right"),
-                overviewInfos = this.addDetailViewToOverviewPage();
+                  feature = this.selectedFeatures.length > 1 ? unionFeatures(this.selectedFeatures) : this.selectedFeatures[0],
+                  template = typeof feature !== "undefined" ?
+                      this.getObjectCopyWithoutReference(baseProportionTemplate) :
+                      this.getObjectCopyWithoutReference(baseFixedTemplateForHamburg),
+                  {downloadURL: overviewImageUrl, bbox} = await this.prepareImage(feature, template, this.projection.getCode(), imageName, mapfishServerConfig, "A4 Hochformat").catch(error => console.error(error)),
+                  headline = this.reportTitle ? this.reportTitle.trim() : "Übersichtskarte",
+                  {imageHeight, imageWidth} = frontPageValue === "withNeuwerk" ? {imageHeight: 400, imageWidth: 510} : {imageHeight: 500, imageWidth: 500},
+                  imageOptions = frontPageValue === "withNeuwerk" ? {width: imageWidth, height: imageHeight, alignment: "center"} : {fit: [imageWidth, imageHeight], alignment: "center"},
+                  minimap = await this.addOverViewPageMinimap(template, bbox, "miniMap", "right"),
+                  overviewInfos = this.addDetailViewToOverviewPage();
 
             if (typeof overviewImageUrl !== "string") {
                 return;
@@ -1170,11 +1170,11 @@ export default {
          */
         async addInfrastructureMapPageToReport (items) {
             const imageName = "infrastructureMap",
-                feature = layerCollection.getLayerById("subject-area").getLayerSource().getFeatures()[0],
-                template = typeof feature !== "undefined" ?
-                    this.getObjectCopyWithoutReference(baseProportionTemplate) :
-                    this.getObjectCopyWithoutReference(baseFixedTemplateForHamburg),
-                reportLayerIds = items.map(item => item.layerId);
+                  feature = layerCollection.getLayerById("subject-area").getLayerSource().getFeatures()[0],
+                  template = typeof feature !== "undefined" ?
+                      this.getObjectCopyWithoutReference(baseProportionTemplate) :
+                      this.getObjectCopyWithoutReference(baseFixedTemplateForHamburg),
+                  reportLayerIds = items.map(item => item.layerId);
 
             let imageOptions = {};
 
@@ -1201,12 +1201,12 @@ export default {
          */
         addDetailViewToOverviewPage () {
             const text = [],
-                tableBody = [[
-                    {
-                        margin: [0, 4, 0, 4]
-                    }
-                ]],
-                infoData = getBasicInfo.getOverviewBasicInfo(this.selectedDistrictLevel);
+                  tableBody = [[
+                      {
+                          margin: [0, 4, 0, 4]
+                      }
+                  ]],
+                  infoData = getBasicInfo.getOverviewBasicInfo(this.selectedDistrictLevel);
 
             infoData.forEach(data => {
                 text.push({text: `${data.label}: `, bold: true, fontSize: 11});
@@ -1235,9 +1235,9 @@ export default {
          */
         async createMapfishDialog () {
             const mapConf = await this.getMapConf(this.parcel[0], this.config?.specification),
-                legends = this.getLegends(this.config?.legends),
-                pdfPageNames = this.preparePDFPageNames(this.pdfPages),
-                attributes = this.getAttributes(mapConf, legends, pdfPageNames);
+                  legends = this.getLegends(this.config?.legends),
+                  pdfPageNames = this.preparePDFPageNames(this.pdfPages),
+                  attributes = this.getAttributes(mapConf, legends, pdfPageNames);
 
             this.mapfishData = {
                 "layout": "A4 Hochformat",
@@ -1265,33 +1265,33 @@ export default {
          */
         prepareImage (feature, baseLayer, projectionCode, imageName, serverConfig, layoutName, mapScaleFactor) {
             const extent = feature?.getGeometry()?.getExtent(),
-                baseLayerName = Object.keys(baseLayer)[0],
-                // mapfishDialog = createMapfishDialog(
-                //     typeof feature !== "undefined" ? {
-                //         center: getCenterOfExtent(extent),
-                //         extent,
-                //         feature,
-                //         featureList: [feature],
-                //         geometry: feature?.getGeometry()
-                //     } : undefined,
-                //     {},
-                //     baseLayer,
-                //     "",
-                //     projectionCode,
-                //     imageName,
-                //     layoutName,
-                //     mapScaleFactor
-                // );
+                  baseLayerName = Object.keys(baseLayer)[0],
+                  // mapfishDialog = createMapfishDialog(
+                  //     typeof feature !== "undefined" ? {
+                  //         center: getCenterOfExtent(extent),
+                  //         extent,
+                  //         feature,
+                  //         featureList: [feature],
+                  //         geometry: feature?.getGeometry()
+                  //     } : undefined,
+                  //     {},
+                  //     baseLayer,
+                  //     "",
+                  //     projectionCode,
+                  //     imageName,
+                  //     layoutName,
+                  //     mapScaleFactor
+                  // );
 
-                mapfishDialogInstance = new MapfishDialog(
-                    {},
-                    baseLayer,
-                    "",
-                    projectionCode,
-                    layoutName,
-                    imageName,
-                    mapScaleFactor
-                );
+                  mapfishDialogInstance = new MapfishDialog(
+                      {},
+                      baseLayer,
+                      "",
+                      projectionCode,
+                      layoutName,
+                      imageName,
+                      mapScaleFactor
+                  );
 
             return mapfishDialogInstance.create(typeof feature !== "undefined" ? {
                 center: getCenterOfExtent(extent),
@@ -1307,14 +1307,14 @@ export default {
 
                 return new Promise((resolve, reject) => {
                     return startPrintProcess(this.restServiceById(serverConfig.name).url, "png", serverConfig.template, mapfishDialog, (url, payload) => {
-                        return axios.post(url, payload);
-                    }, undefined,
-                    error => {
-                        reject(error);
-                    },
-                    downloadURL => {
-                        resolve({downloadURL, bbox: mapfishDialog.attributes.map.bbox});
-                    }, 0);
+                                                 return axios.post(url, payload);
+                                             }, undefined,
+                                             error => {
+                                                 reject(error);
+                                             },
+                                             downloadURL => {
+                                                 resolve({downloadURL, bbox: mapfishDialog.attributes.map.bbox});
+                                             }, 0);
                 });
             });
 
@@ -1331,9 +1331,9 @@ export default {
          */
         getStatCols (districtLevel, districtNames, columns, isRoot = true) {
             const districts = districtLevel.displayAll
-                    ? districtLevel.districts
-                    : districtLevel.districts.filter(dist => districtNames.includes(dist.getName())),
-                refDistrictNames = [];
+                      ? districtLevel.districts
+                      : districtLevel.districts.filter(dist => districtNames.includes(dist.getName())),
+                  refDistrictNames = [];
 
             let refDistrictName;
 
@@ -1390,13 +1390,13 @@ export default {
             this.pdf.addLineBreak();
             this.selectedInfrastructureData.forEach(group => {
                 const topicLength = groupedTopics[group].length,
-                    columns = this.pdf.getColumns(["Typ der Einrichtung", "Name", "Adresse"], []),
-                    body = [columns],
-                    columnAttirbutes = ["type", "name", "address"];
+                      columns = this.pdf.getColumns(["Typ der Einrichtung", "Name", "Adresse"], []),
+                      body = [columns],
+                      columnAttirbutes = ["type", "name", "address"];
 
                 this.pdf.addHeadline(group);
                 this.pdf.addParagraph(`Es sind ${groupedTopics[group].length} ${group} im ausgewählten Gebiet vorhanden.`,
-                    [{text: `${groupedTopics[group].length}`, color: "#3C5F94", bold: true}, {text: `${group}`, color: "#3C5F94", bold: true}]);
+                                      [{text: `${groupedTopics[group].length}`, color: "#3C5F94", bold: true}, {text: `${group}`, color: "#3C5F94", bold: true}]);
 
                 if (topicLength <= this.infrastructureTableLimit || !this.infrastructureTableLimitEnabled) {
                     groupedTopics[group].forEach(topic => {
@@ -1411,7 +1411,7 @@ export default {
                 }
                 else {
                     this.pdf.addParagraph(`Hinweis: Bei mehr als ${this.infrastructureTableLimit} Einrichtungen wird keine Fachdaten-Tabelle dargestellt.`,
-                        [{text: `Hinweis: Bei mehr als ${this.infrastructureTableLimit} Einrichtungen wird keine Fachdaten-Tabelle dargestellt.`, color: "#868686"}]);
+                                          [{text: `Hinweis: Bei mehr als ${this.infrastructureTableLimit} Einrichtungen wird keine Fachdaten-Tabelle dargestellt.`, color: "#868686"}]);
                 }
             });
         },
@@ -1423,7 +1423,7 @@ export default {
          */
         addDiagram (needsPageBreak = true) {
             const data = this.getChartData(this.items, this.selectedDistrictNames, this.areaColumnName, this.categoryInChart, this.initMapping),
-                imageArr = [];
+                  imageArr = [];
 
             if (!Array.isArray(data) || !data.length) {
                 return;
@@ -1456,7 +1456,7 @@ export default {
          */
         getChartImage (data) {
             const oldCanvasElement = document.getElementById("canvas"),
-                canvasElement = document.createElement("canvas");
+                  canvasElement = document.createElement("canvas");
 
             if (oldCanvasElement !== null) {
                 oldCanvasElement.parentElement.removeChild(oldCanvasElement);
@@ -1487,10 +1487,10 @@ export default {
          */
         getChartData (items, selectedDistrictNames, areaColumnName, categoryInChart, mappingJson) {
             const filteredMappingByCategories = mappingJson.filter(obj => {
-                    return this.selectedStatGroups.includes(obj.group);
-                }),
-                groupedMapping = this.groupBy(filteredMappingByCategories, "group"),
-                categoryData = [];
+                      return this.selectedStatGroups.includes(obj.group);
+                  }),
+                  groupedMapping = this.groupBy(filteredMappingByCategories, "group"),
+                  categoryData = [];
 
             if (!Array.isArray(mappingJson) || mappingJson.length === 0 || !Array.isArray(items) || !items.length || !Array.isArray(selectedDistrictNames) || !selectedDistrictNames.length) {
                 return categoryData;
@@ -1504,14 +1504,14 @@ export default {
                 }
 
                 const labels = [],
-                    data = [];
+                      data = [];
 
                 Object.keys(category).forEach(key => {
                     if (!Object.prototype.hasOwnProperty.call(groupedMapping, key)) {
                         return;
                     }
                     const innerObj = {},
-                        statFeature = items.find((item) => item.category === category[key]);
+                          statFeature = items.find((item) => item.category === category[key]);
 
                     statFeature.years.sort((a, b) => a - b);
                     innerObj[key] = category[key];
@@ -1608,9 +1608,9 @@ export default {
 
             if (this.statsFeatureFilter.length) {
                 const filtered = this.initMapping.filter(obj => {
-                        return this.statsFeatureFilter.includes(obj.value);
-                    }),
-                    groups = Object.groupBy(filtered, (obj) => obj.group);
+                          return this.statsFeatureFilter.includes(obj.value);
+                      }),
+                      groups = Object.groupBy(filtered, (obj) => obj.group);
 
                 this.selectedStatGroups = Object.keys(groups);
             }

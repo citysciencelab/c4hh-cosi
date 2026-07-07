@@ -35,9 +35,9 @@ export default {
          */
         filteredAndGroupedItems () {
             const groups = {},
-                visibleItems = this.allowedActions && this.allowedActions.length > 0
-                    ? this.defaultItems.filter(item => this.allowedActions.includes(item.action))
-                    : this.defaultItems;
+                  visibleItems = this.allowedActions && this.allowedActions.length > 0
+                      ? this.defaultItems.filter(item => this.allowedActions.includes(item.action))
+                      : this.defaultItems;
 
             visibleItems.forEach(item => {
                 if (!groups[item.category]) {

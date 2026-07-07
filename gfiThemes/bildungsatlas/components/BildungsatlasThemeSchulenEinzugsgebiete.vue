@@ -190,7 +190,7 @@ export default {
          */
         filterAreasById: function (layer) {
             const areas = layer.get("layer").getSource().getFeatures(),
-                featureIds = [];
+                  featureIds = [];
 
             areas.forEach(area => {
                 this.areaInfo.forEach(val => {
@@ -214,8 +214,8 @@ export default {
          */
         onFeaturesLoadedEvent: function (layerId) {
             const conf = this.getStatisticAreasConfig(),
-                layerStatistischeGebiete = this.getStatisticAreasLayer(),
-                countStudents = this.countStudents;
+                  layerStatistischeGebiete = this.getStatisticAreasLayer(),
+                  countStudents = this.countStudents;
 
             if (layerId === conf.id) {
                 if (layerStatistischeGebiete && countStudents !== "") {
@@ -244,7 +244,7 @@ export default {
          */
         getGfiContent: function (properties) {
             const schulId = properties.schul_id ? properties.schul_id.split("-").shift() : "",
-                featureTypes = ["de.hh.up:einzug_einzugsgebiete_primarstufe", "de.hh.up:einzug_einzugsgebiete_sekundarstufe"];
+                  featureTypes = ["de.hh.up:einzug_einzugsgebiete_primarstufe", "de.hh.up:einzug_einzugsgebiete_sekundarstufe"];
 
             this.name = properties.schulname ? properties.schulname : "";
             this.address = properties.adresse_strasse_hausnr && properties.adresse_ort ? properties.adresse_strasse_hausnr + ", " + properties.adresse_ort : "";
@@ -429,7 +429,7 @@ export default {
          */
         reset: function (feature) {
             const layerEinzugsgebiete = this.getEinzugsgebieteLayer(feature),
-                layerStatistischeGebiete = this.getStatisticAreasLayer();
+                  layerStatistischeGebiete = this.getStatisticAreasLayer();
 
             if (layerEinzugsgebiete) {
                 this.unfilterFeature(layerEinzugsgebiete);

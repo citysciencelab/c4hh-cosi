@@ -55,7 +55,7 @@ export default {
          */
         layerList () {
             const list = [],
-                subjectLayerConfigs = this.allLayerConfigsStructured(treeSubjectsKey);
+                  subjectLayerConfigs = this.allLayerConfigsStructured(treeSubjectsKey);
 
             subjectLayerConfigs.forEach(config => {
                 if (config.type !== "folder") {

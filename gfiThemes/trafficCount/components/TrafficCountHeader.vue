@@ -248,7 +248,7 @@ export default {
             }
 
             const options = this.downloadOptions,
-                results = [];
+                  results = [];
             let remaining = options.length;
 
             this.isDownloading = true;
@@ -283,7 +283,7 @@ export default {
          */
         finishDownloadAll (options, results) {
             const jsonData = [],
-                intervalHeader = this.$t("additional:modules.tools.gfi.themes.trafficCount.downloadIntervalColumn");
+                  intervalHeader = this.$t("additional:modules.tools.gfi.themes.trafficCount.downloadIntervalColumn");
 
             options.forEach((option, index) => {
                 const intervalLabel = this.$t("additional:modules.tools.gfi.themes.trafficCount." + option.intervalLabel);
@@ -304,14 +304,14 @@ export default {
          */
         downloadCsv (jsonData, filenamePrefix) {
             const onerror = msg => {
-                    console.warn(msg);
-                    this.$store.dispatch("Alerting/addSingleAlert", i18next.t("common:shared.modules.buttons.error.download"));
-                },
-                csvText = convertJsonToCsv(jsonData, onerror, true);
+                      console.warn(msg);
+                      this.$store.dispatch("Alerting/addSingleAlert", i18next.t("common:shared.modules.buttons.error.download"));
+                  },
+                  csvText = convertJsonToCsv(jsonData, onerror, true);
 
             if (typeof csvText === "string") {
                 const blob = createCsvBlob(csvText),
-                    filename = String(filenamePrefix) + dayjs().format("_YYYY-MM-DD_HH-mm-ss") + ".csv";
+                      filename = String(filenamePrefix) + dayjs().format("_YYYY-MM-DD_HH-mm-ss") + ".csv";
 
                 if (!downloadBlobPerNavigator(blob, filename)) {
                     downloadBlobPerHTML5(blob, filename, onerror);
@@ -331,7 +331,7 @@ export default {
          */
         getDownloadHandler (interval, originMeansOfTransport) {
             const meansOfTransport = originMeansOfTransport !== "Anzahl_Fahrraeder" ? "Anzahl_Kfz" : originMeansOfTransport,
-                meansOfTransportSV = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "";
+                  meansOfTransportSV = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "";
 
             if (typeof this.downloadUrl === "string") {
                 return false;
@@ -496,7 +496,7 @@ export default {
 
             for (const key in data) {
                 const obj = {},
-                    date = key.split(" ");
+                      date = key.split(" ");
 
                 if (interval === "15-Min" || interval === "1-Stunde") {
                     obj.Datum = date[0];

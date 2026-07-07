@@ -417,11 +417,11 @@ export default {
          */
         getLayerList () {
             const rawLayers = getAndMergeAllRawLayers(),
-                layerConfig = {
-                    baselayer: {},
-                    subjectlayer: {}
-                },
-                layersStructured = buildTreeStructure.build(rawLayers, layerConfig, this.subjectLayerCategory, []);
+                  layerConfig = {
+                      baselayer: {},
+                      subjectlayer: {}
+                  },
+                  layersStructured = buildTreeStructure.build(rawLayers, layerConfig, this.subjectLayerCategory, []);
 
             return this.getParsedLayerList(layersStructured?.elements);
         },
@@ -535,7 +535,7 @@ export default {
 
             modules.forEach(val => {
                 const capModuleName = val?.type.charAt(0).toUpperCase() + val?.type.slice(1),
-                    key = typeof store.getters["Modules/" + capModuleName + "/name"] !== "undefined" ? store.getters["Modules/" + capModuleName + "/name"] : capModuleName;
+                      key = typeof store.getters["Modules/" + capModuleName + "/name"] !== "undefined" ? store.getters["Modules/" + capModuleName + "/name"] : capModuleName;
 
                 toolList.push({toolId: val?.type, label: i18next.t(key)});
             });
@@ -551,7 +551,7 @@ export default {
         handleContent (content) {
             if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
                 const editIndex = this.openContentEditor.index,
-                    currentItem = this.content[editIndex];
+                      currentItem = this.content[editIndex];
 
                 if (currentItem) {
                     this.content.splice(editIndex, 1, content);
@@ -582,8 +582,8 @@ export default {
          */
         saveChapter () {
             const baseLayerId = this.selectedBaseLayer?.id,
-                subjectLayerIds = this.selectedLayers.map(layer => layer.layerId),
-                layers = baseLayerId ? [baseLayerId, ...subjectLayerIds] : subjectLayerIds;
+                  subjectLayerIds = this.selectedLayers.map(layer => layer.layerId),
+                  layers = baseLayerId ? [baseLayerId, ...subjectLayerIds] : subjectLayerIds;
 
             const chapter = {
                 title: this.title.trim() !== "" ? this.title : this.$t("additional:modules.storyCreator.chapter.title"),
@@ -603,7 +603,7 @@ export default {
          * @param {Object} image - The image object containing id, alt, copyright, and objectURL.
          * @returns {void}
          */
-         handleFeature (feature) {
+        handleFeature (feature) {
             if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
                 const editIndex = this.openContentEditor.index;
 

@@ -77,7 +77,7 @@ export default {
             descriptionYAxis: i18next.t("additional:modules.tools.gfi.themes.trafficCount.yAxisTextWeek"),
             renderLabelLegend: (datetime) => {
                 const weeknumber = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").isoWeek(),
-                    year = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").isoWeekYear();
+                      year = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").isoWeekYear();
 
                 return this.calendarweek + " " + weeknumber + " / " + year;
             },
@@ -86,7 +86,7 @@ export default {
                     return meansOfTransports === "Anzahl_Schwerverkehr" ? "triangle" : "circle";
                 }
                 const pointStyle = [],
-                    format = "YYYY-MM-DD";
+                      format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (getPublicHoliday(datetime[i], this.holidays, format)) {
@@ -101,7 +101,7 @@ export default {
             },
             renderPointSize: (datetime) => {
                 const pointSize = [],
-                    format = "YYYY-MM-DD";
+                      format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (getPublicHoliday(datetime[i], this.holidays, format)) {
@@ -192,9 +192,9 @@ export default {
          */
         weekDatepickerValueChanged: function (dates) {
             const api = this.api,
-                thingId = this.thingId,
-                meansOfTransport = this.meansOfTransport,
-                timeSettings = [];
+                  thingId = this.thingId,
+                  meansOfTransport = this.meansOfTransport,
+                  timeSettings = [];
 
             if (!Array.isArray(dates) || dates.length === 0) {
                 this.apiData = [];

@@ -309,8 +309,8 @@ export default {
          */
         loadValueStadtteil (stadtteil_id, joinedValues = []) {
             const id = String(stadtteil_id),
-                reducedIds = id.split("|"),
-                currentId = reducedIds.shift().trim();
+                  reducedIds = id.split("|"),
+                  currentId = reducedIds.shift().trim();
 
             if (!currentId) {
                 // ready

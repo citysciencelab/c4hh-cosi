@@ -198,7 +198,7 @@ export default {
          */
         downloadAll () {
             const chartBox = this.$refs.chart,
-                zip = new JSZip();
+                  zip = new JSZip();
 
             chartBox.forEach((canvas, i) => {
                 const canvasPNG = canvas.$refs.canvas.toDataURL("image/png");

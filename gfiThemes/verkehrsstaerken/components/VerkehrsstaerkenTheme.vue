@@ -81,12 +81,12 @@ export default {
          */
         filterProperties () {
             const allProperties = this.feature.getMappedProperties(),
-                dataPerYear = [],
-                newRowNames = [],
-                parsedYears = [],
-                Erhebungsmethode = [],
-                surveyMethodLabel = "Erhebungsmethode",
-                yearThreshold = new Date().getFullYear() - 10;
+                  dataPerYear = [],
+                  newRowNames = [],
+                  parsedYears = [],
+                  Erhebungsmethode = [],
+                  surveyMethodLabel = "Erhebungsmethode",
+                  yearThreshold = new Date().getFullYear() - 10;
 
             Object.keys(allProperties).forEach(rowName => {
                 const year = parseInt(rowName.slice(-4), 10);
@@ -176,7 +176,7 @@ export default {
          */
         fullView (unmounted = false) {
             const footer = document.getElementById("module-portal-footer"),
-                layerPills = document.getElementById("layer-pills");
+                  layerPills = document.getElementById("layer-pills");
 
             if (this.fullViewActivated) {
                 if (!this.mainExpanded) {

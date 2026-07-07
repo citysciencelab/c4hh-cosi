@@ -355,10 +355,10 @@ export default {
 
         templateData (template) {
             this.saveTemplate.push({name: template.meta.title,
-                activeLayer: this.getActiveLayerList(template),
-                districts: this.getSelectedDistricts(template),
-                statsCategories: this.getStatsCategories(template),
-                calculations: this.getCalculations(template)});
+                                    activeLayer: this.getActiveLayerList(template),
+                                    districts: this.getSelectedDistricts(template),
+                                    statsCategories: this.getStatsCategories(template),
+                                    calculations: this.getCalculations(template)});
         },
 
         applyFilters (template, filter) {
@@ -396,8 +396,8 @@ export default {
             template.meta.isActive = active;
 
             const startingTool = template?.state?.Tools?.toolToOpen,
-                time = new Date().getTime(),
-                visibleLayerIds = this.saveTemplate[this.selectedTemplateIndex].activeLayer.map(layer => layer.id);
+                  time = new Date().getTime(),
+                  visibleLayerIds = this.saveTemplate[this.selectedTemplateIndex].activeLayer.map(layer => layer.id);
 
             if (this.useTemplatesForMapping) {
                 template.meta.time = time;
@@ -512,7 +512,7 @@ export default {
             }
 
             const tool = template?.state?.Tools?.toolToOpen,
-                capModuleName = tool.charAt(0).toUpperCase() + tool.slice(1);
+                  capModuleName = tool.charAt(0).toUpperCase() + tool.slice(1);
 
             return i18next.t(store.getters["Modules/" + capModuleName + "/name"]);
         },
@@ -585,19 +585,19 @@ export default {
             }
 
             const activeTemplates = templates.filter(template => template.meta.isActive),
-                sortedTemplates = activeTemplates.sort((a, b) => b.meta.time - a.meta.time),
-                newMapping = [];
+                  sortedTemplates = activeTemplates.sort((a, b) => b.meta.time - a.meta.time),
+                  newMapping = [];
 
             sortedTemplates.forEach(template => {
                 const filterForTemplate = this.filters.find(filter => filter.name === template.meta.title),
-                    _template = this.applyFilters(template, filterForTemplate),
-                    statsFeatures = _template.state?.Tools?.Dashboard?.statsFeatureFilter,
-                    orientationValues = _template.state?.Tools?.Dashboard?.orientationValues;
+                      _template = this.applyFilters(template, filterForTemplate),
+                      statsFeatures = _template.state?.Tools?.Dashboard?.statsFeatureFilter,
+                      orientationValues = _template.state?.Tools?.Dashboard?.orientationValues;
 
                 if (statsFeatures) {
                     statsFeatures.forEach(statName => {
                         const mappingObject = initMapping.find(obj => obj.value === statName),
-                            newMappingObject = {};
+                              newMappingObject = {};
 
                         if (mappingObject) {
                             Object.assign(newMappingObject, mappingObject);
@@ -731,7 +731,7 @@ export default {
             }
 
             const activeTemplates = templates.filter(template => template.meta.isActive),
-                activeLayerIds = [];
+                  activeLayerIds = [];
 
             activeTemplates.forEach(template => {
                 if (Array.isArray(template.state?.Maps?.layerIds) && template.state?.Maps?.layerIds.length) {
@@ -780,7 +780,7 @@ export default {
                 return;
             }
             const selectedCalc = calc.map(i => i.label),
-                updatedCalculations = this.getCalculations(this.selectedTemplate).filter(c => selectedCalc.includes(c.id));
+                  updatedCalculations = this.getCalculations(this.selectedTemplate).filter(c => selectedCalc.includes(c.id));
 
             this.selectedCalculations = updatedCalculations;
         },

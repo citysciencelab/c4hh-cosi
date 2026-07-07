@@ -114,13 +114,13 @@ export default {
 
                 base.sort((a, b) => {
                     const rawA = a?.get?.(this.sortBy),
-                        rawB = b?.get?.(this.sortBy),
+                          rawB = b?.get?.(this.sortBy),
 
-                        // check for undefined/null first so they sort to the end
-                        isAUndefined = rawA === undefined || rawA === null,
-                        isBUndefined = rawB === undefined || rawB === null,
-                        stringA = String(rawA).toLowerCase(),
-                        stringB = String(rawB).toLowerCase();
+                          // check for undefined/null first so they sort to the end
+                          isAUndefined = rawA === undefined || rawA === null,
+                          isBUndefined = rawB === undefined || rawB === null,
+                          stringA = String(rawA).toLowerCase(),
+                          stringB = String(rawB).toLowerCase();
 
                     if (isAUndefined && !isBUndefined) {
                         return 1;
@@ -134,9 +134,9 @@ export default {
 
                     if (declaredType === "number") {
                         const numA = typeof rawA === "number" ? rawA : Number(String(rawA).replace(",", ".")),
-                            numB = typeof rawB === "number" ? rawB : Number(String(rawB).replace(",", ".")),
-                            isANaN = Number.isNaN(numA),
-                            isBNaN = Number.isNaN(numB);
+                              numB = typeof rawB === "number" ? rawB : Number(String(rawB).replace(",", ".")),
+                              isANaN = Number.isNaN(numA),
+                              isBNaN = Number.isNaN(numB);
 
                         if (isANaN && !isBNaN) {
                             return 1;
@@ -249,7 +249,7 @@ export default {
          */
         getInputValue (feature, key, fallback) {
             const fid = feature?.getId?.(),
-                buffered = this.editBuffer[fid]?.[key];
+                  buffered = this.editBuffer[fid]?.[key];
 
             return buffered !== undefined ? buffered : fallback;
         },
@@ -283,11 +283,11 @@ export default {
          */
         commitEdit (feature, key) {
             const fid = feature?.getId?.(),
-                buffer = fid ? this.editBuffer[fid] : undefined,
-                hasKey = Boolean(buffer) && Object.prototype.hasOwnProperty.call(buffer, key),
-                raw = hasKey ? buffer[key] : undefined,
-                type = this.itemSchema?.properties?.[key]?.type === "number" ? "number" : "string",
-                value = type === "number" ? Number(raw) : raw;
+                  buffer = fid ? this.editBuffer[fid] : undefined,
+                  hasKey = Boolean(buffer) && Object.prototype.hasOwnProperty.call(buffer, key),
+                  raw = hasKey ? buffer[key] : undefined,
+                  type = this.itemSchema?.properties?.[key]?.type === "number" ? "number" : "string",
+                  value = type === "number" ? Number(raw) : raw;
 
             if (!fid || !hasKey) {
                 return;

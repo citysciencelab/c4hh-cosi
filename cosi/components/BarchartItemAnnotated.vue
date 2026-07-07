@@ -81,11 +81,11 @@ export default {
          */
         resetChart (data) {
             const ctx = this.$refs.canvas.getContext("2d"),
-                config = {
-                    type: "bar",
-                    data: data,
-                    options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
-                };
+                  config = {
+                      type: "bar",
+                      data: data,
+                      options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
+                  };
 
             ChartJs.getChart(this.$refs.canvas)?.destroy();
             if (this.chart instanceof ChartJs) {

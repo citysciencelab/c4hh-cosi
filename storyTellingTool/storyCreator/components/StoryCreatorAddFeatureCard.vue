@@ -26,7 +26,7 @@ export default {
          * The selected layer lists
          * @type {Object[]}
          */
-         selectedLayers: {
+        selectedLayers: {
             type: Array,
             required: false,
             default: () => []
@@ -91,7 +91,7 @@ export default {
          * @param {ol/Feature[]} val - The gfi features.
          * @returns {void}
          */
-         gfiFeatures: {
+        gfiFeatures: {
             handler (val) {
                 this.removePointMarker();
                 this.currentFeature = val?.[0];
@@ -141,7 +141,7 @@ export default {
          * @param {Object[]} val - The selected layers.
          * @returns {void}
          */
-         selectedLayers (val) {
+        selectedLayers (val) {
             if (!val.length || val.some(layer => layer.layerId !== this.currentFeature?.getLayerId())) {
                 this.currentFeature = null;
             }
@@ -185,7 +185,7 @@ export default {
          * @param {String} value string to check.
          * @returns {Boolean} whether the given value includes a pipe.
          */
-         hasPipe: function (value) {
+        hasPipe: function (value) {
             return typeof value === "string" && value.includes("|");
         },
 

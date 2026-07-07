@@ -76,12 +76,12 @@ export default {
             try {
                 this.requestState.loading = true;
                 const response = await fetch(`${this.simulationApiUrl}/processes/${processId}`, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            ...additionalHeaders
-                        }
-                    }),
-                    result = await response.json();
+                          headers: {
+                              "Content-Type": "application/json",
+                              ...additionalHeaders
+                          }
+                      }),
+                      result = await response.json();
 
                 if (!response.ok) {
                     this.requestState.error = result.error_message || response.status + ": unknown errror";
@@ -158,17 +158,17 @@ export default {
                 try {
                     this.executionRequestState.loading = true;
                     const response = await fetch(`${this.simulationApiUrl}/processes/${this.selectedProcessId}/execution`, {
-                            method: "POST",
-                            body: JSON.stringify({
-                                job_name,
-                                inputs
-                            }),
-                            headers: {
-                                "Content-Type": "application/json",
-                                ...additionalHeaders
-                            }
-                        }),
-                        result = await response.json();
+                              method: "POST",
+                              body: JSON.stringify({
+                                  job_name,
+                                  inputs
+                              }),
+                              headers: {
+                                  "Content-Type": "application/json",
+                                  ...additionalHeaders
+                              }
+                          }),
+                          result = await response.json();
 
                     if (!response.ok) {
                         this.executionRequestState.error = result.error_message || response.status + ": unknown error";

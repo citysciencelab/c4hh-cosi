@@ -66,7 +66,7 @@ export default {
     },
     mounted () {
         const toggleElement = document.getElementById(this.optionalButton?.id),
-            filterElement = document.getElementById(this.filterButtonId);
+              filterElement = document.getElementById(this.filterButtonId);
 
         if (filterElement) {
             this.filterMenuDropdownInstance = Dropdown.getOrCreateInstance(filterElement);
@@ -93,8 +93,8 @@ export default {
          */
         onGlobalPointerDown (event) {
             const roots = [this.$refs.optionalDropdownRoot, this.$refs.filterDropdownRoot],
-                clickedInVuetifyOverlay = event.target.closest(".v-overlay"),
-                clickedInside = roots.some(root => root?.contains(event.target));
+                  clickedInVuetifyOverlay = event.target.closest(".v-overlay"),
+                  clickedInside = roots.some(root => root?.contains(event.target));
 
             if (clickedInside || clickedInVuetifyOverlay) {
                 return;

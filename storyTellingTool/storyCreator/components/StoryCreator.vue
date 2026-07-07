@@ -121,18 +121,18 @@ export default {
          */
         createImageAsset (blob) {
             const id = crypto.randomUUID(),
-                objectURL = URL.createObjectURL(blob),
-                originalName = typeof blob?.name === "string" && blob.name.trim() !== "" ? blob.name : `${id}.bin`,
-                sanitizedOriginalName = this.sanitizeFileName(originalName),
-                archivePath = `images/${id}__${sanitizedOriginalName}`,
-                assetData = {
-                    id,
-                    blob,
-                    objectURL,
-                    mimeType: blob.type || "application/octet-stream",
-                    originalName,
-                    archivePath
-                };
+                  objectURL = URL.createObjectURL(blob),
+                  originalName = typeof blob?.name === "string" && blob.name.trim() !== "" ? blob.name : `${id}.bin`,
+                  sanitizedOriginalName = this.sanitizeFileName(originalName),
+                  archivePath = `images/${id}__${sanitizedOriginalName}`,
+                  assetData = {
+                      id,
+                      blob,
+                      objectURL,
+                      mimeType: blob.type || "application/octet-stream",
+                      originalName,
+                      archivePath
+                  };
 
             this.workingImageAssetsById = {
                 ...this.workingImageAssetsById,
@@ -279,8 +279,8 @@ export default {
 
             if (typeof val.map.tool === "string" && val.map.tool.length) {
                 const toolId = val.map.tool,
-                    capModuleName = toolId.charAt(0).toUpperCase() + toolId.slice(1),
-                    key = typeof store.getters["Modules/" + capModuleName + "/name"] !== "undefined" ? store.getters["Modules/" + capModuleName + "/name"] : capModuleName;
+                      capModuleName = toolId.charAt(0).toUpperCase() + toolId.slice(1),
+                      key = typeof store.getters["Modules/" + capModuleName + "/name"] !== "undefined" ? store.getters["Modules/" + capModuleName + "/name"] : capModuleName;
 
                 toolName = i18next.t(key);
             }

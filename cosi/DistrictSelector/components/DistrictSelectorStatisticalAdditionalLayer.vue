@@ -28,7 +28,7 @@ export default {
         visibleSubjectDataLayerConfigs: {
             handler (visibleLayerConfigs) {
                 const newIdList = [],
-                    visibleLayerIds = visibleLayerConfigs.map(config => config.id);
+                      visibleLayerIds = visibleLayerConfigs.map(config => config.id);
 
                 for (const key in this.additionalInfoLayers) {
                     for (const layerId of this.additionalInfoLayers[key]) {

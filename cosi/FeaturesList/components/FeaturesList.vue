@@ -490,8 +490,8 @@ export default {
          */
         exportTable (withDetails) {
             const data = this.getActiveItems(),
-                exportData = withDetails ? prepareDetailsExport(data, {}) : prepareTableExport(data),
-                filename = composeFilename(this.$t("additional:modules.tools.cosi.featuresList.exportFilename"));
+                  exportData = withDetails ? prepareDetailsExport(data, {}) : prepareTableExport(data),
+                  filename = composeFilename(this.$t("additional:modules.tools.cosi.featuresList.exportFilename"));
 
             exportXlsx([], exportData, filename, {exclude: this.excludedPropsForExport});
         },
@@ -567,11 +567,11 @@ export default {
         },
         getNumericalValueStyle (item, key) {
             const val = parseFloat(item[key]),
-                maxVal = Math.max(
-                    ...this.items
-                        .map(_item => parseFloat(_item[key]))
-                        .filter(_item => !isNaN(_item))
-                );
+                  maxVal = Math.max(
+                      ...this.items
+                          .map(_item => parseFloat(_item[key]))
+                          .filter(_item => !isNaN(_item))
+                  );
 
             return {
                 padding: 0,
@@ -615,8 +615,8 @@ export default {
             }
 
             const test = Object.keys(this.selected[0].score.distance.facilities),
-                colorMap = test.reduce((acc, layerId, index) => (
-                    {...acc, [layerId]: getColorFromNumber(index, test.length)}), {});
+                  colorMap = test.reduce((acc, layerId, index) => (
+                      {...acc, [layerId]: getColorFromNumber(index, test.length)}), {});
 
             this.selected.forEach(item => {
                 if (item.score.distance) {

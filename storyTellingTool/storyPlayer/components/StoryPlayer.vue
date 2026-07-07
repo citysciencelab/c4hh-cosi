@@ -105,7 +105,7 @@ export default {
         this.scrollerSetup();
 
         const toolBody = document.getElementById("mp-body-secondaryMenu"),
-            coverCard = this.$refs.coverCard;
+              coverCard = this.$refs.coverCard;
 
         if (toolBody) {
             toolBody.addEventListener("scroll", this.handleToolBodyScroll);
@@ -190,9 +190,9 @@ export default {
          */
         activateTool (toolId) {
             const toolMenuSide = this.storyPlayerMenuSide === "mainMenu" ? "secondaryMenu" : "mainMenu",
-                toolKey = toolId.charAt(0).toUpperCase() + toolId.slice(1),
-                module = this.$store.state.Modules && this.$store.state.Modules[toolKey],
-                name = module && module.name ? module.name : toolKey;
+                  toolKey = toolId.charAt(0).toUpperCase() + toolId.slice(1),
+                  module = this.$store.state.Modules && this.$store.state.Modules[toolKey],
+                  name = module && module.name ? module.name : toolKey;
 
             this.setExpandedBySide({expanded: true, side: toolMenuSide});
             this.changeCurrentComponent({type: toolId, side: toolMenuSide, props: {name}});
@@ -211,9 +211,9 @@ export default {
          */
         deactivateSubjectLayer () {
             const layers = mapCollection.getMap("2D")?.getLayers(),
-                visibleLayerList = typeof layers?.getArray !== "function" ? [] : layers.getArray().filter(layer => {
-                    return layer.getVisible() === true && layer.get("name") !== "markerPoint" && layer.get("name") !== "markerPolygon";
-                });
+                  visibleLayerList = typeof layers?.getArray !== "function" ? [] : layers.getArray().filter(layer => {
+                      return layer.getVisible() === true && layer.get("name") !== "markerPoint" && layer.get("name") !== "markerPolygon";
+                  });
 
             visibleLayerList.forEach(layer => {
                 this.addOrReplaceLayer({
@@ -327,8 +327,8 @@ export default {
                 }
                 else {
                     const map = mapCollection.getMap("2D"),
-                        mapView = typeof map?.getView === "function" ? map.getView() : undefined,
-                        zoomLevel = this.currentChapter.map.zoomLevel;
+                          mapView = typeof map?.getView === "function" ? map.getView() : undefined,
+                          zoomLevel = this.currentChapter.map.zoomLevel;
 
                     if (mapView) {
                         setTimeout(() => {
@@ -353,9 +353,9 @@ export default {
                 && Object.prototype.hasOwnProperty.call(this.currentChapter.navigation3D, "cameraPosition")
                 && this.currentChapter.navigation3D.cameraPosition[0] !== null) {
                 const position = this.currentChapter.navigation3D.cameraPosition,
-                    map3d = mapCollection.getMap("3D"),
-                    camera = map3d.getCesiumScene().camera,
-                    destination = Cesium.Cartesian3.fromDegrees(position[0], position[1], position[2]);
+                      map3d = mapCollection.getMap("3D"),
+                      camera = map3d.getCesiumScene().camera,
+                      destination = Cesium.Cartesian3.fromDegrees(position[0], position[1], position[2]);
 
                 camera.flyTo({
                     destination: destination,
@@ -386,23 +386,23 @@ export default {
          */
         getCenterOfVisibleMap () {
             const map = mapCollection.getMap("2D"),
-                mapView = map?.getView(),
-                projection = mapView?.getProjection();
+                  mapView = map?.getView(),
+                  projection = mapView?.getProjection();
 
             if (projection && projection.getUnits() === "degrees") {
                 return this.currentChapter.map.center;
             }
 
             const zoomLevel = this.currentChapter.map.zoomLevel,
-                targetResolution = mapView?.getResolutionForZoom(zoomLevel),
-                rightPadding = this.expanded("secondaryMenu")
-                    ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
-                    : 20,
-                leftPadding = this.expanded("mainMenu")
-                    ? document.getElementById("mp-menu-mainMenu").offsetWidth
-                    : 20,
-                offsetPixels = (rightPadding - leftPadding) / 2,
-                center = this.currentChapter.map.center;
+                  targetResolution = mapView?.getResolutionForZoom(zoomLevel),
+                  rightPadding = this.expanded("secondaryMenu")
+                      ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
+                      : 20,
+                  leftPadding = this.expanded("mainMenu")
+                      ? document.getElementById("mp-menu-mainMenu").offsetWidth
+                      : 20,
+                  offsetPixels = (rightPadding - leftPadding) / 2,
+                  center = this.currentChapter.map.center;
 
 
             const offsetX = offsetPixels * targetResolution;
@@ -415,7 +415,7 @@ export default {
          */
         getConfPathfromUrl () {
             const queryString = window.location.search,
-                urlParams = new URLSearchParams(queryString);
+                  urlParams = new URLSearchParams(queryString);
 
             return urlParams.get("story");
         },
@@ -457,10 +457,10 @@ export default {
             this.zoomToCoordinates({center: val?.coordinate, zoom: val?.zoomlevel});
             this.featureAttributes = val;
             this.overlay = new Overlay({
-                    element: this.$refs.storyPlayerFeature,
-                    positioning: "bottom-center",
-                    offset: [0, -10]
-                });
+                element: this.$refs.storyPlayerFeature,
+                positioning: "bottom-center",
+                offset: [0, -10]
+            });
 
             mapCollection.getMap("2D").addOverlay(this.overlay);
             this.overlay.setPosition(val?.coordinate);
@@ -507,44 +507,44 @@ export default {
             // intersectionRatios tell you how much of each observed element is currently visible,
             // so it can be decided which one is “active”.
             const intersectionRatios = new Array(stepElements.length).fill(0),
-                applyActiveStep = (activeIndex) => {
-                    const step = stepElements[activeIndex];
+                  applyActiveStep = (activeIndex) => {
+                      const step = stepElements[activeIndex];
 
-                    if (!step || !step.classList) {
-                        return;
-                    }
+                      if (!step || !step.classList) {
+                          return;
+                      }
 
-                    stepElements.forEach(s => s.classList.remove("active"));
-                    step.classList.add("active");
+                      stepElements.forEach(s => s.classList.remove("active"));
+                      step.classList.add("active");
 
-                    if (this.currentIndex !== activeIndex) {
-                        const prevChapterIndex = this.currentChapterIndex;
+                      if (this.currentIndex !== activeIndex) {
+                          const prevChapterIndex = this.currentChapterIndex;
 
-                        this.currentIndex = activeIndex;
-                        this.currentChapterIndex = activeIndex;
+                          this.currentIndex = activeIndex;
+                          this.currentChapterIndex = activeIndex;
 
-                        // If currentChapterIndex didn't change (e.g. chapter 0 which is
-                        // also the initial value), the watcher won't fire.
-                        // Trigger tools/layers/position manually in that case.
-                        if (prevChapterIndex === activeIndex) {
-                            this.deactivateSubjectLayer();
-                            this.loadChapter();
-                            this.removePointMarker();
-                            mapCollection.getMap("2D").removeOverlay(this.overlay);
-                        }
-                        // else: watcher on currentChapterIndex handles it.
+                          // If currentChapterIndex didn't change (e.g. chapter 0 which is
+                          // also the initial value), the watcher won't fire.
+                          // Trigger tools/layers/position manually in that case.
+                          if (prevChapterIndex === activeIndex) {
+                              this.deactivateSubjectLayer();
+                              this.loadChapter();
+                              this.removePointMarker();
+                              mapCollection.getMap("2D").removeOverlay(this.overlay);
+                          }
+                          // else: watcher on currentChapterIndex handles it.
 
-                        // Handle iframe aspect ratio and progress
-                        const iframeElement = step.querySelector("iframe"),
-                            iframeDiv = step.getElementsByClassName("field_video")[0];
+                          // Handle iframe aspect ratio and progress
+                          const iframeElement = step.querySelector("iframe"),
+                                iframeDiv = step.getElementsByClassName("field_video")[0];
 
-                        if (iframeElement && iframeDiv) {
-                            const ratioClass = this.getIframeAspectRatio(iframeElement);
+                          if (iframeElement && iframeDiv) {
+                              const ratioClass = this.getIframeAspectRatio(iframeElement);
 
-                            iframeDiv.classList.add("ratio", ratioClass);
-                        }
-                    }
-                };
+                              iframeDiv.classList.add("ratio", ratioClass);
+                          }
+                      }
+                  };
 
             const scroller = document.getElementById("mp-body-secondaryMenu");
 
@@ -553,7 +553,7 @@ export default {
             // all short chapters are fully visible at the same time).
             this._detectActiveStep = () => {
                 const scrollerRect = scroller.getBoundingClientRect(),
-                    viewportCenter = scrollerRect.top + scrollerRect.height / 2;
+                      viewportCenter = scrollerRect.top + scrollerRect.height / 2;
 
                 let activeIndex = -1,
                     minDistance = Infinity;

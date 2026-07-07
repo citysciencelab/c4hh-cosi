@@ -204,8 +204,8 @@ export default {
             }
 
             const labelsXAxis = [],
-                datasets = [],
-                keysOfFirstDataset = Object.keys(apiData[0][this.meansOfTransportKey[0]]);
+                  datasets = [],
+                  keysOfFirstDataset = Object.keys(apiData[0][this.meansOfTransportKey[0]]);
 
             keysOfFirstDataset.forEach(datetime => {
                 labelsXAxis.push(datetime);
@@ -226,20 +226,20 @@ export default {
                         postfix = " " + this.$t("additional:modules.tools.gfi.themes.trafficCount.totalTraffic");
                     }
                     const datetimes = typeof dataObj[meansOfTransport] !== "undefined" ? Object.keys(dataObj[meansOfTransport]) : [],
-                        isComplementaryDataset = meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz"
-                            || meansOfTransport === "Anzahl_Kfz" && this.currentMeansOfTransport === "Anzahl_Schwerverkehr",
-                        color = Array.isArray(colors) ? colors[idx % colors.length] : "",
-                        holidayData = {
-                            borderColor: color,
-                            fill: false,
-                            label: this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign") + postfix,
-                            pointBorderColor: color,
-                            pointBackgroundColor: color,
-                            pointRadius: 3,
-                            pointStyleLegend: "star"
-                        },
-                        checkIsHoliday = typeof callbackRenderPointStyle === "function",
-                        checkSize = typeof callbackRenderPointSize === "function";
+                          isComplementaryDataset = meansOfTransport === "Anzahl_Schwerverkehr" && this.currentMeansOfTransport === "Anzahl_Kfz"
+                              || meansOfTransport === "Anzahl_Kfz" && this.currentMeansOfTransport === "Anzahl_Schwerverkehr",
+                          color = Array.isArray(colors) ? colors[idx % colors.length] : "",
+                          holidayData = {
+                              borderColor: color,
+                              fill: false,
+                              label: this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign") + postfix,
+                              pointBorderColor: color,
+                              pointBackgroundColor: color,
+                              pointRadius: 3,
+                              pointStyleLegend: "star"
+                          },
+                          checkIsHoliday = typeof callbackRenderPointStyle === "function",
+                          checkSize = typeof callbackRenderPointSize === "function";
 
                     datasets.push({
                         label: datetimes.length > 0 && typeof callbackRenderLabelLegend === "function" ? callbackRenderLabelLegend(datetimes[0]) + postfix : "",
@@ -253,13 +253,13 @@ export default {
                         borderDash: isComplementaryDataset ? [2, 2] : [],
                         pointStyle: (context) => {
                             const datetime = datetimes[context?.dataIndex],
-                                isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
+                                  isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
 
                             return isHoliday ? "star" : "circle";
                         },
                         pointRadius: (context) => {
                             const datetime = datetimes[context?.dataIndex],
-                                isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
+                                  isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
 
                             if (!isHoliday) {
                                 return 0;
@@ -268,21 +268,21 @@ export default {
                         },
                         pointHoverRadius: (context) => {
                             const datetime = datetimes[context?.dataIndex],
-                                isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star"),
-                                baseSize = checkSize && datetime ? callbackRenderPointSize([datetime]) : 3,
-                                safeBaseSize = typeof baseSize === "number" && !isNaN(baseSize) ? baseSize : 3;
+                                  isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star"),
+                                  baseSize = checkSize && datetime ? callbackRenderPointSize([datetime]) : 3,
+                                  safeBaseSize = typeof baseSize === "number" && !isNaN(baseSize) ? baseSize : 3;
 
                             return isHoliday ? safeBaseSize + 7 : safeBaseSize + 3;
                         },
                         pointHoverBackgroundColor: (context) => {
                             const datetime = datetimes[context?.dataIndex],
-                                isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
+                                  isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
 
                             return isHoliday ? color : "#FFFFFF";
                         },
                         pointHoverBorderWidth: (context) => {
                             const datetime = datetimes[context?.dataIndex],
-                                isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
+                                  isHoliday = datetime && checkIsHoliday && callbackRenderPointStyle(meansOfTransport, [datetime])?.includes?.("star");
 
                             return isHoliday ? 4 : 3;
                         },
@@ -307,49 +307,49 @@ export default {
          * @returns {HTMLCanvasElement}  a canvas element to use as point style in legend
          */
         createCanvasPointStyleLegend (color, dashed = false) {
-          const canvas = document.createElement("canvas");
+            const canvas = document.createElement("canvas");
 
-          canvas.width = 25;
-          canvas.height = 15;
+            canvas.width = 25;
+            canvas.height = 15;
 
-          const ctx = canvas.getContext("2d");
-          const x = 4;
-          const y = 4;
-          const width = 17;
-          const height = 7;
-          const borderRadius = 2;
+            const ctx = canvas.getContext("2d");
+            const x = 4;
+            const y = 4;
+            const width = 17;
+            const height = 7;
+            const borderRadius = 2;
 
-          if (dashed) {
-            const patternCanvas = document.createElement("canvas");
+            if (dashed) {
+                const patternCanvas = document.createElement("canvas");
 
-            patternCanvas.width = 4;
-            patternCanvas.height = height;
-            const patternCtx = patternCanvas.getContext("2d");
+                patternCanvas.width = 4;
+                patternCanvas.height = height;
+                const patternCtx = patternCanvas.getContext("2d");
 
-            patternCtx.fillStyle = color;
-            patternCtx.fillRect(0, 0, 2, height);
-            const pattern = ctx.createPattern(patternCanvas, "repeat");
+                patternCtx.fillStyle = color;
+                patternCtx.fillRect(0, 0, 2, height);
+                const pattern = ctx.createPattern(patternCanvas, "repeat");
 
-            ctx.fillStyle = pattern;
-          }
-        else {
-            ctx.fillStyle = color;
-          }
+                ctx.fillStyle = pattern;
+            }
+            else {
+                ctx.fillStyle = color;
+            }
 
-          ctx.beginPath();
-          ctx.moveTo(x + borderRadius, y);
-          ctx.lineTo(x + width - borderRadius, y);
-          ctx.arcTo(x + width, y, x + width, y + borderRadius, borderRadius);
-          ctx.lineTo(x + width, y + height - borderRadius);
-          ctx.arcTo(x + width, y + height, x + width - borderRadius, y + height, borderRadius);
-          ctx.lineTo(x + borderRadius, y + height);
-          ctx.arcTo(x, y + height, x, y + height - borderRadius, borderRadius);
-          ctx.lineTo(x, y + borderRadius);
-          ctx.arcTo(x, y, x + borderRadius, y, borderRadius);
-          ctx.closePath();
-          ctx.fill();
+            ctx.beginPath();
+            ctx.moveTo(x + borderRadius, y);
+            ctx.lineTo(x + width - borderRadius, y);
+            ctx.arcTo(x + width, y, x + width, y + borderRadius, borderRadius);
+            ctx.lineTo(x + width, y + height - borderRadius);
+            ctx.arcTo(x + width, y + height, x + width - borderRadius, y + height, borderRadius);
+            ctx.lineTo(x + borderRadius, y + height);
+            ctx.arcTo(x, y + height, x, y + height - borderRadius, borderRadius);
+            ctx.lineTo(x, y + borderRadius);
+            ctx.arcTo(x, y, x + borderRadius, y, borderRadius);
+            ctx.closePath();
+            ctx.fill();
 
-          return canvas;
+            return canvas;
         },
         /**
          * returns the config for chart js
@@ -401,7 +401,7 @@ export default {
                             radius: 10,
                             hoverRadius: 10,
                             hitRadius: 20
-                    }
+                        }
                     },
                     plugins: {
                         title: {
@@ -416,22 +416,22 @@ export default {
                                 padding: 20,
                                 generateLabels: chart => {
                                     const chartData = chart.data,
-                                        legends = Array.isArray(chartData.datasets) ? chartData.datasets.map((dataset, i) => {
-                                            return {
-                                                text: dataset.label,
-                                                backgroundColor: dataset.backgroundColor,
-                                                borderColor: dataset.borderColor,
-                                                borderWidth: dataset.borderWidth,
-                                                pointStyle: dataset.pointStyleLegend,
-                                                pointRadius: dataset.pointRadius,
-                                                pointHoverRadius: dataset.pointHoverRadius,
-                                                strokeStyle: dataset.borderColor,
-                                                fillStyle: dataset.borderColor,
-                                                spanGaps: dataset.spanGaps,
-                                                hidden: !chart.isDatasetVisible(i),
-                                                datasetIndex: i
-                                            };
-                                        }, this) : [];
+                                          legends = Array.isArray(chartData.datasets) ? chartData.datasets.map((dataset, i) => {
+                                              return {
+                                                  text: dataset.label,
+                                                  backgroundColor: dataset.backgroundColor,
+                                                  borderColor: dataset.borderColor,
+                                                  borderWidth: dataset.borderWidth,
+                                                  pointStyle: dataset.pointStyleLegend,
+                                                  pointRadius: dataset.pointRadius,
+                                                  pointHoverRadius: dataset.pointHoverRadius,
+                                                  strokeStyle: dataset.borderColor,
+                                                  fillStyle: dataset.borderColor,
+                                                  spanGaps: dataset.spanGaps,
+                                                  hidden: !chart.isDatasetVisible(i),
+                                                  datasetIndex: i
+                                              };
+                                          }, this) : [];
 
                                     return legends;
                                 },
@@ -461,7 +461,7 @@ export default {
                             callbacks: {
                                 labelColor: function (context) {
                                     const dataset = context.dataset,
-                                        isDashed = dataset.borderDash && dataset.borderDash.length > 0;
+                                          isDashed = dataset.borderDash && dataset.borderDash.length > 0;
 
                                     return {
                                         borderColor: dataset.borderColor,
@@ -489,7 +489,7 @@ export default {
                                 title: () => {
                                     return false;
                                 }
-                    }
+                            }
                         }
                     },
                     hover: {
@@ -497,7 +497,7 @@ export default {
                         intersect: false,
                         onHover: function (e, elements, chart) {
                             const target = e.native?.target ?? e.target,
-                                activePoints = chart.getElementsAtEventForMode(e, "index", {intersect: false}, false);
+                                  activePoints = chart.getElementsAtEventForMode(e, "index", {intersect: false}, false);
 
                             if (!target) {
                                 return;

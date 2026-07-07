@@ -14,13 +14,13 @@ describe("addons/storyTellingTool/storyManager/store/actions.js", () => {
         clickPixel = [300, 400];
         mapCollection.clear();
         const map2D = {
-                id: "ol",
-                mode: "2D",
-                getLayers: () => ({
-                    getArray: () => []
-                }),
-                getPixelFromCoordinate: sinon.stub().returns(clickPixel)
-            };
+            id: "ol",
+            mode: "2D",
+            getLayers: () => ({
+                getArray: () => []
+            }),
+            getPixelFromCoordinate: sinon.stub().returns(clickPixel)
+        };
 
         mapCollection.addMap(map2D, "2D");
         consoleWarnSpy = sinon.stub(console, "warn");

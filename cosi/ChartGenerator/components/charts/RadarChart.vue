@@ -81,7 +81,7 @@ export default {
                         },
                         footer: (item, data) => {
                             const dataset = data.datasets[item[0].datasetIndex],
-                                footer = dataset.tooltip;
+                                  footer = dataset.tooltip;
 
                             return footer;
                         }

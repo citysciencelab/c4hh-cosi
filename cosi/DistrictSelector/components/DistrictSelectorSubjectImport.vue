@@ -99,10 +99,10 @@ export default {
             }
 
             const geojsonFeature = JSON.parse(content),
-                geoJsonParser = new GeoJSON({
-                    dataProjection: "EPSG:4326",
-                    featureProjection: "EPSG:25832"
-                });
+                  geoJsonParser = new GeoJSON({
+                      dataProjection: "EPSG:4326",
+                      featureProjection: "EPSG:25832"
+                  });
 
             try {
                 const olFeatures = geoJsonParser.readFeatures(geojsonFeature);

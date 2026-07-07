@@ -234,7 +234,7 @@ export default {
             // todo generate Legend for CC Data
             this.selectedFeatures.forEach(district => {
                 const getStyling = district.getStyle(),
-                    matchResults = this.colorCodeMapDataset.find(x => utils.unifyString(x.name) === utils.unifyString(district.get(this.keyOfAttrName)));
+                      matchResults = this.colorCodeMapDataset.find(x => utils.unifyString(x.name) === utils.unifyString(district.get(this.keyOfAttrName)));
 
                 if (matchResults) {
                     if (this.originalStyling === null) {
@@ -336,21 +336,21 @@ export default {
          */
         loadToChartGenerator () {
             const graphObj = new ChartDataset({
-                    id: "ccm" + this.selectedFeatures.map(district => {
-                        return district.id_;
-                    }).join("-"),
-                    name: [this.label] + " - " + this.dataCategory + " (" + this.$t("additional:modules.tools.colorCodeMap.title") + ")",
-                    type: ["LineChart", "BarChart", "PieChart"],
-                    color: ["#55eb34", "rgb(14, 150, 240)", "yellow"],
-                    beginAtZero: true,
-                    source: this.$t("additional:modules.tools.colorCodeMap.title"),
-                    scaleLabels: [this.selectedFeature, this.$t("additional:modules.tools.colorCodeMap.yearsLabel")],
-                    data: {
-                        labels: [],
-                        datasets: []
-                    }
-                }),
-                years = this.graphData[0].data.reduce((availableYears, val, i) => val ? [...availableYears, this.availableYears[i]] : availableYears, []);
+                      id: "ccm" + this.selectedFeatures.map(district => {
+                          return district.id_;
+                      }).join("-"),
+                      name: [this.label] + " - " + this.dataCategory + " (" + this.$t("additional:modules.tools.colorCodeMap.title") + ")",
+                      type: ["LineChart", "BarChart", "PieChart"],
+                      color: ["#55eb34", "rgb(14, 150, 240)", "yellow"],
+                      beginAtZero: true,
+                      source: this.$t("additional:modules.tools.colorCodeMap.title"),
+                      scaleLabels: [this.selectedFeature, this.$t("additional:modules.tools.colorCodeMap.yearsLabel")],
+                      data: {
+                          labels: [],
+                          datasets: []
+                      }
+                  }),
+                  years = this.graphData[0].data.reduce((availableYears, val, i) => val ? [...availableYears, this.availableYears[i]] : availableYears, []);
 
             graphObj.data.labels = years.reverse();
             graphObj.data.datasets = this.graphData.map(dataset => ({

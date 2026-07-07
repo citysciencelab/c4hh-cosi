@@ -30,8 +30,8 @@ export default {
          */
         featureProperties () {
             const _propBlacklist = this.propBlacklist,
-                props = this.item.feature.getProperties(),
-                filteredProps = Object.entries(props).filter(prop => !_propBlacklist.includes(prop[0]));
+                  props = this.item.feature.getProperties(),
+                  filteredProps = Object.entries(props).filter(prop => !_propBlacklist.includes(prop[0]));
 
             return Object.fromEntries(filteredProps);
         }

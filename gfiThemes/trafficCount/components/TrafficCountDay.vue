@@ -85,7 +85,7 @@ export default {
                     return meansOfTransports === "Anzahl_Schwerverkehr" ? "triangle" : "circle";
                 }
                 const pointStyle = [],
-                    format = "YYYY-MM-DD";
+                      format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (getPublicHoliday(datetime[i], this.holidays, format)) {
@@ -100,7 +100,7 @@ export default {
             },
             renderPointSize: (datetime) => {
                 const pointSize = [],
-                    format = "YYYY-MM-DD";
+                      format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (getPublicHoliday(datetime[i], this.holidays, format)) {
@@ -169,10 +169,10 @@ export default {
          */
         dayDatepickerValueChanged: function (dates) {
             const api = this.api,
-                thingId = this.thingId,
-                meansOfTransport = this.meansOfTransport,
-                timeSettings = [],
-                minutesForMissingData = api instanceof DauerzaehlstellenRadApi ? 60 : 15;
+                  thingId = this.thingId,
+                  meansOfTransport = this.meansOfTransport,
+                  timeSettings = [],
+                  minutesForMissingData = api instanceof DauerzaehlstellenRadApi ? 60 : 15;
 
             if (!Array.isArray(dates) || dates.length === 0) {
                 this.apiData = [];
@@ -244,8 +244,8 @@ export default {
                 return true;
             }
             const endDate = this.checkGurlittInsel ? dayjs().subtract(1, "day") : dayjs(),
-                startDate = dayjs().subtract(15, "day"),
-                question = dayjs(date);
+                  startDate = dayjs().subtract(15, "day"),
+                  question = dayjs(date);
 
             if (Array.isArray(currentDates) && currentDates.length >= 5) {
                 for (let i = 0; i < 5; i++) {

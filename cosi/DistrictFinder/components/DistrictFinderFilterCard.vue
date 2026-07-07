@@ -234,8 +234,8 @@ export default {
          */
         meanValue () {
             const values = this.featuresToUse.map(feature => feature?.properties?.[this.selectedCategory])
-                    .filter(value => typeof value === "number"),
-                mean = values.reduce((acc, curr) => acc + curr, 0) / values.length;
+                      .filter(value => typeof value === "number"),
+                  mean = values.reduce((acc, curr) => acc + curr, 0) / values.length;
 
             return Number.isFinite(mean) ? mean.toLocaleString(this.currentLocale || "de-DE", {maximumFractionDigits: 1}) : "-";
         },
@@ -294,7 +294,7 @@ export default {
                 return "-";
             }
             return this.$t("additional:modules.tools.cosi.districtFinder.label.valueType",
-                {context: this.selectedDataset.valueType});
+                           {context: this.selectedDataset.valueType});
         }
     },
     watch: {
@@ -306,13 +306,13 @@ export default {
         },
         referenceValue (val) {
             this.chartConfig.options = Object.assign({}, deepAssign(this.chartConfig.options,
-                {plugins: {annotation: {annotations: {referenceLine: {
-                    borderColor: this.referenceLineColor,
-                    value: typeof val === "number" ? val : undefined,
-                    label: {
-                        content: this.$t("additional:modules.tools.cosi.districtFinder.label.referenceValue")
-                    }
-                }}}}}
+                                                                    {plugins: {annotation: {annotations: {referenceLine: {
+                                                                        borderColor: this.referenceLineColor,
+                                                                        value: typeof val === "number" ? val : undefined,
+                                                                        label: {
+                                                                            content: this.$t("additional:modules.tools.cosi.districtFinder.label.referenceValue")
+                                                                        }
+                                                                    }}}}}
             ));
         },
         resultNames: {
@@ -356,8 +356,8 @@ export default {
          */
         addChartData () {
             const sorted = this.sortedData(),
-                allData = sorted.map(data => data[this.selectedCategory]),
-                allLabels = sorted.map(label => label[this.keyOfAttrNameForSelectedLayer]);
+                  allData = sorted.map(data => data[this.selectedCategory]),
+                  allLabels = sorted.map(label => label[this.keyOfAttrNameForSelectedLayer]);
 
             this.chartConfig.data = Object.assign({}, this.chartConfig.data, {labels: allLabels, datasets: [{...this.chartOptions, data: allData, backgroundColor: this.getChartColors(this.keyOfAttrNameForSelectedLayer)}]});
         },
@@ -464,8 +464,8 @@ export default {
 
             extent.forEach(interval => {
                 const firstYear = interval[0].getFullYear(),
-                    lastYear = interval[1].getFullYear(),
-                    yearsToAdd = new Array(lastYear - firstYear + 1).fill(firstYear).map((v, i) => v + i);
+                      lastYear = interval[1].getFullYear(),
+                      yearsToAdd = new Array(lastYear - firstYear + 1).fill(firstYear).map((v, i) => v + i);
 
                 yearsToAdd.forEach(year => years.add(year));
             });

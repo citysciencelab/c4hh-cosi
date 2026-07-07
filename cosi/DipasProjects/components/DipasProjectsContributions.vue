@@ -100,8 +100,8 @@ export default {
             }
 
             const contribution = this.contributions[this.openedPanel],
-                foundFeature = this.items.find(feature => feature.get("id") === contribution.id),
-                extent = foundFeature.getGeometry().getExtent();
+                  foundFeature = this.items.find(feature => feature.get("id") === contribution.id),
+                  extent = foundFeature.getGeometry().getExtent();
 
             if (extent) {
                 this.select.getFeatures().push(foundFeature);
@@ -243,7 +243,7 @@ export default {
             }
 
             const id = selectedFeature.get("id"),
-                index = this.contributions.findIndex(item => item.id === id);
+                  index = this.contributions.findIndex(item => item.id === id);
 
             this.openedPanel = index;
             this.scrollToContributionPanel(`contribution-panel-${id}`);
@@ -298,7 +298,7 @@ export default {
          */
         updateHoverFeatureCollection (item, isSelected = false) {
             const features = this.contributionsLayer.getSource().getFeatures(),
-                foundFeature = features.find(feature => feature.get("id") === item.id);
+                  foundFeature = features.find(feature => feature.get("id") === item.id);
 
             if (!foundFeature) {
                 return;

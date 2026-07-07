@@ -221,9 +221,9 @@ export default {
 
                 reader.onload = f => {
                     const layerName = this.getLayerName(file.name),
-                        checkSameLayer = this.importedFileNames.filter(importedFileName => {
-                            return this.getLayerName(file.name) === this.getLayerName(importedFileName);
-                        });
+                          checkSameLayer = this.importedFileNames.filter(importedFileName => {
+                              return this.getLayerName(file.name) === this.getLayerName(importedFileName);
+                          });
 
                     this.$store.dispatch("Modules/CosiFileImport/importKML", {
                         raw: f.target.result,

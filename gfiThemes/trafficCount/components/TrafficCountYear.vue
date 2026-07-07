@@ -90,7 +90,7 @@ export default {
                     return meansOfTransports === "Anzahl_Schwerverkehr" ? "triangle" : "circle";
                 }
                 const pointStyle = [],
-                    format = "YYYY-MM-DD";
+                      format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (hasHolidayInWeek(datetime[i], this.holidays, format)) {
@@ -105,7 +105,7 @@ export default {
             },
             renderPointSize: (datetime) => {
                 const pointSize = [],
-                    format = "YYYY-MM-DD";
+                      format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (hasHolidayInWeek(datetime[i], this.holidays, format)) {
@@ -176,9 +176,9 @@ export default {
          */
         yearDatepickerValueChanged: function (dates) {
             const api = this.api,
-                thingId = this.thingId,
-                meansOfTransport = this.meansOfTransport,
-                timeSettings = [];
+                  thingId = this.thingId,
+                  meansOfTransport = this.meansOfTransport,
+                  timeSettings = [];
 
             if (!Array.isArray(dates) || dates.length === 0) {
                 this.apiData = [];
@@ -253,8 +253,8 @@ export default {
             let startMoment = dayjs().startOf("year").subtract(10, "year");
 
             const endDate = this.checkGurlittInsel ? dayjs().subtract(1, "day") : dayjs(),
-                startYear = parseInt(startMoment.format("YYYY"), 10),
-                question = dayjs(date);
+                  startYear = parseInt(startMoment.format("YYYY"), 10),
+                  question = dayjs(date);
 
             if (this.checkGurlittInsel) {
                 if (startYear < 2014) {

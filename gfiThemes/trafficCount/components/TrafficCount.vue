@@ -278,17 +278,17 @@ export default {
          */
         createDataConnection: function (feature, onerror, sensorThingsApiOpt = null) {
             const thingId = feature["@iot.id"],
-                meansOfTransport = this.getMeansOfTransportFromDatastream(feature.Datastreams, Object.keys(this.typeAssoc)),
-                url = feature.requestUrl,
-                sensorThingsApiVersion = "v" + feature.versionUrl,
-                mqttOptions = {
-                    host: url.split("/")[2],
-                    rhPath: url,
-                    context: this,
-                    path: "/mqtt",
-                    protocol: "wss",
-                    mqttVersion: "3.1.1"
-                };
+                  meansOfTransport = this.getMeansOfTransportFromDatastream(feature.Datastreams, Object.keys(this.typeAssoc)),
+                  url = feature.requestUrl,
+                  sensorThingsApiVersion = "v" + feature.versionUrl,
+                  mqttOptions = {
+                      host: url.split("/")[2],
+                      rhPath: url,
+                      context: this,
+                      path: "/mqtt",
+                      protocol: "wss",
+                      mqttVersion: "3.1.1"
+                  };
 
             this.api = new TrafficCountCache(url, sensorThingsApiVersion, mqttOptions, sensorThingsApiOpt);
             this.propThingId = thingId;
@@ -465,8 +465,8 @@ export default {
          */
         setHolidays (feature) {
             const gfiTheme = feature?.getTheme(),
-                gfiParams = gfiTheme?.params,
-                holidays = gfiParams?.holidays;
+                  gfiParams = gfiTheme?.params,
+                  holidays = gfiParams?.holidays;
 
             if (Array.isArray(holidays) && holidays.length) {
                 this.holidays = holidays;

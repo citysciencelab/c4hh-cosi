@@ -38,7 +38,7 @@ export default {
          */
         levelsForFilter () {
             const index = this.districtLevels.findIndex(level => level.layerId === this.selectedLevelId),
-                levelsLength = this.districtLevels.length - 1;
+                  levelsLength = this.districtLevels.length - 1;
 
             return index !== levelsLength ? this.districtLevels.slice(index, -1).toReversed() : [this.districtLevels[levelsLength]];
         }
@@ -73,7 +73,7 @@ export default {
 
     mounted () {
         this.addSelectedValues(this.selectedDistrictNamesByMap,
-            this.levelsForFilter.find(level => level.layerId === this.selectedLevelId));
+                               this.levelsForFilter.find(level => level.layerId === this.selectedLevelId));
         this.forceRerender();
     },
 
@@ -119,7 +119,7 @@ export default {
          */
         updateSubLevelValues (districtNames, level) {
             const districtNamesObject = Object.assign(...districtNames.map(key => ({[key]: true}))),
-                filteredDistricts = level.districts.filter(district => Object.prototype.hasOwnProperty.call(districtNamesObject, district.referencDistrictName));
+                  filteredDistricts = level.districts.filter(district => Object.prototype.hasOwnProperty.call(districtNamesObject, district.referencDistrictName));
 
             level.filterableValues = filteredDistricts.map(district => district.getName()).sort();
             level.selectedValues = level.selectedValues.filter(value => {

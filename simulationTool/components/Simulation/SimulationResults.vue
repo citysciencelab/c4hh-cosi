@@ -85,9 +85,9 @@ export default {
          */
         earliestStartTime () {
             const timeValues = this.startTimes
-                    .map(time => new Date(time).getTime())
-                    .filter(value => Number.isFinite(value)),
-                earliestTimeValue = Math.min(...timeValues);
+                      .map(time => new Date(time).getTime())
+                      .filter(value => Number.isFinite(value)),
+                  earliestTimeValue = Math.min(...timeValues);
 
             if (!Number.isFinite(earliestTimeValue)) {
                 return "";
@@ -144,9 +144,9 @@ export default {
          */
         latestFinishedTime () {
             const timeValues = this.finishedTimes
-                    .map(time => new Date(time).getTime())
-                    .filter(value => Number.isFinite(value)),
-                latestTimeValue = Math.max(...timeValues);
+                      .map(time => new Date(time).getTime())
+                      .filter(value => Number.isFinite(value)),
+                  latestTimeValue = Math.max(...timeValues);
 
             if (!Number.isFinite(latestTimeValue)) {
                 return "";
@@ -314,12 +314,12 @@ export default {
          */
         getAllZValuesFromTableFeature (feature) {
             const featureProps = feature.getProperties(),
-                allZValues = Object.entries(featureProps).filter(([key]) => key.startsWith("custom-z-")).sort((a, b) => {
-                    const zA = parseFloat(a[0].replace("custom-z-", "")),
-                        zB = parseFloat(b[0].replace("custom-z-", ""));
+                  allZValues = Object.entries(featureProps).filter(([key]) => key.startsWith("custom-z-")).sort((a, b) => {
+                      const zA = parseFloat(a[0].replace("custom-z-", "")),
+                            zB = parseFloat(b[0].replace("custom-z-", ""));
 
-                    return zB - zA;
-                });
+                      return zB - zA;
+                  });
 
             return allZValues;
         },
@@ -401,13 +401,13 @@ export default {
             if (val?.type === "polygon") {
                 val.styles?.forEach((data, index) => {
                     const legendObj = {
-                            "name": data.value
-                        },
-                        style = {
-                            "polygonFillColor": data.style?.fillColor,
-                            "polygonStrokeColor": data.style?.strokeColor,
-                            "polygonStrokeWidth": data.style?.strokeWidth
-                        };
+                              "name": data.value
+                          },
+                          style = {
+                              "polygonFillColor": data.style?.fillColor,
+                              "polygonStrokeColor": data.style?.strokeColor,
+                              "polygonStrokeWidth": data.style?.strokeWidth
+                          };
 
                     extractedValue[index] = FeaturesHandler.prepareLegendForPolygon(legendObj, style);
                 });
@@ -514,13 +514,13 @@ export default {
 
             outputs.forEach(output => {
                 const layerId = `${simulationId}-${output}`,
-                    layer = this.createOrUpdateLayer(layerId),
-                    layerSource = layer.getLayerSource();
+                      layer = this.createOrUpdateLayer(layerId),
+                      layerSource = layer.getLayerSource();
 
                 Object.values(jobs).forEach(job => {
                     const featuresToAdd = ConvertFeature.geoJsonToOpenlayers(job.jobResults?.[output]?.features || []),
-                        foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
-                        isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table";
+                          foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
+                          isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table";
 
                     if (isTableMode) {
                         this.processAndStylePointFeaturesForTable(layerId, layer, layerSource, featuresToAdd, simulationId, foundProcess?.renderingOptions?.attributeToShow);
@@ -555,8 +555,8 @@ export default {
          */
         storeTranslatedPointAndCreateLine (feature, layerId, toShowAttrKey, originalXYKey, customZKey) {
             const featureGeometry = feature.getGeometry(),
-                [x, y, z] = featureGeometry.getCoordinates().toString().split(","),
-                coordinate2d = `${x},${y}`;
+                  [x, y, z] = featureGeometry.getCoordinates().toString().split(","),
+                  coordinate2d = `${x},${y}`;
             let zValue;
 
             if (!isObject(this.tableFeaturesCollection[layerId][coordinate2d])) {
@@ -590,7 +590,7 @@ export default {
          */
         processAndStylePointFeaturesForTable (layerId, layer, layerSource, geojsonFeature, simulationId, toShowAttrKey) {
             const originalXYKey = "og-xy",
-                customZKey = "custom-z-";
+                  customZKey = "custom-z-";
 
             this.tableFeaturesCollection[layerId] = this.tableFeaturesCollection[layerId] || {};
             this.lineFeaturesCollection[layerId] = this.lineFeaturesCollection[layerId] || {};
@@ -634,8 +634,8 @@ export default {
                 return;
             }
             const tableFeature = event.features.getArray()[0],
-                tableFeatureProps = tableFeature?.getProperties?.(),
-                z = [];
+                  tableFeatureProps = tableFeature?.getProperties?.(),
+                  z = [];
             let xy;
 
             if (!isObject(tableFeature.getGeometry())) {
@@ -669,15 +669,15 @@ export default {
          */
         onFeatureSelect (event, layerId, layerSource, customZKey) {
             const currentFeature = event.selected[0] || event.deselected[0],
-                featureCoordinateAsString = currentFeature.getGeometry().getCoordinates().toString(),
-                keyOfTableFeature = featureCoordinateAsString.split(",").slice(0, -1).join(","),
-                tableFeature = this.tableFeaturesCollection[layerId][keyOfTableFeature],
-                hideFeatures = Array.isArray(event.selected) && event.selected.length > 0;
+                  featureCoordinateAsString = currentFeature.getGeometry().getCoordinates().toString(),
+                  keyOfTableFeature = featureCoordinateAsString.split(",").slice(0, -1).join(","),
+                  tableFeature = this.tableFeaturesCollection[layerId][keyOfTableFeature],
+                  hideFeatures = Array.isArray(event.selected) && event.selected.length > 0;
 
             if (tableFeature) {
                 tableFeature.setStyle(hideFeatures ? new Style(null) : this.getFeatureStyleTable(this.formatKeyValuePairs(this.getAllZValuesFromTableFeature(tableFeature), customZKey)));
                 const multipleLines = Object.keys(this.lineFeaturesCollection[layerId]).filter(key => key.startsWith(keyOfTableFeature)),
-                    bulkUpdate = [];
+                      bulkUpdate = [];
 
                 multipleLines.forEach(featureXYZ => {
                     bulkUpdate.push(this.lineFeaturesCollection[layerId][featureXYZ]);
@@ -690,10 +690,10 @@ export default {
 
             this.layers.forEach(layer => {
                 const layerId = layer.layer?.get("id"),
-                    tableFeatures = this.tableFeaturesCollection[layerId] || {},
-                    lineFeatures = this.lineFeaturesCollection[layerId] || {},
-                    bulkUpdate = Object.values(lineFeatures),
-                    layerSource = layer.getLayerSource();
+                      tableFeatures = this.tableFeaturesCollection[layerId] || {},
+                      lineFeatures = this.lineFeaturesCollection[layerId] || {},
+                      bulkUpdate = Object.values(lineFeatures),
+                      layerSource = layer.getLayerSource();
 
                 Object.values(tableFeatures).forEach(feature => {
                     if (show) {

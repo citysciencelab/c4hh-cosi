@@ -185,7 +185,7 @@ export default {
          */
         filterForSelect (feature) {
             const geomTypes = ["Polygon", "MultiPolygon", "Circle"],
-                isIncluded = geomTypes.includes(feature.getGeometry().getType());
+                  isIncluded = geomTypes.includes(feature.getGeometry().getType());
 
             if (!isIncluded) {
                 this.addSingleAlert({content: "Es können nur Flächen und Kreise ausgwählt werden"});
@@ -205,10 +205,10 @@ export default {
                 return;
             }
             const geojsonFormat = new GeoJSON(),
-                payload = {
-                    geom: geojsonFormat.writeGeometryObject(geometry),
-                    excel: getExcel
-                };
+                  payload = {
+                      geom: geojsonFormat.writeGeometryObject(geometry),
+                      excel: getExcel
+                  };
 
             requestAnalyze(this.apiUrl, payload)
                 .then(data => {

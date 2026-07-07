@@ -99,12 +99,12 @@ export default {
             }
 
             const entry = {story: storySnapshot, imageAssetsById: imageAssetsSnapshot},
-                updatedList = [...this.storyList];
+                  updatedList = [...this.storyList];
 
             if (typeof this.currentStoryIndex === "number") {
                 updatedList[this.currentStoryIndex] = entry;
             }
-             else {
+            else {
                 updatedList.unshift(entry);
             }
             this.setStoryList(updatedList);
@@ -126,19 +126,19 @@ export default {
          */
         async downloadStory (storyEntry) {
             const story = storyEntry?.story,
-                imageAssetsById = storyEntry?.imageAssetsById || {};
+                  imageAssetsById = storyEntry?.imageAssetsById || {};
 
             if (!story) {
                 return;
             }
 
             const zipBlob = await createStoryZip(
-                    story,
-                    imageAssetsById
-                ),
-                filename = `${this.toSafeFileName(story?.title)}.zip`,
-                objectURL = URL.createObjectURL(zipBlob),
-                element = document.createElement("a");
+                      story,
+                      imageAssetsById
+                  ),
+                  filename = `${this.toSafeFileName(story?.title)}.zip`,
+                  objectURL = URL.createObjectURL(zipBlob),
+                  element = document.createElement("a");
 
             element.setAttribute("href", objectURL);
             element.setAttribute("download", filename);
@@ -244,7 +244,7 @@ export default {
          */
         async onStoryImportFileChange (event) {
             const inputElement = event?.target,
-                selectedFile = inputElement?.files?.[0];
+                  selectedFile = inputElement?.files?.[0];
 
             if (!selectedFile) {
                 return;

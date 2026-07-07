@@ -176,12 +176,12 @@ export default {
          */
         cardDatasets () {
             const cardData = [],
-                activeSubCard = this.selectionCardsSubjectData.find(card => card.status === "active"),
-                activeSubjectWKT = activeSubCard?.subjectFeatureWKT;
+                  activeSubCard = this.selectionCardsSubjectData.find(card => card.status === "active"),
+                  activeSubjectWKT = activeSubCard?.subjectFeatureWKT;
 
             this.dataSets.forEach(set => {
                 const subjectWKT = set?.inputs?.subjectFeatureWKT,
-                    isSubject = activeSubjectWKT !== undefined && subjectWKT === activeSubjectWKT;
+                      isSubject = activeSubjectWKT !== undefined && subjectWKT === activeSubjectWKT;
 
                 cardData.push({
                     data: this.getData(set),
@@ -329,7 +329,7 @@ export default {
         clickCoordinate (newClickCoordinate) {
             if (this.activeMode.type === "point") {
                 const coordinate4326 = transformCoordinate(newClickCoordinate, this.projectionCode),
-                    cardText = newClickCoordinate.map(coord => coord.toFixed(6)).join(", ");
+                      cardText = newClickCoordinate.map(coord => coord.toFixed(6)).join(", ");
 
                 this.addSelectionCard(this.clickCoordinate, coordinate4326, undefined, this.$t("additional:modules.tools.cosi.accessibilityAnalysis.points"), false, false, cardText);
             }
@@ -343,9 +343,9 @@ export default {
 
                 if (!newSets.length || !newSets.some(set => set.isSubjectDataArea) && oldSets.some(set => set.isSubjectDataArea)) {
                     const activeCard = this.selectionCardsStatisticalData.find(card => card.status === "active"),
-                        existedCard = this.selectionCardsSubjectData.find(existingCard => {
-                            return JSON.stringify(existingCard.extent) === JSON.stringify(activeCard.extent);
-                        });
+                          existedCard = this.selectionCardsSubjectData.find(existingCard => {
+                              return JSON.stringify(existingCard.extent) === JSON.stringify(activeCard.extent);
+                          });
 
                     existedCard.subjectFeatureWKT = activeCard.bboxGeomWKT;
                 }
@@ -457,18 +457,18 @@ export default {
             this.setMarkerByCoordinates(this.useOuterBoundaries ? clickCoordinate : [clickCoordinate]);
 
             const newCard = {
-                    coord25832: clickCoordinate,
-                    coord4326: coordinate4326,
-                    icon: this.activeMode.icon,
-                    id: clickCoordinate.toString(),
-                    label: layerName || this.activeMode.text,
-                    text: cardText,
-                    layerName: layerName,
-                    layerId,
-                    featureName,
-                    feature
-                },
-                cardExists = this.selectionCards.some(card => card.id === newCard.id);
+                      coord25832: clickCoordinate,
+                      coord4326: coordinate4326,
+                      icon: this.activeMode.icon,
+                      id: clickCoordinate.toString(),
+                      label: layerName || this.activeMode.text,
+                      text: cardText,
+                      layerName: layerName,
+                      layerId,
+                      featureName,
+                      feature
+                  },
+                  cardExists = this.selectionCards.some(card => card.id === newCard.id);
 
             if (!cardExists) {
                 this.selectionCards.push(newCard);
@@ -484,15 +484,15 @@ export default {
          */
         addSelectionCardRoute (routingDirections, transportType, icon) {
             const duration = Math.floor(routingDirections.duration / 60),
-                card = {
-                    coord25832: [],
-                    coord4326: [],
-                    icon,
-                    id: routingDirections.bbox.toString(),
-                    label: "Berechnete Route",
-                    text: `Entfernung: ${this.routingDirections.distance} m | Zeit: ${duration} min | Verkehrsmittel: ${transportType}`,
-                    layerName: "Route"
-                };
+                  card = {
+                      coord25832: [],
+                      coord4326: [],
+                      icon,
+                      id: routingDirections.bbox.toString(),
+                      label: "Berechnete Route",
+                      text: `Entfernung: ${this.routingDirections.distance} m | Zeit: ${duration} min | Verkehrsmittel: ${transportType}`,
+                      layerName: "Route"
+                  };
 
             this.setScaleUnit("distance");
             this.setTransportType("foot-walking");
@@ -505,13 +505,13 @@ export default {
          */
         generateCardTitle () {
             const titlePart = "Erreichbarkeit ID:",
-                allowedCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ2346789",
-                idLength = 6;
+                  allowedCharacters = "ABCDEFGHJKLMNPQRSTUVWXYZ2346789",
+                  idLength = 6;
             let id = "";
 
             for (let i = 0; i < idLength; i++) {
                 const randomIndex = Math.floor(Math.random() * allowedCharacters.length),
-                    randomChar = allowedCharacters[randomIndex];
+                      randomChar = allowedCharacters[randomIndex];
 
                 id += randomChar;
             }
@@ -548,7 +548,7 @@ export default {
          */
         areAllFeaturesInCollection (layer, features) {
             const layerFeatures = layer.getLayerSource().getFeatures(),
-                featureIds = features.map(feature => unpackCluster(feature)[0].getId());
+                  featureIds = features.map(feature => unpackCluster(feature)[0].getId());
 
             return layerFeatures.every(layerFeature => {
                 const unpackedFeatures = unpackCluster(layerFeature);
@@ -630,9 +630,9 @@ export default {
         registerSelectListener (featureCollection) {
             featureCollection.on("add", evt => {
                 const unpackedFeature = unpackCluster(evt.element)[0],
-                    foundLayer = this.visibleVectorLayers.find(layer => {
-                        return getLayerSource(layer.getLayer()).hasFeature(unpackedFeature);
-                    });
+                      foundLayer = this.visibleVectorLayers.find(layer => {
+                          return getLayerSource(layer.getLayer()).hasFeature(unpackedFeature);
+                      });
                 let cardName;
 
                 if (foundLayer.attributes?.searchField?.length > 0) {
@@ -647,7 +647,7 @@ export default {
 
             featureCollection.on("remove", evt => {
                 const featureToRemove = unpackCluster(evt.element)[0],
-                    cardToRemove = this.selectionCards.find(card => card.feature.getId() === featureToRemove.getId());
+                      cardToRemove = this.selectionCards.find(card => card.feature.getId() === featureToRemove.getId());
 
                 if (!cardToRemove) {
                     return;
@@ -702,15 +702,15 @@ export default {
 
             if (this.useOuterBoundaries) {
                 const flatCoordinates = getFlatCoordinates(simplifiedGeom),
-                    coordinates4326 = transformCoordinates(flatCoordinates, this.projectionCode),
-                    cardText = "Flächenaußengrenzen für " + (featureName || flatCoordinates.slice(0, 2) + "...");
+                      coordinates4326 = transformCoordinates(flatCoordinates, this.projectionCode),
+                      cardText = "Flächenaußengrenzen für " + (featureName || flatCoordinates.slice(0, 2) + "...");
 
                 this.addSelectionCard(getFlatCoordinates(simplifiedGeom), coordinates4326, featureName, layerName, feature, layerId, cardText);
             }
             else {
                 getFlatCoordinates(simplifiedGeom).forEach((coordinate) => {
                     const coordinate4326 = transformCoordinate(coordinate, this.projectionCode),
-                        cardText = featureName;
+                          cardText = featureName;
 
                     this.addSelectionCard(coordinate, coordinate4326, featureName, layerName, feature, layerId, cardText);
                 });
@@ -790,7 +790,7 @@ export default {
                 this.showErrorAlert = false;
                 mapCollection.getMap("2D").once("rendercomplete", (evt) => {
                     const canvas = evt.target.getViewport().querySelector("canvas"),
-                        legend = document.getElementById("accessibility-analysis-legend");
+                          legend = document.getElementById("accessibility-analysis-legend");
 
                     html2canvas(legend).then(legendCanvas => {
                         analysisSet.inputs.screenshotLegend = legendCanvas.toDataURL("image/png");
@@ -803,9 +803,9 @@ export default {
                 analysisSet.directionResults = this.directionFeatures;
                 analysisSet.directionResultsGeoJSON = featuresToGeoJsonCollection(this.directionFeatures);
                 analysisSet.inputs = {
-                // These lines have been changed back and forth so arguing my case for checking first if the value is undefined
-                // JSON.parse throws error on undefined
-                // So if the original variable is undefined, we don't copy undefined, but instead cause an error
+                    // These lines have been changed back and forth so arguing my case for checking first if the value is undefined
+                    // JSON.parse throws error on undefined
+                    // So if the original variable is undefined, we don't copy undefined, but instead cause an error
                     mode: this.activeMode.type ? JSON.parse(JSON.stringify(this.activeMode.type)) : undefined,
                     coordinate: this.coordinate ? JSON.parse(JSON.stringify(this.coordinate)) : undefined,
                     selectedFacilityNames: this.selectedFacilityNames ? JSON.parse(JSON.stringify(this.selectedFacilityNames)) : undefined,
@@ -910,9 +910,9 @@ export default {
          */
         handlePopulationResponsee (resp) {
             const node = resp?.ExecuteResponse?.ProcessOutputs?.Output?.Data?.ComplexData?.einwohner,
-                raw = typeof node?.ergebnis === "string" ? node.ergebnis.trim() : "",
-                hasError = String(node?.ErrorOccured).toLowerCase() === "yes",
-                set = this.dataSets[this.activeSet];
+                  raw = typeof node?.ergebnis === "string" ? node.ergebnis.trim() : "",
+                  hasError = String(node?.ErrorOccured).toLowerCase() === "yes",
+                  set = this.dataSets[this.activeSet];
 
             set.populationAlert = null;
             set.inputs.einwohner = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.populationNotAvailable");
@@ -928,7 +928,7 @@ export default {
 
             try {
                 const parsed = JSON.parse(raw),
-                    value = Number(parsed?.einwohner_fhh);
+                      value = Number(parsed?.einwohner_fhh);
 
                 if (Number.isFinite(value)) {
                     set.inputs.einwohner = thousandsSeparator(value);
@@ -1007,7 +1007,7 @@ export default {
          */
         downloadScreenshot (evt) {
             const index = evt.target.closest(".card-total").getAttribute("data-index"),
-                link = document.createElement("a");
+                  link = document.createElement("a");
 
             link.href = this.dataSets[index].inputs.screenshot;
             link.download = "Erreichbarkeitsanalyse.png";
@@ -1192,14 +1192,14 @@ export default {
          */
         getData (data) {
             const result = [],
-                name = this.getScaleUnitByType(data.inputs?.scaleUnit)?.name,
-                title = name === "Zeit" ? data.inputs?.time + " Minuten" : data.inputs?.distance + " Meter",
-                pointDes = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0].layerName : "Mehrere: " + [...new Set(data.inputs.selectionCards.map(card => card.layerName))],
-                coordinate = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0].text : "",
-                icon = data.inputs.selectionCards[0]?.icon,
-                population = data.inputs.einwohner,
-                areaInSqKm = data?.inputs?.areaInSqKm || "-",
-                locale = this.currentLocale || "de-DE";
+                  name = this.getScaleUnitByType(data.inputs?.scaleUnit)?.name,
+                  title = name === "Zeit" ? data.inputs?.time + " Minuten" : data.inputs?.distance + " Meter",
+                  pointDes = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0].layerName : "Mehrere: " + [...new Set(data.inputs.selectionCards.map(card => card.layerName))],
+                  coordinate = data.inputs.selectionCards.length === 1 ? data.inputs.selectionCards[0].text : "",
+                  icon = data.inputs.selectionCards[0]?.icon,
+                  population = data.inputs.einwohner,
+                  areaInSqKm = data?.inputs?.areaInSqKm || "-",
+                  locale = this.currentLocale || "de-DE";
 
             result.push({label: name, value: title});
             if (data.inputs.selectionCards.length > 1 && data.inputs.useOuterBoundaries) {
@@ -1219,8 +1219,8 @@ export default {
             });
             if (data.inputs.useTravelTimeIndex) {
                 const ttiTitle = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.title"),
-                    timeLabel = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.timeOfDay"),
-                    hourLabel = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.hour");
+                      timeLabel = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.timeOfDay"),
+                      hourLabel = this.$t("additional:modules.tools.cosi.accessibilityAnalysis.travelTimeIndex.hour");
 
                 result.push({
                     icon: "bi bi-sliders",
@@ -1260,8 +1260,8 @@ export default {
                 return;
             }
             const oldValue = this.selectedFacilityNames,
-                difference = differenceJs(newValue, oldValue),
-                diff = differenceJs(oldValue, newValue);
+                  difference = differenceJs(newValue, oldValue),
+                  diff = differenceJs(oldValue, newValue);
 
             if (diff.length) {
                 diff.forEach(layer => {
@@ -1284,7 +1284,7 @@ export default {
          */
         generateAnalysisId (name) {
             const idName = name.trim().toLowerCase().replace(/[^a-z0-9]/g, ""),
-                timestamp = dayjs().format("YYYYMMDDHHmmss");
+                  timestamp = dayjs().format("YYYYMMDDHHmmss");
 
             return idName + timestamp;
         },
@@ -1340,10 +1340,10 @@ export default {
          */
         addCardToDistrictSelectorSubject (index) {
             const activeCard = this.selectionCardsStatisticalData.find(card => card.status === "active"),
-                existedCard = this.selectionCardsSubjectData.find(existingCard => {
-                    return JSON.stringify(existingCard.extent) === JSON.stringify(activeCard.extent);
-                }),
-                feature = wktParser.encodeFeature(new Feature({geometry: this.isochroneFeatures[0].getGeometry()}));
+                  existedCard = this.selectionCardsSubjectData.find(existingCard => {
+                      return JSON.stringify(existingCard.extent) === JSON.stringify(activeCard.extent);
+                  }),
+                  feature = wktParser.encodeFeature(new Feature({geometry: this.isochroneFeatures[0].getGeometry()}));
 
             this.clearSubjectAreaFromLayer();
             activeCard.subjectFeatureWKT = feature;
@@ -1376,9 +1376,9 @@ export default {
             this.showSnackbar(index, "reset");
 
             const activeCard = this.selectionCardsStatisticalData.find(card => card.status === "active"),
-                existedCard = this.selectionCardsSubjectData.find(existingCard => {
-                    return JSON.stringify(existingCard.extent) === JSON.stringify(activeCard.extent);
-                });
+                  existedCard = this.selectionCardsSubjectData.find(existingCard => {
+                      return JSON.stringify(existingCard.extent) === JSON.stringify(activeCard.extent);
+                  });
 
             this.clearSubjectAreaFromLayer();
             activeCard.subjectFeatureWKT = activeCard.bboxGeomWKT;

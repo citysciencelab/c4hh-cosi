@@ -340,7 +340,7 @@ export default {
          */
         handleFile (evt) {
             const file = evt.target.files[0],
-                reader = new FileReader();
+                  reader = new FileReader();
 
             this.failedLoading = false;
 

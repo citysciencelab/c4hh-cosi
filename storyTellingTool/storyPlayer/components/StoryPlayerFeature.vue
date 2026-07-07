@@ -36,7 +36,7 @@ export default {
          * @param {String} value string to check.
          * @returns {Boolean} whether the given value includes a pipe.
          */
-         hasPipe: function (value) {
+        hasPipe: function (value) {
             return typeof value === "string" && value.includes("|");
         }
     }

@@ -99,11 +99,11 @@ export default {
         ...mapGetters("Modules/CalculateRatio", Object.keys(getters)),
         ...mapGetters("Modules/DistrictSelector", ["selectedDistrictLevel", "selectedFeatures", "label", "keyOfAttrName", "keyOfAttrNameStats", "loadend"]),
         ...mapGetters("Modules/FeaturesList",
-            {
-            // facilitiesMapping: "mapping",
-            // groupActiveLayer: "groupActiveLayer",
-                isFeatureActive: "isFeatureActive"
-            }),
+                      {
+                          // facilitiesMapping: "mapping",
+                          // groupActiveLayer: "groupActiveLayer",
+                          isFeatureActive: "isFeatureActive"
+                      }),
         ...mapGetters("Modules/ColorCodeMap", ["visualizationState"]),
         ...mapGetters(["layerConfig", "visibleSubjectDataLayerConfigs"]),
 
@@ -115,13 +115,13 @@ export default {
 
             if (this.fActive_A || this.fActive_B) {
                 const capacity = {
-                        name: "Kapazität",
-                        key: "capacity"
-                    },
-                    need = {
-                        name: "Bedarf",
-                        key: "need"
-                    };
+                          name: "Kapazität",
+                          key: "capacity"
+                      },
+                      need = {
+                          name: "Bedarf",
+                          key: "need"
+                      };
 
                 options.push(capacity, need);
             }
@@ -491,7 +491,7 @@ export default {
 
             dataArray_A.forEach((obj_A) => {
                 const obj_B = dataArray_B.find(obj => obj.name === obj_A.name),
-                    combined = {...obj_A, ...obj_B};
+                      combined = {...obj_A, ...obj_B};
 
                 allData.push(combined);
             });
@@ -537,7 +537,7 @@ export default {
 
             this.selectedFeatures.forEach(district => {
                 const name = district.getProperties()[this.keyOfAttrName],
-                    geometry = district.getGeometry();
+                      geometry = district.getGeometry();
 
                 this.calcHelper = {};
                 this.calcHelper.name = name;
@@ -546,7 +546,7 @@ export default {
 
                 if (this[letter + "Switch"]) {
                     const findLayer = this.getVisibleVectorLayers().find(layer => layer.getLayer().get("name") === this["selectedField" + letter]),
-                        layerFeatures = getLayerSource(findLayer.getLayer()).getFeatures();
+                          layerFeatures = getLayerSource(findLayer.getLayer()).getFeatures();
 
                     this.calcHelper["type_" + letter] = "facility";
                     this.featureVals = [];
@@ -601,7 +601,7 @@ export default {
                     this.calcHelper["type_" + letter] = "feature";
 
                     const featureData = this.getFeatureData(name, this["selectedField" + letter]),
-                        yearValues = {};
+                          yearValues = {};
 
                     featureData.forEach(year => {
                         yearValues[year.jahr] = year.wert;
@@ -626,7 +626,7 @@ export default {
          */
         getFeatureData (districtName, featureName) {
             const featureDataList = [],
-                selectedDistricts = this.selectedDistrictLevel.districts.filter(district => district.isSelected === true);
+                  selectedDistricts = this.selectedDistrictLevel.districts.filter(district => district.isSelected === true);
 
             this.selectedStatFeatures = selectedDistricts.map(district => district.statFeatures).flat();
 
@@ -738,21 +738,21 @@ export default {
          */
         loadToChartGenerator () {
             const graphObj = {
-                    id: "calcratio-" + this.selectedFeatures.map(district => {
-                        return district.id_;
-                    }).join("-") + "-" + this.selectedFieldA.id + "-" + this.paramFieldA.name + "-" + this.selectedFieldB.id + "-" + this.paramFieldB.name,
-                    name: "Versorgungsanalyse - Visualisierung " + this.columnSelector.name + " (" + this.$t("additional:modules.tools.cosi.calculateRatio.title") + ")",
-                    type: ["LineChart", "BarChart"],
-                    color: "rainbow",
-                    source: this.$t("additional:modules.tools.cosi.calculateRatio.title"),
-                    scaleLabels: [this.columnSelector.name, "Jahre"],
-                    data: {
-                        labels: [...this.availableYears],
-                        datasets: []
-                    }
-                },
+                      id: "calcratio-" + this.selectedFeatures.map(district => {
+                          return district.id_;
+                      }).join("-") + "-" + this.selectedFieldA.id + "-" + this.paramFieldA.name + "-" + this.selectedFieldB.id + "-" + this.paramFieldB.name,
+                      name: "Versorgungsanalyse - Visualisierung " + this.columnSelector.name + " (" + this.$t("additional:modules.tools.cosi.calculateRatio.title") + ")",
+                      type: ["LineChart", "BarChart"],
+                      color: "rainbow",
+                      source: this.$t("additional:modules.tools.cosi.calculateRatio.title"),
+                      scaleLabels: [this.columnSelector.name, "Jahre"],
+                      data: {
+                          labels: [...this.availableYears],
+                          datasets: []
+                      }
+                  },
 
-                dataArray = [];
+                  dataArray = [];
 
             this.dataSets[this.activeSet].results.forEach(result => {
                 if (result) {
@@ -821,10 +821,10 @@ export default {
          */
         preparesChartData () {
             const chartData = [],
-                inputA = this.dataSets[this.activeSet].inputs.selectedFieldA,
-                inputB = this.dataSets[this.activeSet].inputs.selectedFieldB,
-                parameterA = this.dataSets[this.activeSet].inputs.facilityPropertyList_A.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_A[0] + ")" : "",
-                parameterB = this.dataSets[this.activeSet].inputs.facilityPropertyList_B.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_B[0] + ")" : "";
+                  inputA = this.dataSets[this.activeSet].inputs.selectedFieldA,
+                  inputB = this.dataSets[this.activeSet].inputs.selectedFieldB,
+                  parameterA = this.dataSets[this.activeSet].inputs.facilityPropertyList_A.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_A[0] + ")" : "",
+                  parameterB = this.dataSets[this.activeSet].inputs.facilityPropertyList_B.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_B[0] + ")" : "";
 
 
             this.availableColumns.forEach((type, idx) => {

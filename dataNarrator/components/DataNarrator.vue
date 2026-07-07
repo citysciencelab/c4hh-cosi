@@ -35,8 +35,8 @@ export default {
         },
         isMobileDevice () {
             const userAgentCheck = (/Mobi|Android|iPhone|iPad|iPod|Windows Phone/i).test(navigator.userAgent),
-                touchCheck = "ontouchstart" in window || navigator.maxTouchPoints > 0,
-                screenSizeCheck = this.isMobile;
+                  touchCheck = "ontouchstart" in window || navigator.maxTouchPoints > 0,
+                  screenSizeCheck = this.isMobile;
 
             return userAgentCheck || (touchCheck && screenSizeCheck);
         },

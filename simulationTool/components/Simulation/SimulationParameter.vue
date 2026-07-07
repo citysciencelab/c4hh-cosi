@@ -144,9 +144,9 @@ export default {
             }
 
             const [firstDescription, ...otherDescriptions] = this.processDescriptions,
-                keysExistingInAllDescriptions = Object.keys(firstDescription.outputs).filter(
-                    outputKey => otherDescriptions.every(description => description.outputs[outputKey])
-                );
+                  keysExistingInAllDescriptions = Object.keys(firstDescription.outputs).filter(
+                      outputKey => otherDescriptions.every(description => description.outputs[outputKey])
+                  );
 
             return keysExistingInAllDescriptions.map(key => ({
                 code: key,
@@ -291,7 +291,7 @@ export default {
             }
 
             const primaryProperties = this.simulation?.inputs?.[inputKey]?.primaryProperties || [],
-                result = {};
+                  result = {};
 
             Object.entries(input.schema.properties).forEach(([propertyKey, property]) => {
                 if (!primaryProperties.includes(propertyKey) && !this.ignoreProperties.includes(propertyKey)) {
@@ -452,7 +452,7 @@ export default {
                 if (input.schema?.type === "object" && includeObjectProperties) {
                     // Handle object properties
                     const properties = input.schema.properties || {},
-                        primaryProperties = inputConfig?.primaryProperties || [];
+                          primaryProperties = inputConfig?.primaryProperties || [];
 
                     Object.entries(properties).forEach(([propertyKey, property]) => {
                         // For primary menu, only include properties marked as primary
@@ -489,7 +489,7 @@ export default {
                     const input = this.combinedInputs[inputKey];
 
                     return !(input?.minOccurs === 0
-                && input?.schema?.allOf?.some(schema => schema.format === "geojson-feature-collection"));
+                        && input?.schema?.allOf?.some(schema => schema.format === "geojson-feature-collection"));
                 })
             );
         },
@@ -544,14 +544,14 @@ export default {
             this.oafLoadingStates[inputKey] = true;
 
             const source = this.simulation.inputs[inputKey].source,
-                crs = this.currentPlanningScenario.inputs.crs,
-                filter = getOAFFeature.getOAFGeometryFilter(getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects"),
-                featureCollection = {
-                    type: "FeatureCollection",
-                    features: await getOAFFeature.getOAFFeatureGet(
-                        source.url, source.collection, {limit: 100, filter, filterCrs: crs, crs}
-                    )
-                };
+                  crs = this.currentPlanningScenario.inputs.crs,
+                  filter = getOAFFeature.getOAFGeometryFilter(getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects"),
+                  featureCollection = {
+                      type: "FeatureCollection",
+                      features: await getOAFFeature.getOAFFeatureGet(
+                          source.url, source.collection, {limit: 100, filter, filterCrs: crs, crs}
+                      )
+                  };
 
             this.setRequestBodyInput(inputKey, "", featureCollection);
             this.oafLoadingStates[inputKey] = false;
@@ -777,15 +777,15 @@ export default {
             this.requestBodies = this.replaceEnumValueObjects(this.requestBodies);
 
             const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId), // Cannot use computed property here, which may change during async call.
-                executeResponses = await Promise.all(
-                    this.processHandlers.map((handler, index) => handler.execute(this.requestBodies[index], this.accessToken))
-                ),
-                jobIDs = executeResponses.map(response => response.jobID),
-                initialStatuses = executeResponses.map(response => response.status),
-                newSimulationId = jobIDs.join("_"),
-                newSimulation = {
-                    name: this.simulationName || this.simulation.title,
-                    configId: this.currentSimulationId};
+                  executeResponses = await Promise.all(
+                      this.processHandlers.map((handler, index) => handler.execute(this.requestBodies[index], this.accessToken))
+                  ),
+                  jobIDs = executeResponses.map(response => response.jobID),
+                  initialStatuses = executeResponses.map(response => response.status),
+                  newSimulationId = jobIDs.join("_"),
+                  newSimulation = {
+                      name: this.simulationName || this.simulation.title,
+                      configId: this.currentSimulationId};
 
             if (jobIDs.some(ID => !ID)) {
                 console.warn("Not all job IDs returned from process execution.");

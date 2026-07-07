@@ -90,9 +90,9 @@ export default {
 
             try {
                 const projection = mapCollection.getMapView("2D").getProjection(),
-                    isMetric = projection.getUnits() === "m",
-                    bboxFeature = this.source.getFeatures().find(feature => feature.get("id") === "simulation-area"),
-                    sideLengthExceeded = this.checkBboxSideLengthConstraint(bboxFeature, isMetric);
+                      isMetric = projection.getUnits() === "m",
+                      bboxFeature = this.source.getFeatures().find(feature => feature.get("id") === "simulation-area"),
+                      sideLengthExceeded = this.checkBboxSideLengthConstraint(bboxFeature, isMetric);
 
                 return {sideLengthExceeded};
             }
@@ -319,7 +319,7 @@ export default {
          */
         modifyBBoxByBuffer (val) {
             const hasFeatures = this.source.getFeatures().length > 0,
-                scenarioFeature = this.source.getFeatures().filter(feature => feature.get("id") !== "simulation-area")[0];
+                  scenarioFeature = this.source.getFeatures().filter(feature => feature.get("id") !== "simulation-area")[0];
 
             this.bufferVal = parseFloat(val) >= 0 ? val : "0";
 
@@ -399,8 +399,8 @@ export default {
 
             if (geometry?.getType() === "Polygon") {
                 const coordinates = geometry.getCoordinates()[0],
-                    height = this.getDistanceBetweenPoints(coordinates[0], coordinates[1], isMetric),
-                    width = this.getDistanceBetweenPoints(coordinates[1], coordinates[2], isMetric);
+                      height = this.getDistanceBetweenPoints(coordinates[0], coordinates[1], isMetric),
+                      width = this.getDistanceBetweenPoints(coordinates[1], coordinates[2], isMetric);
 
                 if (coordinates.length !== 5) {
                     console.warn("Expected 5 coordinates for a rectangle, but got:", coordinates.length);

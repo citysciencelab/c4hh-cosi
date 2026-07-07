@@ -62,8 +62,8 @@ export default {
          */
         prepareShowAllResults (categoryItem) {
             const side = this.currentSide,
-                interfaceToAdd = {id: this.limitedSortedSearchResults.results.categoryProvider[categoryItem], searchCategory: categoryItem},
-                exists = this.showAllResultsSearchInterfaceInstances.find(searchInterface => searchInterface.id === interfaceToAdd.id);
+                  interfaceToAdd = {id: this.limitedSortedSearchResults.results.categoryProvider[categoryItem], searchCategory: categoryItem},
+                  exists = this.showAllResultsSearchInterfaceInstances.find(searchInterface => searchInterface.id === interfaceToAdd.id);
 
             if (!exists) {
                 const currentInterfaces = [...this.showAllResultsSearchInterfaceInstances];

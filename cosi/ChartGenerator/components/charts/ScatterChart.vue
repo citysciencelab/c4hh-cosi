@@ -78,7 +78,7 @@ export default {
                     callbacks: {
                         title: (item, data) => {
                             const dataset = data.datasets[item[0].datasetIndex],
-                                d = dataset.data[item[0].index];
+                                  d = dataset.data[item[0].index];
                             let title = dataset.label;
 
                             if (dataset.type !== "line") {
@@ -89,10 +89,10 @@ export default {
                         },
                         footer: (item, data) => {
                             const dataset = data.datasets[item[0].datasetIndex],
-                                d = dataset.data[item[0].index],
-                                stdDev = Math.round((d.stdDev + Number.EPSILON) * 1000) / 1000,
-                                corr = Math.round((dataset.correlation + Number.EPSILON) * 1000) / 1000,
-                                footer = dataset.type === "line" ? `Korrelation: ${corr}` : `Abweichung: ${stdDev}`;
+                                  d = dataset.data[item[0].index],
+                                  stdDev = Math.round((d.stdDev + Number.EPSILON) * 1000) / 1000,
+                                  corr = Math.round((dataset.correlation + Number.EPSILON) * 1000) / 1000,
+                                  footer = dataset.type === "line" ? `Korrelation: ${corr}` : `Abweichung: ${stdDev}`;
 
                             return footer;
                         }
