@@ -83,7 +83,7 @@ export default {
          */
         showDeleteWaypoint () {
             return this.isWaypointSet
-            || (this.countWaypoints > 2 && this.waypoint.coordinates.length === 0);
+                || (this.countWaypoints > 2 && this.waypoint.coordinates.length === 0);
         },
         /**
          * Computed value to determine whether move-up button should be shown for this waypoint
@@ -91,8 +91,8 @@ export default {
          */
         showMoveWaypointUp () {
             return this.isWaypointSet
-            && this.activeRoutingToolOption !== "TSR"
-            && this.waypoint.index !== 0;
+                && this.activeRoutingToolOption !== "TSR"
+                && this.waypoint.index !== 0;
         },
         /**
          * Computed value to determine whether move-down button should be shown for this waypoint
@@ -100,8 +100,8 @@ export default {
          */
         showMoveWaypointDown () {
             return this.isWaypointSet
-            && this.activeRoutingToolOption !== "TSR"
-            && this.waypoint.index !== this.countWaypoints - 1;
+                && this.activeRoutingToolOption !== "TSR"
+                && this.waypoint.index !== this.countWaypoints - 1;
         }
     },
     watch: {
@@ -250,8 +250,8 @@ export default {
                 return false;
             }
             const [latString, lngString] = this.search.split(", "),
-                lat = Number(latString),
-                lng = Number(lngString);
+                  lat = Number(latString),
+                  lng = Number(lngString);
 
             if (!latString || !lngString) {
                 return false;

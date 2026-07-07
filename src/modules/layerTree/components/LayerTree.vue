@@ -73,8 +73,8 @@ export default {
          */
         showLayerSelection () {
             const allLayerConfigsStructured = this.allLayerConfigsStructured(treeSubjectsKey),
-                subjectDataLayerConfs = this.sort(this.reverseLayer ? this.reverseAllLayerConfigs(allLayerConfigsStructured) : allLayerConfigsStructured),
-                baselayerConfs = this.allLayerConfigsStructured(treeBaselayersKey);
+                  subjectDataLayerConfs = this.sort(this.reverseLayer ? this.reverseAllLayerConfigs(allLayerConfigsStructured) : allLayerConfigsStructured),
+                  baselayerConfs = this.allLayerConfigsStructured(treeBaselayersKey);
 
             this.changeCurrentComponent({type: this.layerSelectionType, side: this.menuSide, props: {name: this.layerSelectionName}});
             this.navigateForward({lastFolderName: "root", subjectDataLayerConfs, baselayerConfs});

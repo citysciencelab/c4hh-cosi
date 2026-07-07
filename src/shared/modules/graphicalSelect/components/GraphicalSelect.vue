@@ -279,7 +279,7 @@ export default {
          */
         handleLineDrawEnd: function (evt) {
             const feature = evt.feature,
-                geometry = feature.getGeometry();
+                  geometry = feature.getGeometry();
 
             if (!geometry) {
                 return;
@@ -334,7 +334,7 @@ export default {
          */
         createDrawInteraction: function () {
             const geometryFunction = createBox(),
-                drawtype = this.selectedOptionData;
+                  drawtype = this.selectedOptionData;
 
             this.resetLineState();
 

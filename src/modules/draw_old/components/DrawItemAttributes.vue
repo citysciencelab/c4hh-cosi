@@ -113,8 +113,8 @@ export default {
          */
         unifyAttributeToFeature (feature, keyList) {
             const attributes = Object.assign({}, feature.getProperties()),
-                newAttr = {},
-                gfiAttributes = {};
+                  newAttr = {},
+                  gfiAttributes = {};
 
             delete attributes.masterportal_attributes;
             delete attributes.geometries;
@@ -261,7 +261,7 @@ export default {
                     return;
                 }
                 const key = attributeRow.key,
-                    value = attributeRow.value;
+                      value = attributeRow.value;
 
                 attributes[key] = value;
             });

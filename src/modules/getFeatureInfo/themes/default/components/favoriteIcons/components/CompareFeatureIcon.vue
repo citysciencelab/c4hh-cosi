@@ -62,7 +62,7 @@ export default {
             }
             else {
                 const idLayer = this.gfiFeature.layerId,
-                    idFeature = this.gfiFeature.featureId;
+                      idFeature = this.gfiFeature.featureId;
 
                 this.removeFeature({idFeature, idLayer});
             }

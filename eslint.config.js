@@ -126,6 +126,7 @@ export default [
             "prefer-numeric-literals": "error",
             "prefer-rest-params": "error",
             "radix": "error",
+            "@stylistic/indent": ["error", 4, {"SwitchCase": 1}],
             "spaced-comment": "error",
             "yoda": "error",
             // changes for eslint v9
@@ -271,6 +272,7 @@ export default [
             "vue/no-v-for-template-key-on-child": ["off"],
             "vue/no-deprecated-v-bind-sync": ["off"],
             "vue/html-indent": ["error", 4],
+            "vue/script-indent": ["error", 4, {"baseIndent": 0, "switchCase": 1}],
             "vue/html-closing-bracket-newline": [
                 "error",
                 {
@@ -409,6 +411,12 @@ export default [
             ]
 
 
+        }
+    },
+    {
+        files: ["**/*.vue"],
+        rules: {
+            "@stylistic/indent": "off"
         }
     },
     {

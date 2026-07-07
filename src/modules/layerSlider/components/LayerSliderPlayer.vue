@@ -49,7 +49,7 @@ export default {
          */
         forwardLayer: function () {
             const index = this.activeLayer.index,
-                max = this.layerIds.length - 1;
+                  max = this.layerIds.length - 1;
 
             if (index > -1 && index < max) {
                 this.setActiveIndex(index + 1);
@@ -65,7 +65,7 @@ export default {
          */
         backwardLayer: function () {
             const index = this.activeLayer.index,
-                max = this.layerIds.length - 1;
+                  max = this.layerIds.length - 1;
 
             if (index > 0) {
                 this.setActiveIndex(index - 1);

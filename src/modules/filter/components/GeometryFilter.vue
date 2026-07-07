@@ -184,8 +184,8 @@ export default {
                 return;
             }
             const newValue = isNaN(parseInt(val, 10)) ? this.defaultBuffer : val,
-                jstsGeom = this.ol3Parser.read(this.initFeatureGeometry),
-                buffered = BufferOp.bufferOp(jstsGeom, newValue);
+                  jstsGeom = this.ol3Parser.read(this.initFeatureGeometry),
+                  buffered = BufferOp.bufferOp(jstsGeom, newValue);
 
             if (newValue <= 0) {
                 return;
@@ -348,7 +348,7 @@ export default {
 
             this.draw.on("drawend", (evt) => {
                 const feature = evt.feature,
-                    geometry = this.getGeometryOnDrawEnd(feature, drawType, this.buffer);
+                      geometry = this.getGeometryOnDrawEnd(feature, drawType, this.buffer);
 
                 this.initFeatureGeometry = feature.getGeometry();
                 this.setGeometryAtFeature(feature, geometry, this.invertGeometry);
@@ -397,13 +397,13 @@ export default {
          */
         getGeometries () {
             const result = [],
-                possibleGeometries = {
-                    "Polygon": this.$t("common:modules.filter.geometryFilter.geometryTypes.polygon"),
-                    "Rectangle": this.$t("common:modules.filter.geometryFilter.geometryTypes.rectangle"),
-                    "Circle": this.$t("common:modules.filter.geometryFilter.geometryTypes.circle"),
-                    "LineString": this.$t("common:modules.filter.geometryFilter.geometryTypes.lineString")
-                },
-                additionalGeometries = this.prepareAdditionalGeometries(this.additionalGeometries);
+                  possibleGeometries = {
+                      "Polygon": this.$t("common:modules.filter.geometryFilter.geometryTypes.polygon"),
+                      "Rectangle": this.$t("common:modules.filter.geometryFilter.geometryTypes.rectangle"),
+                      "Circle": this.$t("common:modules.filter.geometryFilter.geometryTypes.circle"),
+                      "LineString": this.$t("common:modules.filter.geometryFilter.geometryTypes.lineString")
+                  },
+                  additionalGeometries = this.prepareAdditionalGeometries(this.additionalGeometries);
 
             this.geometries.forEach(type => {
                 if (Object.prototype.hasOwnProperty.call(possibleGeometries, type)) {
@@ -476,7 +476,7 @@ export default {
         getGeometryOnDrawEnd (feature, type, buffer) {
             if (type === "LineString") {
                 const jstsGeom = this.ol3Parser.read(feature.getGeometry()),
-                    buffered = BufferOp.bufferOp(jstsGeom, buffer);
+                      buffered = BufferOp.bufferOp(jstsGeom, buffer);
 
                 return this.ol3Parser.write(buffered);
             }

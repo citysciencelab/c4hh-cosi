@@ -4,16 +4,16 @@ import {mainMenu, secondaryMenu} from "@shared/js/utils/constants.js";
 import {clampAndApplyHeight, clampAndApplyWidth, dimensionValidator} from "@shared/modules/resize/js/resizeHandleHelper.js";
 
 const handleSigns = {
-        topLeft: [-1, -1],
-        top: [0, -1],
-        topRight: [1, -1],
-        right: [1, 0],
-        bottomRight: [1, 1],
-        bottom: [0, 1],
-        bottomLeft: [-1, 1],
-        left: [-1, 0]
-    },
-    minDistanceBetweenMenus = 300;
+          topLeft: [-1, -1],
+          top: [0, -1],
+          topRight: [1, -1],
+          right: [1, 0],
+          bottomRight: [1, 1],
+          bottom: [0, 1],
+          bottomLeft: [-1, 1],
+          left: [-1, 0]
+      },
+      minDistanceBetweenMenus = 300;
 
 export default {
     name: "ResizeHandle",
@@ -108,7 +108,7 @@ export default {
          */
         cursorClass () {
             const indexWithoutRotation = Object.keys(handleSigns).indexOf(this.handlePosition),
-                indexAfterRotation = Math.floor(Math.abs(this.initialRotation + Math.PI / 8) / (Math.PI / 4));
+                  indexAfterRotation = Math.floor(Math.abs(this.initialRotation + Math.PI / 8) / (Math.PI / 4));
 
             return [
                 "nwse-resize",
@@ -259,9 +259,9 @@ export default {
          */
         onMouseMove (event) {
             const clientX = event.touches ? event.touches[0].clientX : event.clientX,
-                clientY = event.touches ? event.touches[0].clientY : event.clientY,
-                deltaX = clientX - this.initialCursorPosition.x,
-                deltaY = clientY - this.initialCursorPosition.y;
+                  clientY = event.touches ? event.touches[0].clientY : event.clientY,
+                  deltaX = clientX - this.initialCursorPosition.x,
+                  deltaY = clientY - this.initialCursorPosition.y;
 
             if (!event.touches && event.buttons === 0) {
                 this.onMouseUp();
@@ -357,8 +357,8 @@ export default {
          */
         setNewPosition () {
             const deltaWidth = this.initialDimensions.width - this.handleElement.offsetWidth,
-                deltaHeight = this.initialDimensions.height - this.handleElement.offsetHeight,
-                [signX, signY] = handleSigns[this.handlePosition];
+                  deltaHeight = this.initialDimensions.height - this.handleElement.offsetHeight,
+                  [signX, signY] = handleSigns[this.handlePosition];
             let {left, top} = this.initialPosition;
 
             // Disposition correction 1

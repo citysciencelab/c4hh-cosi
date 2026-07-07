@@ -89,7 +89,7 @@ export default {
             handler (newVal) {
                 if (newVal && newVal[treeSubjectsKey] && Array.isArray(newVal[treeSubjectsKey].elements)) {
                     const rootLayerConfig = newVal[treeSubjectsKey].elements,
-                        currentFolderCount = rootLayerConfig.filter(conf => conf.type === "folder").length;
+                          currentFolderCount = rootLayerConfig.filter(conf => conf.type === "folder").length;
 
                     if (currentFolderCount !== this.rootFolderCount) {
                         this.rootFolderCount = currentFolderCount;

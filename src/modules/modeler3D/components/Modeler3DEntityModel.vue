@@ -76,31 +76,31 @@ export default {
 
         showExtrudedHeight () {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId);
+                  entity = entities.getById(this.currentModelId);
 
             return Boolean(entity?.polygon && entity?.wasDrawn);
         },
         showDimensions () {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId);
+                  entity = entities.getById(this.currentModelId);
 
             return Boolean(entity?.polygon?.rectangle);
         },
         showPositioning () {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId);
+                  entity = entities.getById(this.currentModelId);
 
             return Boolean(entity?.polygon || !entity?.wasDrawn);
         },
         showWidth () {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId);
+                  entity = entities.getById(this.currentModelId);
 
             return Boolean(entity?.polyline && entity?.wasDrawn);
         },
         showFillColor () {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId);
+                  entity = entities.getById(this.currentModelId);
 
             return Boolean(entity?.polygon && entity?.wasDrawn);
         },
@@ -178,10 +178,10 @@ export default {
         editedFillColor: {
             get () {
                 const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                    entity = entities?.getById(this.currentModelId),
-                    entityType = this.getEntityType(entity),
-                    color = entity[entityType].material.color.getValue(),
-                    colorToByte = [Cesium.Color.floatToByte(color.red), Cesium.Color.floatToByte(color.green), Cesium.Color.floatToByte(color.blue)];
+                      entity = entities?.getById(this.currentModelId),
+                      entityType = this.getEntityType(entity),
+                      color = entity[entityType].material.color.getValue(),
+                      colorToByte = [Cesium.Color.floatToByte(color.red), Cesium.Color.floatToByte(color.green), Cesium.Color.floatToByte(color.blue)];
 
                 return convertColor(colorToByte, "hex");
             },
@@ -193,9 +193,9 @@ export default {
         editedStrokeColor: {
             get () {
                 const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                    entity = entities?.getById(this.currentModelId),
-                    outlineColor = entity.polygon ? entity?.polygon?.outlineColor.getValue() : entity?.originalColor.getValue(),
-                    colorToByte = [Cesium.Color.floatToByte(outlineColor.red), Cesium.Color.floatToByte(outlineColor.green), Cesium.Color.floatToByte(outlineColor.blue)];
+                      entity = entities?.getById(this.currentModelId),
+                      outlineColor = entity.polygon ? entity?.polygon?.outlineColor.getValue() : entity?.originalColor.getValue(),
+                      colorToByte = [Cesium.Color.floatToByte(outlineColor.red), Cesium.Color.floatToByte(outlineColor.green), Cesium.Color.floatToByte(outlineColor.blue)];
 
                 return convertColor(colorToByte, "hex");
             },
@@ -224,8 +224,8 @@ export default {
         },
         selectedModelName () {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities?.getById(this.currentModelId),
-                drawName = this.drawName !== "" ? this.drawName : entity?.name;
+                  entity = entities?.getById(this.currentModelId),
+                  drawName = this.drawName !== "" ? this.drawName : entity?.name;
 
             return drawName;
         }
@@ -269,7 +269,7 @@ export default {
         },
         isDragging () {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId);
+                  entity = entities.getById(this.currentModelId);
 
 
             if (entity?.polygon?.rectangle) {
@@ -376,7 +376,7 @@ export default {
          */
         checkedAdapt (value) {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId);
+                  entity = entities.getById(this.currentModelId);
 
             if (entity) {
                 entity.clampToGround = value;
@@ -390,7 +390,7 @@ export default {
          */
         updateExtrudedHeight () {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId);
+                  entity = entities.getById(this.currentModelId);
 
             if (entity && entity.polygon instanceof Cesium.PolygonGraphics) {
                 entity.polygon.extrudedHeight = this.extrudedHeight + entity.polygon.height;
@@ -406,28 +406,28 @@ export default {
          */
         rotate () {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId),
-                modelOrigin = this.wasDrawn ? this.drawnModels : this.importedModels,
-                modelFromState = modelOrigin.find(ent => ent.id === entity.id),
-                heading = Cesium.Math.toRadians(this.rotation),
-                position = entity.wasDrawn ? entity.polygon.hierarchy.getValue().positions[0] : entity.position.getValue(),
-                orientationMatrix = Cesium.Transforms.headingPitchRollQuaternion(
-                    position,
-                    new Cesium.HeadingPitchRoll(heading, 0, 0)
-                );
+                  entity = entities.getById(this.currentModelId),
+                  modelOrigin = this.wasDrawn ? this.drawnModels : this.importedModels,
+                  modelFromState = modelOrigin.find(ent => ent.id === entity.id),
+                  heading = Cesium.Math.toRadians(this.rotation),
+                  position = entity.wasDrawn ? entity.polygon.hierarchy.getValue().positions[0] : entity.position.getValue(),
+                  orientationMatrix = Cesium.Transforms.headingPitchRollQuaternion(
+                      position,
+                      new Cesium.HeadingPitchRoll(heading, 0, 0)
+                  );
 
             if (modelFromState && entity) {
                 modelFromState.heading = this.rotation;
 
                 if (entity.wasDrawn) {
                     const positions = entity.polygon.hierarchy.getValue().positions,
-                        center = this.getCenterFromGeometry(entity),
-                        rotatedPositions = positions.map(pos => {
-                            const relativePosition = Cesium.Cartesian3.subtract(pos, center),
-                                rotatedRelativePosition = Cesium.Matrix3.multiplyByVector(orientationMatrix, relativePosition);
+                          center = this.getCenterFromGeometry(entity),
+                          rotatedPositions = positions.map(pos => {
+                              const relativePosition = Cesium.Cartesian3.subtract(pos, center),
+                                    rotatedRelativePosition = Cesium.Matrix3.multiplyByVector(orientationMatrix, relativePosition);
 
-                            return Cesium.Cartesian3.add(rotatedRelativePosition, center, new Cesium.Cartesian3());
-                        });
+                              return Cesium.Cartesian3.add(rotatedRelativePosition, center, new Cesium.Cartesian3());
+                          });
 
                     entity.polygon.hierarchy = new Cesium.PolygonHierarchy(rotatedPositions);
                 }

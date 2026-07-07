@@ -87,8 +87,8 @@ export default {
         currentModelId (newId, oldId) {
             if (!this.isDrawing) {
                 const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                    newEntity = entities.getById(newId),
-                    oldEntity = entities.getById(oldId);
+                      newEntity = entities.getById(newId),
+                      oldEntity = entities.getById(oldId);
 
                 if (oldEntity) {
                     this.resetOldEntity(oldEntity);
@@ -186,7 +186,7 @@ export default {
         resetDrawnEntity (entity) {
             if (entity.polygon) {
                 const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                    outlines = entities.values.filter(ent => ent.outline && ent.polyline);
+                      outlines = entities.values.filter(ent => ent.outline && ent.polyline);
 
                 outlines.forEach(outline => entities.remove(outline));
                 entity.polygon.hierarchy = new Cesium.ConstantProperty(new Cesium.PolygonHierarchy(this.activeShapePoints));
@@ -263,8 +263,8 @@ export default {
                 return;
             }
             const scene = mapCollection.getMap("3D").getCesiumScene(),
-                picked = scene.drillPick(event.endPosition).filter(pickedObj => !pickedObj?.id?.label && !pickedObj?.id?.outline),
-                entity = picked[0]?.id ?? picked[0]?.primitive?.id;
+                  picked = scene.drillPick(event.endPosition).filter(pickedObj => !pickedObj?.id?.label && !pickedObj?.id?.outline),
+                  entity = picked[0]?.id ?? picked[0]?.primitive?.id;
 
             if (Cesium.defined(entity) && entity instanceof Cesium.Entity) {
                 if (this.currentModelId && entity.id === this.currentModelId || entity.cylinder) {
@@ -295,14 +295,14 @@ export default {
 
             if (event) {
                 const scene = mapCollection.getMap("3D").getCesiumScene(),
-                    picked = scene.drillPick(event.position).filter(pickedObj => !pickedObj?.id?.label && !pickedObj?.id?.outline);
+                      picked = scene.drillPick(event.position).filter(pickedObj => !pickedObj?.id?.label && !pickedObj?.id?.outline);
 
                 entity = picked[0]?.id ?? picked[0]?.primitive?.id;
             }
 
             if (entity instanceof Cesium.Entity || !event) {
                 const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                    scene = mapCollection.getMap("3D").getCesiumScene();
+                      scene = mapCollection.getMap("3D").getCesiumScene();
 
                 this.setIsDragging(true);
                 scene.screenSpaceCameraController.enableInputs = false;
@@ -314,7 +314,7 @@ export default {
 
                 if (entity?.cylinder) {
                     const geometry = entities.getById(this.currentModelId),
-                        position = geometry.polygon ? geometry.polygon.hierarchy.getValue().positions[entity.positionIndex] : geometry.polyline.positions.getValue()[entity.positionIndex];
+                          position = geometry.polygon ? geometry.polygon.hierarchy.getValue().positions[entity.positionIndex] : geometry.polyline.positions.getValue()[entity.positionIndex];
 
                     this.currentPosition = position;
                     this.originalPosition = {
@@ -360,7 +360,7 @@ export default {
             }
             let entity = null;
             const scene = mapCollection.getMap("3D").getCesiumScene(),
-                picked = scene.drillPick(event.position).filter(pickedObj => !pickedObj?.id?.label && !pickedObj?.id?.outline);
+                  picked = scene.drillPick(event.position).filter(pickedObj => !pickedObj?.id?.label && !pickedObj?.id?.outline);
 
             if (!Cesium.defined(picked[0])) {
                 return;
@@ -374,10 +374,10 @@ export default {
 
             else if (this.hideObjects && picked[0] instanceof Cesium.Cesium3DTileFeature) {
                 const features = getGfiFeatures.getGfiFeaturesByTileFeature(picked[0]),
-                    gmlId = features[0]?.getProperties()[this.gmlIdPath],
-                    tileSetLayers = this.updateAllLayers ?
-                        layerCollection.getLayers().filter(layer => layer.get("typ") === "TileSet3D") :
-                        layerCollection.getLayers().filter(layer => layer.get("typ") === "TileSet3D" && layer.get("id") === picked[0].tileset.layerReferenceId);
+                      gmlId = features[0]?.getProperties()[this.gmlIdPath],
+                      tileSetLayers = this.updateAllLayers ?
+                          layerCollection.getLayers().filter(layer => layer.get("typ") === "TileSet3D") :
+                          layerCollection.getLayers().filter(layer => layer.get("typ") === "TileSet3D" && layer.get("id") === picked[0].tileset.layerReferenceId);
 
                 tileSetLayers.forEach(layer => layer.addToHiddenObjects([gmlId], this.updateAllLayers));
 
@@ -401,15 +401,15 @@ export default {
             }
 
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId),
-                cylinder = entities.getById(this.cylinderId);
+                  entity = entities.getById(this.currentModelId),
+                  cylinder = entities.getById(this.cylinderId);
 
             if (Cesium.defined(cylinder) && Cesium.defined(entity)) {
                 const scene = mapCollection.getMap("3D").getCesiumScene();
 
                 if (entity.clampToGround) {
                     const ray = scene.camera.getPickRay(event.endPosition),
-                        position = scene.globe.pick(ray, scene);
+                          position = scene.globe.pick(ray, scene);
 
                     if (this.activeShapePoints[cylinder.positionIndex] !== position) {
                         this.activeShapePoints.splice(cylinder.positionIndex, 1, scene.globe.pick(ray, scene));
@@ -418,7 +418,7 @@ export default {
                 }
                 else {
                     const transformedCoordinates = crs.transformFromMapProjection(mapCollection.getMap("3D").getOlMap(), "EPSG:4326", [this.mouseCoordinate[0], this.mouseCoordinate[1]]),
-                        cartographic = Cesium.Cartographic.fromDegrees(transformedCoordinates[0], transformedCoordinates[1]);
+                          cartographic = Cesium.Cartographic.fromDegrees(transformedCoordinates[0], transformedCoordinates[1]);
 
                     cartographic.height = scene.sampleHeight(cartographic, [cylinder, entity]);
 
@@ -445,12 +445,12 @@ export default {
             }
 
             const scene = mapCollection.getMap("3D").getCesiumScene(),
-                posRay = scene.camera.getPickRay(event.endPosition),
-                position = scene.globe.pick(posRay, scene),
-                anchorRay = scene.camera.getPickRay(event.startPosition),
-                anchor = this.useAnchorMove ? scene.globe.pick(anchorRay, scene) : null,
-                entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(this.currentModelId);
+                  posRay = scene.camera.getPickRay(event.endPosition),
+                  position = scene.globe.pick(posRay, scene),
+                  anchorRay = scene.camera.getPickRay(event.startPosition),
+                  anchor = this.useAnchorMove ? scene.globe.pick(anchorRay, scene) : null,
+                  entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
+                  entity = entities.getById(this.currentModelId);
 
             if (!Cesium.defined(position) || !Cesium.defined(entity)) {
                 return;
@@ -478,8 +478,8 @@ export default {
                 return;
             }
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                scene = mapCollection.getMap("3D").getCesiumScene(),
-                entity = entities.getById(this.currentModelId);
+                  scene = mapCollection.getMap("3D").getCesiumScene(),
+                  entity = entities.getById(this.currentModelId);
 
             this.eventHandler?.removeInputAction(Cesium.ScreenSpaceEventType.LEFT_UP);
             this.eventHandler?.setInputAction(this.cursorCheck, Cesium.ScreenSpaceEventType.MOUSE_MOVE);
@@ -543,7 +543,7 @@ export default {
             await this.$nextTick();
 
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                movedEntity = entityObject.attachedEntityId ? entities.values.find(val => val.positionIndex === entityObject.entityId) : entities.getById(entityObject.entityId);
+                  movedEntity = entityObject.attachedEntityId ? entities.values.find(val => val.positionIndex === entityObject.entityId) : entities.getById(entityObject.entityId);
 
             if (!movedEntity) {
                 return;
@@ -589,7 +589,7 @@ export default {
          */
         highlightEntity (entity) {
             const silhouetteColor = this.highlightStyle.silhouetteColor,
-                silhouetteSize = this.highlightStyle.silhouetteSize;
+                  silhouetteSize = this.highlightStyle.silhouetteSize;
 
             if (entity.wasDrawn) {
                 if (entity.polygon) {
@@ -617,7 +617,7 @@ export default {
          */
         generateOutlines (entity) {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                positions = entity.polygon.hierarchy.getValue().positions;
+                  positions = entity.polygon.hierarchy.getValue().positions;
 
             entities.add({outline: true, polyline: {
                 width: 4,
@@ -661,7 +661,7 @@ export default {
          */
         showObject (object) {
             const tileSetLayers = layerCollection.getLayers().filter(layer => layer.get("typ") === "TileSet3D"),
-                index = this.hiddenObjects.findIndex(obj => obj.name === object.name);
+                  index = this.hiddenObjects.findIndex(obj => obj.name === object.name);
 
             tileSetLayers.forEach(tileSetLayer => {
                 tileSetLayer.showObjects([object.name]);
@@ -674,14 +674,14 @@ export default {
          */
         positionPovCamera () {
             const scene = mapCollection.getMap("3D").getCesiumScene(),
-                transformedCoordinates = crs.transformFromMapProjection(mapCollection.getMap("3D").getOlMap(), "EPSG:4326", this.clickCoordinate),
-                currentPosition = scene.camera.positionCartographic,
-                destination = new Cesium.Cartographic(
-                    Cesium.Math.toRadians(transformedCoordinates[0]),
-                    Cesium.Math.toRadians(transformedCoordinates[1])
-                ),
-                entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                povCylinder = entities.getById(this.cylinderId);
+                  transformedCoordinates = crs.transformFromMapProjection(mapCollection.getMap("3D").getOlMap(), "EPSG:4326", this.clickCoordinate),
+                  currentPosition = scene.camera.positionCartographic,
+                  destination = new Cesium.Cartographic(
+                      Cesium.Math.toRadians(transformedCoordinates[0]),
+                      Cesium.Math.toRadians(transformedCoordinates[1])
+                  ),
+                  entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
+                  povCylinder = entities.getById(this.cylinderId);
 
             this.originalCursorStyle = document.getElementById("map").style.cursor;
             this.currentCartesian = Cesium.Cartographic.toCartesian(currentPosition);
@@ -819,9 +819,9 @@ export default {
             }
 
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                transformedCoordinates = crs.transformFromMapProjection(mapCollection.getMap("3D").getOlMap(), "EPSG:4326", [this.mouseCoordinate[0], this.mouseCoordinate[1]]),
-                cartographic = Cesium.Cartographic.fromDegrees(transformedCoordinates[0], transformedCoordinates[1]),
-                povCylinder = entities.getById(this.cylinderId);
+                  transformedCoordinates = crs.transformFromMapProjection(mapCollection.getMap("3D").getOlMap(), "EPSG:4326", [this.mouseCoordinate[0], this.mouseCoordinate[1]]),
+                  cartographic = Cesium.Cartographic.fromDegrees(transformedCoordinates[0], transformedCoordinates[1]),
+                  povCylinder = entities.getById(this.cylinderId);
             let currentCartesian;
 
             if (cartographic) {

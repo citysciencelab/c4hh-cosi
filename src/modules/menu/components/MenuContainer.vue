@@ -152,7 +152,7 @@ export default {
          */
         hideElementsForBiggerMenu (menuPercentWidth) {
             const hideElementBreakPoint = document.documentElement.clientWidth > 1000 ? 0.7 : 0.5,
-                footer = document.getElementById("module-portal-footer");
+                  footer = document.getElementById("module-portal-footer");
 
             this.setLayerPillsHidden(menuPercentWidth >= hideElementBreakPoint);
             if (footer) {

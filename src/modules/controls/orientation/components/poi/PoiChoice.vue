@@ -15,7 +15,7 @@ export default {
         ...mapGetters("Controls/Orientation", ["poiMode", "customPosition", "iFrameGeolocationEnabled"]),
         choices () {
             const inIframe = window.self !== window.top,
-                iFrameGeolocationEnabled = this.iFrameGeolocationEnabled === true;
+                  iFrameGeolocationEnabled = this.iFrameGeolocationEnabled === true;
 
             if (inIframe && !iFrameGeolocationEnabled) {
                 this.setPoiMode("customPosition");
@@ -65,7 +65,7 @@ export default {
          */
         show () {
             const el = document.querySelector(".modal.poi-choice"),
-                backdrop = document.querySelector(".modal-backdrop");
+                  backdrop = document.querySelector(".modal-backdrop");
 
             if (el) {
                 el.style.display = "block";

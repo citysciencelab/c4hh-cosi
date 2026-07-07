@@ -161,7 +161,7 @@ export default {
          */
         selectedFilters () {
             const selectedRegions = this.selectedRegions.map(region => region.label),
-                selectedDates = this.selectedDates.map(dates => dates.label);
+                  selectedDates = this.selectedDates.map(dates => dates.label);
 
             return [...new Set([...this.selectedStatisticsNames, ...selectedRegions, ...selectedDates])];
         },
@@ -491,14 +491,14 @@ export default {
             }
 
             const csv = {},
-                csvHeader = [""],
-                csvSubHeader = ["Gebiet"];
+                  csvHeader = [""],
+                  csvSubHeader = ["Gebiet"];
             let elements = [];
 
             Object.entries(this.statisticsData).forEach(([statisticName, statisticValues]) => {
                 const statisticAreaNames = Object.keys(statisticValues),
-                    statisticTimeLabels = Object.keys(statisticValues[statisticAreaNames[0]]).reverse(),
-                    amount = statisticTimeLabels.length;
+                      statisticTimeLabels = Object.keys(statisticValues[statisticAreaNames[0]]).reverse(),
+                      amount = statisticTimeLabels.length;
 
                 csvSubHeader.push(...statisticTimeLabels);
                 for (let i = 0; i < amount; i++) {
@@ -548,10 +548,10 @@ export default {
                 return {};
             }
             const layerId = level.layerId,
-                timeAttribute = level.mappingFilter.timeAttribute.attrName,
-                timeInputFormat = level.mappingFilter.timeAttribute.inputFormat,
-                timeOutputFormat = level.mappingFilter.timeAttribute.outputFormat,
-                regionNameAttribute = level.mappingFilter.regionNameAttribute.attrName;
+                  timeAttribute = level.mappingFilter.timeAttribute.attrName,
+                  timeInputFormat = level.mappingFilter.timeAttribute.inputFormat,
+                  timeOutputFormat = level.mappingFilter.timeAttribute.outputFormat,
+                  regionNameAttribute = level.mappingFilter.regionNameAttribute.attrName;
             let uniqueValues = null;
 
             uniqueValues = await FetchDataHandler.getUniqueValues(layerId, [timeAttribute, regionNameAttribute], timeInputFormat, timeOutputFormat);
@@ -600,7 +600,7 @@ export default {
          */
         getChartDirection (regions, differenceMode) {
             const regionsLength = differenceMode === false ? regions.length : regions.length - 1,
-                chartDirectionValue = this.selectedLevel?.chartDirectionValue ? this.selectedLevel?.chartDirectionValue : 5;
+                  chartDirectionValue = this.selectedLevel?.chartDirectionValue ? this.selectedLevel?.chartDirectionValue : 5;
 
             return regionsLength < chartDirectionValue ? "vertical" : "horizontal";
         },
@@ -687,8 +687,8 @@ export default {
          */
         createColorPalette () {
             const key = this.selectableColorPalettes[this.selectedColorPaletteIndex].key,
-                hexPalette = colorbrewer[key][this.numberOfClasses],
-                palette = hexPalette.map(color => convertColor(color, "rgb"));
+                  hexPalette = colorbrewer[key][this.numberOfClasses],
+                  palette = hexPalette.map(color => convertColor(color, "rgb"));
 
             return palette;
         },
@@ -811,7 +811,7 @@ export default {
                 return "";
             }
             const operator = filterMap[filter?.tagName_],
-                dateAttributeName = this.getSelectedLevelDateAttribute(this.selectedLevel)?.attrName;
+                  dateAttributeName = this.getSelectedLevelDateAttribute(this.selectedLevel)?.attrName;
             let parsedFilter = "";
 
             if (!Array.isArray(filter?.conditions)) {
@@ -852,16 +852,16 @@ export default {
             this.setIsFeatureLoaded(false);
 
             const statsKeys = Object.keys(this.selectedStatistics),
-                selectedLayer = this.getRawLayerByLayerId(this.selectedLevel.layerId),
-                selectedLevelRegionNameAttribute = this.getSelectedLevelRegionNameAttributeInDepth(this.selectedLevel.mappingFilter.regionNameAttribute),
-                selectedLevelDateAttribute = this.getSelectedLevelDateAttribute(this.selectedLevel),
-                payload = {
-                    featureTypes: [selectedLayer.featureType],
-                    featureNS: selectedLayer.featureNS,
-                    srsName: this.projection.getCode(),
-                    propertyNames: [...statsKeys, selectedLevelRegionNameAttribute.attrName, selectedLevelDateAttribute.attrName, this.selectedLevel.geometryAttribute],
-                    filter: this.getFilter(regions, dates)
-                };
+                  selectedLayer = this.getRawLayerByLayerId(this.selectedLevel.layerId),
+                  selectedLevelRegionNameAttribute = this.getSelectedLevelRegionNameAttributeInDepth(this.selectedLevel.mappingFilter.regionNameAttribute),
+                  selectedLevelDateAttribute = this.getSelectedLevelDateAttribute(this.selectedLevel),
+                  payload = {
+                      featureTypes: [selectedLayer.featureType],
+                      featureNS: selectedLayer.featureNS,
+                      srsName: this.projection.getCode(),
+                      propertyNames: [...statsKeys, selectedLevelRegionNameAttribute.attrName, selectedLevelDateAttribute.attrName, this.selectedLevel.geometryAttribute],
+                      filter: this.getFilter(regions, dates)
+                  };
 
             let response = null,
                 statFeatures = [];
@@ -969,13 +969,13 @@ export default {
          */
         addHoverInteraction () {
             const map = mapCollection.getMap("2D"),
-                debouncedUpdateInfo = debounce(feature => {
-                    this.updateHoverInfo(feature);
-                }, 200),
-                debouncedClearInfo = debounce(() => {
-                    this.overlay.setPosition(undefined);
-                    this.clearHoverInfo();
-                }, 200);
+                  debouncedUpdateInfo = debounce(feature => {
+                      this.updateHoverInfo(feature);
+                  }, 200),
+                  debouncedClearInfo = debounce(() => {
+                      this.overlay.setPosition(undefined);
+                      this.clearHoverInfo();
+                  }, 200);
 
             if (!map || !this.$refs.hoverInfoOverlay) {
                 return;
@@ -1010,7 +1010,7 @@ export default {
             this.hoverInteraction.on("select", (event) => {
                 if (event.selected.length > 0) {
                     const feature = event.selected[0],
-                        coordinate = event.mapBrowserEvent.coordinate;
+                          coordinate = event.mapBrowserEvent.coordinate;
 
                     this.overlay.setPosition(coordinate);
 
@@ -1033,18 +1033,18 @@ export default {
             }
 
             const {selectedLevel, statisticsData, chosenStatisticName, selectedColumn, $refs, getSelectedLevelRegionNameAttributeInDepth, maxDecimalPlaces} = this,
-                regionNameAttribute = getSelectedLevelRegionNameAttributeInDepth(selectedLevel?.mappingFilter?.regionNameAttribute).attrName,
-                region = feature.get(regionNameAttribute),
-                statName = chosenStatisticName,
-                statisticData = statisticsData?.[statName],
-                rawValue = statisticData?.[region]?.[selectedColumn],
-                groupSeparator = Intl.NumberFormat(i18next.language).formatToParts(1000.1).find(part => part.type === "group").value,
-                decimalSeparator = Intl.NumberFormat(i18next.language).formatToParts(1000.1).find(part => part.type === "decimal").value,
-                overlayEl = $refs.hoverInfoOverlay,
-                titleEl = document.createElement("strong"),
-                lineEl = document.createElement("div"),
-                labelEl = document.createElement("span"),
-                valueEl = document.createElement("span");
+                  regionNameAttribute = getSelectedLevelRegionNameAttributeInDepth(selectedLevel?.mappingFilter?.regionNameAttribute).attrName,
+                  region = feature.get(regionNameAttribute),
+                  statName = chosenStatisticName,
+                  statisticData = statisticsData?.[statName],
+                  rawValue = statisticData?.[region]?.[selectedColumn],
+                  groupSeparator = Intl.NumberFormat(i18next.language).formatToParts(1000.1).find(part => part.type === "group").value,
+                  decimalSeparator = Intl.NumberFormat(i18next.language).formatToParts(1000.1).find(part => part.type === "decimal").value,
+                  overlayEl = $refs.hoverInfoOverlay,
+                  titleEl = document.createElement("strong"),
+                  lineEl = document.createElement("div"),
+                  labelEl = document.createElement("span"),
+                  valueEl = document.createElement("span");
 
             let formattedValue = rawValue;
 
@@ -1130,7 +1130,7 @@ export default {
             this.$nextTick(() => {
                 filteredStatistics.forEach((statistic, idx) => {
                     const ctx = document.createElement("canvas"),
-                        chartContainer = this.$refs[`chart${idx + 1}`];
+                          chartContainer = this.$refs[`chart${idx + 1}`];
 
                     if (!chartContainer) {
                         return;
@@ -1163,7 +1163,7 @@ export default {
          */
         prepareChartData (topic, preparedData, canvas, type, direction, differenceMode, renderSimple = false, renderToModal = false) {
             const canvasTmp = canvas || document.createElement("canvas"),
-                uniqueTopic = renderToModal ? `modal-${topic}` : topic;
+                  uniqueTopic = renderToModal ? `modal-${topic}` : topic;
 
             if (!canvas && this.$refs.chartContainer) {
                 if (this.$refs.chartContainer.hasChildNodes()) {
@@ -1254,9 +1254,9 @@ export default {
          */
         updateChartSize () {
             const chart = document.querySelector(".chart-container"),
-                totalBars = this.allFilteredRegions.length,
-                chartHeight = 400,
-                newHeight = (totalBars - this.barLimit) * 45 + chartHeight;
+                  totalBars = this.allFilteredRegions.length,
+                  chartHeight = 400,
+                  newHeight = (totalBars - this.barLimit) * 45 + chartHeight;
 
             this.canvasSize = chart.style.height = newHeight + "px";
         },
@@ -1315,9 +1315,9 @@ export default {
                 return undefined;
             }
             const regionAttrName = this.getSelectedLevelRegionNameAttributeInDepth(this.selectedLevel?.mappingFilter?.regionNameAttribute)?.attrName,
-                dateAttrName = this.getSelectedLevelDateAttribute(this.selectedLevel)?.attrName,
-                tmpFlattenedRegions = [...this.flattenedRegions].reverse(),
-                allRegions = this.flattenedRegions.find(region => !Object.prototype.hasOwnProperty.call(region, "child"))?.values;
+                  dateAttrName = this.getSelectedLevelDateAttribute(this.selectedLevel)?.attrName,
+                  tmpFlattenedRegions = [...this.flattenedRegions].reverse(),
+                  allRegions = this.flattenedRegions.find(region => !Object.prototype.hasOwnProperty.call(region, "child"))?.values;
 
             if (regions.length === allRegions.length) {
                 if (dates.length === this.dates.length) {
@@ -1365,7 +1365,7 @@ export default {
          */
         getTableData (statisticsData, statisticName = undefined) {
             const headers = [],
-                data = [];
+                  data = [];
 
             if (typeof statisticName !== "undefined" && !isObject(statisticsData) || !Object.keys(statisticsData).length) {
                 return [];
@@ -1425,10 +1425,10 @@ export default {
          */
         prepareStatisticsData (features, statistics, regions, dates, dateAttribute, regionAttribute, differenceMode) {
             const regionKey = regionAttribute.attrName,
-                dateKey = dateAttribute.attrName,
-                refRegionValues = {},
-                refDateValues = {},
-                data = {};
+                  dateKey = dateAttribute.attrName,
+                  refRegionValues = {},
+                  refDateValues = {},
+                  data = {};
 
             if (!differenceMode || typeof differenceMode === "undefined") {
                 this.fixedColumn = undefined;
@@ -1454,9 +1454,9 @@ export default {
                 });
                 features.forEach(feature => {
                     const region = feature.properties[regionKey],
-                        date = feature.properties[dateKey],
-                        formatedDate = dayjs(date).format(dateAttribute.outputFormat),
-                        value = parseFloat(feature?.properties[statsKey]);
+                          date = feature.properties[dateKey],
+                          formatedDate = dayjs(date).format(dateAttribute.outputFormat),
+                          value = parseFloat(feature?.properties[statsKey]);
 
                     if (differenceMode === "region" && region === this.selectedReferenceData?.value) {
                         refRegionValues[stat][formatedDate] = value;
@@ -1514,10 +1514,10 @@ export default {
          */
         getChartDataOutOfDifference (features, statistics, regions, dates, dateAttribute, regionAttribute, differenceMode) {
             const regionKey = regionAttribute.attrName,
-                dateKey = dateAttribute.attrName,
-                refRegionValues = {},
-                refDateValues = {},
-                data = {};
+                  dateKey = dateAttribute.attrName,
+                  refRegionValues = {},
+                  refDateValues = {},
+                  data = {};
 
             statistics.forEach(stat => {
                 const statsKey = StatisticsHandler.getStatsKeysByName(this.statisticsByCategory, [stat])[0];
@@ -1541,9 +1541,9 @@ export default {
                 });
                 features.forEach(feature => {
                     const region = feature.properties[regionKey],
-                        date = feature.properties[dateKey],
-                        formatedDate = dayjs(date).format(dateAttribute.outputFormat),
-                        value = parseFloat(feature?.properties[statsKey]);
+                          date = feature.properties[dateKey],
+                          formatedDate = dayjs(date).format(dateAttribute.outputFormat),
+                          value = parseFloat(feature?.properties[statsKey]);
 
                     if (differenceMode === "region" && region === this.selectedReferenceData?.value) {
                         refRegionValues[stat][formatedDate] = value;
@@ -1742,7 +1742,7 @@ export default {
                 ?? this.getRawLayerByLayerId(selectedLevel.layerId)?.datasets?.[0]?.md_name);
 
             const uniqueValues = await this.getUniqueValuesForLevel(selectedLevel),
-                selectedLevelDateAttribute = this.getSelectedLevelDateAttribute(selectedLevel);
+                  selectedLevelDateAttribute = this.getSelectedLevelDateAttribute(selectedLevel);
 
             this.selectedLevelRegionNameAttribute = this.getSelectedLevelRegionNameAttribute(selectedLevel);
             if (uniqueValues[this.selectedLevelRegionNameAttribute?.attrName] && uniqueValues[selectedLevelDateAttribute?.attrName]) {
@@ -1787,14 +1787,14 @@ export default {
             this.layer.setStyle(null);
 
             const regionKey = this.getSelectedLevelRegionNameAttributeInDepth(
-                    this.selectedLevel.mappingFilter.regionNameAttribute
-                ).attrName,
-                rawLayer = this.getRawLayerByLayerId(this.selectedLevel.layerId),
-                featureStream = getOAFFeature.getOAFFeatureStream(`${rawLayer.url}/collections/${rawLayer.collection}/items`, {
-                    crs: this.selectedLevel.oafRequestCRS,
-                    properties: `${regionKey},${this.selectedLevel.geometryAttribute}`,
-                    ...this.selectedLevel.geomRequestParams
-                });
+                      this.selectedLevel.mappingFilter.regionNameAttribute
+                  ).attrName,
+                  rawLayer = this.getRawLayerByLayerId(this.selectedLevel.layerId),
+                  featureStream = getOAFFeature.getOAFFeatureStream(`${rawLayer.url}/collections/${rawLayer.collection}/items`, {
+                      crs: this.selectedLevel.oafRequestCRS,
+                      properties: `${regionKey},${this.selectedLevel.geometryAttribute}`,
+                      ...this.selectedLevel.geomRequestParams
+                  });
 
             for await (const feature of featureStream) {
                 this.layer.getSource().addFeature(feature);

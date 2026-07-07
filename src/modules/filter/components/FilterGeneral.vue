@@ -267,7 +267,7 @@ export default {
 
             while (selecetedAccordionsLen--) {
                 const accordion = params.selectedAccordions[selecetedAccordionsLen],
-                    rulesOfAccordeon = params.rulesOfFilters[accordion?.filterId];
+                      rulesOfAccordeon = params.rulesOfFilters[accordion?.filterId];
                 let layerModel = null,
                     layerConfig = null,
                     layerSource = null;
@@ -285,10 +285,10 @@ export default {
                     typeof layerSource?.getFeatures === "function"
                     && layerSource.getFeatures().length === 0)
                     || (typeof layerModel?.getFeatures === "function"
-                    && layerModel.getFeatures().length === 0))) {
+                        && layerModel.getFeatures().length === 0))) {
                     (layerConfig?.typ === "SensorThings" ? layerModel : layerSource).once("featuresloadend", async () => {
                         const rulesOfFiltersTmp = [...this.rulesOfFilters],
-                            selectedAccordionsTmp = [...this.selectedAccordions];
+                              selectedAccordionsTmp = [...this.selectedAccordions];
 
                         rulesOfFiltersTmp[accordion.filterId] = rulesOfAccordeon;
                         selectedAccordionsTmp.push(accordion);
@@ -327,7 +327,7 @@ export default {
 
                 for (const additionalGeometry of additionalGeometries) {
                     const rawLayer = rawLayerList.getLayerWhere({id: additionalGeometry.layerId}),
-                        features = await getFeature.getFeatureGET(rawLayer.url, {version: rawLayer.version, featureType: rawLayer.featureType});
+                          features = await getFeature.getFeatureGET(rawLayer.url, {version: rawLayer.version, featureType: rawLayer.featureType});
 
                     additionalGeometry.features = wfsReader.readFeatures(features);
                 }
@@ -340,7 +340,7 @@ export default {
          */
         updateSelectedGroups (layerGroupIndex) {
             const selectedGroups = JSON.parse(JSON.stringify(this.selectedGroups)),
-                index = selectedGroups.indexOf(layerGroupIndex);
+                  index = selectedGroups.indexOf(layerGroupIndex);
 
             if (index >= 0) {
                 selectedGroups.splice(index, 1);
@@ -357,8 +357,8 @@ export default {
          */
         updateSelectedAccordions (filterId) {
             const selectedGroups = JSON.parse(JSON.stringify(this.selectedGroups)),
-                filterIdsOfAccordions = [],
-                collapseButtonGroups = this.preparedLayerGroups.filter(group => group.collapseButtons);
+                  filterIdsOfAccordions = [],
+                  collapseButtonGroups = this.preparedLayerGroups.filter(group => group.collapseButtons);
             let selectedAccordionIndex = -1;
 
             if (!this.multiLayerSelector || collapseButtonGroups.length || this.collapseButtons) {
@@ -524,7 +524,7 @@ export default {
          */
         writeUrlParams (newState) {
             const params = this.urlHandler.getParamsFromState(newState, this.neededUrlParams),
-                generatedParams = JSON.stringify(params);
+                  generatedParams = JSON.stringify(params);
 
             this.setUrlParams(generatedParams);
         },

@@ -73,8 +73,8 @@ export default {
          */
         initializeLayers () {
             const newLayerInformation = this.allLayerConfigs.filter(item => this.layerIds.includes(item.id)),
-                firstActiveLayer = newLayerInformation.findIndex(layer => layer.visibility),
-                currentLayerDeactivated = this.currentLayerIndex > -1 && !newLayerInformation[this.currentLayerIndex].visibility;
+                  firstActiveLayer = newLayerInformation.findIndex(layer => layer.visibility),
+                  currentLayerDeactivated = this.currentLayerIndex > -1 && !newLayerInformation[this.currentLayerIndex].visibility;
 
             this.setLayerInformation(newLayerInformation);
             if ((this.currentLayerIndex === -1 && firstActiveLayer > -1) ||

@@ -90,7 +90,7 @@ export default {
          */
         show () {
             const el = document.querySelector(".modal"),
-                backdrop = document.querySelector(".modal-backdrop");
+                  backdrop = document.querySelector(".modal-backdrop");
 
             if (el) {
                 el.style.display = "block";
@@ -122,8 +122,8 @@ export default {
          */
         getFeatures (layerConfigs) {
             const poiDistances = this.poiDistances,
-                poiFeatures = [],
-                centerPosition = this.position;
+                  poiFeatures = [],
+                  centerPosition = this.position;
             let featInCircle = [];
 
             poiDistances.forEach(distance => {
@@ -190,18 +190,18 @@ export default {
          */
         zoomFeature (evt) {
             const id = evt.currentTarget.id,
-                poiFeatures = this.poiFeatures,
-                activeCategory = this.activeCategory,
-                selectedPoiFeatures = poiFeatures.find(poi => {
-                    return poi.category === activeCategory;
-                }),
-                feature = selectedPoiFeatures.features.find(feat => {
-                    return feat.getId() === id;
-                }),
-                extent = feature.getGeometry().getExtent(),
-                coordinate = extractEventCoordinates(extent),
-                resolutions = mapCollection.getMapView("2D").getResolutions(),
-                index = resolutions.indexOf(0.2645831904584105) === -1 ? resolutions.length : resolutions.indexOf(0.2645831904584105);
+                  poiFeatures = this.poiFeatures,
+                  activeCategory = this.activeCategory,
+                  selectedPoiFeatures = poiFeatures.find(poi => {
+                      return poi.category === activeCategory;
+                  }),
+                  feature = selectedPoiFeatures.features.find(feat => {
+                      return feat.getId() === id;
+                  }),
+                  extent = feature.getGeometry().getExtent(),
+                  coordinate = extractEventCoordinates(extent),
+                  resolutions = mapCollection.getMapView("2D").getResolutions(),
+                  index = resolutions.indexOf(0.2645831904584105) === -1 ? resolutions.length : resolutions.indexOf(0.2645831904584105);
 
             this.zoomToExtent({extent: coordinate, options: {maxZoom: index}});
             this.$store.dispatch("Maps/removePointMarker");
@@ -233,7 +233,7 @@ export default {
             this.imgPathByFeature[feat.getId()] = "";
             if (styleObject) {
                 const featureStyleObject = createStyle.getGeometryStyle(feat, styleObject.rules, false, Config.wfsImgPath),
-                    featureStyle = createStyle.createStyle(styleObject, feat, false, Config.wfsImgPath);
+                      featureStyle = createStyle.createStyle(styleObject, feat, false, Config.wfsImgPath);
 
                 if (featureStyleObject.attributes?.type === "icon") {
                     this.imgPathByFeature[feat.getId()] = featureStyle.getImage()?.getSrc() ? featureStyle.getImage()?.getSrc() : "";

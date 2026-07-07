@@ -33,14 +33,14 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/Routing/TSR",
-            ["isInputDisabled",
-                "settings",
-                "tsrRouteSource",
-                "tsrWaypointsLayer",
-                "tsrDirections",
-                "getTSRSpeedProfiles",
-                "waypoints"
-            ]
+                      ["isInputDisabled",
+                       "settings",
+                       "tsrRouteSource",
+                       "tsrWaypointsLayer",
+                       "tsrDirections",
+                       "getTSRSpeedProfiles",
+                       "waypoints"
+                      ]
         )
     },
 
@@ -61,14 +61,14 @@ export default {
     methods: {
         ...mapMutations("Modules/Routing/TSR", ["setTsrDirections"]),
         ...mapActions("Modules/Routing/TSR",
-            ["removeWaypoint",
-                "isStartEndInput",
-                "addWaypoint",
-                "addFeatToSource",
-                "findTSR",
-                "initTSR",
-                "closeTSR"
-            ]
+                      ["removeWaypoint",
+                       "isStartEndInput",
+                       "addWaypoint",
+                       "addFeatToSource",
+                       "findTSR",
+                       "initTSR",
+                       "closeTSR"
+                      ]
         ),
 
         /**
@@ -111,7 +111,7 @@ export default {
          */
         afterFileValidation () {
             const modalElement = this.$refs.uploadModal,
-                modal = Modal.getInstance(modalElement);
+                  modal = Modal.getInstance(modalElement);
 
             modal.hide();
         },

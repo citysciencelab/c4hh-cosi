@@ -130,7 +130,7 @@ export default {
          */
         loadCorrectFileFormat (file, reader) {
             const fileNameSplit = file.name.split("."),
-                fileExtension = fileNameSplit.length > 0 ? fileNameSplit[fileNameSplit.length - 1].toLowerCase() : "";
+                  fileExtension = fileNameSplit.length > 0 ? fileNameSplit[fileNameSplit.length - 1].toLowerCase() : "";
 
             if (fileExtension === "png" || fileExtension === "jpg" || fileExtension === "jpeg" || this.configuredFileExtensions.includes(fileExtension)) {
                 this.fileUploaded = true;

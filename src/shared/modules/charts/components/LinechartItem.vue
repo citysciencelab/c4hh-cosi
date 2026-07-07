@@ -85,12 +85,12 @@ export default {
             }
 
             const existingChart = typeof Chart.getChart === "function" ? Chart.getChart(canvas) : null,
-                ctx = canvas.getContext("2d"),
-                config = {
-                    type: "line",
-                    data: data,
-                    options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
-                };
+                  ctx = canvas.getContext("2d"),
+                  config = {
+                      type: "line",
+                      data: data,
+                      options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
+                  };
 
             if (existingChart) {
                 existingChart.stop();
@@ -131,7 +131,7 @@ export default {
          */
         destroyChart () {
             const canvas = this.$el,
-                existingChart = canvas && typeof Chart.getChart === "function" ? Chart.getChart(canvas) : null;
+                  existingChart = canvas && typeof Chart.getChart === "function" ? Chart.getChart(canvas) : null;
 
             if (existingChart) {
                 existingChart.stop();

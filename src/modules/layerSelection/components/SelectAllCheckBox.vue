@@ -97,7 +97,7 @@ export default {
 
             if (layer?.attributes?.boundingBox) {
                 const bbox = layer.attributes.boundingBox,
-                    [bottomLeft, topRight] = bbox;
+                      [bottomLeft, topRight] = bbox;
 
                 minX = Math.min(this.encompassingBoundingBox[0], bottomLeft[0]);
                 minY = Math.min(this.encompassingBoundingBox[1], bottomLeft[1]);

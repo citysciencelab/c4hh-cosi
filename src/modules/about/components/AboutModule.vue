@@ -43,9 +43,9 @@ export default {
             return this.mainMenu.sections[0].find(m => {
                 return m.type === "contact";
             })
-            || this.secondaryMenu.sections[0].find(m => {
-                return m.type === "contact";
-            });
+                || this.secondaryMenu.sections[0].find(m => {
+                    return m.type === "contact";
+                });
         },
         /**
          * Returns the menu the about module is in.

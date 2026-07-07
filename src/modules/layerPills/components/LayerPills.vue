@@ -51,7 +51,7 @@ export default {
          */
         sortedVisibleLayerPills () {
             const treeLayers = this.layerTreeSortedLayerConfigs(false),
-                visible = this.visibleSubjectDataLayerConfigs;
+                  visible = this.visibleSubjectDataLayerConfigs;
 
             return [
                 ...treeLayers.filter(l => visible.some(v => v.id === l.id)),
@@ -155,8 +155,8 @@ export default {
 
             if (mapMode === "2D") {
                 const layerTypes3d = layerTypes.getLayerTypes3d(),
-                    visible2DLayers = visibleLayers.filter(layer => !layerTypes3d.includes(layer.typ?.toUpperCase())
-                        && !layer.isNeverVisibleInTree);
+                      visible2DLayers = visibleLayers.filter(layer => !layerTypes3d.includes(layer.typ?.toUpperCase())
+                          && !layer.isNeverVisibleInTree);
 
                 this.setVisibleSubjectDataLayers(visible2DLayers);
             }
@@ -202,13 +202,13 @@ export default {
             this.$nextTick(() => {
                 this.setupResizeObserver();
                 const container = this.$refs.layerPillsContainer,
-                    pills = container?.querySelectorAll(".nav-item"),
-                    pillWidth = pills?.[0]
-                        ? (pills[0].offsetWidth + 10) * this.visibleSubjectDataLayers.length
-                        : 0,
-                    containerWidth = container?.querySelector(".nav-pills")
-                        ? container.querySelector(".nav-pills").getBoundingClientRect().width
-                        : 0;
+                      pills = container?.querySelectorAll(".nav-item"),
+                      pillWidth = pills?.[0]
+                          ? (pills[0].offsetWidth + 10) * this.visibleSubjectDataLayers.length
+                          : 0,
+                      containerWidth = container?.querySelector(".nav-pills")
+                          ? container.querySelector(".nav-pills").getBoundingClientRect().width
+                          : 0;
 
                 if (!container || !pills || !pills[0]) {
                     this.showToggleButton = false;

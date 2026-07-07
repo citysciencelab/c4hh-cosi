@@ -132,7 +132,7 @@ export default {
             this.titleText = [
                 this.$t(this.chartValue?.title || ""),
                 `${this.$t("common:modules.getFeatureInfo.themes.sensor.sensorBarChart.chartTitleAverage")} `
-                + this.$t(`common:modules.getFeatureInfo.themes.sensor.sensorBarChart.${this.periodUnit}`, {count: this.periodLength}),
+                    + this.$t(`common:modules.getFeatureInfo.themes.sensor.sensorBarChart.${this.periodUnit}`, {count: this.periodLength}),
                 this.$t(this.noticeText)
             ];
 

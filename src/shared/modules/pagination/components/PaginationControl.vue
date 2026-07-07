@@ -26,7 +26,7 @@ export default {
          */
         visiblePages () {
             const pages = [],
-                maxVisible = 7;
+                  maxVisible = 7;
 
             if (this.totalPages <= maxVisible) {
                 for (let i = 1; i <= this.totalPages; i++) {

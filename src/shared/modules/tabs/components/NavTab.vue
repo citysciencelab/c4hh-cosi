@@ -75,10 +75,10 @@ export default {
             event.preventDefault();
             event.stopPropagation();
             const tabs = [...tablist.querySelectorAll("[role=tab]:not([disabled])")],
-                currentIndex = tabs.indexOf(event.currentTarget),
-                next = currentIndex >= 0
-                    ? tabs[(currentIndex + step + tabs.length) % tabs.length]
-                    : null;
+                  currentIndex = tabs.indexOf(event.currentTarget),
+                  next = currentIndex >= 0
+                      ? tabs[(currentIndex + step + tabs.length) % tabs.length]
+                      : null;
 
             next?.focus();
             next?.click();

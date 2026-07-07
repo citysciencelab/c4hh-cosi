@@ -62,9 +62,9 @@ function closeFullScreen () {
 function isFullScreen () {
     return Boolean(
         document.fullscreenElement ||
-        document.mozFullScreenElement ||
-        document.webkitFullscreenElement ||
-        document.msFullscreenElement
+            document.mozFullScreenElement ||
+            document.webkitFullscreenElement ||
+            document.msFullscreenElement
     );
 }
 

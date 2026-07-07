@@ -248,8 +248,8 @@ export default {
             }
 
             const layer = layerCollection.getLayerById(this.layerId),
-                targetTime = this.timeRange[this.sliderValue],
-                targetTimeEnd = this.dualRangeSlider ? this.timeRange[this.sliderValueEnd] : null;
+                  targetTime = this.timeRange[this.sliderValue],
+                  targetTimeEnd = this.dualRangeSlider ? this.timeRange[this.sliderValueEnd] : null;
 
             if (layer) {
                 layer.updateTime(this.layerId, this.defaultDimensionName, targetTime, targetTimeEnd, this.staticDimensions);

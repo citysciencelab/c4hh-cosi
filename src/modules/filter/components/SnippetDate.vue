@@ -191,8 +191,8 @@ export default {
         inRangeValue: {
             get () {
                 const momentMinimum = dayjs(this.minimumValue, this.internalFormat),
-                    momentMaximum = dayjs(this.maximumValue, this.internalFormat),
-                    momentValue = dayjs(this.value, this.internalFormat, true);
+                      momentMaximum = dayjs(this.maximumValue, this.internalFormat),
+                      momentValue = dayjs(this.value, this.internalFormat, true);
 
                 if (!momentValue.isValid()) {
                     return "";
@@ -249,8 +249,8 @@ export default {
     mounted () {
         this.$nextTick(() => {
             const momentPrechecked = dayjs(this.prechecked, this.format, true),
-                momentMin = dayjs(this.minValue, this.format, true),
-                momentMax = dayjs(this.maxValue, this.format, true);
+                  momentMin = dayjs(this.minValue, this.format, true),
+                  momentMax = dayjs(this.maxValue, this.format, true);
 
             this.precheckedIsValid = momentPrechecked.isValid();
 
@@ -268,39 +268,39 @@ export default {
             }
             else if (this.api) {
                 this.api.getMinMax(this.attrName, minMaxObj => {
-                    if (!isObject(minMaxObj)) {
-                        return;
-                    }
+                                       if (!isObject(minMaxObj)) {
+                                           return;
+                                       }
 
-                    if (Object.prototype.hasOwnProperty.call(minMaxObj, "min")) {
-                        this.minimumValue = dayjs(minMaxObj.min, this.format).format(this.internalFormat);
-                    }
-                    else {
-                        this.minimumValue = momentMin.format(this.internalFormat);
-                    }
-                    if (Object.prototype.hasOwnProperty.call(minMaxObj, "max")) {
-                        this.maximumValue = dayjs(minMaxObj.max, this.format).format(this.internalFormat);
-                    }
-                    else {
-                        this.maximumValue = momentMax.format(this.internalFormat);
-                    }
+                                       if (Object.prototype.hasOwnProperty.call(minMaxObj, "min")) {
+                                           this.minimumValue = dayjs(minMaxObj.min, this.format).format(this.internalFormat);
+                                       }
+                                       else {
+                                           this.minimumValue = momentMin.format(this.internalFormat);
+                                       }
+                                       if (Object.prototype.hasOwnProperty.call(minMaxObj, "max")) {
+                                           this.maximumValue = dayjs(minMaxObj.max, this.format).format(this.internalFormat);
+                                       }
+                                       else {
+                                           this.maximumValue = momentMax.format(this.internalFormat);
+                                       }
 
-                    if (this.precheckedIsValid) {
-                        this.value = momentPrechecked.format(this.internalFormat);
-                    }
-                    this.$nextTick(() => {
-                        this.isInitializing = false;
-                        this.emitSnippetPrechecked(this.precheckedIsValid, this.snippetId, this.visible);
-                    });
-                }, err => {
-                    this.isInitializing = false;
-                    this.emitSnippetPrechecked();
-                    console.warn(err);
-                }, typeof this.minValue === "undefined" && typeof this.maxValue !== "undefined", typeof this.minValue !== "undefined" && typeof this.maxValue === "undefined", true,
-                {rules: this.fixedRules, filterId: this.filterId, format: this.format, commands: {
-                    filterGeometry: this.filterGeometry,
-                    geometryName: this.filterGeometryName
-                }});
+                                       if (this.precheckedIsValid) {
+                                           this.value = momentPrechecked.format(this.internalFormat);
+                                       }
+                                       this.$nextTick(() => {
+                                           this.isInitializing = false;
+                                           this.emitSnippetPrechecked(this.precheckedIsValid, this.snippetId, this.visible);
+                                       });
+                                   }, err => {
+                                       this.isInitializing = false;
+                                       this.emitSnippetPrechecked();
+                                       console.warn(err);
+                                   }, typeof this.minValue === "undefined" && typeof this.maxValue !== "undefined", typeof this.minValue !== "undefined" && typeof this.maxValue === "undefined", true,
+                                   {rules: this.fixedRules, filterId: this.filterId, format: this.format, commands: {
+                                       filterGeometry: this.filterGeometry,
+                                       geometryName: this.filterGeometryName
+                                   }});
             }
             else {
                 this.value = this.precheckedIsValid ? momentPrechecked.format(this.internalFormat) : "";

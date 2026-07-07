@@ -92,9 +92,9 @@ export default {
          */
         getDownloadHandler (onsuccess) {
             const result = [],
-                features = this.filteredItems,
-                model = openlayerFunctions.getLayerByLayerId(this.layerId),
-                gfiAttributes = typeof model?.get === "function" && isObject(model.get("gfiAttributes")) ? model.get("gfiAttributes") : {};
+                  features = this.filteredItems,
+                  model = openlayerFunctions.getLayerByLayerId(this.layerId),
+                  gfiAttributes = typeof model?.get === "function" && isObject(model.get("gfiAttributes")) ? model.get("gfiAttributes") : {};
 
             if (!Array.isArray(features)) {
                 onsuccess([]);
@@ -105,7 +105,7 @@ export default {
                     return;
                 }
                 const properties = {},
-                    geometryName = typeof item.getGeometryName === "function" ? item.getGeometryName() : false;
+                      geometryName = typeof item.getGeometryName === "function" ? item.getGeometryName() : false;
 
                 Object.entries(item.getProperties()).forEach(([attrName, value]) => {
                     if (attrName === geometryName) {
@@ -123,9 +123,9 @@ export default {
                     typeof item.getGeometry().getCoordinates()[0] !== "undefined" &&
                     typeof item.getGeometry().getCoordinates()[1] !== "undefined") {
                     const map = mapCollection.getMap("2D"),
-                        view = typeof map?.getView === "function" ? map.getView() : undefined,
-                        projection = typeof view?.getProjection === "function" ? view.getProjection() : undefined,
-                        code = typeof projection?.getCode === "function" ? projection.getCode() + " | " : "";
+                          view = typeof map?.getView === "function" ? map.getView() : undefined,
+                          projection = typeof view?.getProjection === "function" ? view.getProjection() : undefined,
+                          code = typeof projection?.getCode === "function" ? projection.getCode() + " | " : "";
 
                     properties["Koordinaten-System"] = code + item.getGeometry().getCoordinates()[0] + " | " + item.getGeometry().getCoordinates()[1];
                 }

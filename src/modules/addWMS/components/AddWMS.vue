@@ -117,7 +117,7 @@ export default {
          */
         importLayers: function () {
             const serviceUrl = this.$el.querySelector("#wmsUrl").value.trim(),
-                url = this.getUrl(serviceUrl);
+                  url = this.getUrl(serviceUrl);
 
             if (this.invalidUrl === true || url.includes("http:") || url.length === 0) {
                 return;
@@ -131,16 +131,16 @@ export default {
                 .then((data) => {
                     try {
                         const parser = new WMSCapabilities(),
-                            capability = parser.read(data),
-                            version = capability?.version,
-                            checkVersion = this.isVersionEnabled(version),
-                            currentExtent = this.mapViewSettings?.extent,
-                            folder = {
-                                type: "folder",
-                                isExternal: true,
-                                name: "",
-                                elements: []
-                            };
+                              capability = parser.read(data),
+                              version = capability?.version,
+                              checkVersion = this.isVersionEnabled(version),
+                              currentExtent = this.mapViewSettings?.extent,
+                              folder = {
+                                  type: "folder",
+                                  isExternal: true,
+                                  name: "",
+                                  elements: []
+                              };
                         let checkExtent = this.getIfInExtent(capability, currentExtent),
                             finalCapability = capability;
 
@@ -338,9 +338,9 @@ export default {
          */
         getIfInExtent: function (capability, currentExtent) {
             const layer = capability?.Capability?.Layer?.BoundingBox?.filter(bbox => {
-                    return bbox?.crs && bbox?.crs.includes("EPSG") && crs.getProjection(bbox?.crs) !== undefined && Array.isArray(bbox?.extent) && bbox?.extent.length === 4;
-                }),
-                layerEPSG4326Projection = layer.find((element) => element.crs === "EPSG:4326");
+                      return bbox?.crs && bbox?.crs.includes("EPSG") && crs.getProjection(bbox?.crs) !== undefined && Array.isArray(bbox?.extent) && bbox?.extent.length === 4;
+                  }),
+                  layerEPSG4326Projection = layer.find((element) => element.crs === "EPSG:4326");
             let layerExtent;
 
             // If there is no extent defined or the extent is not right defined, it will import the external wms layer(s).

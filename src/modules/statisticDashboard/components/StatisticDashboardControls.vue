@@ -74,13 +74,13 @@ export default {
             differenceModalContainer: null,
             referenceLabel: undefined,
             buttonGroupControls: [{
-                name: "Tabelle",
-                icon: "bi bi-table pe-2"
-            },
-            {
-                name: "Diagramm",
-                icon: "bi bi-bar-chart pe-2"
-            }],
+                                      name: "Tabelle",
+                                      icon: "bi bi-table pe-2"
+                                  },
+                                  {
+                                      name: "Diagramm",
+                                      icon: "bi bi-bar-chart pe-2"
+                                  }],
             switchValue: "",
             referenceTag: undefined,
             indexSelectedStatistics: 0,
@@ -375,7 +375,7 @@ export default {
                 return [];
             }
             const nonSelectedCategories = [{name: i18next.t("common:modules.statisticDashboard.button.all")}, ...categories].filter(category => !selectedCategories.some(selectedCategory => selectedCategory.name === category.name)),
-                result = [...selectedCategories, ...nonSelectedCategories];
+                  result = [...selectedCategories, ...nonSelectedCategories];
 
             return result;
         },
@@ -410,7 +410,7 @@ export default {
                 return timeStepsFilter;
             }
             const notSelectedDates = timeStepsFilter.filter(timeStep => !selectedDates.some(selectedStep => selectedStep.label === timeStep.label)),
-                sortedDates = [...selectedDates, ...notSelectedDates];
+                  sortedDates = [...selectedDates, ...notSelectedDates];
 
             return sortedDates;
         },
@@ -425,8 +425,8 @@ export default {
                 return [];
             }
             const allStatistics = [],
-                selectedStatistics = [],
-                selectedStatisticsKeys = Object.keys(selectedStatisticsObject).sort((a, b) => selectedStatisticsObject[a].selectedOrder - selectedStatisticsObject[b].selectedOrder);
+                  selectedStatistics = [],
+                  selectedStatisticsKeys = Object.keys(selectedStatisticsObject).sort((a, b) => selectedStatisticsObject[a].selectedOrder - selectedStatisticsObject[b].selectedOrder);
             let notSelectedStatistics = [],
                 result = [];
 
@@ -510,8 +510,8 @@ export default {
          */
         removeSelectedStatsByCategory (category) {
             const selectedStatisticsCopy = {...this.selectedStatistics},
-                isCategoryAllSelected = this.selectedCategories.filter(selectedCategory => selectedCategory.name === i18next.t("common:modules.statisticDashboard.button.all")).length,
-                statsToDelete = this.sortedSelectedStatistics.filter(statistic => statistic.category === category.name);
+                  isCategoryAllSelected = this.selectedCategories.filter(selectedCategory => selectedCategory.name === i18next.t("common:modules.statisticDashboard.button.all")).length,
+                  statsToDelete = this.sortedSelectedStatistics.filter(statistic => statistic.category === category.name);
 
             if (category.name !== i18next.t("common:modules.statisticDashboard.button.all") && isCategoryAllSelected) {
                 return;
@@ -557,7 +557,7 @@ export default {
          */
         toggleDropdown (element) {
             const button = element.target.closest(".difference-button").firstChild,
-                dropdown = new Dropdown(button);
+                  dropdown = new Dropdown(button);
 
             dropdown.toggle();
         }

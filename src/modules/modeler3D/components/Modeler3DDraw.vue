@@ -119,8 +119,8 @@ export default {
             });
 
             const scene = mapCollection.getMap("3D").getCesiumScene(),
-                entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                floatingPoint = entities.values.find(cyl => cyl.id === this.cylinderId);
+                  entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
+                  floatingPoint = entities.values.find(cyl => cyl.id === this.cylinderId);
 
             floatingPoint.position = this.clampToGround ?
                 new Cesium.CallbackProperty(() => adaptCylinderToGround(floatingPoint, this.currentPosition), false) :
@@ -167,13 +167,13 @@ export default {
          */
         onMouseMove (event) {
             const scene = mapCollection.getMap("3D").getCesiumScene(),
-                entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                floatingPoint = entities.values.find(cyl => cyl.id === this.cylinderId);
+                  entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
+                  floatingPoint = entities.values.find(cyl => cyl.id === this.cylinderId);
 
 
             if (this.clampToGround) {
                 const ray = scene.camera.getPickRay(event.endPosition),
-                    position = scene.globe.pick(ray, scene);
+                      position = scene.globe.pick(ray, scene);
 
                 if (Cesium.defined(position)) {
                     document.body.style.cursor = "copy";
@@ -185,9 +185,9 @@ export default {
             }
             else {
                 const transformedCoordinates = crs.transformFromMapProjection(mapCollection.getMap("3D").getOlMap(), "EPSG:4326", [this.mouseCoordinate[0], this.mouseCoordinate[1]]),
-                    cartographic = Cesium.Cartographic.fromDegrees(transformedCoordinates[0], transformedCoordinates[1]),
-                    polygon = entities.values.find(ent => ent.id === this.currentModelId),
-                    ignoreObjects = polygon ? [floatingPoint, polygon] : [floatingPoint];
+                      cartographic = Cesium.Cartographic.fromDegrees(transformedCoordinates[0], transformedCoordinates[1]),
+                      polygon = entities.values.find(ent => ent.id === this.currentModelId),
+                      ignoreObjects = polygon ? [floatingPoint, polygon] : [floatingPoint];
 
                 if (cartographic) {
                     document.body.style.cursor = "copy";
@@ -220,7 +220,7 @@ export default {
             this.lastAddedPosition = this.currentPosition;
 
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                floatingPoint = entities.values.find(cyl => cyl.id === this.cylinderId);
+                  floatingPoint = entities.values.find(cyl => cyl.id === this.cylinderId);
 
             let entity = entities.getById(this.shapeId),
                 label = null;
@@ -237,7 +237,7 @@ export default {
                 label = this.addLabel("distance", {
                     position: new Cesium.CallbackProperty(() => {
                         const midpoint = Cesium.Cartesian3.midpoint(this.activeShapePoints[(this.activeShapePoints.length - 2) || 0], this.currentPosition, new Cesium.Cartesian3()),
-                            midPointCart = Cesium.Cartographic.fromCartesian(midpoint);
+                              midPointCart = Cesium.Cartographic.fromCartesian(midpoint);
 
                         return Cesium.Cartesian3.fromRadians(midPointCart.longitude, midPointCart.latitude, (entity.polygon?.extrudedHeight?.getValue() || midPointCart.height) + 2);
                     }, false),
@@ -254,9 +254,9 @@ export default {
             // Creates new permanent label for the distance between the last two points
             if (this.activeShapePoints.length >= 2) {
                 const arrayLength = this.activeShapePoints.length,
-                    midpoint = Cesium.Cartesian3.midpoint(this.activeShapePoints[arrayLength - 2], this.activeShapePoints[arrayLength - 1], new Cesium.Cartesian3()),
-                    midPointCart = Cesium.Cartographic.fromCartesian(midpoint),
-                    distance = Cesium.Cartesian3.distance(this.activeShapePoints[arrayLength - 2], this.activeShapePoints[arrayLength - 1], new Cesium.Cartesian3());
+                      midpoint = Cesium.Cartesian3.midpoint(this.activeShapePoints[arrayLength - 2], this.activeShapePoints[arrayLength - 1], new Cesium.Cartesian3()),
+                      midPointCart = Cesium.Cartographic.fromCartesian(midpoint),
+                      distance = Cesium.Cartesian3.distance(this.activeShapePoints[arrayLength - 2], this.activeShapePoints[arrayLength - 1], new Cesium.Cartesian3());
 
                 label = this.addLabel("distance", {
                     position: Cesium.Cartesian3.fromRadians(midPointCart.longitude, midPointCart.latitude, (entity.polygon?.extrudedHeight?.getValue() || midPointCart.height) + 2),
@@ -288,7 +288,7 @@ export default {
                 label = this.addLabel("distance", {
                     position: new Cesium.CallbackProperty(() => {
                         const midpoint = Cesium.Cartesian3.midpoint(this.activeShapePoints[0], this.activeShapePoints[this.activeShapePoints.length - 1], new Cesium.Cartesian3()),
-                            midPointCart = Cesium.Cartographic.fromCartesian(midpoint);
+                              midPointCart = Cesium.Cartographic.fromCartesian(midpoint);
 
                         return Cesium.Cartesian3.fromRadians(midPointCart.longitude, midPointCart.latitude, (entity.polygon?.extrudedHeight?.getValue() || midPointCart.height) + 2);
                     }, false),
@@ -323,7 +323,7 @@ export default {
                 });
             }
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                newFloatingPoint = entities.values.find(cyl => cyl.id === this.cylinderId);
+                  newFloatingPoint = entities.values.find(cyl => cyl.id === this.cylinderId);
 
             newFloatingPoint.position = this.clampToGround ?
                 new Cesium.CallbackProperty(() => adaptCylinderToGround(floatingPoint, this.currentPosition), false) :
@@ -336,8 +336,8 @@ export default {
          */
         createPolygonLabels (entity) {
             const lblHeight = entity.polygon.extrudedHeight.getValue(),
-                positionArea = Cesium.Cartographic.fromCartesian(this.activeShapePoints[0 + (entity.polygon?.rectangle ? 1 : 0)]),
-                positions = entity.polygon.hierarchy.getValue().positions;
+                  positionArea = Cesium.Cartographic.fromCartesian(this.activeShapePoints[0 + (entity.polygon?.rectangle ? 1 : 0)]),
+                  positions = entity.polygon.hierarchy.getValue().positions;
 
             this.addLabel("area", {
                 position: Cesium.Cartesian3.fromRadians(positionArea.longitude, positionArea.latitude, lblHeight + 12),
@@ -376,9 +376,9 @@ export default {
             }
 
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                lastPositionIndex = this.activeShapePoints.length - 2,
-                lastFloatingPoint = entities.values.find(cyl => cyl.positionIndex === lastPositionIndex),
-                currentFloatingPoint = entities.values.find(cyl => cyl.positionIndex === lastPositionIndex + 1);
+                  lastPositionIndex = this.activeShapePoints.length - 2,
+                  lastFloatingPoint = entities.values.find(cyl => cyl.positionIndex === lastPositionIndex),
+                  currentFloatingPoint = entities.values.find(cyl => cyl.positionIndex === lastPositionIndex + 1);
 
             currentFloatingPoint.positionIndex = lastPositionIndex;
             this.undonePointInfo = {
@@ -400,8 +400,8 @@ export default {
                 return;
             }
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                undonePositionIndex = this.activeShapePoints.length - 1,
-                currentFloatingPoint = entities.values.find(cyl => cyl.positionIndex === undonePositionIndex);
+                  undonePositionIndex = this.activeShapePoints.length - 1,
+                  currentFloatingPoint = entities.values.find(cyl => cyl.positionIndex === undonePositionIndex);
 
             currentFloatingPoint.positionIndex = undonePositionIndex + 1;
 
@@ -421,8 +421,8 @@ export default {
             }
 
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                lastLabelIndex = this.labelList.length - 1,
-                lastLabelId = this.labelList[lastLabelIndex].id;
+                  lastLabelIndex = this.labelList.length - 1,
+                  lastLabelId = this.labelList[lastLabelIndex].id;
 
             this.undoneLabelInfo = {
                 position: this.labelList[lastLabelIndex].position,
@@ -475,7 +475,7 @@ export default {
                 return;
             }
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                shape = entities.getById(this.shapeId);
+                  shape = entities.getById(this.shapeId);
 
             this.activeShapePoints.pop();
 
@@ -515,21 +515,21 @@ export default {
          */
         drawShape () {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                models = this.drawnModels,
-                shapeId = uniqueId("draw"),
-                positionData = new Cesium.CallbackProperty(() => {
-                    if (this.selectedDrawType === "polygon" || this.selectedDrawType === "rectangle") {
-                        return new Cesium.PolygonHierarchy(this.activeShapePoints);
-                    }
-                    return this.activeShapePoints;
-                }, false),
-                shape = new Cesium.Entity({
-                    id: shapeId,
-                    name: this.drawName ? this.drawName : i18next.t("common:modules.modeler3D.draw.captions.drawing") + ` ${shapeId}`,
-                    wasDrawn: true,
-                    clampToGround: this.clampToGround,
-                    showDimensions: this.dimensions
-                });
+                  models = this.drawnModels,
+                  shapeId = uniqueId("draw"),
+                  positionData = new Cesium.CallbackProperty(() => {
+                      if (this.selectedDrawType === "polygon" || this.selectedDrawType === "rectangle") {
+                          return new Cesium.PolygonHierarchy(this.activeShapePoints);
+                      }
+                      return this.activeShapePoints;
+                  }, false),
+                  shape = new Cesium.Entity({
+                      id: shapeId,
+                      name: this.drawName ? this.drawName : i18next.t("common:modules.modeler3D.draw.captions.drawing") + ` ${shapeId}`,
+                      wasDrawn: true,
+                      clampToGround: this.clampToGround,
+                      showDimensions: this.dimensions
+                  });
 
             if (this.selectedDrawType === "line") {
                 shape.polyline = {
@@ -600,7 +600,7 @@ export default {
          */
         zoomTo (id) {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(id);
+                  entity = entities.getById(id);
 
             if (entity) {
                 let height;
@@ -613,11 +613,11 @@ export default {
                 }
 
                 const scene = mapCollection.getMap("3D").getCesiumScene(),
-                    center = this.getCenterFromGeometry(entity),
-                    centerCartographic = Cesium.Cartographic.fromCartesian(center),
-                    longitude = centerCartographic.longitude,
-                    latitude = centerCartographic.latitude,
-                    targetHeight = height + 250;
+                      center = this.getCenterFromGeometry(entity),
+                      centerCartographic = Cesium.Cartographic.fromCartesian(center),
+                      longitude = centerCartographic.longitude,
+                      latitude = centerCartographic.latitude,
+                      targetHeight = height + 250;
 
                 scene.camera.flyTo({
                     destination: Cesium.Cartesian3.fromRadians(longitude, latitude, targetHeight)
@@ -638,7 +638,7 @@ export default {
          */
         downloadGeoJson (geojson) {
             const url = URL.createObjectURL(new Blob([geojson], {type: "application/geo+json"})),
-                link = document.createElement("a");
+                  link = document.createElement("a");
 
             link.href = url;
             link.download = "export.geojson";
@@ -655,8 +655,8 @@ export default {
          */
         addLabel (type, labelInfo) {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                attachedEntity = labelInfo.attachedEntity || entities.getById(this.shapeId),
-                position = labelInfo.position;
+                  attachedEntity = labelInfo.attachedEntity || entities.getById(this.shapeId),
+                  position = labelInfo.position;
             let label;
 
             if (type === "distance") {
@@ -721,7 +721,7 @@ export default {
             }
 
             const camera = mapCollection.getMap("3D").getCesiumScene().camera,
-                position = Cesium.Cartographic.fromCartesian(camera.position);
+                  position = Cesium.Cartographic.fromCartesian(camera.position);
 
             if (this.selectedDrawModelType === "rectangle") {
                 this.isStandardRectangle = true;
@@ -749,19 +749,19 @@ export default {
          */
         generateRectangleCorners (position) {
             const scene = mapCollection.getMap("3D").getCesiumScene(),
-                ellipsoid = scene.globe.ellipsoid,
-                localFrame = Cesium.Transforms.eastNorthUpToFixedFrame(ellipsoid.cartographicToCartesian(position)),
+                  ellipsoid = scene.globe.ellipsoid,
+                  localFrame = Cesium.Transforms.eastNorthUpToFixedFrame(ellipsoid.cartographicToCartesian(position)),
 
-                halfDepth = 20 / 2,
-                halfWidth = 15 / 2,
-                corners = [
-                    new Cesium.Cartesian3(-halfWidth, -halfDepth, 0),
-                    new Cesium.Cartesian3(-halfWidth, halfDepth, 0),
-                    new Cesium.Cartesian3(halfWidth, halfDepth, 0),
-                    new Cesium.Cartesian3(halfWidth, -halfDepth, 0)
-                ],
+                  halfDepth = 20 / 2,
+                  halfWidth = 15 / 2,
+                  corners = [
+                      new Cesium.Cartesian3(-halfWidth, -halfDepth, 0),
+                      new Cesium.Cartesian3(-halfWidth, halfDepth, 0),
+                      new Cesium.Cartesian3(halfWidth, halfDepth, 0),
+                      new Cesium.Cartesian3(halfWidth, -halfDepth, 0)
+                  ],
 
-                cornersCartesian = corners.map(cr => Cesium.Matrix4.multiplyByPoint(localFrame, cr, new Cesium.Cartesian3()));
+                  cornersCartesian = corners.map(cr => Cesium.Matrix4.multiplyByPoint(localFrame, cr, new Cesium.Cartesian3()));
 
             return cornersCartesian;
         },
@@ -772,7 +772,7 @@ export default {
          */
         toggleDimensions (id) {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(id);
+                  entity = entities.getById(id);
 
             if (!entity) {
                 return;
@@ -794,14 +794,14 @@ export default {
          */
         generateLabels (entity) {
             const positions = entity.polygon ? entity.polygon.hierarchy.getValue().positions : entity.polyline.positions.getValue(),
-                distanceLabelCount = entity.polygon ? positions.length : positions.length - 1;
+                  distanceLabelCount = entity.polygon ? positions.length : positions.length - 1;
 
             if (entity.polygon) {
                 this.addLabel("area", {
                     attachedEntity: entity,
                     position: new Cesium.CallbackProperty(() => {
                         const height = entity.polygon.extrudedHeight.getValue() + 12,
-                            position = Cesium.Cartographic.fromCartesian(positions[0 + (entity.polygon?.rectangle ? 1 : 0)]);
+                              position = Cesium.Cartographic.fromCartesian(positions[0 + (entity.polygon?.rectangle ? 1 : 0)]);
 
                         return Cesium.Cartesian3.fromRadians(position.longitude, position.latitude, height);
                     }, false),
@@ -815,7 +815,7 @@ export default {
                     attachedEntity: entity,
                     position: new Cesium.CallbackProperty(() => {
                         const height = entity.polygon.extrudedHeight.getValue() + 6,
-                            position = Cesium.Cartographic.fromCartesian(positions[1 + (entity.polygon?.rectangle ? 1 : 0)]);
+                              position = Cesium.Cartographic.fromCartesian(positions[1 + (entity.polygon?.rectangle ? 1 : 0)]);
 
                         return Cesium.Cartesian3.fromRadians(position.longitude, position.latitude, height);
                     }, false),
@@ -835,7 +835,7 @@ export default {
                         attachedEntity: entity,
                         position: new Cesium.CallbackProperty(() => {
                             const midpoint = Cesium.Cartesian3.midpoint(positions[index + rectangleOffset], positions[(index + 1 + rectangleOffset) % positions.length], new Cesium.Cartesian3()),
-                                midPointCart = Cesium.Cartographic.fromCartesian(midpoint);
+                                  midPointCart = Cesium.Cartographic.fromCartesian(midpoint);
 
                             return Cesium.Cartesian3.fromRadians(midPointCart.longitude, midPointCart.latitude, (entity.polygon?.extrudedHeight?.getValue() || midPointCart.height) + 2);
                         }, false),

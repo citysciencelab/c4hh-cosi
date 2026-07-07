@@ -104,7 +104,7 @@ export default {
          */
         axiosCallback: function (response) {
             const data = response.data,
-                collectedAlerts = [];
+                  collectedAlerts = [];
 
             let collectedAlertIds = [];
 

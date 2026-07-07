@@ -56,7 +56,7 @@ export default {
 
                 Object.keys(measureValues).forEach(featureId => {
                     const feature = this.lines[featureId] || this.polygons[featureId],
-                        styles = this.generateTextStyles(feature, measureValues[featureId]);
+                          styles = this.generateTextStyles(feature, measureValues[featureId]);
 
                     this.layer.getSource().forEachFeature(aFeature => {
                         if (aFeature.get("featureId") === feature.ol_uid) {
@@ -103,15 +103,15 @@ export default {
          */
         generateTextStyles (feature, newValue = "0") {
             const fill = new Fill({
-                    color: [0, 0, 0, 1]
-                }),
-                stroke = new Stroke({
-                    color: this.color,
-                    width: 1
-                }),
-                backgroundFill = new Fill({
-                    color: this.color
-                });
+                      color: [0, 0, 0, 1]
+                  }),
+                  stroke = new Stroke({
+                      color: this.color,
+                      width: 1
+                  }),
+                  backgroundFill = new Fill({
+                      color: this.color
+                  });
 
             return [
                 new Style({

@@ -127,17 +127,17 @@ export default {
                 }
 
                 const oldVisibleIds = (oldVal || [])
-                        .filter(layer => layer.visibility)
-                        .map(layer => layer.id),
-                    newVisibleIds = (newVal || [])
-                        .filter(layer => layer.visibility)
-                        .map(layer => layer.id);
+                          .filter(layer => layer.visibility)
+                          .map(layer => layer.id),
+                      newVisibleIds = (newVal || [])
+                          .filter(layer => layer.visibility)
+                          .map(layer => layer.id);
 
                 for (const element of this.properties.elements) {
                     const requiredLayerIds = element.showOnlyByLayersVisible || [],
-                        newlyVisible = requiredLayerIds.some(
-                            id => newVisibleIds.includes(id) && !oldVisibleIds.includes(id)
-                        );
+                          newlyVisible = requiredLayerIds.some(
+                              id => newVisibleIds.includes(id) && !oldVisibleIds.includes(id)
+                          );
 
                     if (requiredLayerIds.length === 0) {
                         continue;
@@ -151,7 +151,7 @@ export default {
                             }
                             if (
                                 this.currentComponent(this.side)?.props?.name !== this.name &&
-                        !this.navigationHistory(this.side)?.some(entry => entry?.props?.name === this.name)
+                                !this.navigationHistory(this.side)?.some(entry => entry?.props?.name === this.name)
                             ) {
                                 this.changeCurrentComponent({
                                     type: this.type,
@@ -209,16 +209,16 @@ export default {
         checkIsVisible () {
             const {supportedMapModes, supportedDevices, supportedTreeTypes, elements} = this.properties,
 
-                showModule = visibilityChecker.isModuleVisible({
-                    mapMode: this.mode,
-                    deviceMode: this.deviceMode,
-                    treeType: this.portalConfig?.tree?.type,
-                    elements,
-                    supportedMapModes,
-                    supportedDevices,
-                    supportedTreeTypes,
-                    visibleLayerConfigs: this.visibleLayerConfigs
-                });
+                  showModule = visibilityChecker.isModuleVisible({
+                      mapMode: this.mode,
+                      deviceMode: this.deviceMode,
+                      treeType: this.portalConfig?.tree?.type,
+                      elements,
+                      supportedMapModes,
+                      supportedDevices,
+                      supportedTreeTypes,
+                      visibleLayerConfigs: this.visibleLayerConfigs
+                  });
 
             if (!showModule && this.menu.currentComponent === this.type && this.menu.navigation.currentComponent.props.name === this.name) {
                 this.resetMenu(this.side);

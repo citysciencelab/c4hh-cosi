@@ -32,7 +32,7 @@ export default {
 
         currentTitle () {
             const component = this.currentMenuComponent,
-                key = component?.props?.name || `common:modules.${component?.type}.name`;
+                  key = component?.props?.name || `common:modules.${component?.type}.name`;
 
             return this.$t(key);
         },
@@ -61,7 +61,7 @@ export default {
             }
 
             const pointsToMenuRoot = this.previousNavigation === this.$t("common:modules.menu.name"),
-                hideSecondaryGfiBack = this.isSecondaryGfiWithoutMenu && pointsToMenuRoot;
+                  hideSecondaryGfiBack = this.isSecondaryGfiWithoutMenu && pointsToMenuRoot;
 
             return !hideSecondaryGfiBack;
         },

@@ -132,17 +132,17 @@ describe("src/app-store/actionsLayerConfig.js", () => {
         ];
         layerConfig = {};
         layerConfig[treeBaselayersKey] =
-        {
-            elements: [
-                {
-                    id: "453",
-                    visibility: true
-                },
-                {
-                    id: "452"
-                }
-            ]
-        };
+            {
+                elements: [
+                    {
+                        id: "453",
+                        visibility: true
+                    },
+                    {
+                        id: "452"
+                    }
+                ]
+            };
         layerConfig[treeSubjectsKey] = {
             elements: [
                 {

@@ -125,8 +125,8 @@ export default {
          */
         checkIsVisible (key) {
             const supportedMapModes = this.$store.getters[`Controls/${changeCase.upperFirst(key)}/supportedMapModes`],
-                supportedDevices = this.$store.getters[`Controls/${changeCase.upperFirst(key)}/supportedDevices`],
-                supportedTreeTypes = this.$store.getters[`Controls/${changeCase.upperFirst(key)}/supportedTreeTypes`];
+                  supportedDevices = this.$store.getters[`Controls/${changeCase.upperFirst(key)}/supportedDevices`],
+                  supportedTreeTypes = this.$store.getters[`Controls/${changeCase.upperFirst(key)}/supportedTreeTypes`];
 
             return visibilityChecker.isModuleVisible({
                 mapMode: this.mode,

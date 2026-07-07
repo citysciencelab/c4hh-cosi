@@ -188,7 +188,7 @@ export default {
             // add current elevation point in route while hovering over corresponding data
             if (hoverData.length) {
                 const index = hoverData[0].index,
-                    point = this.directions.lineString[index];
+                      point = this.directions.lineString[index];
 
                 if (source.getFeatures().length === 0) {
                     const feature = new Feature({
@@ -218,8 +218,8 @@ export default {
             }
             if (chart.tooltip?._active?.length) {
                 const x = chart.tooltip._active[0].element.x,
-                    yAxis = chart.scales.y,
-                    ctx = chart.ctx;
+                      yAxis = chart.scales.y,
+                      ctx = chart.ctx;
 
                 ctx.save();
                 ctx.beginPath();

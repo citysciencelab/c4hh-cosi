@@ -138,7 +138,7 @@ export default {
                 this.fileUploaded = true;
 
                 const fileNameSplit = file.name.split("."),
-                    fileExtension = fileNameSplit.length > 0 ? fileNameSplit[fileNameSplit.length - 1].toLowerCase() : "";
+                      fileExtension = fileNameSplit.length > 0 ? fileNameSplit[fileNameSplit.length - 1].toLowerCase() : "";
 
                 this.fileExtension = fileExtension;
                 this.currentFileName = file.name;
@@ -166,7 +166,7 @@ export default {
                         .then(({layer, layerId}) => {
                             if (layer) {
                                 const fileNameSplit = file.name.split("."),
-                                    fileExtension = fileNameSplit.length > 0 ? fileNameSplit[fileNameSplit.length - 1].toLowerCase() : "";
+                                      fileExtension = fileNameSplit.length > 0 ? fileNameSplit[fileNameSplit.length - 1].toLowerCase() : "";
 
                                 if (fileExtension === "geojson" || fileExtension === "json") {
                                     this.importGeoJSON({raw: f.target.result, layer: layer.layer, filename: file.name, layerId});

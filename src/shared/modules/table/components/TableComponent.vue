@@ -242,10 +242,10 @@ export default {
          */
         editedTable () {
             const table = {
-                    headers: [],
-                    items: []
-                },
-                items = Object.keys(this.filterObject).length === 0 ? this.data?.items : this.editedTable?.items;
+                      headers: [],
+                      items: []
+                  },
+                  items = Object.keys(this.filterObject).length === 0 ? this.data?.items : this.editedTable?.items;
 
             table.headers = this.visibleHeaders;
             table.items = this.getSortedItems(items, this.currentSorting.columnName, this.currentSorting.order);
@@ -517,7 +517,7 @@ export default {
 
             const sorted = [...items].sort((a, b) => {
                 const va = a[columnToSort],
-                    vb = b[columnToSort];
+                      vb = b[columnToSort];
 
                 if (va === null || va === "") {
                     return 1;
@@ -601,7 +601,7 @@ export default {
             }
 
             const value = selectedOption.toLowerCase(),
-                filterObject = JSON.parse(JSON.stringify(this.filterObject));
+                  filterObject = JSON.parse(JSON.stringify(this.filterObject));
 
             if (!Object.prototype.hasOwnProperty.call(filterObject, columnName)) {
                 filterObject[columnName] = {};
@@ -620,7 +620,7 @@ export default {
                 return;
             }
             const value = removedOption.toLowerCase(),
-                filterObject = JSON.parse(JSON.stringify(this.filterObject));
+                  filterObject = JSON.parse(JSON.stringify(this.filterObject));
 
             if (Object.keys(filterObject[columnName]).length === 1) {
                 delete filterObject[columnName];
@@ -723,11 +723,11 @@ export default {
                     type: "FeatureCollection",
                     features: this.editedTable.items.map(obj => {
                         const geojsonFormat = new GeoJSON({
-                                featureProjection: this.$store.getters["Maps/projection"],
-                                dataProjection: "EPSG:4326"
-                            }),
-                            geojsonGeom = obj.geom ? geojsonFormat.writeGeometryObject(obj.geom) : undefined,
-                            feature = {type: "Feature", id: obj.id, geometry: geojsonGeom, properties: {...obj}};
+                                  featureProjection: this.$store.getters["Maps/projection"],
+                                  dataProjection: "EPSG:4326"
+                              }),
+                              geojsonGeom = obj.geom ? geojsonFormat.writeGeometryObject(obj.geom) : undefined,
+                              feature = {type: "Feature", id: obj.id, geometry: geojsonGeom, properties: {...obj}};
 
                         delete feature.properties.id;
                         delete feature.properties.geom;
@@ -1017,11 +1017,11 @@ export default {
          */
         fullView (unmounted = false) {
             const footer = document.getElementById("module-portal-footer"),
-                layerPills = document.getElementById("layer-pills"),
-                select = document.querySelectorAll("#mp-menu-secondaryMenu .multiselect > .multiselect__select"),
-                tags = document.querySelectorAll("#mp-menu-secondaryMenu .multiselect > .multiselect__tags"),
-                tableRow = this.$refs.headerRow,
-                clientWidth = document.body.clientWidth;
+                  layerPills = document.getElementById("layer-pills"),
+                  select = document.querySelectorAll("#mp-menu-secondaryMenu .multiselect > .multiselect__select"),
+                  tags = document.querySelectorAll("#mp-menu-secondaryMenu .multiselect > .multiselect__tags"),
+                  tableRow = this.$refs.headerRow,
+                  clientWidth = document.body.clientWidth;
 
             if (!this.fullViewEnabled) {
                 return;

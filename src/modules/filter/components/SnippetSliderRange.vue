@@ -541,7 +541,7 @@ export default {
          */
         getMeasureLeft () {
             const range = this.currentSliderMax - this.currentSliderMin,
-                left = this.sliderFrom - this.currentSliderMin;
+                  left = this.sliderFrom - this.currentSliderMin;
 
             return String((95 / Math.max(1, range) * left).toFixed(1)) + "%";
         },
@@ -552,7 +552,7 @@ export default {
          */
         getMeasureWidth () {
             const range = this.currentSliderMax - this.currentSliderMin,
-                measure = this.sliderUntil - this.sliderFrom;
+                  measure = this.sliderUntil - this.sliderFrom;
 
             return String((95 / Math.max(1, range) * measure + 5).toFixed(1)) + "%";
         },

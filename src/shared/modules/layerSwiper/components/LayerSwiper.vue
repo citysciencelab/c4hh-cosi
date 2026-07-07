@@ -51,7 +51,7 @@ export default {
          */
         initializeSwiper () {
             const mapSize = mapCollection.getMap(this.mode).getSize(),
-                target = this.$refs["layerSwiper-button"];
+                  target = this.$refs["layerSwiper-button"];
 
             target.style.top = `${mapSize[1] / 2}px`;
             target.style.left = `${mapSize[0] / 2}px`;

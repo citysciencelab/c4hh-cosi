@@ -121,7 +121,7 @@ export default {
             }
 
             const draggedLayer = event.draggedContext.element,
-                targetLayer = event.relatedContext.element;
+                  targetLayer = event.relatedContext.element;
 
             if (draggedLayer.baselayer && !targetLayer.baselayer) {
                 return false;

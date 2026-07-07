@@ -215,7 +215,7 @@ export default {
             }
             this.$nextTick(() => {
                 const mindayjs = dayjs(adjusting?.adjust?.min, this.getFormat("from"), true),
-                    maxdayjs = dayjs(adjusting?.adjust?.max, this.getFormat("until"), true);
+                      maxdayjs = dayjs(adjusting?.adjust?.max, this.getFormat("until"), true);
 
                 if (adjusting.start) {
                     this.isAdjusting = true;
@@ -245,7 +245,7 @@ export default {
                         this.isAdjusting = false;
                         if (Array.isArray(this.prechecked)) {
                             const sliderFrom = this.getSliderIdxCloseToFromDate(this.prechecked[0]),
-                                sliderUntil = this.getSliderIdxCloseToUntilDate(this.prechecked[1]);
+                                  sliderUntil = this.getSliderIdxCloseToUntilDate(this.prechecked[1]);
 
                             if (this.currentSliderMin > sliderFrom) {
                                 this.sliderFrom = this.currentSliderMin;
@@ -322,7 +322,7 @@ export default {
                 Promise.allSettled(promises)
                     .then((results) => {
                         const arrErr = [],
-                            concatList = [];
+                              concatList = [];
 
                         results.forEach((result) => {
                             if (result.status === "fulfilled") {
@@ -540,14 +540,14 @@ export default {
          */
         getInitialDateReference (listFrom, listUntil) {
             const result = [],
-                displayAssoc = {},
-                unixAssoc = {},
-                formatFrom = this.getFormat("from"),
-                formatUntil = this.getFormat("until"),
-                minMoment = dayjs(Array.isArray(this.value) ? this.value[0] : undefined, formatFrom),
-                minValid = minMoment.isValid(),
-                maxMoment = dayjs(Array.isArray(this.value) ? this.value[1] : undefined, formatUntil),
-                maxValid = maxMoment.isValid();
+                  displayAssoc = {},
+                  unixAssoc = {},
+                  formatFrom = this.getFormat("from"),
+                  formatUntil = this.getFormat("until"),
+                  minMoment = dayjs(Array.isArray(this.value) ? this.value[0] : undefined, formatFrom),
+                  minValid = minMoment.isValid(),
+                  maxMoment = dayjs(Array.isArray(this.value) ? this.value[1] : undefined, formatUntil),
+                  maxValid = maxMoment.isValid();
 
             this.addListToUnixAssoc(listFrom, formatFrom, minValid, maxValid, minMoment, maxMoment, unixAssoc);
             this.addListToUnixAssoc(listUntil, formatUntil, minValid, maxValid, minMoment, maxMoment, unixAssoc);
@@ -569,7 +569,7 @@ export default {
          */
         sortResultByTime (obj) {
             const list = Object.keys(obj).sort((a, b) => a - b),
-                sortedResult = {};
+                  sortedResult = {};
 
             list.forEach(function (v, i) {
                 sortedResult[i] = obj[v];
@@ -666,7 +666,7 @@ export default {
          */
         getMeasureLeft () {
             const range = this.currentSliderMax - this.currentSliderMin,
-                left = this.sliderFrom - this.currentSliderMin;
+                  left = this.sliderFrom - this.currentSliderMin;
 
             return String((95 / Math.max(1, range) * left).toFixed(1)) + "%";
         },
@@ -677,7 +677,7 @@ export default {
          */
         getMeasureWidth () {
             const range = this.currentSliderMax - this.currentSliderMin,
-                measure = this.sliderUntil - this.sliderFrom;
+                  measure = this.sliderUntil - this.sliderFrom;
 
             return String((95 / Math.max(1, range) * measure + 5).toFixed(1)) + "%";
         },

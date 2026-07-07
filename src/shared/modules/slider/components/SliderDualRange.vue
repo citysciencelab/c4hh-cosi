@@ -99,7 +99,7 @@ export default {
 
             if (container) {
                 const percentMin = (min / this.max) * container.offsetWidth,
-                    percentMax = (max / this.max) * container.offsetWidth;
+                      percentMax = (max / this.max) * container.offsetWidth;
 
                 this.$refs.sliderRange.style.left = percentMin + "px";
                 this.$refs.sliderRange.style.width = (percentMax - percentMin) + "px";

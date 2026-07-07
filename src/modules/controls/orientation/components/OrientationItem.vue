@@ -116,7 +116,7 @@ export default {
             let geolocation = null;
 
             const inIframe = window.self !== window.top,
-                iFrameGeolocationEnabled = this.iFrameGeolocationEnabled === true;
+                  iFrameGeolocationEnabled = this.iFrameGeolocationEnabled === true;
 
             if (inIframe && !iFrameGeolocationEnabled) {
                 this.addSingleAlert({
@@ -266,9 +266,9 @@ export default {
          */
         positioning () {
             const position = this.geolocation.getPosition(),
-                firstGeolocation = this.firstGeolocation,
-                zoomMode = this.zoomMode,
-                centerPosition = proj4(proj4("EPSG:4326"), proj4(this.projection.getCode()), position);
+                  firstGeolocation = this.firstGeolocation,
+                  zoomMode = this.zoomMode,
+                  centerPosition = proj4(proj4("EPSG:4326"), proj4(this.projection.getCode()), position);
 
             // setting the center position
             this.setPosition(centerPosition);
@@ -370,8 +370,8 @@ export default {
         showPoiWindow () {
             if (!this.position) {
                 const geolocation = this.geolocation,
-                    position = geolocation.getPosition(),
-                    centerPosition = proj4(proj4("EPSG:4326"), proj4(this.projection.getCode()), position);
+                      position = geolocation.getPosition(),
+                      centerPosition = proj4(proj4("EPSG:4326"), proj4(this.projection.getCode()), position);
 
                 // setting the center position
                 this.setPosition(centerPosition);
@@ -405,8 +405,8 @@ export default {
          */
         getVectorFeaturesInCircle (layerConfigs, distance, centerPosition) {
             const circle = new Circle(centerPosition, distance),
-                circleExtent = circle.getExtent(),
-                visibleWFSLayers = [];
+                  circleExtent = circle.getExtent(),
+                  visibleWFSLayers = [];
 
             layerConfigs.forEach(layerConfig => {
                 if (layerConfig.typ === "WFS" && layerConfig.visibility) {
@@ -486,7 +486,7 @@ export default {
          */
         getDistance (feat, centerPosition) {
             const closestPoint = feat.getGeometry().getClosestPoint(centerPosition),
-                line = new LineString([closestPoint, centerPosition]);
+                  line = new LineString([closestPoint, centerPosition]);
 
             return Math.round(line.getLength());
         },

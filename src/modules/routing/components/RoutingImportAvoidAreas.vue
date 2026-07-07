@@ -98,7 +98,7 @@ export default {
          */
         addFiles (files) {
             const file = files[0],
-                reader = new FileReader();
+                  reader = new FileReader();
 
             this.dataIsValid = true;
 
@@ -127,7 +127,7 @@ export default {
         parseGeoJSON (content) {
             try {
                 const format = new GeoJSON(),
-                    features = format.readFeatures(content);
+                      features = format.readFeatures(content);
 
                 this.checkPolygonFormat(features);
                 if (this.dataIsValid) {
@@ -151,7 +151,7 @@ export default {
         parseKML (content) {
             try {
                 const format = new KML(),
-                    features = format.readFeatures(content);
+                      features = format.readFeatures(content);
 
                 this.checkPolygonFormat(features);
                 if (this.dataIsValid) {
@@ -170,7 +170,7 @@ export default {
          */
         async validateAndExtractPolygons (features) {
             const multiPolygonCoordinates = [],
-                featureCount = features.length;
+                  featureCount = features.length;
 
             for (const feature of features) {
                 const geometry = feature.getGeometry ? feature.getGeometry() : feature.geometry;
@@ -203,7 +203,7 @@ export default {
 
                 for (const avoidPolygon of this.avoidPolygons.coordinates) {
                     const transformedAvoidPolygon = await this.transformAvoidPolygon(avoidPolygon),
-                        polygonFeature = this.createFeature(transformedAvoidPolygon);
+                          polygonFeature = this.createFeature(transformedAvoidPolygon);
 
                     this.checkPolygonSize(transformedAvoidPolygon);
                     this.checkPolygonSideLength(transformedAvoidPolygon[0]);
@@ -284,7 +284,7 @@ export default {
             }
             else {
                 const firstCoordinate = polygonCoordinates[0][0],
-                    lastCoordinate = polygonCoordinates[0][polygonCoordinates[0].length - 1];
+                      lastCoordinate = polygonCoordinates[0][polygonCoordinates[0].length - 1];
 
 
                 if (!(firstCoordinate[0] === lastCoordinate[0] && firstCoordinate[1] === lastCoordinate[1])) {
@@ -300,8 +300,8 @@ export default {
          */
         checkPolygonSize (transformedAvoidArea) {
             const polygon = new Polygon(transformedAvoidArea),
-                area = polygon.getArea(),
-                maxArea = this.maxArea * 1000;
+                  area = polygon.getArea(),
+                  maxArea = this.maxArea * 1000;
 
             if (area > maxArea) {
                 this.addValidationErrorAlert(this.$t("common:modules.routing.importAvoidAreas.error.areaTooBig", {area: (area / 1000000).toFixed(2), maxArea: (maxArea / 1000000).toFixed(2)}));
@@ -318,11 +318,11 @@ export default {
 
             for (let i = 0; i < transformedAvoidArea.length - 1; i++) {
                 const point1 = transformedAvoidArea[i],
-                    point2 = transformedAvoidArea[i + 1],
-                    distance = Math.sqrt(
-                        Math.pow(point2[0] - point1[0], 2) +
-            Math.pow(point2[1] - point1[1], 2)
-                    );
+                      point2 = transformedAvoidArea[i + 1],
+                      distance = Math.sqrt(
+                          Math.pow(point2[0] - point1[0], 2) +
+                              Math.pow(point2[1] - point1[1], 2)
+                      );
 
                 if (distance > maxSideLength) {
                     this.addValidationErrorAlert(this.$t("common:modules.routing.importAvoidAreas.error.sideTooLong", {maxSideLength: (maxSideLength / 1000).toFixed(2), distance: (distance / 1000).toFixed(2)}));
@@ -338,9 +338,9 @@ export default {
         createFeature (transformedAvoidArea) {
             const polygon = new Polygon(transformedAvoidArea),
 
-                feature = new Feature({
-                    geometry: polygon
-                });
+                  feature = new Feature({
+                      geometry: polygon
+                  });
 
             return feature;
         },

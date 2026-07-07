@@ -22,7 +22,7 @@ export default {
 
         if (subMenuButton) {
             subMenuButton.addEventListener("show.bs.collapse", () => {
-            // call required functions to load meta data and get contact info from the meta data to be used in the contact button
+                // call required functions to load meta data and get contact info from the meta data to be used in the contact button
                 this.setLayerInfo(this.layerConf);
                 this.setMetadataURL(this.mdid);
                 this.additionalSingleLayerInfo();

@@ -99,7 +99,7 @@ export default {
          */
         add3DListener () {
             const scene = mapCollection.getMap("3D").getCesiumScene(),
-                northPointer = this.$el.querySelector("#north-pointer");
+                  northPointer = this.$el.querySelector("#north-pointer");
 
             this.remove3DListener();
             this.scenePostRenderListener = scene.postRender.addEventListener(function () {
@@ -168,7 +168,7 @@ export default {
          */
         northDown (event) {
             const offsetRect = this.$el.querySelector("#north-pointer").getBoundingClientRect(),
-                cursorPosition = {x: event.clientX, y: event.clientY};
+                  cursorPosition = {x: event.clientX, y: event.clientY};
 
             this.correction = {
                 y: offsetRect.top + offsetRect.height / 2 - cursorPosition.y,
@@ -246,13 +246,13 @@ export default {
          */
         setHeading (heading) {
             const camera = mapCollection.getMap("3D").getCesiumScene().camera,
-                options = {
-                    orientation: {
-                        pitch: camera.pitch,
-                        roll: camera.roll,
-                        heading: heading
-                    }
-                };
+                  options = {
+                      orientation: {
+                          pitch: camera.pitch,
+                          roll: camera.roll,
+                          heading: heading
+                      }
+                  };
 
             if (this.destination) {
                 options.destination = this.destination;

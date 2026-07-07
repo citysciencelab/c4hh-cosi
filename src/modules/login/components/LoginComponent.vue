@@ -59,10 +59,10 @@ export default {
             let timer = null;
 
             const params = "width=500,height=500,status=no,location=no,menubar=no," +
-                    `top=${window.screenY + (window.outerHeight - 500) / 2.5},` +
-                    `left=${window.screenX + (window.outerWidth - 500) / 2}`,
+                      `top=${window.screenY + (window.outerHeight - 500) / 2.5},` +
+                      `left=${window.screenX + (window.outerWidth - 500) / 2}`,
 
-                loginPopup = window.open(await this.getAuthCodeUrl(), this.translate("common:modules.login.login"), params);
+                  loginPopup = window.open(await this.getAuthCodeUrl(), this.translate("common:modules.login.login"), params);
 
             timer = setInterval(() => {
                 if (loginPopup.closed) {

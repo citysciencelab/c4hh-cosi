@@ -95,7 +95,7 @@ export default {
         selectedMetaURLs () {
             if (this.layerInfo.typ?.startsWith("GROUP") && Array.isArray(this.layerInfo.layers)) {
                 const selectedLayer = this.layerInfo.layers[this.selectedOption],
-                    metaID = selectedLayer?.metaID;
+                      metaID = selectedLayer?.metaID;
 
                 return buildMetaURLs(metaID, {
                     layerInfo: this.layerInfo,
@@ -305,7 +305,7 @@ export default {
          */
         getLayerAddress (layerInfo) {
             const typ = layerInfo.typ ?? layerInfo.type,
-                config = this.layerConfigById(layerInfo.id);
+                  config = this.layerConfigById(layerInfo.id);
             let url = config?.origUrl ? config.origUrl : layerInfo.url,
                 urlObject = new URL(url, location.href);
 

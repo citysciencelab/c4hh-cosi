@@ -31,7 +31,7 @@ export default {
         visibleBaselayerConfigs: {
             handler (newVal) {
                 const baselayerConfigs = Object.values(this.allBaselayerConfigs),
-                    topLayer = zIndexManager.getLayerWithMaxZIndex(newVal);
+                      topLayer = zIndexManager.getLayerWithMaxZIndex(newVal);
 
                 if (topLayer?.id !== undefined) {
                     const baselayers = baselayerConfigs.filter(layer => layer.id !== topLayer.id);
@@ -51,10 +51,10 @@ export default {
     created () {
         this.initializeModule({configPaths: this.configPaths, type: this.type});
         const baselayerConfigs = [],
-            baselayers = this.layerConfigsByAttributes({
-                baselayer: true,
-                showInLayerTree: true
-            });
+              baselayers = this.layerConfigsByAttributes({
+                  baselayer: true,
+                  showInLayerTree: true
+              });
 
         if (baselayers.length > 1) {
             const layerWithMaxZIndex = zIndexManager.getLayerWithMaxZIndex(baselayers);
@@ -79,7 +79,7 @@ export default {
 
         document.addEventListener("click", event => {
             const baselayerSwitcher = this.$refs["baselayer-switcher"],
-                isClickInside = baselayerSwitcher ? baselayerSwitcher.contains(event.target) : false;
+                  isClickInside = baselayerSwitcher ? baselayerSwitcher.contains(event.target) : false;
 
             if (!isClickInside) {
                 this.setActivatedExpandable(false);
@@ -100,9 +100,9 @@ export default {
             this.updateLayerVisibilityAndZIndex(layer.id);
 
             const selectableBackroundLayers = this.filteredBaseLayers,
-                index = selectableBackroundLayers.map(backgroundLayer => {
-                    return backgroundLayer.id;
-                }).indexOf(layer.id);
+                  index = selectableBackroundLayers.map(backgroundLayer => {
+                      return backgroundLayer.id;
+                  }).indexOf(layer.id);
 
             selectableBackroundLayers.splice(index, 1);
             if (this.topBaselayer !== null) {
