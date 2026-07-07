@@ -8,6 +8,7 @@
 ### __Breaking Changes__
 
 ### Added
+- package.json: Added `npm run buildJsDoc` to script `prePushHook`.
 
 ### Changed
 - FeatureLister: Replaced the module-specific navigation tabs with the shared NavTab component.
