@@ -82,7 +82,7 @@ export default {
         markerDirectionStyle () {
             return getMarkerDirectionStyle(this.showDirection, this.heading);
         }
-    }, 
+    },
     watch: {
         tracking () {
             this.trackingChanged();

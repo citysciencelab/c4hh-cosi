@@ -188,10 +188,6 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
             ];
 
         it("getVectorFeaturesInCircle returns all features", () => {
-            const wrapper = shallowMount(OrientationItemComponent, {
-                global: {
-                    plugins: [store]
-                }});
             let returnedFeatures = "";
 
             sinon.stub(layerCollection, "getLayerById").returns(wfsLayer);
@@ -205,10 +201,6 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         });
         it("getVectorFeaturesInCircle returns only filtered features", () => {
             onlyFilteredFeatures = true;
-            const wrapper = shallowMount(OrientationItemComponent, {
-                global: {
-                    plugins: [store]
-                }});
             let returnedFeatures = "";
 
             sinon.stub(layerCollection, "getLayerById").returns(wfsLayer);
@@ -222,10 +214,6 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         });
         it("getVectorFeaturesInCircle returns only features in extent", () => {
             let returnedFeatures = "";
-            const wrapper = shallowMount(OrientationItemComponent, {
-                global: {
-                    plugins: [store]
-                }});
 
             sinon.stub(layerCollection, "getLayerById").returns(wfsLayer);
             returnedFeatures = getVectorFeaturesInCircle({
