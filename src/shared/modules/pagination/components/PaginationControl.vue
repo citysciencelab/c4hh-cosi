@@ -187,7 +187,6 @@ export default {
 </template>
 
 <style scoped lang="scss">
-@import 'variables';
 
 .pagination-controls {
     display: flex;
