@@ -225,47 +225,15 @@ export default {
         },
 
         /**
-         * Calculates the movement heading from two geolocation points.
-         * @param {Number[]|null} previousPosition previous geolocation position as [lon, lat].
-         * @param {Number[]|null} currentPosition current geolocation position as [lon, lat].
-         * @returns {Number|null} heading in radians clockwise from north.
-         */
-        calculateHeadingFromPositions (previousPosition, currentPosition) {
-            if (!Array.isArray(previousPosition) || !Array.isArray(currentPosition)) {
-                return null;
-            }
-            const [lon1, lat1] = previousPosition;
-            const [lon2, lat2] = currentPosition;
-            const lon1Rad = lon1 * Math.PI / 180;
-            const lat1Rad = lat1 * Math.PI / 180;
-            const lon2Rad = lon2 * Math.PI / 180;
-            const lat2Rad = lat2 * Math.PI / 180;
-            const deltaLon = lon2Rad - lon1Rad;
-            const y = Math.sin(deltaLon) * Math.cos(lat2Rad);
-            const x = Math.cos(lat1Rad) * Math.sin(lat2Rad) - Math.sin(lat1Rad) * Math.cos(lat2Rad) * Math.cos(deltaLon);
-            const bearing = Math.atan2(y, x);
-            const normalizedBearing = (bearing + 2 * Math.PI) % (2 * Math.PI);
-
-            if (!Number.isFinite(normalizedBearing) || Math.abs(deltaLon) < 1e-12 && Math.abs(lat2Rad - lat1Rad) < 1e-12) {
-                return null;
-            }
-
-            return normalizedBearing;
-        },
-
-        /**
          * Returns heading from geolocation sensor and falls back to movement bearing.
          * @param {Number|null|undefined} nativeHeading heading from Geolocation API.
-         * @param {Number[]|null} previousPosition previous geolocation position as [lon, lat].
-         * @param {Number[]|null} currentPosition current geolocation position as [lon, lat].
          * @returns {Number|null} heading in radians clockwise from north.
          */
-        resolveHeading (nativeHeading, previousPosition, currentPosition) {
+        resolveHeading (nativeHeading) {
             if (Number.isFinite(nativeHeading)) {
                 return nativeHeading;
             }
-
-            return this.calculateHeadingFromPositions(previousPosition, currentPosition);
+            return null;
         },
 
         /**
@@ -418,7 +386,7 @@ export default {
                 firstGeolocation = this.firstGeolocation,
                 zoomMode = this.zoomMode,
                 centerPosition = proj4(proj4("EPSG:4326"), proj4(this.projection.getCode()), position),
-                resolvedHeading = this.resolveHeading(this.geolocation.getHeading(), this.previousPosition, position);
+                resolvedHeading = this.resolveHeading(this.geolocation.getHeading());
 
             if (Number.isFinite(resolvedHeading)) {
                 this.heading = resolvedHeading;
