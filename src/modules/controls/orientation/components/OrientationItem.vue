@@ -17,6 +17,10 @@ import {
     updateAccuracyGeometry as updateAccuracyGeometryUtil
 } from "../utils/accuracyLayer.js";
 import {getVectorFeaturesInCircle as getVectorFeaturesInCircleUtil} from "../utils/poiFeatureSearch.js";
+import {
+    getMarkerDirectionStyle,
+    resolveHeading
+} from "../utils/directionMarker.js";
 
 /**
  * Orientation control that allows the user to locate themselves on the map.
@@ -76,17 +80,9 @@ export default {
             return this.poiDistances === true ? [500, 1000, 2000] : this.poiDistances;
         },
         markerDirectionStyle () {
-            if (!this.showDirection || !Number.isFinite(this.heading)) {
-                return {};
-            }
-
-            const headingInDegree = (this.heading * 180 / Math.PI + 360) % 360;
-
-            return {
-                "--marker-heading-angle": `${headingInDegree}deg`
-            };
+            return getMarkerDirectionStyle(this.showDirection, this.heading);
         }
-    },
+    }, 
     watch: {
         tracking () {
             this.trackingChanged();
@@ -220,18 +216,6 @@ export default {
             this.unbindGeolocationListeners(geolocation);
             this.heading = null;
             this.previousPosition = null;
-        },
-
-        /**
-         * Returns heading from geolocation sensor and falls back to movement bearing.
-         * @param {Number|null|undefined} nativeHeading heading from Geolocation API.
-         * @returns {Number|null} heading in radians clockwise from north.
-         */
-        resolveHeading (nativeHeading) {
-            if (Number.isFinite(nativeHeading)) {
-                return nativeHeading;
-            }
-            return null;
         },
 
         /**
@@ -384,7 +368,7 @@ export default {
                 firstGeolocation = this.firstGeolocation,
                 zoomMode = this.zoomMode,
                 centerPosition = proj4(proj4("EPSG:4326"), proj4(this.projection.getCode()), position),
-                resolvedHeading = this.resolveHeading(this.geolocation.getHeading());
+                resolvedHeading = resolveHeading(this.geolocation.getHeading());
 
             if (Number.isFinite(resolvedHeading)) {
                 this.heading = resolvedHeading;

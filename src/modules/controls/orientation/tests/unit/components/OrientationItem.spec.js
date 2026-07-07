@@ -115,17 +115,6 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         expect(wrapper.vm.markerDirectionStyle["--marker-heading-angle"]).to.equal("90deg");
     });
 
-    it("prefers native heading if available", () => {
-        const wrapper = mount(OrientationItemComponent, {
-            global: {
-                plugins: [store]
-            }});
-
-        const heading = wrapper.vm.resolveHeading(1.2, [0, 0], [1, 0]);
-
-        expect(heading).to.equal(1.2);
-    });
-
     describe("OrientationItem.vue methods", () => {
         const centerPosition = [0, 0],
             distance = 100,
