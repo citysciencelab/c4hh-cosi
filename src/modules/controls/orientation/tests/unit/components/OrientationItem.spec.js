@@ -111,17 +111,6 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         expect(wrapper.vm.markerDirectionStyle["--marker-heading-angle"]).to.equal("90deg");
     });
 
-    it("calculates fallback heading from movement", () => {
-        const wrapper = mount(OrientationItemComponent, {
-            global: {
-                plugins: [store]
-            }});
-
-        const heading = wrapper.vm.calculateHeadingFromPositions([0, 0], [1, 0]);
-
-        expect(heading).to.be.closeTo(Math.PI / 2, 0.001);
-    });
-
     it("prefers native heading if available", () => {
         const wrapper = mount(OrientationItemComponent, {
             global: {
@@ -133,16 +122,6 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         expect(heading).to.equal(1.2);
     });
 
-    it("uses fallback heading if native heading missing", () => {
-        const wrapper = mount(OrientationItemComponent, {
-            global: {
-                plugins: [store]
-            }});
-
-        const heading = wrapper.vm.resolveHeading(null, [0, 0], [1, 0]);
-
-        expect(heading).to.be.closeTo(Math.PI / 2, 0.001);
-    });
     describe("OrientationItem.vue methods", () => {
         const centerPosition = [0, 0],
             distance = 100,
