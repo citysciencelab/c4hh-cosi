@@ -155,40 +155,40 @@ export default {
          */
         showGeomOnLayer (geom) {
             const map = mapCollection.getMap("2D"),
-                newFeature = this.createNewVectorFeature(geom);
+                  newFeature = this.createNewVectorFeature(geom);
 
             this.clearGeom();
 
             if (newFeature) {
                 const vectorSource = new VectorSource({
-                        features: [newFeature]
-                    }),
-                    vectorLayer = new VectorLayer({
-                        alwaysOnTop: true,
-                        id: this.geomLayerId,
-                        source: vectorSource,
-                        zIndex: 1000,
-                        style: new Style({
-                            fill: new Fill({
-                                color: this.lzsGeomLayout.fillColor
-                            }),
-                            stroke: new Stroke({
-                                color: this.lzsGeomLayout.strokeColor,
-                                width: this.lzsGeomLayout.strokeWidth
-                            }),
-                            image: new Circle({
-                                radius: this.lzsGeomLayout.circleRadius,
-                                fill: new Fill({
-                                    color: this.lzsGeomLayout.circleFillColor
-                                }),
-                                stroke: new Stroke({
-                                    color: this.lzsGeomLayout.circleStrokeColor,
-                                    width: this.lzsGeomLayout.strokeWidth
-                                })
-                            })
-                        })
-                    }),
-                    extent = newFeature.getGeometry().getExtent();
+                          features: [newFeature]
+                      }),
+                      vectorLayer = new VectorLayer({
+                          alwaysOnTop: true,
+                          id: this.geomLayerId,
+                          source: vectorSource,
+                          zIndex: 1000,
+                          style: new Style({
+                              fill: new Fill({
+                                  color: this.lzsGeomLayout.fillColor
+                              }),
+                              stroke: new Stroke({
+                                  color: this.lzsGeomLayout.strokeColor,
+                                  width: this.lzsGeomLayout.strokeWidth
+                              }),
+                              image: new Circle({
+                                  radius: this.lzsGeomLayout.circleRadius,
+                                  fill: new Fill({
+                                      color: this.lzsGeomLayout.circleFillColor
+                                  }),
+                                  stroke: new Stroke({
+                                      color: this.lzsGeomLayout.circleStrokeColor,
+                                      width: this.lzsGeomLayout.strokeWidth
+                                  })
+                              })
+                          })
+                      }),
+                      extent = newFeature.getGeometry().getExtent();
 
                 map.addLayer(vectorLayer);
                 this.geoRefShown = true;
@@ -346,7 +346,7 @@ export default {
         getSortedData (data, sortByIndex, sortAsc) {
             const sortedData = [...data].sort((a, b) => {
                 const valueA = a.attributes[sortByIndex].value,
-                    valueB = b.attributes[sortByIndex].value;
+                      valueB = b.attributes[sortByIndex].value;
 
                 if ((valueA === undefined || valueA === null) && (valueB === undefined || valueB === null)) {
                     return 0;

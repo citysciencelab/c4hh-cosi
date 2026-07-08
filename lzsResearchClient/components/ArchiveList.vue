@@ -67,17 +67,17 @@ export default {
          */
         archives () {
             const archiveIds = [...new Set(this.datasets.map(result => {
-                    return result.archiveId;
-                }))],
-                result = archiveIds.map(val => {
-                    const attributes = this.datasets.find(attr => attr.archiveId === val).attributes;
+                      return result.archiveId;
+                  }))],
+                  result = archiveIds.map(val => {
+                      const attributes = this.datasets.find(attr => attr.archiveId === val).attributes;
 
-                    return {
-                        archiveId: val,
-                        attributeToGroupBy: this.groupBySelections?.[val] || attributes[0].name || attributes[0].id,
-                        attributeCount: attributes.length
-                    };
-                });
+                      return {
+                          archiveId: val,
+                          attributeToGroupBy: this.groupBySelections?.[val] || attributes[0].name || attributes[0].id,
+                          attributeCount: attributes.length
+                      };
+                  });
 
             return result;
         },
@@ -134,14 +134,14 @@ export default {
          */
         groupsForArchive (archiveData) {
             const resultsForArchiveId = this.datasets.filter((archive) => {
-                    return archive.archiveId === archiveData.archiveId;
-                }),
-                groupList = [...new Set(resultsForArchiveId.map(result => {
-                    const groupByObj = result?.attributes?.find(attr => attr.name === archiveData.attributeToGroupBy || attr.id === archiveData.attributeToGroupBy),
-                        groupByValue = groupByObj ? groupByObj.value : "";
+                      return archive.archiveId === archiveData.archiveId;
+                  }),
+                  groupList = [...new Set(resultsForArchiveId.map(result => {
+                      const groupByObj = result?.attributes?.find(attr => attr.name === archiveData.attributeToGroupBy || attr.id === archiveData.attributeToGroupBy),
+                            groupByValue = groupByObj ? groupByObj.value : "";
 
-                    return groupByValue;
-                }))];
+                      return groupByValue;
+                  }))];
 
             return groupList.sort((a, b) => {
                 return Number(a) - Number(b);
@@ -157,21 +157,21 @@ export default {
          */
         resultsForGroupsForArchive (archiveData, groupByValue = null) {
             const resultsForArchiveId = JSON.parse(JSON.stringify(this.datasets.filter((archive) => {
-                    return archive.archiveId === archiveData.archiveId;
-                }))),
-                resultsForGroup = groupByValue
-                    ? resultsForArchiveId.filter((dataset) => {
-                        const groupByObj = dataset.attributes.find(attr => attr.name === archiveData.attributeToGroupBy || attr.id === archiveData.attributeToGroupBy);
+                      return archive.archiveId === archiveData.archiveId;
+                  }))),
+                  resultsForGroup = groupByValue
+                      ? resultsForArchiveId.filter((dataset) => {
+                          const groupByObj = dataset.attributes.find(attr => attr.name === archiveData.attributeToGroupBy || attr.id === archiveData.attributeToGroupBy);
 
-                        return groupByObj && groupByObj.value === groupByValue;
-                    }).map((dataset) => {
-                        const attributeIndexToDelete = dataset.attributes.findIndex(attr => attr.name === archiveData.attributeToGroupBy || attr.id === archiveData.attributeToGroupBy);
+                          return groupByObj && groupByObj.value === groupByValue;
+                      }).map((dataset) => {
+                          const attributeIndexToDelete = dataset.attributes.findIndex(attr => attr.name === archiveData.attributeToGroupBy || attr.id === archiveData.attributeToGroupBy);
 
-                        dataset.attributes.splice(attributeIndexToDelete, 1);
+                          dataset.attributes.splice(attributeIndexToDelete, 1);
 
-                        return dataset;
-                    })
-                    : resultsForArchiveId;
+                          return dataset;
+                      })
+                      : resultsForArchiveId;
 
             return resultsForGroup.sort((a, b) => {
                 return Number(a.attributes[0]?.value) - Number(b.attributes[0]?.value);

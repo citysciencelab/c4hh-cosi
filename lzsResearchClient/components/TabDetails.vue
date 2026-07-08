@@ -95,13 +95,13 @@ export default {
          */
         getTableHeaders () {
             const details = this.getDetailsForSelectedDetail,
-                headers = details?.primaryData ? details?.primaryData[0].primarydataAttributes.map(p => p.key) : [],
-                attributeNames = (details?.attributes || []).map(attr => attr.name),
-                filteredHeaders = headers
-                    .filter(header => !attributeNames.includes(header))
-                    .map((header) => {
-                        return getTranslationForAttribute(`additional:modules.lzsResearchClient.tabs.tabDetails.${header.toLowerCase()}`, header);
-                    });
+                  headers = details?.primaryData ? details?.primaryData[0].primarydataAttributes.map(p => p.key) : [],
+                  attributeNames = (details?.attributes || []).map(attr => attr.name),
+                  filteredHeaders = headers
+                      .filter(header => !attributeNames.includes(header))
+                      .map((header) => {
+                          return getTranslationForAttribute(`additional:modules.lzsResearchClient.tabs.tabDetails.${header.toLowerCase()}`, header);
+                      });
 
             filteredHeaders.push(this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"));
 
@@ -123,8 +123,8 @@ export default {
          */
         getTableDatasets () {
             const results = [],
-                details = this.getDetailsForSelectedDetail,
-                instanceAttributeNames = (details?.attributes || []).map(attr => attr.name);
+                  details = this.getDetailsForSelectedDetail,
+                  instanceAttributeNames = (details?.attributes || []).map(attr => attr.name);
 
             details?.primaryData?.forEach(dataset => {
                 const attributes = [];
@@ -176,11 +176,11 @@ export default {
             this.showSpinner = true;
 
             const onlySelectedPrimaryData = JSON.parse(JSON.stringify(this.getDetailsForSelectedDetail || {})),
-                filenamesToAddToDownload = this.placeholderDataClassList?.[onlySelectedPrimaryData?.archiveId]?.FILES_TO_ADD_TO_SINGLE_DOWNLOAD;
+                  filenamesToAddToDownload = this.placeholderDataClassList?.[onlySelectedPrimaryData?.archiveId]?.FILES_TO_ADD_TO_SINGLE_DOWNLOAD;
 
             onlySelectedPrimaryData.primaryData = (onlySelectedPrimaryData.primaryData || []).filter(
                 p => p.primaryDataId === primaryDataId ||
-                (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename))
+                    (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename))
             );
 
             this.downloadSelectedFiles(onlySelectedPrimaryData);

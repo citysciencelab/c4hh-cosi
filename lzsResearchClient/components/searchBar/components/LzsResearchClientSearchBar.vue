@@ -85,7 +85,7 @@ export default {
 
                 categories.forEach(category => {
                     const searchResultsByCategory = this.searchResults.filter(searchResult => searchResult.category === category),
-                        searchInterfaceIds = [...new Set(searchResultsByCategory.map(searchResult => searchResult.searchInterfaceId))];
+                          searchInterfaceIds = [...new Set(searchResultsByCategory.map(searchResult => searchResult.searchInterfaceId))];
 
                     if (searchInterfaceIds.length > 1) {
                         let count = 0;
@@ -113,7 +113,7 @@ export default {
          */
         limitedSortedSearchResults () {
             const results = {},
-                currentShowAllList = [];
+                  currentShowAllList = [];
 
             results.categoryProvider = {};
             this.setSearchSuggestions([]);
@@ -315,7 +315,7 @@ export default {
 
                 for (const searchResult of this.searchResults) {
                     const category = searchResult.category.toLowerCase(),
-                        name = (searchResult.name || "").toLowerCase().trim();
+                          name = (searchResult.name || "").toLowerCase().trim();
 
                     if (
                         category.includes("adresse") ||
@@ -353,9 +353,9 @@ export default {
             }
 
             const mapProjection = mapCollection.getMapView("2D").getProjection().getCode(),
-                addressPointWGS84 = pointGeometry.clone().transform(mapProjection, "EPSG:4326"),
-                parcelGeometry = new MultiPolygon([]),
-                parcel = await this.fetchFeatures(addressPointWGS84, "Flurstueck", this.alkisBaseUrl, "geometrie");
+                  addressPointWGS84 = pointGeometry.clone().transform(mapProjection, "EPSG:4326"),
+                  parcelGeometry = new MultiPolygon([]),
+                  parcel = await this.fetchFeatures(addressPointWGS84, "Flurstueck", this.alkisBaseUrl, "geometrie");
 
             let searchGeometry;
 
@@ -395,12 +395,12 @@ export default {
         async fetchFeatures (geometry, collection, url, geom) {
             try {
                 const filter = getOAFFeature.getOAFGeometryFilter(geometry, geom, "intersects"),
-                    geoJsonFeatures = await getOAFFeature.getOAFFeatureGet(url, collection, {
-                        limit: 100,
-                        filter,
-                        filterCrs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84",
-                        crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
-                    });
+                      geoJsonFeatures = await getOAFFeature.getOAFFeatureGet(url, collection, {
+                          limit: 100,
+                          filter,
+                          filterCrs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84",
+                          crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+                      });
 
                 return geoJsonFeatures;
             }

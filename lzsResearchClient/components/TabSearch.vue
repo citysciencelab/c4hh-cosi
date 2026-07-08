@@ -193,7 +193,7 @@ export default {
         },
         spatialAreaWarning () {
             const areaInSquareKilometers = roundFileSizeToFixed(this.searchGeometryArea / 1e6),
-                maxAreaInSquareKilometers = roundFileSizeToFixed(this.maxGeometryArea / 1e6);
+                  maxAreaInSquareKilometers = roundFileSizeToFixed(this.maxGeometryArea / 1e6);
 
             if (this.selectedButtonGroup === "extent" && this.scale > this.minScaleValue) {
                 return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.extentWarningMessage", {scale: this.minScaleValue});
@@ -363,24 +363,24 @@ export default {
          */
         initializeSearchForm () {
             const formData = {},
-                archives = {};
+                  archives = {};
 
             this.dataClassList?.forEach(element => {
                 const archiveName = element.name,
-                    archiveId = element.id,
-                    attributes = element.highestActiveDataclassVersion.dataclassAttributs
-                        .filter(attribute => attribute.usage === "I")
-                        .map(attribute => ({
-                            ...attribute,
-                            value: "",
-                            placeholder: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.PLACEHOLDER || "",
-                            labelKey: `additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`,
-                            pattern: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.PATTERN || "",
-                            testNumberRange: null,
-                            errorKey: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.ERROR_KEY,
-                            errorParams: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.ERROR_PARAMS || {},
-                            errorMessage: ""
-                        }));
+                      archiveId = element.id,
+                      attributes = element.highestActiveDataclassVersion.dataclassAttributs
+                          .filter(attribute => attribute.usage === "I")
+                          .map(attribute => ({
+                              ...attribute,
+                              value: "",
+                              placeholder: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.PLACEHOLDER || "",
+                              labelKey: `additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`,
+                              pattern: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.PATTERN || "",
+                              testNumberRange: null,
+                              errorKey: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.ERROR_KEY,
+                              errorParams: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.ERROR_PARAMS || {},
+                              errorMessage: ""
+                          }));
 
                 formData[archiveName] = [
                     ...attributes,
@@ -460,7 +460,7 @@ export default {
 
                     if (!regex.test(String(attribute.value))) {
                         attribute.errorMessage = this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.errorKey}`,
-                            attribute.errorParams
+                                                         attribute.errorParams
                         );
                         this.isAttributeSearchFormValid = false;
                     }
@@ -472,7 +472,7 @@ export default {
                         Number(attribute.value) > attribute.testNumberRange[1]
                     ) {
                         attribute.errorMessage = this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.errorKey}`,
-                            attribute.errorParams
+                                                         attribute.errorParams
                         );
                         this.isAttributeSearchFormValid = false;
                     }
@@ -569,7 +569,7 @@ export default {
         async onSelectedArchiveIdsChange (archiveId, event) {
             this.setErrorMessage("");
             const checked = event.target.checked,
-                layerConfig = this.placeholderDataClassList?.[archiveId]?.LAYERCONFIG;
+                  layerConfig = this.placeholderDataClassList?.[archiveId]?.LAYERCONFIG;
 
             if (checked) {
                 if (!this.selectedArchiveIds.includes(archiveId)) {
@@ -641,33 +641,33 @@ export default {
 
             // Get only the extent of the visible map area if any menus are expanded
             const map = mapCollection.getMap("2D"),
-                bottomLeftPixelAtCoordinates = map?.getPixelFromCoordinate([this.extent[0], this.extent[1]]),
-                topRightPixelAtCoordinates = map?.getPixelFromCoordinate([this.extent[2], this.extent[3]]),
-                rightPadding = this.expanded("secondaryMenu")
-                    ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
-                    : 20,
-                leftPadding = this.expanded("mainMenu")
-                    ? document.getElementById("mp-menu-mainMenu").offsetWidth
-                    : 20,
-                shiftedBottomLeftPixelX = [bottomLeftPixelAtCoordinates[0] + leftPadding, bottomLeftPixelAtCoordinates[1]],
-                shiftedBottomLeftCoordinate = map.getCoordinateFromPixel(shiftedBottomLeftPixelX),
-                shiftedTopRightPixelX = [topRightPixelAtCoordinates[0] - rightPadding, topRightPixelAtCoordinates[1]],
-                shiftedTopRightCoordinate = map.getCoordinateFromPixel(shiftedTopRightPixelX),
-                bottomLeft = [
-                    shiftedBottomLeftCoordinate[0],
-                    shiftedBottomLeftCoordinate[1]
-                ],
-                topRight = [
-                    shiftedTopRightCoordinate[0],
-                    shiftedTopRightCoordinate[1]
-                ],
-                polygonCoordinates = [[
-                    bottomLeft,
-                    [topRight[0], bottomLeft[1]],
-                    topRight,
-                    [bottomLeft[0], topRight[1]],
-                    bottomLeft
-                ]];
+                  bottomLeftPixelAtCoordinates = map?.getPixelFromCoordinate([this.extent[0], this.extent[1]]),
+                  topRightPixelAtCoordinates = map?.getPixelFromCoordinate([this.extent[2], this.extent[3]]),
+                  rightPadding = this.expanded("secondaryMenu")
+                      ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
+                      : 20,
+                  leftPadding = this.expanded("mainMenu")
+                      ? document.getElementById("mp-menu-mainMenu").offsetWidth
+                      : 20,
+                  shiftedBottomLeftPixelX = [bottomLeftPixelAtCoordinates[0] + leftPadding, bottomLeftPixelAtCoordinates[1]],
+                  shiftedBottomLeftCoordinate = map.getCoordinateFromPixel(shiftedBottomLeftPixelX),
+                  shiftedTopRightPixelX = [topRightPixelAtCoordinates[0] - rightPadding, topRightPixelAtCoordinates[1]],
+                  shiftedTopRightCoordinate = map.getCoordinateFromPixel(shiftedTopRightPixelX),
+                  bottomLeft = [
+                      shiftedBottomLeftCoordinate[0],
+                      shiftedBottomLeftCoordinate[1]
+                  ],
+                  topRight = [
+                      shiftedTopRightCoordinate[0],
+                      shiftedTopRightCoordinate[1]
+                  ],
+                  polygonCoordinates = [[
+                      bottomLeft,
+                      [topRight[0], bottomLeft[1]],
+                      topRight,
+                      [bottomLeft[0], topRight[1]],
+                      bottomLeft
+                  ]];
 
             this.searchGeometry = {
                 type: "Polygon",
@@ -751,10 +751,10 @@ export default {
 
             if (geometry instanceof LineString) {
                 const coordinates = geometry.getCoordinates(),
-                    polygonCoordinates = [
-                        [...coordinates, coordinates[0]]
-                    ],
-                    polygon = new Polygon(polygonCoordinates);
+                      polygonCoordinates = [
+                          [...coordinates, coordinates[0]]
+                      ],
+                      polygon = new Polygon(polygonCoordinates);
 
                 this.searchGeometry = {
                     type: "Polygon",
@@ -1013,7 +1013,7 @@ export default {
                 .then((parcelGeoJson) => {
                     if (parcelGeoJson && parcelGeoJson[0]?.geometry) {
                         const parcelGeometry = new MultiPolygon([]),
-                            parcel = parcelGeoJson[0];
+                              parcel = parcelGeoJson[0];
 
                         let searchGeometry;
 
@@ -1068,8 +1068,8 @@ export default {
          */
         displayLayerInMap (layerId) {
             const existingLayer = layerCollection.getLayerById(layerId),
-                configJsonLayer = this.layerConfigById(layerId),
-                servicesJsonLayer = rawLayerList.getLayerWhere({id: layerId});
+                  configJsonLayer = this.layerConfigById(layerId),
+                  servicesJsonLayer = rawLayerList.getLayerWhere({id: layerId});
 
             if (!configJsonLayer && !servicesJsonLayer) {
                 this.addSingleAlert({
@@ -1098,13 +1098,13 @@ export default {
 
                     this.addLayerToLayerConfig({
                         layerConfig:
-                        {...servicesJsonLayer,
-                            ...{
-                                showInLayerTree: true,
-                                visibility: true,
-                                type: "layer"
-                            }
-                        },
+                            {...servicesJsonLayer,
+                             ...{
+                                 showInLayerTree: true,
+                                 visibility: true,
+                                 type: "layer"
+                             }
+                            },
                         parentKey: treeSubjectsKey
                     });
                 }
