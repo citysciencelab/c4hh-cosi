@@ -1809,7 +1809,7 @@ Folgende Events existieren. Welche Events konfiguriert werden können ist den Be
 
 - activateLayerInTopicTree: Aktiviert den gefunden layer im Themenbaum und in der Karte.
 - addLayerToTopicTree: Fügt den gefundenen Layer zum Themenbaum und der Karte hinzu.
-- highligtFeature: Hebt das Scuhergebniss auf der Karte hervor.
+- highlightFeature: Hebt das Suchergebnis auf der Karte hervor.
 - openGetFeatureInfo: Öffnet die GetFeatureInfo zum Suchtreffer im Menü.
 - setMarker: Es wird ein Marker in der Karte platziert.
 - showInTree: Öffnet die Themenauswahl und zeigt den ausgewählten Layer an.

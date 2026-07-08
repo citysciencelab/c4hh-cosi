@@ -882,8 +882,8 @@ Defines the initial map view and a background shown when no layer or map is sele
             }
         ],
         "extent": [510000.0, 5850000.0, 625000.4, 6000000.0],
-        "StartResolution": 15.874991427504629,
-        "StartZoomLevel": 1,
+        "startResolution": 15.874991427504629,
+        "startZoomLevel": 1,
         "epsg": "EPSG:25832"
     }
 }
@@ -1814,7 +1814,7 @@ The following events exist. Which events can be configured can be found in the d
 
 - activateLayerInTopicTree: Activates the found layer in the topic tree and map.
 - addLayerToTopicTree: Adds the found layer to the topic tree and map.
-- highligtFeature: Highlights the search result on the map.
+- highlightFeature: Highlights the search result on the map.
 - openGetFeatureInfo: Opens the GetFeatureInfo for the search hit in the menu.
 - showInTree: Opens the topic selection and shows the selected layer.
 - showLayerInfo: Opens the layer information.
