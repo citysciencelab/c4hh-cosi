@@ -207,7 +207,11 @@ export default {
         }
     },
     mounted () {
-        const layers = mapCollection.getMap("2D")?.getLayers();
+        const layers = mapCollection.getMap("2D")?.getLayers(),
+              map = mapCollection.getMap("2D"),
+              additionalLayers = this.allLayerConfigs.filter(
+                  obj => !this.originalLayerConfig.some(item => item.id === obj.id)
+              );
 
         this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
 
@@ -215,8 +219,6 @@ export default {
         this.toolList = this.getToolList(this.configuredModules);
 
         this.loadChapterData();
-
-        const map = mapCollection.getMap("2D");
 
         if (map) {
             map.on("moveend", this.updatePositionFromMap);
@@ -241,6 +243,12 @@ export default {
                 }
             ];
         }
+
+        additionalLayers.forEach(layer => {
+            const layerConf = this.layerConfigById(layer.id);
+
+            this.removeLayer(layerConf);
+        });
     },
     beforeUnmount () {
         const map = mapCollection.getMap("2D");
@@ -670,7 +678,13 @@ export default {
          * @returns {void}
          */
         resetLayerConfig () {
+            this.selectedLayers.forEach(layer => {
+                const layerConf = this.layerConfigById(layer.layerId);
+
+                this.removeLayer(layerConf);
+            });
             this.selectedLayers = [];
+
             this.updateLayerConfigs(this.originalLayerConfig);
         },
         /**

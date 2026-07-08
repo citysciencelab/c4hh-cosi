@@ -66,6 +66,12 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                 },
                                 subjectLayerCategory: {}
                             }
+                        },
+                        LayerTree: {
+                            namespaced: true,
+                            actions: {
+                                removeLayer: () => sinon.stub()
+                            }
                         }
                     }
                 }

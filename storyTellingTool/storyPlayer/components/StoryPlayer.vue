@@ -53,7 +53,8 @@ export default {
         ]),
         ...mapGetters([
             "allLayerConfigs",
-            "layerConfigById"
+            "layerConfigById",
+            "visibleBaselayerConfigs"
         ]),
         ...mapGetters("Maps", ["mode"]),
         ...mapGetters("Menu", [
@@ -119,6 +120,7 @@ export default {
             );
             this.coverCardObserver.observe(coverCard);
         }
+        this.deactivateSubjectLayer();
     },
     beforeUnmount () {
         if (this.coverCardObserver) {
@@ -177,6 +179,7 @@ export default {
                 document.querySelectorAll("#story-player .stepper").forEach(s => s.classList.remove("active"));
                 this.currentIndex = -1;
                 this.deactivateTool();
+                this.deactivateSubjectLayer();
                 return;
             }
             if (this._detectActiveStep) {
@@ -212,7 +215,7 @@ export default {
         deactivateSubjectLayer () {
             const layers = mapCollection.getMap("2D")?.getLayers(),
                   visibleLayerList = typeof layers?.getArray !== "function" ? [] : layers.getArray().filter(layer => {
-                      return layer.getVisible() === true && layer.get("name") !== "markerPoint" && layer.get("name") !== "markerPolygon";
+                      return layer.getVisible() === true && layer.get("name") !== "markerPoint" && layer.get("name") !== "markerPolygon" && layer.get("id") !== this.visibleBaselayerConfigs[0]?.id;
                   });
 
             visibleLayerList.forEach(layer => {

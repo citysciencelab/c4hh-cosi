@@ -188,7 +188,8 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                     actions: {
                         changeMapMode: sinon.stub(),
                         placingPointMarker: sinon.spy(),
-                        removePointMarker: sinon.spy()
+                        removePointMarker: sinon.spy(),
+                        zoomToCoordinates: sinon.spy()
                     },
                     getters: {
                         mode: () => "2D"
@@ -221,7 +222,8 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 configJs: state => state.configJs,
                 allLayerConfigs: () => [],
                 layerConfigsByAttributes: () => [],
-                layerConfigById: () => sinon.stub()
+                layerConfigById: () => sinon.stub(),
+                visibleBaselayerConfigs: () => []
             },
             actions: {
                 addLayerToLayerConfig: () => sinon.stub(),
