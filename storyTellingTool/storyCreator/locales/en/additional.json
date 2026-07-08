@@ -81,8 +81,8 @@
           "video": "Video"
         },
         "feature": {
-          "title": "Title",
-          "description": "Description (optional)",
+          "title": "Title (max. 200 signs)",
+          "description": "Description (optional, max. 500 signs)",
           "editAttribute": "Edit attribute",
           "remove": "Remove",
           "cancel": "Discard feature",

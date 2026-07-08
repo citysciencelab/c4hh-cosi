@@ -81,8 +81,8 @@
           "video": "Video"
         },
         "feature": {
-          "title": "Überschrift",
-          "description": "Beschreibung (optional)",
+          "title": "Überschrift (max. 200 Zeichen)",
+          "description": "Beschreibung (optional, max. 500 Zeichen)",
           "editAttribute": "Attribute bearbeiten",
           "remove": "Löschen",
           "cancel": "Feature verwerfen",

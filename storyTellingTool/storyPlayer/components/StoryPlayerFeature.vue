@@ -48,8 +48,14 @@ export default {
         id="feature-popup"
         class="bg-white p-4"
     >
-        <h5>{{ featureAttributes?.title }}</h5>
-        <div>{{ featureAttributes?.description }}</div>
+        <h5>
+            {{ featureAttributes?.title }}
+        </h5>
+        <div
+            class="description"
+        >
+            {{ featureAttributes?.description }}
+        </div>
         <div
             class="table-wrapper mt-3"
         >
@@ -131,9 +137,17 @@ export default {
 </template>
 
 <style lang="scss">
-.table-wrapper {
-    max-height: 300px;
-    max-width: 500px;
+#feature-popup {
+    max-height: 450px;
     overflow: auto;
+    h5, .description {
+        max-width: 500px;
+        white-space: normal;
+        overflow-wrap: break-word;
+    }
+    .table-wrapper {
+        max-width: 500px;
+        overflow: auto;
+    }
 }
 </style>

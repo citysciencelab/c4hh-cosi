@@ -145,8 +145,31 @@ export default {
             if (!val.length || val.some(layer => layer.layerId !== this.currentFeature?.getLayerId())) {
                 this.currentFeature = null;
             }
+        },
+        /**
+         * Watches of the title length and cut it.
+         * @param {String} val - The title.
+         * @returns {void}
+         */
+        title (val) {
+            if (val && val.length > 200) {
+                this.$nextTick(() => {
+                    this.title = val.substring(0, 200);
+                });
+            }
+        },
+        /**
+         * Watches of the description length and cut it.
+         * @param {String} val - The description.
+         * @returns {void}
+         */
+        description (val) {
+            if (val && val.length > 500) {
+                this.$nextTick(() => {
+                    this.description = val.substring(0, 500);
+                });
+            }
         }
-
     },
     beforeUnmount () {
         this.removePointMarker();
