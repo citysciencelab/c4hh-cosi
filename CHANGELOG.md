@@ -16,6 +16,7 @@
 
 ### Changed
 - FeatureLister: Replaced the module-specific navigation tabs with the shared NavTab component.
+- Repository: Added repository rules to enforce consistent contribution and review standards.
 
 ### Deprecated
 
