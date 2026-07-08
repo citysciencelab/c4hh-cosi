@@ -1,22 +1,29 @@
 <script>
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import Badges from "../../shared/modules/badges/components/Badges.vue";
 import {Circle, Fill, Stroke, Style} from "ol/style.js";
 import dayjs from "dayjs";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getLayerById} from "../../utils/layer/getLayerById.js";
+import Heatmap from "ol/layer/Heatmap";
+import LabeledSlider from "../../shared/modules/slider/components/LabeledSlider.vue";
 import {mapActions} from "vuex";
 import {pointerMove} from "ol/events/condition";
 import {Select} from "ol/interaction";
+import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import {VExpansionPanels, VExpansionPanel, VExpansionPanelTitle, VExpansionPanelText} from "vuetify/components/VExpansionPanel";
 
 export default {
     name: "DipasProjectsContributions",
     components: {
+        AccordionItem,
         AlertMessage,
         Badges,
         FlatButton,
+        LabeledSlider,
+        SwitchInput,
         TagGroup,
         VExpansionPanels,
         VExpansionPanel,
@@ -52,7 +59,11 @@ export default {
             ],
             isProjectExpanded: false,
             openedPanel: undefined,
-            selectedCategories: this.project.categories
+            selectedCategories: this.project.categories,
+            showHeatmap: false,
+            heatmapLayer: null,
+            heatmapMaxVotes: 1,
+            heatmapOpacity: 100
         };
     },
     computed: {
@@ -90,6 +101,18 @@ export default {
             });
 
             return contributions.filter(k => this.selectedCategories.includes(k.category));
+        },
+        /**
+         * Checks whether the project contains any voting data for the heatmap.
+         * @returns {Boolean} True if at least one contribution has votes, otherwise false.
+         */
+        hasHeatmapData () {
+            return this.items.some(feature => {
+                return (
+                    Number(feature.get("votingPro")) +
+                    Number(feature.get("votingContra"))
+                ) > 0;
+            });
         }
     },
     watch: {
@@ -107,6 +130,16 @@ export default {
                 this.select.getFeatures().push(foundFeature);
                 this.zoomToExtent({extent: extent, options: {padding: [10, 10, 10, 10]}});
             }
+        },
+        /**
+         * Updates the heatmap layer opacity when the transparency value changes.
+         * @param {Number} value - The opacity percentage value from the slider.
+         * @returns {void}
+         */
+        heatmapOpacity (value) {
+            if (this.heatmapLayer) {
+                this.heatmapLayer.setOpacity(value / 100);
+            }
         }
     },
     created () {
@@ -114,6 +147,7 @@ export default {
         this.createSelectInteraction();
         this.createHoverInteraction();
         this.contributionsLayer = getLayerById("dipas-contributions").getLayer();
+        this.map = mapCollection.getMap("2D");
     },
     mounted () {
         this.scrollToContributionPanel("contributions");
@@ -125,9 +159,14 @@ export default {
         this.select.setActive(false);
         this.hover.setActive(false);
         this.contributionsLayer.getSource().clear();
+        if (this.heatmapLayer) {
+            this.map.removeLayer(this.heatmapLayer);
+            this.heatmapLayer = null;
+        }
     },
     methods: {
         ...mapActions("Maps", ["zoomToExtent", "addInteraction"]),
+        ...mapActions("Modules/DipasProjects", ["addLayer"]),
 
         /**
          * Adds multiple features to a specified layer and makes the layer visible.
@@ -143,6 +182,49 @@ export default {
                 source.addFeatures(features);
                 layer.setVisible(true);
             }
+        },
+
+        /**
+         * changes the visibility of the heatmap layer
+         * @param {Boolean} value - Whether the heatmap layer should be visible.
+         * @returns {void}
+         */
+        changeHeatmapVisibility (value) {
+            if (!this.heatmapLayer) {
+
+                const maxVotes = Math.max(
+                    ...this.items.map(f => Number(f.get("votingPro")) +
+                        Number(f.get("votingContra"))
+                    ),
+                    1
+                );
+
+                this.heatmapMaxVotes = maxVotes;
+
+                this.heatmapLayer = new Heatmap({
+                    source: this.contributionsLayer.getSource(),
+                    radius: 40,
+                    blur: 20,
+                    weight: feature => {
+                        if (!this.selectedCategories.includes(feature.get("category"))) {
+                            return 0;
+                        }
+
+                        return (
+                            Number(feature.get("votingPro")) +
+                            Number(feature.get("votingContra"))
+                        ) / this.heatmapMaxVotes;
+                    }
+                });
+
+                this.heatmapLayer.setOpacity(this.heatmapOpacity / 100);
+                this.heatmapLayer.changed();
+                this.heatmapLayer.setZIndex(9999);
+
+                this.map.addLayer(this.heatmapLayer);
+            }
+
+            this.heatmapLayer.setVisible(value);
         },
 
         createHoverInteraction () {
@@ -285,6 +367,9 @@ export default {
         updateCategory (tag) {
             this.select.getFeatures().clear();
             this.selectedCategories = tag.map(v => v.label);
+            if (this.heatmapLayer) {
+                this.heatmapLayer.changed();
+            }
             this.openedPanel = undefined;
 
             this.contributionsLayer.getSource().changed();
@@ -310,6 +395,17 @@ export default {
             else {
                 this.hover.getFeatures().remove(foundFeature);
             }
+        },
+        /**
+         * Handles the heatmap switch toggle and updates the heatmap visibility.
+         * @param {Event} event - The switch event or the new visibility state.
+         * @returns {void}
+         */
+        onHeatmapToggle (event) {
+            const checked = event?.target?.checked ?? Boolean(event);
+
+            this.showHeatmap = checked;
+            this.changeHeatmapVisibility(checked);
         }
     }
 };
@@ -350,6 +446,58 @@ export default {
                 {{ isProjectExpanded ? 'Schließen' : 'Weiterlesen...' }}
             </button>
         </div>
+        <AccordionItem
+            id="contribution-analysis"
+            :title="$t('additional:modules.tools.cosi.dipasProjects.contributionAnalysis')"
+            icon="bi bi-clipboard-data"
+        >
+            <SwitchInput
+                id="heatmap"
+                :aria="$t('additional:modules.tools.cosi.dipasProjects.showHeatmap')"
+                :checked="showHeatmap"
+                :disabled="!hasHeatmapData"
+                :interaction="onHeatmapToggle"
+                :label="$t('additional:modules.tools.cosi.dipasProjects.showHeatmap')"
+                class="mb-3"
+            />
+            <div
+                v-if="showHeatmap"
+                class="heatmap-legend pt-2 ps-6"
+            >
+                <div
+                    class="heatmap-legend"
+                >
+                    <h5 class="legend-title">
+                        {{ $t("additional:modules.tools.cosi.dipasProjects.legend") }}
+                    </h5>
+                    <div class="legend-gradient" />
+                    <div class="legend-labels d-flex justify-content-between mt-1">
+                        <span>0</span>
+                        <span>{{ Math.round(heatmapMaxVotes / 3) }}</span>
+                        <span>{{ Math.round((heatmapMaxVotes * 2) / 3) }}</span>
+                        <span>{{ heatmapMaxVotes }}</span>
+                    </div>
+                </div>
+                <div class="heatmap-transparency pt-4">
+                    <h5 class="transparency-title">
+                        {{ $t("additional:modules.tools.cosi.dipasProjects.transparency") }}
+                    </h5>
+                    <LabeledSlider
+                        class="mb-3"
+                        :min="0"
+                        :max="100"
+                        :unit="'%'"
+                        :model-value="heatmapOpacity"
+                        @update:model-value="heatmapOpacity = $event"
+                    />
+                </div>
+            </div>
+            <AlertMessage
+                v-if="!hasHeatmapData"
+                :text="$t('additional:modules.tools.cosi.dipasProjects.noContributionsRatings')"
+                type="noData"
+            />
+        </AccordionItem>
         <TagGroup
             class="my-4 ps-3"
             :items="categoryTags"
@@ -483,6 +631,20 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+    .legend-gradient {
+        height: 15px;
+        width: 100%;
+        border-radius: 15px;
+        background: linear-gradient(
+            to right,
+            rgba(0,0,255,0),
+            blue 20%,
+            cyan 40%,
+            lime 60%,
+            yellow 80%,
+            red 100%
+        );
+    }
     h6 {
         color: $secondary;
         font-family: $font_family_accent;
