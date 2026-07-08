@@ -4,11 +4,6 @@ import mutationsObliqueViewer from "../store/mutationsVcOblique.js";
 
 export default {
     name: "VcOblique",
-        data () {
-        return {
-            resizeObserver: null
-        };
-    },
     computed: {
         ...mapGetters("Modules/VcOblique", [
             "active",
@@ -40,8 +35,6 @@ export default {
         this.$nextTick(() => {
             this.createObliqueViewerURL(this.center || this.initialCenter);
             this.initObliqueView();
-
-            this.initializeResizer();
         });
     },
     beforeUnmount () {
@@ -55,29 +48,7 @@ export default {
             "resetObliqueViewer",
             "obliqueView",
             "createObliqueViewerURL"
-        ]),
-
-        /**
-         * Initialize the iframe resizer for the oblique viewer iframe.
-         * @returns {void}
-         */
-        initializeResizer () {
-                        const container = document.getElementById("obliqueViewer"),
-                iframe = this.$refs.iframeContent;
-
-            if (container && iframe) {
-                this.resizeObserver = new ResizeObserver((entries) => {
-                    for (const entry of entries) {
-                        const {height, width} = entry.contentRect;
-
-                        iframe.style.height = `${height}px`;
-                        iframe.style.width = `${width}px`;
-                    }
-                });
-
-                this.resizeObserver.observe(container);
-            }
-        }
+        ])
     }
 };
 </script>
@@ -89,9 +60,7 @@ export default {
     >
         <iframe
             id="obliqueIframe"
-            ref="iframeContent"
             title="ObliqueIframe"
-            style="border: 0; display: block;"
             :src="obliqueViewerURL"
         />
         <div
@@ -104,9 +73,20 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-#obliqueViewer{
+#obliqueViewer {
     height: 84vh;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     container-type: inline-size;
+}
+
+#obliqueIframe {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    border: 0;
+    display: block;
 }
 
 #oblique-footer {
