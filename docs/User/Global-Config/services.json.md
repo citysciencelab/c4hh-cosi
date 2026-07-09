@@ -354,7 +354,7 @@ A layer based on the OGC's [Web Feature Service](https://www.ogc.org/standard/wf
 |useProxy|no|Boolean|`false`|_Deprecated in the next major release. *[GDI-DE](https://www.gdi-de.org/en)* recommends setting CORS headers on the required services instead._ Only used for GFI requests. The request will contain the requested URL as path, with dots replaced by underscores.|`false`|
 |wfsFilter|no|String||Set to use xml ressource as wfs filter, the content of the filter file will be sent to the wfs server as POST request (**[see below](#filtering-of-wfs-layers)**).|`"ressources/xmlFilter/filterSchulenStadtteilschulen"`|
 |doNotLoadInitially|no|String|false|if set to true the layer will be initialized without network call, an empty array of features is promoted - this is useful to add features later on (e.g. by filtering) to a full functional but initially empty layer|false|
-|isSecured|no|Boolean|false|Displays whether the layer belongs to a secured service. (**[see below](#secured-wms-services)**)|false|
+|isSecured|no|Boolean|false|Displays whether the layer belongs to a secured service. (**[see below](#secured-wfs-oaf-services)**)|false|
 |layerSequence|no|Number||Number to determine the sequence of layers in the layerTree and layerSelection. The layers are rendered in sequence based on the assigned value, e.g. layers with `layerSequence=1` will initially be on top, etc. Does not work for Baselayers.|
 |propertyNames|no|Array||The attributes as PROPERTYNAME parameter to receive response from wfs layer |`["properties"]`|
 |wildCard|no|String||The wildcard parameter for the highlightFeaturesByAttribute property query. Must be one character only.|
@@ -487,7 +487,7 @@ The layerId and suffix must be unique as a pair!
 }
 ```
 
-### Secured WFS Services
+### Secured WFS OAF Services
 
 **CAUTION: If the layer belongs to a secured service, the following changes must be made to the service!**
 
@@ -1425,19 +1425,19 @@ With these confurations a url in the feature properties can be displayed either 
 
 | Name | Required | Type | Default | Description | Example |
 |---|---|---|---|---|---|
-| altitude | no | Number |  | Display height in 3D mode in meters. If an altitude is given, any existing z coordinate is overwritten. If no z coordinate exists, altitude is used as its value. | `527` |
+| altitude | no | Number |  | Display height in 3D mode in meters. If an altitude is given, any existing z coordinate is overwritten. If no z coordinate exists, altitude is set as z coordinate. | `527` |
 | altitudeMode | no | enum["clampToGround","absolute","relativeToGround"] | `"clampToGround"` | Height mode in 3D mode. | `"absolute"` |
 | altitudeOffset | no | Number |  | Height offset for display in 3D mode in meters. If given, any existing z coordinates will be increased by this value. If no z coordinate exists, this value is used as z coordinate. | `10` |
 | collection | yes | String |  | Collection to load. | `"bab_vkl"` |
 | crs | false | String | http://www.opengis.net/def/crs/EPSG/0/25832 | The coordinate reference system of the response geometries. If not supported, server will respond with error 400. See collections index of your oaf service for supported crs. e.g. https://api.hamburg.de/datasets/v1/schulen/collections. Can also be set to false to disable the crs parameter | `"EPSG:25832"` |
 | datasets | yes | **[datasets](#wms_wfs_oaf_datasets)**[]/Boolean |  | Metadata specification. All metadata of the layer data is referenced here. By clicking the "i" button in the layer tree, the information is retrieved by the CSW interface and shown to the user. For this, the **[rest-services.json](rest-services.json.md)** has to provide the URL of the metadata catalog resp. its CSW interface. The values *kategorie_opendata*, *kategorie_inspire*, and *kategorie_organisation* are used for layer categorization if the **[config.json](../Portal-Config/config.json.md)** has `tree.type` set to `"auto"`. To remove the "i" button altogether, explicitly set `"datasets": false`. |  |
-| datetime | no | String |  | If filled is added as parameter with key ´datetime´ to request. |  |
+| datetime | no | String |  | If set, the key ‘datetime’ is added to requests to the layer, using this value. |  |
 | doNotLoadInitially | no | Boolean |  | If set to true, the layer will be loaded without any features. Can be used for external filtering. |  |
-| gfiTheme | yes | String/Object |  | Display style of GFI information for this layer. Unless `"default"` is chosen, custom templates may be used to show GFI information in another format than the default table style. | `"default"` |
 | gfiAttributes | yes | String/**[gfiAttributes](#gfi-attributes)** |  | GFI attributes to be shown.  | `"ignore"` |
+| gfiTheme | yes | String/Object |  | Display style of GFI information for this layer. Unless `"default"` is chosen, custom templates may be used to show GFI information in another format than the default table style. | `"default"` |
 | id | yes | String/**[wfs_id](#wfs_id)** |  | Arbitrary id or an object with id and suffix | `"44"` |
-| isSecured | no | Boolean | false | Displays whether the layer belongs to a secured service. (**[see below](#secured-wfs-services)**) | false |
-| layerAttribution | no | String | `"nicht vorhanden"` | Additional layer information to be shown in the portal's control element *LayerAttribution*, if configured to appear. If `"nicht vorhanden"` (technical key meaning "not available") is chosen, no layer attribution is shown. | `"nicht vorhanden"` |
+| isSecured | no | Boolean | false | Displays whether the layer belongs to a secured service. (**[see above](#secured-wfs-oaf-services)**) | false |
+| layerAttribution | no | String | `"nicht vorhanden"` | Additional layer information to be shown in the portal's control element *LayerAttribution*, if configured to appear.If "nicht vorhanden" (technical key meaning "not available") or omitted, no layer attribution is shown. | `"nicht vorhanden"` |
 | layerSequence | no | Number |  | Number to determine the sequence of layers in the layerTree and layerSelection. The layers are rendered in sequence based on the assigned value, e.g. layers with `layerSequence=1` will initially be on top, etc. Does not work for Baselayers. |  |
 | legend | no | Boolean/String/String[] |  | Value of the **[services.json](services.json.md)** file. URL to be used to request a static legend image. Use a boolean value to dynamically generate the legend from a OAF request or the OAF styling respectively. Use a string to link an image or a PDF file. Use `"ignore"` or `false` for no legend. | `false` |
 | limit | false | Number | `400` | Limits the number of items presented in the response document. Ignored if bulk is `true`. | `10` |
