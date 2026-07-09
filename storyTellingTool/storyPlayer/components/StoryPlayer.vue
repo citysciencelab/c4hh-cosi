@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import {boundingExtent} from "ol/extent.js";
 import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
@@ -167,7 +168,7 @@ export default {
         ]),
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapMutations("Menu", ["setExpandedBySide"]),
-        ...mapActions("Maps", ["changeMapMode", "placingPointMarker", "removePointMarker", "zoomToCoordinates"]),
+        ...mapActions("Maps", ["changeMapMode", "placingPointMarker", "removePointMarker", "zoomToExtent"]),
         ...mapActions(["addLayerToLayerConfig", "addOrReplaceLayer", "replaceByIdInLayerConfig", "updateLayerConfigs"]),
         ...mapActions("Menu", ["changeCurrentComponent", "resetMenu"]),
 
@@ -457,12 +458,12 @@ export default {
             }
 
             this.placingPointMarker(val?.coordinate);
-            this.zoomToCoordinates({center: val?.coordinate, zoom: val?.zoomlevel});
+            this.zoomToExtent({extent: boundingExtent([val?.coordinate]), options: {maxZoom: typeof val?.zoomlevel === "number" ? val?.zoomlevel : mapCollection.getMapView("2D").getZoom()}});
             this.featureAttributes = val;
             this.overlay = new Overlay({
                 element: this.$refs.storyPlayerFeature,
                 positioning: "bottom-center",
-                offset: [0, -10]
+                offset: [0, -20]
             });
 
             mapCollection.getMap("2D").addOverlay(this.overlay);

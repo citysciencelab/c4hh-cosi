@@ -8,7 +8,7 @@ import StoryCreatorAddFeatureCard from "../../../components/StoryCreatorAddFeatu
 config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => {
-    let store, wrapper;
+    let map, store, wrapper;
 
     beforeEach(() => {
         store = createStore({
@@ -39,7 +39,7 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
                     actions: {
                         placingPointMarker: sinon.spy(),
                         removePointMarker: sinon.spy(),
-                        zoomToCoordinates: sinon.spy()
+                        zoomToExtent: sinon.spy()
                     }
                 }
             },
@@ -52,10 +52,32 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
                 plugins: [store]
             },
             props: {
+                chapterZoomLevel: 1,
                 selectedLayers: [],
                 initialContent: undefined
             }
         });
+        mapCollection.clear();
+        map = {
+            id: "ol",
+            mode: "2D",
+            on: sinon.stub(),
+            un: sinon.stub(),
+            getLayers: () => {
+                return {
+                    getArray: () => {
+                        return [];
+                    }
+                };
+            },
+            getView: () => {
+                return {
+                    getZoom: () => sinon.stub(),
+                    getCenter: () => []
+                };
+            }
+        };
+        mapCollection.addMap(map, "2D");
     });
 
     describe("Component DOM", () => {
@@ -86,6 +108,7 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
                     plugins: [store]
                 },
                 props: {
+                    chapterZoomLevel: 1,
                     selectedLayers: [{layerId: "1"}]
                 }
             });
@@ -134,10 +157,13 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
                         plugins: [store]
                     },
                     props: {
+                        chapterZoomLevel: 1,
                         selectedLayers: [{layerId: "1"}],
                         initialContent: {
                             attrs: {
-                                title: "title"
+                                coordinate: [1, 1],
+                                title: "title",
+                                zoomlevel: 1
                             }
                         }
                     }

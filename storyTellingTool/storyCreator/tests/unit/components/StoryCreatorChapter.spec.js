@@ -126,7 +126,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             },
             getView: () => {
                 return {
-                    getZoom: () => sinon.stub(),
+                    getZoom: () => 1,
                     getCenter: () => []
                 };
             }
@@ -520,6 +520,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     layerId: "1",
                     featureId: "1",
                     coordinate: [0, 0],
+                    zoomlevel: 1,
                     attributes: {}
                 };
 
@@ -546,6 +547,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                             layerId: "1",
                             featureId: "1",
                             coordinate: [0, 0],
+                            zoomlevel: 1,
                             attributes: {}
                         }
                     }

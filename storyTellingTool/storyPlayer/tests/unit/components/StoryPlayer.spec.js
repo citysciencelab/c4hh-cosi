@@ -13,19 +13,6 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
         originalIntersectionObserver,
         originalScrollIntoView;
 
-    beforeAll(() => {
-        map = {
-            id: "ol",
-            mode: "2D",
-            addOverlay: sinon.spy(),
-            getLayers: sinon.spy(),
-            removeOverlay: sinon.spy()
-        };
-
-        mapCollection.clear();
-        mapCollection.addMap(map, "2D");
-    });
-
     beforeEach(() => {
         // Save original XMLHttpRequest
         originalXMLHttpRequest = global.XMLHttpRequest;
@@ -189,7 +176,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                         changeMapMode: sinon.stub(),
                         placingPointMarker: sinon.spy(),
                         removePointMarker: sinon.spy(),
-                        zoomToCoordinates: sinon.spy()
+                        zoomToExtent: sinon.spy()
                     },
                     getters: {
                         mode: () => "2D"
@@ -279,6 +266,28 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 plugins: [store]
             }
         });
+
+        mapCollection.clear();
+        map = {
+            id: "ol",
+            mode: "2D",
+            getLayers: () => {
+                return {
+                    getArray: () => {
+                        return [];
+                    }
+                };
+            },
+            getView: () => {
+                return {
+                    getZoom: () => sinon.stub(),
+                    getCenter: () => []
+                };
+            },
+            addOverlay: sinon.spy(),
+            removeOverlay: sinon.spy()
+        };
+        mapCollection.addMap(map, "2D");
     });
 
     afterEach(() => {
@@ -537,49 +546,40 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
         });
 
         describe("openFeaturePopup", () => {
-            it("should not call placingPointMarker and zoomToCoordinates", () => {
-                const placingPointMarkerSpy = sinon.spy(wrapper.vm, "placingPointMarker"),
-                    zoomToCoordinatesSpy = sinon.spy(wrapper.vm, "zoomToCoordinates");
+            it("should not call placingPointMarker", () => {
+                const placingPointMarkerSpy = sinon.spy(wrapper.vm, "placingPointMarker");
 
                 wrapper.vm.openFeaturePopup(null);
                 expect(placingPointMarkerSpy.called).to.be.false;
-                expect(zoomToCoordinatesSpy.called).to.be.false;
 
                 wrapper.vm.openFeaturePopup(0);
                 expect(placingPointMarkerSpy.called).to.be.false;
-                expect(zoomToCoordinatesSpy.called).to.be.false;
 
                 wrapper.vm.openFeaturePopup([]);
                 expect(placingPointMarkerSpy.called).to.be.false;
-                expect(zoomToCoordinatesSpy.called).to.be.false;
 
                 wrapper.vm.openFeaturePopup(true);
                 expect(placingPointMarkerSpy.called).to.be.false;
-                expect(zoomToCoordinatesSpy.called).to.be.false;
 
                 wrapper.vm.openFeaturePopup("");
                 expect(placingPointMarkerSpy.called).to.be.false;
-                expect(zoomToCoordinatesSpy.called).to.be.false;
 
                 wrapper.vm.openFeaturePopup(undefined);
                 expect(placingPointMarkerSpy.called).to.be.false;
-                expect(zoomToCoordinatesSpy.called).to.be.false;
             });
 
-            it("should call placingPointMarker and zoomToCoordinates", () => {
-                const placingPointMarkerSpy = sinon.spy(wrapper.vm, "placingPointMarker"),
-                    zoomToCoordinatesSpy = sinon.spy(wrapper.vm, "zoomToCoordinates");
+            it("should call placingPointMarker", () => {
+                const placingPointMarkerSpy = sinon.spy(wrapper.vm, "placingPointMarker");
 
-                wrapper.vm.openFeaturePopup({});
+                wrapper.vm.openFeaturePopup({coordinate: [1, 1]});
                 expect(placingPointMarkerSpy.called).to.be.true;
-                expect(zoomToCoordinatesSpy.called).to.be.true;
             });
 
             it("should render StoryPlayerFeature component", async () => {
                 await wrapper.setData({featureAttributes: undefined});
                 expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.false;
 
-                await wrapper.vm.openFeaturePopup({});
+                await wrapper.vm.openFeaturePopup({coordinate: [1, 1], title: "title"});
                 expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.true;
             });
         });

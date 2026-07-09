@@ -997,6 +997,7 @@ export default {
                             <StoryCreatorAddFeatureCard
                                 v-if="isEditingContentItem(index)"
                                 class="mt-2"
+                                :chapter-zoom-level="element?.attrs?.zoomlevel"
                                 :initial-content="element"
                                 :selected-layers="selectedLayers"
                                 @addFeature="handleFeature"
@@ -1054,6 +1055,7 @@ export default {
             <StoryCreatorAddFeatureCard
                 v-else-if="isAddingContentType('feature')"
                 class="mt-2"
+                :chapter-zoom-level="confirmedZoomlevel"
                 :selected-layers="selectedLayers"
                 @addFeature="handleFeature"
                 @click:close="closeContentEditor"

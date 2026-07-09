@@ -1,5 +1,6 @@
 <script>
 import beautifyKey from "@shared/js/utils/beautifyKey.js";
+import {boundingExtent} from "ol/extent.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {isEmailAddress} from "@shared/js/utils/isEmailAddress.js";
@@ -17,6 +18,10 @@ export default {
         InputText
     },
     props: {
+        /**
+         * The initial content
+         * @type {Object}
+         */
         initialContent: {
             type: [Object, null],
             required: false,
@@ -30,6 +35,14 @@ export default {
             type: Array,
             required: false,
             default: () => []
+        },
+        /**
+         * The zoom level of current chapter
+         * @type {Number}
+         */
+        chapterZoomLevel: {
+            type: [Number, String],
+            required: true
         }
     },
     emits: ["addFeature", "click:close"],
@@ -41,7 +54,7 @@ export default {
             description: "",
             layerName: "",
             title: "",
-            zoomlevel: ""
+            zoomlevel: this.chapterZoomLevel
         };
     },
     computed: {
@@ -104,7 +117,6 @@ export default {
                 this.layerName = this.layerConfigById(this.currentFeature?.getLayerId())?.name || "";
                 this.attributes = this.currentFeature?.getProperties();
                 this.title = this.getDefaultTitle();
-                this.zoomlevel = mapCollection.getMapView("2D").getZoom();
             },
             deep: true
         },
@@ -130,8 +142,8 @@ export default {
                 this.title = content?.title;
                 this.zoomlevel = content?.zoomlevel;
 
-                this.zoomToCoordinates({center: this.coordinate, zoom: this.zoomLevel});
                 this.placingPointMarker(content?.coordinate);
+                this.zoomToExtent({extent: boundingExtent([this.coordinate]), options: {maxZoom: typeof this.zoomlevel === "number" ? content?.zoomlevel : mapCollection.getMapView("2D").getZoom()}});
             },
             deep: true,
             immediate: true
@@ -175,7 +187,7 @@ export default {
         this.removePointMarker();
     },
     methods: {
-        ...mapActions("Maps", ["placingPointMarker", "removePointMarker", "zoomToCoordinates"]),
+        ...mapActions("Maps", ["placingPointMarker", "removePointMarker", "zoomToExtent"]),
         ...mapActions("Modules/StoryManager", ["collectGfiFeatures"]),
         beautifyKey,
         isWebLink,
