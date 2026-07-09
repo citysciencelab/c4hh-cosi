@@ -48,6 +48,17 @@
                     "polling": {
                         "label": "Automatisches Update",
                         "help": "Neue Beiträge automatisch nachladen."
+                    },
+                    "contributionsAnalyse": {
+                        "label": "Beitrags-Analyse",
+                        "labelPointAnalyse": "Punktestyling nach Stimmung pro Beitrag",
+                        "legend": "Legende"
+                    },
+                    "voting": {
+                      "balancedVotes": "ausgeglichen",
+                      "negativeVotes": "negativ",
+                      "noVotes": "Keine Bewertung",
+                      "positiveVotes": "positiv"
                     }
                 }
             }

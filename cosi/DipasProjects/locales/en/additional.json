@@ -48,6 +48,17 @@
                     "polling": {
                         "label": "Automatic Update",
                         "help": "Load new contributions automatically."
+                    },
+                    "contributionsAnalyse": {
+                        "label": "Contributions analysis",
+                        "labelPointAnalyse": "Point styling by mood per contribution",
+                        "legend": "Legend"
+                    },
+                    "voting": {
+                      "balancedVotes": "balanced",
+                      "negativeVotes": "negative",
+                      "noVotes": "No votes",
+                      "positiveVotes": "positive"
                     }
                 }
             }

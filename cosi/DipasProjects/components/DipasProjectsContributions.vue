@@ -1,34 +1,35 @@
 <script>
-import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import Badges from "../../shared/modules/badges/components/Badges.vue";
 import {Circle, Fill, Stroke, Style} from "ol/style.js";
 import dayjs from "dayjs";
+import DipasProjectsContributionsAnalyse from "./DipasProjectsContributionsAnalyse.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getLayerById} from "../../utils/layer/getLayerById.js";
-import Heatmap from "ol/layer/Heatmap";
-import LabeledSlider from "../../shared/modules/slider/components/LabeledSlider.vue";
 import {mapActions} from "vuex";
 import {pointerMove} from "ol/events/condition";
 import {Select} from "ol/interaction";
-import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import {VExpansionPanels, VExpansionPanel, VExpansionPanelTitle, VExpansionPanelText} from "vuetify/components/VExpansionPanel";
 
 export default {
     name: "DipasProjectsContributions",
     components: {
-        AccordionItem,
+        DipasProjectsContributionsAnalyse,
         AlertMessage,
         Badges,
         FlatButton,
-        LabeledSlider,
-        SwitchInput,
         TagGroup,
         VExpansionPanels,
         VExpansionPanel,
         VExpansionPanelTitle,
         VExpansionPanelText
+    },
+    provide () {
+        return {
+            votingClassificationThresholds: this.getVotingClassificationThresholds(),
+            votingLegend: this.votingLegend
+        };
     },
     props: {
         project: {
@@ -58,12 +59,35 @@ export default {
                 "#512DA8"
             ],
             isProjectExpanded: false,
+            isPointAnalyseActive: false,
             openedPanel: undefined,
             selectedCategories: this.project.categories,
-            showHeatmap: false,
-            heatmapLayer: null,
-            heatmapMaxVotes: 1,
-            heatmapOpacity: 100
+            votingLegend: {
+                positiv: {
+                    color: "#63CC63",
+                    icon: "bi bi-hand-thumbs-up",
+                    id: "positiv",
+                    text: this.$t("additional:modules.tools.cosi.dipasProjects.voting.positiveVotes")
+                },
+                negativ: {
+                    color: "#EA5050",
+                    icon: "bi bi-hand-thumbs-down",
+                    id: "negativ",
+                    text: this.$t("additional:modules.tools.cosi.dipasProjects.voting.negativeVotes")
+                },
+                balanced: {
+                    color: "#f5a623",
+                    icon: "bi bi-circle",
+                    id: "balanced",
+                    text: this.$t("additional:modules.tools.cosi.dipasProjects.voting.balancedVotes")
+                },
+                noVoting: {
+                    color: "#888888",
+                    icon: "bi bi-circle",
+                    id: "noVoting",
+                    text: this.$t("additional:modules.tools.cosi.dipasProjects.voting.noVotes")
+                }
+            }
         };
     },
     computed: {
@@ -87,7 +111,7 @@ export default {
             return this.project.categories?.map(cat => ({
                 label: cat,
                 selected: this.selectedCategories.includes(cat),
-                color: this.categoryColors[cat]
+                color: this.isPointAnalyseActive ? "#151C27" : this.categoryColors[cat]
             }));
         },
         /**
@@ -96,23 +120,21 @@ export default {
          */
         contributions () {
             const contributions = this.items.map(feature => {
+                const votingPro = parseInt(feature.get("votingPro"), 10),
+                      votingContra = parseInt(feature.get("votingContra"), 10),
+                      votingResultType = this.getVotingResultType(votingPro, votingContra),
+                      {id, color, icon} = this.votingLegend[votingResultType];
+
                 feature.set("isSelected", false);
+                feature.set("votingResultValue", votingPro - votingContra);
+                feature.set("votingResult", id);
+                feature.set("color", color);
+                feature.set("icon", icon);
+
                 return feature.getProperties();
             });
 
             return contributions.filter(k => this.selectedCategories.includes(k.category));
-        },
-        /**
-         * Checks whether the project contains any voting data for the heatmap.
-         * @returns {Boolean} True if at least one contribution has votes, otherwise false.
-         */
-        hasHeatmapData () {
-            return this.items.some(feature => {
-                return (
-                    Number(feature.get("votingPro")) +
-                    Number(feature.get("votingContra"))
-                ) > 0;
-            });
         }
     },
     watch: {
@@ -129,16 +151,6 @@ export default {
             if (extent) {
                 this.select.getFeatures().push(foundFeature);
                 this.zoomToExtent({extent: extent, options: {padding: [10, 10, 10, 10]}});
-            }
-        },
-        /**
-         * Updates the heatmap layer opacity when the transparency value changes.
-         * @param {Number} value - The opacity percentage value from the slider.
-         * @returns {void}
-         */
-        heatmapOpacity (value) {
-            if (this.heatmapLayer) {
-                this.heatmapLayer.setOpacity(value / 100);
             }
         }
     },
@@ -159,14 +171,9 @@ export default {
         this.select.setActive(false);
         this.hover.setActive(false);
         this.contributionsLayer.getSource().clear();
-        if (this.heatmapLayer) {
-            this.map.removeLayer(this.heatmapLayer);
-            this.heatmapLayer = null;
-        }
     },
     methods: {
         ...mapActions("Maps", ["zoomToExtent", "addInteraction"]),
-        ...mapActions("Modules/DipasProjects", ["addLayer"]),
 
         /**
          * Adds multiple features to a specified layer and makes the layer visible.
@@ -184,56 +191,18 @@ export default {
             }
         },
 
-        /**
-         * changes the visibility of the heatmap layer
-         * @param {Boolean} value - Whether the heatmap layer should be visible.
-         * @returns {void}
-         */
-        changeHeatmapVisibility (value) {
-            if (!this.heatmapLayer) {
-
-                const maxVotes = Math.max(
-                    ...this.items.map(f => Number(f.get("votingPro")) +
-                        Number(f.get("votingContra"))
-                    ),
-                    1
-                );
-
-                this.heatmapMaxVotes = maxVotes;
-
-                this.heatmapLayer = new Heatmap({
-                    source: this.contributionsLayer.getSource(),
-                    radius: 40,
-                    blur: 20,
-                    weight: feature => {
-                        if (!this.selectedCategories.includes(feature.get("category"))) {
-                            return 0;
-                        }
-
-                        return (
-                            Number(feature.get("votingPro")) +
-                            Number(feature.get("votingContra"))
-                        ) / this.heatmapMaxVotes;
-                    }
-                });
-
-                this.heatmapLayer.setOpacity(this.heatmapOpacity / 100);
-                this.heatmapLayer.changed();
-                this.heatmapLayer.setZIndex(9999);
-
-                this.map.addLayer(this.heatmapLayer);
-            }
-
-            this.heatmapLayer.setVisible(value);
-        },
-
         createHoverInteraction () {
             this.hover = new Select({
                 condition: (evt) => pointerMove(evt),
                 filter: (feature, layer) => {
                     return layer.get("id") === "dipas-contributions";
                 },
-                style: (feature) => this.getContributionStyle(feature.get("category"), true)
+                style: (feature) => {
+                    if (this.isPointAnalyseActive) {
+                        return this.getContributionAnalyseStyle(feature, true);
+                    }
+                    return this.getContributionStyle(feature.get("category"), true);
+                }
             });
             this.hover.set("id", "dipas-contributions-hover");
             this.hover.getFeatures().on("add", this.setFeatureIsSelected);
@@ -246,7 +215,12 @@ export default {
                 filter: (feature, layer) => {
                     return layer.get("id") === "dipas-contributions";
                 },
-                style: (feature) => this.getContributionStyle(feature.get("category"), true)
+                style: (feature) => {
+                    if (this.isPointAnalyseActive) {
+                        return this.getContributionAnalyseStyle(feature, true);
+                    }
+                    return this.getContributionStyle(feature.get("category"), true);
+                }
             });
             this.select.set("id", "dipas-contributions-select");
             this.select.on("select", this.handleMapSelect);
@@ -267,10 +241,42 @@ export default {
 
             return new Style({
                 image: new Circle({
-                    radius: isHighlighted ? 10 : 5,
+                    radius: isHighlighted ? 12 : 8,
                     fill: new Fill({color: colorByCategory}),
                     stroke: new Stroke({
-                        color: isHighlighted ? "#fff" : colorByCategory,
+                        color: isHighlighted ? "#fff" : "#000",
+                        width: isHighlighted ? 1.5 : 1
+                    })
+                })
+            });
+        },
+
+        /**
+         * Gets the style for a contribution feature based on its voting result value and whether it is highlighted.
+         * @param {ol/Feature} feature - The contribution feature whose voting result value is used to determine the style.
+         * @param {Boolean} isHighlighted - A flag indicating whether the contribution is highlighted, affecting the radius and stroke of the style.
+         * @returns {ol/style/Style} The generated style for the contribution feature.
+         */
+        getContributionAnalyseStyle (feature, isHighlighted = false) {
+            const thresholds = this.getVotingClassificationThresholds(),
+                  absValue = Math.abs(feature.get("votingResultValue")),
+                  fillColor = this.votingLegend[feature.get("votingResult")].color;
+
+            let radius = 6;
+
+            if (absValue > thresholds[2]) {
+                radius = 12;
+            }
+            else if (absValue > thresholds[1]) {
+                radius = 9;
+            }
+
+            return new Style({
+                image: new Circle({
+                    radius: isHighlighted ? radius + 4 : radius,
+                    fill: new Fill({color: fillColor}),
+                    stroke: new Stroke({
+                        color: isHighlighted ? "#fff" : "#000",
                         width: isHighlighted ? 1.5 : 1
                     })
                 })
@@ -289,6 +295,10 @@ export default {
                 return null;
             }
 
+            if (this.isPointAnalyseActive) {
+                return this.getContributionAnalyseStyle(feature);
+            }
+
             return this.getContributionStyle(category, feature.get("isSelected"));
         },
 
@@ -299,6 +309,42 @@ export default {
          */
         getDate (date) {
             return dayjs(date).format("DD.MM.YYYY");
+        },
+
+        /**
+         * Calculates the thresholds for classifying voting results into three equal intervals.
+         * Converts negative values to positive (absolute) values before calculation.
+         * @returns {Number[]} Array with interval boundaries [min, threshold1, threshold2, max].
+         */
+        getVotingClassificationThresholds () {
+            const values = this.contributions.map(c => Math.abs(c.votingResultValue)),
+                  min = Math.min(...values),
+                  max = Math.max(...values),
+                  range = max - min,
+                  intervalSize = Math.ceil(range / 3),
+                  threshold1 = min + intervalSize,
+                  threshold2 = min + 2 * intervalSize;
+
+            return [min, threshold1, threshold2, threshold1 + threshold2];
+        },
+
+        /**
+         * Determines the voting result type based on pro and contra votes.
+         * @param {Number} votingPro - The number of positive votes.
+         * @param {Number} votingContra - The number of negative votes.
+         * @returns {String} The voting result type key ('positiv', 'negativ', 'balanced', or 'noVoting').
+         */
+        getVotingResultType (votingPro, votingContra) {
+            if (votingPro > votingContra) {
+                return "positiv";
+            }
+            if (votingPro < votingContra) {
+                return "negativ";
+            }
+            if (votingPro === 0 && votingContra === 0) {
+                return "noVoting";
+            }
+            return "balanced";
         },
 
         /**
@@ -360,6 +406,14 @@ export default {
         },
 
         /**
+         * Toggles the state of the point analysis, enabling or disabling it based on its current state.
+         * @returns {void}
+         */
+        toggleIsPointAnalyseActive () {
+            this.isPointAnalyseActive = !this.isPointAnalyseActive;
+        },
+
+        /**
          * Updates the list of selected categories based on the provided tags.
          * @param {Object[]} tag the selected tags.
          * @returns {void}
@@ -367,9 +421,6 @@ export default {
         updateCategory (tag) {
             this.select.getFeatures().clear();
             this.selectedCategories = tag.map(v => v.label);
-            if (this.heatmapLayer) {
-                this.heatmapLayer.changed();
-            }
             this.openedPanel = undefined;
 
             this.contributionsLayer.getSource().changed();
@@ -395,17 +446,6 @@ export default {
             else {
                 this.hover.getFeatures().remove(foundFeature);
             }
-        },
-        /**
-         * Handles the heatmap switch toggle and updates the heatmap visibility.
-         * @param {Event} event - The switch event or the new visibility state.
-         * @returns {void}
-         */
-        onHeatmapToggle (event) {
-            const checked = event?.target?.checked ?? Boolean(event);
-
-            this.showHeatmap = checked;
-            this.changeHeatmapVisibility(checked);
         }
     }
 };
@@ -418,7 +458,7 @@ export default {
                 {{ $t('additional:modules.tools.cosi.dipasProjects.contributionsHeadline') }}
             </h4>
             <FlatButton
-                class="btn btn-sm small"
+                class="btn btn-sm"
                 icon="bi bi-chevron-left"
                 :text="$t('additional:modules.tools.cosi.dipasProjects.backToProjects')"
                 @click="() => $emit('back')"
@@ -446,58 +486,11 @@ export default {
                 {{ isProjectExpanded ? 'Schließen' : 'Weiterlesen...' }}
             </button>
         </div>
-        <AccordionItem
-            id="contribution-analysis"
-            :title="$t('additional:modules.tools.cosi.dipasProjects.contributionAnalysis')"
-            icon="bi bi-clipboard-data"
-        >
-            <SwitchInput
-                id="heatmap"
-                :aria="$t('additional:modules.tools.cosi.dipasProjects.showHeatmap')"
-                :checked="showHeatmap"
-                :disabled="!hasHeatmapData"
-                :interaction="onHeatmapToggle"
-                :label="$t('additional:modules.tools.cosi.dipasProjects.showHeatmap')"
-                class="mb-3"
-            />
-            <div
-                v-if="showHeatmap"
-                class="heatmap-legend pt-2 ps-6"
-            >
-                <div
-                    class="heatmap-legend"
-                >
-                    <h5 class="legend-title">
-                        {{ $t("additional:modules.tools.cosi.dipasProjects.legend") }}
-                    </h5>
-                    <div class="legend-gradient" />
-                    <div class="legend-labels d-flex justify-content-between mt-1">
-                        <span>0</span>
-                        <span>{{ Math.round(heatmapMaxVotes / 3) }}</span>
-                        <span>{{ Math.round((heatmapMaxVotes * 2) / 3) }}</span>
-                        <span>{{ heatmapMaxVotes }}</span>
-                    </div>
-                </div>
-                <div class="heatmap-transparency pt-4">
-                    <h5 class="transparency-title">
-                        {{ $t("additional:modules.tools.cosi.dipasProjects.transparency") }}
-                    </h5>
-                    <LabeledSlider
-                        class="mb-3"
-                        :min="0"
-                        :max="100"
-                        :unit="'%'"
-                        :model-value="heatmapOpacity"
-                        @update:model-value="heatmapOpacity = $event"
-                    />
-                </div>
-            </div>
-            <AlertMessage
-                v-if="!hasHeatmapData"
-                :text="$t('additional:modules.tools.cosi.dipasProjects.noContributionsRatings')"
-                type="noData"
-            />
-        </AccordionItem>
+        <DipasProjectsContributionsAnalyse
+            :is-point-analyse-active="isPointAnalyseActive"
+            :selected-categories="selectedCategories"
+            @toggle:is-point-analyse-active="toggleIsPointAnalyseActive"
+        />
         <TagGroup
             class="my-4 ps-3"
             :items="categoryTags"
@@ -535,10 +528,30 @@ export default {
                         <hr>
                         <div class="d-flex justify-space-between align-center w-100">
                             <div class="d-flex align-center text-start">
-                                <i
-                                    class="bi bi-circle-fill me-3 category-icon"
-                                    :style="{ color: categoryColors[i.category] }"
-                                />
+                                <template v-if="isPointAnalyseActive">
+                                    <div class="d-flex flex-column align-items-center me-3">
+                                        <i
+                                            :class="[
+                                                i.icon,
+                                                'rounded-circle fs-5 p-2 mb-1',
+                                                { 'text-white': ['positiv', 'negativ'].includes(i.votingResult) }
+                                            ]"
+                                            :style="{
+                                                background: i.color,
+                                                color: ['positiv', 'negativ'].includes(i.votingResult) ? undefined : i.color
+                                            }"
+                                        />
+                                        <span v-if="['positiv', 'negativ'].includes(i.votingResult)">
+                                            {{ i.votingResultValue }}
+                                        </span>
+                                    </div>
+                                </template>
+                                <template v-else>
+                                    <span
+                                        class="d-inline-block rounded-circle me-3 legend-icon-size legend-icon-border"
+                                        :style="{ background: categoryColors[i.category] }"
+                                    />
+                                </template>
 
                                 <div class="d-flex flex-column">
                                     <h6 class="mb-0">
@@ -552,9 +565,9 @@ export default {
                             <div class="text-end mx-2">
                                 <Badges
                                     class="mb-2 mt-1"
-                                    :color="'#FFFFFF'"
+                                    :color="isPointAnalyseActive ? undefined : '#FFFFFF'"
                                     :text="i.category"
-                                    :background-color="categoryColors[i.category]"
+                                    :background-color="isPointAnalyseActive ? '#e3e3e3' : categoryColors[i.category]"
                                 />
                             </div>
                         </div>
@@ -572,7 +585,7 @@ export default {
                                 </small>
                             </div>
                             <FlatButton
-                                class="btn btn-sm btn-light py-0 px-2 small"
+                                class="btn btn-sm btn-light py-0 px-2"
                                 icon="bi bi-link-45deg"
                                 :text="$t('additional:modules.tools.cosi.dipasProjects.viewOriginalPost')"
                                 @click="handleLinkClick(i.link)"
@@ -621,7 +634,7 @@ export default {
         </div>
         <div class="d-flex justify-content-center my-4 pt-3">
             <FlatButton
-                class="btn btn-sm small"
+                class="btn btn-sm"
                 icon="bi bi-chevron-left"
                 :text="$t('additional:modules.tools.cosi.dipasProjects.backToProjects')"
                 @click="() => $emit('back')"
@@ -631,30 +644,21 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    .legend-gradient {
-        height: 15px;
-        width: 100%;
-        border-radius: 15px;
-        background: linear-gradient(
-            to right,
-            rgba(0,0,255,0),
-            blue 20%,
-            cyan 40%,
-            lime 60%,
-            yellow 80%,
-            red 100%
-        );
+
+    .legend-icon-border {
+        border-width: 1px;
+        border-color: #000 !important;
+        border-style: solid;
+    }
+    .legend-icon-size {
+        width: 24px;
+        height: 24px;
     }
     h6 {
         color: $secondary;
         font-family: $font_family_accent;
     }
-    .category-icon {
-        font-size: 1.4rem;
-        display: inline-flex;
-        align-self: center;
-        vertical-align: middle;
-    }
+
     .type {
         color: $dark-grey;
         font-family: $font_family_accent;
