@@ -6,6 +6,7 @@ import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import Multiselect from "vue-multiselect";
 import TabResultTable from "./TabResultTable.vue";
+import SumOfCheckedFiles from "./SumOfCheckedFiles.vue";
 import {getTranslationForAttribute, capitalizeString} from "../utils/translationHelpers";
 
 export default {
@@ -16,7 +17,8 @@ export default {
         Multiselect,
         SwitchInput,
         SpinnerItem,
-        TabResultTable
+        TabResultTable,
+        SumOfCheckedFiles
     },
     props: {
         datasets: {
@@ -497,6 +499,11 @@ export default {
                 @click="downloadChecked()"
             />
         </div>
+
+        <SumOfCheckedFiles
+            v-if="somethingCheckedForDownload"
+            :checked-datasets="datasets.filter(data => data.checked)"
+        />
 
         <div class="steps">
             <div

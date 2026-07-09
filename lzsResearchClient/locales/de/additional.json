@@ -118,6 +118,11 @@
                 "zipping": "Erzeuge das ZIP ...",
                 "done": "Erledigt!"
               }
+            },
+            "sumOfCheckedFiles": {
+              "progressAriaLabel": "Anteil der ausgewählten Dateien am gesamten Downloadvolumen {{ percent }}%",
+              "sumOk": "{{ currentFileSize }} von {{ maxFileSize }} ausgewählt",
+              "sumTooHigh": "Bitte wählen Sie weniger Dateien, der Download wird mit {{ currentFileSize }} zu groß!"
             }
         }
     }

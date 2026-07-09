@@ -2,6 +2,7 @@
 import {mapGetters, mapMutations, mapActions} from "vuex";
 import {TAB_SET_CURRENT} from "@shared/modules/tabs/components/TabContainer.vue";
 import TabResultTable from "./TabResultTable.vue";
+import SumOfCheckedFiles from "./SumOfCheckedFiles.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
@@ -12,6 +13,7 @@ export default {
     name: "TabDetails",
     components: {
         TabResultTable,
+        SumOfCheckedFiles,
         FlatButton,
         SpinnerItem,
         ModalItem
@@ -279,6 +281,11 @@ export default {
                 @click="downloadChecked()"
             />
         </div>
+
+        <SumOfCheckedFiles
+            v-if="somethingCheckedForDownload"
+            :checked-datasets="[getAllFilesForDownload()]"
+        />
 
         <div class="contentDetailsTableContainer">
             <div
