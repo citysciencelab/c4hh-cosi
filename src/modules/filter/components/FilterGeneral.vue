@@ -149,8 +149,8 @@ export default {
         }
 
         const filterUrlParams = this.getFilterUrlParams(this.appStoreUrlParams),
-            hasInitialFilterUrlState = Array.isArray(filterUrlParams)
-                || (isObject(filterUrlParams) && Object.prototype.hasOwnProperty.call(filterUrlParams, "rulesOfFilters"));
+              hasInitialFilterUrlState = Array.isArray(filterUrlParams)
+                  || (isObject(filterUrlParams) && Object.prototype.hasOwnProperty.call(filterUrlParams, "rulesOfFilters"));
 
         this.urlHandler.readFromUrlParams(filterUrlParams, this.layerConfigs, this.mapHandler, async params => {
             this.handleStateForAlreadyActiveLayers(params);
@@ -336,7 +336,7 @@ export default {
 
             accordions.forEach(accordion => {
                 const layerFilterComp = this.$refs[`filter-${accordion?.filterId}`],
-                    layerFilterCompRef = Array.isArray(layerFilterComp) ? layerFilterComp[0] : layerFilterComp;
+                      layerFilterCompRef = Array.isArray(layerFilterComp) ? layerFilterComp[0] : layerFilterComp;
 
                 if (typeof layerFilterCompRef?.applyDeserializedState !== "function") {
                     return;
