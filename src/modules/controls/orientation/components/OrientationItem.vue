@@ -365,10 +365,10 @@ export default {
          */
         positioning () {
             const position = this.geolocation.getPosition(),
-                firstGeolocation = this.firstGeolocation,
-                zoomMode = this.zoomMode,
-                centerPosition = proj4(proj4("EPSG:4326"), proj4(this.projection.getCode()), position),
-                resolvedHeading = resolveHeading(this.geolocation.getHeading());
+                  firstGeolocation = this.firstGeolocation,
+                  zoomMode = this.zoomMode,
+                  centerPosition = proj4(proj4("EPSG:4326"), proj4(this.projection.getCode()), position),
+                  resolvedHeading = resolveHeading(this.geolocation.getHeading());
 
             if (Number.isFinite(resolvedHeading)) {
                 this.heading = resolvedHeading;

@@ -29,7 +29,8 @@ export function initAccuracyLayer ({accuracyFeature, accuracyLayer, map}) {
     const accuracyFillColor = getPrimaryColor(0.15);
     const accuracyStrokeColor = getPrimaryColor(0.9);
     const accuracySource = markRaw(new VectorSource());
-    const nextAccuracyLayer = markRaw(new VectorLayer({
+    const nextAccuracyLayer = markRaw(
+        new VectorLayer({
             id: "orientation_accuracy_layer",
             source: accuracySource,
             style: new Style({
@@ -42,7 +43,8 @@ export function initAccuracyLayer ({accuracyFeature, accuracyLayer, map}) {
                 })
             }),
             zIndex: 9999
-        }));
+        })
+    );
 
     accuracySource.addFeature(accuracyFeature);
     map.addLayer(nextAccuracyLayer);
@@ -59,7 +61,12 @@ export function initAccuracyLayer ({accuracyFeature, accuracyLayer, map}) {
  * @param {ol/Feature} params.accuracyFeature Feature receiving transformed accuracy geometry.
  * @returns {void}
  */
-export function updateAccuracyGeometry ({showAccuracy, geolocation, projectionCode, accuracyFeature}) {
+export function updateAccuracyGeometry ({
+    showAccuracy,
+    geolocation,
+    projectionCode,
+    accuracyFeature
+}) {
     if (!showAccuracy || geolocation === null) {
         return;
     }
@@ -70,7 +77,9 @@ export function updateAccuracyGeometry ({showAccuracy, geolocation, projectionCo
         return;
     }
 
-    accuracyFeature.setGeometry(accuracyGeometry.clone().transform("EPSG:4326", projectionCode));
+    accuracyFeature.setGeometry(
+        accuracyGeometry.clone().transform("EPSG:4326", projectionCode)
+    );
 }
 
 /**
@@ -81,7 +90,11 @@ export function updateAccuracyGeometry ({showAccuracy, geolocation, projectionCo
  * @param {Function} params.listener Listener to remove from geolocation accuracy changes.
  * @returns {void}
  */
-export function clearAccuracyGeometry ({geolocation, accuracyFeature, listener}) {
+export function clearAccuracyGeometry ({
+    geolocation,
+    accuracyFeature,
+    listener
+}) {
     if (geolocation) {
         geolocation.un("change:accuracyGeometry", listener);
     }

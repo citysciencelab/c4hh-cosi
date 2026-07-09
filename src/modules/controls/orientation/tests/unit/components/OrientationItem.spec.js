@@ -105,7 +105,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
 
     it("creates marker direction style from heading", () => {
         showDirection = true;
-        const wrapper = mount(OrientationItemComponent, {
+        const wrapper = shallowMount(OrientationItemComponent, {
             global: {
                 plugins: [store]
             }});
