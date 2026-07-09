@@ -321,6 +321,7 @@ export default {
                 this.alreadyWatching = this.$watch("$store.state.Modules.Filter", this.writeUrlParams, {
                     deep: true
                 });
+                this.writeUrlParams(this.$store.state.Modules.Filter);
             }
         },
         /**
@@ -555,6 +556,9 @@ export default {
             const params = this.urlHandler.getParamsFromState(newState, this.neededUrlParams),
                   generatedParams = JSON.stringify(params);
 
+            if (this.urlParams === generatedParams) {
+                return;
+            }
             this.setUrlParams(generatedParams);
         },
         /**
