@@ -39,7 +39,8 @@
 - Issue \#1522: Show publish date and creation date of metadata separately.
 - Issue \#1626: Added fallback to OpenLayers default style for vector layers when styleId is missing or not found.
 - Issue \#1627: Module openConfig updates menu.
-- Issue \#1630: Fixed parseMissingKeyHandler misinterpreting decimal numbers as time values (e.g. "0.58 m" became "0:58 m"). The time format replacement now requires two-digit hours only.
+-  Issue \#1630: Fixed parseMissingKeyHandler misinterpreting decimal numbers as time values (e.g. "0.58 m" became "0:58 m"). The time format replacement now requires two-digit hours only.
+- Issue \#1632: Filter: Fix setting filter rules from URL Parameters.
 - Issue \#1634: url parameter `highlightFeaturesByAttributes` can now handle MultiPoint, MultiPolygon and MultiLineString features.
 - Issue \#1638: FolderCheckBox: Folder checkbox selection (isFolderSelectable) now adds layers in the same order as "add all".
 - Control: Fixed a layout issue with the control module.
