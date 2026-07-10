@@ -33,6 +33,7 @@
 - Filter: A bug has been fixed that prevented the geometry filter from working with multipolygons.
 - Menu: Fixed a bug on mobile, where the close button disappeared behind input fields.
 - WMSTime: Fixed deleting WMS-Time layers in compare mode, which kept the remaining layer, LayerSwiper und TimeSlider in a broken state.
+- LayerPills: Fixed a bug that showed "show more" button on certain zoom sizes and refactored how LayerPills width is calculated.
 
 ---
 

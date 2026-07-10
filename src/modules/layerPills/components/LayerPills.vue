@@ -18,7 +18,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["isMobile", "visibleSubjectDataLayerConfigs"]),
+        ...mapGetters(["visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Modules/LayerPills", [
             "active",
             "configPaths",
@@ -29,17 +29,7 @@ export default {
         ]),
         ...mapGetters("Modules/LayerTree", ["layerTreeSortedLayerConfigs"]),
         ...mapGetters("Maps", ["mode"]),
-        ...mapGetters("Menu", ["currentSecondaryMenuWidth", "currentMainMenuWidth"]),
-        /**
-         * combinedMenuState keeps track of the state of menu, i.e. whether the menus are expanded and their current width.
-         * Enables the use of a single watcher on all four variables.
-         */
-        combinedMenuWidthState () {
-            return {
-                currentMainMenuWidth: this.currentMainMenuWidth,
-                currentSecondaryMenuWidth: this.currentSecondaryMenuWidth
-            };
-        },
+
         /**
          * Returns all visible subject data layers in the correct display order
          * for the LayerPills component.
@@ -81,18 +71,6 @@ export default {
             );
 
             this.setVisibleLayers(sortedByTree, value);
-        },
-        /**
-         * Detects changes to the menu state and width to update the layerPills accordingly.
-         * Animation of menus opening or closing make the timeout necessary.
-         * @returns {void}
-         */
-        combinedMenuWidthState: {
-            handler () {
-                if (this.active) {
-                    this.setToggleButtonVisibility();
-                }
-            }
         }
     },
     created () {
@@ -116,8 +94,7 @@ export default {
         }
     },
     methods: {
-        ...mapMutations("Modules/LayerPills", ["setVisibleSubjectDataLayers", "setActive"]),
-        ...mapMutations(["setVisibleSubjectDataLayerConfigs"]),
+        ...mapMutations("Modules/LayerPills", ["setVisibleSubjectDataLayers"]),
         ...mapActions(["initializeModule", "replaceByIdInLayerConfig"]),
         ...mapActions("Modules/LayerInformation", ["startLayerInformation"]),
 
@@ -200,12 +177,13 @@ export default {
          */
         setToggleButtonVisibility () {
             this.$nextTick(() => {
-                this.setupResizeObserver();
+
+                const pillMargin = 10;
+                const roundingTolerance = 2;
+                let totalPillWidth = 0;
+
                 const container = this.$refs.layerPillsContainer,
-                      pills = container?.querySelectorAll(".nav-item"),
-                      pillWidth = pills?.[0]
-                          ? (pills[0].offsetWidth + 10) * this.visibleSubjectDataLayers.length
-                          : 0,
+                      pills = container?.querySelectorAll(".nav-pills > li"),
                       containerWidth = container?.querySelector(".nav-pills")
                           ? container.querySelector(".nav-pills").getBoundingClientRect().width
                           : 0;
@@ -214,7 +192,12 @@ export default {
                     this.showToggleButton = false;
                     return;
                 }
-                this.showToggleButton = pillWidth > containerWidth;
+
+                pills.forEach(pill => {
+                    totalPillWidth += pill.offsetWidth + pillMargin;
+                });
+
+                this.showToggleButton = Math.round(totalPillWidth) > Math.round(containerWidth) + roundingTolerance;
             });
         }
     }

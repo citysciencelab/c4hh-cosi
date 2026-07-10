@@ -291,17 +291,21 @@ describe("src/modules/LayerPills.vue", () => {
             });
         });
 
-        it.skip("does not show toggle button when there is enough space", async () => {
+        it("does not show toggle button when there is enough space", async () => {
             wrapper = mount(LayerPillsComponent, {
                 global: {plugins: [store]},
                 attachTo: document.body
             });
 
             const container = wrapper.find("#layer-pills").element;
+            const queryAllStub = sinon.stub(container, "querySelectorAll");
+            const querySingleStub = sinon.stub(container, "querySelector");
 
-            sinon.stub(container, "querySelectorAll").returns([{offsetWidth: 100}]);
-            sinon.stub(container, "querySelector").returns({offsetWidth: 50});
-            Object.defineProperty(container, "clientWidth", {value: 400});
+            queryAllStub.withArgs(".nav-pills > li").returns([{offsetWidth: 100}]);
+
+            querySingleStub.withArgs(".nav-pills").returns({
+                getBoundingClientRect: () => ({width: 500})
+            });
 
             await wrapper.vm.$nextTick();
             wrapper.vm.setToggleButtonVisibility();
@@ -310,7 +314,7 @@ describe("src/modules/LayerPills.vue", () => {
             expect(wrapper.vm.showToggleButton).to.be.false;
         });
 
-        it.skip("shows toggle button when pills overflow container", async () => {
+        it("shows toggle button when pills overflow container", async () => {
             visibleSubjectDataLayers = [{name: "l1"}, {name: "l2"}];
 
             wrapper = mount(LayerPillsComponent, {
@@ -318,16 +322,17 @@ describe("src/modules/LayerPills.vue", () => {
                 attachTo: document.body
             });
 
-            const container = wrapper.vm.$refs.layerPillsContainer,
+            const container = wrapper.vm.$refs.layerPillsContainer;
+            const queryAllStub = sinon.stub(container, "querySelectorAll");
+            const querySingleStub = sinon.stub(container, "querySelector");
 
-                queryStub = sinon.stub(container, "querySelectorAll");
+            queryAllStub.withArgs(".nav-pills > li").returns([{offsetWidth: 150}, {offsetWidth: 150}]);
 
-            queryStub.withArgs(".nav-item").returns([{offsetWidth: 150}]);
-            queryStub.withArgs(".nav-pills").returns([{
-                getBoundingClientRect: () => ({width: 100})
-            }]);
+            querySingleStub.withArgs(".nav-pills").returns({
+                getBoundingClientRect: () => ({width: 250})
+            });
+
             wrapper.vm.setToggleButtonVisibility();
-
             await wrapper.vm.$nextTick();
 
             expect(wrapper.vm.showToggleButton).to.be.true;
@@ -482,44 +487,5 @@ describe("src/modules/LayerPills.vue", () => {
             expect(setVisibleLayersSpy.secondCall.args[1]).to.be.equals("3D");
         });
 
-    });
-    describe("menus", () => {
-        it.skip("should call setToggleButtonVisibility on mount and whenever combinedMenuWidthState changes", async () => {
-            const stubSetToggleButtonVisibility = sinon.stub(LayerPillsComponent.methods, "setToggleButtonVisibility");
-
-            wrapper = createWrapper();
-            expect(stubSetToggleButtonVisibility.calledOnce).to.be.true;
-            store.hotUpdate({
-                modules: {
-                    Menu: {
-                        namespaced: true,
-                        getters: {
-                            currentMainMenuWidth: () => 20,
-                            currentSecondaryMenuWidth: () => 30
-                        }
-                    }
-                }
-            });
-            await wrapper.vm.$nextTick();
-
-            expect(stubSetToggleButtonVisibility.calledTwice).to.be.true;
-
-            store.hotUpdate({
-                modules: {
-                    Menu: {
-                        namespaced: true,
-                        getters: {
-                            currentMainMenuWidth: () => 15,
-                            currentSecondaryMenuWidth: () => 0
-                        }
-                    }
-                }
-            });
-
-            await wrapper.vm.$nextTick();
-
-            expect(stubSetToggleButtonVisibility.calledThrice).to.be.true;
-            stubSetToggleButtonVisibility.restore();
-        });
     });
 });
