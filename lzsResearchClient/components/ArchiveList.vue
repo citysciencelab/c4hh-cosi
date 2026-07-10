@@ -59,7 +59,8 @@ export default {
             groupBySelections: {},
             showSpinner: false,
             fetchProgressCount: 0,
-            fetchProgressTotal: 0
+            fetchProgressTotal: 0,
+            sumOfCheckedFilesProgress: 0
         };
     },
     computed: {
@@ -493,7 +494,7 @@ export default {
             <FlatButton
                 v-if="numberOfResults > 0"
                 id="tabResultDownloadButton"
-                :disabled="progressNow >= 0 || !somethingCheckedForDownload"
+                :disabled="progressNow >= 0 || !somethingCheckedForDownload || sumOfCheckedFilesProgress > 100"
                 :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
                 :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
                 @click="downloadChecked()"
@@ -503,6 +504,7 @@ export default {
         <SumOfCheckedFiles
             v-if="somethingCheckedForDownload"
             :checked-datasets="datasets.filter(data => data.checked)"
+            @update:progress-percentage="sumOfCheckedFilesProgress = $event"
         />
 
         <div class="steps">

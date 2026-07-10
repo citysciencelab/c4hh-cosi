@@ -243,5 +243,16 @@ describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", (
 
             expect(hideGeomFake.called).to.be.false;
         });
+
+        it("should disable download button when sumOfCheckedFilesProgress exceeds 100", async () => {
+            mockDatasets[0].checked = true;
+            await wrapper.vm.$nextTick();
+            expect(wrapper.find("#tabResultDownloadButton").attributes("disabled")).to.equal("false");
+
+            wrapper.vm.sumOfCheckedFilesProgress = 101;
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find("#tabResultDownloadButton").attributes("disabled")).to.equal("true");
+        });
     });
 });

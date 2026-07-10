@@ -6,6 +6,7 @@ import TabContainer from "@shared/modules/tabs/components/TabContainer.vue";
 import TabDetails from "./TabDetails.vue";
 import TabResult from "./TabResult.vue";
 import TabSearch from "./TabSearch.vue";
+import DownloadProgressBar from "./DownloadProgressBar.vue";
 import ConfirmModal from "@shared/modules/modals/components/ConfirmModal.vue";
 
 export default {
@@ -14,6 +15,7 @@ export default {
         SpinnerItem,
         IconButton,
         TabContainer,
+        DownloadProgressBar,
         ConfirmModal
     },
     data () {
@@ -32,8 +34,6 @@ export default {
             "requestTokenExpireTime",
             "globalError",
             "errorMessage",
-            "currentProgressValue",
-            "progressNow",
             "searchAttributeResponse",
             "selectedDetail",
             "menuWidthOnStart"
@@ -41,9 +41,6 @@ export default {
         ...mapGetters("Menu", [
             "currentMenuWidth"
         ]),
-        progressBarWidthClass () {
-            return `width: ${this.progressNow}%;`;
-        },
         errorOccured () {
             return this.errorMessage !== "";
         },
@@ -85,14 +82,6 @@ export default {
     watch: {
         searchAttributeResponse () {
             this.newSearchPerformed = true;
-        },
-        progressNow (val) {
-            if (val === 100) {
-                setTimeout(() => {
-                    this.setProgressNow(-1);
-                    this.setCurrentProgressValue("");
-                }, 1000);
-            }
         }
     },
     /**
@@ -166,9 +155,7 @@ export default {
         ]),
         ...mapMutations("Modules/LzsResearchClient", [
             "setShowLoadingSpinner",
-            "setErrorMessage",
-            "setProgressNow",
-            "setCurrentProgressValue"
+            "setErrorMessage"
         ]),
         ...mapMutations("Menu", ["setCurrentMenuWidth"]),
         hideErrorMessage () {
@@ -270,24 +257,7 @@ export default {
             />
         </div>
 
-        <div
-            v-if="progressNow >= 0"
-            class="progress"
-            role="progressbar"
-            :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.progressAriaLabel', {percent: progressNow})"
-            :aria-valuenow="progressNow"
-            aria-valuemin="0"
-            aria-valuemax="100"
-        >
-            <div
-                class="progress-bar progress-bar-striped progress-bar-animated"
-                :style="progressBarWidthClass"
-            />
-        </div>
-
-        <p id="result">
-            {{ currentProgressValue }}
-        </p>
+        <DownloadProgressBar />
 
         <div
             v-if="showLoadingSpinner"
@@ -323,14 +293,9 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    @import "bootstrap/scss/progress";
 
     #lzsResearchClient{
         height: 100%;
-
-        div.progress-bar {
-            background-color: #3C5F94;
-        }
 
         div.alertError {
             color: #a94442;

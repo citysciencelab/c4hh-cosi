@@ -34,9 +34,12 @@ import stateSearchBar from "./searchBar/stateSearchBar.js";
  * @property {Object} archiveYears - Map of archive IDs to year data { [archiveId]: { year: "2022", archiveName: ["xyz", "abc"] } }
  * @property {Object[]} searchAttributeResponse - List of dataclass objects from the search response
  * @property {String} selectedDetail - Object containing the selected instanceId and primaryDataId to show details for
- * @property {String} errorMessage - message text for errors from backend or while ziping download
- * @property {String} currentProgressValue - message for current progress for ziping the files for download
- * @property {Number} progressNow - percentage of progress in ziping and downloading files, -1 to hide progressbar
+ * @property {String} errorMessage - message text for errors from backend or while zipping download
+ * @property {AbortController|null} downloadAbortController - AbortController for the download request, null if no download is running
+ * @property {String} progressPhase - current phase of the progress modal ("start"|"fetch"|"dossier"|"download"|"zip"|"done"|"error")
+ * @property {Number} progressCurrent - current progress value for zipping and downloading files
+ * @property {Number} progressTotal - total progress value for zipping and downloading files
+ * @property {Number} progressNow - percentage of progress in zipping and downloading files, -1 to hide progressbar
  * @property {Object|null} parcelSourceData - JSON data for the parcel search, containing the parcel districts and their respective names and ids
  * @property {String|null} parcelSearchSelectSource - URL to fetch the list of parcel districts for the parcel search
  *
@@ -86,7 +89,10 @@ const state = {
         primaryDataId: null
     },
     errorMessage: "",
-    currentProgressValue: "",
+    downloadAbortController: null,
+    progressPhase: "",
+    progressCurrent: 0,
+    progressTotal: 0,
     progressNow: -1,
     parcelSourceData: null,
     parcelSearchSelectSource: null,

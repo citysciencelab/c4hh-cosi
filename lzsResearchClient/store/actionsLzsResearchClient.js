@@ -204,10 +204,10 @@ export default {
      * @param {Object} payload
      * @param {String} payload.archiveId - Archive identifier to request primarydata for.
      * @param {String} payload.instanceId - Instance identifier to request primarydata for.
-     * @param {Array} payload.primaryDataIds - Array of primary data identifiers to request primarydata for.
+     * @param {AbortSignal} payload.signal - AbortSignal to cancel the request if needed.
      */
     async fetchPrimarydata ({state, commit, dispatch}, payload) {
-        const {archiveId, instanceId} = payload,
+        const {archiveId, instanceId, signal} = payload,
             params = {
                 Token: state.requestToken,
                 f: "json",
@@ -215,7 +215,7 @@ export default {
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}`, params);
 
-        await axios.get(url)
+        await axios.get(url, {signal})
             .then(function (response) {
                 const primaryDataIds = response?.data?.map(p => p.primaryDataId) || [];
 
@@ -240,9 +240,10 @@ export default {
      * @param {Object} payload
      * @param {String} payload.archiveId - Archive identifier to request dossier data for.
      * @param {String} payload.dossierId - Dossier identifier to request metadata for.
+     * @param {AbortSignal} payload.signal - AbortSignal to cancel the request if needed.
      */
     async fetchDossierInformation ({state, commit, dispatch}, payload) {
-        const {archiveId, dossierId} = payload,
+        const {archiveId, dossierId, signal} = payload,
             params = {
                 Token: state.requestToken,
                 f: "json",
@@ -250,7 +251,7 @@ export default {
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/dossier/${dossierId}`, params);
 
-        await axios.get(url)
+        await axios.get(url, {signal})
             .then(function (response) {
                 commit("addDossierDataToArchive", {
                     archiveId: archiveId,
@@ -387,7 +388,7 @@ export default {
      * - Ensures primaryData for each item exists (dispatches fetchPrimarydata when missing).
      * - Builds a flat list of file URLs with target path parts and known sizes (contentFileLength).
      * - Downloads files in parallel while reporting incremental progress to state.progressNow
-     *      and state.currentProgressValue via fetchWithProgress.
+     *      and via fetchWithProgress.
      * - Constructs a nested object matching fflate.zip input and calls zip(...).
      * - Triggers download via saveAs and updates final progress state.
      *
@@ -406,6 +407,9 @@ export default {
 
         const selectedFiles = Array.isArray(filesToDownload) ? filesToDownload : [filesToDownload];
 
+        state.downloadAbortController = new AbortController();
+        const {signal} = state.downloadAbortController;
+
         // Progress phase boundaries
         // 0..20 = fetching primaryData
         // 20..80 = downloading files
@@ -416,7 +420,7 @@ export default {
 
         state.errorMessage = "";
         state.progressNow = 0;
-        state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.start");
+        state.progressPhase = "start";
 
         // Group selected files by archiveId and instanceId to fetch primaryData in batches
         // Skip items that already have primaryData loaded.
@@ -439,7 +443,8 @@ export default {
             [...groupedByInstance.values()].map(
                 ({archiveId, instanceId}) => dispatch("fetchPrimarydata", {
                     archiveId,
-                    instanceId
+                    instanceId,
+                    signal
                 }).then(() => {
                     const current = ++completedInstances;
 
@@ -449,15 +454,19 @@ export default {
                         start: 0,
                         end: phaseEnd.fetch
                     });
-                    state.currentProgressValue = i18next.t(
-                        "additional:modules.lzsResearchClient.zipAndDownload.progress.fetchPrimaryData",
-                        {current: current, total: totalInstances}
-                    );
+                    state.progressPhase = "fetch";
+                    state.progressCurrent = current;
+                    state.progressTotal = totalInstances;
                 })
             )
         );
 
-        state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.fetchDossierData");
+        if (signal.aborted) {
+            return;
+        }
+
+        // eslint-disable-next-line require-atomic-updates
+        state.progressPhase = "dossier";
 
         // collect flat list of files with target path and url
         const files = [];
@@ -510,8 +519,12 @@ export default {
         await Promise.all(
             archiveDossierPairs
                 .filter(({archiveId, dossierId}) => !getters.getDossierDataForArchiveId(archiveId, dossierId))
-                .map(({archiveId, dossierId}) => dispatch("fetchDossierInformation", {archiveId, dossierId}))
+                .map(({archiveId, dossierId}) => dispatch("fetchDossierInformation", {archiveId, dossierId, signal}))
         );
+
+        if (signal.aborted) {
+            return;
+        }
 
         for (const {archiveId, dossierId} of archiveDossierPairs) {
             const dossierData = getters.getDossierDataForArchiveId(archiveId, dossierId),
@@ -543,11 +556,13 @@ export default {
                     sumFileSize: getHumanReadableFileSize(knownTotalBytes)
                 });
             state.progressNow = phaseEnd.done;
-            state.currentProgressValue = "";
+            state.progressPhase = "error";
             return;
         }
 
-        state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.downloading");
+        state.progressPhase = "download";
+        state.progressCurrent = 0;
+        state.progressTotal = files.length;
 
         // per-file last-seen bytes
         const lastSeen = new Map();
@@ -572,7 +587,7 @@ export default {
                             end: phaseEnd.download
                         });
                     }
-                });
+                }, signal);
 
                 return {
                     pathParts: file.pathParts,
@@ -598,12 +613,14 @@ export default {
                     });
                 }
 
-                state.currentProgressValue = i18next.t(
-                    "additional:modules.lzsResearchClient.zipAndDownload.progress.downloadingFile",
-                    {current, total: files.length}
-                );
+                state.progressCurrent = current;
+                state.progressTotal = files.length;
             }
         }));
+
+        if (signal.aborted) {
+            return;
+        }
 
         // build nested object structure required by fflate.zip
         const nested = {};
@@ -612,31 +629,51 @@ export default {
             .filter(item => !item.err) // skip failed files
             .forEach(item => setNested(nested, item.pathParts, item.data));
 
+        if (signal.aborted) {
+            return;
+        }
+
         // eslint-disable-next-line require-atomic-updates
         state.progressNow = phaseEnd.setNested;
         // eslint-disable-next-line require-atomic-updates
-        state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.zipping");
+        state.progressPhase = "zip";
 
         // create zip and trigger download
-        zip(nested, {}, (err, data) => {
-            if (err) {
-                state.errorMessage = err.message || String(err);
-                state.progressNow = phaseEnd.done;
-                state.currentProgressValue = "";
-                return;
+        try {
+            const zippedData = await new Promise((resolve, reject) => {
+                const terminate = zip(nested, {}, (err, data) => err ? reject(err) : resolve(data));
+
+                signal.addEventListener("abort", () => {
+                    terminate();
+                    reject(new DOMException("Aborted", "AbortError"));
+                }, {once: true});
+            });
+
+            if (!signal.aborted) {
+                saveAs(
+                    new Blob([zippedData], {type: "application/zip"}),
+                    null,
+                    state.zipFileName + ".zip"
+                );
             }
 
-            saveAs(
-                new Blob(
-                    [data],
-                    {type: "application/zip"}
-                ),
-                null,
-                state.zipFileName + ".zip"
-            );
 
+            // eslint-disable-next-line require-atomic-updates
             state.progressNow = phaseEnd.done;
-            state.currentProgressValue = i18next.t("additional:modules.lzsResearchClient.zipAndDownload.progress.done");
-        });
+            // eslint-disable-next-line require-atomic-updates
+            state.progressPhase = "done";
+        }
+        catch (err) {
+            if (err instanceof DOMException && err.name === "AbortError") {
+                return;
+            }
+            // eslint-disable-next-line require-atomic-updates
+            state.errorMessage = err.message || String(err);
+            // eslint-disable-next-line require-atomic-updates
+            state.progressNow = phaseEnd.done;
+
+            // eslint-disable-next-line require-atomic-updates
+            state.progressPhase = "error";
+        }
     }
 };

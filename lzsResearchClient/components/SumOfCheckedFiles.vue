@@ -10,6 +10,7 @@ export default {
             required: true
         }
     },
+    emits: ["update:progressPercentage"],
     data () {
         return {
             bytesForMetadata: 50000
@@ -74,6 +75,11 @@ export default {
             });
 
             return sumOfFiles;
+        }
+    },
+    watch: {
+        progressPercentage (val) {
+            this.$emit("update:progressPercentage", val);
         }
     }
 };

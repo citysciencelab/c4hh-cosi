@@ -41,11 +41,16 @@ function saveAs (blob, url, filename) {
  *
  * @param {string} url - The resource URL to fetch.
  * @param {(loaded: number) => void} onProgress - Callback receiving the number of bytes loaded so far.
- * @returns {Promise<Uint8Array>} Promise that resolves with the downloaded bytes.
+ * @param {AbortSignal} signal - AbortSignal to cancel the request if needed. * @returns {Promise<Uint8Array>} Promise that resolves with the downloaded bytes.
  * @throws {Error} If the fetch response is not ok.
  */
-async function fetchWithProgress (url, onProgress) {
-    const response = await fetch(url, {credentials: "same-origin"});
+async function fetchWithProgress (url, onProgress, signal) {
+    const fetchOptions = {credentials: "same-origin"};
+
+    if (signal !== undefined) {
+        fetchOptions.signal = signal;
+    }
+    const response = await fetch(url, fetchOptions);
 
     if (!response.ok) {
         throw new Error(`${response.status} ${response.statusText}`);
