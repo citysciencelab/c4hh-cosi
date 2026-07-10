@@ -72,6 +72,15 @@ export default class UrlHandler {
             .find(value => value?.currentComponent === "filter")
             ?.attributes || {};
     }
+    /**
+     * Checks if the given values represent a new filter URL state.
+     * @param {*} values The values to check.
+     * @returns {boolean} True if the values represent a new filter URL state, false otherwise.
+     */
+    isNewFilterUrlState (values) {
+        return isObject(values)
+            && Object.prototype.hasOwnProperty.call(values, "rulesOfFilters");
+    }
 
     /**
      * Builds current filter url.
@@ -114,7 +123,7 @@ export default class UrlHandler {
                 return;
             }
         }
-        if (isObject(values) && Object.prototype.hasOwnProperty.call(values, "rulesOfFilters")) {
+        if (this.isNewFilterUrlState(values)) {
             if (typeof onsuccess === "function") {
                 onsuccess(values);
             }

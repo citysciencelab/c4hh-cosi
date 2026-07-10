@@ -13,9 +13,6 @@ import isObject from "@shared/js/utils/isObject.js";
 import {isRule} from "../utils/isRule.js";
 import GeometryFilter from "./GeometryFilter.vue";
 import {getFeaturesOfAdditionalGeometries} from "../utils/getFeaturesOfAdditionalGeometries.js";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
-import getFeature from "@shared/js/api/wfs/getFeature.js";
-import {WFS} from "ol/format.js";
 import UrlHandler from "../utils/urlHandler.js";
 import Cluster from "ol/source/Cluster.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
@@ -34,7 +31,6 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
  * @vue-data {Array} preparedLayerGroups - List of prepared layer groups.
  * @vue-data {Array} flattenPreparedLayerGroups - List of prepared, flattened layer groups.
  * @vue-data {Object} layerLoaded - The loaded layer.
- * @vue-data {String} layerFilterSnippetPostKey - The layer filter snippet post key.
  */
 export default {
     name: "FilterGeneral",
@@ -62,7 +58,6 @@ export default {
             layerRules: [],
             flattenPreparedLayerGroups: [],
             layerLoaded: {},
-            layerFilterSnippetPostKey: "",
             urlHandler: new UrlHandler(this.mapHandler),
             alreadyWatching: null,
             mapMoveListeners: {},
@@ -90,8 +85,6 @@ export default {
                 this.urlParams
             );
         },
-
-        console: () => console,
         filters () {
             return this.layerConfigs.layers.filter(layer => {
                 return isObject(layer);
@@ -147,9 +140,7 @@ export default {
             this.setSelectedAccordions(this.transformLayerConfig([...this.layerConfigs.layers, ...this.flattenPreparedLayerGroups], selectedFilterIds));
         }
 
-        const filterUrlParams = this.urlHandler.getFilterUrlParamsFromAppStore(this.appStoreUrlParams, this.type.toUpperCase()),
-              hasInitialFilterUrlState = Array.isArray(filterUrlParams)
-                  || (isObject(filterUrlParams) && Object.prototype.hasOwnProperty.call(filterUrlParams, "rulesOfFilters"));
+        const filterUrlParams = this.urlHandler.getFilterUrlParamsFromAppStore(this.appStoreUrlParams, this.type.toUpperCase());
 
         this.urlHandler.readFromUrlParams(filterUrlParams, this.layerConfigs, this.mapHandler, async params => {
             this.handleStateForAlreadyActiveLayers(params);
@@ -157,6 +148,9 @@ export default {
             await this.applyDeserializedFilters(params?.selectedAccordions);
             this.addWatcherToWriteUrl();
         });
+
+        const hasInitialFilterUrlState = Array.isArray(filterUrlParams) || this.urlHandler.isNewFilterUrlState(filterUrlParams);
+
         if (!hasInitialFilterUrlState) {
             this.addWatcherToWriteUrl();
         }
@@ -169,7 +163,6 @@ export default {
     methods: {
         ...mapMutations("Modules/Filter", Object.keys(mutations)),
         ...mapActions("Modules/Filter", [
-            "initialize",
             "updateRules",
             "deleteAllRules",
             "updateFilterHits",
@@ -179,34 +172,6 @@ export default {
         ...mapActions("Maps", ["registerListener", "unregisterListener"]),
         hasUnfixedRules,
         isRule,
-
-        /**
-         * Check if there are active filter.
-         * @param {Object[]} rules The rules of filter.
-         * @returns {void}
-         */
-        checkActiveFilter (rules) {
-            if (!Array.isArray(rules) || !rules.length) {
-                this.isFilterActive = false;
-                return;
-            }
-
-            for (let i = 0; i < rules.length; i++) {
-                if (rules[i] === null) {
-                    this.isFilterActive = false;
-                }
-                else if (Array.isArray(rules[i]) && rules[i].length) {
-                    this.isFilterActive = rules[i].filter(v => v !== false && v !== null && !v?.fixed).length > 0;
-                }
-                else {
-                    this.isFilterActive = false;
-                }
-
-                if (this.isFilterActive) {
-                    break;
-                }
-            }
-        },
         /**
          * Generates the layer rules.
          * @param {Object[]} rules The rules of filter.
@@ -282,7 +247,7 @@ export default {
                         && layerModel.getFeatures().length === 0))) {
                     (layerConfig?.typ === "SensorThings" ? layerModel : layerSource).once("featuresloadend", async () => {
                         const rulesOfFiltersTmp = [...this.rulesOfFilters],
-                              selectedAccordionsTmp = [...this.selectedAccordions];
+                            selectedAccordionsTmp = [...this.selectedAccordions];
 
                         rulesOfFiltersTmp[accordion.filterId] = rulesOfAccordeon;
                         selectedAccordionsTmp.push(accordion);
@@ -323,49 +288,14 @@ export default {
             await this.$nextTick();
 
             accordions.forEach(accordion => {
-                const layerFilterComp = this.$refs[`filter-${accordion?.filterId}`],
-                      layerFilterCompRef = Array.isArray(layerFilterComp) ? layerFilterComp[0] : layerFilterComp;
+                const layerFilterComp = this.$refs[`filter-${accordion?.filterId}`];
+                const layerFilterCompRef = Array.isArray(layerFilterComp) ? layerFilterComp[0] : layerFilterComp;
 
                 if (typeof layerFilterCompRef?.applyDeserializedState !== "function") {
                     return;
                 }
                 layerFilterCompRef.applyDeserializedState();
             });
-        },
-        /**
-         * Gets the features of the additional geometries by the given layer id.
-         * @param {Object[]} additionalGeometries - The additional geometries.
-         * @param {String} additionalGeometries[].layerId - The id of the layer.
-         * @returns {void}
-         */
-        async getFeaturesOfAdditionalGeometries (additionalGeometries) {
-            if (additionalGeometries) {
-                const wfsReader = new WFS();
-
-                for (const additionalGeometry of additionalGeometries) {
-                    const rawLayer = rawLayerList.getLayerWhere({id: additionalGeometry.layerId}),
-                          features = await getFeature.getFeatureGET(rawLayer.url, {version: rawLayer.version, featureType: rawLayer.featureType});
-
-                    additionalGeometry.features = wfsReader.readFeatures(features);
-                }
-            }
-        },
-        /**
-         * Update selected layer group.
-         * @param {Number} layerGroupIndex index of the layer group
-         * @returns {void}
-         */
-        updateSelectedGroups (layerGroupIndex) {
-            const selectedGroups = JSON.parse(JSON.stringify(this.selectedGroups)),
-                  index = selectedGroups.indexOf(layerGroupIndex);
-
-            if (index >= 0) {
-                selectedGroups.splice(index, 1);
-            }
-            else {
-                selectedGroups.push(layerGroupIndex);
-            }
-            this.setSelectedGroups(selectedGroups);
         },
         /**
          * Update selectedAccordions array in groups.
@@ -541,7 +471,7 @@ export default {
          */
         writeUrlParams (newState) {
             const params = this.urlHandler.getParamsFromState(newState, this.neededUrlParams),
-                  generatedParams = JSON.stringify(params);
+                generatedParams = JSON.stringify(params);
 
             if (this.urlParams === generatedParams) {
                 return;
