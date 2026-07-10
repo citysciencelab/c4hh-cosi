@@ -82,14 +82,12 @@ export default {
         },
 
         currentURL () {
-            const url = new URL(window.location.href);
-
-            url.searchParams.set("MENU", "{\""
-                + (this.menuSide === "mainMenu" ? "main" : "secondary")
-                + "\":{\"currentComponent\":\"filter\"}}"
+            return this.urlHandler.createFilterUrl(
+                window.location.href,
+                this.menuSide,
+                this.type.toUpperCase(),
+                this.urlParams
             );
-            url.searchParams.set(this.type.toUpperCase(), this.urlParams);
-            return url;
         },
 
         console: () => console,
@@ -149,8 +147,8 @@ export default {
         }
 
         const filterUrlParams = this.getFilterUrlParams(this.appStoreUrlParams),
-              hasInitialFilterUrlState = Array.isArray(filterUrlParams)
-                  || (isObject(filterUrlParams) && Object.prototype.hasOwnProperty.call(filterUrlParams, "rulesOfFilters"));
+            hasInitialFilterUrlState = Array.isArray(filterUrlParams)
+                || (isObject(filterUrlParams) && Object.prototype.hasOwnProperty.call(filterUrlParams, "rulesOfFilters"));
 
         this.urlHandler.readFromUrlParams(filterUrlParams, this.layerConfigs, this.mapHandler, async params => {
             this.handleStateForAlreadyActiveLayers(params);
@@ -249,10 +247,7 @@ export default {
          * @returns {Object} The filter url params.
          */
         getFilterUrlParams (appStoreUrlParams) {
-            if (typeof appStoreUrlParams?.FILTER === "string") {
-                return JSON.parse(appStoreUrlParams.FILTER);
-            }
-            return Object.values(JSON.parse(appStoreUrlParams?.MENU || "{}")).filter(value => value.currentComponent === "filter").map(obj => obj.attributes)[0] || {};
+            return this.urlHandler.getFilterUrlParamsFromAppStore(appStoreUrlParams, this.type.toUpperCase());
         },
 
         /**
