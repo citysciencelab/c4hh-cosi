@@ -57,7 +57,7 @@ describe("src/modules/filter/utils/mapHandler.js", () => {
         });
 
         it("should parse a valid JSON string", () => {
-            expect(urlHandler.parseJsonString('{"foo":"bar"}', "warn")).to.deep.equal({foo: "bar"});
+            expect(urlHandler.parseJsonString("{\"foo\":\"bar\"}", "warn")).to.deep.equal({foo: "bar"});
         });
 
         it("should return fallback and warn for invalid JSON", () => {
@@ -105,14 +105,14 @@ describe("src/modules/filter/utils/mapHandler.js", () => {
         it("should create a filter url for main menu", () => {
             const url = urlHandler.createFilterUrl("https://example.com/?foo=bar", "mainMenu", "FILTER", "{\"x\":1}");
 
-            expect(url.searchParams.get("MENU")).to.equal('{"main":{"currentComponent":"filter"}}');
-            expect(url.searchParams.get("FILTER")).to.equal('{"x":1}');
+            expect(url.searchParams.get("MENU")).to.equal("{\"main\":{\"currentComponent\":\"filter\"}}");
+            expect(url.searchParams.get("FILTER")).to.equal("{\"x\":1}");
         });
 
         it("should create a filter url for secondary menu", () => {
             const url = urlHandler.createFilterUrl("https://example.com/", "secondaryMenu", "FILTER", "{}");
 
-            expect(url.searchParams.get("MENU")).to.equal('{"secondary":{"currentComponent":"filter"}}');
+            expect(url.searchParams.get("MENU")).to.equal("{\"secondary\":{\"currentComponent\":\"filter\"}}");
             expect(url.searchParams.get("FILTER")).to.equal("{}");
         });
     });
