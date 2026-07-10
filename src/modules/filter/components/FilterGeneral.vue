@@ -1,6 +1,6 @@
 <script>
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
-import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
 import getters from "../store/gettersFilter.js";
 import mutations from "../store/mutationsFilter.js";
 import LayerFilterSnippet from "./LayerFilterSnippet.vue";
@@ -74,6 +74,7 @@ export default {
         };
     },
     computed: {
+        ...mapState("Modules/Filter", {filterModuleState: state => state}),
         ...mapGetters("Modules/Filter", Object.keys(getters)),
         ...mapGetters({appStoreUrlParams: "urlParams"}),
 
@@ -146,9 +147,9 @@ export default {
             this.setSelectedAccordions(this.transformLayerConfig([...this.layerConfigs.layers, ...this.flattenPreparedLayerGroups], selectedFilterIds));
         }
 
-        const filterUrlParams = this.getFilterUrlParams(this.appStoreUrlParams),
-            hasInitialFilterUrlState = Array.isArray(filterUrlParams)
-                || (isObject(filterUrlParams) && Object.prototype.hasOwnProperty.call(filterUrlParams, "rulesOfFilters"));
+        const filterUrlParams = this.urlHandler.getFilterUrlParamsFromAppStore(this.appStoreUrlParams, this.type.toUpperCase()),
+              hasInitialFilterUrlState = Array.isArray(filterUrlParams)
+                  || (isObject(filterUrlParams) && Object.prototype.hasOwnProperty.call(filterUrlParams, "rulesOfFilters"));
 
         this.urlHandler.readFromUrlParams(filterUrlParams, this.layerConfigs, this.mapHandler, async params => {
             this.handleStateForAlreadyActiveLayers(params);
@@ -242,15 +243,6 @@ export default {
         },
 
         /**
-         * Gets the filter url params from the app store url params.
-         * @param {Object} appStoreUrlParams The url params from the app store.
-         * @returns {Object} The filter url params.
-         */
-        getFilterUrlParams (appStoreUrlParams) {
-            return this.urlHandler.getFilterUrlParamsFromAppStore(appStoreUrlParams, this.type.toUpperCase());
-        },
-
-        /**
          * Handles the state for already activated layers by given params.
          * The given params are set for the matching layer if it is already active but has no features loaded yet.
          * This function edits the given param and removes the rules and
@@ -313,10 +305,10 @@ export default {
                 if (typeof this.alreadyWatching === "function") {
                     return;
                 }
-                this.alreadyWatching = this.$watch("$store.state.Modules.Filter", this.writeUrlParams, {
+                this.alreadyWatching = this.$watch("filterModuleState", this.writeUrlParams, {
                     deep: true
                 });
-                this.writeUrlParams(this.$store.state.Modules.Filter);
+                this.writeUrlParams(this.filterModuleState);
             }
         },
         /**
