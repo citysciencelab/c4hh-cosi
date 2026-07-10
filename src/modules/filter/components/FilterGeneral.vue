@@ -247,7 +247,7 @@ export default {
                         && layerModel.getFeatures().length === 0))) {
                     (layerConfig?.typ === "SensorThings" ? layerModel : layerSource).once("featuresloadend", async () => {
                         const rulesOfFiltersTmp = [...this.rulesOfFilters],
-                            selectedAccordionsTmp = [...this.selectedAccordions];
+                              selectedAccordionsTmp = [...this.selectedAccordions];
 
                         rulesOfFiltersTmp[accordion.filterId] = rulesOfAccordeon;
                         selectedAccordionsTmp.push(accordion);
@@ -471,7 +471,7 @@ export default {
          */
         writeUrlParams (newState) {
             const params = this.urlHandler.getParamsFromState(newState, this.neededUrlParams),
-                generatedParams = JSON.stringify(params);
+                  generatedParams = JSON.stringify(params);
 
             if (this.urlParams === generatedParams) {
                 return;
