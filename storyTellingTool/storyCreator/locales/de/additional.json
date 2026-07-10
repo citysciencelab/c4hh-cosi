@@ -27,19 +27,25 @@
         "editStory": "Story bearbeiten",
         "downloadStory": "Story herunterladen",
         "wrongFormat": "Es sind nur Bilddateien (z. B. JPG, PNG) zulässig.",
+        "wrongVideoFormat": "Es sind nur Video (z. B. mp4, webm, ogg, mov, avi, mkv, wmv, flv, m4v, 3gp) zulässig.",
         "wrongFormatTitle": "Ungültiges Dateiformat",
         "emptyChapter": "Es wurden noch keine Kapitel angelegt.",
-        "mapPosition": "Kartenposition"
+        "mapPosition": "Kartenposition",
+        "videoLink": "Video-URL",
+        "videoTitle": "Video-Titel (Optional)",
+        "videoAccessibleText": "Text für Barrierefreiheit"
       },
       "buttons": {
           "confirm": "Übernehmen",
           "discardImage": "Bild verwerfen",
           "discardStory": "Story verwerfen",
-          "discardChanges": "Änderungen verwerfen"
+          "discardChanges": "Änderungen verwerfen",
+          "discardVideo": "Video verwerfen"
       },
       "headlines": {
         "addImages": "Neues Bild hinzufügen",
         "addTexts": "Neuen Text hinzufügen",
+        "addVideo": "Neues Video hinzufügen",
         "chapterList": "Übersicht der Kapitel",
         "addImageTitle": "Neues Titelbild hinzufügen",
         "coverOfStory": "Titelbild der Story"

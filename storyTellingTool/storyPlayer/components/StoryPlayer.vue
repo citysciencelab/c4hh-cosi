@@ -327,6 +327,21 @@ export default {
             });
         },
         /**
+         * Checks if the link text is a direct video.
+         * @param {String} val - the link text
+         * @returns {Boolean} true if the link text is a direct video.
+         */
+        isDirectVideo (val) {
+            if (typeof val !== "string") {
+                return false;
+            }
+
+            const validVideoTypes = ["mp4", "webm", "ogg", "mov", "m4v", "avi", "mkv", "flv", "wmv", "3gp"];
+
+            return validVideoTypes.some(type => val.toLowerCase().includes(type)
+            );
+        },
+        /**
          * Sets up the tool window and content for the selected chapter.
          * @returns {void}
          */
@@ -852,6 +867,45 @@ export default {
                                             :interaction="() => openFeaturePopup(item.attrs)"
                                         />
                                     </div>
+                                    <div
+                                        v-else-if="item.type === 'video'"
+                                    >
+                                        <div v-if="isDirectVideo(item?.attrs?.link)">
+                                            <video
+                                                width="100%"
+                                                height="auto"
+                                                controls
+                                                :aria-label="item?.attrs?.accessibleText"
+                                            >
+                                                <source
+                                                    :src="item?.attrs?.link"
+                                                    :type="'video/' + item?.attrs?.link.split('.').pop()"
+                                                >
+                                                <track
+                                                    kind="captions"
+                                                    src=""
+                                                    srclang="de"
+                                                    label="German"
+                                                    default
+                                                >
+                                            </video>
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="video-container"
+                                        >
+                                            <iframe
+                                                width="100%"
+                                                height="100%"
+                                                allow="autoplay"
+                                                :src="item?.attrs?.link"
+                                                :title="item?.attrs?.title"
+                                            />
+                                        </div>
+                                        <div class="mt-1 small">
+                                            {{ item?.attrs?.title }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -1065,6 +1119,19 @@ export default {
 
     .scroll-space {
         height: 5vh;
+    }
+
+    .video-container {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        aspect-ratio: 16 / 9;
+    }
+
+    .video-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
     }
 }
 </style>

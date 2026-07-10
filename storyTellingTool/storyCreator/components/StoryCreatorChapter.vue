@@ -11,8 +11,9 @@ import Multiselect from "vue-multiselect";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
 import StoryCreatorAddFeatureCard from "./StoryCreatorAddFeatureCard.vue";
-import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
+import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
+import StoryCreatorAddVideoCard from "./StoryCreatorAddVideoCard.vue";
 import tipTapJsonToHtml from "../shared/modules/tipTapEditor/js/tipTapJsonToHtml.js";
 import {Toast} from "bootstrap";
 
@@ -26,7 +27,8 @@ export default {
         Multiselect,
         StoryCreatorAddFeatureCard,
         StoryCreatorAddImageCard,
-        StoryCreatorAddTextCard
+        StoryCreatorAddTextCard,
+        StoryCreatorAddVideoCard
     },
     props: {
         /**
@@ -86,6 +88,18 @@ export default {
     computed: {
         ...mapGetters(["allLayerConfigs", "allBaselayerConfigs", "visibleBaselayerConfigs", "configuredModules", "layerConfigById"]),
         ...mapGetters("Modules/StoryManager", ["originalLayerConfig", "subjectLayerCategory", "toolStoryWhitelist"]),
+        ...mapGetters("Modules/StoryManager", ["enableVideo", "originalLayerConfig", "subjectLayerCategory"]),
+        /**
+         * Returns the allowed actions, if video is allowed, it will be added.
+         * @returns {String[]} the allowed actions.
+         */
+        allowedActions () {
+            if (this.enableVideo) {
+                return ["text", "image", "feature", "video"];
+            }
+
+            return ["text", "image", "feature"];
+        },
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
          * @returns {Boolean} True if position or zoom has changed, otherwise false.
@@ -575,6 +589,21 @@ export default {
             this.closeContentEditor();
         },
         /**
+         * Checks if the link text is a direct video.
+         * @param {String} val - the link text
+         * @returns {Boolean} true if the link text is a direct video.
+         */
+        isDirectVideo (val) {
+            if (typeof val !== "string") {
+                return false;
+            }
+
+            const validVideoTypes = ["mp4", "webm", "ogg", "mov", "m4v", "avi", "mkv", "flv", "wmv", "3gp"];
+
+            return validVideoTypes.some(type => val.toLowerCase().includes(type)
+            );
+        },
+        /**
          * Resets the current chapter.
          * @returns {void}
          */
@@ -661,6 +690,29 @@ export default {
                     }
                 });
             }
+            this.closeContentEditor();
+        },
+        /**
+         * Handles video add/edit by writing it to the content array and closing the open editor.
+         * @param {Object} videoObj - The video object containing link, title and freetext.
+         * @returns {void}
+         */
+        handleVideo (videoObj) {
+            if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
+                const editIndex = this.openContentEditor.index;
+
+                this.content.splice(editIndex, 1, {
+                    type: "video",
+                    attrs: videoObj
+                });
+            }
+            else {
+                this.content.push({
+                    type: "video",
+                    attrs: videoObj
+                });
+            }
+
             this.closeContentEditor();
         },
         /**
@@ -1033,13 +1085,82 @@ export default {
                                 />
                             </div>
                         </div>
+                        <div
+                            v-if="element.type === 'video'"
+                            class="chapter-content-item__wrapper"
+                        >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
+                            <StoryCreatorAddVideoCard
+                                v-if="isEditingContentItem(index)"
+                                class="mt-2"
+                                :initial-content="element"
+                                @addVideo="handleVideo"
+                                @click:close="closeContentEditor"
+                            />
+                            <div
+                                v-else
+                                class="card rounded-3 border-0 p-4 position-relative chapter-content-item__preview"
+                                :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
+                                role="button"
+                                tabindex="0"
+                                @click="openContentEditorForEdit(index, 'video')"
+                                @keydown.enter="openContentEditorForEdit(index, 'video')"
+                                @keydown.space.prevent="openContentEditorForEdit(index, 'video')"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-1 chapter-content-item__close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
+                                <div v-if="isDirectVideo(element?.attrs?.link)">
+                                    <video
+                                        width="100%"
+                                        height="auto"
+                                        controls
+                                        :aria-label="element?.attrs?.accessibleText"
+                                    >
+                                        <source
+                                            :src="element?.attrs?.link"
+                                            :type="'video/' + element?.attrs?.link.split('.').pop()"
+                                        >
+                                        <track
+                                            kind="captions"
+                                            src=""
+                                            srclang="de"
+                                            label="German"
+                                            default
+                                        >
+                                    </video>
+                                </div>
+                                <div
+                                    v-else
+                                    class="video-container"
+                                >
+                                    <iframe
+                                        width="100%"
+                                        height="100%"
+                                        allow="autoplay"
+                                        :src="element?.attrs?.link"
+                                        :title="element?.attrs?.title"
+                                    />
+                                </div>
+                                <div class="mt-1 small">
+                                    {{ element?.attrs?.title }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </template>
             </Draggable>
             <AddElementDropdown
                 v-if="!isContentEditorOpen"
                 class="mt-5"
-                :allowed-actions="['text', 'image', 'feature']"
+                :allowed-actions="allowedActions"
                 @action-triggered="openContentEditorForAdd"
             />
             <StoryCreatorAddTextCard
@@ -1062,6 +1183,12 @@ export default {
                 :chapter-zoom-level="confirmedZoomlevel"
                 :selected-layers="selectedLayers"
                 @addFeature="handleFeature"
+                @click:close="closeContentEditor"
+            />
+            <StoryCreatorAddVideoCard
+                v-else-if="isAddingContentType('video')"
+                class="mt-2"
+                @addVideo="handleVideo"
                 @click:close="closeContentEditor"
             />
         </AccordionItem>
@@ -1296,5 +1423,18 @@ export default {
     &:focus {
         outline: 1px solid $light_grey;
     }
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16 / 9;
+}
+
+.video-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
 }
 </style>

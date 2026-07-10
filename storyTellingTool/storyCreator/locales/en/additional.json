@@ -29,17 +29,22 @@
         "wrongFormat": "Only image files (e.g. JPG, PNG) are permitted.",
         "wrongFormatTitle": "Invalid file format",
         "emptyChapter": "No chapters have been created yet.",
-        "mapPosition": "Map position"
+        "mapPosition": "Map position",
+        "videoLink": "Video-URL",
+        "videoTitle": "Video-Title (Optional)",
+        "videoAccessibleText": "Text for accessibility"
       },
       "buttons": {
           "confirm": "Confirm",
           "discardImage": "Discard image",
           "discardStory": "Discard story",
-          "discardChanges": "Discard changes"
+          "discardChanges": "Discard changes",
+          "discardVideo": "Discard video"
       },
       "headlines": {
         "addImages": "Add new image",
         "addTexts": "Add new text",
+        "addVideo": "Add new video",
         "chapterList": "List of Chapters",
         "addImageTitle": "Add new title image",
         "coverOfStory": "Cover photo for the story"

@@ -12,7 +12,8 @@
  * @property {String[]} fixedStoryFiles the fixed story files name.
  * @property {Boolean} fixedStoryLoaded check if fixed story is load.
  * @property {Object[]} [gfiFeatures=[]] temporary array for features at click to be moved to gfi module.
- * @property {ol/layer[]} originalLayerConfig the original layer configs.
+ * @property {Boolean} [enableVideo=false] - Defines if video is enabled in chapter creator.
+* @property {ol/layer[]} originalLayerConfig the original layer configs.
  * @property {Object[]} storyList List entries with story and image assets.
  * @property {Object} subjectLayerCategory - The subject layer category for layer selection.
  * @property {String[]} [toolStoryWhitelist=[]] - List of tool type IDs to show in the StoryCreator tool selector. Empty array means all configured tools are shown.
@@ -22,22 +23,23 @@ const state = {
     type: "storyManager",
     name: "additional:modules.storyManager.title",
     icon: "bi-file-plus",
-    hasMouseMapInteractions: true,
+    currentStoryIndex: undefined,
     enableCreator: true,
     enableImport: true,
-    toolStoryWhitelist: ["measure", "coordToolkit", "legend", "scaleSwitcher", "shareView", "draw_old"],
-    currentStoryIndex: undefined,
+    enableVideo: false,
     fixedStoryPath: "./assets",
     fixedStoryFiles: [],
     fixedStoryLoaded: false,
     gfiFeatures: null,
+    hasMouseMapInteractions: true,
     originalLayerConfig: undefined,
     storyList: [],
     subjectLayerCategory: {
         "key": "kategorie_opendata",
         "name": "common:modules.layerTree.categoryOpendata",
         "active": true
-    }
+    },
+    toolStoryWhitelist: ["measure", "coordToolkit", "legend", "scaleSwitcher", "shareView", "draw_old"]
 };
 
 export default state;
