@@ -45,6 +45,7 @@ export default {
         ...mapGetters("Modules/LayerInformation", [
             "abstractText",
             "customText",
+            "dateCreation",
             "datePublication",
             "dateRevision",
             "downloadLinks",
@@ -410,13 +411,16 @@ export default {
         </div>
         <br>
         <br>
-        <p v-if="showPublication">
-            {{ $t("common:modules.layerInformation.publicationCreation") }}: {{ datePublication }}
+        <p v-if="datePublication">
+            {{ $t("common:modules.layerInformation.publicationDate") }}: {{ datePublication }}
         </p>
-        <p v-if="showRevision">
+        <p v-if="dateCreation">
+            {{ $t("common:modules.layerInformation.creationDate") }}: {{ dateCreation }}
+        </p>
+        <p v-if="dateRevision">
             {{ $t("common:modules.layerInformation.lastModified") }}: {{ dateRevision }}
         </p>
-        <p v-if="showPeriodicity">
+        <p v-if="periodicityKey">
             {{ $t("common:modules.layerInformation.periodicityTitle") }}: {{ $t(periodicityKey) }}
         </p>
         <template

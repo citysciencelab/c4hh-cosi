@@ -4,6 +4,7 @@
  *
  * @property {String} [abstractText=""] the abstract Info text
  * @property {String} [customText=null] the custom Info text
+ * @property {String} [dateCreation=""] the date of creation
  * @property {String} [datePublication=""] the date of the publication
  * @property {String} [dateRevision=""] the date of the last revision
  * @property {String[]} [downloadLinks=null] the download Links
@@ -26,6 +27,7 @@
 export default {
     abstractText: "",
     customText: null,
+    dateCreation: "",
     datePublication: "",
     dateRevision: "",
     downloadLinks: null,

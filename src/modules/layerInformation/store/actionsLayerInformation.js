@@ -156,7 +156,8 @@ export default {
             commit("setAbstractText", metadata?.getAbstract());
             commit("setPeriodicityKey", metadata?.getFrequenzy());
             commit("setDownloadLinks", metadata?.getDownloadLinks());
-            commit("setDatePublication", metadata?.getPublicationDate() || metadata?.getCreationDate());
+            commit("setDatePublication", metadata?.getPublicationDate());
+            commit("setDateCreation", metadata?.getCreationDate());
             commit("setPointOfContact", metadata?.getContact());
             commit("setPublisher", metadata?.getPublisher());
             commit("setDateRevision", metadata?.getRevisionDate());
