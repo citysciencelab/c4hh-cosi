@@ -25,6 +25,7 @@
 ### Removed
 
 ### Fixed
+- Issue \#1522: Show publish date and creation date of metadata separately.
 - Issue \#1626: Added fallback to OpenLayers default style for vector layers when styleId is missing or not found.
 -Issue \#1630: Fixed parseMissingKeyHandler misinterpreting decimal numbers as time values (e.g. "0.58 m" became "0:58 m"). The time format replacement now requires two-digit hours only.
 - FeatureLister/NavTab: Disabled tabs are now non-interactive, and native nav-link tab markup is prevented by lint rules in favor of the shared NavTab component.
