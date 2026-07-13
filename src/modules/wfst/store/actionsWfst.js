@@ -11,6 +11,8 @@ import store from "@appstore/index.js";
 import {handleMultipolygon, buildMultipolygon, splitOuterFeatures} from "../js/handleMultipolygon.js";
 import {nextTick} from "vue";
 
+const layerLoaderTimeoutMs = 10000;
+
 let drawInteraction,
     featureToDelete,
     drawLayer,
@@ -23,7 +25,54 @@ let drawInteraction,
     lassoInteraction,
     boxInteraction,
     translateInteraction,
-    selectedFeatures;
+    selectedFeatures,
+    layerLoaderTimeoutId = null,
+    layerLoaderIntervalId = null,
+    currentLoadingSource = null,
+    currentLoadingHandlers = {};
+
+/**
+ * Clears the hard-stop timeout and hides the loading spinner.
+ * @param {Function} commit The commit function.
+ * @returns {void}
+ */
+function stopLoading (commit) {
+    clearTimeout(layerLoaderTimeoutId);
+    layerLoaderTimeoutId = null;
+    commit("setLayerLoading", false);
+}
+
+/**
+ * Attaches listeners to the given source to handle loading events.
+ * @param {Object} src The source to attach listeners to.
+ * @param {Function} commit The commit function.
+ * @returns {void}
+ */
+function attachListeners (src, commit) {
+    currentLoadingHandlers = {
+        start: () => {
+            commit("setLayerLoading", true);
+            clearTimeout(layerLoaderTimeoutId);
+            layerLoaderTimeoutId = setTimeout(() => stopLoading(commit), layerLoaderTimeoutMs);
+        },
+        end: () => {
+            clearTimeout(layerLoaderTimeoutId);
+            layerLoaderTimeoutId = setTimeout(() => stopLoading(commit), 500);
+        },
+        error: () => {
+            clearTimeout(layerLoaderTimeoutId);
+            layerLoaderTimeoutId = setTimeout(() => stopLoading(commit), 500);
+        }
+    };
+    src.on("featuresloadstart", currentLoadingHandlers.start);
+    src.on("featuresloadend", currentLoadingHandlers.end);
+    src.on("featuresloaderror", currentLoadingHandlers.error);
+    currentLoadingSource = src;
+
+    if (src.loading) {
+        currentLoadingHandlers.start();
+    }
+}
 
 const actions = {
     /**
@@ -78,6 +127,130 @@ const actions = {
                 commit("setButtonsDisabled", false);
             }
         }, {deep: true});
+    },
+    /**
+     * Handles a change of the selected layer. Depending on the configuration the
+     * layer is activated in the layer tree and a loading spinner is shown while
+     * its features are fetched.
+     * @param {Object} context The context object.
+     * @param {Object} context.state The vuex state.
+     * @param {Function} context.dispatch The dispatch function.
+     * @returns {void}
+     */
+    handleLayerSelected ({state, dispatch}) {
+        if (state.showLayerLoader) {
+            dispatch("startLayerLoader");
+        }
+        if (state.activateLayerInTree) {
+            dispatch("activateSelectedLayer");
+        }
+    },
+    /**
+     * Activates the currently selected layer in the layer tree so its features
+     * are loaded and it appears selected. The previously activated layer is
+     * restored first. The original tree state is stored to restore it later.
+     * @param {Object} context The context object.
+     * @param {Object} context.getters The vuex getters.
+     * @param {Function} context.rootGetters The root getters.
+     * @param {Function} context.dispatch The dispatch function.
+     * @param {Function} context.commit The commit function.
+     * @returns {void}
+     */
+    activateSelectedLayer ({getters, rootGetters, dispatch, commit}) {
+        const {currentLayerId, managedLayer} = getters;
+
+        if (managedLayer?.id === currentLayerId) {
+            return;
+        }
+        dispatch("restoreManagedLayer");
+        if (!currentLayerId) {
+            return;
+        }
+        const config = rootGetters.layerConfigById(currentLayerId);
+
+        commit("setManagedLayer", {
+            id: currentLayerId,
+            visibility: config?.visibility,
+            showInLayerTree: config?.showInLayerTree,
+            zIndex: config?.zIndex
+        });
+        dispatch("replaceByIdInLayerConfig", {
+            layerConfigs: [{id: currentLayerId, layer: {id: currentLayerId, visibility: true, showInLayerTree: true}}]
+        }, {root: true});
+    },
+    /**
+     * Restores the layer that was activated in the tree by this module to its
+     * original state.
+     * @param {Object} context The context object.
+     * @param {Object} context.getters The vuex getters.
+     * @param {Function} context.dispatch The dispatch function.
+     * @param {Function} context.commit The commit function.
+     * @returns {void}
+     */
+    restoreManagedLayer ({getters, dispatch, commit}) {
+        const {managedLayer} = getters;
+
+        if (!managedLayer) {
+            return;
+        }
+        dispatch("replaceByIdInLayerConfig", {
+            layerConfigs: [{id: managedLayer.id, layer: {
+                id: managedLayer.id,
+                visibility: Boolean(managedLayer.visibility),
+                showInLayerTree: Boolean(managedLayer.showInLayerTree),
+                zIndex: managedLayer.zIndex ?? null
+            }}]
+        }, {root: true});
+        dispatch("updateAllZIndexes", null, {root: true});
+        commit("setManagedLayer", null);
+    },
+    /**
+     * Registers listeners that show the loading spinner only while the currently
+     * selected layer actually loads its features and hide it once loading has
+     * finished or failed. If no load is triggered - e.g. the layer is already
+     * loaded - the spinner is not shown. A timeout acts as a hard stop so the
+     * spinner can never stay stuck when a load never reports back.
+     * @param {Object} context The context object.
+     * @param {Object} context.getters The vuex getters.
+     * @param {Function} context.commit The commit function.
+     * @returns {void}
+     */
+    startLayerLoader ({getters, commit}) {
+        let source = layerCollection.getLayerById(getters.currentLayerId)?.getLayerSource();
+
+        stopLoading(commit);
+        if (layerLoaderIntervalId) {
+            clearInterval(layerLoaderIntervalId);
+            layerLoaderIntervalId = null;
+        }
+
+        if (currentLoadingSource) {
+            currentLoadingSource.un("featuresloadstart", currentLoadingHandlers.start);
+            currentLoadingSource.un("featuresloadend", currentLoadingHandlers.end);
+            currentLoadingSource.un("featuresloaderror", currentLoadingHandlers.error);
+            currentLoadingSource = null;
+        }
+
+        if (source) {
+            attachListeners(source, commit);
+        }
+        else {
+            let attempts = 0;
+
+            layerLoaderIntervalId = setInterval(() => {
+                source = layerCollection.getLayerById(getters.currentLayerId)?.getLayerSource();
+                attempts++;
+                if (source) {
+                    clearInterval(layerLoaderIntervalId);
+                    layerLoaderIntervalId = null;
+                    attachListeners(source, commit);
+                }
+                else if (attempts > 40) {
+                    clearInterval(layerLoaderIntervalId);
+                    layerLoaderIntervalId = null;
+                }
+            }, 50);
+        }
     },
     /**
      * Prepares everything so that the user can interact with features or draw features

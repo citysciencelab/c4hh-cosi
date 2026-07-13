@@ -4777,6 +4777,7 @@ When editing properties of a feature / adding properties to a new feature, the a
 
 |Name|Required|Type|Default|Description|Expert|
 |----|--------|----|-------|-----------|------|
+|activateLayerInTree|no|Boolean|false|Whether the layer currently selected in the module is automatically activated in the layer tree. When switching the layer or leaving the module, the layer is restored to its original state.|false|
 |delete|no|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)/Boolean|false|Defines which layers of `layerIds` allow delete transactions.|false|
 |icon|no|String|"bi-globe"|Icon that is shown in front of the module-name in the menu. For selection see **[Bootstrap Icons](https://icons.getbootstrap.com/)**.|false|
 |layerIds|yes|String[]||Array of layer-ids defined in **[services.json](../Global-Config/services.json.md)**.|false|
@@ -4786,6 +4787,7 @@ When editing properties of a feature / adding properties to a new feature, the a
 |pointButton|no|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)[]/Boolean|[]|Defines which layers of `layerIds` allow insert transactions of point geometries.|false|
 |polygonButton|no|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)[]/Boolean|[]|Defines which layers of `layerIds` allow insert transactions of polygon geometries.|false|
 |showConfirmModal|no|Boolean|false|Flag if the modal dialog should be shown.|false|
+|showLayerLoader|no|Boolean|false|Whether a loading spinner is shown next to the layer select while the selected layer loads its features. While loading, editing, creating and deleting are disabled.|false|
 |toggleLayer|no|Boolean|false|Whether the features of the currently selected layer should stay visible when adding a new feature.|false|
 |type|no|String|"wfst"|The type of the module. Defines which module is configured.|false|
 |update|no|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)/Boolean|false|Defines which layers of `layerIds` allow update transactions.|false|

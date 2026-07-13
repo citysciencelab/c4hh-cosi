@@ -16,6 +16,7 @@
 - Readme: Information and link to issues in opencode added.
 - Security: Updated SECURITY.md to direct vulnerability reports to a private email address instead of the public issue tracker, and added a corresponding note in the README.
 - Alerting: Added first-open alerts for modules via `config.js` (`alerting.moduleOpenAlerts`).
+- WFS-T: Added a loading spinner while fetching features (disabling interactions). The selected layer can automatically activate in the layer tree and restore on exit. Configurable via `showLayerLoader` and `activateLayerInTree`.
 
 ### Changed
 - GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.

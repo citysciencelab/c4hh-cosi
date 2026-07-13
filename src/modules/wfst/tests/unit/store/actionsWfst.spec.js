@@ -420,4 +420,170 @@ describe("src/modules/wfst/store/actionsWfst.js", () => {
             expect(prepareFeaturePropertiesSpy.notCalled).to.be.true;
         });
     });
+    describe("handleLayerSelected", () => {
+        it("should dispatch activateSelectedLayer and startLayerLoader if both flags are enabled", () => {
+            actionsWfst.handleLayerSelected({state: {activateLayerInTree: true, showLayerLoader: true}, dispatch});
+
+            expect(dispatch.calledWith("activateSelectedLayer")).to.be.true;
+            expect(dispatch.calledWith("startLayerLoader")).to.be.true;
+        });
+        it("should not dispatch anything if both flags are disabled", () => {
+            actionsWfst.handleLayerSelected({state: {activateLayerInTree: false, showLayerLoader: false}, dispatch});
+
+            expect(dispatch.notCalled).to.be.true;
+        });
+        it("should only dispatch activateSelectedLayer if only activateLayerInTree is enabled", () => {
+            actionsWfst.handleLayerSelected({state: {activateLayerInTree: true, showLayerLoader: false}, dispatch});
+
+            expect(dispatch.calledOnceWith("activateSelectedLayer")).to.be.true;
+        });
+    });
+    describe("activateSelectedLayer", () => {
+        beforeEach(() => {
+            rootGetters = {
+                layerConfigById: () => ({visibility: false, showInLayerTree: false, zIndex: 3})
+            };
+        });
+        it("should store the original state and activate the current layer in the tree", () => {
+            getters = {currentLayerId: "wfstOne", managedLayer: null};
+
+            actionsWfst.activateSelectedLayer({getters, rootGetters, dispatch, commit});
+
+            expect(dispatch.calledWith("restoreManagedLayer")).to.be.true;
+            expect(commit.calledWith("setManagedLayer", {id: "wfstOne", visibility: false, showInLayerTree: false, zIndex: 3})).to.be.true;
+            expect(dispatch.calledWith("replaceByIdInLayerConfig", {
+                layerConfigs: [{id: "wfstOne", layer: {id: "wfstOne", visibility: true, showInLayerTree: true}}]
+            }, {root: true})).to.be.true;
+        });
+        it("should do nothing if the current layer is already managed", () => {
+            getters = {currentLayerId: "wfstOne", managedLayer: {id: "wfstOne"}};
+
+            actionsWfst.activateSelectedLayer({getters, rootGetters, dispatch, commit});
+
+            expect(dispatch.notCalled).to.be.true;
+            expect(commit.notCalled).to.be.true;
+        });
+        it("should only restore the previous layer if no layer is currently selected", () => {
+            getters = {currentLayerId: undefined, managedLayer: {id: "wfstTwo"}};
+
+            actionsWfst.activateSelectedLayer({getters, rootGetters, dispatch, commit});
+
+            expect(dispatch.calledOnceWith("restoreManagedLayer")).to.be.true;
+            expect(commit.notCalled).to.be.true;
+        });
+    });
+    describe("restoreManagedLayer", () => {
+        it("should restore the managed layer to its original state and clear it", () => {
+            getters = {managedLayer: {id: "wfstOne", visibility: false, showInLayerTree: true, zIndex: 3}};
+
+            actionsWfst.restoreManagedLayer({getters, dispatch, commit});
+
+            expect(dispatch.calledWith("replaceByIdInLayerConfig", {
+                layerConfigs: [{id: "wfstOne", layer: {id: "wfstOne", visibility: false, showInLayerTree: true, zIndex: 3}}]
+            }, {root: true})).to.be.true;
+            expect(dispatch.calledWith("updateAllZIndexes", null, {root: true})).to.be.true;
+            expect(commit.calledOnceWith("setManagedLayer", null)).to.be.true;
+        });
+        it("should do nothing if no layer is managed", () => {
+            getters = {managedLayer: null};
+
+            actionsWfst.restoreManagedLayer({getters, dispatch, commit});
+
+            expect(dispatch.notCalled).to.be.true;
+            expect(commit.notCalled).to.be.true;
+        });
+    });
+    describe("startLayerLoader", () => {
+        /**
+         * Builds a fake layer whose source stores its event listeners so tests
+         * can trigger them manually.
+         * @returns {Object} handlers map and the fake layer.
+         */
+        function makeSource () {
+            const handlers = {};
+
+            return {handlers, source: {getLayerSource: () => ({
+                on: (evt, cb) => {
+                    handlers[evt] = cb;
+                },
+                un: (evt, cb) => {
+                    if (handlers[evt] === cb) {
+                        delete handlers[evt];
+                    }
+                }
+            })}};
+        }
+
+        it("should show the spinner when a load starts and hide it when it ends", () => {
+            const clock = sinon.useFakeTimers(),
+                {handlers, source} = makeSource();
+
+            getters = {currentLayerId: "wfstOne"};
+            sinon.stub(layerCollection, "getLayerById").returns(source);
+
+            actionsWfst.startLayerLoader({getters, commit});
+
+            expect(commit.calledWith("setLayerLoading", false)).to.be.true;
+            handlers.featuresloadstart();
+            expect(commit.calledWith("setLayerLoading", true)).to.be.true;
+            handlers.featuresloadend();
+            clock.tick(500);
+            expect(commit.lastCall.args).to.deep.equal(["setLayerLoading", false]);
+            clock.restore();
+        });
+        it("should hide the spinner when the load fails", () => {
+            const clock = sinon.useFakeTimers(),
+                {handlers, source} = makeSource();
+
+            getters = {currentLayerId: "wfstOne"};
+            sinon.stub(layerCollection, "getLayerById").returns(source);
+
+            actionsWfst.startLayerLoader({getters, commit});
+            handlers.featuresloadstart();
+            handlers.featuresloaderror();
+            clock.tick(500);
+
+            expect(commit.lastCall.args).to.deep.equal(["setLayerLoading", false]);
+            clock.restore();
+        });
+        it("should force the spinner off via timeout if the load never reports back (e.g. CORS)", () => {
+            const clock = sinon.useFakeTimers(),
+                {handlers, source} = makeSource();
+
+            getters = {currentLayerId: "wfstOne"};
+            sinon.stub(layerCollection, "getLayerById").returns(source);
+
+            actionsWfst.startLayerLoader({getters, commit});
+            handlers.featuresloadstart();
+            expect(commit.calledWith("setLayerLoading", true)).to.be.true;
+
+            clock.tick(10000);
+            expect(commit.lastCall.args).to.deep.equal(["setLayerLoading", false]);
+            clock.restore();
+        });
+        it("should not show the spinner if no load is triggered for an already loaded layer", () => {
+            const {source} = makeSource();
+
+            getters = {currentLayerId: "wfstOne"};
+            sinon.stub(layerCollection, "getLayerById").returns(source);
+
+            actionsWfst.startLayerLoader({getters, commit});
+
+            expect(commit.calledOnceWith("setLayerLoading", false)).to.be.true;
+        });
+        it("should hide the spinner if no source is available", () => {
+            const clock = sinon.useFakeTimers();
+
+            getters = {currentLayerId: "wfstOne"};
+            sinon.stub(layerCollection, "getLayerById").returns(undefined);
+
+            actionsWfst.startLayerLoader({getters, commit});
+
+            expect(commit.calledOnceWith("setLayerLoading", false)).to.be.true;
+
+            // Advance the clock to clear the interval (41 attempts * 50ms)
+            clock.tick(2050);
+            clock.restore();
+        });
+    });
 });

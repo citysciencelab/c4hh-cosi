@@ -2,6 +2,7 @@
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import LightButton from "@shared/modules/buttons/components/LightButton.vue";
 import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import SelectTypeButtons from "./SelectTypeButtons.vue";
 
 
@@ -11,7 +12,7 @@ import SelectTypeButtons from "./SelectTypeButtons.vue";
  */
 export default {
     name: "WfsTransaction",
-    components: {LightButton, ModalItem, SelectTypeButtons},
+    components: {LightButton, ModalItem, SelectTypeButtons, SpinnerItem},
     computed: {
         ...mapGetters("Modules/Wfst", [
             "currentInteractionConfig",
@@ -36,7 +37,11 @@ export default {
             "selectedUpdate",
             "buttonsDisabled",
             "anyInputValue",
-            "currentLayerId"
+            "currentLayerId",
+            "showLayerLoader",
+            "layerLoading",
+            "activateLayerInTree",
+            "interactionsDisabled"
         ]),
         multiupdateCurrentLayerIndex () {
             return this.multiUpdate.find(
@@ -60,13 +65,27 @@ export default {
     mounted () {
         this.initializeLayers();
         this.prepareEditButton();
+        this.setupSelectedLayer();
     },
     beforeUnmount () {
         this.reset();
+        this.restoreManagedLayer();
     },
     methods: {
         ...mapMutations("Modules/Wfst", ["setTransactionProcessing", "setCurrentLayerIndex", "setLayerInformation", "setShowConfirmModal", "setShowVoidModal", "setHideVoidModal", "setFeaturePropertiesBatch", "setSelectedSelectInteraction", "setIsDrawMode", "addProcessedMultiPolygon", "setVoidModalCallback"]),
-        ...mapActions("Modules/Wfst", ["prepareInteraction", "reset", "resetCancel", "save", "setActive", "saveMulti", "setFeatureProperty", "setFeaturesBatchProperty", "setFeatureProperties", "updateFeatureProperty", "sendTransaction", "switchToDrawMode", "propagateModal", "prepareEditButton", "clearInteractions"]),
+        ...mapActions("Modules/Wfst", ["prepareInteraction", "reset", "resetCancel", "save", "setActive", "saveMulti", "setFeatureProperty", "setFeaturesBatchProperty", "setFeatureProperties", "updateFeatureProperty", "sendTransaction", "switchToDrawMode", "propagateModal", "prepareEditButton", "clearInteractions", "handleLayerSelected", "restoreManagedLayer"]),
+        /**
+         * Selects the first layer if none is active yet and configured to
+         * activate the layer in the tree, then triggers the layer selection.
+         * @returns {void}
+         */
+        setupSelectedLayer () {
+            if (this.activateLayerInTree && this.currentLayerIndex === -1 && this.layerInformation.length > 0) {
+                this.setCurrentLayerIndex(0);
+                this.setFeatureProperties();
+            }
+            this.handleLayerSelected();
+        },
         /**
          * Initializes all layers stored in state's layerIds.
          * @returns {void}
@@ -97,6 +116,7 @@ export default {
             this.setFeatureProperties();
             this.setFeaturePropertiesBatch();
             this.prepareEditButton();
+            this.handleLayerSelected();
             this.reset();
         },
         /**
@@ -161,20 +181,26 @@ export default {
                 >
                     {{ $t(layerSelectLabel) }}
                 </label>
-                <select
-                    id="tool-wfs-transaction-layer-select-input"
-                    class="form-select"
-                    :disabled="layerSelectDisabled"
-                    @change="layerChanged($event.target.options.selectedIndex)"
-                >
-                    <option
-                        v-for="(layer, index) of layerInformation"
-                        :key="layer.id"
-                        :selected="index === currentLayerIndex"
+                <div class="layer-select-input-wrapper">
+                    <select
+                        id="tool-wfs-transaction-layer-select-input"
+                        class="form-select"
+                        :disabled="layerSelectDisabled"
+                        @change="layerChanged($event.target.options.selectedIndex)"
                     >
-                        {{ $t(layer.name) }}
-                    </option>
-                </select>
+                        <option
+                            v-for="(layer, index) of layerInformation"
+                            :key="layer.id"
+                            :selected="index === currentLayerIndex"
+                        >
+                            {{ $t(layer.name) }}
+                        </option>
+                    </select>
+                    <SpinnerItem
+                        v-if="showLayerLoader && layerLoading"
+                        custom-class="wfst-layer-spinner"
+                    />
+                </div>
             </div>
             <!-- Error message if feature properties are a string -->
             <template v-if="typeof featureProperties === 'string'">
@@ -199,7 +225,7 @@ export default {
                             :key="key"
                             :text="config.text"
                             :icon="config.icon"
-                            :disabled="buttonsDisabled"
+                            :disabled="interactionsDisabled"
                             class="interaction-button"
                             customclasstitle="btn-title-long"
                             :interaction="() => prepareInteraction(key)"
@@ -576,12 +602,30 @@ $checkbox-check-url: url("#{$checkbox-check-icon}");
     .layer-select-container {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         width: 25em;
 
         #tool-wfs-transaction-layer-select-label {
             width: 5em;
             align-self: center;
             margin-right: 1em;
+        }
+
+        .layer-select-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            flex: 1;
+
+            .form-select {
+                flex: 1;
+            }
+
+            .wfst-layer-spinner {
+                flex: 0 0 auto;
+                width: 1.25rem;
+                height: 1.25rem;
+            }
         }
     }
 

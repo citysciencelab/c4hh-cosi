@@ -106,6 +106,16 @@ const getters = {
      */
     showInteractionsButtons (state) {
         return [null, "delete", "update", "multiUpdate"].includes(state.selectedInteraction);
+    },
+    /**
+     * Whether editing, creating and deleting interactions are disabled.
+     * True while features are fetched or the selected layer is loading.
+     *
+     * @param {Object} state Local vuex state.
+     * @returns {Boolean} Whether the interactions are disabled.
+     */
+    interactionsDisabled (state) {
+        return state.buttonsDisabled || state.layerLoading;
     }
 };
 
