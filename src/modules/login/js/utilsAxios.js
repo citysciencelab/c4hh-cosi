@@ -5,9 +5,10 @@ import utilsUrl from "@modules/login/js/utilsUrl.js";
  * Adds interceptors to the different HTTP Get methods of javascript
  *
  * @param {string|RegExp} interceptorUrlRegex regex to match the urls that shall be equipped with the bearer token
+ * @param {boolean} [includeCredentials=true] includes credentials for intercepted requests
  * @return {void}
  */
-function addInterceptor (interceptorUrlRegex) {
+function addInterceptor (interceptorUrlRegex, includeCredentials = true) {
     if (!interceptorUrlRegex) {
         return;
     }
@@ -18,7 +19,7 @@ function addInterceptor (interceptorUrlRegex) {
                 return config;
             }
 
-            return utilsUrl.getAuthToken(config);
+            return utilsUrl.getAuthToken(config, includeCredentials);
         },
         error => {
             return Promise.reject(error);
@@ -48,7 +49,10 @@ function addInterceptor (interceptorUrlRegex) {
 
             if (tokenHeader) {
                 this.setRequestHeader("Authorization", tokenHeader);
-                this.withCredentials = true;
+
+                if (includeCredentials) {
+                    this.withCredentials = true;
+                }
             }
 
             return opened;
@@ -62,13 +66,18 @@ function addInterceptor (interceptorUrlRegex) {
             return originalFetch(resource, originalConfig);
         }
 
-        const config = utilsUrl.getAuthToken({
+        const config = {
             ...originalConfig,
-            credentials: "include",
             headers: originalConfig?.headers || {}
-        });
+        };
 
-        return originalFetch(resource, config);
+        if (includeCredentials) {
+            config.credentials = "include";
+        }
+
+        const configWithAuth = utilsUrl.getAuthToken(config, includeCredentials);
+
+        return originalFetch(resource, configWithAuth);
     };
 
 }

@@ -13,6 +13,7 @@
 - The following packages have been added:
     - devDependencies:
         - "docdash": "^2.0.2"
+- Login: Added new config.js parameter `includeCredentials`. If set to false, intercepted requests still get the Authorization header but do not send credentials (cookies), which can help prevent CORS errors.
 
 ### Changed
 - FeatureLister: Replaced the module-specific navigation tabs with the shared NavTab component.

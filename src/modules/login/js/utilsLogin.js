@@ -62,7 +62,8 @@ export function handleLoginParameters () {
  * Check if token is set in cookie.
  * If yes, add axios/fetch interceptors to add authentication token to HTTP requests
  *
- * @param {*} config OIDC configuration parameters
+ * @param {Object} config OIDC configuration parameters
+ * @param {boolean} [config.includeCredentials=true] If false, auth interceptors do not send credentials.
  * @returns {void}
  */
 function addAuthenticationBearerInterceptors (config) {
@@ -76,7 +77,7 @@ function addAuthenticationBearerInterceptors (config) {
             OIDC.eraseCookies();
         }
 
-        AxiosUtils.addInterceptor(config?.interceptorUrlRegex);
+        AxiosUtils.addInterceptor(config?.interceptorUrlRegex, config?.includeCredentials !== false);
     }
 }
 

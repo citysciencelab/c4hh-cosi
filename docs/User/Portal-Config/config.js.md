@@ -186,6 +186,7 @@ This module allows the user to login with an OIDC server. The retrieved access t
 |oidcScope|yes|String||The scope used for oidc, defaults to "profile email openid".|
 |oidcRedirectUri|yes|String||The url to redirect the oidc process to - after login.|
 |interceptorUrlRegex|yes|String||An regexp pattern that allows to specify urls the oidc token will be attached to.|
+|includeCredentials|no|Boolean|true|If set to false, intercepted requests still get the Authorization header but do not send credentials (cookies), which can help prevent CORS errors.|
 
 Make sure in keycloak the client is configured as follows:
 ```
