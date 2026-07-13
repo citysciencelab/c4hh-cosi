@@ -291,6 +291,7 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
                     getAbstract: () => "abstract",
                     getFrequenzy: () => "123",
                     getDownloadLinks: () => [],
+                    getCreationDate: () => "thisIsADate",
                     getPublicationDate: () => "thisIsADate",
                     getContact: () => "contact",
                     getPublisher: () => "publisher",
@@ -301,7 +302,7 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
 
             await actions.getAbstractInfo({commit, dispatch, state, rootGetters}, metaInfo);
 
-            expect(commit.callCount).to.be.equal(10);
+            expect(commit.callCount).to.be.equal(11);
             expect(commit.firstCall.args[0]).to.equal("setDownloadLinks");
             expect(commit.firstCall.args[1]).to.be.deep.equals(null);
             expect(commit.secondCall.args[0]).to.equal("setTitle");
@@ -314,14 +315,16 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
             expect(commit.getCall(4).args[1]).to.be.deep.equals([]);
             expect(commit.getCall(5).args[0]).to.equal("setDatePublication");
             expect(commit.getCall(5).args[1]).to.be.deep.equals("thisIsADate");
-            expect(commit.getCall(6).args[0]).to.equal("setPointOfContact");
-            expect(commit.getCall(6).args[1]).to.be.deep.equals("contact");
-            expect(commit.getCall(7).args[0]).to.equal("setPublisher");
-            expect(commit.getCall(7).args[1]).to.be.deep.equals("publisher");
-            expect(commit.getCall(8).args[0]).to.equal("setDateRevision");
-            expect(commit.getCall(8).args[1]).to.be.deep.equals("thisIsADate");
-            expect(commit.getCall(9).args[0]).to.equal("setDownloadLinks");
-            expect(commit.getCall(9).args[1]).to.be.deep.equals([]);
+            expect(commit.getCall(6).args[0]).to.equal("setDateCreation");
+            expect(commit.getCall(6).args[1]).to.be.deep.equals("thisIsADate");
+            expect(commit.getCall(7).args[0]).to.equal("setPointOfContact");
+            expect(commit.getCall(7).args[1]).to.be.deep.equals("contact");
+            expect(commit.getCall(8).args[0]).to.equal("setPublisher");
+            expect(commit.getCall(8).args[1]).to.be.deep.equals("publisher");
+            expect(commit.getCall(9).args[0]).to.equal("setDateRevision");
+            expect(commit.getCall(9).args[1]).to.be.deep.equals("thisIsADate");
+            expect(commit.getCall(10).args[0]).to.equal("setDownloadLinks");
+            expect(commit.getCall(10).args[1]).to.be.deep.equals([]);
         });
 
         it("ensures that downloadLinks is set to null", () => {
