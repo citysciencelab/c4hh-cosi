@@ -1,9 +1,8 @@
 import {createStore} from "vuex";
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import DipasTheme from "../../../components/DipasTheme.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/dipas/components/DipasTheme.vue", () => {
     const iconPath = "https://geoportal-hamburg.de/lgv-beteiligung/icons/einzelmarker_dunkel.png",

@@ -1,10 +1,8 @@
 import TabGenders from "../../../components/Tabs/TabGenders.vue";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Vuex from "vuex";
 
-
-config.global.mocks.$t = key => key;
 
 /**
  * Run only these tests via command:

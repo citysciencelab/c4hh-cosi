@@ -1,8 +1,7 @@
 import {expect} from "chai";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import CreateScreenshot from "../../../components/CreateScreenshot.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("CreateScreenshot.vue", () => {
     beforeAll(() => {

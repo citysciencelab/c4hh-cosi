@@ -1,11 +1,10 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
 import StoryCreatorChapter from "../../../components/StoryCreatorChapter.vue";
 import store from "@appstore/index.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
     let localStore, map, wrapper;

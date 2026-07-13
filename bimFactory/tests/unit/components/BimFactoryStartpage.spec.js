@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 
 import Component from "../../../components/BimFactoryStartpage.vue";
 import BimFactory from "../../../store/indexBimFactory.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/bimFactory/components/BimFactoryStartpage.vue", () => {
     const store = createStore({

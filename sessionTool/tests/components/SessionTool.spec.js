@@ -1,11 +1,10 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
 import SessionTool from "../../components/SessionTool.vue";
 import SessionToolModule from "../../store/indexSessionTool.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/tools/sessionTool/components/sessionTool.vue", () => {
     let wrapper, store, addSingleAlertStub;

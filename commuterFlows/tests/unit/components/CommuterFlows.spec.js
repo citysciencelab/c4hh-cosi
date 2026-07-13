@@ -1,10 +1,9 @@
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import CommuterFlowsComponent from "../../../components/CommuterFlows.vue";
 import CommuterFlows from "../../../store/indexCommuterFlows.js";
 import {createStore} from "vuex";
 
-config.global.mocks.$t = key => key;
 
 /**
  * mocks secondary menu

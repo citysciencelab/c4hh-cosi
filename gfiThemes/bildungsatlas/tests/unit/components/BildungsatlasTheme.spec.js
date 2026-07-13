@@ -1,9 +1,8 @@
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import BildungsatlasTheme from "../../../components/BildungsatlasTheme.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/bildungsatlas/components/BildungsatlasTheme.vue", () => {
     let wrapper;

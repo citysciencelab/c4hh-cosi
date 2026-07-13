@@ -1,5 +1,5 @@
 import axios from "axios";
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
@@ -12,7 +12,6 @@ import VectorSource from "ol/source/Vector.js";
 import layerFactory from "@core/layers/js/layerFactory.js";
 import {Style} from "ol/style.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", () => {
     let consoleWarnSpy, store;

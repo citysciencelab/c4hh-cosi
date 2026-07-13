@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import UpdateRequirements from "../../components/UpdateRequirements.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue", () => {
     let store;

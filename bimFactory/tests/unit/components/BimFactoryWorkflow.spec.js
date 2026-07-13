@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import Component from "../../../components/BimFactoryWorkflow.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/bimFactory/components/BimFactoryWorkflow.vue", () => {
     const mockWorkflows = {

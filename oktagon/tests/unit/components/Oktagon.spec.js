@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import sinon from "sinon";
 import {expect} from "chai";
 import OktagonComponent from "../../../components/OktagonComponent.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("OktagonComponent.vue", () => {
     let store, wrapper;

@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import BimFactory from "../../../store/indexBimFactory.js";
 
 import Component from "../../../components/BimFactory.vue";
 
-config.global.mocks.$t = key => key;
 
 /**
  * mocks secondary menu

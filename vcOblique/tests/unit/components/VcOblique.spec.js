@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import ObliqueViewerComponent from "../../../components/VcOblique.vue";
 import VcOblique from "../../../store/indexVcOblique.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/vcOblique/components/VcOblique.vue", () => {
     const mockConfigJson = {

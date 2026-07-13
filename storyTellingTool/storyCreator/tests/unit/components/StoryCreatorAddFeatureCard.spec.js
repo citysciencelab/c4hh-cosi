@@ -1,11 +1,10 @@
 import {beforeEach} from "vitest";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
 import StoryCreatorAddFeatureCard from "../../../components/StoryCreatorAddFeatureCard.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => {
     let map, store, wrapper;

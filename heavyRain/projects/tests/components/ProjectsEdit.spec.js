@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import ProjectsEdit from "../../components/ProjectsEdit.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
     let store;

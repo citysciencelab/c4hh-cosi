@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import VerkehrsstaerkenThemeLineChart from "../../../components/VerkehrsstaerkenThemeLineChart.vue";
 import {createStore} from "vuex";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/gfiThemes/verkehrsstaerken/components/VerkehrsstaerkenThemeLineChart.vue", () => {
     const lineChartData = [

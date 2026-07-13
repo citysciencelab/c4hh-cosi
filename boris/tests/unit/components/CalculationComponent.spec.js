@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import CalculationComponent from "../../../components/CalculationComponent.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("ADDONS: addons/boris/components/CalculationComponent.vue", () => {
     const mockConfigJson = {

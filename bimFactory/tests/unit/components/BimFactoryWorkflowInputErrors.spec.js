@@ -1,9 +1,8 @@
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import BimFactoryWorkflowInputErrors from "../../../components/BimFactoryWorkflowInputErrors.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("BimFactoryWorkflowInputErrors.vue", () => {
     let wrapper;

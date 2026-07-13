@@ -1,11 +1,10 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import StoryCreatorAddImageCard from "../../../components/StoryCreatorAddImageCard.vue";
 import sinon from "sinon";
 import {beforeEach, describe} from "vitest";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
     let wrapper,

@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import AddElementDropdown from "../../../components/AddElementDropdown.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/storyTellingTool/storyCreator/shared/modules/AddElementDropdown/components/AddElementDropdown.vue", () => {
     let wrapper;
