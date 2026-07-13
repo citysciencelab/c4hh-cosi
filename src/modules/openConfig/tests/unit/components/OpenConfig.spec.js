@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import OpenConfigComponent from "@modules/openConfig/components/OpenConfig.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/openConfig/components/OpenConfig.vue", () => {
     let store,

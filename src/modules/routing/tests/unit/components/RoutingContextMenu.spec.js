@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import RoutingContextMenuComponent from "../../../components/RoutingContextMenu.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/RoutingContextMenu.vue", () => {
     let store,

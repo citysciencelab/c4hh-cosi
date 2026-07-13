@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import escapeId from "@shared/js/utils/escapeId.js";
 import FolderCheckBox from "@modules/layerTree/components/FolderCheckBox.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerTree/components/FolderCheckBox.vue", () => {
     let changeVisibilitySpy,

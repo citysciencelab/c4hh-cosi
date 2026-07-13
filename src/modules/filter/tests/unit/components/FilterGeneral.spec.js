@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import FilterGeneral from "@modules/filter/components/FilterGeneral.vue";
 import FilterStore from "@modules/filter/store/indexFilter.js";
@@ -7,7 +7,6 @@ import sinon from "sinon";
 import openlayerFunctions from "@modules/filter/utils/openlayerFunctions.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/FilterGeneral.vue", () => {
     const layers = [

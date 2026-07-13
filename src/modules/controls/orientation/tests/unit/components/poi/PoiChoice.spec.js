@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import PoiChoiceComponent from "@modules/controls/orientation/components/poi/PoiChoice.vue";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/controls/orientation/components/PoiChoice.vue", () => {
     let store,

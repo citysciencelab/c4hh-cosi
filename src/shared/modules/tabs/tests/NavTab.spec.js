@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/tabs/components/NavTab.vue", () => {
 

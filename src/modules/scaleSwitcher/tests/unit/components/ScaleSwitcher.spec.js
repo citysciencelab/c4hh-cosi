@@ -1,11 +1,10 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 
 import ScaleSwitcherComponent from "@modules/scaleSwitcher/components/ScaleSwitcher.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/scaleSwitcher/components/ScaleSwitcher.vue", () => {
     const scales = ["1000", "5000", "10000"];

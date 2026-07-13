@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import layerCollection from "@core/layers/js/layerCollection.js";
 
 import TimeSlider from "@modules/wmsTime/components/TimeSlider.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/wmsTime/components/TimeSlider.vue", () => {
     let store,

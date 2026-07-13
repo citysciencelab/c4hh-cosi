@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 
 import WfsSearchField from "@modules/wfsSearch/components/WfsSearchField.vue";
 import WfsSearchModule from "@modules/wfsSearch/store/indexWfsSearch.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/wfsSearch/components/WfsSearchField.vue", () => {
     let store,

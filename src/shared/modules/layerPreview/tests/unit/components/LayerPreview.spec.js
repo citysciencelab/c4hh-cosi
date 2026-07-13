@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import crs from "@masterportal/masterportalapi/src/crs.js";
@@ -8,7 +8,6 @@ import LayerPreview from "@shared/modules/layerPreview/store/indexLayerPreview.j
 import wmts from "@masterportal/masterportalapi/src/layer/wmts.js";
 import axios from "axios";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerPreview/components/LayerPreview.vue", () => {
     let store,

@@ -1,7 +1,7 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount, config} from "@vue/test-utils";
 import IsochronesComponent from "@modules/routing/components/Isochrones/IsochronesItem.vue";
 import IsochronesItemBatchProcessingComponent from "@modules/routing/components/Isochrones/IsochronesItemBatchProcessing.vue";
 import RoutingBatchProcessingCheckboxComponent from "@modules/routing/components/RoutingBatchProcessingCheckbox.vue";
@@ -17,7 +17,6 @@ import gettersIsochrones from "@modules/routing/store/isochrones/gettersIsochron
 import stateIsochrones from "@modules/routing/store/isochrones/stateIsochrones.js";
 
 config.silent = true;
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/Isochrones/IsochronesItem.vue", () => {
 

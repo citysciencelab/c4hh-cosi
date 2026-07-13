@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import BufferAnalysisComponent from "@modules/bufferAnalysis/components/BufferAnalysis.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 import {createLayerConfigsArray} from "../utils/functions.js";
 import {nextTick} from "vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
     let store,

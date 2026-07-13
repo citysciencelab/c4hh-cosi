@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import CopyrightConstraints from "@modules/copyrightConstraints/components/CopyrightConstraints.vue";
 import state from "@modules/copyrightConstraints/store/stateCopyrightConstraints.js";
 import sinon from "sinon";
 import axios from "axios";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/copyrightConstraints/components/CopyrightConstraints.vue", () => {
     let store,

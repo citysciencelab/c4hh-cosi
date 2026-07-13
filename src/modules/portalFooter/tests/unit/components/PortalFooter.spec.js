@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import PortalFooterComponent from "@modules/portalFooter/components/PortalFooter.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/portalFooter/components/PortalFooter.vue", () => {
     const urls = [{

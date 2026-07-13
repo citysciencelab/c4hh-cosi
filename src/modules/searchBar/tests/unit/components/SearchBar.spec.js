@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import SearchBarComponent from "@modules/searchBar/components/SearchBar.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/searchBar/components/SearchBar.vue", () => {
     const searchInterfaceInstances = [

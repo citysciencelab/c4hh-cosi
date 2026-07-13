@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import Button3dItem from "@modules/controls/button3d/components/Button3dItem.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/controls/button3d/components/Button3dItem.vue", () => {
     const changeMapModeSpy = sinon.spy();

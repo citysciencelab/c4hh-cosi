@@ -1,10 +1,9 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import DrawSettingsCircleComponent from "@shared/modules/draw/components/DrawSettingsCircle.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/draw/components/DrawSettingsCircle.vue", () => {
     let circleOptions,

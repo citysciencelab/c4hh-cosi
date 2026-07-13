@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import SearchBarSuggestionListItemComponent from "@modules/searchBar/components/SearchBarSuggestionListItem.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/searchBar/components/SearchBarSuggestionListItem.vue", () => {
     let store,

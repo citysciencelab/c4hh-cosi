@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import FileImportComponent from "@modules/fileImport/components/FileImport.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/fileImport/components/FileImport.vue", () => {
     let store,

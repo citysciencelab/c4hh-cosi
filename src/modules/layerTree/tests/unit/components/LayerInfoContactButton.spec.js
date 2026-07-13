@@ -1,9 +1,8 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import LayerInfoContactButton from "@modules/layerTree/components/LayerInfoContactButton.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerTree/components/LayerInfoContactButton.vue", () => {
     let store,

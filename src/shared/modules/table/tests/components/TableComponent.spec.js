@@ -1,10 +1,9 @@
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import {expect} from "chai";
 import TableComponent from "@shared/modules/table/components/TableComponent.vue";
 import sinon from "sinon";
 import {createStore} from "vuex";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/table/components/TableComponent.vue", () => {
     let store, wrapper;

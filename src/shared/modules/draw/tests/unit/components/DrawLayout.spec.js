@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import DrawLayoutComponent from "@shared/modules/draw/components/DrawLayout.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/draw/components/DrawLayout.vue", () => {
     let currentLayout,

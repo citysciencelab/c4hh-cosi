@@ -342,13 +342,11 @@ export default Config;
 
 ```js title="myMasterPortalFolder/addons/vueAddon/tests/unit/components/VueAddon.spec.js"
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import VueAddon from "../../../components/VueAddon.vue";
 
-// mock i18n
-config.global.mocks.$t = (key) => key;
 
 describe("addons/vueAddon/components/VueAddon.vue", () => {
   const showAlertSpy = sinon.spy();

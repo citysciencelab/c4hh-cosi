@@ -1,4 +1,4 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount, config} from "@vue/test-utils";
 import dayjs from "dayjs";
 import {expect} from "chai";
 import sinon from "sinon";
@@ -6,7 +6,6 @@ import "../../../../../../../../devtools/tests/chartMocks.js";
 import Chart from "chart.js";
 import SensorThemeBartChart from "@modules/getFeatureInfo/themes/sensor/components/SensorThemeBarChart.vue";
 
-config.global.mocks.$t = key => key;
 config.global.mocks.$i18next = {
     language: "de"
 };

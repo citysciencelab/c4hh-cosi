@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import IsochronesLegendComponent from "@modules/routing/components/Isochrones/IsochronesLegend.vue";
 import {RoutingIsochrones} from "@modules/routing/js/classes/routing-isochrones.js";
 import {RoutingIsochronesArea} from "@modules/routing/js/classes/routing-isochrones-area.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/Isochrones/IsochronesLegend.vue", () => {
 

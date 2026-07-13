@@ -1,7 +1,7 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import RoutingDownloadComponent from "@modules/routing/components/RoutingDownload.vue";
 import mutations from "@modules/routing/store/mutationsRouting.js";
 import actions from "@modules/routing/store/actionsRouting.js";
@@ -13,7 +13,6 @@ import {Stroke, Style} from "ol/style.js";
 import Feature from "ol/Feature.js";
 import LineString from "ol/geom/LineString.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/RoutingDownload.vue", () => {
     let activeRoutingToolOption,

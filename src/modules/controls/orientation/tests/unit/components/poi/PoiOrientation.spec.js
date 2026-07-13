@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createStyle.js";
@@ -7,7 +7,6 @@ import PoiOrientationComponent from "@modules/controls/orientation/components/po
 import Feature from "ol/Feature.js";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/controls/orientation/components/PoiOrientation.vue", () => {
     let store,

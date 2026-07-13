@@ -1,7 +1,7 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {mount, config} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import Modeler3DImportComponent from "@modules/modeler3D/components/Modeler3DImport.vue";
 import Modeler3D from "@modules/modeler3D/store/indexModeler3D.js";
 import actions from "@modules/modeler3D/store/actionsModeler3D.js";
@@ -65,7 +65,6 @@ const featureCollection = {
     ]
 };
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/modeler3D/components/Modeler3DImport.vue", () => {
     let store,

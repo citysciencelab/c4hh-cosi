@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import Modeler3DEntityModelComponent from "@modules/modeler3D/components/Modeler3DEntityModel.vue";
 import Modeler3D from "@modules/modeler3D/store/indexModeler3D.js";
 import actions from "@modules/modeler3D/store/actionsModeler3D.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/modeler3D/components/Modeler3DEntityModel.vue", () => {
     const provide = {

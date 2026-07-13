@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 
 import WmsTimeComponent from "@modules/wmsTime/components/WmsTime.vue";
@@ -7,7 +7,6 @@ import LayerSwiper from "@shared/modules/layerSwiper/components/LayerSwiper.vue"
 import TimeSlider from "@modules/wmsTime/components/TimeSlider.vue";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/wmsTime/components/WmsTime.vue", () => {
     let store,

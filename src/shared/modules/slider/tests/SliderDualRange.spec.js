@@ -1,10 +1,9 @@
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
 import SliderDualRange from "@shared/modules/slider/components/SliderDualRange.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/components/SliderDualRange.vue", () => {
     let interactionSpy, props;

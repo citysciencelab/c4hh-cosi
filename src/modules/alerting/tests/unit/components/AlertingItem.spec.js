@@ -1,11 +1,10 @@
 import AlertingItemComponent from "@modules/alerting/components/AlertingItem.vue";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount, config} from "@vue/test-utils";
 import {createStore} from "vuex";
 
 
-config.global.mocks.$t = key => key;
 config.global.mocks.$i18n = {
     i18next: {
         options: {

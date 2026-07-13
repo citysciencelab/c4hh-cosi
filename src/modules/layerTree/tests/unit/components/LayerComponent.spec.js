@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import layerTypes from "@core/layers/js/layerTypes.js";
 import LayerComponent from "@modules/layerTree/components/LayerComponent.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerTree/components/LayerComponent.vue", () => {
     let store,

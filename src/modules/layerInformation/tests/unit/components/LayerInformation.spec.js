@@ -1,10 +1,8 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import LayerInformationComponent from "@modules/layerInformation/components/LayerInformation.vue";
 import sinon from "sinon";
-
-config.global.mocks.$t = key => key;
 
 
 describe("src/modules/layerInformation/components/LayerInformation.vue", () => {

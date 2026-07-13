@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import SnippetDownload from "@modules/filter/components/SnippetDownload.vue";
 import ExportButtonGeoJSON from "@shared/modules/buttons/components/ExportButtonGeoJSON.vue";
 import {expect} from "chai";
 import openlayerFunctions from "@modules/filter/utils/openlayerFunctions.js";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/SnippetDownload.vue", () => {
     let wrapper = null,

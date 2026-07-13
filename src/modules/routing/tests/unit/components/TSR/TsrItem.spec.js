@@ -1,7 +1,7 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import TsrComponent from "@modules/routing/components/TSR/TsrItem.vue";
 import TsrUploadComponent from "@modules/routing/components/TSR/TsrUpload.vue";
 import RoutingCoordinateInputComponent from "@modules/routing/components/RoutingCoordinateInput.vue";
@@ -9,7 +9,6 @@ import RoutingContextMenuComponent from "../../../../components/RoutingContextMe
 import TsrOutputComponent from "@modules/routing/components/TSR/TsrOutput.vue";
 import {RoutingTSRDirections} from "@modules/routing/js/classes/routing-directions-tsr.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/TSR/TsrItem.vue", () => {
     let mapInteractionMode,

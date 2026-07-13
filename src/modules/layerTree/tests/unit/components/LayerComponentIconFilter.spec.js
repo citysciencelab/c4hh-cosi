@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 
 import LayerComponentIconFilter from "@modules/layerTree/components/LayerComponentIconFilter.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerTree/components/LayerComponentIconFilter.vue", () => {
     let icon,

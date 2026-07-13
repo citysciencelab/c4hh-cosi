@@ -4,7 +4,6 @@ import {expect} from "chai";
 import ShadowComponent from "@modules/shadow/components/ShadowTool.vue";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 config.global.mocks.$i18next = {
     language: "de"
 };

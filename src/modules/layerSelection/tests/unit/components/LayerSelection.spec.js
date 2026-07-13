@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import LayerSelectionComponent from "@modules/layerSelection/components/LayerSelection.vue";
 import LayerSelection from "@modules/layerSelection/store/indexLayerSelection.js";
 import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerSelection/components/LayerSelection.vue", () => {
     let addLayerButtonSearchActive,

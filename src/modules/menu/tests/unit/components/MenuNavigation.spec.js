@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import MenuNavigation from "@modules/menu/components/MenuNavigation.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/core/menu/navigation/components/MenuNavigation.vue", () => {
     let wrapper,

@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import GraphicalSelectComponent from "@shared/modules/graphicalSelect/components/GraphicalSelect.vue";
 import GraphicalSelect from "@shared/modules/graphicalSelect/store/indexGraphicalSelect.js";
@@ -9,8 +9,6 @@ import VectorSource from "ol/source/Vector.js";
 import Polygon from "ol/geom/Polygon.js";
 import LineString from "ol/geom/LineString.js";
 import Feature from "ol/Feature.js";
-
-config.global.mocks.$t = key => key;
 
 
 let store, layersOnMap, layer, mockMapGetters, mockMapActions, mockAlertActions, map;

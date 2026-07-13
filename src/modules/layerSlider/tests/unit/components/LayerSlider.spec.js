@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
@@ -7,7 +7,6 @@ import LayerSliderComponent from "@modules/layerSlider/components/LayerSlider.vu
 import LayerSlider from "@modules/layerSlider/store/indexLayerSlider.js";
 import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerSlider/components/LayerSlider.vue", () => {
     const layerSliderPlayerComponentMock = {

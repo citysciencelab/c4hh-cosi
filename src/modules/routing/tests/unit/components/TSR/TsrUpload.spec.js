@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import TsrComponent from "@modules/routing/components/TSR/TsrItem.vue";
 import TsrUpload from "@modules/routing/components/TSR/TsrUpload.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/TSR/TsrUpload.vue", () => {
     let mapInteractionMode,

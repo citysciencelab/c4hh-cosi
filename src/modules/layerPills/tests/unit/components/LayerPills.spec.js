@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount, config} from "@vue/test-utils";
 import LayerPillsComponent from "@modules/layerPills/components/LayerPills.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 config.global.directives = {"bs-tooltip": {mounted: () => { /* stub */ }}};
 
 let observeSpy, disconnectSpy, ResizeObserverStub;

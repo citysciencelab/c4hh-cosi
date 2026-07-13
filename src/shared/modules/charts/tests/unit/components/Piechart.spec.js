@@ -1,11 +1,10 @@
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import "../../../../../../../devtools/tests/chartMocks.js";
 import ChartJs from "chart.js/auto";
 import {nextTick} from "vue";
 import PiechartItem from "@shared/modules/charts/components/PiechartItem.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/share-components/charts/components/PiechartItem.vue", () => {
     let wrapper,

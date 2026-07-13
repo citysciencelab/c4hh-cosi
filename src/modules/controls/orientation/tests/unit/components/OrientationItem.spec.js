@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import OrientationItemComponent from "@modules/controls/orientation/components/OrientationItem.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/controls/orientation/components/OrientationItem.vue", () => {
     let store,

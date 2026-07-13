@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import {treeBaselayersKey, treeSubjectsKey} from "@shared/js/utils/constants.js";
 import LayerTreeNode from "@modules/layerTree/components/LayerTreeNode.vue";
 import gettersLayerTree from "@modules/layerTree/store/gettersLayerTree.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
     let store,

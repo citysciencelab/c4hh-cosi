@@ -1,9 +1,8 @@
 import sinon from "sinon";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/checkboxes/components/SwitchInput.vue", () => {
     let interactionSpy;

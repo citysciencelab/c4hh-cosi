@@ -1,9 +1,8 @@
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
 

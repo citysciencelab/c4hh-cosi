@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import MenuToggleButton from "@modules/menu/components/MenuToggleButton.vue";
 
-config.global.mocks.$t = key => key;
 
 /**
  * Factory to create a Vuex store for Menu module tests

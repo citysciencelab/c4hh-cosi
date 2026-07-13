@@ -1,11 +1,10 @@
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import "../../../../../../../devtools/tests/chartMocks.js";
 import ChartJs from "chart.js/auto";
 import {nextTick} from "vue";
 import BarchartItem from "@shared/modules/charts/components/BarchartItem.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/share-components/charts/components/BarchartItem.vue", () => {
     let wrapper;

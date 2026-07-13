@@ -1,10 +1,9 @@
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 
 
 import FreezeScreenUnfreeze from "@modules/controls/freeze/components/FreezeScreenUnfreeze.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/controls/freeze/components/FreezeScreenUnfreeze.vue", () => {
 

@@ -1,10 +1,9 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import SnippetDateRange from "@modules/filter/components/SnippetDateRange.vue";
 import dayjs from "dayjs";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/SnippetDateRange.vue", () => {
     let wrapper = null;

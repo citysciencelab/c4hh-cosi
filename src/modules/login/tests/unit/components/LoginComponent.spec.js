@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 
 import LoginComponent from "@modules/login/components/LoginComponent.vue";
 import Login from "@modules/login/store/indexLogin.js";
@@ -13,7 +13,6 @@ import sinon from "sinon";
 
 const fakeToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6IjViY2IzZThmNDM2MGI0YjI4MWRjNDM4ZTExODE4YzZlIn0.e30.LEo9imrM5zuR1yo-KMzdY62XbnL7UBO2AImB2Pf-bD35NVZlMsU7xsXMUX6petNWU61tJSFzyMk4nWZQHm3LBQ";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/Modules/Login/components/LoginComponent.vue", () => {
     const

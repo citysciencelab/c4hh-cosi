@@ -1,11 +1,9 @@
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import FilterList from "@modules/filter/components/FilterList.vue";
 import sinon from "sinon";
-
-config.global.mocks.$t = key => key;
 
 
 describe("src/modules/filter/components/FilterList.vue", () => {

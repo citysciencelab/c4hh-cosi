@@ -1,5 +1,5 @@
 Error.stackTraceLimit = 50;
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import StatisticDashboard from "@modules/statisticDashboard/components/StatisticDashboard.vue";
@@ -20,7 +20,6 @@ import {
 } from "ol/format/filter.js";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature.js";
 
-config.global.mocks.$t = key => key;
 
 /**
  * mocks secondary menu

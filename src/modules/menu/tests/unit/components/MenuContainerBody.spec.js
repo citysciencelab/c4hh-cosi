@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import MenuContainerBody from "@modules/menu/components/MenuContainerBody.vue";
 import {expect} from "chai";
 import MenuNavigation from "@modules/menu/components/MenuNavigation.vue";
 import MenuContainerBodyRoot from "@modules/menu/components/MenuContainerBodyRoot.vue";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/menu/MenuContainerBody.vue", () => {
     let store,

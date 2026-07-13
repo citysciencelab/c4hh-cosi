@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import LayerFilterSnippet from "@modules/filter/components/LayerFilterSnippet.vue";
 import SnippetDownload from "@modules/filter/components/SnippetDownload.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
@@ -9,7 +9,6 @@ import MapHandler from "@modules/filter/utils/mapHandler.js";
 import openlayerFunctions from "@modules/filter/utils/openlayerFunctions.js";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
     let wrapper = null,

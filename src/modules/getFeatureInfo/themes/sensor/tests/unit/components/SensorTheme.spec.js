@@ -1,14 +1,12 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import dayjs from "dayjs";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import sinon from "sinon";
 
 import SensorTheme from "@modules/getFeatureInfo/themes/sensor/components/SensorTheme.vue";
 import SensorChartsData from "@modules/getFeatureInfo/themes/sensor/components/SensorThemeData.vue";
 import SensorChartsBarChart from "@modules/getFeatureInfo/themes/sensor/components/SensorThemeBarChart.vue";
-
-config.global.mocks.$t = key => key;
 
 
 describe("src/modules/getFeatureInfo/themes/senor/components/SensorTheme.vue", () => {

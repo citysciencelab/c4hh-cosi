@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import FeatureListerComponent from "@modules/featureLister/components/FeatureLister.vue";
 import sinon from "sinon";
 import {expect} from "chai";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/featureLister/components/FeatureLister.vue", () => {
     let wrapper, actions, getters, store,

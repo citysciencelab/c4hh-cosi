@@ -1,11 +1,9 @@
 import {expect} from "chai";
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import CompareFeaturesComponent from "@modules/compareFeatures/components/CompareFeatures.vue";
 import TableComponent from "@shared/modules/table/components/TableComponent.vue";
 import {createStore} from "vuex";
 import sinon from "sinon";
-
-config.global.mocks.$t = key => key;
 
 
 describe("CompareFeatures.vue", () => {

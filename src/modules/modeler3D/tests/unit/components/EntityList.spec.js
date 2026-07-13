@@ -1,10 +1,9 @@
 import {expect} from "chai";
 import {createStore} from "vuex";
 import Modeler3D from "@modules/modeler3D/store/indexModeler3D.js";
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import EntityListComponent from "@modules/modeler3D/components/ui/EntityList.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/modeler3D/components/EntityList.vue", () => {
     let store, wrapper;

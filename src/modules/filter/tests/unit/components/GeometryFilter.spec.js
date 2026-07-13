@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import GeometryFilter from "@modules/filter/components/GeometryFilter.vue";
 import {expect} from "chai";
 import sinon from "sinon";
@@ -9,7 +9,6 @@ import Feature from "ol/Feature.js";
 import {Polygon, LineString, MultiPolygon} from "ol/geom.js";
 import {nextTick} from "vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/GeometryFilter.vue", () => {
     let wrapper = null,

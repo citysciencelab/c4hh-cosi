@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import LayerComponentSubMenu from "@modules/layerTree/components/LayerComponentSubMenu.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
     let changeCurrentComponentStub,

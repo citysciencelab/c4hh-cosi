@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import RoutingAvoidFeaturesComponent from "@modules/routing/components/RoutingAvoidFeatures.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/RoutingAvoidFeatures.vue", () => {
     let store,

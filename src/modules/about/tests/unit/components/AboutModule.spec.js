@@ -1,10 +1,8 @@
 import {createStore} from "vuex";
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import AboutComponent from "@modules/about/components/AboutModule.vue";
 import sinon from "sinon";
-
-config.global.mocks.$t = key => key;
 
 
 describe("src/modules/about/components/AboutModule.vue", () => {

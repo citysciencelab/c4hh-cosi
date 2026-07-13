@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import MenuContainerBodyRootItems from "@modules/menu/components/MenuContainerBodyRootItems.vue";
 import {expect} from "chai";
 import MenuContainerBodyRootItemElement from "@modules/menu/components/MenuContainerBodyRootItemElement.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
     let store,
