@@ -17,6 +17,8 @@
               "screenToSmallMessage": "DIPAS_stories has not been optimized for this screen size yet. Please use a bigger screen if possible!",
               "mobilePortraitMessage": "Usage in landscape mode recommended."
             },
+            "copyStoryLink": "Copy current story as link",
+            "copyStoryLinkSuccess": "Link copied to clipboard.",
             "floatingButton": {
                 "scrollToTop": "Scroll to top"
             },

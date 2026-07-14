@@ -26,6 +26,7 @@ export default {
             interval: null,
             isHovering: null,
             isChangeFrom3D: false,
+            linkCopied: false,
             loadedContent: null,
             overlay: null,
             scroller: null,
@@ -35,7 +36,9 @@ export default {
         };
     },
     computed: {
+        ...mapGetters("Modules/ShareView", ["url"]),
         ...mapGetters("Modules/StoryPlayer", [
+            "currentStoryName",
             "description",
             "duration",
             "fixedStoryName",
@@ -83,6 +86,21 @@ export default {
     },
     watch: {
         /**
+         * Reloads the story when the currentStoryName changes.
+         * This happens when the portal is opened via a shared URL that encodes a specific story.
+         * @param {String} newName the new story name
+         * @returns {void}
+         */
+        async currentStoryName (newName) {
+            if (newName && newName !== this.fixedStoryName) {
+                await this.getFixedStoryList(this.fixedStoryPath, newName);
+                this.currentIndex = -1;
+                this.currentChapterIndex = 0;
+                await this.$nextTick();
+                this.scrollerSetup();
+            }
+        },
+        /**
          * Handles step changes.
          * @returns {void}
          */
@@ -100,10 +118,13 @@ export default {
     },
     async mounted () {
         if (!Object.keys(this.storyConf).length) {
-            await this.getFixedStoryList(this.fixedStoryPath, this.fixedStoryName);
+            const storyName = this.currentStoryName || this.fixedStoryName;
+
+            await this.getFixedStoryList(this.fixedStoryPath, storyName);
         }
         this.toolBodyScrollTop = 0;
 
+        await this.$nextTick();
         this.scrollerSetup();
 
         const toolBody = document.getElementById("mp-body-secondaryMenu"),
@@ -154,6 +175,7 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/StoryPlayer", [
+            "setCurrentStoryName",
             "setImageAssetsById",
             "setSupportedDevices",
             "setSupportedMapModes",
@@ -166,6 +188,7 @@ export default {
             "setStoryConf",
             "setMode"
         ]),
+        ...mapActions("Alerting", ["addSingleAlert"]),
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapMutations("Menu", ["setExpandedBySide"]),
         ...mapActions("Maps", ["changeMapMode", "placingPointMarker", "removePointMarker", "zoomToExtent"]),
@@ -270,6 +293,7 @@ export default {
 
                     this.setStoryConf(storyJson);
                     this.setImageAssetsById(imageAssetsById);
+                    this.setCurrentStoryName(name);
                 }
                 catch (error) {
                     console.warn(
@@ -609,6 +633,25 @@ export default {
         },
 
         /**
+         * Copies the current shareable URL (including the active story) to the clipboard.
+         * @returns {void}
+         */
+        copyToClipboard () {
+            if (window.isSecureContext) {
+                navigator.clipboard.writeText(this.url + "#");
+                this.linkCopied = true;
+                setTimeout(() => {
+                    this.linkCopied = false;
+                }, 2000);
+            }
+            else {
+                this.addSingleAlert({
+                    category: "error",
+                    content: this.$t("common:modules.shareView.copyErrorAlert", {url: this.url})
+                });
+            }
+        },
+        /**
          * Scrolls the secondary menu to the top.
          * @returns {void}
          */
@@ -630,14 +673,32 @@ export default {
     >
         <div
             v-if="showStickyHeader"
-            class="sticky-top bg-white border-bottom shadow-sm py-3 px-3 d-flex flex-column gap-1"
+            class="sticky-top bg-white border-bottom shadow-sm py-3 px-3 d-flex flex-row align-items-center gap-2"
         >
-            <h4 class="sticky-title mb-0 flex-grow-1">
-                {{ storyConf.title }}
-            </h4>
-            <span class="number-of-chapters">
-                {{ $t('additional:modules.storyPlayer.numberOfChapters', { current: currentChapterIndex + 1, total: storyConf.chapters.length }) }}
-            </span>
+            <div class="d-flex flex-column gap-1 flex-grow-1">
+                <h4 class="sticky-title mb-0">
+                    {{ storyConf.title }}
+                </h4>
+                <span class="number-of-chapters">
+                    {{ $t('additional:modules.storyPlayer.numberOfChapters', { current: currentChapterIndex + 1, total: storyConf.chapters.length }) }}
+                </span>
+            </div>
+            <div class="d-flex justify-content-end bd-highlight mb-3 align-items-center gap-2 flex-shrink-0">
+                <span
+                    v-if="linkCopied"
+                    class="badge rounded-pill bg-success badge-pill"
+                >
+                    {{ $t('additional:modules.storyPlayer.copyStoryLinkSuccess') }}
+                </span>
+                <IconButton
+                    class="btn-light btn-sm"
+                    :class-array="['chevron']"
+                    :aria="$t('additional:modules.storyPlayer.copyStoryLink')"
+                    icon="bi bi-share fs-5"
+                    :title="$t('additional:modules.storyPlayer.copyStoryLink')"
+                    :interaction="copyToClipboard"
+                />
+            </div>
         </div>
         <div
             class="d-flex w-100 flex-column player"
@@ -672,23 +733,43 @@ export default {
                         {{ storyConf.title }}
                     </h4>
                     <div
-                        class="d-flex align-items-center gap-2 mb-2 author-block"
+                        class="d-flex align-items-center justify-content-between w-100 mb-2"
                     >
-                        <i
-                            v-if="storyConf.author"
-                            class="bi bi-person-circle fs-4 me-1"
-                        />
-                        <div class="d-flex flex-column justify-content-center">
-                            <small
-                                class="author-name"
+                        <div
+                            class="d-flex align-items-center gap-2 author-block"
+                        >
+                            <i
+                                v-if="storyConf.author"
+                                class="bi bi-person-circle fs-4 me-1"
+                            />
+                            <div class="d-flex flex-column justify-content-center">
+                                <small
+                                    class="author-name"
+                                >
+                                    {{ storyConf.author }}
+                                </small>
+                                <small
+                                    class="created text-muted small"
+                                >
+                                    {{ storyConf.created }}
+                                </small>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 flex-shrink-0">
+                            <span
+                                v-if="linkCopied"
+                                class="badge rounded-pill bg-success"
                             >
-                                {{ storyConf.author }}
-                            </small>
-                            <small
-                                class="created text-muted small"
-                            >
-                                {{ storyConf.created }}
-                            </small>
+                                {{ $t('additional:modules.storyPlayer.copyStoryLinkSuccess') }}
+                            </span>
+                            <IconButton
+                                class="btn-light btn-sm"
+                                :class-array="['chevron']"
+                                :aria="$t('additional:modules.storyPlayer.copyStoryLink')"
+                                icon="bi bi-share fs-5"
+                                :title="$t('additional:modules.storyPlayer.copyStoryLink')"
+                                :interaction="copyToClipboard"
+                            />
                         </div>
                     </div>
                     <p
@@ -817,6 +898,20 @@ export default {
 #story-player {
     background-color: #F5F5F5;
 
+    .chevron {
+        background-color: $white;
+        border: 1px solid $dark_grey;
+
+        &:hover {
+            background-color: $light_blue;
+        }
+
+        &:active {
+            background-color: $dark_blue;
+            color: $white;
+        }
+    }
+
     .sticky-top {
         z-index: 1050;
     }
@@ -894,20 +989,6 @@ export default {
 
     .story-title {
         font-family: $font_family_accent;
-    }
-
-    .chevron {
-        background-color: $white;
-        border: 1px solid $dark_grey;
-
-        &:hover {
-            background-color: $light_blue;
-        }
-
-        &:active {
-            background-color: $dark_blue;
-            color: $white;
-        }
     }
 
     .stepper {

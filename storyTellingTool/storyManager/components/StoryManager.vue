@@ -69,7 +69,7 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/StoryManager", ["setCurrentStoryIndex", "setFixedStoryLoaded", "setStoryList"]),
-        ...mapMutations("Modules/StoryPlayer", ["setImageAssetsById", "setStoryConf"]),
+        ...mapMutations("Modules/StoryPlayer", ["setImageAssetsById", "setStoryConf", "setCurrentStoryName"]),
         ...mapActions("Menu", ["changeCurrentComponent"]),
 
         /**
@@ -168,6 +168,7 @@ export default {
         playStory (index) {
             this.setStoryConf(this.storyList[index].story);
             this.setImageAssetsById(this.storyList[index].imageAssetsById);
+            this.setCurrentStoryName(this.storyList[index].name || null);
             this.changeCurrentComponent({
                 type: "storyPlayer",
                 side: this.menuSide,
@@ -215,7 +216,8 @@ export default {
                             this.setFixedStoryLoaded(true);
                             return {
                                 story: storyJson,
-                                imageAssetsById
+                                imageAssetsById,
+                                name: filename
                             };
                         }
                         catch (error) {

@@ -17,6 +17,8 @@
               "screenToSmallMessage": "DIPAS_stories ist für diese Bildschirmgröße noch nicht optimiert. Bitte nach Möglichkeit einen größeren Bildschirm nutzen!",
                "mobilePortraitMessage": "Nutzung im Querformat empfohlen."
             },
+            "copyStoryLink": "Aktuelle Story als Link kopieren",
+            "copyStoryLinkSuccess": "Link in die Zwischenablage kopiert.",
             "floatingButton": {
                 "scrollToTop": "Nach oben scrollen"
             },

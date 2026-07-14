@@ -87,10 +87,14 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                         StoryPlayer: {
                             namespaced: true,
                             state: () => ({
+                                currentStoryName: null,
                                 imageAssetsById: {},
                                 storyConf: {}
                             }),
                             mutations: {
+                                setCurrentStoryName (state, value) {
+                                    state.currentStoryName = value;
+                                },
                                 setImageAssetsById (state, value) {
                                     state.imageAssetsById = value;
                                 },
