@@ -8,17 +8,10 @@
             "goToPrevStep": "Go to the previous chapter",
             "goToNextStep": "Go to the next chapter",
             "numberOfChapters": "Chapter {{current}} of {{total}}",
-            "dipasPlayer": {
-              "closeTOC": "Close the table of contents",
-              "goToPrevStep": "Go to the previous step",
-              "goToNextStep": "Go to the next step",
-              "toggleTOC": "Toggle the table of contents",
-              "openStoriesOverview": "Open the overview of all stories",
-              "screenToSmallMessage": "DIPAS_stories has not been optimized for this screen size yet. Please use a bigger screen if possible!",
-              "mobilePortraitMessage": "Usage in landscape mode recommended."
-            },
+            "copyLink": "Share",
             "copyStoryLink": "Copy current story as link",
             "copyStoryLinkSuccess": "Link copied to clipboard.",
+            "fullscreen": "Fullscreen",
             "floatingButton": {
                 "scrollToTop": "Scroll to top"
             },

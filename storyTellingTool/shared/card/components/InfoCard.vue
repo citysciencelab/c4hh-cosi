@@ -80,7 +80,7 @@ export default {
             aria-hidden="true"
         />
         <div
-            class="card shadow rounded-3 mb-3"
+            class="card shadow rounded-3 mb-5"
             :class="{
                 'story-card': cardType === 'story',
                 'is-editable': editable
@@ -186,7 +186,7 @@ export default {
                             <span class="ms-1 small">{{ cardItems.numberOfChapters + " " + $t('additional:modules.storyCreator.numberOfChapters') }}</span>
                         </div>
                         <div
-                            class="d-flex align-items-center gap-2"
+                            class="d-flex align-items-center gap-3"
                         >
                             <IconButton
                                 :aria="$t('additional:modules.storyCreator.labels.playStory')"

@@ -163,22 +163,22 @@ export default {
         display: flex;
         align-items: center;
         padding: 0.5rem 1rem;
-        color: $dark_grey;
+        color: $dark_blue;
         transition: background-color 0.2s ease;
 
         i {
-            color: $placeholder-color;
+            color: $dark_blue;
             font-size: 1.1rem;
             width: 24px;
             text-align: center;
         }
 
         &:hover, &:focus, &.active {
-            background-color: $light_blue;
-            color: $black;
+            background-color: $secondary;
+            color: $white;
 
             i {
-                color: $black;
+                color: $white;
             }
         }
     }

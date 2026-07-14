@@ -10,6 +10,7 @@ import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import Overlay from "ol/Overlay.js";
 import StoryPlayerFeature from "./StoryPlayerFeature.vue";
+import StoryPlayerToolbar from "./StoryPlayerToolbar.vue";
 import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/tipTapJsonToHtml";
 
 export default {
@@ -17,7 +18,8 @@ export default {
     components: {
         FlatButton,
         IconButton,
-        StoryPlayerFeature
+        StoryPlayerFeature,
+        StoryPlayerToolbar
     },
     data () {
         return {
@@ -27,7 +29,6 @@ export default {
             interval: null,
             isHovering: null,
             isChangeFrom3D: false,
-            linkCopied: false,
             loadedContent: null,
             overlay: null,
             scroller: null,
@@ -442,16 +443,7 @@ export default {
 
             return [center[0] + offsetX, center[1]];
         },
-        /**
-         * Gets the URL of a story.json from the URL parameter 'story'
-         * @returns {String} the URL of the story.json
-         */
-        getConfPathfromUrl () {
-            const queryString = window.location.search,
-                  urlParams = new URLSearchParams(queryString);
 
-            return urlParams.get("story");
-        },
         /**
          * Navigates to the previous step
          * @returns {void}
@@ -491,8 +483,8 @@ export default {
             this.featureAttributes = val;
             this.overlay = new Overlay({
                 element: this.$refs.storyPlayerFeature,
-                positioning: "bottom-center",
-                offset: [0, -20]
+                positioning: "center-right",
+                offset: [-30, -20]
             });
 
             mapCollection.getMap("2D").addOverlay(this.overlay);
@@ -637,25 +629,6 @@ export default {
         },
 
         /**
-         * Copies the current shareable URL (including the active story) to the clipboard.
-         * @returns {void}
-         */
-        copyToClipboard () {
-            if (window.isSecureContext) {
-                navigator.clipboard.writeText(this.url + "#");
-                this.linkCopied = true;
-                setTimeout(() => {
-                    this.linkCopied = false;
-                }, 2000);
-            }
-            else {
-                this.addSingleAlert({
-                    category: "error",
-                    content: this.$t("common:modules.shareView.copyErrorAlert", {url: this.url})
-                });
-            }
-        },
-        /**
          * Scrolls the secondary menu to the top.
          * @returns {void}
          */
@@ -687,21 +660,8 @@ export default {
                     {{ $t('additional:modules.storyPlayer.numberOfChapters', { current: currentChapterIndex + 1, total: storyConf.chapters.length }) }}
                 </span>
             </div>
-            <div class="d-flex justify-content-end bd-highlight mb-3 align-items-center gap-2 flex-shrink-0">
-                <span
-                    v-if="linkCopied"
-                    class="badge rounded-pill bg-success badge-pill"
-                >
-                    {{ $t('additional:modules.storyPlayer.copyStoryLinkSuccess') }}
-                </span>
-                <IconButton
-                    class="btn-light btn-sm"
-                    :class-array="['chevron']"
-                    :aria="$t('additional:modules.storyPlayer.copyStoryLink')"
-                    icon="bi bi-share fs-5"
-                    :title="$t('additional:modules.storyPlayer.copyStoryLink')"
-                    :interaction="copyToClipboard"
-                />
+            <div class="d-flex flex-column justify-content-end align-items-center gap-2">
+                <StoryPlayerToolbar />
             </div>
         </div>
         <div
@@ -715,16 +675,19 @@ export default {
                     'justify-content-center': !coverImagePath || !coverImagePath.length
                 }"
             >
+                <div class="d-flex justify-content-end align-items-center gap-2 mb-2">
+                    <StoryPlayerToolbar />
+                </div>
                 <img
                     v-if="coverImagePath && coverImagePath.length"
                     :src="coverImagePath"
-                    class="card-img-top cover-image"
+                    class="cover-image rounded-3"
                     :alt="storyConf.coverImageAlt"
                 >
                 <div class="text-end">
                     <small
                         v-if="storyConf.imageCopyright"
-                        class="text-muted copyright me-2 mt-1"
+                        class="text-muted me-2 mt-1"
                     >
                         &copy; {{ storyConf.imageCopyright }}
                     </small>
@@ -753,27 +716,11 @@ export default {
                                     {{ storyConf.author }}
                                 </small>
                                 <small
-                                    class="created text-muted small"
+                                    class="created text-muted"
                                 >
                                     {{ storyConf.created }}
                                 </small>
                             </div>
-                        </div>
-                        <div class="d-flex align-items-center gap-2 flex-shrink-0">
-                            <span
-                                v-if="linkCopied"
-                                class="badge rounded-pill bg-success"
-                            >
-                                {{ $t('additional:modules.storyPlayer.copyStoryLinkSuccess') }}
-                            </span>
-                            <IconButton
-                                class="btn-light btn-sm"
-                                :class-array="['chevron']"
-                                :aria="$t('additional:modules.storyPlayer.copyStoryLink')"
-                                icon="bi bi-share fs-5"
-                                :title="$t('additional:modules.storyPlayer.copyStoryLink')"
-                                :interaction="copyToClipboard"
-                            />
                         </div>
                     </div>
                     <p
@@ -795,14 +742,14 @@ export default {
                 >
                     <div
                         v-if="index === currentChapterIndex && index > 0"
-                        class="d-flex justify-content-center mb-3 p-2"
+                        class="d-flex justify-content-center mb-3 py-2"
                     >
                         <IconButton
-                            class="me-5 btn-light"
+                            class="btn-light"
                             :class-array="['chevron']"
-                            :aria="$t('additional:modules.storyCreator.goToPrevStep')"
+                            :aria="$t('additional:modules.storyPlayer.goToPrevStep')"
                             icon="bi bi-chevron-up"
-                            :title="$t('additional:modules.storyCreator.goToPrevStep')"
+                            :title="$t('additional:modules.storyPlayer.goToPrevStep')"
                             :interaction="() => goToPreviousStep()"
                         />
                     </div>
@@ -820,11 +767,11 @@ export default {
                         >
                             <h5
                                 v-if="chapter.title"
-                                class="card-title px-4 pt-4 pb-3"
+                                class="card-title px-3 pb-3"
                             >
                                 {{ chapter.title }}
                             </h5>
-                            <div class="story-player-content card-text">
+                            <div class="story-player-content card-text px-3">
                                 <div
                                     v-for="(item, itemIndex) in chapter.content"
                                     :key="'content-' + itemIndex"
@@ -835,8 +782,8 @@ export default {
                                             :alt="item.attrs?.alt"
                                             class="rounded w-100 d-block mb-2"
                                         >
-                                        <div class="text-end small text-muted">
-                                            <span v-if="item.attrs?.copyright">© {{ item.attrs.copyright }}</span>
+                                        <div class="text-end text-muted">
+                                            <small v-if="item.attrs?.copyright">© {{ item.attrs.copyright }}</small>
                                         </div>
                                     </div>
                                     <div
@@ -904,11 +851,11 @@ export default {
                         class="d-flex justify-content-center py-2"
                     >
                         <IconButton
-                            class="me-5 btn-light"
+                            class="btn-light"
                             :class-array="['chevron']"
-                            :aria="$t('additional:modules.storyCreator.goToPrevStep')"
+                            :aria="$t('additional:modules.storyPlayer.goToPrevStep')"
                             icon="bi bi-chevron-down"
-                            :title="$t('additional:modules.storyCreator.goToPrevStep')"
+                            :title="$t('additional:modules.storyPlayer.goToPrevStep')"
                             :interaction="() => goToNextStep()"
                         />
                     </div>
@@ -940,6 +887,10 @@ export default {
 <style lang="scss">
 #story-player {
     background-color: #F5F5F5;
+
+    .btn-wrapper {
+        width: 50px;
+    }
 
     .chevron {
         background-color: $white;
@@ -1011,8 +962,8 @@ export default {
             }
 
             .cover-image {
-                height: 50vh;
-                max-height: 50vh;
+                height: 60vh;
+                max-height: 60vh;
                 width: 100%;
                 object-fit: cover;
             }
@@ -1047,7 +998,6 @@ export default {
 
         .story-player-content {
             overflow: auto;
-            padding: 0.625rem 1.25rem;
 
             :deep() {
                 .paragraph {

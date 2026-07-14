@@ -824,7 +824,7 @@ export default {
         >
             <div class="map-position">
                 <FlatButton
-                    class="float-left"
+                    class="mb-4"
                     icon="bi bi-play-circle"
                     :text="$t('additional:modules.storyCreator.chapter.mapPosition')"
                     :disabled="isButtonDisabled"
@@ -875,7 +875,7 @@ export default {
                     </div>
                 </div>
             </div>
-            <div class="row no-gutters mb-4">
+            <div class="row no-gutters mb-4 mt-3">
                 <label
                     for="base-layer-list"
                     class="form-label small text-muted"
@@ -1043,8 +1043,8 @@ export default {
                                     :alt="element.attrs.alt"
                                     class="rounded w-100 d-block"
                                 >
-                                <div class="text-end mt-1 small">
-                                    © {{ element?.attrs?.copyright }}
+                                <div class="text-end mt-1">
+                                    <small>© {{ element?.attrs?.copyright }}</small>
                                 </div>
                             </div>
                         </div>
@@ -1241,7 +1241,7 @@ export default {
             <hr class="w-100">
             <FlatButton
                 id="save"
-                class="mb-4"
+                class="my-4"
                 :icon="'bi-save'"
                 :text="$t('additional:modules.storyCreator.chapter.save')"
                 :title="$t('additional:modules.storyCreator.chapter.save')"
@@ -1418,7 +1418,7 @@ export default {
     border-radius: 10px;
 }
 .chapter .multiselect__tag:hover {
-    background: $dark_blue;
+    background: $secondary;
     color: $white;
 }
 .chapter .multiselect .multiselect__tag i::before {
@@ -1434,8 +1434,6 @@ export default {
     left: 9px;
 }
 
-.chapter .multiselect__option--selected.multiselect__option--highlight,
-.chapter .multiselect__option--selected.multiselect__option--highlight:after,
 .chapter .multiselect__option:after,
 .chapter .multiselect__option--selected,
 .chapter .multiselect__option--selected:after,
@@ -1447,6 +1445,7 @@ export default {
 .chapter .multiselect__option--highlight,
 .chapter .multiselect__option--highlight:after {
     background: $secondary;
+    color: $white;
 }
 
 .map-position {

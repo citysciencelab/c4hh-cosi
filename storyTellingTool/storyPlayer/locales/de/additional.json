@@ -8,17 +8,10 @@
             "goToPrevStep": "Zum vorherigen Kapitel gehen",
             "goToNextStep": "Zum nächsten Kapitel gehen",
             "numberOfChapters": "Kapitel {{current}} von {{total}}",
-            "dipasPlayer": {
-              "closeTOC": "Inhaltsverzeichnis schließen",
-              "goToPrevStep": "Gehe zum vorherigen Schritt",
-              "goToNextStep": "Gehe zum nächsten Schritt",
-              "toggleTOC": "Öffne bzw. schließe das Inhaltsverzeichnis",
-              "openStoriesOverview": "Öffne die Übersicht aller Stories",
-              "screenToSmallMessage": "DIPAS_stories ist für diese Bildschirmgröße noch nicht optimiert. Bitte nach Möglichkeit einen größeren Bildschirm nutzen!",
-               "mobilePortraitMessage": "Nutzung im Querformat empfohlen."
-            },
+            "copyLink": "Teilen",
             "copyStoryLink": "Aktuelle Story als Link kopieren",
             "copyStoryLinkSuccess": "Link in die Zwischenablage kopiert.",
+            "fullscreen": "Vollbild",
             "floatingButton": {
                 "scrollToTop": "Nach oben scrollen"
             },

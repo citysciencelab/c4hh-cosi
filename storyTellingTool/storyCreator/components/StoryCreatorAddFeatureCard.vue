@@ -386,7 +386,7 @@ export default {
             <div class="d-flex justify-content-center gap-2 mt-4">
                 <FlatButton
                     id="save"
-                    class="mb-3"
+                    class="mb-4"
                     :icon="'bi-save'"
                     :text="$t('additional:modules.storyCreator.addElementDropdown.feature.save')"
                     :title="$t('additional:modules.storyCreator.addElementDropdown.feature.save')"

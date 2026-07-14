@@ -473,6 +473,7 @@ export default {
             <hr class="w-100">
             <div class="d-flex flex-column align-items-center p-2">
                 <FlatButton
+                    class="mt-3"
                     :icon="'bi-collection-play'"
                     :aria-label="$t('additional:modules.storyCreator.preview')"
                     :text="$t('additional:modules.storyCreator.preview')"

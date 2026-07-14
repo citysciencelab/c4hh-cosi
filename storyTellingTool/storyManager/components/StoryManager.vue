@@ -309,26 +309,26 @@ export default {
         />
         <template v-else-if="currentView === 'manager'">
             <div class="mb-2">
-                <h6 class="fw-bold text-dark">
+                <h5>
                     {{ $t('additional:modules.storyManager.mainTitle') }}
-                </h6>
-                <p class="text-muted small mb-0">
+                </h5>
+                <p>
                     {{ $t('additional:modules.storyManager.mainDescription') }}
                 </p>
             </div>
             <AddCardButton
                 v-if="enableCreator"
-                class="mt-3 mb-3 w-100 mx-0"
+                class="my-3 w-100 mx-0"
                 :text="$t('additional:modules.storyManager.createStoryTitle')"
                 :descr="$t('additional:modules.storyManager.createStoryDescription')"
                 @click="createNewStory"
             />
             <hr>
             <div class="mt-2 mb-3">
-                <h6 class="fw-bold d-flex align-items-center mb-1 text-dark">
-                    <i class="bi bi-play-btn me-2 fs-5" />
+                <h5 class="d-flex align-items-center">
+                    <i class="bi bi-play-btn me-2 fs-4 pt-1" />
                     {{ $t('additional:modules.storyManager.selectStoryTitle') }}
-                </h6>
+                </h5>
                 <p class="text-muted small mb-4">
                     {{ $t('additional:modules.storyManager.selectStoryDescription') }}
                 </p>
@@ -387,6 +387,3 @@ export default {
         </template>
     </div>
 </template>
-
-<style lang="scss" scoped>
-</style>

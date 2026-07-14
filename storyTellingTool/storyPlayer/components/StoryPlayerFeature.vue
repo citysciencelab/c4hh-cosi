@@ -46,7 +46,7 @@ export default {
 <template lang="html">
     <div
         id="feature-popup"
-        class="bg-white p-4"
+        class="bg-white p-3"
     >
         <h5>
             {{ featureAttributes?.title }}
@@ -122,10 +122,9 @@ export default {
                 </tbody>
             </table>
         </div>
-        <div class="d-flex justify-content-center gap-2 mt-4">
+        <div class="d-flex justify-content-center mt-2">
             <FlatButton
                 id="save"
-                class="mb-3"
                 :icon="'bi-x-lg'"
                 :text="$t('additional:modules.storyPlayer.close')"
                 :title="$t('additional:modules.storyPlayer.close')"
@@ -138,15 +137,17 @@ export default {
 
 <style lang="scss">
 #feature-popup {
-    max-height: 450px;
-    overflow: auto;
+    max-height: 60h;
+
     h5, .description {
         max-width: 500px;
         white-space: normal;
         overflow-wrap: break-word;
     }
+
     .table-wrapper {
         max-width: 500px;
+        max-height: 40vh;
         overflow: auto;
     }
 }

@@ -525,7 +525,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
 
                 const buttons = wrapper.findAllComponents({name: "IconButton"});
 
-                expect(buttons.length).to.equal(3);
+                expect(buttons.length).to.equal(2);
             });
 
             it("should hide chevrons at step boundaries", async () => {
@@ -547,76 +547,14 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
 
                 const buttons = wrapper.findAllComponents({name: "IconButton"});
 
-                await buttons.at(2).props("interaction")();
+                await buttons.at(1).props("interaction")();
                 expect(goNextSpy.calledOnce).to.be.true;
 
-                await buttons.at(1).props("interaction")();
+                await buttons.at(0).props("interaction")();
                 expect(goPrevSpy.calledOnce).to.be.true;
 
                 goNextSpy.restore();
                 goPrevSpy.restore();
-            });
-        });
-
-        describe("copyToClipboard", () => {
-            let clipboardWriteTextStub, originalIsSecureContext, originalNavigator;
-
-            beforeEach(() => {
-                clipboardWriteTextStub = sinon.stub().resolves();
-                originalIsSecureContext = globalThis.isSecureContext;
-                originalNavigator = globalThis.navigator;
-                globalThis.isSecureContext = true;
-                globalThis.navigator = Object.assign({}, globalThis.navigator, {
-                    clipboard: {writeText: clipboardWriteTextStub}
-                });
-            });
-
-            afterEach(() => {
-                globalThis.isSecureContext = originalIsSecureContext;
-                globalThis.navigator = originalNavigator;
-            });
-
-            it("positive: writes url+'#' to clipboard when isSecureContext is true", async () => {
-                await wrapper.vm.copyToClipboard();
-                expect(clipboardWriteTextStub.calledOnce).to.be.true;
-                expect(clipboardWriteTextStub.calledWith("https://example.com/portal?test=1#")).to.be.true;
-            });
-
-            it("positive: sets linkCopied to true after successful copy", async () => {
-                await wrapper.vm.copyToClipboard();
-                expect(wrapper.vm.linkCopied).to.be.true;
-            });
-
-            it("negative: does not write to clipboard when isSecureContext is false", async () => {
-                globalThis.isSecureContext = false;
-                const addSingleAlertStub = sinon.stub(wrapper.vm, "addSingleAlert");
-
-                await wrapper.vm.copyToClipboard();
-                expect(clipboardWriteTextStub.called).to.be.false;
-                expect(addSingleAlertStub.calledOnce).to.be.true;
-                addSingleAlertStub.restore();
-            });
-
-            it("positive: clicking the sticky header share button calls copyToClipboard", async () => {
-                const copyToClipboardSpy = sinon.spy(wrapper.vm, "copyToClipboard");
-
-                wrapper.vm.showStickyHeader = true;
-                await wrapper.vm.$nextTick();
-
-                await wrapper.find(".sticky-top").findComponent({name: "IconButton"}).props("interaction")();
-                expect(copyToClipboardSpy.calledOnce).to.be.true;
-                copyToClipboardSpy.restore();
-            });
-
-            it("positive: clicking the cover card share button calls copyToClipboard", async () => {
-                const copyToClipboardSpy = sinon.spy(wrapper.vm, "copyToClipboard");
-
-                wrapper.vm.$forceUpdate();
-                await wrapper.vm.$nextTick();
-
-                await wrapper.find(".cover-card .card-body").findComponent({name: "IconButton"}).props("interaction")();
-                expect(copyToClipboardSpy.calledOnce).to.be.true;
-                copyToClipboardSpy.restore();
             });
         });
 

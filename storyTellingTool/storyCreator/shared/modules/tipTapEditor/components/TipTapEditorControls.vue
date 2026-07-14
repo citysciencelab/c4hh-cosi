@@ -1,7 +1,11 @@
 <script>
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 
 export default {
     name: "TipTapEditorControls",
+    components: {
+        IconButton
+    },
     props: {
         editor: {
             type: [Object, null],
@@ -15,6 +19,16 @@ export default {
         };
     },
     methods: {
+        toggleLink () {
+            if (this.editor?.isActive("link")) {
+                this.editor?.chain().focus().extendMarkRange("link").unsetLink().run();
+                this.showLinkInput = false;
+                this.linkUrl = "";
+            }
+            else {
+                this.openLinkInput();
+            }
+        },
         openLinkInput () {
             this.linkUrl = this.editor?.getAttributes("link").href ?? "";
             this.showLinkInput = true;
@@ -139,10 +153,10 @@ export default {
             aria-label="Link group"
         >
             <button
-                aria-label="set link"
-                class="btn btn-primary rounded-start-3"
+                :aria-label="editor?.isActive('link') ? 'remove link' : 'set link'"
+                class="btn btn-primary rounded-3"
                 :class="{ 'is-active': editor?.isActive('link') }"
-                @click="openLinkInput"
+                @click="toggleLink"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -154,38 +168,12 @@ export default {
                 >
                     <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z" />
                     <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z" />
-                </svg>
-            </button>
-            <button
-                aria-label="remove link"
-                class="btn btn-primary rounded-end-3"
-                :disabled="!editor?.isActive('link')"
-                @click="editor?.chain().focus().unsetLink().run()"
-            >
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
-                    fill="currentColor"
-                    class="bi bi-link-45deg"
-                    viewBox="0 0 16 16"
-                >
-                    <path d="M4.715 6.542 3.343 7.914a3 3 0 1 0 4.243 4.243l1.828-1.829A3 3 0 0 0 8.586 5.5L8 6.086a1 1 0 0 0-.154.199 2 2 0 0 1 .861 3.337L6.88 11.45a2 2 0 1 1-2.83-2.83l.793-.792a4 4 0 0 1-.128-1.287z" />
-                    <path d="M6.586 4.672A3 3 0 0 0 7.414 9.5l.775-.776a2 2 0 0 1-.896-3.346L9.12 3.55a2 2 0 1 1 2.83 2.83l-.793.792c.112.42.155.855.128 1.287l1.372-1.372a3 3 0 1 0-4.243-4.243z" />
-                    <line
-                        x1="2"
-                        y1="2"
-                        x2="14"
-                        y2="14"
-                        stroke="currentColor"
-                        stroke-width="2"
-                    />
                 </svg>
             </button>
         </div>
         <div
             v-if="showLinkInput"
-            class="link-input-group d-flex align-items-center gap-1 ms-2"
+            class="link-input-group d-flex align-items-center gap-1 mt-2"
         >
             <input
                 ref="linkInput"
@@ -196,18 +184,18 @@ export default {
                 @keyup.enter="confirmLink"
                 @keyup.esc="cancelLink"
             >
-            <button
-                class="btn btn-sm btn-success"
+            <IconButton
+                icon="bi bi-check-lg"
+                :aria="$t('additional:modules.storyCreator.buttons.confirm')"
+                :class-array="['btn-secondary']"
                 @click="confirmLink"
-            >
-                ✓
-            </button>
-            <button
-                class="btn btn-sm btn-secondary"
+            />
+            <IconButton
+                icon="bi bi-x-lg"
+                :aria="$t('additional:modules.storyCreator.buttons.abort')"
+                :class-array="['btn-primary']"
                 @click="cancelLink"
-            >
-                ✕
-            </button>
+            />
         </div>
     </div>
 </template>
