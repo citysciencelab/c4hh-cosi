@@ -181,6 +181,7 @@ export default {
                 this.currentIndex = -1;
                 this.deactivateTool();
                 this.deactivateSubjectLayer();
+                this.closePopup();
                 return;
             }
             if (this._detectActiveStep) {
