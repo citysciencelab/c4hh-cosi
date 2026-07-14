@@ -358,7 +358,8 @@ export default defineConfig(({mode}) => {
                 "vuex",
                 "olcs",
                 "bootstrap",
-                "axios"
+                "axios",
+                "ol-mapbox-style"
             ],
             exclude: [
                 "sinon",
