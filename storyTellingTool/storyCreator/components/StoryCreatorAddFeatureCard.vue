@@ -153,10 +153,15 @@ export default {
          * @param {Object[]} val - The selected layers.
          * @returns {void}
          */
-        selectedLayers (val) {
-            if (!val.length || val.some(layer => layer.layerId !== this.currentFeature?.getLayerId())) {
-                this.currentFeature = null;
-            }
+        selectedLayers: {
+            handler (val) {
+                if (!val.length || !val.some(layer => layer.layerId === this.currentFeature?.getLayerId())) {
+                    this.currentFeature = null;
+                    this.attributes = null;
+                }
+            },
+            deep: true,
+            immediate: true
         },
         /**
          * Watches of the title length and cut it.
