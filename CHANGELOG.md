@@ -14,11 +14,13 @@
     - devDependencies:
         - "docdash": "^2.0.2"
 - Login: Added new config.js parameter `includeCredentials`. If set to false, intercepted requests still get the Authorization header but do not send credentials (cookies), which can help prevent CORS errors.
+- NavTab: Added slot to display optional content (e.g., badges, counts) after the label.
 
 ### Changed
 - FeatureLister: Replaced the module-specific navigation tabs with the shared NavTab component.
 - Repository: Added repository rules to enforce consistent contribution and review standards.
 - services.json-md: Corrected and extended dodumentation of OAF layer.
+- PoiOrientation: Replaced navigation pills with the shared NavTab component and updated badge display using the new slot.
 
 ### Deprecated
 

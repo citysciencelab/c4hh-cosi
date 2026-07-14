@@ -5,12 +5,12 @@
  * @module shared/modules/tabs/NavTab
  * @vue-prop {String} id - the id of the navTab-button.
  * @vue-prop {String} label - the label used on the navTab-button.
- * @vue-prop {String} icon - optional bootstrap icon class suffix (e.g. 'bi-geo-alt') shown before the label.
+ * @vue-prop {String} [icon] - optional bootstrap icon class suffix (e.g. 'bi-geo-alt') shown before the label.
  * @vue-prop {Boolean} active - whether the tab is currently active.
- * @vue-prop {Boolean} disabled - whether the tab is non-interactive.
+ * @vue-prop {Boolean} [disabled] - whether the tab is non-interactive.
  * @vue-prop {String} target - used to specify the id of the element shown by the navTab button (i.e. '#section-1').
- * @vue-prop {String} value - optional value attribute for the list element (e.g. <li value="my-value">)
- * @vue-prop {Function} interaction - can be used to bind a function to an interaction with the navTab-button, to be executed on click.
+ * @vue-prop {String} [value] - optional value attribute for the list element (e.g. &lt;li value="my-value"&gt;).
+ * @vue-prop {Function} [interaction] - can be used to bind a function to an interaction with the navTab-button, to be executed on click.
  */
 export default {
     name: "NavTab",
@@ -117,6 +117,7 @@ export default {
                 aria-hidden="true"
             />
             {{ $t(label) }}
+            <slot />
         </button>
     </li>
 </template>
