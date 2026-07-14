@@ -90,7 +90,8 @@ export default {
                         aria-valuemax="100"
                     >
                         <div
-                            class="progress-bar progress-bar-striped progress-bar-animated"
+                            class="progress-bar"
+                            :class="[progressPhase !== 'done' && progressPhase !== 'error' ? 'progress-bar-striped progress-bar-animated' : '']"
                             :style="progressBarCss"
                         />
                     </div>

@@ -42,6 +42,7 @@ import stateSearchBar from "./searchBar/stateSearchBar.js";
  * @property {Number} progressNow - percentage of progress in zipping and downloading files, -1 to hide progressbar
  * @property {Object|null} parcelSourceData - JSON data for the parcel search, containing the parcel districts and their respective names and ids
  * @property {String|null} parcelSearchSelectSource - URL to fetch the list of parcel districts for the parcel search
+ * @property {Number} pendingPrimaryDataFetches - Number of pending primary data fetches, used to indicate loading state in the progress bar
  *
  * Draw state
  * @property {Object} lzsCurrentLayout - Current layout settings for the drawn features in the draw component
@@ -96,6 +97,7 @@ const state = {
     progressNow: -1,
     parcelSourceData: null,
     parcelSearchSelectSource: null,
+    pendingPrimaryDataFetches: 0,
 
     // Draw component
     lzsCurrentLayout: {

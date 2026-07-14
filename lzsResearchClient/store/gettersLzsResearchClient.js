@@ -74,6 +74,14 @@ const getters = {
             return (dataset.instanceId === instanceId)
                 && (!primaryDataId || dataset.primaryDataId === primaryDataId);
         });
+    },
+    /**
+     * Checks if there are any pending primary data fetches in the state.
+     * @param {Object} state - The Vuex state object.
+     * @returns {Boolean} - Returns true if there are any pending primary data fetches, otherwise false.
+     */
+    isFetchingPrimaryData: state => {
+        return state.pendingPrimaryDataFetches > 0;
     }
 };
 

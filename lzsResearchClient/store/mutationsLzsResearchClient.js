@@ -46,6 +46,19 @@ const mutations = {
             (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename))
         );
     },
+    /** Updates the count of pending primary data fetches in the state.
+     * @param {Object} state - The current state object.
+     * @param {Object} payload - The payload object containing the increment flag.
+     * @param {boolean} payload.increment - Flag indicating whether to increment (true) or decrement (false) the pendingPrimaryDataFetches count.
+     */
+    updatePendingPrimaryDataFetches (state, {increment = true}) {
+        if (!increment) {
+            state.pendingPrimaryDataFetches--;
+            return;
+        }
+
+        state.pendingPrimaryDataFetches++;
+    },
     /**
      * Adds the fetched dossier data into the existing data class object.
      * @param {Object} state - The current state object.

@@ -19,7 +19,8 @@ export default {
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
             "maxDownloadMB",
-            "getDossierIdsForArchiveId"
+            "getDossierIdsForArchiveId",
+            "isFetchingPrimaryData"
         ]),
         maxDownloadBytes () {
             return this.maxDownloadMB * 1e6;
@@ -97,7 +98,8 @@ export default {
             aria-valuemax="100"
         >
             <div
-                class="progress-bar progress-bar-striped progress-bar-animated"
+                class="progress-bar"
+                :class="[isFetchingPrimaryData ? 'progress-bar-striped progress-bar-animated' : '']"
                 :style="progressBarCss"
             />
         </div>

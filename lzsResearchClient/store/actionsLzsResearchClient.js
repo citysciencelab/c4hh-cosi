@@ -215,24 +215,32 @@ export default {
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}`, params);
 
-        await axios.get(url, {signal})
-            .then(function (response) {
-                const primaryDataIds = response?.data?.map(p => p.primaryDataId) || [];
+        commit("updatePendingPrimaryDataFetches", {increment: true});
 
-                commit("addPrimaryDataToInstance", {
-                    selectedDetail: {instanceId: instanceId},
-                    primaryData: response?.data
-                });
+        try {
+            await axios.get(url, {signal})
+                .then(function (response) {
+                    const primaryDataIds = response?.data?.map(p => p.primaryDataId) || [];
 
-                for (const primaryDataId of primaryDataIds) {
                     commit("addPrimaryDataToInstance", {
-                        selectedDetail: {instanceId: instanceId, primaryDataId: primaryDataId},
+                        selectedDetail: {instanceId: instanceId},
                         primaryData: response?.data
                     });
-                }
-            }).catch(function (error) {
-                dispatch("axiosErrorHandling", error);
-            });
+
+                    for (const primaryDataId of primaryDataIds) {
+                        commit("addPrimaryDataToInstance", {
+                            selectedDetail: {instanceId: instanceId, primaryDataId: primaryDataId},
+                            primaryData: response?.data
+                        });
+                    }
+                }).catch(function (error) {
+                    dispatch("axiosErrorHandling", error);
+                });
+
+        }
+        finally {
+            commit("updatePendingPrimaryDataFetches", {increment: false});
+        }
     },
     /**
      * Request metadata for a given dossier and add them to the store.
