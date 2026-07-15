@@ -601,6 +601,9 @@ export default {
             :icon="'bi bi-pencil'"
             :title="$t('additional:modules.cosi.districtSelector.drawHeader')"
         >
+            <p>
+                <small>{{ $t('additional:modules.cosi.districtSelector.drawHelp') }}</small>
+            </p>
             <div class="d-flex gap-4 mb-4 ms-3">
                 <DrawTypes
                     :current-layout="drawStyle"
@@ -624,6 +627,9 @@ export default {
             :icon="'bi bi-record-circle'"
             :title="$t('additional:modules.cosi.districtSelector.bufferHeader')"
         >
+            <p>
+                <small>{{ $t('additional:modules.cosi.districtSelector.bufferHelp') }}</small>
+            </p>
             <InputText
                 id="district-selector-buffer"
                 class="mb-4 ms-3"

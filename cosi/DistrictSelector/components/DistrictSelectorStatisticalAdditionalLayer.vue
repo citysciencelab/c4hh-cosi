@@ -75,9 +75,9 @@ export default {
         :title="$t('additional:modules.cosi.districtSelector.additionalLayer')"
         icon="bi bi-layers-half"
     >
-        <div class="mb-2">
-            {{ $t('additional:modules.cosi.districtSelector.additionalInfoLayersHelp') }}
-        </div>
+        <p class="mb-2">
+            <small>{{ $t('additional:modules.cosi.districtSelector.additionalInfoLayersHelp') }}</small>
+        </p>
         <SwitchInput
             v-for="(ids, key) in additionalInfoLayers"
             :id="'layerSwitcher'"

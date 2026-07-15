@@ -4,7 +4,7 @@
             "cosi": {
                 "dipasProjects": {
                     "title": "DIPAS Projekte",
-                    "summary": "Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert und eingesehen werden.",
+                    "summary": "Mit der DIPAS Funktion können Sie Beiträge aus allen Beteiligungsverfahren auf der Karte anzeigen lassen. Beiträge können nach Kategorien oder nach Bewertungen gestylt werden.",
                     "projectsHeadline": "Alle Projekte",
                     "contributionsHeadline": "Alle Beiträge",
                     "showAllContributions": "Alle Beiträge anzeigen",

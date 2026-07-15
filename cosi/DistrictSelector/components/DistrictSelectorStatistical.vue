@@ -809,6 +809,9 @@ export default {
                 :title="$t('additional:modules.cosi.districtSelector.drawLabel')"
                 icon="bi bi-plus-square-dotted"
             >
+                <p>
+                    <small>{{ $t('additional:modules.cosi.districtSelector.areaSelection') }}</small>
+                </p>
                 <div class="d-flex align-items-center">
                     <IconButton
                         :id="'districtSelectorDragBox'"

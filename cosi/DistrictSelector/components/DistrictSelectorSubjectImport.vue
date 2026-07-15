@@ -126,6 +126,9 @@ export default {
         :icon="'bi bi-arrow-bar-up'"
         :title="$t('additional:modules.cosi.districtSelector.importHeader')"
     >
+        <p>
+            <small>{{ $t('additional:modules.cosi.districtSelector.importHelp') }}</small>
+        </p>
         <FileUpload
             :id="'District-Selector-Upload'"
             :keydown="(e) => triggerClickOnFileInput(e)"
