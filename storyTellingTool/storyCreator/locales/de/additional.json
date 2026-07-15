@@ -31,7 +31,7 @@
         "wrongFormatTitle": "Ungültiges Dateiformat",
         "emptyChapter": "Es wurden noch keine Kapitel angelegt.",
         "mapPosition": "Kartenposition",
-        "videoLink": "Video-URL",
+        "videoLink": "Video-URL (MP4, WebM, Ogg oder YouTube-Link)",
         "videoTitle": "Video-Titel (Optional)",
         "videoAccessibleText": "Text für Barrierefreiheit"
       },

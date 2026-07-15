@@ -5,6 +5,7 @@ import buildTreeStructure from "@appstore/js/buildTreeStructure.js";
 import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
+import {getDirectVideo, getEmbedLink} from "../../shared/utils/video.js";
 import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
@@ -279,6 +280,8 @@ export default {
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapMutations("Modules/StoryManager", ["setOriginalLayerConfig"]),
 
+        getDirectVideo,
+        getEmbedLink,
         tipTapJsonToHtml,
         /**
          * Resets the current chapter and goes back to overview page.
@@ -543,7 +546,6 @@ export default {
 
             return results;
         },
-
         /**
          * Gets all the tools from Masterportal filtered by the configured list of tools.
          * @param {Object[]} modules - list of strings where each string represent tool key
@@ -587,21 +589,6 @@ export default {
                 this.content.push(content);
             }
             this.closeContentEditor();
-        },
-        /**
-         * Checks if the link text is a direct video.
-         * @param {String} val - the link text
-         * @returns {Boolean} true if the link text is a direct video.
-         */
-        isDirectVideo (val) {
-            if (typeof val !== "string") {
-                return false;
-            }
-
-            const validVideoTypes = ["mp4", "webm", "ogg", "mov", "m4v", "avi", "mkv", "flv", "wmv", "3gp"];
-
-            return validVideoTypes.some(type => val.toLowerCase().includes(type)
-            );
         },
         /**
          * Resets the current chapter.
@@ -1117,7 +1104,7 @@ export default {
                                     :aria-label="$t('common:button.close')"
                                     @click.stop="removeContentItem(index)"
                                 />
-                                <div v-if="isDirectVideo(element?.attrs?.link)">
+                                <div v-if="getDirectVideo(element?.attrs?.link).length">
                                     <video
                                         width="100%"
                                         height="auto"
@@ -1126,7 +1113,7 @@ export default {
                                     >
                                         <source
                                             :src="element?.attrs?.link"
-                                            :type="'video/' + element?.attrs?.link.split('.').pop()"
+                                            :type="getDirectVideo(element?.attrs?.link)[0]?.content"
                                         >
                                         <track
                                             kind="captions"
@@ -1145,7 +1132,7 @@ export default {
                                         width="100%"
                                         height="100%"
                                         allow="autoplay"
-                                        :src="element?.attrs?.link"
+                                        :src="getEmbedLink(element?.attrs?.link)"
                                         :title="element?.attrs?.title"
                                     />
                                 </div>

@@ -30,7 +30,7 @@
         "wrongFormatTitle": "Invalid file format",
         "emptyChapter": "No chapters have been created yet.",
         "mapPosition": "Map position",
-        "videoLink": "Video-URL",
+        "videoLink": "Video-URL (MP4, WebM, Ogg or YouTube-Link)",
         "videoTitle": "Video-Title (Optional)",
         "videoAccessibleText": "Text for accessibility"
       },

@@ -439,34 +439,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             });
         });
 
-        describe("isDirectVideo", () => {
-            it("should return false if the parameter is not string", () => {
-                expect(wrapper.vm.isDirectVideo(0)).to.be.false;
-                expect(wrapper.vm.isDirectVideo(null)).to.be.false;
-                expect(wrapper.vm.isDirectVideo(undefined)).to.be.false;
-                expect(wrapper.vm.isDirectVideo([])).to.be.false;
-                expect(wrapper.vm.isDirectVideo({})).to.be.false;
-                expect(wrapper.vm.isDirectVideo(false)).to.be.false;
-            });
-
-            it("should return false if it is not a direct video", () => {
-                expect(wrapper.vm.isDirectVideo("www.youtube.com")).to.be.false;
-            });
-
-            it("should return true", () => {
-                expect(wrapper.vm.isDirectVideo("test.mp4")).to.be.true;
-                expect(wrapper.vm.isDirectVideo("test.webm")).to.be.true;
-                expect(wrapper.vm.isDirectVideo("test.ogg")).to.be.true;
-                expect(wrapper.vm.isDirectVideo("test.mov")).to.be.true;
-                expect(wrapper.vm.isDirectVideo("test.m4v")).to.be.true;
-                expect(wrapper.vm.isDirectVideo("test.avi")).to.be.true;
-                expect(wrapper.vm.isDirectVideo("test.mkv")).to.be.true;
-                expect(wrapper.vm.isDirectVideo("test.flv")).to.be.true;
-                expect(wrapper.vm.isDirectVideo("test.wmv")).to.be.true;
-                expect(wrapper.vm.isDirectVideo("test.3gp")).to.be.true;
-            });
-        });
-
         describe("saveChapter", () => {
             it("should emit chapter payload when saving in add mode", async () => {
                 await wrapper.setData({
