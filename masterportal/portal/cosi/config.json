@@ -316,8 +316,8 @@
                 "isochroneBackend": "valhalla",
                 "serviceId": "valhalla",
                 "valhallaIsochroneOptions": {
-                  "generalize": 30,
-                  "denoise": 0.3
+                  "generalize": 5,
+                  "denoise": 0.2
                 }
               },
               {
