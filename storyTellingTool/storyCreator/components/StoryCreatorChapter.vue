@@ -78,7 +78,9 @@ export default {
             zoomlevel: "",
             confirmedCoordinate: [],
             confirmedZoomlevel: "",
+            is3DLayerExisted: false,
             layerList: [],
+            navigation3D: undefined,
             toolList: [],
             selectedLayers: [],
             selectedTool: "",
@@ -88,6 +90,7 @@ export default {
     },
     computed: {
         ...mapGetters(["allLayerConfigs", "allBaselayerConfigs", "visibleBaselayerConfigs", "configuredModules", "layerConfigById"]),
+        ...mapGetters("Maps", ["mode"]),
         ...mapGetters("Modules/StoryManager", ["originalLayerConfig", "subjectLayerCategory", "toolStoryWhitelist"]),
         ...mapGetters("Modules/StoryManager", ["enableVideo", "originalLayerConfig", "subjectLayerCategory"]),
         /**
@@ -173,7 +176,17 @@ export default {
          * @returns {void}
          */
         selectedLayers: {
-            handler (val) {
+            handler (val, oldVal) {
+                if (this.mode === "3D" && Array.isArray(oldVal)) {
+                    oldVal.forEach(layer => {
+                        const layerConf = this.layerConfigById(layer.layerId);
+
+                        if (layerConf?.is3DLayer) {
+                            this.removeLayer(layerConf);
+                        }
+                    });
+                }
+
                 const layers = mapCollection.getMap("2D")?.getLayers();
 
                 this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
@@ -192,6 +205,10 @@ export default {
                         visibility: true
                     });
                 });
+
+                this.is3DLayerExisted = val.some(layer => this.layerConfigById(layer.layerId)?.is3DLayer);
+
+                this.changeMapMode(this.is3DLayerExisted ? "3D" : "2D");
             },
             deep: true
         },
@@ -227,6 +244,10 @@ export default {
               additionalLayers = this.allLayerConfigs.filter(
                   obj => !this.originalLayerConfig.some(item => item.id === obj.id)
               );
+
+        if (this.mode === "3D") {
+            this.changeMapMode("2D");
+        }
 
         this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
 
@@ -273,9 +294,14 @@ export default {
         }
 
         this.resetLayerConfig(this.selectedLayers);
+
+        if (this.mode === "3D") {
+            this.changeMapMode("2D");
+        }
     },
     methods: {
         ...mapActions(["addOrReplaceLayer", "updateLayerConfigs"]),
+        ...mapActions("Maps", ["changeMapMode"]),
         ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapMutations("Modules/StoryManager", ["setOriginalLayerConfig"]),
@@ -461,6 +487,7 @@ export default {
             this.confirmedCoordinate = [...this.coordinate];
             this.confirmedZoomlevel = this.zoomlevel;
             this.showAlert = true;
+            this.navigation3D = this.get3DParameter();
         },
         /**
          * Activates the selected layer by updating layer config visibility.
@@ -621,10 +648,38 @@ export default {
                     layers,
                     tool: this.selectedTool.toolId
                 },
-                content: this.content
+                navigation3D: this.is3DLayerExisted ? this.navigation3D : undefined,
+                content: this.content,
+                is3D: this.is3DLayerExisted
             };
 
             this.$emit("save-chapter", chapter);
+        },
+        /**
+         * Gets the 3d parameter for coordination and position.
+         * @returns {Object} the parameter object.
+         */
+        get3DParameter () {
+            if (!this.is3DLayerExisted) {
+                return undefined;
+            }
+
+            const olCesium = mapCollection.getMap("3D"),
+                  camera = olCesium?.scene_?.camera,
+                  cartographic = Cesium?.Cartographic?.fromCartesian(camera?.position),
+                  longitude = Cesium?.Math?.toDegrees(cartographic?.longitude),
+                  latitude = Cesium?.Math?.toDegrees(cartographic?.latitude),
+                  height = cartographic?.height,
+                  heading = camera?.heading,
+                  pitch = camera?.pitch,
+                  roll = camera?.roll;
+
+            return {
+                cameraPosition: [longitude, latitude, height],
+                heading: heading,
+                pitch: pitch,
+                roll: roll
+            };
         },
         /**
          * Handles image add/edit by writing it to the content array and closing the open editor.

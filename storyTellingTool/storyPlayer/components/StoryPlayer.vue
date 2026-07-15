@@ -208,6 +208,7 @@ export default {
                 this.deactivateTool();
                 this.deactivateSubjectLayer();
                 this.closePopup();
+                this.changeMapMode("2D");
                 return;
             }
             if (this._detectActiveStep) {
@@ -384,18 +385,18 @@ export default {
             if (this.currentChapter.navigation3D
                 && Object.prototype.hasOwnProperty.call(this.currentChapter.navigation3D, "cameraPosition")
                 && this.currentChapter.navigation3D.cameraPosition[0] !== null) {
-                const position = this.currentChapter.navigation3D.cameraPosition,
-                      map3d = mapCollection.getMap("3D"),
-                      camera = map3d.getCesiumScene().camera,
-                      destination = Cesium.Cartesian3.fromDegrees(position[0], position[1], position[2]);
+                const camera = mapCollection.getMap("3D").getCesiumScene().camera,
+                      postion = this.currentChapter.navigation3D.cameraPosition;
 
                 camera.flyTo({
-                    destination: destination,
+                    destination: Cesium.Cartesian3.fromDegrees(postion[0], postion[1], postion[2]),
                     orientation: {
                         heading: this.currentChapter.navigation3D.heading,
-                        pitch: this.currentChapter.navigation3D.pitch
+                        pitch: this.currentChapter.navigation3D.pitch,
+                        roll: this.currentChapter.navigation3D.roll
                     },
-                    easingFunction: Cesium.EasingFunction.QUADRATIC_OUT
+                    easingFunction: Cesium.EasingFunction.QUADRATIC_OUT,
+                    duration: this.duration / 1000
                 });
             }
 

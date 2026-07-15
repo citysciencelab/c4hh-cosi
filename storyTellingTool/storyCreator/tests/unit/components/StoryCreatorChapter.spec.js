@@ -7,16 +7,21 @@ import store from "@appstore/index.js";
 
 
 describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
-    let localStore, map, wrapper;
+    let localStore, map, originalCesium, wrapper;
 
     beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false
         });
+        originalCesium = global.Cesium;
     });
 
     beforeEach(() => {
+        global.Cesium = {};
+        global.Cesium.Cartographic = {
+            fromCartesian: sinon.spy()
+        };
         localStore = createStore({
             namespaced: true,
             modules: {
@@ -77,6 +82,15 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                             }
                         }
                     }
+                },
+                Maps: {
+                    namespaced: true,
+                    getters: {
+                        mode: () => sinon.stub()
+                    },
+                    actions: {
+                        changeMapMode: sinon.spy()
+                    }
                 }
             },
             getters: {
@@ -135,6 +149,10 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             }
         };
         mapCollection.addMap(map, "2D");
+    });
+
+    afterEach(() => {
+        global.Cesium = originalCesium;
     });
 
     describe("Component DOM", () => {
@@ -286,6 +304,31 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         },
                         {type: "layer", level: 1, $isDisabled: false}
                     ]
+                );
+            });
+        });
+
+        describe("get3DParameter", () => {
+            it("should return undefined", () => {
+                expect(wrapper.vm.get3DParameter()).to.be.undefined;
+            });
+
+            it("should return an object", async () => {
+                await wrapper.setData({
+                    is3DLayerExisted: true
+                });
+
+                expect(wrapper.vm.get3DParameter()).to.deep.equal(
+                    {
+                        cameraPosition: [
+                            undefined,
+                            undefined,
+                            undefined
+                        ],
+                        heading: undefined,
+                        pitch: undefined,
+                        roll: undefined
+                    }
                 );
             });
         });
@@ -447,7 +490,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     confirmedZoomlevel: 2,
                     selectedLayers: [{layerId: 1}, {layerId: 2}],
                     selectedTool: {toolId: "testTool"},
-                    content: []
+                    content: [],
+                    is3DLayerExisted: false
                 });
 
                 wrapper.vm.saveChapter();
@@ -457,7 +501,9 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 expect(emitted).to.have.lengthOf(1);
                 expect(emitted[0][0]).to.deep.equal({
                     content: [],
+                    is3D: false,
                     title: "Neues Testkapitel",
+                    navigation3D: undefined,
                     map: {
                         center: [123, 456],
                         zoomLevel: 2,
@@ -486,6 +532,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 expect(emitted).to.have.lengthOf(1);
                 expect(emitted[0][0]).to.deep.equal({
                     title: "Geändertes Kapitel 2",
+                    is3D: false,
+                    navigation3D: undefined,
                     map: {
                         center: [999, 888],
                         zoomLevel: 10,
