@@ -15,10 +15,11 @@ describe("addons/lzsResearchClient/tests/unit/components/SumOfCheckedFiles.spec.
             {
                 "archiveId": "DKL_ALKIS",
                 "checked": true,
+                "fileSizeBytes": 9800,
                 "primaryData": [
                     {
                         "id": "primaryDataId1",
-                        "contentFileSize": 9800,
+                        "fileSizeBytes": 9800,
                         "georeferencePrimarydata": null
                     }
                 ]
@@ -26,21 +27,22 @@ describe("addons/lzsResearchClient/tests/unit/components/SumOfCheckedFiles.spec.
             {
                 "archiveId": "DKL_3DSTADT_LOD1",
                 "checked": true,
+                "fileSizeBytes": 200200,
                 "primaryData": [
                     {
                         "id": "primaryDataId2",
-                        "contentFileSize": 100000,
+                        "fileSizeBytes": 100100,
                         "georeferencePrimarydata": {
                             "id": "georeferencePrimarydataId2",
-                            "contentFileSize": 100
+                            "fileSizeBytes": 100
                         }
                     },
                     {
                         "id": "primaryDataId3",
-                        "contentFileSize": 100000,
+                        "fileSizeBytes": 100100,
                         "georeferencePrimarydata": {
                             "id": "georeferencePrimarydataId3",
-                            "contentFileSize": 100
+                            "fileSizeBytes": 100
                         }
                     }
                 ]
@@ -65,7 +67,8 @@ describe("addons/lzsResearchClient/tests/unit/components/SumOfCheckedFiles.spec.
                                     }
                                     return [];
                                 },
-                                maxDownloadMB: () => 50
+                                maxDownloadMB: () => 50,
+                                isFetchingPrimaryData: () => false
                             }
                         }
                     }
@@ -101,13 +104,13 @@ describe("addons/lzsResearchClient/tests/unit/components/SumOfCheckedFiles.spec.
         expect(wrapper.exists()).to.be.true;
     });
 
-    it("should calculate current and max files sizes correctly", () => {
+    it("should calculate current and max files sizes correctly, including metadata bytes", async () => {
         expect(wrapper.vm.maxDownloadMB).to.equal(50);
         expect(wrapper.vm.maxDownloadBytes).to.equal(50000000);
         expect(wrapper.vm.sumOfFileSizes).to.equal(310000);
         expect(wrapper.vm.progressPercentage).to.equal(0.62);
 
-        mockCheckedData[0].primaryData[0].contentFileSize = 50000000;
+        mockCheckedData[0].fileSizeBytes = 50000000;
 
         expect(wrapper.vm.sumOfFileSizes).to.equal(50300200);
         expect(wrapper.vm.progressPercentage).to.equal(100.6004);
@@ -120,7 +123,7 @@ describe("addons/lzsResearchClient/tests/unit/components/SumOfCheckedFiles.spec.
         });
         expect(wrapper.vm.currentProgressInformation).to.deep.equal("additional:modules.lzsResearchClient.sumOfCheckedFiles.sumOk:310 kB,50 MB");
 
-        mockCheckedData[0].primaryData[0].contentFileSize = 55000000;
+        mockCheckedData[0].fileSizeBytes = 55000000;
 
         expect(wrapper.vm.progressBarCss).to.deep.equal({
             "--maxValueReached": "#E10019",

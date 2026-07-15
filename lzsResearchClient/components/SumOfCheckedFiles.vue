@@ -1,6 +1,6 @@
 <script>
 import {mapGetters} from "vuex";
-import {getHumanReadableFileSize} from "../utils/zipHelpers.js";
+import {calcMetadataBytesForArchives, getHumanReadableFileSize} from "../utils/zipHelpers.js";
 
 export default {
     name: "SumOfCheckedFiles",
@@ -11,11 +11,6 @@ export default {
         }
     },
     emits: ["update:progressPercentage"],
-    data () {
-        return {
-            bytesForMetadata: 50000
-        };
-    },
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
             "maxDownloadMB",
@@ -59,28 +54,22 @@ export default {
             let sumOfFiles = 0;
 
             this.checkedDatasets?.forEach(dataset => {
-                dataset.primaryData?.forEach(primaryData => {
-                    sumOfFiles += primaryData.contentFileSize;
-
-                    if (primaryData.georeferencePrimarydata) {
-                        sumOfFiles += primaryData.georeferencePrimarydata.contentFileSize;
-                    }
-                });
-
-                // add some extra file size for metadata since there is no content file size given for metadata
-                const dossierIds = this.getDossierIdsForArchiveId(dataset.archiveId);
-
-                if (dossierIds) {
-                    sumOfFiles += this.bytesForMetadata * dossierIds.length;
-                }
+                sumOfFiles += dataset.fileSizeBytes ?? 0;
             });
+
+            const uniqueArchiveIds = [...new Set(this.checkedDatasets?.map(d => d.archiveId) ?? [])];
+
+            sumOfFiles += calcMetadataBytesForArchives(uniqueArchiveIds, this.getDossierIdsForArchiveId);
 
             return sumOfFiles;
         }
     },
     watch: {
-        progressPercentage (val) {
-            this.$emit("update:progressPercentage", val);
+        progressPercentage: {
+            immediate: true,
+            handler (val) {
+                this.$emit("update:progressPercentage", val);
+            }
         }
     }
 };

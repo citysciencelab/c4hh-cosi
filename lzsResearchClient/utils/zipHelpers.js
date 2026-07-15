@@ -1,10 +1,11 @@
 import {buildEndpointUrl} from "./buildEndpointUrl";
 
 const ALREADY_COMPRESSED = [
-    "zip", "gz", "png", "jpg", "jpeg", "jp2", "pdf", "doc", "docx", "ppt", "pptx",
-    "xls", "xlsx", "heic", "heif", "7z", "bz2", "rar", "gif", "webp", "webm",
-    "mp4", "mov", "mp3", "aifc"
-];
+        "zip", "gz", "png", "jpg", "jpeg", "jp2", "pdf", "doc", "docx", "ppt", "pptx",
+        "xls", "xlsx", "heic", "heif", "7z", "bz2", "rar", "gif", "webp", "webm",
+        "mp4", "mov", "mp3", "aifc"
+    ],
+    BYTES_FOR_METADATA = 50000;
 
 /**
  * Trigger a browser download for the provided Blob by creating a temporary object URL
@@ -237,6 +238,48 @@ function roundFileSizeToFixed (fileSize, fixed2 = false) {
     return result;
 }
 
+/**
+ * Calculate the file size in bytes for a single primary data item.
+ * Includes the georefence file size if present.
+ * @param {Object} primaryData - A single primary data item with optional contentFileSize and georeferencePrimarydata.
+ * @returns {number} Size in bytes.
+ */
+function calcPrimaryDataSizeBytes (primaryData) {
+    return (primaryData.contentFileSize || 0) + (primaryData.georeferencePrimarydata?.contentFileSize || 0);
+}
+
+/**
+ * Calculate the total estimated file size in bytes for a dataset's primary data files only.
+ * Does not include metadata (dossier) overhead — use calcMetadataBytesForArchives for that.
+ * @param {Object} dataset - A dataset with optional primaryData array.
+ * @returns {number} Total primary data size in bytes, or 0 if no primaryData.
+ */
+function calcFileSizeBytes (dataset) {
+    if (!dataset.primaryData?.length) {
+        return 0;
+    }
+
+    return dataset.primaryData.reduce((sum, p) => {
+        return sum + calcPrimaryDataSizeBytes(p);
+    }, 0);
+}
+
+/**
+ * Calculate the total estimated metadata (dossier) file size in bytes for a set of archives.
+ * Metadata is downloaded once per archive regardless of how many datasets are selected,
+ * so this should be called once with the unique archive IDs across all selected datasets.
+ * @param {Array<string|number>} archiveIds - Unique archive IDs to include in the calculation.
+ * @param {Function} getDossierIds - getDossierIdsForArchiveId(archiveId) → string[]|null
+ * @returns {number} Total estimated metadata size in bytes.
+ */
+function calcMetadataBytesForArchives (archiveIds, getDossierIds) {
+    return archiveIds.reduce((sum, archiveId) => {
+        const dossierIds = getDossierIds(archiveId);
+
+        return sum + (dossierIds ? BYTES_FOR_METADATA * dossierIds.length : 0);
+    }, 0);
+}
+
 export {
     saveAs,
     fetchWithProgress,
@@ -244,5 +287,8 @@ export {
     calcProgress,
     buildFileInformationObject,
     getHumanReadableFileSize,
-    roundFileSizeToFixed
+    roundFileSizeToFixed,
+    calcPrimaryDataSizeBytes,
+    calcFileSizeBytes,
+    calcMetadataBytesForArchives
 };

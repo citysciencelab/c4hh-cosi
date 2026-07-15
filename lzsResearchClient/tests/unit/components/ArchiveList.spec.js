@@ -13,10 +13,10 @@ describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", (
 
     beforeEach(() => {
         mockDatasets = reactive([
-            {"archiveId": "DKL_3DSTADT_LOD1", "instanceId": "id1", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "6232", "type": "I"}]},
-            {"archiveId": "DKL_3DSTADT_LOD1", "instanceId": "id2", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "4835", "type": "I"}]},
-            {"archiveId": "test", "instanceId": "id3", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "1000", "type": "I"}]},
-            {"archiveId": "testOneColumn", "instanceId": "id4", "checked": false, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}]}
+            {"archiveId": "DKL_3DSTADT_LOD1", "instanceId": "id1", "checked": false, fileSizeBytes: 1e7, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "6232", "type": "I"}]},
+            {"archiveId": "DKL_3DSTADT_LOD1", "instanceId": "id2", "checked": false, fileSizeBytes: 4e7, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "4835", "type": "I"}]},
+            {"archiveId": "test", "instanceId": "id3", "checked": false, fileSizeBytes: 3e7, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}, {"name": "KACHELNUMMER", "value": "1000", "type": "I"}]},
+            {"archiveId": "testOneColumn", "instanceId": "id4", "checked": false, fileSizeBytes: 2e7, "attributes": [{"name": "JAHRGANG", "value": "2022", "type": "I"}]}
         ]);
 
         const tableStubInstances = [];
@@ -61,10 +61,17 @@ describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", (
                                 getNameForArchiveId: () => (id) => {
                                     return id;
                                 },
+                                getDossierIdsForArchiveId: () => (id) => {
+                                    if (id === "DKL_3DSTADT_LOD1") {
+                                        return ["dossierId1", "dossierId2"];
+                                    }
+                                    return [];
+                                },
                                 archiveHasGeoref: () => (id) => {
                                     return id === "test";
                                 },
-                                progressNow: () => -1
+                                progressNow: () => -1,
+                                isFetchingPrimaryData: () => false
                             }
                         }
                     }
@@ -205,6 +212,26 @@ describe("addons/lzsResearchClient/tests/unit/components/ArchiveList.spec.js", (
         expect(wrapper.vm.somethingCheckedForDownload).to.be.false;
         expect(downloadButton.exists()).to.be.true;
         expect(downloadButton.attributes("disabled")).to.be.equal("true");
+    });
+
+    describe("sumOfCheckedFileSizesForArchive", async () => {
+        it("should return the correct sum of checked file sizes for a given archive, including metadata bytes", async () => {
+            mockDatasets[0].checked = true;
+            mockDatasets[1].checked = true;
+
+            await wrapper.vm.$nextTick();
+
+            const sumForArchive1 = wrapper.vm.sumOfCheckedFileSizesForArchive("DKL_3DSTADT_LOD1");
+
+            expect(sumForArchive1).to.equal("50,10 MB");
+
+        });
+
+        it("should return null when no datasets are checked for a given archive", async () => {
+            const sumForArchive2 = wrapper.vm.sumOfCheckedFileSizesForArchive("DKL_3DSTADT_LOD1");
+
+            expect(sumForArchive2).to.equal(null);
+        });
     });
 
     describe("syncGeomToInstance", async () => {

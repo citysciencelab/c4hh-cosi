@@ -7,6 +7,7 @@ import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import Multiselect from "vue-multiselect";
 import TabResultTable from "./TabResultTable.vue";
 import SumOfCheckedFiles from "./SumOfCheckedFiles.vue";
+import {roundFileSizeToFixed, calcMetadataBytesForArchives, getHumanReadableFileSize} from "../utils/zipHelpers";
 import {getTranslationForAttribute, capitalizeString} from "../utils/translationHelpers";
 
 export default {
@@ -66,8 +67,10 @@ export default {
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
             "getNameForArchiveId",
+            "getDossierIdsForArchiveId",
             "archiveHasGeoref",
-            "progressNow"
+            "progressNow",
+            "isFetchingPrimaryData"
         ]),
         /**
          * Computes a list of unique archive IDs from the datasets and determines the attribute to group by for each archive.
@@ -197,9 +200,21 @@ export default {
                       })
                       : resultsForArchiveId;
 
-            return resultsForGroup.sort((a, b) => {
+            const sorted = resultsForGroup.sort((a, b) => {
                 return Number(a.attributes[0]?.value) - Number(b.attributes[0]?.value);
             });
+
+            const hasAnyPrimaryData = sorted.some(d => d.primaryData?.length);
+
+            if (hasAnyPrimaryData) {
+                sorted.forEach(dataset => {
+                    const sizeValue = dataset.primaryData?.length ? roundFileSizeToFixed(dataset.fileSizeBytes / 1e6, true) : "—";
+
+                    dataset.attributes.push({name: "fileSizeMB", id: "fileSizeMB", value: sizeValue});
+                });
+            }
+
+            return sorted;
         },
         /**
          * Groups the results for all steps by the specified attribute and stores them in groupedResultsForAllSteps.
@@ -240,13 +255,16 @@ export default {
          * @returns {String[]} - Array of strings to be used as table headers.
          */
         getTableHeaders (step, groupValue = null) {
-            let headers = this.resultsForGroupsForArchive(step, groupValue)[0].attributes.map(a => getTranslationForAttribute(`additional:modules.lzsResearchClient.tabs.tabSearch.${a.name.toLowerCase()}`, a.id));
+            let headers = this.resultsForGroupsForArchive(step, groupValue)[0].attributes
+                .map(a => {
+                    const key = `additional:modules.lzsResearchClient.tabs.tabSearch.${a.name.toLowerCase()}`;
+
+                    return getTranslationForAttribute(key, capitalizeString(a.id));
+                });
 
             if (groupValue) {
                 headers = headers.filter(a => a !== step.attributeToGroupBy);
             }
-
-            headers = headers.map(header => capitalizeString(header));
 
             this.additionalHeaders.forEach((header) => {
                 if (!this.archiveHasGeoref(step.archiveId) && header === this.$t("additional:modules.lzsResearchClient.tabs.archiveList.table.headers.position")) {
@@ -445,6 +463,41 @@ export default {
             return capitalizeString(getTranslationForAttribute(key, fallback));
         },
         /**
+         * Returns the human-readable sum of file sizes for checked datasets belonging to a specific archive,
+         * including the metadata overhead for that archive.
+         * @param {String} archiveId - The archiveId to sum the checked file sizes for.
+         * @returns {String} - Human-readable file size string (e.g. "12,3 MB").
+         */
+        sumOfCheckedFileSizesForArchive (archiveId) {
+            const checkedForArchive = this.datasets.filter(d => d.archiveId === archiveId && d.checked);
+            let sumOfFiles = 0;
+
+            checkedForArchive.forEach(dataset => {
+                sumOfFiles += dataset.fileSizeBytes ?? 0;
+            });
+
+            if (checkedForArchive.length === 0) {
+                return null;
+            }
+
+            sumOfFiles += calcMetadataBytesForArchives([archiveId], this.getDossierIdsForArchiveId);
+
+            return getHumanReadableFileSize(sumOfFiles);
+        },
+        /**
+         * Returns a string indicating the sum of checked file sizes for a specific archive and step, formatted for display.
+         * @param {String} archiveId - The archiveId to sum the checked file sizes for.
+         * @returns {String} - Formatted string indicating the sum of checked file sizes, or an empty string if no files are checked.
+         */
+        archiveSumString (archiveId) {
+            const sum = this.sumOfCheckedFileSizesForArchive(archiveId);
+
+            if (!sum) {
+                return "";
+            }
+            return ` - ${this.$t("additional:modules.lzsResearchClient.tabs.archiveList.selected", {sum: sum})}`;
+        },
+        /**
          * Starts the download for the files of all datasets that are checked in the tables.
          * @returns {void}
          */
@@ -494,7 +547,7 @@ export default {
             <FlatButton
                 v-if="numberOfResults > 0"
                 id="tabResultDownloadButton"
-                :disabled="progressNow >= 0 || !somethingCheckedForDownload || sumOfCheckedFilesProgress > 100"
+                :disabled="progressNow >= 0 || !somethingCheckedForDownload || isFetchingPrimaryData || sumOfCheckedFilesProgress > 100"
                 :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
                 :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
                 @click="downloadChecked()"
@@ -524,7 +577,7 @@ export default {
                 <AccordionItem
                     :id="`${idPrefix}-item-${index}`"
                     class="archive-step"
-                    :title="getNameForArchiveId(step.archiveId)"
+                    :title="`${getNameForArchiveId(step.archiveId)}${archiveSumString(step.archiveId)}`"
                     :is-open="openAllAccordions"
                     :coloured-header="true"
                 >

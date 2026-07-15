@@ -39,11 +39,52 @@ export default {
             "progressNow",
             "placeholderDataClassList"
         ]),
+        /**
+         * Returns the table datasets for the result table
+         * removes attributes, that are already available at dataset instance
+         * adds extra lines for world files, if available
+         * @returns {Object[]} - Object of data to be used as table datasets.
+         */
+        tableDatasets () {
+            const results = [],
+                  details = this.getDetailsForSelectedDetail,
+                  instanceAttributeNames = (details?.attributes || []).map(attr => attr.name);
+
+            details?.primaryData?.forEach(dataset => {
+                const attributes = [];
+
+                dataset.primarydataAttributes.forEach(attribute => {
+                    if (!instanceAttributeNames.includes(attribute.key)) {
+                        attributes.push({
+                            name: attribute.key,
+                            value: attribute.value
+                        });
+                    }
+                });
+
+                attributes.push({
+                    name: this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"),
+                    value: roundFileSizeToFixed(dataset.fileSizeBytes / 1e6, true)
+                });
+
+                results.push(
+                    {
+                        attributes: attributes,
+                        instanceId: details?.instanceId,
+                        primaryDataId: dataset.primaryDataId,
+                        hasPreview: ["TIFF", "JP2"].includes(dataset.geoFileFormat), // are there other formats, that allow a preview?
+                        checked: dataset.checked
+                    }
+                );
+            });
+
+            return results;
+        },
         showTableButtons () {
             return {
                 georef: false,
                 details: false,
-                preview: this.getTableDatasets().some(d => d.hasPreview),
+                preview: this.tableDatasets.some(d => d.hasPreview),
                 download: true
             };
         },
@@ -121,47 +162,6 @@ export default {
             return filteredHeaders;
         },
         /**
-         * Returns the table datasets for the result table
-         * removes attributes, that are already available at dataset instance
-         * adds extra lines for world files, if available
-         * @returns {Object[]} - Object of data to be used as table datasets.
-         */
-        getTableDatasets () {
-            const results = [],
-                  details = this.getDetailsForSelectedDetail,
-                  instanceAttributeNames = (details?.attributes || []).map(attr => attr.name);
-
-            details?.primaryData?.forEach(dataset => {
-                const attributes = [];
-
-                dataset.primarydataAttributes.forEach(attribute => {
-                    if (!instanceAttributeNames.includes(attribute.key)) {
-                        attributes.push({
-                            name: attribute.key,
-                            value: attribute.value
-                        });
-                    }
-                });
-
-                attributes.push({
-                    name: this.$t("additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB"),
-                    value: roundFileSizeToFixed(dataset.contentFileSize / 1e6, true)
-                });
-
-                results.push(
-                    {
-                        attributes: attributes,
-                        instanceId: details?.instanceId,
-                        primaryDataId: dataset.primaryDataId,
-                        hasPreview: ["TIFF", "JP2"].includes(dataset.geoFileFormat), // are there other formats, that allow a preview?
-                        checked: dataset.checked
-                    }
-                );
-            });
-
-            return results;
-        },
-        /**
          * Downloads the preview picture from the server and opens the modal to show the preview if there is one available
          * @param {String} selectedDetail - The selected detail object containing instanceId and primaryDataId of the detail to request preview for.
          */
@@ -175,8 +175,8 @@ export default {
             }
         },
         /**
-         * Returns all datasets that are checked or match the given primaryDataId
-         *  and adds datasets contained in "filenamesToAddToDownload"
+         * Returns all datasets that are checked or match the given primaryDataId,
+         *  adds datasets contained in "filenamesToAddToDownload" and calculates fileSizeBytes for the selected primaryData only.
          * @param {String} primaryDataId - Primary data identifier to download the dataset for.
          * @returns {Object} The dataset object containing all datasets relevant for download.
          */
@@ -193,6 +193,9 @@ export default {
                 return p.checked ||
                     (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename));
             });
+            onlySelectedPrimaryData.fileSizeBytes = onlySelectedPrimaryData.primaryData.reduce(
+                (sum, p) => sum + (p.fileSizeBytes ?? 0), 0
+            );
 
             return onlySelectedPrimaryData;
         },
@@ -306,7 +309,7 @@ export default {
                 v-if="primaryDataCount > 0"
                 :table-index="`details-table-${selectedDetail.primaryDataId || selectedDetail.instanceId}`"
                 :table-header="getTableHeaders()"
-                :table-datasets="getTableDatasets()"
+                :table-datasets="tableDatasets"
                 :show-buttons="showTableButtons"
                 @showPreview="showPreview"
                 @download="downloadDataset"

@@ -2,6 +2,7 @@ import {generateSimpleMutations} from "@shared/js/utils/generators";
 import searchBarMutations from "./searchBar/mutationsSearchBar.js";
 import stateLzsResearchClient from "./stateLzsResearchClient.js";
 import getters from "./gettersLzsResearchClient.js";
+import {calcFileSizeBytes, calcPrimaryDataSizeBytes} from "../utils/zipHelpers.js";
 
 const mutations = {
     /**
@@ -45,6 +46,10 @@ const mutations = {
             p => !primaryDataId || (p.primaryDataId === primaryDataId) ||
             (filenamesToAddToDownload && filenamesToAddToDownload.includes(p.contentFilename))
         );
+        selectedDataset.primaryData.forEach(p => {
+            p.fileSizeBytes = calcPrimaryDataSizeBytes(p);
+        });
+        selectedDataset.fileSizeBytes = calcFileSizeBytes(selectedDataset);
     },
     /** Updates the count of pending primary data fetches in the state.
      * @param {Object} state - The current state object.

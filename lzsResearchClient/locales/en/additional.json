@@ -49,6 +49,7 @@
                     "punkt_nummer": "Number of Point",
                     "auftrag_blatt_nummer": "Order Sheet Number",
                     "hamburger_karte_id": "Hamburg Map Id",
+                    "filesizemb": "Size (MB)",
                     "maxValueCount": "Max. Results",
                     "patternError": "Please enter a numeric value with {{ digitNumber }} digits.",
                     "patternErrorRange": "Please enter a numeric value with {{ minDigits }} to {{ maxDigits }} digits.",
@@ -86,6 +87,7 @@
                     "selectAllAriaLabel": "Select all for download",
                     "groupByLabel": "Group by",
                     "selectOptionLabel": "Select option",
+                    "selected": "{{sum}} selected",
                     "table": {
                       "showPositionInMap": "Show / Hide position of dataset in map",
                       "goToDetails": "Show details for this dataset",

@@ -69,7 +69,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
                     "primaryDataId": "FB8305947897840444B93EB9FC3DF46C2B854A4B9DCDA659027250D4DA190D21",
                     "contentMimetype": null,
                     "geoDatatypeCtrl": "RASTER_OHNE_RAUMBEZUG",
-                    "contentFileSize": 961558,
+                    "fileSizeBytes": 961558,
                     "dklVersionId": "d69ea1b1-7f0a-c7e9-aa8d-ded48507a386",
                     "dklVersion": 2,
                     "instanceId": "79d300ee-0029-a4d2-53d9-a8524541f72d",
@@ -107,7 +107,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
                     "primaryDataId": "FE3C518992558A0237BF6183D30A0DECD2F8E40B2289D58C68A7223E2E84FA40",
                     "contentMimetype": null,
                     "geoDatatypeCtrl": "RASTER_OHNE_RAUMBEZUG",
-                    "contentFileSize": 959916,
+                    "fileSizeBytes": 959916,
                     "dklVersionId": "d69ea1b1-7f0a-c7e9-aa8d-ded48507a386",
                     "dklVersion": 2,
                     "instanceId": "79d300ee-0029-a4d2-53d9-a8524541f72d",
@@ -143,7 +143,11 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
                                 },
                                 progressNow: () => -1,
                                 currentProgressValue: () => "",
-                                placeholderDataClassList: () => null
+                                placeholderDataClassList: () => ({
+                                    "DKL_GNW": {
+                                        "FILES_TO_ADD_TO_SINGLE_DOWNLOAD": ["AdV-Metadatensatz.xml"]
+                                    }
+                                })
                             }
                         }
                     }
@@ -182,7 +186,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
         });
 
         const lengthOfHeaders = wrapper.vm.getTableHeaders().length,
-            lengthOfDatasets = wrapper.vm.getTableDatasets()[0].attributes.length,
+            lengthOfDatasets = wrapper.vm.tableDatasets[0].attributes.length,
             numberOfAdditionalButtons = Object.values(wrapper.vm.showTableButtons).filter(v => v === true).length;
 
         expect(lengthOfDatasets + numberOfAdditionalButtons).to.equal(lengthOfHeaders);
@@ -195,11 +199,11 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
                 "additional:modules.lzsResearchClient.tabs.archiveList.table.headers.download"
             ]
         );
-        expect(wrapper.vm.getTableDatasets()[0].attributes[0]).to.deep.equal({name: "AKTENHINWEIS", value: "E"});
-        expect(wrapper.vm.getTableDatasets()[0].attributes[1]).to.deep.equal({name: "SEITENNUMMER", value: "00002"});
-        expect(wrapper.vm.getTableDatasets()[0].attributes[2]).to.deep.equal({name: "additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB", value: "0,96"});
-        expect(wrapper.vm.getTableDatasets()[0].hasPreview).to.be.true;
-        expect(wrapper.vm.getTableDatasets()[1].hasPreview).to.be.true;
+        expect(wrapper.vm.tableDatasets[0].attributes[0]).to.deep.equal({name: "AKTENHINWEIS", value: "E"});
+        expect(wrapper.vm.tableDatasets[0].attributes[1]).to.deep.equal({name: "SEITENNUMMER", value: "00002"});
+        expect(wrapper.vm.tableDatasets[0].attributes[2]).to.deep.equal({name: "additional:modules.lzsResearchClient.tabs.tabDetails.fileSizeMB", value: "0,96"});
+        expect(wrapper.vm.tableDatasets[0].hasPreview).to.be.true;
+        expect(wrapper.vm.tableDatasets[1].hasPreview).to.be.true;
     });
 
     it("should have buttons and table content to show only download but nothing more when no geoFileFormat is given", () => {
@@ -215,7 +219,7 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
         });
 
         const lengthOfHeaders = wrapper.vm.getTableHeaders().length,
-            lengthOfDatasets = wrapper.vm.getTableDatasets()[0].attributes.length,
+            lengthOfDatasets = wrapper.vm.tableDatasets[0].attributes.length,
             numberOfAdditionalButtons = Object.values(wrapper.vm.showTableButtons).filter(v => v === true).length;
 
         expect(lengthOfDatasets + numberOfAdditionalButtons).to.equal(lengthOfHeaders);
@@ -227,8 +231,8 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
                 "additional:modules.lzsResearchClient.tabs.archiveList.table.headers.download"
             ]
         );
-        expect(wrapper.vm.getTableDatasets()[0].hasPreview).to.be.false;
-        expect(wrapper.vm.getTableDatasets()[1].hasPreview).to.be.false;
+        expect(wrapper.vm.tableDatasets[0].hasPreview).to.be.false;
+        expect(wrapper.vm.tableDatasets[1].hasPreview).to.be.false;
     });
 
     it("should enable download button only when one or more table rows are checked", async () => {
@@ -327,6 +331,50 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabDetails.spec.js
             expect(dataForDownload).to.be.an("object");
             expect(dataForDownload.primaryData).to.be.an("array").to.have.length(0);
 
+        });
+
+        it("should return the FILES_TO_ADD_TO_SINGLE_DOWNLOAD and the correct fileSizeBytes for the given archiveId", async () => {
+            details.primaryData.push({
+                "objectId": "testObjectId",
+                "checked": false,
+                "georeferencePrimarydata": null,
+                "primarydataAttributes": [
+                    {
+                        "value": "1",
+                        "key": "INSTANZKACHELNUMMER"
+                    },
+                    {
+                        "value": "2005",
+                        "key": "JAHRGANG"
+                    },
+                    {
+                        "value": "AdV-Metadatensatz",
+                        "key": "DATEITYP"
+                    },
+                    {
+                        "value": "0000",
+                        "key": "BILDNUMMER"
+                    }
+                ],
+                "contentFilename": "AdV-Metadatensatz.xml",
+                "dklId": "DKL_GNW",
+                "geoDatatype": "RASTER_MIT_RAUMBEZUG",
+                "primaryDataId": "testPrimaryDataId",
+                "contentMimetype": null,
+                "geoDatatypeCtrl": "RASTER_MIT_RAUMBEZUG",
+                "dklVersionId": "testDklVersionId",
+                "dklVersion": 2,
+                "fileSizeBytes": 40000,
+                "instanceId": "testInstanceId",
+                "geoFileFormat": "XML"
+            });
+
+            const dataForDownload = wrapper.vm.getAllFilesForDownload("FB8305947897840444B93EB9FC3DF46C2B854A4B9DCDA659027250D4DA190D21");
+
+            expect(dataForDownload).to.be.an("object");
+            expect(dataForDownload.primaryData).to.be.an("array").to.have.length(2);
+            expect(dataForDownload.primaryData[1].contentFilename).to.equal("AdV-Metadatensatz.xml");
+            expect(dataForDownload.fileSizeBytes).to.equal(1001558);
         });
     });
 });

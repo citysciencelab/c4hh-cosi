@@ -49,6 +49,7 @@
                     "punkt_nummer": "Punktnummer",
                     "auftrag_blatt_nummer": "Auftrag Blattnummer",
                     "hamburger_karte_id": "Hamburger Karte Id",
+                    "filesizemb": "Größe (MB)",
                     "maxValueCount": "Max. Trefferanzahl",
                     "patternError": "Bitte eine Zahl mit {{ digitNumber }} Ziffern eingeben.",
                     "patternErrorRange": "Bitte eine Zahl mit {{ minDigits }} bis {{ maxDigits }} Ziffern eingeben.",
@@ -85,7 +86,8 @@
                     "selectAll": "Alles auswählen",
                     "selectAllAriaLabel": "Alles auswählen zum Download",
                     "groupByLabel": "Gruppieren nach",
-                    "selectOptionLabel": "Option selektieren",
+                    "selectOptionLabel": "Option auswählen",
+                    "selected": "{{sum}} ausgewählt",
                     "table": {
                       "showPositionInMap": "Position des Datensatzes in der Karte anzeigen / ausblenden",
                       "goToDetails": "Details zum Datensatz anzeigen",
