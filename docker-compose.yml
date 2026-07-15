@@ -41,6 +41,11 @@ services:
       - LAYER_CONF=${LAYER_CONF:-}
       - REST_CONF=${REST_CONF:-}
       - STYLE_CONF=${STYLE_CONF:-}
+    volumes:
+      # nginx disk cache for the Hamburg upstreams (deploy/nginx.conf: /hh-api/
+      # + /geodienste/). Persisting it means previously seen datasets can be
+      # served STALE across restarts/redeploys while Hamburg APIs are down.
+      - hh-upstream-cache:/var/cache/nginx/hh-upstreams
     depends_on:
       # Start Valhalla first, but DON'T wait for healthy — its first-run tile
       # build can take a long time; the portal serves immediately, routing
@@ -94,6 +99,10 @@ services:
     #   - traefik.http.routers.cosi-portal-web.middlewares=cosi-portal-https
     #   - traefik.http.middlewares.cosi-portal-https.redirectscheme.scheme=https
     #   - traefik.http.services.cosi-portal.loadbalancer.server.port=80
+
+volumes:
+  # Cache for the Hamburg upstream proxy (see portal service + deploy/nginx.conf).
+  hh-upstream-cache:
 
 networks:
   # The stack's own internal network (portal ↔ valhalla). Declared explicitly so

@@ -11,13 +11,16 @@ Reproducible, one-command deployment of the whole COSI stack — the **portal**
                          │   /cosi/          static SPA + registries│
                          │   /mastercode/    versioned JS/CSS       │
                          │   /valhalla/  ──▶  reverse-proxy ───────┐ │
+                         │   /hh-api/    ──▶  cache ▶ api.hamburg.de│
+                         │   /geodienste/ ─▶  cache ▶ geodienste.…  │
                          └────────────────────────────────────────│─┘
                                                                    ▼
                          ┌─────────────────────────────────────────┐
                          │  valhalla  (routing, :8002)  — BACKLOG §2 │
                          └─────────────────────────────────────────┘
 
-  WPS (population) + statistical / OAF data stay EXTERNAL at Hamburg (BACKLOG §7).
+  WPS (population) + statistical / OAF data stay EXTERNAL at Hamburg (BACKLOG §7),
+  but flow through the portal's caching proxy so outages serve stale copies.
 ```
 
 The portal calls routing **same-origin** as `/valhalla/...`; nginx proxies that to
@@ -31,8 +34,9 @@ regardless of where Valhalla actually runs.
 | `../docker-compose.yml` | Root orchestration: `portal` + `valhalla` (via `include`) |
 | `../.env.example` | Stack config — portal (`PORTAL_PORT`, `VALHALLA_URL`, registry overrides) **and** the Valhalla routing knobs used when `valhalla/.env` is absent |
 | `Dockerfile` | Multi-stage portal image (Node 24.15.0 build → nginx runtime) |
-| `nginx.conf` | Serves the SPA + registries, reverse-proxies `/valhalla/` |
+| `nginx.conf` | Serves the SPA + registries, reverse-proxies `/valhalla/`, caching proxy for the Hamburg upstreams |
 | `docker-entrypoint.d/40-cosi-runtime-config.sh` | Startup hook: runtime config injection |
+| `warm-hh-cache.py` | Pre-warms the Hamburg upstream cache (see *Hamburg API outages*) |
 | `bootstrap-csl.sh` | One-command bring-up (CSL server or any Docker host) |
 
 ## Quick start (prod / staging — built image)
@@ -120,6 +124,43 @@ warning (`docker compose logs gtfs-fetch`); it never blocks the deploy. Set
 > volume (Compose project `cosi`). Tiles you built earlier with the *standalone*
 > `cd valhalla && docker compose up` live in a different volume, so the first
 > full-stack start rebuilds them once.
+
+## Hamburg API outages (stale cache)
+
+The portal is only as available as `api.hamburg.de` (OAF: Verwaltungsgrenzen,
+Regionalstatistik) and `geodienste.hamburg.de` (WFS/WMS Fachdaten, basemap,
+styles) — and those go down at the worst moments. The nginx in this stack
+therefore proxies **all** traffic to both hosts:
+
+- The served `config.js` / `config.json` / `services.json` / `rest-services.json`
+  are rewritten on the fly (`sub_filter`) so every layer URL points at
+  `/hh-api/` resp. `/geodienste/` on the portal's own host. The files on disk /
+  in git stay untouched — dev via Vite keeps talking to Hamburg directly.
+  Absolute URLs are required (masterportalapi does `new URL(rawLayer.url)`),
+  hence the `$http_host`-based rewrite instead of relative paths.
+- Responses are cached on disk (volume `hh-upstream-cache`, survives
+  redeploys). While Hamburg is up you always get **live data** (cache entries
+  are revalidated after 6 h). When Hamburg errors, times out or is plain
+  unreachable, nginx serves the last cached copy instead
+  (`proxy_cache_use_stale` + an `error_page 502/504` fallback that covers
+  DNS-level failures, i.e. a fully offline box still works).
+- OAF pagination `next` links in JSON responses are rewritten too, so page 2+
+  stays on the proxy. Check any response's `X-Cache-Status` header:
+  `MISS`/`HIT`/`STALE`.
+
+**Before a presentation**, warm the cache — only URLs seen at least once can be
+served stale. Either click through the demo while Hamburg is up, or run:
+
+```bash
+deploy/warm-hh-cache.py https://cosi.example.org   # or http://localhost:8080
+```
+
+It replays the app's exact requests (byte-identical URLs = same cache keys) for
+the critical datasets: all district levels (Stadtteile/Bezirke/Hamburg), the
+full Regionalstatistik matrix (~800 filtered OAF queries), HVV Haltestellen +
+Staatliche Schulen (WFS), map styles + icons. Takes a few minutes; needs only
+Python 3. Anything it doesn't cover (e.g. basemap tiles for areas you'll pan
+to, other Fachdaten layers) is warmed by simply browsing it once.
 
 ## Dev vs prod
 
