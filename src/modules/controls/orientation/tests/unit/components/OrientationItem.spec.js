@@ -14,13 +14,15 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     let store,
         onlyFilteredFeatures = false,
         showDirection = false,
-        iconGeolocationMarker;
+        iconGeolocationMarker,
+        iconDirectionArrow;
     const mockAlertingActions = {
         addSingleAlert: sinon.stub()
     };
 
     beforeEach(() => {
         iconGeolocationMarker = "bi-crosshair";
+        iconDirectionArrow = "bi-arrow-up";
         showDirection = false;
         store = createStore({
             namespaced: true,
@@ -35,6 +37,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
                                 iconGeolocate: sinon.stub(),
                                 iconGeolocatePOI: sinon.stub(),
                                 iconGeolocationMarker: () => iconGeolocationMarker,
+                                iconDirectionArrow: () => iconDirectionArrow,
                                 poiDistances: () => [],
                                 poiMode: sinon.stub(),
                                 poiModeCurrentPositionEnabled: sinon.stub(),
