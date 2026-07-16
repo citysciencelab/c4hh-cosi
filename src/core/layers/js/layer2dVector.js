@@ -223,7 +223,7 @@ Layer2dVector.prototype.createStyle = async function (attrs) {
                 const feat = feature !== undefined ? feature : this,
                     isClusterFeature = typeof feat.get("features") === "function" || typeof feat.get("features") === "object" && Boolean(feat.get("features").length > 1);
 
-                styleResult = createStyle.createStyle(styleObject, feat, isClusterFeature, Config.wfsImgPath);
+                styleResult = createStyle.createStyle(styleObject, feat, isClusterFeature, Config.wfsImgPath, {layerId: attrs.id});
             }
             finally {
                 this.isStyling = false;

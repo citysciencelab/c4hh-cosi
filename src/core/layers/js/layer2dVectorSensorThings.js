@@ -250,7 +250,7 @@ Layer2dVectorSensorThings.prototype.createStyle = function (attrs) {
         styleFunction = function (feature, resolution) {
             const feat = typeof feature !== "undefined" ? feature : this,
                 isClusterFeature = typeof feat.get("features") === "function" || typeof feat.get("features") === "object" && Boolean(feat.get("features").length > 1),
-                style = createStyle.createStyle(styleObject, feat, isClusterFeature, Config.wfsImgPath),
+                style = createStyle.createStyle(styleObject, feat, isClusterFeature, Config.wfsImgPath, {layerId: attrs.id}),
                 styleElement = Array.isArray(style) ? style[0] : style,
                 mapView = mapCollection.getMapView("2D"),
                 zoomLevel = mapView.getZoomForResolution(resolution) + 1,
