@@ -148,10 +148,12 @@ export default {
                       outputKey => otherDescriptions.every(description => description.outputs[outputKey])
                   );
 
-            return keysExistingInAllDescriptions.map(key => ({
-                code: key,
-                name: this.getMappedProperty(key, this.simulation?.outputs?.propertiesMapping)
-            }));
+            return keysExistingInAllDescriptions
+                .filter(key => this.simulation?.outputs?.[key]?.omit !== true)
+                .map(key => ({
+                    code: key,
+                    name: this.getMappedProperty(key, this.simulation?.outputs?.propertiesMapping)
+                }));
         },
 
         /**
@@ -227,7 +229,7 @@ export default {
             this.requestBodies.forEach(requestBody => {
                 requestBody.outputs = {};
                 val.forEach(elem => {
-                    requestBody.outputs[elem.code] = this.simulation?.outputs?.[elem.code] || {};
+                    requestBody.outputs[elem.code] = this.getOutputConfigForRequest(elem.code);
                 });
             });
         },
@@ -391,6 +393,30 @@ export default {
          * Gets the mapped property from key and configured object.
          */
         getMappedProperty,
+
+        /**
+         * Resolves output configuration to be sent in request body.
+         * Supports only the configured structure: { omit: Boolean, value: Object }.
+         * @param {String} outputKey The output key.
+         * @returns {Object|undefined} Output config or undefined if omitted.
+         */
+        getOutputConfigForRequest (outputKey) {
+            const configuredOutput = this.simulation?.outputs?.[outputKey];
+
+            if (!isObject(configuredOutput)) {
+                return {};
+            }
+
+            if (configuredOutput.omit === true) {
+                return undefined;
+            }
+
+            if (Object.hasOwn(configuredOutput, "value")) {
+                return configuredOutput.value;
+            }
+
+            return {};
+        },
 
         /**
          * Processes an input property to extract type information and handle enums.
@@ -1130,34 +1156,36 @@ export default {
                     </AccordionItem>
                 </AccordionItem>
             </div>
-            <h6 class="mt-2 mb-3">
-                {{ $t('additional:modules.tools.simulationTool.outputParam') }}
-            </h6>
-            <Multiselect
-                id="outputParam"
-                v-model="selectedOutputOptions"
-                :placeholder="$t('additional:modules.tools.simulationTool.chooseOutputParam')"
-                :aria-label="$t('additional:modules.tools.simulationTool.chooseOutputParam')"
-                label="name"
-                track-by="code"
-                :show-labels="false"
-                :allow-empty="false"
-                :options="outputOptions"
-                :searchable="true"
-                :multiple="true"
-                :open="true"
-            >
-                <template #tag="{ option, remove }">
-                    <button
-                        class="multiselect__tag"
-                        :class="option.code"
-                        @click="remove(option)"
-                        @keypress="remove(option)"
-                    >
-                        {{ option.name }}
-                    </button>
-                </template>
-            </Multiselect>
+            <template v-if="simulation?.showOutputSelection !== false">
+                <h6 class="mt-2 mb-3">
+                    {{ $t('additional:modules.tools.simulationTool.outputParam') }}
+                </h6>
+                <Multiselect
+                    id="outputParam"
+                    v-model="selectedOutputOptions"
+                    :placeholder="$t('additional:modules.tools.simulationTool.chooseOutputParam')"
+                    :aria-label="$t('additional:modules.tools.simulationTool.chooseOutputParam')"
+                    label="name"
+                    track-by="code"
+                    :show-labels="false"
+                    :allow-empty="false"
+                    :options="outputOptions"
+                    :searchable="true"
+                    :multiple="true"
+                    :open="true"
+                >
+                    <template #tag="{ option, remove }">
+                        <button
+                            class="multiselect__tag"
+                            :class="option.code"
+                            @click="remove(option)"
+                            @keypress="remove(option)"
+                        >
+                            {{ option.name }}
+                        </button>
+                    </template>
+                </Multiselect>
+            </template>
         </div>
         <div
             class="mb-5"

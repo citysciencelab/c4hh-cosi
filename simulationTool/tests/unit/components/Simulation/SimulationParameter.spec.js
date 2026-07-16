@@ -230,6 +230,46 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
             expect(wrapper.find("#simulation-name").exists()).to.be.true;
             expect(wrapper.find("#startSimulation").attributes("disabled")).to.be.undefined;
         });
+
+        it("positive: should hide output selection UI when showOutputSelection is false", async () => {
+            store = getStore({
+                simulations: {
+                    id: "simulationId",
+                    canOmitScenario: true,
+                    showOutputSelection: false,
+                    title: "Simulation A",
+                    inputs: {},
+                    outputs: {},
+                    processes: []
+                }
+            });
+
+            const wrapper = factory.getMount();
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find("#outputParam").exists()).to.be.false;
+        });
+
+        it("negative: should show output selection UI when showOutputSelection is true", async () => {
+            store = getStore({
+                simulations: {
+                    id: "simulationId",
+                    canOmitScenario: true,
+                    showOutputSelection: true,
+                    title: "Simulation A",
+                    inputs: {},
+                    outputs: {},
+                    processes: []
+                }
+            });
+
+            const wrapper = factory.getMount();
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find("#outputParam").exists()).to.be.true;
+        });
     });
 
     describe("Computed Properties", () => {
@@ -387,6 +427,76 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
     });
 
     describe("Methods", () => {
+        describe("selectedOutputOptions watcher", () => {
+            it("positive: should omit outputs with omit=true from serialized request payload", async () => {
+                store = getStore({
+                    simulations: {
+                        id: "simulationId",
+                        title: "Simulation A",
+                        inputs: {},
+                        outputs: {
+                            includedOutput: {
+                                value: {
+                                    transmissionMode: "value"
+                                }
+                            },
+                            omittedOutput: {
+                                omit: true
+                            }
+                        },
+                        processes: []
+                    }
+                });
+
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.requestBodies = [{outputs: {}, inputs: {}}];
+                wrapper.vm.$options.watch.selectedOutputOptions.call(wrapper.vm, [
+                    {code: "includedOutput"},
+                    {code: "omittedOutput"}
+                ]);
+
+                const serializedRequestBody = JSON.stringify(wrapper.vm.requestBodies[0]);
+
+                expect(wrapper.vm.requestBodies[0].outputs.includedOutput).to.deep.equal({
+                    transmissionMode: "value"
+                });
+                expect(wrapper.vm.requestBodies[0].outputs.omittedOutput).to.be.undefined;
+                expect(serializedRequestBody).to.contain("includedOutput");
+                expect(serializedRequestBody).not.to.contain("omittedOutput");
+            });
+
+            it("negative: should keep outputs without omit=true in serialized request payload", async () => {
+                store = getStore({
+                    simulations: {
+                        id: "simulationId",
+                        title: "Simulation A",
+                        inputs: {},
+                        outputs: {
+                            includedOutput: {
+                                value: {
+                                    transmissionMode: "value"
+                                }
+                            }
+                        },
+                        processes: []
+                    }
+                });
+
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.requestBodies = [{outputs: {}, inputs: {}}];
+                wrapper.vm.$options.watch.selectedOutputOptions.call(wrapper.vm, [{code: "includedOutput"}]);
+
+                const serializedRequestBody = JSON.stringify(wrapper.vm.requestBodies[0]);
+
+                expect(wrapper.vm.requestBodies[0].outputs.includedOutput).to.deep.equal({
+                    transmissionMode: "value"
+                });
+                expect(serializedRequestBody).to.contain("includedOutput");
+            });
+        });
+
         describe("getRequestBodyInputByKey", () => {
             it("should return default value if the keys are not string", () => {
                 const wrapper = factory.getMount();
