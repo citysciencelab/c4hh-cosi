@@ -136,6 +136,7 @@
           "planningScenarioImported": "The Scenario <b>{{name}}</b> with Id {{id}} is imported.",
           "planningScenarioInvalidName": "Please enter a name for the planning scenario!",
           "planningScenarioMissedKey": "{{key}} is required.",
+          "noScenario": "No scenario",
           "planningScenarioOverview": "Overview planning scenarios",
           "planningScenarioSave": "Save planning scenario",
           "planningScenarioUpload": "Upload planning scenario",

@@ -518,7 +518,8 @@ export default {
                       layerSource = layer.getLayerSource();
 
                 Object.values(jobs).forEach(job => {
-                    const featuresToAdd = ConvertFeature.geoJsonToOpenlayers(job.jobResults?.[output]?.features || []),
+                    const featuresFromJob = job.jobResults?.[output]?.value?.features || job.jobResults?.[output]?.features || [],
+                          featuresToAdd = ConvertFeature.geoJsonToOpenlayers(featuresFromJob),
                           foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
                           isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table";
 

@@ -7,7 +7,6 @@ import sinon from "sinon";
 import axios from "axios";
 import getOAFFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
 
-
 describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", () => {
     let consoleWarnSpy, store;
 
@@ -43,7 +42,23 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
     /**
      * Creates a Vuex store with a mock state and getters for the SimulationTool module.
      */
-    function getStore (simulations) {
+    function getStore (options) {
+        let simulations,
+            planningScenarios,
+            accessToken;
+
+        if (typeof options === "undefined") {
+            // Keep legacy default behavior when no argument is provided.
+        }
+        else if (Object.prototype.hasOwnProperty.call(options, "simulations")
+            || Object.prototype.hasOwnProperty.call(options, "planningScenarios")
+            || Object.prototype.hasOwnProperty.call(options, "accessToken")) {
+            ({simulations, planningScenarios, accessToken} = options);
+        }
+        else {
+            simulations = options;
+        }
+
         return createStore({
             namespaced: true,
             modules: {
@@ -61,7 +76,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                             },
                             getters: {
                                 currentPlanningScenarioId: () => "planningScenarioId",
-                                planningScenarios: () => [
+                                planningScenarios: () => planningScenarios || [
                                     {
                                         id: "planningScenarioId",
                                         inputs: {}
@@ -100,7 +115,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                         Login: {
                             namespaced: true,
                             getters: {
-                                accessToken: () => "accessToken"
+                                accessToken: () => accessToken === undefined ? "accessToken" : accessToken
                             }
                         },
                         Alerting: {
@@ -121,6 +136,10 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
         sinon.stub(axios, "get").resolves({data: {}});
         sinon.stub(console, "warn").callsFake(consoleWarnSpy);
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
 
@@ -177,6 +196,27 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                 }
             });
             expect(wrapper.find("#startSimulation").attributes()).have.property("disabled");
+        });
+
+        it("should render simulation inputs and enable start without a planning scenario if a simulation can omit it", async () => {
+            store = getStore({
+                simulations: {
+                    id: "simulationId",
+                    canOmitScenario: true,
+                    title: "Simulation A",
+                    inputs: {},
+                    outputs: {},
+                    processes: []
+                },
+                planningScenarios: []
+            });
+
+            const wrapper = factory.getMount();
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find("#simulation-name").exists()).to.be.true;
+            expect(wrapper.find("#startSimulation").attributes("disabled")).to.be.undefined;
         });
     });
 
@@ -274,6 +314,43 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                 }
             });
             expect(wrapper.vm.isSomeOafLoading).to.be.true;
+        });
+
+        it("should add a no-scenario option if the simulation can omit a planning scenario", () => {
+            store = getStore({
+                simulations: {
+                    id: "simulationId",
+                    canOmitScenario: true,
+                    title: "Simulation A",
+                    inputs: {},
+                    outputs: {},
+                    processes: []
+                }
+            });
+
+            const wrapper = factory.getShallowMount();
+
+            expect(wrapper.vm.planningScenarioOptions).to.deep.equal([
+                {
+                    id: "noScenario",
+                    name: "additional:modules.tools.simulationTool.noScenario"
+                },
+                {
+                    id: "planningScenarioId",
+                    inputs: {}
+                }
+            ]);
+        });
+
+        it("should not add a no-scenario option if the simulation requires a planning scenario", () => {
+            const wrapper = factory.getShallowMount();
+
+            expect(wrapper.vm.planningScenarioOptions).to.deep.equal([
+                {
+                    id: "planningScenarioId",
+                    inputs: {}
+                }
+            ]);
         });
     });
 
@@ -779,6 +856,51 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
                 expect(getStub.called).to.be.false;
             });
+
+            it("should request OAF features without planning scenario geometry if the simulation can omit a scenario", async () => {
+                store = getStore({
+                    simulations: {
+                        id: "simulationId",
+                        canOmitScenario: true,
+                        title: "Simulation A",
+                        inputs: {
+                            anOafInput: {
+                                source: {
+                                    url: "https://example.com",
+                                    collection: "buildings",
+                                    options: {
+                                        crs: "EPSG:25832"
+                                    }
+                                }
+                            }
+                        },
+                        outputs: {},
+                        processes: []
+                    },
+                    planningScenarios: []
+                });
+
+                const wrapper = factory.getShallowMount(),
+                    getStub = sinon.stub(getOAFFeature, "getOAFFeatureGet").resolves([{id: 1}]),
+                    filterStub = sinon.stub(getOAFFeature, "getOAFGeometryFilter"),
+                    setRequestBodyInputSpy = sinon.spy(wrapper.vm, "setRequestBodyInput");
+
+                await wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
+
+                expect(filterStub.called).to.be.false;
+                expect(getStub.calledOnceWithExactly(
+                    "https://example.com",
+                    "buildings",
+                    {limit: 100, filter: "", filterCrs: "EPSG:25832", crs: "EPSG:25832"}
+                )).to.be.true;
+                expect(setRequestBodyInputSpy.calledOnce).to.be.true;
+                expect(setRequestBodyInputSpy.firstCall.args[0]).to.equal("anOafInput");
+                expect(setRequestBodyInputSpy.firstCall.args[1]).to.equal("");
+                expect(setRequestBodyInputSpy.firstCall.args[2]).to.deep.equal({
+                    type: "FeatureCollection",
+                    features: [{id: 1}]
+                });
+            });
             it("should set a top-level input in the request body", () => {
                 const wrapper = factory.getMount();
 
@@ -978,6 +1100,46 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                 wrapper.vm.setRequestBodyInput("anOafInput", "", undefined);
 
                 expect(wrapper.vm.requestBodies[0].inputs.anOafInput).to.be.undefined;
+            });
+        });
+
+        describe("createRequestBodies", () => {
+            it("should include constant inputs even if no planning scenario is selected", () => {
+                store = getStore({
+                    simulations: {
+                        id: "simulationId",
+                        canOmitScenario: true,
+                        title: "Simulation A",
+                        inputs: {
+                            constantInput: {
+                                source: {
+                                    type: "constant",
+                                    value: "constantValue"
+                                }
+                            }
+                        },
+                        outputs: {},
+                        processes: []
+                    },
+                    planningScenarios: []
+                });
+
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.processDescriptions = [{inputs: {}, outputs: {}}];
+                wrapper.vm.ignoreProperties = [];
+
+                wrapper.vm.createRequestBodies();
+
+                expect(wrapper.vm.requestBodies).to.deep.equal([
+                    {
+                        inputs: {
+                            constantInput: "constantValue"
+                        },
+                        outputs: {},
+                        response: "document"
+                    }
+                ]);
             });
         });
     });

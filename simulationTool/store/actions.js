@@ -337,16 +337,15 @@ export default {
             olFeature.setStyle(ConvertStyle.geoJsonToOpenlayers(feat.style));
             layerSource.addFeature(olFeature);
         });
-        currentPlanningScenario.inputs.buildings.features.forEach(building => {
-            const olFeature = geoJsonParser.readFeature(building);
+        Object.values(currentPlanningScenario.inputs)
+            .filter(input => input?.isEditable === true && Array.isArray(input.features))
+            .forEach(input => {
+                input.features.forEach(feature => {
+                    const olFeature = geoJsonParser.readFeature(feature);
 
-            layerSourceForObjects.addFeature(olFeature);
-        });
-        currentPlanningScenario.inputs.roads.features.forEach(road => {
-            const olFeature = geoJsonParser.readFeature(road);
-
-            layerSourceForObjects.addFeature(olFeature);
-        });
+                    layerSourceForObjects.addFeature(olFeature);
+                });
+            });
     },
 
     /**

@@ -138,6 +138,7 @@
           "planningScenarioImported": "Das Planungsszenario <b>{{name}}</b> mit der Id {{id}} ist importiert.",
           "planningScenarioInvalidName": "Bitte geben Sie einen Namen für das Planungsszenario ein!",
           "planningScenarioMissedKey": "{{key}} ist erforderlich.",
+          "noScenario": "Kein Szenario",
           "planningScenarioOverview": "Übersicht Planungsszenarien",
           "planningScenarioSave": "Planungsgebiet speichern",
           "planningScenarioUpload": "Planungsszenario hochladen",

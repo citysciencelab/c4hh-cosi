@@ -155,6 +155,20 @@ export default {
         },
 
         /**
+         * Gets the planning scenario options for the select input.
+         * If the simulation allows omitting a scenario, it adds an option for "Kein Szenario".
+         * @returns {Object[]} The array of planning scenario options.
+         */
+        planningScenarioOptions () {
+            const options = [...this.planningScenarios];
+
+            if (this.simulation?.canOmitScenario) {
+                options.unshift({id: "noScenario", name: this.$t("additional:modules.tools.simulationTool.noScenario")});
+            }
+            return options;
+        },
+
+        /**
          * Gets the keys of the primaryTypeInputs object.
          * @returns {String[]} The keys of the primaryTypeInputs object.
          */
@@ -213,18 +227,16 @@ export default {
             this.requestBodies.forEach(requestBody => {
                 requestBody.outputs = {};
                 val.forEach(elem => {
-                    requestBody.outputs[elem.code] = {};
+                    requestBody.outputs[elem.code] = this.simulation?.outputs?.[elem.code] || {};
                 });
             });
         },
 
         currentSimulationId: {
             async handler () {
-                if (this.currentPlanningScenario && this.simulation) {
-                    await this.prepareRequestBodies();
-                    this.primaryTypeInputs = this.getPrimaryTypeInputs();
-                    this.selectedOutputOptions = this.outputOptions;
-                }
+                await this.prepareRequestBodies();
+                this.primaryTypeInputs = this.getPrimaryTypeInputs();
+                this.selectedOutputOptions = this.outputOptions;
             },
             immediate: true
         },
@@ -239,7 +251,7 @@ export default {
         }
     },
     mounted () {
-        if (typeof this.currentPlanningScenario !== "undefined") {
+        if (this.currentPlanningScenario?.scenarioFeature) {
             this.updateFeatures();
             this.zoomToFeature();
         }
@@ -537,36 +549,29 @@ export default {
                 this.setRequestBodyInput(inputKey, "", undefined);
                 return;
             }
-            if (this.currentPlanningScenario.inputs[inputKey]) {
+            if (this.currentPlanningScenario?.inputs?.[inputKey]) {
                 this.setRequestBodyInput(inputKey, "", this.currentPlanningScenario.inputs[inputKey]);
                 return;
             }
             this.oafLoadingStates[inputKey] = true;
 
             const source = this.simulation.inputs[inputKey].source,
-                  crs = this.currentPlanningScenario.inputs.crs,
-                  filter = getOAFFeature.getOAFGeometryFilter(getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects"),
+                  crs = source.options?.crs || this.currentPlanningScenario?.inputs?.crs,
+                  filter = this.currentPlanningScenario?.scenarioFeature ? getOAFFeature.getOAFGeometryFilter(getBBOXGeometry(this.currentPlanningScenario), "geometry", "intersects") : "",
+                  sourceOptions = source.options ?? {},
                   featureCollection = {
                       type: "FeatureCollection",
                       features: await getOAFFeature.getOAFFeatureGet(
-                          source.url, source.collection, {limit: 100, filter, filterCrs: crs, crs}
+                          source.url, source.collection, {limit: 100, filter, filterCrs: crs, crs, ...sourceOptions}
                       )
                   };
 
             this.setRequestBodyInput(inputKey, "", featureCollection);
             this.oafLoadingStates[inputKey] = false;
 
-            this.currentPlanningScenario.inputs[inputKey] = featureCollection;
-        },
-
-        /**
-         * Event handler for change of selected planning scenario.
-         * @param {Object} event The change event.
-         * @returns {void}
-         */
-        async onPlanningScenarioChange (event) {
-            this.setCurrentPlanningScenarioId(event.target.value);
-            this.currentSimulationId = "";
+            if (this.currentPlanningScenario?.inputs) {
+                this.currentPlanningScenario.inputs[inputKey] = featureCollection;
+            }
         },
 
         /**
@@ -664,7 +669,7 @@ export default {
          * @returns {void}
          */
         setupIgnoreProperties () {
-            this.ignoreProperties = Object.keys(this.simulation.inputs)
+            this.ignoreProperties = Object.keys(this.simulation?.inputs ?? {})
                 .filter(inputKey => this.simulation.inputs[inputKey].ignoreProperties)
                 .flatMap(inputKey => this.simulation.inputs[inputKey].ignoreProperties);
 
@@ -676,15 +681,26 @@ export default {
          */
         createRequestBodies () {
             const filteredProcessDescriptions = [];
+            let additionalInputs = {};
+
+            if (this.currentPlanningScenario?.inputs) {
+                additionalInputs = {...this.currentPlanningScenario.inputs};
+            }
+            for (const [inputKey, input] of Object.entries(this.simulation.inputs || {})) {
+                if (input.source?.type === "constant") {
+                    additionalInputs[inputKey] = input.source.value;
+                }
+            }
 
             this.processDescriptions.forEach(
                 description => filteredProcessDescriptions.push(this.removeUnwantedProperty(description, this.ignoreProperties)));
             this.requestBodies = filteredProcessDescriptions.map(description => ({
                 inputs: {
                     ...OgcApiProcess.getInputDefaultsFromDescription(description),
-                    ...this.currentPlanningScenario.inputs
+                    ...additionalInputs
                 },
-                outputs: {}
+                outputs: {},
+                response: "document"
             }));
         },
 
@@ -905,14 +921,14 @@ export default {
                             class="form-select"
                             :aria-label="$t('additional:modules.tools.simulationTool.selectPlanningScenario')"
                             :value="currentPlanningScenarioId"
-                            @change="onPlanningScenarioChange"
+                            @change="setCurrentPlanningScenarioId($event.target.value)"
                         >
                             <option
                                 v-for="(scenario, i) in planningScenarios"
                                 :key="i"
                                 :value="scenario.id"
                             >
-                                {{ scenario.name }}
+                                {{ $t(scenario.name) }}
                             </option>
                         </select>
                         <label for="simulateForPlanning">
@@ -942,7 +958,7 @@ export default {
             class="col-md-12"
         />
         <hr>
-        <div v-if="currentPlanningScenario">
+        <div v-if="currentPlanningScenario || simulations.some(simulation => simulation.canOmitScenario)">
             <h5 class="my-4">
                 {{ $t('additional:modules.tools.simulationTool.addSimulation') }}
             </h5>
@@ -1161,7 +1177,7 @@ export default {
                         :interaction="startSimulation"
                         :aria-label="$t('additional:modules.tools.simulationTool.simulationStart')"
                         :text="$t('additional:modules.tools.simulationTool.simulationStart')"
-                        :disabled="!currentPlanningScenario || isSomeOafLoading || !currentSimulationId"
+                        :disabled="!currentPlanningScenario && simulations.every(s => !s.canOmitScenario) || isSomeOafLoading || !currentSimulationId"
                     />
                 </div>
             </form>
