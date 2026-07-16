@@ -26,6 +26,8 @@
 - The following packages have been updated:
     - dependencies:
         - @masterportal/masterportalapi: 2.62.0 to 2.63.0
+    - devDependencies:
+        - vite: 8.0.14 to 8.1.4
 
 ### Deprecated
 

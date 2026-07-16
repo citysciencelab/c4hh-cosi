@@ -108,7 +108,7 @@
     "shelljs": "^0.10.0",
     "sinon": "22.0.0",
     "sinon-chai": "^4.0.1",
-    "vite": "^8.0.14",
+    "vite": "^8.1.4",
     "vite-plugin-cp": "^6.0.3",
     "vite-plugin-dynamic-import": "^1.6.0",
     "vite-plugin-node-polyfills": "^0.28.0",
