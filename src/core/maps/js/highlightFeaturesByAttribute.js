@@ -2,6 +2,7 @@ import axios from "axios";
 import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createStyle.js";
 import Feature from "ol/Feature.js";
 import Point from "ol/geom/Point.js";
+import MultiPoint from "ol/geom/MultiPoint.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import {WFS} from "ol/format.js";
 import store from "@appstore/index.js";
@@ -74,14 +75,16 @@ export default {
 
         features.forEach(feature => {
             const geometry = feature.getGeometry();
+            const isMultiPoint = geometry.getType() === "MultiPoint";
+            const isPoint = geometry.getType() === "Point"; 
 
-            if (styleObject && geometry.getType() === "Point") {
+            if (styleObject && (isPoint || isMultiPoint)) {
                 hasPoint = true;
-                const coordinate = geometry.getCoordinates(),
-                    iconFeature = new Feature({
-                        geometry: new Point(coordinate)
-                    }),
-                    featureStyle = createStyle.createStyle(styleObject, feature, false, Config.wfsImgPath);
+                const coordinate = geometry.getCoordinates();
+                const iconFeature = new Feature({
+                        geometry: isPoint ? new Point(coordinate) : new MultiPoint(coordinate)
+                    });
+                const featureStyle = createStyle.createStyle(styleObject, feature, false, Config.wfsImgPath);
 
                 iconFeature.setProperties(feature.getProperties());
                 rootGetters.ignoredKeys.forEach(key => {
