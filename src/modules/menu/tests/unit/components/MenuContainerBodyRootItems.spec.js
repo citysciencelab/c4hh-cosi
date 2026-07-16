@@ -26,7 +26,8 @@ describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
                     namespaced: true,
                     getters: {
                         section: () => () => sections,
-                        customMenuElementIcon: () => "bi-customMenuElementIcon"
+                        customMenuElementIcon: () => "bi-customMenuElementIcon",
+                        sectionsBySide: () => () => []
                     }
                 },
                 Modules: {

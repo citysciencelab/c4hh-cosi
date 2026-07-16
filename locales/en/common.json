@@ -911,9 +911,11 @@
     "openConfig": {
       "explanation": "Open a map that you have saved as a local configuration file.",
       "loadFileFailed": "The <b>{{targetFileName}}</b> configuration file was not loaded. The file format <b>{{targetFileFormat}}</b> is not supported. Please load a file in the <b>json</b> file format.",
-      "loadFileSuccess": "The <b>{{targetFileName}}</b> configuration file was loaded successfully",
+      "loadFileSuccess": "The <b>{{targetFileName}}</b> configuration file was loaded successfully.",
       "name": "Load map",
-      "openFile": "Open configuration file"
+      "openFile": "Open configuration file",
+      "modulesNotAvailable_one": "Unfortunately, the {{modules}} module is not available",
+      "modulesNotAvailable_other": "Unfortunately, the {{modules}} modules are not available."
     },
     "portalFooter": {
       "designation": "Cartography and design:",

@@ -330,6 +330,14 @@ const menuGetters = {
             extraPadding = 20;
 
         return [extraPadding, secondaryOffset + extraPadding, extraPadding, mainOffset + extraPadding];
+    },
+    /**
+     * Returns the sections by side.
+     * @param {MenuState} state Local vuex state.
+     * @returns {Array} the sections by side
+     */
+    sectionsBySide: (state) => side => {
+        return state[side].sections;
     }
 };
 

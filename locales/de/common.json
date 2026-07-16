@@ -914,9 +914,11 @@
     "openConfig": {
       "explanation": "Öffnen Sie eine Karte, die Sie als lokale Konfigurationsdatei abgespeichert haben.",
       "loadFileFailed": "Die Konfigurationsdatei <b>{{targetFileName}}</b> wurde nicht geladen. Das Dateiformat <b>{{targetFileFormat}}</b> wird nicht unterstützt. Bitte laden Sie eine Datei im Dateiformat <b>json</b>.",
-      "loadFileSuccess": "Die Konfigurationsdatei <b>{{targetFileName}}</b> wurde erfolgreich geladen",
+      "loadFileSuccess": "Die Konfigurationsdatei <b>{{targetFileName}}</b> wurde erfolgreich geladen.",
       "name": "Karte öffnen",
-      "openFile": "Konfigurationsdatei öffnen"
+      "openFile": "Konfigurationsdatei öffnen",
+      "modulesNotAvailable_one": "Das Modul {{modules}} steht leider nicht zur Verfügung.",
+      "modulesNotAvailable_other": "Die Module {{modules}} stehen leider nicht zur Verfügung."
     },
     "portalFooter": {
       "designation": "Kartographie und Gestaltung:",

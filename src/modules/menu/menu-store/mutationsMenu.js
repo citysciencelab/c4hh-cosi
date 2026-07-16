@@ -167,7 +167,7 @@ export default {
         state[side].navigation.history = newHistory;
     },
     /**
-     * Sets currently shown component by side
+     * Sets currently shown component by side.
      * @param {Object} state current state
      * @param {Object} payload The payload.
      * @param {String} payload.side The current side.
@@ -176,5 +176,16 @@ export default {
      */
     setCurrentComponentBySide (state, {side, type}) {
         state[side].currentComponent = type;
+    },
+    /**
+     * Sets the sections by side.
+     * @param {Object} state current state
+     * @param {Object} payload The payload.
+     * @param {String} payload.side The current side.
+     * @param {Array} payload.sections the sections
+     * @returns {void}
+     */
+    setSectionsBySide (state, {side, sections}) {
+        state[side].sections = sections;
     }
 };

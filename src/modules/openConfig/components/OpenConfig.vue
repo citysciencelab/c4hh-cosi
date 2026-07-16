@@ -49,13 +49,9 @@ export default {
                 const reader = new FileReader();
 
                 reader.onload = (evt) => {
-                    this.processConfigJsonOnload(evt);
-                    this.addSingleAlert({
-                        category: "success",
-                        content: this.$t("common:modules.openConfig.loadFileSuccess", {targetFileName: targetFile?.name})
-                    });
+                    this.processConfigJsonOnload({event: evt, targetFileName: targetFile?.name});
                 };
-                reader.readAsText(event.target.files[0]);
+                reader.readAsText(targetFile);
             }
             else {
                 this.addSingleAlert({

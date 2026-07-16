@@ -9,6 +9,7 @@ import changeCase from "@shared/js/utils/changeCase.js";
  * @vue-prop {String} idAppendix - The appendix set on the id to make it unique.
  * @vue-prop {Array} path - The path to find the MenuContainerBodyElement inside the store structure.
  * @vue-prop {String} side - The side in which the menu component is being rendered.
+ * @vue-computed {Array} sections - Returns the sections of this side.
  */
 export default {
     name: "MenuContainerBodyRootItems",
@@ -33,7 +34,23 @@ export default {
         }
     },
     computed: {
-        ...mapGetters("Menu", ["customMenuElementIcon", "section"])
+        ...mapGetters("Menu", ["customMenuElementIcon", "section", "sectionsBySide"]),
+        sections () {
+            return this.sectionsBySide(this.side);
+        }
+    },
+    watch: {
+        sections: {
+            /**
+             * Is triggered if sections change. E.g. if module 'openConfig' is used with another config.json.
+             * Loads new sections.
+             * @returns {void}
+             */
+            handler () {
+                this.prepareItemProps();
+            },
+            deep: true
+        }
     },
     created () {
         this.prepareItemProps();
