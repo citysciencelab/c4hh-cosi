@@ -111,6 +111,8 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                 Maps: {
                     namespaced: true,
                     actions: {
+                        addInteraction: sinon.stub(),
+                        removeInteraction: sinon.stub(),
                         zoomToExtent: sinon.stub()
                     }
                 },
@@ -656,6 +658,131 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                 wrapper.vm.onFeatureMove(event, layerId, originalXYKey, customZKey);
 
                 expect(spy.called).to.be.false;
+            });
+        });
+
+        describe("getStyleFunctionFromDisplayOptions", () => {
+            it("should return a style function that resolves styles from dynamic-binary display settings", () => {
+                const wrapper = factory.getShallowMount(),
+                    displayOptions = {
+                        type: "dynamic-binary",
+                        properties: ["propA", "propB"],
+                        classificationBreakOutputs: {
+                            propA: "breaksA",
+                            propB: "breaksB"
+                        },
+                        colors: [
+                            ["rgba(10, 20, 30, 0.5)", "rgba(40, 50, 60, 0.5)"],
+                            ["rgba(70, 80, 90, 0.5)", "rgba(100, 110, 120, 0.5)"]
+                        ],
+                        strokeColor: "#000000",
+                        strokeWidth: 1
+                    },
+                    jobResults = {
+                        breaksA: [10],
+                        breaksB: [5]
+                    },
+                    featureA = new Feature({propA: 12, propB: 8}),
+                    featureB = new Feature({propA: 13, propB: 9}),
+                    styleFunction = wrapper.vm.getStyleFunctionFromDisplayOptions(displayOptions, jobResults),
+                    styleA = styleFunction(featureA),
+                    styleB = styleFunction(featureB);
+
+                expect(styleFunction).to.be.a("function");
+                expect(styleA).to.be.instanceof(Style);
+                expect(styleA).to.equal(styleB);
+            });
+        });
+
+        describe("showFeatures", () => {
+            it("should use process displaySettings style function when available", () => {
+                const wrapper = factory.getShallowMount(),
+                    output = "noise_day",
+                    simulationId = "simulationId",
+                    source = new VectorSource(),
+                    dynamicStyle = new Style(),
+                    mockLayer = {
+                        get: key => key === "id" ? `${simulationId}-${output}` : undefined,
+                        layer: {
+                            get: key => key === "id" ? `${simulationId}-${output}` : undefined,
+                            setZIndex: sinon.stub(),
+                            setVisible: sinon.stub()
+                        },
+                        getLayerSource: () => source
+                    },
+                    displaySettings = {
+                        [output]: {
+                            type: "dynamic-binary",
+                            properties: ["propA", "propB"],
+                            classificationBreakOutputs: {
+                                propA: "breaksA",
+                                propB: "breaksB"
+                            },
+                            colors: [["rgba(10, 20, 30, 0.5)"]]
+                        }
+                    },
+                    jobs = {
+                        job1: {
+                            jobStatus: {
+                                processID: "process-1"
+                            },
+                            jobResults: {
+                                [output]: {
+                                    type: "FeatureCollection",
+                                    features: [
+                                        {
+                                            type: "Feature",
+                                            properties: {propA: 1, propB: 1},
+                                            geometry: {
+                                                type: "Point",
+                                                coordinates: [9.98, 53.55]
+                                            }
+                                        }
+                                    ]
+                                },
+                                breaksA: [0],
+                                breaksB: [0]
+                            },
+                            resultStyle: {
+                                type: "polygon",
+                                styles: []
+                            }
+                        }
+                    };
+
+                sinon.stub(wrapper.vm, "createOrUpdateLayer").returns(mockLayer);
+                sinon.stub(wrapper.vm, "getStyleFunctionFromDisplayOptions").returns(() => dynamicStyle);
+                sinon.stub(wrapper.vm, "setFeatureStyle");
+                sinon.stub(wrapper.vm, "setCurrentOutput");
+                sinon.stub(wrapper.vm, "simulationConfig").value({
+                    id: "config-1",
+                    processes: [
+                        {
+                            id: "process-1",
+                            displaySettings,
+                            renderingOptions: {}
+                        }
+                    ]
+                });
+                sinon.stub(wrapper.vm, "simulations").value([
+                    {
+                        id: "config-1",
+                        processes: [
+                            {
+                                id: "process-1",
+                                displaySettings,
+                                renderingOptions: {}
+                            }
+                        ]
+                    }
+                ]);
+
+                wrapper.vm.showFeatures(simulationId, jobs, [output]);
+
+                expect(wrapper.vm.getStyleFunctionFromDisplayOptions.calledOnceWithExactly(displaySettings[output], jobs.job1.jobResults)).to.be.true;
+                expect(source.getFeatures()).to.have.length(1);
+                expect(source.getFeatures()[0].getStyle()).to.equal(dynamicStyle);
+                expect(wrapper.vm.setFeatureStyle.called).to.be.false;
             });
         });
 

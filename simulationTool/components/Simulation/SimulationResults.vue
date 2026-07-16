@@ -470,6 +470,110 @@ export default {
         getMappedProperty,
 
         /**
+         * Gets a dynamic-binary style function for the display options.
+         * @param {Object} displayOptions The display options configuration for the output.
+         * @param {Object} jobResults The job results containing classification break values.
+         * @returns {Function|null} The OpenLayers style function or null.
+         */
+        getStyleFunctionFromDisplayOptions (displayOptions, jobResults) {
+            if (displayOptions?.hide) {
+                return () => null;
+            }
+
+            if (displayOptions?.type !== "dynamic-binary") {
+                console.warn(`Unsupported display option type "${displayOptions?.type}". Expected "dynamic-binary".`);
+                return null;
+            }
+
+            const properties = Array.isArray(displayOptions?.properties) ? displayOptions.properties : [],
+                  colors = displayOptions?.colors;
+
+            if (properties.length < 2) {
+                console.warn("displayOptions.properties must contain at least two entries for dynamic-binary styling.");
+                return null;
+            }
+
+            if (!Array.isArray(colors) || !colors.length || !colors.some(row => Array.isArray(row) && row.length)) {
+                console.warn("displayOptions.colors must be a non-empty 2D array for dynamic-binary styling.");
+                return null;
+            }
+
+            const [firstProperty, secondProperty] = properties,
+                  classificationBreakOutputs = displayOptions?.classificationBreakOutputs || {},
+                  firstClassificationBreakOutput = classificationBreakOutputs[firstProperty],
+                  secondClassificationBreakOutput = classificationBreakOutputs[secondProperty];
+
+            if (!firstClassificationBreakOutput || !secondClassificationBreakOutput) {
+                console.warn(`Missing classificationBreakOutputs mapping for properties "${firstProperty}" and/or "${secondProperty}".`);
+            }
+
+            const strokeColor = displayOptions?.strokeColor,
+                  strokeWidth = Number.isFinite(Number(displayOptions?.strokeWidth))
+                      ? Number(displayOptions?.strokeWidth)
+                      : 0,
+                  rowClassCount = colors.length,
+                  columnClassCount = Math.max(...colors.map(row => Array.isArray(row) ? row.length : 0), 0),
+                  maxRowIndex = Math.max(rowClassCount - 1, 0),
+                  maxColumnIndex = Math.max(columnClassCount - 1, 0);
+
+            const styleCache = colors.map(row => Array.isArray(row)
+                ? row.map(color => {
+                    if (!color) {
+                        return null;
+                    }
+                    const styleDefinition = {
+                        fill: new Fill({color})
+                    };
+
+                    if (strokeColor && strokeWidth > 0) {
+                        styleDefinition.stroke = new Stroke({
+                            color: strokeColor,
+                            width: strokeWidth
+                        });
+                    }
+
+                    return new Style(styleDefinition);
+                })
+                : []);
+
+            /**
+             * Gets the classification index for a property value.
+             * @param {String|Number} propertyValue The feature property value.
+             * @param {Number[]} classificationBreaks The classification break values.
+             * @param {Number} maxClassIndex The maximum allowed classification index.
+             * @returns {Number} The classification index between 0 and maxClassIndex.
+             */
+            function getClassificationIndex (propertyValue, classificationBreaks, maxClassIndex) {
+                const numericValue = Number(propertyValue),
+                      numericBreaks = Array.isArray(classificationBreaks) ? classificationBreaks.map(value => Number(value)).filter(value => Number.isFinite(value)) : [];
+
+                if (!Number.isFinite(numericValue) || !numericBreaks.length) {
+                    return 0;
+                }
+
+                let classificationIndex = 0;
+
+                numericBreaks.forEach((classificationBreak, index) => {
+                    if (numericValue >= classificationBreak) {
+                        classificationIndex = Math.min(index + 1, maxClassIndex);
+                    }
+                });
+
+                return classificationIndex;
+            }
+
+            return feature => {
+                const propertyValues = properties.map(property => feature.get(property)),
+                      firstClassificationBreaks = jobResults?.[firstClassificationBreakOutput]?.value || jobResults?.[firstClassificationBreakOutput],
+                      secondClassificationBreaks = jobResults?.[secondClassificationBreakOutput]?.value || jobResults?.[secondClassificationBreakOutput],
+                      firstClassificationIndex = getClassificationIndex(propertyValues[0], firstClassificationBreaks, maxRowIndex),
+                      secondClassificationIndex = getClassificationIndex(propertyValues[1], secondClassificationBreaks, maxColumnIndex);
+
+                return styleCache?.[firstClassificationIndex]?.[secondClassificationIndex] || null;
+            };
+        },
+
+        /**
          * Sets the Feature style according to the value of property.
          * @param {ol/Feature} feature - The feature.
          * @param {Object} currentStyles - The current style objects.
@@ -521,7 +625,13 @@ export default {
                     const featuresFromJob = job.jobResults?.[output]?.value?.features || job.jobResults?.[output]?.features || [],
                           featuresToAdd = ConvertFeature.geoJsonToOpenlayers(featuresFromJob),
                           foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
-                          isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table";
+                          isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table",
+                          styleFunction = foundProcess?.displaySettings
+                              ? this.getStyleFunctionFromDisplayOptions(foundProcess.displaySettings[output], job.jobResults)
+                              : null;
+
+                    // TEMP: Uncomment the next line to force client-side geometry transform until backend transform is ready.
+                    // featuresToAdd.forEach(feature => feature.getGeometry()?.transform("EPSG:4326", "EPSG:25832"));
 
                     if (isTableMode) {
                         this.processAndStylePointFeaturesForTable(layerId, layer, layerSource, featuresToAdd, simulationId, foundProcess?.renderingOptions?.attributeToShow);
@@ -529,7 +639,15 @@ export default {
                     }
                     featuresToAdd?.forEach(feature => {
                         feature.set("simulationId", simulationId);
-                        this.setFeatureStyle(feature, job.resultStyle);
+
+                        if (typeof styleFunction === "function") {
+                            const style = styleFunction(feature);
+
+                            feature.setStyle(style);
+                        }
+                        else {
+                            this.setFeatureStyle(feature, job.resultStyle);
+                        }
                     });
                     layerSource.addFeatures(featuresToAdd);
                 });
