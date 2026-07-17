@@ -1,0 +1,282 @@
+import crs from "@masterportal/masterportalapi/src/crs.js";
+
+import SearchInterface from "./searchInterface.js";
+import getCswRecords from "@shared/js/api/getCswRecords.js";
+import detectServiceType from "@modules/searchBar/js/detectServiceType.js";
+import store from "@appstore/index.js";
+import {uniqueId} from "@shared/js/utils/uniqueId.js";
+
+/**
+ * The search interface for CSW (Catalogue Service for the Web) catalogs.
+ * Performs a full-text GetRecords request against one or more CSW endpoints.
+ * @module modules/searchBar/searchInterfaces/searchInterfaceCSW
+ * @name SearchInterfaceCSW
+ * @constructs
+ * @extends SearchInterface
+ * @see {@link https://www.ogc.org/standards/cat}
+ * @param {Object[]} definitions CSW search endpoint definitions.
+ * @param {String} definitions[].url URL of the CSW endpoint.
+ * @param {String} [definitions[].version="2.0.2"] CSW version ("2.0.2" or "3.0").
+ * @param {Number} [definitions[].maxRecords=10] Maximum number of records to return per request.
+ * @param {String} [definitions[].typeName="gmd:MD_Metadata"] Type name for the CSW query.
+ * @param {String[]} [definitions[].serviceTypeFilter=null] Optional INSPIRE ServiceType filter. Restricts results to records with matching ServiceType (e.g. ["view"] for WMS only, ["view","download"] for WMS+WFS).
+ * @param {String} [hitTemplate="default"] The template for rendering the hits.
+ * @param {Object} [resultEvents] Actions that are executed when an interaction, such as hover or click, is performed with a result list item.
+ * @param {String[]} [resultEvents.onClick=["addLayerFromCswRecord", "zoomToResult"]] Actions fired when clicking a result.
+ * @param {String[]} [resultEvents.buttons=["showLayerInfo"]] Actions shown as buttons on a result.
+ * @param {String} [searchInterfaceId="csw"] The id of the search interface.
+ * @returns {void}
+ */
+export default function SearchInterfaceCSW ({definitions, hitTemplate, resultEvents, searchInterfaceId} = {}) {
+    const resultEventsDefault = {
+            onClick: ["addLayerFromCswRecord", "zoomToResult"],
+            buttons: ["showLayerInfo"]
+        },
+        resultEventsSupported = ["showLayerInfo", "zoomToResult", "addLayerFromCswRecord"];
+
+    this.checkConfig(resultEvents, resultEventsSupported, searchInterfaceId);
+    SearchInterface.call(this,
+        "request",
+        searchInterfaceId || "csw",
+        resultEvents || resultEventsDefault,
+        hitTemplate
+    );
+
+    this.definitions = definitions || [];
+}
+
+SearchInterfaceCSW.prototype = Object.create(SearchInterface.prototype);
+
+/**
+ * Search in all configured CSW endpoints.
+ * @override
+ * @param {String} searchInput The search input.
+ * @returns {Object[]} The accumulated search results.
+ */
+SearchInterfaceCSW.prototype.search = async function (searchInput) {
+    this.searchState = "running";
+
+    for (const definition of this.definitions) {
+        try {
+            const {records, numberOfRecordsMatched} = await this.fetchCswResults(definition, searchInput);
+
+            this.totalHits = (this.totalHits || 0) + numberOfRecordsMatched;
+            this.pushHitsToSearchResults(this.normalizeResults(records, definition, searchInput));
+        }
+        catch (error) {
+            if (error.name !== "AbortError" && error.code !== "ERR_CANCELED") {
+                console.warn(`SearchInterfaceCSW: search failed for ${definition.url}.`, error);
+            }
+        }
+    }
+
+    this.searchState = "finished";
+    return this.searchResults;
+};
+
+/**
+ * Fetches and parses CSW records for one endpoint definition.
+ * If the request fails and a serviceTypeFilter is configured, retries without the filter,
+ * because some CSW servers do not support the ServiceType property.
+ * @param {Object} definition The CSW endpoint definition.
+ * @param {String} searchInput The search string.
+ * @returns {Promise<Object>} Parsed response with records and numberOfRecordsMatched.
+ */
+SearchInterfaceCSW.prototype.fetchCswResults = async function (definition, searchInput) {
+    const xml = this.buildGetRecordsXml(definition, searchInput, 1);
+
+    try {
+        const responseXml = await this.requestSearch(definition.url, "POST", xml, "application/xml; charset=UTF-8");
+
+        return getCswRecords.parseGetRecordsResponse(responseXml);
+    }
+    catch (error) {
+        if (error.name === "AbortError" || error.code === "ERR_CANCELED" || !definition.serviceTypeFilter?.length) {
+            throw error;
+        }
+
+        console.warn(`SearchInterfaceCSW: request with serviceTypeFilter failed for ${definition.url}. Retrying without filter. Status: ${error?.response?.status ?? error?.code ?? "unknown"}.`);
+        const fallbackXml = this.buildGetRecordsXml({...definition, serviceTypeFilter: null}, searchInput, 1),
+            responseXml = await this.requestSearch(definition.url, "POST", fallbackXml, "application/xml; charset=UTF-8");
+
+        return getCswRecords.parseGetRecordsResponse(responseXml);
+    }
+};
+
+/**
+ * Builds a CSW GetRecords XML body for the given definition and search input.
+ * @param {Object} definition The CSW endpoint definition.
+ * @param {String} searchInput The search string.
+ * @param {Number} [startPosition=1] Start position for pagination.
+ * @returns {String} The GetRecords XML string.
+ */
+SearchInterfaceCSW.prototype.buildGetRecordsXml = function (definition, searchInput, startPosition = 1) {
+    return getCswRecords.buildGetRecordsXml(searchInput, {
+        version: definition.version || "2.0.2",
+        maxRecords: definition.maxRecords || 10,
+        startPosition: startPosition,
+        typeName: definition.typeName || "gmd:MD_Metadata",
+        elementSetName: definition.elementSetName || "brief",
+        serviceTypeFilter: definition.serviceTypeFilter || null
+    });
+};
+
+/**
+ * Normalizes an array of parsed CSW records into search result objects.
+ * @param {Object[]} records Array of parsed record objects from parseGetRecordsResponse.
+ * @param {Object} definition The CSW endpoint definition that returned these records.
+ * @param {String} searchInput The current search input to rank results by relevance.
+ * @returns {Object[]} Normalized search result objects.
+ */
+SearchInterfaceCSW.prototype.normalizeResults = function (records, definition, searchInput = "") {
+    const filterOnMissingDistribution = definition.filterOnMissingDistribution === true;
+
+    return records
+        .filter(record => record.title)
+        .filter(record => {
+            const {distributionLinks} = record;
+
+            if (distributionLinks === null || distributionLinks === undefined) {
+                return !filterOnMissingDistribution;
+            }
+
+            return distributionLinks.some(link => detectServiceType(link.protocol, link.url) !== null);
+        })
+        .map(record => ({
+            normalizedResult: this.normalizeResult(record, definition),
+            score: this.getRelevanceScore(record, searchInput)
+        }))
+        .sort((a, b) => {
+            if (b.score !== a.score) {
+                return b.score - a.score;
+            }
+
+            const nameCompare = (a.normalizedResult.name || "").localeCompare(b.normalizedResult.name || "", undefined, {sensitivity: "base"});
+
+            if (nameCompare !== 0) {
+                return nameCompare;
+            }
+
+            return (a.normalizedResult.id || "").localeCompare(b.normalizedResult.id || "", undefined, {sensitivity: "base"});
+        })
+        .map(({normalizedResult}) => normalizedResult);
+};
+
+/**
+ * Computes relevance score of a CSW record for a given search input.
+ * Ranking priority: exact title match > title prefix > title contains > abstract contains.
+ * @param {Object} record The parsed CSW record.
+ * @param {String} searchInput The current search input.
+ * @returns {Number} Relevance score.
+ */
+SearchInterfaceCSW.prototype.getRelevanceScore = function (record, searchInput = "") {
+    const normalizedSearchInput = searchInput.trim().toLocaleLowerCase(),
+        title = (record.title || "").toLocaleLowerCase(),
+        abstract = (record.abstract || "").toLocaleLowerCase();
+
+    if (!normalizedSearchInput.length || !title.length) {
+        return 0;
+    }
+
+    if (title === normalizedSearchInput) {
+        return 100;
+    }
+
+    if (title.startsWith(normalizedSearchInput)) {
+        return 60;
+    }
+
+    if (title.includes(normalizedSearchInput)) {
+        return 30;
+    }
+
+    if (abstract.includes(normalizedSearchInput)) {
+        return 10;
+    }
+
+    return 0;
+};
+
+/**
+ * Normalizes a single parsed CSW record into a search result object.
+ * @param {Object} record The parsed CSW record.
+ * @param {Object} definition The CSW endpoint definition.
+ * @returns {Object} Normalized search result object.
+ */
+SearchInterfaceCSW.prototype.normalizeResult = function (record, definition) {
+    return {
+        events: this.normalizeResultEvents(this.resultEvents, record, definition),
+        category: this.searchInterfaceId,
+        id: uniqueId("CswSearch"),
+        icon: "bi-list-ul",
+        name: record.title,
+        toolTip: record.abstract ? `${record.title} — ${record.abstract}` : record.title
+    };
+};
+
+/**
+ * Creates the possible actions for a CSW search result.
+ * @override
+ * @param {Object} record The parsed CSW record.
+ * @param {Object} definition The CSW endpoint definition.
+ * @returns {Object} The possible actions with their parameters.
+ */
+SearchInterfaceCSW.prototype.createPossibleActions = function (record, definition) {
+    const showDocUrl = definition?.showDocUrl || definition?.show_doc_url;
+    const detectedType = record.distributionLinks
+        ?.map(link => detectServiceType(link.protocol, link.url))
+        .find(type => type !== null) ?? null;
+    const possibleActions = {
+        showLayerInfo: {
+            layerId: record.fileIdentifier,
+            source: {
+                id: record.fileIdentifier,
+                metaID: record.fileIdentifier,
+                name: record.title,
+                typ: detectedType,
+                isExternal: true,
+                ...showDocUrl && {showDocUrl},
+                datasets: [{
+                    md_id: record.fileIdentifier,
+                    csw_url: definition?.url || "",
+                    md_name: record.title,
+                    ...showDocUrl && {show_doc_url: showDocUrl}
+                }]
+            }
+        },
+        addLayerFromCswRecord: {
+            fileIdentifier: record.fileIdentifier,
+            recordTitle: record.title,
+            cswUrl: definition?.url || "",
+            filterNonQueryableLayers: definition?.filterNonQueryableLayers === true,
+            ...showDocUrl && {showDocUrl}
+        }
+    };
+
+    if (record.boundingBox) {
+        const {west, south, east, north} = record.boundingBox,
+            mapProjection = store.getters["Maps/projection"]?.getCode();
+
+        /**
+         * Transforms a WGS84 coordinate pair into the current map projection.
+         * @param {Number} lon Longitude in EPSG:4326.
+         * @param {Number} lat Latitude in EPSG:4326.
+         * @returns {Number[]} Coordinate pair in the map projection.
+         */
+        function transformCoord (lon, lat) {
+            if (mapProjection && mapProjection !== "EPSG:4326") {
+                return crs.transformToMapProjection(mapCollection.getMap("2D"), "EPSG:4326", [lon, lat]);
+            }
+            return [lon, lat];
+        }
+
+        const sw = transformCoord(west, south),
+            ne = transformCoord(east, north);
+
+        possibleActions.zoomToResult = {
+            coordinates: [sw[0], sw[1], ne[0], ne[1]]
+        };
+    }
+
+    return possibleActions;
+};

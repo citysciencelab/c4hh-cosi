@@ -306,6 +306,9 @@ Layer2d.prototype.addErrorListener = function (layerSource) {
         + "&request=describeFeatureType";
 
         await this.errorHandling(await axios.get(url, {withCredentials: true})
+            .then(function (response) {
+                return response.status;
+            })
             .catch(function (error) {
                 return error.toJSON().status;
             }), this.get("name"));
@@ -315,6 +318,9 @@ Layer2d.prototype.addErrorListener = function (layerSource) {
 
         if (url) {
             await this.errorHandling(await axios.get(url, {withCredentials: true})
+                .then(function (response) {
+                    return response.status;
+                })
                 .catch(function (error) {
                     return error.toJSON().status;
                 }), this.get("name"));
@@ -322,6 +328,9 @@ Layer2d.prototype.addErrorListener = function (layerSource) {
     }.bind(this));
     layerSource?.on("imageloaderror", async function (evt) {
         await this.errorHandling(await axios.get(evt.image.src_, {withCredentials: true})
+            .then(function (response) {
+                return response.status;
+            })
             .catch(function (error) {
                 return typeof error.toJSON === "function" ? error.toJSON().status : 0;
             }), this.get("name"));

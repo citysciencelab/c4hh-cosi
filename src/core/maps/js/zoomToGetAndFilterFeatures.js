@@ -1,21 +1,8 @@
 import axios from "axios";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import {GeoJSON, WFS} from "ol/format.js";
+import escapeXml from "@shared/js/utils/escapeXml.js";
 import handleAxiosResponse from "@shared/js/utils/handleAxiosResponse.js";
-
-/**
- * Escapes special characters for safe usage inside XML.
- * @param {String} value The value to escape.
- * @returns {String} Escaped value.
- */
-function escape (value) {
-    return String(value)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&apos;");
-}
 
 /**
  * Retrieves features from the defined layer.
@@ -117,7 +104,7 @@ function createFilter (featureNS, featurePrefix, version, property, values) {
 
     // handling for values
     values.forEach(value => {
-        const escapedValue = escape(value);
+        const escapedValue = escapeXml(value);
 
         propPart += propStart + escapedValue + propEnd;
     });

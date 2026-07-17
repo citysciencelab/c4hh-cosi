@@ -1270,6 +1270,7 @@ Definitionen der Suchschnittstellen.
 |Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
 |----|-------------|---|-------|------------|------|
 |bkg|nein|**[bkg](#portalconfigmenusearchbarsearchinterfacesbkg)**||Konfiguration des BKG Suchdienstes.|false|
+|csw|nein|**[csw](#portalconfigmenusearchbarsearchinterfacescsw)**||Konfiguration der CSW-Metadatensuche.|false|
 |elasticSearch|nein|**[elasticSearch](#portalconfigmenusearchbarsearchinterfaceselasticsearch)**||Konfiguration des ElasticSearch Suchdienstes.|false|
 |gazetteer|nein|**[gazetteer](#portalconfigmenusearchbarsearchinterfacesgazetteer)**||Konfiguration des Gazetteer Suchdienstes.|false|
 |komootPhoton|nein|**[komootPhoton](#portalconfigmenusearchbarsearchinterfaceskomootphoton)**||Konfiguration des Komoot Photon Suchdienstes.|false|
@@ -1598,6 +1599,65 @@ Suche bei OpenStreetMap über Stadt, Strasse und Hausnummer. Wird nur durch Klic
     "classes": "place,highway,building,shop,historic,leisure,city,county"
 }
 ```
+
+***
+
+###### portalConfig.menu.searchBar.searchInterfaces.csw {data-toc-label='CSW'}
+
+[type:resultEvents]: # (portalConfig.menu.searchBar.searchInterfaces.resultEvents)
+
+Durchsucht einen CSW-Dienst (Catalogue Service for the Web) über eine ISO-19139-`GetRecords`-Anfrage mit einem AnyText-Volltext-Filter. Über das Array `definitions` können mehrere CSW-Endpunkte konfiguriert werden. Die Ergebnisliste zeigt Datensatztitel; ein Klick auf ein Ergebnis öffnet das Layer-Informationsfenster, zoomt auf die Ausdehnung des Datensatzes oder fügt den ersten gefundenen WMS-/WFS-Distribuitionslink als neuen Layer hinzu.
+Bitte beachten, dass der [addLayerButton](#portalConfig.tree.addLayerButton) als `"active": true` konfiguriert sein muss, um Zugriff auf "Externen Fachdaten" zu haben. Dienste, die das CRS des Portals nicht unterstützen, werden nicht der Karte hinzugefügt.
+
+> **Hinweis:** Wenn der CSW-Endpunkt keine CORS-Header sendet, muss ein Proxy konfiguriert werden.
+
+|Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
+|----|-------------|---|-------|------------|------|
+|definitions|ja|**[definition](#portalconfigmenusearchbarsearchinterfacescswdefinition)** *[]||Liste der CSW-Endpunkt-Definitionen.|false|
+|hitTemplate|nein|String|"default"|Template für die Darstellung der Ergebnisliste.|false|
+|resultEvents|nein|**[resultEvents](#portalconfigmenusearchbarsearchinterfacesresultevents)**|{"onClick": ["addLayerFromCswRecord", "zoomToResult"], "buttons": ["showLayerInfo"]}|Aktionen, die bei einer Interaktion mit einem Suchergebnis ausgeführt werden. Mögliche Ereignisse: "addLayerFromCswRecord", "showLayerInfo", "zoomToResult".|false|
+|searchInterfaceId|nein|String|"csw"|Eindeutige ID dieser Suchschnittstellen-Instanz.|false|
+|type|ja|String|"csw"|Typ der Suchschnittstelle. Definiert welche Suchschnittstelle konfiguriert ist.|false|
+
+**Beispiel**
+
+```json
+{
+    "type": "csw",
+    "searchInterfaceId": "csw_1",
+    "definitions": [
+        {
+            "url": "https://example.org/geonetwork/srv/ger/csw",
+            "version": "2.0.2",
+            "maxRecords": 10,
+            "serviceTypeFilter": ["view", "download"],
+            "showDocUrl": "https://example.org/metadatenkatalog?docuuid="
+        }
+    ],
+    "resultEvents": {
+        "onClick": ["addLayerFromCswRecord", "zoomToResult"],
+        "buttons": ["showLayerInfo"]
+    }
+}
+```
+
+***
+
+###### portalConfig.menu.searchBar.searchInterfaces.csw.definition {data-toc-label='Definition'}
+
+Konfiguration eines einzelnen CSW-Endpunkts innerhalb des Arrays `definitions`.
+
+|Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
+|----|-------------|---|-------|------------|------|
+|elementSetName|nein|String|"brief"|ISO-Elementset für die GetRecords-Anfrage. Unterstützte Werte: `"brief"`, `"summary"`, `"full"`. GeoNetwork-Server (z. B. GeoPortal-BW) liefern `gmd:distributionInfo` erst ab `"summary"` — dieser Wert ist für die Vorfilterung in `normalizeResults` erforderlich. `"brief"` ist sicherer für Server die bei `"summary"` keine Titel für föderierte Records liefern (z. B. IngridPortal/metaver.de).|false|
+|filterNonQueryableLayers|nein|Boolean|false|Wenn `true`, werden WMS-Layer ohne `queryable`-Attribut (d. h. `queryable="0"`) beim Hinzufügen in den Themenbaum herausgefiltert. INSPIRE harmonisierte View-Layer (z. B. `LU.SpatialPlan`) sind typischerweise nicht queryable und rendern ohne INSPIRE SLD-Stylesheet transparent — mit diesem Flag werden sie nicht in den Themenbaum aufgenommen.|false|
+|filterOnMissingDistribution|nein|Boolean|false|Wenn `true`, werden Records ohne `gmd:distributionInfo` in der Suchantwort aus den Ergebnissen gefiltert. Sinnvoll für GeoNetwork-Server (z. B. GeoPortal-BW mit `elementSetName: "summary"`), bei denen das Fehlen von `distributionInfo` bedeutet, dass kein OGC-Dienst verfügbar ist. Standard `false` — Records ohne Distribution-Info werden weiterhin angezeigt (sicher für Server, die `distributionInfo` nie liefern).|false|
+|maxRecords|nein|Integer|10|Maximale Anzahl der zurückgegebenen Datensätze pro Anfrage.|false|
+|serviceTypeFilter|nein|String[]|null|Optionaler INSPIRE-ServiceType-Filter. Schränkt die Ergebnisse auf Datensätze mit passendem ServiceType ein (z. B. `["view"]` für nur WMS, `["view", "download"]` für WMS+WFS). Wird der Filter vom CSW-Server nicht unterstützt, erfolgt automatisch ein erneuter Versuch ohne Filter.|false|
+|showDocUrl|nein|String|""|Basis-URL zum Erstellen der Metadatenkatalog-Verlinkung, indem der Identifier eines Layers angehängt wird (`md_id`/fileIdentifier). Beispiel: `https://example.org/metadatenkatalog?docuuid=`.|false|
+|typeName|nein|String|"gmd:MD_Metadata"|Typname für die CSW-Anfrage (ISO-19139-Standard).|false|
+|url|ja|String||URL des CSW-Endpunkts.|false|
+|version|nein|String|"2.0.2"|CSW-Version. Unterstützte Werte: "2.0.2" (OGC Filter 1.1) und "3.0" (FES 2.0).|false|
 
 ***
 

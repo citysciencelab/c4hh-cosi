@@ -1262,7 +1262,16 @@
         "street": "Straße",
         "subject": "Thema",
         "topic": "Thema (Fachdaten)",
+        "csw": "CSW Metadaten",
         "topicBaselayer": "Thema (Hintergrundkarten)"
+      },
+      "csw": {
+        "noLayerLink": "Kein WMS- oder WFS-Link in den Metadaten gefunden.",
+        "noServiceResponse": "Der Dienst antwortet nicht. Bitte versuchen Sie es später erneut: {{serviceUrl}}",
+        "largeWfsLayer": "Der WFS-Layer '{{layerName}}' enthält {{count}} Features und wird nur für den sichtbaren Kartenausschnitt geladen (Bbox-Strategie).",
+        "largeWfsLayers": "{{layerCount}} WFS-Layer sind groß und werden nur für den sichtbaren Kartenausschnitt geladen (Bbox-Strategie).",
+        "layerAddedTitle": "Layer erfolgreich hinzugefügt",
+        "layerAdded": "Die Layer aus den Metadaten wurden dem Themenbaum hinzugefügt und können über <b>Themen hinzufügen</b> ausgewählt werden."
       },
       "specialWFS": {
         "ongoing": "im Verfahren",
@@ -1280,7 +1289,8 @@
         "zoomToResult": "Zum Ergebnis zoomen",
         "startRouting": "Route starten",
         "showInTree": "Thema im Ordner anzeigen",
-        "showLayerInfo": "Informationen und Legende"
+        "showLayerInfo": "Informationen und Legende",
+        "addLayerFromCswRecord": "Layer hinzufügen"
       },
       "noInitialResults": "Die initiale Suche ergab keine Treffer.",
       "showAll": "Alle anzeigen",

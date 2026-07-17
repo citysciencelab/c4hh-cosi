@@ -353,8 +353,8 @@ A layer based on the OGC's [Web Feature Service](https://www.ogc.org/standard/wf
 |gfiTheme|yes|String/Object||Display style of GFI information for this layer. Unless `"default"` is chosen, custom templates may be used to show GFI information in another format than the default table style.|`"default"`|
 |useProxy|no|Boolean|`false`|_Deprecated in the next major release. *[GDI-DE](https://www.gdi-de.org/en)* recommends setting CORS headers on the required services instead._ Only used for GFI requests. The request will contain the requested URL as path, with dots replaced by underscores.|`false`|
 |wfsFilter|no|String||Set to use xml ressource as wfs filter, the content of the filter file will be sent to the wfs server as POST request (**[see below](#filtering-of-wfs-layers)**).|`"ressources/xmlFilter/filterSchulenStadtteilschulen"`|
-|doNotLoadInitially|no|String|false|if set to true the layer will be initialized without network call, an empty array of features is promoted - this is useful to add features later on (e.g. by filtering) to a full functional but initially empty layer|false|
-|isSecured|no|Boolean|false|Displays whether the layer belongs to a secured service. (**[see below](#secured-wfs-oaf-services)**)|false|
+|doNotLoadInitially|no|Boolean|`false`|if set to true the layer will be initialized without network call, an empty array of features is promoted - this is useful to add features later on (e.g. by filtering) to a full functional but initially empty layer|`false`|
+|isSecured|no|Boolean|false|Displays whether the layer belongs to a secured service. (**[see below](#secured-wms-services)**)|false|
 |layerSequence|no|Number||Number to determine the sequence of layers in the layerTree and layerSelection. The layers are rendered in sequence based on the assigned value, e.g. layers with `layerSequence=1` will initially be on top, etc. Does not work for Baselayers.|
 |propertyNames|no|Array||The attributes as PROPERTYNAME parameter to receive response from wfs layer |`["properties"]`|
 |wildCard|no|String||The wildcard parameter for the highlightFeaturesByAttribute property query. Must be one character only.|
