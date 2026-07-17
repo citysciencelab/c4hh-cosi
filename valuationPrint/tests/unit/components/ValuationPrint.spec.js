@@ -100,6 +100,8 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
                             messageList: [],
                             specificAddress: "",
                             printedFeature: [],
+                            multiSelectParcels: false,
+                            parcelLayerZoomLevel: 0,
                             ...values
                         };
                     },
@@ -130,6 +132,8 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
                             selectedFeatures: [],
                             messageList: [],
                             specificAddress: "",
+                            multiSelectParcels: false,
+                            parcelLayerZoomLevel: 0,
                             printedFeature: []
                         };
                     },

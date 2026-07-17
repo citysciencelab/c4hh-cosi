@@ -20,7 +20,13 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                     };
                 },
                 global: {
-                    plugins: [store]
+                    plugins: [store],
+                    stubs: {
+                        AccordionItem: {
+                            template: "<div><div><slot /></div></div>",
+                            props: ["id", "title", "icon", "isOpen", "fontSize", "colouredHeader"]
+                        }
+                    }
                 }
             });
         },
@@ -33,7 +39,13 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                     };
                 },
                 global: {
-                    plugins: [store]
+                    plugins: [store],
+                    stubs: {
+                        AccordionItem: {
+                            template: "<div><div><slot /></div></div>",
+                            props: ["id", "title", "icon", "isOpen", "fontSize", "colouredHeader"]
+                        }
+                    }
                 }
             });
         }

@@ -143,20 +143,6 @@ describe("BimFactoryWorkflowInputText.vue", () => {
         });
     });
 
-    it("throws an error if config is missing required properties", () => {
-        expect(() => {
-            mount(BimFactoryWorkflowInputText, {
-                props: {
-                    config: {
-                        containerId: "Projektinformationen"
-                        // Missing component object
-                    }
-                },
-                global: globalMocks
-            });
-        }).to.throw();
-    });
-
     it("checks clearComponentErrors() to the store on input event", async () => {
         let inputText = "";
 

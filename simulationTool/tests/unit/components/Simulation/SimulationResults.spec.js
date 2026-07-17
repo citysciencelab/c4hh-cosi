@@ -20,7 +20,11 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
             getShallowMount: () => {
                 return shallowMount(SimulationResults, {
                     global: {
-                        plugins: [store]
+                        plugins: [store],
+                        AccordionItem: {
+                            template: "<div><div><slot /></div></div>",
+                            props: ["id", "title", "icon", "isOpen", "fontSize", "colouredHeader"]
+                        }
                     }
                 });
             },
@@ -28,7 +32,11 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
             getMount: () => {
                 return mount(SimulationResults, {
                     global: {
-                        plugins: [store]
+                        plugins: [store],
+                        AccordionItem: {
+                            template: "<div><div><slot /></div></div>",
+                            props: ["id", "title", "icon", "isOpen", "fontSize", "colouredHeader"]
+                        }
                     }
                 });
             }

@@ -77,6 +77,13 @@ describe("ADDONS: addons/boris/components/BorisComponent.vue", () => {
                                 printStarted: () => sinon.stub(),
                                 progressWidth: () => sinon.stub()}
                         }
+                    },
+                    ResizeHandle: {
+                        namespaced: true,
+                        getters: {
+                            mainMenuWidth: () => 0,
+                            secondaryMenuWidth: () => 0
+                        }
                     }
                 },
                 Maps: {
