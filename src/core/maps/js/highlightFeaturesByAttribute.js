@@ -171,6 +171,22 @@ export default {
     },
 
     /**
+     * Runs all highlight calls for the given features.
+     * @param {Object} highlightFeaturesLayer The configuration for the Layer.
+     * @param {Array} features The loaded WFS features.
+     * @param {Function} dispatch dispatch function
+     * @param {Function} rootGetters rootGetters function
+     * @returns {void}
+     */
+    runHighlighting: function (highlightFeaturesLayer, features, dispatch, rootGetters) {
+        this.highlightPointFeature(this.settings.pointStyleId, "highlight_point_layer", "highlightPoint", highlightFeaturesLayer, features, dispatch, rootGetters);
+        this.highlightLineOrPolygonFeature(this.settings.polygonStyleId, "highlight_polygon_layer", "highlightPolygon", "Polygon", highlightFeaturesLayer, features, dispatch, rootGetters);
+        this.highlightLineOrPolygonFeature(this.settings.polygonStyleId, "highlight_polygon_layer", "highlightPolygon", "MultiPolygon", highlightFeaturesLayer, features, dispatch, rootGetters);
+        this.highlightLineOrPolygonFeature(this.settings.lineStyleId, "highlight_line_layer", "highlightLine", "LineString", highlightFeaturesLayer, features, dispatch, rootGetters);
+        this.highlightLineOrPolygonFeature(this.settings.lineStyleId, "highlight_line_layer", "highlightLine", "MultiLineString", highlightFeaturesLayer, features, dispatch, rootGetters);
+    },
+
+    /**
      * handles the error
      * @param {Function} dispatch dispatch function
      * @param {String} error - the given error
@@ -209,18 +225,12 @@ export default {
             }
         }
         if (rootGetters.styleListLoaded) {
-            this.highlightPointFeature(this.settings.pointStyleId, "highlight_point_layer", "highlightPoint", highlightFeaturesLayer, features, dispatch, rootGetters);
-            this.highlightLineOrPolygonFeature(this.settings.polygonStyleId, "highlight_polygon_layer", "highlightPolygon", "Polygon", highlightFeaturesLayer, features, dispatch, rootGetters);
-            this.highlightLineOrPolygonFeature(this.settings.polygonStyleId, "highlight_polygon_layer", "highlightPolygon", "MultiPolygon", highlightFeaturesLayer, features, dispatch, rootGetters);
-            this.highlightLineOrPolygonFeature(this.settings.lineStyleId, "highlight_line_layer", "highlightLine", "LineString", highlightFeaturesLayer, features, dispatch, rootGetters);
+            this.runHighlighting(highlightFeaturesLayer, features, dispatch, rootGetters);
         }
         else {
             store.watch((state, getters) => getters.styleListLoaded, value => {
                 if (value) {
-                    this.highlightPointFeature(this.settings.pointStyleId, "highlight_point_layer", "highlightPoint", highlightFeaturesLayer, features, dispatch, rootGetters);
-                    this.highlightLineOrPolygonFeature(this.settings.polygonStyleId, "highlight_polygon_layer", "highlightPolygon", "Polygon", highlightFeaturesLayer, features, dispatch, rootGetters);
-                    this.highlightLineOrPolygonFeature(this.settings.polygonStyleId, "highlight_polygon_layer", "highlightPolygon", "MultiPolygon", highlightFeaturesLayer, features, dispatch, rootGetters);
-                    this.highlightLineOrPolygonFeature(this.settings.lineStyleId, "highlight_line_layer", "highlightLine", "LineString", highlightFeaturesLayer, features, dispatch, rootGetters);
+                    this.runHighlighting(highlightFeaturesLayer, features, dispatch, rootGetters);
                 }
             });
         }
