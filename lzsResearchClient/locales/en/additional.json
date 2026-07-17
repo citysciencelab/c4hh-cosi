@@ -87,7 +87,7 @@
                     "selectAllAriaLabel": "Select all for download",
                     "groupByLabel": "Group by",
                     "selectOptionLabel": "Select option",
-                    "selected": "{{sum}} selected",
+                    "selected": "{{sum}} selected (incl. metadata)",
                     "table": {
                       "showPositionInMap": "Show / Hide position of dataset in map",
                       "goToDetails": "Show details for this dataset",
@@ -110,6 +110,7 @@
               "withoutArchive": "unknown archive",
               "withoutYear": "unknown year",
               "metadataFolderName": "Metadata",
+              "cancelDownloadButtonLabel": "Cancel",
               "progress": {
                 "start": "Preparing download...",
                 "fetchPrimaryData": "{{ current }} of {{ total }} files fetched...",

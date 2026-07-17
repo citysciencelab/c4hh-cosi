@@ -87,7 +87,7 @@
                     "selectAllAriaLabel": "Alles auswählen zum Download",
                     "groupByLabel": "Gruppieren nach",
                     "selectOptionLabel": "Option auswählen",
-                    "selected": "{{sum}} ausgewählt",
+                    "selected": "{{sum}} ausgewählt (inkl. Metadaten)",
                     "table": {
                       "showPositionInMap": "Position des Datensatzes in der Karte anzeigen / ausblenden",
                       "goToDetails": "Details zum Datensatz anzeigen",
@@ -110,6 +110,7 @@
               "withoutArchive": "unbekanntes Archiv",
               "withoutYear": "ohne Jahrgang",
               "metadataFolderName": "Metadaten",
+              "cancelDownloadButtonLabel": "Abbrechen",
               "progress": {
                 "start": "Download vorbereiten ...",
                 "fetchPrimaryData": "{{ current }} von {{ total }} Dateien abgerufen ...",

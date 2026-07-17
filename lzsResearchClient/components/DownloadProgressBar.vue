@@ -1,12 +1,18 @@
 <script>
 import {mapGetters, mapMutations} from "vuex";
 import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
-
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 
 export default {
     name: "DownloadProgressBar",
     components: {
-        ModalItem
+        ModalItem,
+        FlatButton
+    },
+    data () {
+        return {
+            closeTimer: null
+        };
     },
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
@@ -48,15 +54,20 @@ export default {
     watch: {
         progressNow (val) {
             if (val === 100) {
-                setTimeout(() => {
+                this.closeTimer = setTimeout(() => {
                     this.closeModal();
                 }, 1000);
             }
         }
     },
+    beforeUnmount () {
+        clearTimeout(this.closeTimer);
+    },
     methods: {
         ...mapMutations("Modules/LzsResearchClient", [
             "setProgressNow",
+            "setProgressCurrent",
+            "setProgressTotal",
             "setProgressPhase"
         ]),
         /**
@@ -64,9 +75,16 @@ export default {
          * @returns {void}
          */
         closeModal () {
+            if (this.progressNow === -1) {
+                return;
+            }
+
             this.downloadAbortController?.abort();
+
             this.setProgressNow(-1);
             this.setProgressPhase("");
+            this.setProgressCurrent(-1);
+            this.setProgressTotal(-1);
         }
     }
 };
@@ -76,8 +94,8 @@ export default {
     <div id="DownloadProgressBar">
         <ModalItem
             :show-modal="progressModalIsOpen"
-            modal-inner-wrapper-style="min-width: 400px; width: 50%; height: 150px;"
-            @modalHid="closeModal()"
+            modal-inner-wrapper-style="min-width: 400px; width: 50%;"
+            :force-click-to-close="true"
         >
             <template #default>
                 <div class="DownloadProgressBarElement">
@@ -99,6 +117,14 @@ export default {
                         {{ currentProgressValue }}
                     </p>
                 </div>
+
+                <div class="cancel-button-wrapper">
+                    <FlatButton
+                        :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.cancelDownloadButtonLabel')"
+                        :text="$t('additional:modules.lzsResearchClient.zipAndDownload.cancelDownloadButtonLabel')"
+                        @click="closeModal()"
+                    />
+                </div>
             </template>
         </ModalItem>
     </div>
@@ -112,9 +138,21 @@ export default {
 
 div#modal-1-container {
     div.DownloadProgressBarElement {
+        padding-top: 2rem;
+
         div.progress-bar {
             background-color: var(--progressBarColor);
         }
+    }
+
+    div.cancel-button-wrapper {
+        display: flex;
+        justify-content: end;
+        padding: 0 1rem;
+    }
+
+    :deep(div[titel="discard"]) {
+        display: none;
     }
 }
 </style>

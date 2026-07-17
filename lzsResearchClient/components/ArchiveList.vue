@@ -208,7 +208,7 @@ export default {
 
             if (hasAnyPrimaryData) {
                 sorted.forEach(dataset => {
-                    const sizeValue = dataset.primaryData?.length ? roundFileSizeToFixed(dataset.fileSizeBytes / 1e6, true) : "—";
+                    const sizeValue = dataset.primaryData?.length && dataset.checked ? roundFileSizeToFixed(dataset.fileSizeBytes / 1e6, true) : "—";
 
                     dataset.attributes.push({name: "fileSizeMB", id: "fileSizeMB", value: sizeValue});
                 });

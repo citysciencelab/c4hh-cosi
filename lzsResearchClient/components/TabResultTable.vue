@@ -427,24 +427,24 @@ export default {
             <thead>
                 <tr>
                     <th
-                        class="resultTableHeaderCheckboxWrapper"
+                        class="checkbox-item resultTableHeaderCheckboxWrapper"
                         @click.stop="toggleAllRows(!headerChecked)"
                         @keypress.stop="toggleAllRows(!headerChecked)"
                     >
-                        <div class="th-content">
-                            <input
-                                id="header-checkbox"
-                                type="checkbox"
-                                :checked="headerChecked"
-                            >
-                        </div>
+                        <input
+                            id="header-checkbox"
+                            class="checkbox-content"
+                            type="checkbox"
+                            :checked="headerChecked"
+                        >
                     </th>
                     <th
                         v-for="(attrName, attrIndex) in tableHeader"
                         :key="attrName"
-                        :class="`th-item-${attrName}`"
+                        :class="`th-item-${attrName} ${attrIndex < sortableHeaderCount ? 'flexible-item' : 'action-item'}`"
                     >
                         <div
+                            :class="`${attrIndex < sortableHeaderCount ? 'item-content' : ''}`"
                             class="th-content"
                             :title="attrName"
                         >
@@ -468,16 +468,17 @@ export default {
                 <tr
                     v-for="(dataset, datasetIndex) in sortedData"
                     :key="datasetIndex"
-                    :class="'dataset-row dataset-row-' + datasetIndex"
+                    class="dataset-row"
                     :data-dataset-index="datasetIndex"
                 >
                     <td
-                        class="resultTableCheckboxWrapper"
+                        class="checkbox-item resultTableCheckboxWrapper"
                         @click.stop="toggleOneRow(dataset, !dataset.checked)"
                         @keypress.stop="toggleOneRow(dataset, !dataset.checked)"
                     >
                         <input
                             :id="`checkbox-${datasetIndex}`"
+                            class="checkbox-content"
                             type="checkbox"
                             :checked="dataset.checked"
                         >
@@ -485,20 +486,21 @@ export default {
                     <td
                         v-for="attrName in sortedData[0].attributes.map(a => a.id || a.name)"
                         :key="attrName"
+                        class="flexible-item"
                         :class="`td-item-${attrName}`"
                         @click.stop="toggleOneRow(dataset, !dataset.checked)"
                         @keypress.stop="toggleOneRow(dataset, !dataset.checked)"
                     >
-                        <span class="td-content">
+                        <div class="item-content">
                             {{
                                 (dataset.attributes.find(a => (a.id || a.name) === attrName) || {}).value || ''
                             }}
-                        </span>
+                        </div>
                     </td>
 
                     <td
                         v-if="showButtons.georef"
-                        class="action-col"
+                        class="action-item"
                     >
                         <IconButton
                             v-if="hasGeoRef"
@@ -519,7 +521,7 @@ export default {
 
                     <td
                         v-if="showButtons.details"
-                        class="action-col"
+                        class="action-item"
                     >
                         <IconButton
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
@@ -531,7 +533,7 @@ export default {
 
                     <td
                         v-if="showButtons.preview && dataset.primaryDataId"
-                        class="action-col"
+                        class="action-item"
                     >
                         <IconButton
                             v-if="dataset.hasPreview"
@@ -544,7 +546,7 @@ export default {
 
                     <td
                         v-if="showButtons.download && dataset.primaryDataId"
-                        class="action-col"
+                        class="action-item"
                     >
                         <IconButton
                             :class-array="['btn-light', 'me-2', 'listAction', datasetIndex % 2 !== 0 ? 'button-dark-background' : '']"
@@ -562,49 +564,61 @@ export default {
 <style lang="scss" scoped>
 
 .TabResultTable {
+    overflow: hidden;
+
     table {
         width: 100%;
         table-layout: fixed;
         border-collapse: collapse;
-        overflow: hidden;
+
+        .checkbox-item {
+            width: 3rem;
+            padding: 0 1rem;
+
+            .checkbox-content {
+                display: flex;
+                align-items: center;
+            }
+        }
+
+        .flexible-item {
+            position: relative;
+        }
+
+        .item-content {
+            min-width: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .action-item {
+            width: 4rem;
+        }
 
         th {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            min-width: 0;
-
-            &:first-child {
-                padding-left: 1rem;
-            }
-            span.sortable-icon {
-                cursor: pointer;
-                margin: 0 0 0 0.5rem;
-                flex: 0 0 auto;
-
-                &:hover {
-                    background-color: $light_grey_hover;
-                }
+            span.sortable-icon:hover {
+                background-color: $light_grey_hover;
             }
 
             .th-content {
                 display: flex;
                 align-items: center;
-                gap: 0.5rem;
+                gap: 1rem;
                 white-space: nowrap;
+                overflow: hidden;
             }
 
             .th-title {
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
-                display: inline-block;
                 flex: 0 1 auto;
                 min-width: 0;
                 font-family: $font_family_accent;
             }
-
-            padding-right: 0.5rem;
         }
 
         tr {
@@ -621,33 +635,6 @@ export default {
             &.dataset-row[data-dataset-index]:nth-child(even):hover {
                 background: $light_grey_active;
             }
-
-            td:first-child {
-                padding-left: 1rem;
-            }
-        }
-
-        td {
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            min-width: 0;
-        }
-
-        .td-content {
-            display: block;
-            width: 100%;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
-
-        .action-col {
-            width: 3rem;
-            max-width: 3rem;
-            min-width: 3rem;
-            text-align: center;
-            white-space: nowrap;
         }
     }
 
