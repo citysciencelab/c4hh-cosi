@@ -21,6 +21,9 @@
 - Repository: Added repository rules to enforce consistent contribution and review standards.
 - services.json-md: Corrected and extended dodumentation of OAF layer.
 - PoiOrientation: Replaced navigation pills with the shared NavTab component and updated badge display using the new slot.
+- The following packages have been updated:
+    - dependencies:
+        - @masterportal/masterportalapi: 2.62.0 to 2.63.0
 
 ### Deprecated
 
