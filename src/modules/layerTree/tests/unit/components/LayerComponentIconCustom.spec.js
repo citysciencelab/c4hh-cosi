@@ -37,6 +37,19 @@ describe("src/modules/layerTree/components/LayerComponentIconCustom.vue", () => 
                     getters: {
                         expanded: () => true
                     }
+                },
+                Modules: {
+                    namespaced: true,
+                    modules: {
+                        namespaced: true,
+                        ResizeHandle: {
+                            namespaced: true,
+                            getters: {
+                                mainMenuWidth: () => 0,
+                                secondaryMenuWidth: () => 0
+                            }
+                        }
+                    }
                 }
             }
         });

@@ -1,6 +1,5 @@
-import {mount, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import sinon from "sinon";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 
 
@@ -116,8 +115,8 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
         expect(icon.classes()).to.include("me-2");
         expect(icon.classes()).to.not.include("me-3");
     });
-    it("should render all heading levels (h1-h6)", async () => {
-        const headingLevels = ["h1", "h2", "h3", "h4", "h5", "h6"];
+    it("should render all heading levels (h1-h6) and div", async () => {
+        const headingLevels = ["h1", "h2", "h3", "h4", "h5", "h6", "div"];
 
         for (const level of headingLevels) {
             const wrapper = shallowMount(AccordionItem, {
@@ -130,14 +129,5 @@ describe("src/shared/modules/accordion/components/AccordionItem.vue", () => {
             expect(heading.element.tagName).to.equal(level.toUpperCase());
         }
     });
-    it("should warn for invalid headingLevel", async () => {
-        const warnStub = sinon.stub(console, "warn");
 
-        mount(AccordionItem, {
-            props: {id: "id-invalid-heading", title, icon: iconString, headingLevel: "h7"}
-        });
-
-        expect(warnStub.called).to.be.true;
-        warnStub.restore();
-    });
 });

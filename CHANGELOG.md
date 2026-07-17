@@ -28,6 +28,7 @@
         - @masterportal/masterportalapi: 2.62.0 to 2.63.0
     - devDependencies:
         - vite: 8.0.14 to 8.1.4
+- Tests: Tests now fail on vue warnings.
 
 ### Deprecated
 

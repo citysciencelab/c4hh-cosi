@@ -334,6 +334,19 @@ if (!globalThis.__vueTestUtilsSettings) {
     globalThis.__vueTestUtilsSettings = true;
 }
 
+const fileWarnings = [];
+
+config.global.config = {
+    warnHandler: (msg) => {
+        console.warn("[Vue warn]", msg);
+        fileWarnings.push(`[Vue warn]: ${msg}`);
+    },
+    errorHandler: (err, instance, info) => {
+        console.warn("[Vue error]", info);
+        fileWarnings.push(`[Vue error]: ${info} — ${err?.message ?? String(err)}`);
+    }
+};
+
 globalThis.beforeAll(() => {
     expect(mapCollection.count()).to.be.equals(0);
 });
@@ -343,6 +356,15 @@ globalThis.afterAll(() => {
     proj4.defs([]);
     unregisterProjections();
     resetUniqueId();
+
+    // Check only AFTER all cleanups are complete — once per file
+    const warnings = fileWarnings.splice(0);
+
+    if (warnings.length > 0) {
+        const unique = [...new Set(warnings)]; // Remove duplicates
+
+        throw new Error(`⚠️ Vue warnings in this testfile (${unique.length}):\n\n${unique.join("\n")}`);
+    }
 });
 
 globalThis.afterEach(() => {

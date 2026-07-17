@@ -64,7 +64,8 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
                                 showUrlGlobal: () => true,
                                 pointOfContact: () => pointOfContact,
                                 publisher: () => publisher,
-                                dateRevision: sinon.stub()
+                                dateRevision: sinon.stub(),
+                                dateCreation: sinon.stub()
                             },
                             actions: {
                                 setConfigParams: () => sinon.stub(),
@@ -85,6 +86,13 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
                             getters: {
                                 name: () => "Contactname",
                                 type: () => "contact"
+                            }
+                        },
+                        ResizeHandle: {
+                            namespaced: true,
+                            getters: {
+                                mainMenuWidth: () => 0,
+                                secondaryMenuWidth: () => 0
                             }
                         }
                     }
