@@ -13,6 +13,7 @@
 
 ### Changed
 - GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.
+- Filter: Snippet - DateRange. Replaced the native date inputs with vue-datepicker-next. Improved synchronization between datepicker and slider values so manually selected dates are preserved even when no exact value exists in initialDateRef. Added support for date, month, and year picker modes based on the configured format.
 
 ### Deprecated
 
