@@ -76,14 +76,14 @@ export default {
         features.forEach(feature => {
             const geometry = feature.getGeometry();
             const isMultiPoint = geometry.getType() === "MultiPoint";
-            const isPoint = geometry.getType() === "Point"; 
+            const isPoint = geometry.getType() === "Point";
 
             if (styleObject && (isPoint || isMultiPoint)) {
                 hasPoint = true;
                 const coordinate = geometry.getCoordinates();
                 const iconFeature = new Feature({
-                        geometry: isPoint ? new Point(coordinate) : new MultiPoint(coordinate)
-                    });
+                    geometry: isPoint ? new Point(coordinate) : new MultiPoint(coordinate)
+                });
                 const featureStyle = createStyle.createStyle(styleObject, feature, false, Config.wfsImgPath);
 
                 iconFeature.setProperties(feature.getProperties());
