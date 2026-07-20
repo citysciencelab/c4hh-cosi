@@ -97,7 +97,8 @@ export default {
 
             this.registerListener({
                 type: "click",
-                listener: this.mapClicked
+                listener: this.mapClicked,
+                keyForBoundFunctions: "poiChoiceTriggerTrack"
             });
         },
 
@@ -111,7 +112,8 @@ export default {
             this.setShowPoi(true);
             this.unregisterListener({
                 type: "click",
-                listener: this.mapClicked
+                listener: this.mapClicked,
+                keyForBoundFunctions: "poiChoiceTriggerTrack"
             });
         },
 
@@ -122,7 +124,8 @@ export default {
         stopPoi () {
             this.unregisterListener({
                 type: "click",
-                listener: this.mapClicked
+                listener: this.mapClicked,
+                keyForBoundFunctions: "poiChoiceTriggerTrack"
             });
             this.setPoiMode("currentPosition");
             this.setCurrentPositionEnabled(true);
