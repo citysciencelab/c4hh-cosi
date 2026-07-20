@@ -630,9 +630,6 @@ export default {
                               ? this.getStyleFunctionFromDisplayOptions(foundProcess.displaySettings[output], job.jobResults)
                               : null;
 
-                    // TEMP: Uncomment the next line to force client-side geometry transform until backend transform is ready.
-                    // featuresToAdd.forEach(feature => feature.getGeometry()?.transform("EPSG:4326", "EPSG:25832"));
-
                     if (isTableMode) {
                         this.processAndStylePointFeaturesForTable(layerId, layer, layerSource, featuresToAdd, simulationId, foundProcess?.renderingOptions?.attributeToShow);
                         return;

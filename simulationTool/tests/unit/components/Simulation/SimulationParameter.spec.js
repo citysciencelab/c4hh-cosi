@@ -210,32 +210,10 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
             expect(wrapper.find("#startSimulation").attributes()).have.property("disabled");
         });
 
-        it("should render simulation inputs and enable start without a planning scenario if a simulation can omit it", async () => {
-            store = getStore({
-                simulations: {
-                    id: "simulationId",
-                    canOmitScenario: true,
-                    title: "Simulation A",
-                    inputs: {},
-                    outputs: {},
-                    processes: []
-                },
-                planningScenarios: []
-            });
-
-            const wrapper = factory.getMount();
-
-            await wrapper.vm.$nextTick();
-
-            expect(wrapper.find("#simulation-name").exists()).to.be.true;
-            expect(wrapper.find("#startSimulation").attributes("disabled")).to.be.undefined;
-        });
-
         it("positive: should hide output selection UI when showOutputSelection is false", async () => {
             store = getStore({
                 simulations: {
                     id: "simulationId",
-                    canOmitScenario: true,
                     showOutputSelection: false,
                     title: "Simulation A",
                     inputs: {},
@@ -255,7 +233,6 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
             store = getStore({
                 simulations: {
                     id: "simulationId",
-                    canOmitScenario: true,
                     showOutputSelection: true,
                     title: "Simulation A",
                     inputs: {},
@@ -368,42 +345,6 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
             expect(wrapper.vm.isSomeOafLoading).to.be.true;
         });
 
-        it("should add a no-scenario option if the simulation can omit a planning scenario", () => {
-            store = getStore({
-                simulations: {
-                    id: "simulationId",
-                    canOmitScenario: true,
-                    title: "Simulation A",
-                    inputs: {},
-                    outputs: {},
-                    processes: []
-                }
-            });
-
-            const wrapper = factory.getShallowMount();
-
-            expect(wrapper.vm.planningScenarioOptions).to.deep.equal([
-                {
-                    id: "noScenario",
-                    name: "additional:modules.tools.simulationTool.noScenario"
-                },
-                {
-                    id: "planningScenarioId",
-                    inputs: {}
-                }
-            ]);
-        });
-
-        it("should not add a no-scenario option if the simulation requires a planning scenario", () => {
-            const wrapper = factory.getShallowMount();
-
-            expect(wrapper.vm.planningScenarioOptions).to.deep.equal([
-                {
-                    id: "planningScenarioId",
-                    inputs: {}
-                }
-            ]);
-        });
     });
 
     describe("User Interaction", () => {

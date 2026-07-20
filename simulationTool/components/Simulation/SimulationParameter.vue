@@ -157,20 +157,6 @@ export default {
         },
 
         /**
-         * Gets the planning scenario options for the select input.
-         * If the simulation allows omitting a scenario, it adds an option for "Kein Szenario".
-         * @returns {Object[]} The array of planning scenario options.
-         */
-        planningScenarioOptions () {
-            const options = [...this.planningScenarios];
-
-            if (this.simulation?.canOmitScenario) {
-                options.unshift({id: "noScenario", name: this.$t("additional:modules.tools.simulationTool.noScenario")});
-            }
-            return options;
-        },
-
-        /**
          * Gets the keys of the primaryTypeInputs object.
          * @returns {String[]} The keys of the primaryTypeInputs object.
          */
@@ -214,7 +200,6 @@ export default {
                             this.flatInputs[inputKey] = input;
                             break;
                         default:
-                            console.warn(`Unsupported input type for ${inputKey}: ${input.schema?.type}`);
                             break;
                     }
                 }
@@ -984,7 +969,7 @@ export default {
             class="col-md-12"
         />
         <hr>
-        <div v-if="currentPlanningScenario || simulations.some(simulation => simulation.canOmitScenario)">
+        <div v-if="currentPlanningScenario">
             <h5 class="my-4">
                 {{ $t('additional:modules.tools.simulationTool.addSimulation') }}
             </h5>
@@ -1205,7 +1190,7 @@ export default {
                         :interaction="startSimulation"
                         :aria-label="$t('additional:modules.tools.simulationTool.simulationStart')"
                         :text="$t('additional:modules.tools.simulationTool.simulationStart')"
-                        :disabled="!currentPlanningScenario && simulations.every(s => !s.canOmitScenario) || isSomeOafLoading || !currentSimulationId"
+                        :disabled="!currentPlanningScenario || isSomeOafLoading || !currentSimulationId"
                     />
                 </div>
             </form>
