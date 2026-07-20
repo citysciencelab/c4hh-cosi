@@ -545,7 +545,7 @@ export default {
                 const snippetIds = this.filterRules
                     .filter(rule => this.isRule(rule) && !rule.fixed)
                     .map(rule => rule.snippetId);
-                
+
                 this.handleActiveStrategy(snippetIds.length ? snippetIds : undefined);
                 this.isApplyingDeserializedState = false;
             });
