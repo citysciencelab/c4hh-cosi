@@ -536,16 +536,17 @@ export default {
             }
 
             this.$nextTick(() => {
-                if (this.isStrategyActive()) {
-                    const snippetIds = this.filterRules
-                        .filter(rule => this.isRule(rule) && !rule.fixed)
-                        .map(rule => rule.snippetId);
-
-                    this.handleActiveStrategy(snippetIds.length ? snippetIds : undefined);
+                if (!this.isStrategyActive()) {
+                    this.filter();
                     this.isApplyingDeserializedState = false;
                     return;
                 }
-                this.filter();
+
+                const snippetIds = this.filterRules
+                    .filter(rule => this.isRule(rule) && !rule.fixed)
+                    .map(rule => rule.snippetId);
+                
+                this.handleActiveStrategy(snippetIds.length ? snippetIds : undefined);
                 this.isApplyingDeserializedState = false;
             });
         },
