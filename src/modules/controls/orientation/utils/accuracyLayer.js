@@ -4,6 +4,7 @@ import VectorSource from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector.js";
 import {Fill, Stroke, Style} from "ol/style.js";
 import {getPrimaryColor} from "@shared/js/utils/colors.js";
+import zIndexManager from "@core/layers/js/zIndexManager";
 
 /**
  * Creates the feature used to render geolocation accuracy geometry.
@@ -42,7 +43,7 @@ export function initAccuracyLayer ({accuracyFeature, accuracyLayer, map}) {
                     width: 2
                 })
             }),
-            zIndex: 9999
+            zIndex: zIndexManager.alwaysOnTop
         })
     );
 
