@@ -528,7 +528,7 @@ export default {
                     const layerConfig = [...this.flattenPreparedLayerGroups, ...this.layerConfigs.layers]
                         .find(layer => layer.filterId === filterId);
 
-                    if (layerConfig?.api?.stop) {
+                    if (typeof layerConfig?.api?.stop === "function") {
                         layerConfig.api.stop(() => {
                             this.runningMapMoveListeners[filterId] = true;
                             mapMoveListener(evt);
