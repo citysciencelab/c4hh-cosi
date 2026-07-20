@@ -3,7 +3,7 @@ import Cluster from "ol/source/Cluster.js";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
 import store from "@appstore/index.js";
-import zIndexManager from "@core/layers/js/zIndexManager";
+import zIndexManager from "@core/layers/js/zIndexManager.js";
 
 /**
  * Interactions with the layers of the map.
