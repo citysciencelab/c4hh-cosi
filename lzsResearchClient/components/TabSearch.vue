@@ -8,6 +8,8 @@ import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
 import DrawEdit from "@shared/modules/draw/components/DrawEdit.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
+import ExtentInteraction from "ol/interaction/Extent.js";
+import {never} from "ol/events/condition.js";
 import LzsResearchClientSearchBar from "./searchBar/components/LzsResearchClientSearchBar.vue";
 import {roundFileSizeToFixed} from "../utils/zipHelpers";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature";
@@ -16,7 +18,7 @@ import layerCollection from "@core/layers/js/layerCollection.js";
 import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 
-import Polygon from "ol/geom/Polygon";
+import Polygon, {fromExtent} from "ol/geom/Polygon";
 import LineString from "ol/geom/LineString";
 import Point from "ol/geom/Point";
 import MultiPolygon from "ol/geom/MultiPolygon.js";
@@ -25,6 +27,49 @@ import {Fill, Stroke, Style} from "ol/style";
 import {getArea} from "ol/sphere";
 
 import {mapGetters, mapActions, mapMutations} from "vuex";
+
+/**
+ * Rectangle interaction class extending ExtentInteraction to handle rectangle drawing events.
+ * It dispatches custom events "modifystart" and "modifyend" when the user starts and ends drawing an extent, respectively.
+ * This allows for more granular control over the drawing process, enabling features like area calculation and validation.
+ * @class RectangleInteraction
+ */
+class RectangleInteraction extends ExtentInteraction {
+    /**
+     * Uses the parent class's handleDownEvent method to determine if the event should be handled.
+     * If the event is handled, it dispatches a "modifystart" event with the original map browser event.
+     * @param {MapBrowserEvent} evt - The map browser event to handle.
+     * @returns {Boolean} - Returns true if the event was handled, false otherwise.
+     */
+    handleDownEvent (evt) {
+        const handled = super.handleDownEvent(evt);
+
+        if (handled) {
+            this.dispatchEvent({
+                type: "modifystart",
+                mapBrowserEvent: evt
+            });
+        }
+
+        return handled;
+    }
+    /**
+     * Uses the parent class's handleUpEvent method to dispatch a "modifyend" event with the original map browser event and the extent that was drawn.
+     * @param {MapBrowserEvent} evt - The map browser event to handle.
+     * @returns {Boolean} - Always returns false.
+     */
+    handleUpEvent (evt) {
+        super.handleUpEvent(evt);
+
+        this.dispatchEvent({
+            type: "modifyend",
+            mapBrowserEvent: evt,
+            extent: this.getExtent()
+        });
+
+        return false;
+    }
+}
 
 export default {
     name: "TabSearch",
@@ -335,7 +380,9 @@ export default {
 
             if (this.currentModifyInteraction) {
                 this.currentModifyInteraction.un("modifyend", this.onModifyEnd);
-                this.currentModifyInteraction?.un("modifystart", this.onModifyStart);
+                this.currentModifyInteraction.un("modifyend", this.onRectangleModifyEnd);
+                this.currentModifyInteraction.un("modifystart", this.onModifyStart);
+
                 this.removeInteraction(this.currentModifyInteraction);
                 this.currentModifyInteraction = null;
             }
@@ -696,11 +743,24 @@ export default {
          */
         onDrawEnd (event) {
             this.setSearchGeometry(event.feature.getGeometry());
+            const isRectangle = this.lzsSelectedDrawType === "box";
+
             this.resetDrawingInteraction();
-            this.editFeature();
+            this.editFeature(event.feature, isRectangle);
         },
         /**
-         * Event handler for the 'modifyend' event.
+         * Event handler for the 'modifyend' event from the rectangle interaction.
+         * Triggered when a rectangle modification operation is completed, updating the search geometry accordingly.
+         * @param {DrawEvent} event - The event object containing details about the completed modification.
+         * @returns {void}
+         */
+        onRectangleModifyEnd (event) {
+            const polygon = fromExtent(event.extent);
+
+            this.setSearchGeometry(polygon);
+        },
+        /**
+         * Event handler for the 'modifyend' event from the modify interaction.
          * Triggered when a modification operation on a feature is completed, updating the search geometry accordingly.
          *
          * @param {ModifyEvent} event - The event object containing details about the completed modification.
@@ -723,12 +783,42 @@ export default {
         /**
          * Sets the map interaction to modify a feature.
          *
+         * @param {Feature} feature - The feature to be modified.
+         * @param {Boolean} isRectangle - Indicates if the feature is a rectangle, default is false.
          * @returns {void}
          */
-        editFeature () {
-            this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.lzsDrawLayerSource);
-            this.currentModifyInteraction.on("modifyend", this.onModifyEnd);
-            this.currentModifyInteraction?.on("modifystart", this.onModifyStart);
+        editFeature (feature, isRectangle = false) {
+            const geometry = feature.getGeometry();
+
+            if (isRectangle) {
+                const style = feature.getStyle();
+
+                feature.setStyle(new Style({
+                    fill: new Fill({
+                        color: "transparent"
+                    }),
+                    stroke: new Stroke({
+                        color: "transparent",
+                        width: 0
+                    })
+                }));
+
+                this.currentModifyInteraction = new RectangleInteraction({
+                    extent: geometry.getExtent(),
+                    source: this.lzsDrawLayerSource,
+                    createCondition: never,
+                    drag: false,
+                    boxStyle: style
+                });
+
+                this.currentModifyInteraction.on("modifyend", this.onRectangleModifyEnd);
+            }
+            else {
+                this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.lzsDrawLayerSource);
+                this.currentModifyInteraction.on("modifyend", this.onModifyEnd);
+            }
+            this.currentModifyInteraction.on("modifystart", this.onModifyStart);
+
             this.addInteraction(this.currentModifyInteraction);
         },
         /**

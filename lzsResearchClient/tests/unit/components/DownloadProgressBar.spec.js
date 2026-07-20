@@ -41,6 +41,12 @@ describe("addons/lzsResearchClient/tests/unit/components/DownloadProgressBar.spe
                                 setProgressNow (state, val) {
                                     storeState.progressNow = val;
                                 },
+                                setProgressCurrent (state, val) {
+                                    storeState.progressCurrent = val;
+                                },
+                                setProgressTotal (state, val) {
+                                    storeState.progressTotal = val;
+                                },
                                 setProgressPhase (state, val) {
                                     storeState.progressPhase = val;
                                 }
