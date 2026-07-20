@@ -227,7 +227,7 @@ Ermöglicht dem User die Darstellung im Vollbildmodus (ohne Tabs und Adressleist
 ***
 
 ##### portalConfig.map.controls.orientation {data-toc-label='Orientation'}
-Orientation nutzt die geolocation des Browsers zur Standortbestimmung des Nutzers. Es wird eine Liste von Features in der Umgebung des Standortes angezeigt.
+Orientation nutzt die geolocation des Browsers zur Standortbestimmung des Nutzers. Es wird eine Liste von Features in der Umgebung des Standortes angezeigt. Die Genauigkeit des angezeigten Standortes kann als Kreises um den Standortmarker angezeigt werden. Mittels eines Richtungsmarkers kann auch die Bewegungsrichtung dargestellt werden. 
 
 |Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
 |----|-------------|---|-------|------------|------|

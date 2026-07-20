@@ -226,7 +226,7 @@ Allows the user to view the portal in full screen mode by clicking a button with
 ***
 
 ##### portalConfig.map.controls.orientation {data-toc-label='Orientation'}
-Orientation uses the browser's geolocation to determine the user's location. A list of features in the vicinity of the location is displayed.
+Orientation uses the browser's geolocation to determine the user's location. A list of features in the vicinity of the location is displayed. The accuracy of the location can be rendered as circle around the location marker. A marker to show the direction of movement can be displayed.
 
 |Name|Required|Type|Default|Description|Expert|
 |----|--------|----|-------|-----------|------|
