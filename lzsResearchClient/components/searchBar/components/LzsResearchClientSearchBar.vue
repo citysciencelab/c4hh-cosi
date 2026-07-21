@@ -416,25 +416,27 @@ export default {
 <template lang="html">
     <div id="lzs-research-client-search-bar">
         <div class="input-group">
-            <input
-                id="searchInput"
-                ref="searchInput"
-                v-model="searchInputValue"
-                type="search"
-                class="form-control"
-                :placeholder="$t(layerSelectionPlaceHolder)"
-                :aria-label="$t(layerSelectionPlaceHolder)"
-                @keydown.enter="tryToMarkAddressResult(searchInputValue), checkCurrentComponent(currentComponentSide)"
-            >
-            <button
-                v-if="searchInputValue"
-                class="btn-icon input-icon reset-button"
-                type="button"
-                aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.addressSearchCancel.clearSearch')"
-                @click="clearSearch"
-            >
-                <i class="bi-x-lg fs-6" />
-            </button>
+            <div class="search-input-wrapper flex-grow-1 position-relative">
+                <input
+                    id="searchInput"
+                    ref="searchInput"
+                    v-model="searchInputValue"
+                    type="search"
+                    class="form-control"
+                    :placeholder="$t(layerSelectionPlaceHolder)"
+                    :aria-label="$t(layerSelectionPlaceHolder)"
+                    @keydown.enter="tryToMarkAddressResult(searchInputValue), checkCurrentComponent(currentComponentSide)"
+                >
+                <button
+                    v-if="searchInputValue"
+                    class="btn-icon input-icon reset-button"
+                    type="button"
+                    aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.addressSearchCancel.clearSearch')"
+                    @click="clearSearch"
+                >
+                    <i class="bi-x-lg fs-6" />
+                </button>
+            </div>
             <button
                 id="lzs-research-client-search-button"
                 class="btn btn-primary"
@@ -444,10 +446,7 @@ export default {
                 @click="handleSearchSubmit"
                 @keydown.enter="handleSearchSubmit"
             >
-                <i
-                    class="bi-check-square"
-                    role="img"
-                />
+                {{ $t('additional:modules.lzsResearchClient.addressSearch.searchButtonSelect') }}
             </button>
         </div>
         <div
@@ -467,64 +466,69 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+    #lzs-research-client-search-bar {
+    position: relative;
+
     .input-group {
         position: relative;
     }
-    #lzs-research-client-search-bar {
+
+    #lzs-research-client-search-button {
+        border-top-right-radius: 5px;
+        border-bottom-right-radius: 5px;
         position: relative;
-
-        #lzs-research-client-search-button {
-            border-top-right-radius: 5px;
-            border-bottom-right-radius: 5px;
-            position: relative;
-
-        }
-        .input-label {
-            color: $placeholder-color;
-        }
-
-        .dropdown {
-            position: static;
-            overflow-anchor: none;
-        }
-
-        .dropdown-menu {
-            position: absolute;
-            bottom: 100%;
-            top: auto;
-            left: 0;
-            right: 0;
-            max-height: min(24rem, 50vh);
-            overflow-y: auto;
-            z-index: 20;
-            border: 1px solid #adb5bd;
-            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
-        }
     }
+
+    .input-label {
+        color: $placeholder-color;
+    }
+
+    .dropdown {
+        position: static;
+        overflow-anchor: none;
+    }
+
+    .dropdown-menu {
+        position: absolute;
+        bottom: 100%;
+        top: auto;
+        left: 0;
+        right: 0;
+        max-height: min(24rem, 50vh);
+        overflow-y: auto;
+        z-index: 20;
+        border: 1px solid #adb5bd;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
+    }
+
     input[type="search"] {
         -webkit-appearance: none;
         appearance: none;
 
         &::-webkit-search-cancel-button {
-        display: none;
-    }
-    }
-    .btn-icon {
-        position: absolute;
-        right: 40px;
-        top: 40%;
-        transform: translateY(-50%);
-        background-color: rgba(0, 0, 0, 0);
-        border: none;
-        padding: 5px 0 0 10px;
-        z-index: 5;
+            display: none;
+        }
     }
 
-    .input-icon {
-        margin-left: -37px;
+    .search-input-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        input {
+            width: 100%;
+        }
     }
 
     .reset-button {
+        position: absolute;
+        background-color: transparent;
+        border: none;
+        padding: 5px 0 0 10px;
+        z-index: 5;
+        right: 4px;
+        top: 45%;
+        transform: translateY(-50%);
         cursor: pointer;
     }
 
@@ -534,9 +538,10 @@ export default {
         font-size: $font-size-base;
     }
 
-    .overflowHidden{
+    .overflowHidden {
         overflow: hidden;
         text-overflow: ellipsis;
     }
+}
 </style>
 

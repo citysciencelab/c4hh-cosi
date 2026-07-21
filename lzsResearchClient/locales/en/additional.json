@@ -126,6 +126,9 @@
               "progressAriaLabel": "Percentage of the total download volume accounted for by the selected files: {{ percent }}%",
               "sumOk": "{{ currentFileSize }} of {{ maxFileSize }} selected",
               "sumTooHigh": "Please select less files, the download becomes too large with {{ currentFileSize }}!"
+            },
+            "addressSearch": {
+              "searchButtonSelect": "Select"
             }
         }
     }
