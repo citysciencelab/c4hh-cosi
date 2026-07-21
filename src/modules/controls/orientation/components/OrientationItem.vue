@@ -280,7 +280,6 @@ export default {
          * @returns {void}
          */
         removeOverlay () {
-            this.accuracyFeature.setGeometry(null);
             mapCollection.getMap("2D").removeOverlay(this.marker);
         },
 
@@ -451,6 +450,9 @@ export default {
                 }
                 geolocation.on("change", this.showPoiWindow);
                 geolocation.on("error", this.onPOIError);
+            }
+            else {
+                this.untrack();
             }
         },
 
