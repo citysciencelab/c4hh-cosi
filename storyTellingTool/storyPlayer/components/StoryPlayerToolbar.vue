@@ -14,7 +14,8 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/ShareView", ["url"])
+        ...mapGetters("Modules/ShareView", ["url"]),
+        ...mapGetters("Modules/StoryPlayer", ["fixedStoryPath"])
     },
     mounted () {
         document.addEventListener("fullscreenchange", this.fullScreenChangeHandler);
@@ -110,6 +111,7 @@ export default {
                 :interaction="toggleFullScreen"
             />
             <IconButton
+                v-if="fixedStoryPath"
                 :class-array="['btn-light']"
                 :aria="$t('additional:modules.storyPlayer.copyLink')"
                 icon="bi bi-share fs-4"

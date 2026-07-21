@@ -94,6 +94,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 }
             },
             getters: {
+                addLayerButton: () => sinon.stub(),
                 allBaselayerConfigs: () => [],
                 allLayerConfigs: () => [],
                 configuredModules: () => sinon.stub(),

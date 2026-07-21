@@ -219,8 +219,9 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 }
             },
             getters: {
-                configJs: state => state.configJs,
+                addLayerButton: () => sinon.stub(),
                 allLayerConfigs: () => [],
+                configJs: state => state.configJs,
                 layerConfigsByAttributes: () => [],
                 layerConfigById: () => sinon.stub(),
                 visibleBaselayerConfigs: () => []

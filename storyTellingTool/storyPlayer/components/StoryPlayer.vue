@@ -58,6 +58,7 @@ export default {
             "supportedMapModes"
         ]),
         ...mapGetters([
+            "addLayerButton",
             "allLayerConfigs",
             "layerConfigById",
             "visibleBaselayerConfigs"
@@ -171,7 +172,9 @@ export default {
             toolBody.scrollTop = 0;
         }
         this.deactivateSubjectLayer();
-        this.updateLayerConfigs(this.originalLayerConfig);
+        if (!this.addLayerButton?.active) {
+            this.updateLayerConfigs(this.originalLayerConfig);
+        }
         this.deactivateTool();
         this.closePopup();
     },
@@ -249,10 +252,17 @@ export default {
                   });
 
             visibleLayerList.forEach(layer => {
-                this.addOrReplaceLayer({
-                    layerId: layer.get("id"),
-                    visibility: false
-                });
+                if (!this.addLayerButton.active) {
+                    this.addOrReplaceLayer({
+                        layerId: layer.get("id"),
+                        visibility: false
+                    });
+                }
+                else {
+                    const layerConf = this.layerConfigById(layer.get("id"));
+
+                    this.removeLayer(layerConf);
+                }
             });
 
             this.allLayerConfigs.forEach(each => {

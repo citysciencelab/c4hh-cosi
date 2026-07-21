@@ -89,10 +89,9 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["allLayerConfigs", "allBaselayerConfigs", "visibleBaselayerConfigs", "configuredModules", "layerConfigById"]),
+        ...mapGetters(["addLayerButton", "allLayerConfigs", "allBaselayerConfigs", "visibleBaselayerConfigs", "configuredModules", "layerConfigById"]),
         ...mapGetters("Maps", ["mode"]),
-        ...mapGetters("Modules/StoryManager", ["originalLayerConfig", "subjectLayerCategory", "toolStoryWhitelist"]),
-        ...mapGetters("Modules/StoryManager", ["enableVideo", "originalLayerConfig", "subjectLayerCategory"]),
+        ...mapGetters("Modules/StoryManager", ["enableVideo", "originalLayerConfig", "subjectLayerCategory", "toolStoryWhitelist"]),
         /**
          * Returns the allowed actions, if video is allowed, it will be added.
          * @returns {String[]} the allowed actions.
@@ -783,7 +782,9 @@ export default {
             });
             this.selectedLayers = [];
 
-            this.updateLayerConfigs(this.originalLayerConfig);
+            if (!this.addLayerButton?.active) {
+                this.updateLayerConfigs(this.originalLayerConfig);
+            }
         },
         /**
          * Updates the current zoom level and coordinate from the map view.

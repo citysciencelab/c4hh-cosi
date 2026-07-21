@@ -15,6 +15,15 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayerToolbar.spec.js", 
                 Modules: {
                     namespaced: true,
                     modules: {
+                        StoryPlayer: {
+                            namespaced: true,
+                            state: () => ({
+                                fixedStoryPath: "assets/"
+                            }),
+                            getters: {
+                                fixedStoryPath: (state) => state.fixedStoryPath
+                            }
+                        },
                         ShareView: {
                             namespaced: true,
                             getters: {
