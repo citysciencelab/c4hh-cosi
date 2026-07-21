@@ -41,6 +41,7 @@
 - Issue \#1630: Fixed parseMissingKeyHandler misinterpreting decimal numbers as time values (e.g. "0.58 m" became "0:58 m"). The time format replacement now requires two-digit hours only.
 - Issue \#1634: url parameter `highlightFeaturesByAttributes` can now handle MultiPoint, MultiPolygon and MultiLineString features.
 - Issue \#1638: FolderCheckBox: Folder checkbox selection (isFolderSelectable) now adds layers in the same order as "add all".
+- Control: Fixed a layout issue with the control module.
 - FeatureLister/NavTab: Disabled tabs are now non-interactive, and native nav-link tab markup is prevented by lint rules in favor of the shared NavTab component.
 - Filter: A bug has been fixed that prevented the geometry filter from working with multipolygons.
 - Menu: Fixed a bug on mobile, where the close button disappeared behind input fields.
