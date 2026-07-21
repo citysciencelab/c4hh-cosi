@@ -15,7 +15,8 @@ export function handleChangeCategory (payload) {
 
     trackMatomoEvent({
         category: "Layer",
-        action: "Layertree category switched",
-        name: typeof i18next !== "undefined" ? i18next.t(payload.name) : payload.name
+        action: "Changed layertree category",
+        name: typeof i18next !== "undefined" ? i18next.t(payload.name) : payload.name,
+        _source: handleChangeCategory.name
     });
 }

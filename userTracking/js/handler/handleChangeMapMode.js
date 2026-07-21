@@ -8,13 +8,14 @@ import {isPayloadValid} from "../util.js";
  * @returns {void}
  */
 export function handleChangeMapMode (payload) {
-    if (!isPayloadValid({funcName: handleChangeMapMode.name, payload})) {
+    if (!isPayloadValid({funcName: handleChangeMapMode.name, isArrayOrObject: false, payload})) {
         return;
     }
 
     trackMatomoEvent({
-        category: "MapMode",
-        action: "Mapmode switched",
-        name: `Mapmode switched to ${payload}`
+        category: "MapControls",
+        action: "Changed map-mode",
+        name: payload,
+        _source: handleChangeMapMode.name
     });
 }

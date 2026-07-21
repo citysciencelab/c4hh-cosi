@@ -1,4 +1,4 @@
-import {trackMatomoPageView} from "../trackMatomo.js";
+import {trackMatomoEvent, trackMatomoPageView} from "../trackMatomo.js";
 import {getLayerSelectionUrlSegement, isPayloadValid} from "../util.js";
 
 /**
@@ -25,6 +25,15 @@ export function handleMenuNavigateBack (payload, store) {
         return;
     }
 
+    // Actions
+    trackMatomoEvent({
+        category: "Menu",
+        action: "Clicked back-button",
+        name: payload.side,
+        _source: handleMenuNavigateBack.name
+    });
+
+    // PageView
     const menuHistoryLength = store.getters["Menu/navigationHistory"](payload.side).length,
         pageHistoryLength = store.getters["UserTracking/getPageHistoryLength"](payload.side),
         numberOfEntriesToRemove = Math.max(0, pageHistoryLength - (menuHistoryLength + 1));
@@ -38,5 +47,9 @@ export function handleMenuNavigateBack (payload, store) {
             ? getLayerSelectionUrlSegement(store)
             : "";
 
-    trackMatomoPageView(`${page.url}${urlSegment}`, page.title);
+    trackMatomoPageView({
+        url: `${page.url}${urlSegment}`,
+        title: page.title,
+        _source: handleMenuNavigateBack.name
+    });
 }

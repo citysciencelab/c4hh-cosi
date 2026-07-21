@@ -1,5 +1,5 @@
 import {mainMenu} from "@shared/js/utils/constants";
-import {trackMatomoPageView} from "../trackMatomo.js";
+import {trackMatomoEvent, trackMatomoPageView} from "../trackMatomo.js";
 import {isPayloadValid} from "../util.js";
 
 /**
@@ -14,7 +14,7 @@ export function handleSearch (payload, store) {
     store.dispatch("UserTracking/forceClearSearchBarTimeout");
 
     if (
-        !Config?.userTracking?.global?.privacy?.allowInputTracking
+        !Config?.userTracking?.options?.enableInputTracking
         || !isPayloadValid({funcName: handleSearch.name, payload})
         || !payload.searchInput
     ) {
@@ -22,14 +22,24 @@ export function handleSearch (payload, store) {
     }
 
     const searchBarInputTimeoutId = setTimeout(() => {
+        // Actions
+        trackMatomoEvent({
+            category: "Layer",
+            action: "Processed search",
+            name: payload.searchInput,
+            _source: handleSearch.name
+        });
+
+        // PageView
         const page = store.getters["UserTracking/getCurrentPage"](mainMenu);
 
         store.commit("UserTracking/setSearchBarInputTimeoutId", null);
 
-        trackMatomoPageView(
-            `${page.url}?q=${encodeURIComponent(payload.searchInput)}`,
-            `${page.title}: ${payload.searchInput}`
-        );
+        trackMatomoPageView({
+            url: `${page.url}?q=${encodeURIComponent(payload.searchInput)}`,
+            title: `${page.title}: ${payload.searchInput}`,
+            _source: handleSearch.name
+        });
     }, 500);
 
     store.commit("UserTracking/setSearchBarInputTimeoutId", searchBarInputTimeoutId);

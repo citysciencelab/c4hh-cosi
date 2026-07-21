@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo.js";
-import {isPayloadValid} from "../util.js";
+import {getLayerInformation, isPayloadValid} from "../util.js";
 
 /**
  * Tracks adding a layer from the search results to the topic tree.
@@ -19,8 +19,9 @@ export function handleAddLayerToTopicTree (payload, store) {
     if (layerId !== undefined) {
         trackMatomoEvent({
             category: "Layer",
-            action: "Layer added via Search",
-            name: `${store.getters.layerConfigById(layerId)?.name} (layerId: ${layerId})`
+            action: "Added layer via search",
+            name: getLayerInformation(layerId, store),
+            _source: handleAddLayerToTopicTree.name
         });
     }
 }

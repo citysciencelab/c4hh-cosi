@@ -2,7 +2,7 @@
  * Converts a text string to a URI-compatible representation.
  * Replaces German umlauts (ä→ae, ö→oe, ü→ue, ß→ss), converts letters following a space to uppercase,
  * and removes all characters not permitted in an unencoded URI segment (keeps A–Z, a–z, 0–9, "/", "-", "_", ".", "~").
- * @param {String} text - The input text to convert.
+ * @param {String} text The input text to convert.
  * @returns {String} The URI-compatible string.
  */
 export function convertToUriCompatible (text) {
@@ -23,10 +23,31 @@ export function getBaseUrl () {
 }
 
 /**
+ * Returns a formatted string with the layer name and ID for the given layer ID.
+ * Falls back to "LayerId unknown" when no layerId is provided.
+ * @param {String} layerId The ID of the layer to look up.
+ * @param {Object} store The Vuex store.
+ * @returns {String} A string of the form "Layer: <name> (id: <id>)".
+ */
+export function getLayerInformation (layerId, store) {
+    return layerId ? `Layer: ${store.getters.layerConfigById(layerId)?.name} (id: ${layerId})` : "LayerId unknown";
+}
+
+/**
+ * Returns the value of the "_source" property of the given payload,
+ * or "unknown source" if the property is not present.
+ * @param {Object} payload The action or mutation payload.
+ * @returns {String} The source string.
+ */
+export function getSourceFromPayload (payload) {
+    return payload._source ?? "unknown source";
+}
+
+/**
  * Returns a URL segment representing the currently active folder path in the layer selection tree.
  * Folder names are joined with "/" and converted to PascalCase (spaces removed, following letter capitalised).
  * Returns an empty string when no folder (other than root) is active.
- * @param {Object} store - The Vuex store instance.
+ * @param {Object} store The Vuex store instance.
  * @returns {String} The URL segment (e.g. "/Emissionen/Starkregen") or "" if no folder is selected.
  */
 export function getLayerSelectionUrlSegement (store) {
@@ -48,10 +69,32 @@ export function getLayerSelectionUrlSegement (store) {
  * @returns {Boolean} true if the payload is valid, false otherwise.
  */
 export function isPayloadValid ({funcName, isArrayOrObject = true, payload}) {
-    if (!payload || isArrayOrObject && typeof payload !== "object") {
+    if (payload === undefined || isArrayOrObject && typeof payload !== "object") {
         console.error(`The function "${funcName}" requires a payload${isArrayOrObject ? "-object" : ""}.`);
         return false;
     }
 
     return true;
+}
+
+/**
+ * Removes the "body" query parameter from the given href URL.
+ * Returns the original href unchanged when it contains no query string.
+ * @param {String} href The URL to strip the "body" parameter from.
+ * @returns {String} The URL without the "body" query parameter.
+ */
+export function stripBodyParameterFromHref (href) {
+    const queryStart = href.indexOf("?");
+
+    if (queryStart === -1) {
+        return href;
+    }
+
+    const params = new URLSearchParams(href.slice(queryStart + 1));
+
+    params.delete("body");
+
+    const query = params.toString();
+
+    return `${href.slice(0, queryStart)}${query ? `?${query}` : ""}`;
 }

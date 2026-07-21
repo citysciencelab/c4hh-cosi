@@ -1,5 +1,5 @@
 import {trackMatomoEvent, trackMatomoPageView} from "../trackMatomo.js";
-import {getBaseUrl, convertToUriCompatible, isPayloadValid} from "../util.js";
+import {convertToUriCompatible, getBaseUrl, getLayerInformation, isPayloadValid} from "../util.js";
 
 /**
  * Tracks a page view (and menu event) whenever the content of the main or secondary menu changes.
@@ -16,16 +16,91 @@ export function handleChangeCurrentComponent (payload, store) {
         return;
     }
 
+    handleActions(payload, store, handleChangeCurrentComponent.name);
+    handlePageView(payload, store, handleChangeCurrentComponent.name);
+}
+
+/**
+ * Dispatches Matomo events for relevant component-change actions in the menu.
+ * Handles search bar focus, layer selection navigation, general menu item clicks,
+ * and specific tool openings (streetSmart, vcOblique).
+ * @param {Object} payload The action payload.
+ * @param {Object} [payload.props] The properties of the component being displayed.
+ * @param {String} [payload._source] Optional source identifier for the action.
+ * @param {String} payload.side The menu side (mainMenu or secondaryMenu).
+ * @param {String} payload.type The type of the component being displayed.
+ * @param {Object} store The Vuex store.
+ * @param {String} funcName The name of the parent function (handleChangeCurrentComponent).
+ * @returns {void}
+ */
+function handleActions (payload, store, funcName) {
     const {props, side, type} = payload;
 
-    // Actions
-    if (props !== undefined && type !== "getFeatureInfo" && type !== "searchBar" && type !== "layerSelection") {
+    if (type === "searchBar") {
         trackMatomoEvent({
-            category: "Menu",
-            action: "Menuitem clicked",
-            name: typeof i18next !== "undefined" ? i18next.t(props.name) : props.name ?? ""
+            category: "Layer",
+            action: "Started typing into search bar",
+            _source: funcName
         });
     }
+    else if (props !== undefined && type === "layerSelection") {
+        if (props.layerId) {
+            trackMatomoEvent({
+                category: "Layer",
+                action: "Clicked on \"go-to-layertree\"-button",
+                name: getLayerInformation(props.layerId, store),
+                _source: funcName
+            });
+        }
+        else {
+            trackMatomoEvent({
+                category: "Layer",
+                action: "Clicked on \"Add layer\"-button",
+                _source: funcName
+            });
+        }
+    }
+    else if (props !== undefined && type !== "getFeatureInfo" && type !== "layerInformation") {
+        trackMatomoEvent({
+            category: "Menu",
+            action: `Clicked on item in ${payload._source ?? side}`,
+            name: typeof i18next !== "undefined" ? i18next.t(props.name) : props.name ?? "",
+            _source: funcName
+        });
+    }
+
+    if (type === "streetSmart") {
+        trackMatomoEvent({
+            category: "Tool",
+            action: "Opened tool",
+            name: "360DegreePanorama",
+            _source: funcName
+        });
+    }
+    else if (type === "vcOblique") {
+        trackMatomoEvent({
+            category: "Tool",
+            action: "Opened tool",
+            name: "ObliqueAerialView",
+            _source: funcName
+        });
+    }
+}
+
+/**
+ * Reports a Matomo page view for the newly displayed menu component.
+ * Constructs a URL and title from the menu side, component type, and navigation history,
+ * stores the result in the UserTracking history, and calls trackMatomoPageView.
+ * @param {Object} payload The action payload.
+ * @param {Object} [payload.props] The properties of the component being displayed.
+ * @param {String} payload.side The menu side (mainMenu or secondaryMenu).
+ * @param {String} payload.type The type of the component being displayed.
+ * @param {Object} store The Vuex store.
+ * @param {String} funcName The name of the parent function (handleChangeCurrentComponent).
+ * @returns {void}
+ */
+function handlePageView (payload, store, funcName) {
+    const {props, side, type} = payload;
 
     // PageView
     let sectionTitle = "";
@@ -55,5 +130,5 @@ export function handleChangeCurrentComponent (payload, store) {
         url = `${getBaseUrl()}${side}${type !== "folder" ? `/${type}` : ""}${section}`;
 
     store.commit("UserTracking/addPageToHistory", {side, title, url});
-    trackMatomoPageView(url, title);
+    trackMatomoPageView({url, title, _source: funcName});
 }

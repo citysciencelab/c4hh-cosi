@@ -16,9 +16,6 @@ export const configCommands = {
                 dimId,
                 window.location.pathname.split("/").filter(Boolean).reverse()[0] ?? "unknown"
             ]);
-        }],
-        ["spaSession", (dimId) => {
-            typeof crypto?.randomUUID === "function" && window._paq.push(["setCustomDimension", dimId, crypto.randomUUID()]);
         }]
     ]),
     privacy: new Map([

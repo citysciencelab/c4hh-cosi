@@ -12,17 +12,26 @@ import {isPayloadValid} from "../util.js";
  * @returns {void}
  */
 export function handleCreatePrintJob (payload) {
-    if (!isPayloadValid({funcName: handleCreatePrintJob.name, payload})) {
+    if (
+        !isPayloadValid({funcName: handleCreatePrintJob.name, payload})
+        || !payload.payload
+    ) {
         return;
     }
 
     const {payload: printPayload} = payload;
 
-    if (printPayload) {
-        trackMatomoEvent({
-            category: "Print",
-            action: `${printPayload.attributes?.is3dMode ? "3D" : "2D"} printjob created`,
-            name: `Layout: ${printPayload.layout}`
-        });
-    }
+    trackMatomoEvent({
+        category: "Tool",
+        action: "Used tool successfully",
+        name: "Print",
+        _source: handleCreatePrintJob.name
+    });
+
+    trackMatomoEvent({
+        category: "Tool",
+        action: "Created printjob",
+        name: `Mode: ${printPayload.attributes?.is3dMode ? "\"3D\"" : "\"2D\""}, Layout: "${printPayload.layout}"`,
+        _source: handleCreatePrintJob.name
+    });
 }

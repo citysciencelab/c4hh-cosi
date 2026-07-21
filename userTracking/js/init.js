@@ -1,11 +1,14 @@
 import store from "../../../src/app-store/index.js";
 import {actionCallback} from "./actionCallback.js";
 import {configCommands} from "./configCommands.js";
+import {mutationCallback} from "./mutationCallback.js";
+import {trackMatomoEvent} from "./trackMatomo.js";
+import {getBaseUrl, stripBodyParameterFromHref} from "./util.js";
 
 /**
  * Initializes user tracking based on the global "Config" object.
  * If a Matomo configuration is present, Matomo is initialized.
- * Subscribes to Vuex store actions so that relevant actions are tracked.
+ * Subscribes to Vuex store actions and mutations so that relevant interactions are tracked.
  * @returns {void}
  */
 export function initializeUserTracking () {
@@ -14,14 +17,20 @@ export function initializeUserTracking () {
     }
 
     if (Config.userTracking) {
+        const {matomo, options} = Config.userTracking;
         let isAvailable = false;
 
-        if (Config.userTracking.matomo) {
-            isAvailable = isAvailable || initializeMatomo(Config.userTracking.matomo);
+        if (matomo) {
+            isAvailable = isAvailable || initializeMatomo(matomo);
         }
 
         if (isAvailable) {
-            store.subscribeAction({after: (action) => actionCallback(store, action)});
+            store.subscribe(mutation => mutationCallback(mutation, store));
+            store.subscribeAction({after: action => actionCallback(action, store)});
+
+            if (options?.enableLinkTracking) {
+                initializeLinkTracking();
+            }
         }
     }
 }
@@ -90,4 +99,55 @@ export function initializeMatomo (config) {
     document.body.appendChild(scriptElement);
 
     return true;
+}
+
+/**
+ * Registers a click listener on document.body that intercepts anchor clicks.
+ * Tracks external links, mailto links, and blob download links via Matomo.
+ * Internal links (same origin and pathname) are ignored.
+ * @returns {void}
+ */
+export function initializeLinkTracking () {
+    document.body.addEventListener("click", ({target}) => {
+        const anchor = target.closest("a");
+
+        if (!anchor || !anchor.href || anchor.href === "#") {
+            return;
+        }
+
+        const hrefAsLowerCase = anchor.href.toLowerCase();
+
+        if (hrefAsLowerCase.startsWith(getBaseUrl().toLowerCase())) {
+            return;
+        }
+
+        let className = anchor.getAttribute("class"),
+            id = anchor.getAttribute("id");
+
+        if (!className && !id) {
+            className = target.getAttribute("class");
+            id = target.getAttribute("id");
+        }
+
+        if (Config.userTracking.matomo) {
+            if (hrefAsLowerCase.startsWith("blob")) {
+                trackMatomoEvent({
+                    category: "Link",
+                    action: "Triggered download",
+                    name: `href: "${anchor.href.slice(5)} | class: "${className}" | id: "${id}"`,
+                    _source: initializeLinkTracking.name
+                });
+            }
+            else {
+                const isMailToLink = hrefAsLowerCase.startsWith("mailto");
+
+                trackMatomoEvent({
+                    category: "Link",
+                    action: `Clicked on ${isMailToLink ? "mailto" : "external"} link`,
+                    name: `href: "${isMailToLink ? stripBodyParameterFromHref(anchor.href) : anchor.href}" | class: "${className}" | id: "${id}"`,
+                    _source: initializeLinkTracking.name
+                });
+            }
+        }
+    });
 }
