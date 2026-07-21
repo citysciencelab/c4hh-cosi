@@ -355,6 +355,51 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                 });
             });
         });
+
+        describe("deactivated", () => {
+            it("negative: currentView stays 'manager' when already in manager view on deactivation", () => {
+                wrapper.vm.currentView = "manager";
+                wrapper.vm.$options.deactivated.call(wrapper.vm);
+                expect(wrapper.vm.currentView).to.equal("manager");
+            });
+        });
+
+        describe("confirmLeaveTool", () => {
+            it("positive: closes the modal, resets currentView to 'manager', clears pendingNavigation, and dispatches the intercepted navigation", () => {
+                const pendingNav = {type: "layerSelection", side: "secondaryMenu", props: {name: "Layer Selection"}};
+
+                wrapper.vm.currentView = "creator";
+                wrapper.vm.showLeaveToolModal = true;
+                wrapper.vm.pendingNavigation = pendingNav;
+
+                wrapper.vm.confirmLeaveTool();
+
+                expect(wrapper.vm.showLeaveToolModal).to.be.false;
+                expect(wrapper.vm.currentView).to.equal("manager");
+                expect(wrapper.vm.pendingNavigation).to.be.null;
+                expect(changeCurrentComponentSpy.calledOnce).to.be.true;
+                expect(changeCurrentComponentSpy.firstCall.args[1]).to.deep.equal(pendingNav);
+            });
+
+            it("negative: does not dispatch navigation when pendingNavigation is null", () => {
+                wrapper.vm.pendingNavigation = null;
+                wrapper.vm.confirmLeaveTool();
+                expect(changeCurrentComponentSpy.called).to.be.false;
+            });
+        });
+
+        describe("cancelLeaveTool", () => {
+            it("positive: closes the leave-tool modal and clears pendingNavigation without dispatching any navigation", () => {
+                wrapper.vm.showLeaveToolModal = true;
+                wrapper.vm.pendingNavigation = {type: "layerSelection", side: "secondaryMenu", props: {}};
+
+                wrapper.vm.cancelLeaveTool();
+
+                expect(wrapper.vm.showLeaveToolModal).to.be.false;
+                expect(wrapper.vm.pendingNavigation).to.be.null;
+                expect(changeCurrentComponentSpy.called).to.be.false;
+            });
+        });
     });
 
     describe("User Interaction", () => {

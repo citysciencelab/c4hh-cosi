@@ -3,6 +3,7 @@ import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMe
 import AddCardButton from "../../../cosi/shared/modules/cards/components/AddCardButton.vue";
 import axios from "axios";
 import {createStoryZip, extractStoryZip} from "../shared/js/storyZipCreator.js";
+import ConfirmModal from "@shared/modules/modals/components/ConfirmModal.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InfoText from "../../shared/card/components/InfoText.vue";
@@ -14,6 +15,7 @@ export default {
     components: {
         AlertMessage,
         AddCardButton,
+        ConfirmModal,
         FlatButton,
         InfoCard,
         InfoText,
@@ -23,7 +25,9 @@ export default {
         return {
             currentView: "manager",
             showImportError: false,
-            showImportWarning3D: false
+            showImportWarning3D: false,
+            showLeaveToolModal: false,
+            pendingNavigation: null
         };
     },
     computed: {
@@ -38,6 +42,7 @@ export default {
             "enableCreator",
             "enableImport"
         ]),
+        ...mapGetters("Modules/StoryManager", {storyManagerTitle: "name"}),
         /**
          * Returns the story object to pass to StoryCreator.
          * Empty object for new stories, existing entry for edits.
@@ -58,22 +63,107 @@ export default {
                 return Object.assign({}, this.storyList[this.currentStoryIndex]?.imageAssetsById);
             }
             return {};
+        },
+        /**
+         * Returns true when the user is actively creating or editing a story.
+         * @returns {Boolean} True if in creator view.
+         */
+        isInEditMode () {
+            return this.currentView === "creator";
         }
     },
     activated () {
         // Hook required by masterportal for keep-alive support
     },
     deactivated () {
-        // Hook required by masterportal for keep-alive support
+        // this.currentView = "manager";
     },
     mounted () {
         this.getFixedStoryList(this.fixedStoryPath, this.fixedStoryFiles);
+        this._navUnsubscribe = this.$store.subscribe((mutation, state) => {
+            if (!this.menuSide || !this.isInEditMode) {
+                return;
+            }
+
+            // Back navigation via mp-menu-navigation-link (navigateBack action)
+            if (
+                mutation.type === "Menu/switchToPreviousComponent" &&
+                mutation.payload === this.menuSide
+            ) {
+                const newComponent = state.Menu[this.menuSide]?.navigation?.currentComponent;
+
+                if (!newComponent || newComponent.type === "storyManager") {
+                    return;
+                }
+                this.pendingNavigation = {
+                    type: newComponent.type,
+                    side: this.menuSide,
+                    props: newComponent.props
+                };
+                this.changeCurrentComponent({
+                    type: "storyManager",
+                    side: this.menuSide,
+                    props: {name: this.storyManagerTitle}
+                });
+                this.showLeaveToolModal = true;
+            }
+
+            // Close button (mp-menu-navigation-reset-button) via resetMenu action
+            if (
+                mutation.type === "Menu/switchToRoot" &&
+                mutation.payload === this.menuSide
+            ) {
+                this.pendingNavigation = {type: "root", side: this.menuSide, props: []};
+                this.changeCurrentComponent({
+                    type: "storyManager",
+                    side: this.menuSide,
+                    props: {name: this.storyManagerTitle}
+                });
+                this.showLeaveToolModal = true;
+            }
+        });
+    },
+    beforeUnmount () {
+        this._navUnsubscribe?.();
     },
     methods: {
         ...mapMutations("Modules/StoryManager", ["setCurrentStoryIndex", "setFixedStoryLoaded", "setStoryList"]),
         ...mapMutations("Modules/StoryPlayer", ["setImageAssetsById", "setStoryConf", "setCurrentStoryName"]),
-        ...mapActions("Menu", ["changeCurrentComponent"]),
+        ...mapActions("Menu", ["changeCurrentComponent", "resetMenu"]),
 
+        /**
+         * Called when the user confirms leaving the tool via the navigation modal.
+         * Resets the creator view and replays the intercepted navigation.
+         * @returns {void}
+         */
+        confirmLeaveTool () {
+            this.showLeaveToolModal = false;
+            this.currentView = "manager";
+            const nav = this.pendingNavigation;
+
+            this.pendingNavigation = null;
+            if (!nav) {
+                return;
+            }
+            if (nav.type === "root") {
+                this.resetMenu(nav.side);
+            }
+            else {
+                this.changeCurrentComponent({
+                    type: nav.type,
+                    side: nav.side,
+                    props: nav.props
+                });
+            }
+        },
+        /**
+         * Called when the user cancels leaving the tool via the navigation modal.
+         * @returns {void}
+         */
+        cancelLeaveTool () {
+            this.showLeaveToolModal = false;
+            this.pendingNavigation = null;
+        },
         /**
          * Opens the creator for a new story.
          * @returns {void}
@@ -309,6 +399,15 @@ export default {
         id="story-manager"
         class="d-flex flex-column"
     >
+        <ConfirmModal
+            :show-modal="showLeaveToolModal"
+            :modal-title="$t('additional:modules.storyManager.confirmLeaveTitle')"
+            :modal-content="$t('additional:modules.storyManager.confirmLeaveContent')"
+            :button-confirm-label="$t('additional:modules.storyManager.confirmLeaveConfirm')"
+            :button-cancel-label="$t('additional:modules.storyManager.confirmLeaveCancel')"
+            @clicked-confirm="confirmLeaveTool"
+            @clicked-cancel="cancelLeaveTool"
+        />
         <StoryCreator
             v-if="currentView === 'creator'"
             :story="editingStory"

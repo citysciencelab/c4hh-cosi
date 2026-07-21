@@ -14,7 +14,11 @@
       "importWarning3D": "The 3D Layer will not be loaded, because the 3d-modus is not configured in this portal.",
       "createdAt": "Created on:",
       "chapters": "Chapters",
-      "emptyStory": "There are no stories yet."
+      "emptyStory": "There are no stories yet.",
+      "confirmLeaveTitle": "Leave story manager?",
+      "confirmLeaveContent": "Unsaved changes will be lost.",
+      "confirmLeaveConfirm": "Leave",
+      "confirmLeaveCancel": "Cancel"
     }
   }
 }
