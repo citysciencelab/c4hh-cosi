@@ -105,6 +105,12 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                             mutations: {
                                 setMode: sinon.stub()
                             }
+                        },
+                        LayerSelection: {
+                            namespaced: true,
+                            actions: {
+                                changeVisibility: sinon.stub()
+                            }
                         }
                     }
                 },
@@ -123,6 +129,9 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                         mainExpanded: () => true
                     }
                 }
+            },
+            actions: {
+                addLayerToLayerConfig: sinon.stub()
             }
         });
     }
@@ -191,24 +200,54 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                 expect(addInteractionStub.calledWith(interaction)).to.be.true;
             });
         });
-        describe("createOrUpdateLayer", () => {
-            it("should return existing layer and call clear", () => {
+        describe("getVisibleOutputs", () => {
+            it("should filter out outputs with hide set to true", () => {
                 const wrapper = factory.getShallowMount(),
-                    clearStub = sinon.stub(),
+                    allOutputs = ["noise_day", "noise_night", "hidden_output"];
+
+                sinon.stub(wrapper.vm, "simulationConfig").value({
+                    outputs: {
+                        noise_day: {hide: false},
+                        noise_night: {},
+                        hidden_output: {hide: true}
+                    }
+                });
+
+                expect(wrapper.vm.getVisibleOutputs(allOutputs)).to.deep.equal(["noise_day", "noise_night"]);
+            });
+
+            it("should return all outputs if no hide flag is configured", () => {
+                const wrapper = factory.getShallowMount(),
+                    allOutputs = ["noise_day", "noise_night"];
+
+                sinon.stub(wrapper.vm, "simulationConfig").value({
+                    outputs: {}
+                });
+
+                expect(wrapper.vm.getVisibleOutputs(allOutputs)).to.deep.equal(allOutputs);
+            });
+        });
+        describe("createOrUpdateLayer", () => {
+            it("should return existing layer and set visibility to true", () => {
+                const wrapper = factory.getShallowMount(),
+                    changeVisibilityStub = sinon.stub(wrapper.vm, "changeVisibility"),
                     resultLayer = {
                         getLayerSource: () => {
-                            return {clear: clearStub};
+                            return {clear: sinon.stub()};
                         }
                     };
 
                 layerCollection.getLayerById.restore();
                 sinon.stub(layerCollection, "getLayerById").returns(resultLayer);
                 expect(wrapper.vm.createOrUpdateLayer("test")).to.deep.equal(resultLayer);
-                expect(clearStub.calledOnce).to.be.true;
+                expect(changeVisibilityStub.calledOnceWithExactly({
+                    layerId: "test",
+                    value: true
+                })).to.be.true;
             });
             it("should call create createLayer", () => {
                 const wrapper = factory.getShallowMount(),
-                    createLayerStub = sinon.stub(layerFactory, "createLayer").returns({layer: {setZIndex: sinon.stub()}});
+                    createLayerStub = sinon.stub(layerFactory, "createLayer").returns({layer: {setZIndex: sinon.stub(), setMinZoom: sinon.stub()}});
 
                 layerCollection.getLayerById.restore();
                 sinon.stub(layerCollection, "getLayerById").returns(undefined);
@@ -783,6 +822,129 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
                 expect(source.getFeatures()).to.have.length(1);
                 expect(source.getFeatures()[0].getStyle()).to.equal(dynamicStyle);
                 expect(wrapper.vm.setFeatureStyle.called).to.be.false;
+            });
+
+            it("should set layer style and skip feature conversion in reference transmission mode", () => {
+                const wrapper = factory.getShallowMount(),
+                    output = "noise_day",
+                    simulationId = "simulationId",
+                    source = {
+                        clear: sinon.stub(),
+                        addFeatures: sinon.stub()
+                    },
+                    dynamicStyle = new Style(),
+                    setStyleStub = sinon.stub(),
+                    mockLayer = {
+                        get: key => key === "id" ? `${simulationId}-${output}` : undefined,
+                        layer: {
+                            get: key => key === "id" ? `${simulationId}-${output}` : undefined,
+                            setStyle: setStyleStub,
+                            setZIndex: sinon.stub(),
+                            setVisible: sinon.stub()
+                        },
+                        getLayerSource: () => source
+                    },
+                    displaySettings = {
+                        [output]: {
+                            type: "dynamic-binary",
+                            properties: ["propA", "propB"],
+                            classificationBreakOutputs: {
+                                propA: "breaksA",
+                                propB: "breaksB"
+                            },
+                            colors: [["rgba(10, 20, 30, 0.5)"]]
+                        }
+                    },
+                    jobs = {
+                        job1: {
+                            jobStatus: {
+                                processID: "process-1"
+                            },
+                            jobResults: {
+                                [output]: {
+                                    href: "https://example.com/oaf"
+                                },
+                                breaksA: [0],
+                                breaksB: [0]
+                            },
+                            resultStyle: {
+                                type: "polygon",
+                                styles: []
+                            }
+                        }
+                    };
+
+                sinon.stub(wrapper.vm, "createOrUpdateLayer").returns(mockLayer);
+                sinon.stub(wrapper.vm, "getStyleFunctionFromDisplayOptions").returns(() => dynamicStyle);
+                sinon.stub(wrapper.vm, "setFeatureStyle");
+                sinon.stub(wrapper.vm, "setCurrentOutput");
+                sinon.stub(wrapper.vm, "simulationConfig").value({
+                    id: "config-1",
+                    outputs: {
+                        [output]: {
+                            value: {
+                                transmissionMode: "reference"
+                            }
+                        }
+                    },
+                    processes: [
+                        {
+                            id: "process-1",
+                            displaySettings,
+                            renderingOptions: {}
+                        }
+                    ]
+                });
+
+                wrapper.vm.showFeatures(simulationId, jobs, [output]);
+
+                expect(wrapper.vm.getStyleFunctionFromDisplayOptions.calledOnceWithExactly(displaySettings[output], jobs.job1.jobResults)).to.be.true;
+                expect(setStyleStub.calledOnce).to.be.true;
+                expect(setStyleStub.firstCall.args[0]).to.be.a("function");
+                expect(source.clear.called).to.be.false;
+                expect(source.addFeatures.called).to.be.false;
+                expect(wrapper.vm.setFeatureStyle.called).to.be.false;
+            });
+
+            it("should skip hidden outputs and not create a layer", () => {
+                const wrapper = factory.getShallowMount(),
+                    output = "noise_day",
+                    simulationId = "simulationId",
+                    jobs = {
+                        job1: {
+                            jobStatus: {
+                                processID: "process-1"
+                            },
+                            jobResults: {
+                                [output]: {
+                                    type: "FeatureCollection",
+                                    features: []
+                                }
+                            }
+                        }
+                    };
+
+                sinon.stub(wrapper.vm, "createOrUpdateLayer");
+                sinon.stub(wrapper.vm, "setCurrentOutput");
+                sinon.stub(wrapper.vm, "simulationConfig").value({
+                    id: "config-1",
+                    outputs: {
+                        [output]: {
+                            hide: true
+                        }
+                    },
+                    processes: [
+                        {
+                            id: "process-1",
+                            displaySettings: {},
+                            renderingOptions: {}
+                        }
+                    ]
+                });
+
+                wrapper.vm.showFeatures(simulationId, jobs, [output]);
+
+                expect(wrapper.vm.createOrUpdateLayer.called).to.be.false;
             });
         });
 

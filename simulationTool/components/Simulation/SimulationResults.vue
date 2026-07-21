@@ -212,7 +212,10 @@ export default {
                 this.startTimes = jobsArr.map(job => job.jobStatus?.started).filter(time => time);
                 this.finishedTimes = jobsArr.map(job => job.jobStatus?.finished).filter(time => time);
                 this.progressValues = jobsArr.map(job => job.jobStatus?.progress).filter(progress => Number.isFinite(progress));
-                this.outputs = Object.keys(jobsArr[0]?.jobResults || {});
+
+                const allOutputs = Object.keys(jobsArr[0]?.jobResults || {});
+
+                this.outputs = this.getVisibleOutputs(allOutputs);
                 this.showFeatures(this.simulationIdForResults, this.jobs, this.outputs);
             },
             immediate: true
@@ -246,23 +249,43 @@ export default {
         }
     },
     unmounted () {
-        if (this.layers.length) {
-            this.layers.forEach(layer => {
-                layer.getLayerSource().clear();
-            });
-        }
         Object.values(this.outputSelectInteraction).forEach(interactionsOnLayer => Object.values(interactionsOnLayer).forEach(interaction => this.removeInteraction(interaction)));
         if (layerCollection.getLayerById(infrastructureLayerId)) {
             layerCollection.getLayerById(infrastructureLayerId).getLayerSource().clear();
         }
+        this.layers.forEach(layer => {
+            const layerId = layer.layer?.get("id");
+
+            if (layerId) {
+                this.changeVisibility({
+                    layerId,
+                    value: false
+                });
+            }
+        });
     },
     methods: {
         ...mapActions("Modules/SimulationTool", ["updateFeatures", "zoomToFeature"]),
         ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
         ...mapActions("Menu", ["changeCurrentComponent", "toggleMenu"]),
+        ...mapActions(["addLayerToLayerConfig"]),
+        ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
         ...mapMutations("Modules/SimulationTool", [
             "setMode"
         ]),
+
+        /**
+         * Filters outputs to exclude those marked with hide: true in the simulation config.
+         * @param {String[]} allOutputs - Array of all output keys from job results.
+         * @returns {String[]} Filtered array of visible output keys.
+         */
+        getVisibleOutputs (allOutputs) {
+            return allOutputs.filter(outputKey => {
+                const outputConfig = this.simulationConfig?.outputs?.[outputKey];
+
+                return outputConfig?.hide !== true;
+            });
+        },
 
         /**
          * Adds a select for given layer.
@@ -288,22 +311,62 @@ export default {
         /**
          * Creates or updates a layer with the given layerId.
          * @param {String} layerId - The ID of the layer to create or update.
+         * @param {string} output - The output key.
          * @returns {Object} The created or updated layer.
          */
-        createOrUpdateLayer (layerId) {
-            if (typeof layerCollection.getLayerById(layerId) !== "undefined") {
-                const layer = layerCollection.getLayerById(layerId);
+        createOrUpdateLayer (layerId, output) {
+            const existingLayer = layerCollection.getLayerById(layerId);
 
-                layer.getLayerSource().clear();
-                return layer;
+            if (existingLayer) {
+                this.changeVisibility({
+                    layerId,
+                    value: true
+                });
+                return existingLayer;
             }
-            const layer = layerFactory.createLayer({
-                typ: "VECTORBASE",
-                id: layerId,
-                name: layerId
-            });
 
+            const transmissionMode = this.simulationConfig?.outputs?.[output]?.value?.transmissionMode || "value",
+                  minZoom = this.simulationConfig?.outputs?.[output]?.minZoom,
+                  legendURL = this.simulationConfig?.outputs?.[output]?.legendUrl || "",
+                  outputResult = Object.values(this.jobs || {}).find(job => job?.jobResults?.[output]),
+                  url = outputResult?.jobResults?.[output]?.href || outputResult?.jobResults?.[output]?.value?.links?.[0]?.href || "",
+                  layerType = transmissionMode === "reference" ? "OAF" : "VECTORBASE",
+                  layerAttributes = transmissionMode === "reference"
+                      ? {
+                          id: layerId,
+                          name: this.currentSimulation?.name || layerId,
+                          typ: layerType,
+                          url,
+                          loadingStrategy: "bbox",
+                          dontInitStyle: true
+                      }
+                      : {
+                          typ: layerType,
+                          id: layerId,
+                          name: this.currentSimulation?.name || layerId
+                      };
+
+            if (transmissionMode === "reference" && url === "") {
+                console.warn(`No reference URL found for result layer ${layerId}.`);
+            }
+
+            const layer = layerFactory.createLayer(layerAttributes);
+
+            this.addLayerToLayerConfig({
+                layerConfig: {
+                    id: layerId,
+                    name: this.currentSimulation?.name || layerId,
+                    type: "layer",
+                    typ: layerType,
+                    visibility: true,
+                    showInLayerTree: true,
+                    transparency: 0,
+                    legendURL
+                },
+                parentKey: "subjectlayer"
+            });
             layer.layer.setZIndex(9999998);
+            layer.layer.setMinZoom(typeof minZoom === "number" ? minZoom : 0);
             return layer;
         },
 
@@ -617,19 +680,31 @@ export default {
             }
 
             outputs.forEach(output => {
+                if (this.simulationConfig?.outputs?.[output]?.hide === true) {
+                    return;
+                }
+
                 const layerId = `${simulationId}-${output}`,
-                      layer = this.createOrUpdateLayer(layerId),
+                      transmissionMode = this.simulationConfig?.outputs?.[output]?.value?.transmissionMode || "value",
+                      layer = this.createOrUpdateLayer(layerId, output),
                       layerSource = layer.getLayerSource();
 
                 Object.values(jobs).forEach(job => {
-                    const featuresFromJob = job.jobResults?.[output]?.value?.features || job.jobResults?.[output]?.features || [],
-                          featuresToAdd = ConvertFeature.geoJsonToOpenlayers(featuresFromJob),
-                          foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
-                          isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table",
+                    const foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
                           styleFunction = foundProcess?.displaySettings
                               ? this.getStyleFunctionFromDisplayOptions(foundProcess.displaySettings[output], job.jobResults)
                               : null;
 
+                    if (transmissionMode === "reference") {
+                        layer.layer.setStyle(styleFunction);
+                        return;
+                    }
+
+                    const featuresFromJob = job.jobResults?.[output]?.value?.features || job.jobResults?.[output]?.features || [],
+                          featuresToAdd = ConvertFeature.geoJsonToOpenlayers(featuresFromJob),
+                          isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table";
+
+                    layerSource.clear();
                     if (isTableMode) {
                         this.processAndStylePointFeaturesForTable(layerId, layer, layerSource, featuresToAdd, simulationId, foundProcess?.renderingOptions?.attributeToShow);
                         return;
