@@ -1468,7 +1468,8 @@
         "noFeature": "Bitte zeichnen Sie eine zu Ihren Einträgen assoziierte Geometrie.",
         "onlyNumbersAllowed": "Das Eingabefeld erlaubt nur Zahlen.",
         "requiredPropertiesNotSet": "Bitte geben Sie einen validen Wert für die verpflichtenden Felder {{properties}} ein.",
-        "fetchFeaturePropError": "Das Laden der Parameter dauert länger als gewöhnlich. Bitte versuchen Sie es erneut."
+        "fetchFeaturePropError": "Das Laden der Parameter dauert länger als gewöhnlich. Bitte versuchen Sie es erneut.",
+        "regexInputError": "Die Eingabe entspricht nicht dem vorgegebenen Muster."
       },
       "mandatoryInputError": {
         "text": "Normale Textzeichen und Sonderzeichen wie , . / \\ [ ] Leerzeichen und deutsche Zeichen ö ä ü Ö Ä Ü ß und nicht nur Zahlen sind erforderlich.",

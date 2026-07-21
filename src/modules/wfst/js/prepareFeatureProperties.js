@@ -54,7 +54,9 @@ async function prepareFeatureProperties (layer, featurePropertiesValues) {
 
                 return [...array, {
                     ...property,
-                    label
+                    label,
+                    regex: gfiAttributeEntry?.regex,
+                    regexError: gfiAttributeEntry?.regexError
                 }];
             },
             []);

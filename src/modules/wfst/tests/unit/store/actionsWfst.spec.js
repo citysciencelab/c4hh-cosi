@@ -363,6 +363,77 @@ describe("src/modules/wfst/store/actionsWfst.js", () => {
             expect(dispatch.secondCall.args[1]).to.eql(getters.featureProperties);
         });
     });
+    describe("validateInput", () => {
+        beforeEach(() => {
+            commit = sinon.spy();
+        });
+        it("should keep an empty optional field valid and skip the regex", () => {
+            actionsWfst.validateInput({commit}, {type: "text", value: "", key: "k", required: false, regex: "^.+$"});
+
+            expect(commit.calledOnce).to.be.true;
+            expect(commit.firstCall.args[0]).to.equal("setFeatureProperty");
+            expect(commit.firstCall.args[1].valid).to.be.true;
+        });
+        it("should invalidate a value that passes the type check but fails the regex", () => {
+            actionsWfst.validateInput({commit}, {type: "number", value: "3", key: "k", required: true, regex: "^[0-9]{5}$"});
+
+            expect(commit.firstCall.args[1].valid).to.be.false;
+        });
+        it("should validate a value that passes both the type check and the regex", () => {
+            actionsWfst.validateInput({commit}, {type: "number", value: "12345", key: "k", required: true, regex: "^[0-9]{5}$"});
+
+            expect(commit.firstCall.args[1].valid).to.be.true;
+        });
+        it("should keep the existing type validation when no regex is configured", () => {
+            actionsWfst.validateInput({commit}, {type: "number", value: "3", key: "k", required: true});
+
+            expect(commit.firstCall.args[1].valid).to.be.true;
+        });
+    });
+
+    describe("validateForm", () => {
+        beforeEach(() => {
+            commit = sinon.spy();
+        });
+        it("should disable the form when a required field is invalid", () => {
+            actionsWfst.validateForm({commit}, [{type: "text", required: true, valid: false, value: "x"}]);
+
+            expect(commit.calledWith("setIsFormDisabled", true)).to.be.true;
+        });
+        it("should disable the form when a filled optional regex field is invalid", () => {
+            actionsWfst.validateForm({commit}, [{type: "text", required: false, regex: "^[0-9]+$", valid: false, value: "abc"}]);
+
+            expect(commit.calledWith("setIsFormDisabled", true)).to.be.true;
+        });
+        it("should not disable the form for an empty optional regex field", () => {
+            actionsWfst.validateForm({commit}, [{type: "text", required: false, regex: "^[0-9]+$", valid: undefined, value: ""}]);
+
+            expect(commit.calledWith("setIsFormDisabled", false)).to.be.true;
+        });
+        it("should ignore geometry properties", () => {
+            actionsWfst.validateForm({commit}, [{type: "geometry", required: true, valid: false}]);
+
+            expect(commit.calledWith("setIsFormDisabled", false)).to.be.true;
+        });
+    });
+
+    describe("updateFeatureProperty with a regex", () => {
+        beforeEach(() => {
+            commit = sinon.spy();
+            dispatch = sinon.spy();
+            getters = {featureProperties: Symbol("featureProperties")};
+        });
+        it("should dispatch a validation for a non-required field that carries a regex", () => {
+            const featureProperty = {type: "text", value: "abc", key: "k", required: false, regex: "^[0-9]+$"};
+
+            actionsWfst.updateFeatureProperty({commit, dispatch, getters}, featureProperty);
+
+            expect(commit.notCalled).to.be.true;
+            expect(dispatch.calledTwice).to.be.true;
+            expect(dispatch.firstCall.args[1]).to.eql(featureProperty);
+        });
+    });
+
     describe("setFeatureProperties", () => {
         let prepareFeaturePropertiesSpy;
 

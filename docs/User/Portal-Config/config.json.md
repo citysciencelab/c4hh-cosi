@@ -4773,7 +4773,7 @@ A singular instance of the WFS Search which is selectable through a dropdown.
 WFS-T module to visualize (*getFeature*), create (*insert*), update (*update*) and delete (*delete*) features of a Web Feature Service (*WFS*) which is able to receive transactions.
 To use this tool, a WFS-T layer must be provided in version 1.1.0. For more configuration information see **[services.json](../Global-Config/services.json.md)**.
 
-When editing properties of a feature / adding properties to a new feature, the available values including its label are based on the layers configured `gfiAttributes`. For more information see **[services.json](../Global-Config/services.json.md)**.
+When editing properties of a feature / adding properties to a new feature, the available values including its label are based on the layers configured `gfiAttributes`. Each attribute may additionally carry an optional `regex` (and `regexError`) to validate the user input on single insert and update. For more information see **[services.json](../Global-Config/services.json.md)**.
 
 |Name|Required|Type|Default|Description|Expert|
 |----|--------|----|-------|-----------|------|

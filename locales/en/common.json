@@ -1466,7 +1466,8 @@
         "noFeature": "Please draw a geometry for your added properties.",
         "onlyNumbersAllowed": "The input only allows numbers.",
         "requiredPropertiesNotSet": "Please enter a valid value for the required properties {{properties}}.",
-        "fetchFeaturePropError": "Loading of parameters takes longer than expected. Please try again."
+        "fetchFeaturePropError": "Loading of parameters takes longer than expected. Please try again.",
+        "regexInputError": "The input does not match the required pattern."
       },
       "mandatoryInputError": {
         "text": "Regular text characters and special characters like , . / \\ [ ] space and German characters ö ä ü Ö Ä Ü ß and not only numbers are required",

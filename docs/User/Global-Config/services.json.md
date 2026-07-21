@@ -1175,6 +1175,8 @@ If the gfiAttributes are given as an object, a key's value may also be an object
 | format | no | String/Object | `"YYYY-MM-DDTHH:mm:ss.SSSZ"/{"key": "value"}` | Data format. | `"DD.MM.YYY"` |
 | prefix | no | String |  | Attribute value prefix. | Add string to value without whitespace `"https://"` |
 | suffix | no | String |  | Attribute value suffix. | `"°C"` |
+| regex | no | String |  | Only evaluated by the WFS-T module. Regular expression the input of this attribute is validated against on single insert and update. **Important:** The expression is an *additional* restriction on top of the built-in validation of the attribute type, it does not replace it. A digits-only expression on a `string` attribute therefore never validates, see **[regex and the built-in validation](#regex-and-the-built-in-validation)**. Empty optional fields stay valid. Since this is defined in a JSON string, backslashes must be escaped. | `"^\\d{5}$"` |
+| regexError | no | String | `"common:modules.wfst.error.regexInputError"` | Only evaluated by the WFS-T module. Locale key or plain text shown when the input does not match `regex`. | `"common:modules.wfst.error.regexInputError"` |
 
 **gfiAttributes example object using `suffix` and `prefix` :**
 
@@ -1301,6 +1303,42 @@ If the gfiAttributes are given as an object, a key's value may also be an object
    }
 }
 ```
+
+**gfiAttributes example object using `regex` for WFS-T input validation:**
+
+```json
+{
+   "gfiAttributes": {
+      "name": "Name",
+      "plz": {
+         "name": "Postleitzahl",
+         "regex": "^\\d{5}$",
+         "regexError": "common:modules.wfst.error.regexInputError"
+      }
+   }
+}
+```
+
+In this example the service must describe `plz` as a numeric type (`integer`, `int`, `short`, `decimal` or `float`). If `plz` were described as `string`, the digits-only expression could never be fulfilled - see the following note.
+
+### regex and the built-in validation
+
+> **Important:** A `regex` only further restricts the input, it never relaxes the built-in validation. An input is accepted only if it passes **both** the built-in validation of the attribute type **and** the configured `regex`. An expression that contradicts the built-in rules can never be fulfilled and the field stays invalid permanently.
+
+This mainly affects attributes the service describes as `string`, which are rendered as a text input. Their built-in validation
+
+* rejects any input consisting of digits only, and
+* only allows the characters `A-Z`, `a-z`, `0-9`, space, `ä`, `ö`, `ü`, `Ä`, `Ö`, `Ü`, `ß`, `[`, `]`, `,`, `.`, `-`, `/` and `\`.
+
+Consequences for a `string` attribute:
+
+| Expression | Result | Reason |
+|---|---|---|
+| `"^\\d{5}$"` | never validates | Digits-only input is always rejected by the text validation. |
+| `"^[^@]+@[^@]+$"` | never validates | `@` is not among the characters allowed by the text validation. |
+| `"^[A-Z]{2}-\\d{4}$"` | works | Letters, `-` and digits are allowed, and the input is not digits only. |
+
+Configure digits-only expressions on attributes the service describes as a numeric type, or extend the expression so it also satisfies the text rule (for example `"^PLZ \\d{5}$"`).
 
 ***
 

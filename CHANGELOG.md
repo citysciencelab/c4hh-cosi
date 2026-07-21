@@ -8,6 +8,7 @@
 ### __Breaking Changes__
 
 ### Added
+- WFS-T: Added configurable per-field input validation on single insert and update, configurable in the layer's `gfiAttributes`.
 
 ### Changed
 

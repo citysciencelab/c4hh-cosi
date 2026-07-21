@@ -178,6 +178,28 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
         expect(properties.find(({key}) => key === "premiumflaeche").value).to.equal(false);
         expect(properties.find(({type}) => type === "geometry")).to.exist;
     });
+    it("should attach regex and regexError from a nested gfiAttributes object and leave plain string labels untouched", async () => {
+        exampleLayerInformation.gfiAttributes = {
+            name: "Name",
+            nummer: {
+                name: "Nummer",
+                regex: "^[0-9]+$",
+                regexError: "common:modules.wfst.error.regexInputError"
+            },
+            bemerkung: "Bemerkung",
+            datum: "Datum"
+        };
+        receivePossiblePropertiesStub.resolves(exampleProperties);
+
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation),
+            nummer = properties.find(({key}) => key === "nummer"),
+            name = properties.find(({key}) => key === "name");
+
+        expect(nummer.regex).to.equal("^[0-9]+$");
+        expect(nummer.regexError).to.equal("common:modules.wfst.error.regexInputError");
+        expect(name.label).to.equal("Name");
+        expect(name.regex).to.be.undefined;
+    });
     it("should set default values", async () => {
         exampleLayerInformation.gfiAttributes = "showAll";
         receivePossiblePropertiesStub.resolves(exampleProperties);

@@ -4,6 +4,7 @@ import VectorSource from "ol/source/Vector.js";
 import {platformModifierKeyOnly, primaryAction, click} from "ol/events/condition.js";
 import addFeaturePropertiesToFeature from "../js/addFeaturePropertiesToFeature.js";
 import prepareFeaturePropertiesModule from "../js/prepareFeatureProperties.js";
+import matchesRegex from "../js/matchesRegex.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import wfs from "@masterportal/masterportalapi/src/layer/wfs.js";
 import DragBox from "ol/interaction/DragBox.js";
@@ -1078,27 +1079,38 @@ const actions = {
      * @returns {void}
      */
     validateInput ({commit}, property) {
+        const isEmpty = [null, undefined, ""].includes(property.value);
+        let valid = true;
+
+        if (!property.required && isEmpty) {
+            commit("setFeatureProperty", {...property, valid: true});
+            return;
+        }
+
         if (property.type === "number") {
             const isNotEmpty = property.value.length > 0,
-                hasNumbersOrPartialNumbers = !Number.isNaN(Number(property.value)),
-                isNumberValid = isNotEmpty && hasNumbersOrPartialNumbers;
+                hasNumbersOrPartialNumbers = !Number.isNaN(Number(property.value));
 
-            commit("setFeatureProperty", {...property, valid: isNumberValid});
+            valid = isNotEmpty && hasNumbersOrPartialNumbers;
         }
         else if (property.type === "text") {
             const hasTextAndNumberAndHasSpecials = (/^[A-Za-z0-9 [\]öäüÖÄÜß,/\\.-]*$/).test(property.value),
-                hasOnlyNumbers = (/^[0-9]*$/).test(property.value),
-                isTextValid = hasTextAndNumberAndHasSpecials && !hasOnlyNumbers;
+                hasOnlyNumbers = (/^[0-9]*$/).test(property.value);
 
-            commit("setFeatureProperty", {...property, valid: isTextValid});
+            valid = hasTextAndNumberAndHasSpecials && !hasOnlyNumbers;
         }
         else if (property.type === "date") {
             const dateEpoch = Date.parse(property.value),
-                year2100 = 4133894400000,
-                isDateValid = year2100 > dateEpoch;
+                year2100 = 4133894400000;
 
-            commit("setFeatureProperty", {...property, valid: isDateValid});
+            valid = year2100 > dateEpoch;
         }
+
+        if (property.regex) {
+            valid = valid && matchesRegex(property.regex, property.value);
+        }
+
+        commit("setFeatureProperty", {...property, valid});
     },
     /**
      * Validates whole form based on the list of received properties.
@@ -1108,7 +1120,17 @@ const actions = {
      * @returns {void}
      */
     validateForm ({commit}, featureProperties) {
-        const isFormInvalid = featureProperties.find(f => f.type !== "geometry" && f.required && f.valid !== true);
+        const isFormInvalid = featureProperties.find(f => {
+            if (f.type === "geometry") {
+                return false;
+            }
+            if (f.required) {
+                return f.valid !== true;
+            }
+            const hasValue = ![null, undefined, ""].includes(f.value);
+
+            return Boolean(f.regex) && hasValue && f.valid !== true;
+        });
 
         commit("setIsFormDisabled", Boolean(isFormInvalid));
     },
@@ -1122,7 +1144,7 @@ const actions = {
      * @returns {void}
      */
     updateFeatureProperty ({dispatch, commit, getters: {featureProperties}}, feature) {
-        if (feature.required) {
+        if (feature.required || feature.regex) {
             dispatch("validateInput", feature);
             dispatch("validateForm", featureProperties);
         }

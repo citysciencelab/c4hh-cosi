@@ -399,11 +399,15 @@ export default {
                                     :id="`tool-wfs-transaction-form-input-${property.key}`"
                                     :key="`${property.key}-input`"
                                     :class="{
-                                        'form-control__valid': property.required && property.valid === true,
-                                        'form-control__invalid': property.required && property.valid === false
+                                        'form-control__valid': (property.required || property.regex) && property.valid === true,
+                                        'form-control__invalid': (property.required || property.regex) && property.valid === false
                                     }"
                                     :step="property.type === 'decimal' ? getDecimalStep(property.type, property.value) : null"
-                                    :title="property.required && !property.valid ? $t(`common:modules.wfst.mandatoryInputError.${getInputType(property.type)}`): ''"
+                                    :title="(property.required || property.regex) && property.valid === false
+                                        ? $t(property.regex
+                                            ? (property.regexError || 'common:modules.wfst.error.regexInputError')
+                                            : `common:modules.wfst.mandatoryInputError.${getInputType(property.type)}`)
+                                        : ''"
                                     :type="getInputType(property.type)"
                                     :required="property.required"
                                     :value="property.value"
@@ -411,9 +415,19 @@ export default {
                                         key: property.key,
                                         type: getInputType(property.type),
                                         value: property.type === 'decimal' ? formatDecimalValue(property.type, event.target.value) : event.target.value,
-                                        required: property.required
+                                        required: property.required,
+                                        regex: property.regex
                                     })"
                                 >
+                                <span
+                                    v-if="(property.required || property.regex) && property.valid === false"
+                                    :key="`${property.key}-error`"
+                                    class="form-control-error"
+                                >
+                                    {{ $t(property.regex
+                                        ? (property.regexError || 'common:modules.wfst.error.regexInputError')
+                                        : `common:modules.wfst.mandatoryInputError.${getInputType(property.type)}`) }}
+                                </span>
                             </template>
                         </template>
                         <div class="tool-wfs-transaction-form-buttons">
@@ -664,6 +678,11 @@ $checkbox-check-url: url("#{$checkbox-check-icon}");
         }
         .form-control.form-control__invalid {
             border: 1px solid red;
+        }
+        .form-control-error {
+            grid-column: 2;
+            color: red;
+            font-size: 12px;
         }
     }
     .form-label__required::after,
