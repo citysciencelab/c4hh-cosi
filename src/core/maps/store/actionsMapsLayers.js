@@ -44,7 +44,7 @@ export default {
                 name: layerName,
                 source: new VectorSource(),
                 alwaysOnTop: alwaysOnTop,
-                zIndex: alwaysOnTop === true ? alwaysOnTop : undefined
+                zIndex: alwaysOnTop === true ? zIndexManager.alwaysOnTop : undefined
             });
 
             // @TODO use the existing method
