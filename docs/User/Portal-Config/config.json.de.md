@@ -4780,6 +4780,7 @@ Beim Bearbeiten eines Features / Hinzufügen von Attributen zu einem neuen Featu
 |update|nein|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)/Boolean|false|Legt fest, welche der zu `layerIds` zugehörigen Layer das Bearbeiten von Geometrien erlauben.|false|
 |multiUpdate|nein|[multiUpdate](#portalconfigmenusectionsmoduleswfstmultiupdate)[]|[]|Definiert, für welche Layer die gleichzeitige Aktualisierung mehrerer Features möglich ist.|false|
 |featurePropertiesValues|nein|[featurePropertiesValues](#portalconfigmenusectionsmoduleswfstfeaturepropertiesvalues)[]|[]|Defaultwerte für die Properties der Features das WFS setzen.|false|
+|lockedFields|nein|String[]|"none"|Legt fest, welche Felder des WFS-T in den Formularen gesperrt (read-only) sein sollen. Unterstützt "all", "none", ein Array von Feldnamen (gilt für alle Layer) oder ein Objekt (Schlüssel des Objekts entsprechen den Layer-IDs, Werte sind Arrays von zu sperrenden Feldnamen, z.B. `{"layerId1": ["feldname1", "feldname2"]}`).|false|
 
 **Beispiel**
 
@@ -4836,7 +4837,8 @@ Beim Bearbeiten eines Features / Hinzufügen von Attributen zu einem neuen Featu
             "key":"kategorie",
             "value":"meine Kategorie"
         }
-    ]
+    ],
+    "lockedFields": ["name", "gemeinde"]
 }
 ```
 
