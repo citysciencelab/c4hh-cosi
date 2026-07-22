@@ -229,6 +229,10 @@
     "path": "cosi/cosiPrintLayoutSelection",
     "type": "vueComponent"
   },
+  "scenarioBuilder": {
+    "path": "cosi/ScenarioBuilder",
+    "type": "tool"
+  },
    "waterRiskCheckSearchBar": {
     "path": "waterRiskCheck/searchBar",
     "type": "tool"
