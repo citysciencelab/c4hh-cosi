@@ -246,6 +246,7 @@ export default {
 
         if (this.mode === "3D") {
             this.changeMapMode("2D");
+            this.setToNorth();
         }
 
         this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
@@ -296,6 +297,7 @@ export default {
 
         if (this.mode === "3D") {
             this.changeMapMode("2D");
+            this.setToNorth();
         }
     },
     methods: {
@@ -787,6 +789,13 @@ export default {
             }
         },
         /**
+         * Set the mapView to north.
+         * @returns {void}
+         */
+        setToNorth () {
+            mapCollection.getMapView("2D").animate({rotation: 0});
+        },
+        /**
          * Updates the current zoom level and coordinate from the map view.
          * @returns {void}
          */
@@ -804,7 +813,6 @@ export default {
             this.zoomlevel = mapView.getZoom();
             this.coordinate = [...mapView.getCenter()];
         }
-
     }
 };
 </script>

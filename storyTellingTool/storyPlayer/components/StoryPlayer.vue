@@ -177,6 +177,7 @@ export default {
         }
         this.deactivateTool();
         this.closePopup();
+        this.setToNorth();
     },
     methods: {
         ...mapMutations("Modules/StoryPlayer", [
@@ -213,6 +214,7 @@ export default {
                 this.deactivateSubjectLayer();
                 this.closePopup();
                 this.changeMapMode("2D");
+                this.setToNorth();
                 return;
             }
             if (this._detectActiveStep) {
@@ -362,6 +364,7 @@ export default {
             else if (!this.currentChapter.is3D && this.mode === "3D") {
                 this.isChangeFrom3D = true;
                 this.changeMapMode("2D");
+                this.setToNorth();
             }
 
             // Updates the map center and zoom level for 2D
@@ -419,6 +422,7 @@ export default {
                 if (this.currentChapter.map?.tool) {
                     this.activateTool(this.currentChapter.map.tool);
                 }
+                this.setToNorth();
             }
         },
         /**
@@ -648,6 +652,14 @@ export default {
             if (secondaryMenu) {
                 secondaryMenu.scrollTo({top: 0, behavior: "smooth"});
             }
+        },
+
+        /**
+         * Set the mapView to north.
+         * @returns {void}
+         */
+        setToNorth () {
+            mapCollection.getMapView("2D").animate({rotation: 0});
         }
     }
 };

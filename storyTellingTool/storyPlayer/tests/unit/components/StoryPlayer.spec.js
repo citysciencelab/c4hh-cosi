@@ -294,6 +294,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             },
             getView: () => {
                 return {
+                    animate: sinon.spy(),
                     getZoom: () => sinon.stub(),
                     getCenter: () => []
                 };

@@ -144,6 +144,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             },
             getView: () => {
                 return {
+                    animate: sinon.spy(),
                     getZoom: () => 1,
                     getCenter: () => []
                 };
