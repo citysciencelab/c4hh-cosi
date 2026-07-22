@@ -3,7 +3,6 @@ import {mapGetters, mapActions} from "vuex";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
-import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import Multiselect from "vue-multiselect";
 import TabResultTable from "./TabResultTable.vue";
 import SumOfCheckedFiles from "./SumOfCheckedFiles.vue";
@@ -17,7 +16,6 @@ export default {
         FlatButton,
         Multiselect,
         SwitchInput,
-        SpinnerItem,
         TabResultTable,
         SumOfCheckedFiles
     },
@@ -58,9 +56,6 @@ export default {
             geomIsShownBy: null,
             groupedResultsForAllSteps: {},
             groupBySelections: {},
-            showSpinner: false,
-            fetchProgressCount: 0,
-            fetchProgressTotal: 0,
             sumOfCheckedFilesProgress: 0
         };
     },
@@ -142,11 +137,6 @@ export default {
             },
             deep: true,
             immediate: true
-        },
-        fetchProgressCount (newVal) {
-            if (newVal === this.fetchProgressTotal) {
-                this.showSpinner = false;
-            }
         }
     },
     methods: {
@@ -377,10 +367,6 @@ export default {
             const tableRefPrefix = `${this.idPrefix}-table-`,
                   promises = [];
 
-            this.fetchProgressCount = 0;
-            this.fetchProgressTotal = this.datasets.filter(d => changeTo && !d.primaryData && d.archiveId).length;
-
-            this.showSpinner = true;
             Object.keys(this.$refs).forEach((refTable) => {
                 if (refTable.startsWith(tableRefPrefix)) {
                     promises.push(this.$refs[refTable]?.[0]?.toggleAllRows(changeTo));
@@ -388,19 +374,6 @@ export default {
             });
 
             await Promise.all(promises.filter(Boolean));
-            this.fetchProgressCount = 0;
-            this.fetchProgressTotal = 0;
-            this.showSpinner = false;
-        },
-        /**
-         * Reacts on toggle of all datasets in one table, starts the spinner to wait for fetching all primary data
-         * @param {Number} countOfPrimaryDataToFetch - count of primary data datasets to wait for.
-         * @returns {void}
-         */
-        async toggleAllInOneTable (countOfPrimaryDataToFetch) {
-            this.fetchProgressCount = 0;
-            this.fetchProgressTotal = countOfPrimaryDataToFetch;
-            this.showSpinner = true;
         },
         /** Toggles the checked state of all datasets in a specific archive.
          * @param {Number} index - The index of the archive to toggle.
@@ -510,17 +483,6 @@ export default {
 
 <template>
     <div class="ArchiveList">
-        <div
-            v-if="showSpinner"
-            class="loadingSpinner"
-        >
-            <SpinnerItem
-                custom-class="spinner"
-                class="ms-3"
-            />
-            <p> {{ $t("additional:modules.lzsResearchClient.tabs.archiveList.loading", {current: fetchProgressCount, total: fetchProgressTotal}) }}</p>
-        </div>
-
         <div class="archiveListHeaderLine">
             <p class="numberOfResults">
                 {{ numberOfResultsLabel }}
@@ -644,8 +606,6 @@ export default {
                                 @openDetails="onOpenDetails"
                                 @clearOtherGeom="clearGeomAndGeomIndicator"
                                 @showGeomAgain="showGeomAgain"
-                                @primaryDataFetched="fetchProgressCount++"
-                                @toggleAllRowsOnThisTable="toggleAllInOneTable"
                             />
                         </AccordionItem>
                     </div>
@@ -661,8 +621,6 @@ export default {
                             @openDetails="onOpenDetails"
                             @clearOtherGeom="clearGeomAndGeomIndicator"
                             @showGeomAgain="showGeomAgain"
-                            @primaryDataFetched="fetchProgressCount++"
-                            @toggleAllRowsOnThisTable="toggleAllInOneTable"
                         />
                     </div>
                 </AccordionItem>
@@ -676,30 +634,6 @@ export default {
 <style lang="scss" scoped>
 
 .ArchiveList {
-    div.loadingSpinner {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        gap: 2rem;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255,255,255,0.7);
-        z-index: 3;
-
-        div.spinner {
-            width: 4rem;
-            height: 4rem;
-        }
-
-        p {
-            background-color: white;
-            white-space: pre-line;
-            padding: 1.5rem;
-        }
-    }
-
     div.archiveListHeaderLine {
         display: flex;
         gap: 1rem;

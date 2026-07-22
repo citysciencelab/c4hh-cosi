@@ -370,15 +370,12 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabResultTable.spe
         expect(headerCheckbox.element.checked).to.be.true;
         expect(checkboxes[0].element.checked).to.be.true;
         expect(checkboxes[1].element.checked).to.be.true;
-        expect(wrapper.emitted("toggleAllRowsOnThisTable")).to.be.an("array").with.lengthOf(1);
-        expect(wrapper.emitted("toggleAllRowsOnThisTable")[0]).to.deep.equal([2]);
 
         await headerCheckboxWrapper.trigger("click");
 
         expect(headerCheckbox.element.checked).to.be.false;
         expect(checkboxes[0].element.checked).to.be.false;
         expect(checkboxes[1].element.checked).to.be.false;
-        expect(wrapper.emitted("toggleAllRowsOnThisTable")).to.be.an("array").with.lengthOf(1);
     });
 
     describe("hideGeom", () => {

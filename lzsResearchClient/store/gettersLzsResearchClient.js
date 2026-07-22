@@ -81,7 +81,7 @@ const getters = {
      * @returns {Boolean} - Returns true if there are any pending primary data fetches, otherwise false.
      */
     isFetchingPrimaryData: state => {
-        return state.pendingPrimaryDataFetches > 0;
+        return state.pendingPrimaryDataFetches.size > 0;
     }
 };
 

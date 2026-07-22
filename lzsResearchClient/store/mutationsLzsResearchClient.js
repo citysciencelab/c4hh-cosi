@@ -51,18 +51,19 @@ const mutations = {
         });
         selectedDataset.fileSizeBytes = calcFileSizeBytes(selectedDataset);
     },
-    /** Updates the count of pending primary data fetches in the state.
+    /** Updates the set of pending primary data fetches in the state.
      * @param {Object} state - The current state object.
-     * @param {Object} payload - The payload object containing the increment flag.
-     * @param {boolean} payload.increment - Flag indicating whether to increment (true) or decrement (false) the pendingPrimaryDataFetches count.
+     * @param {Object} payload - The payload object containing the instanceId and the add flag.
+     * @param {boolean} payload.instanceId - The id of the instance for which the pending fetch count is being updated.
+     * @param {boolean} payload.add - Flag indicating whether to add (true) or remove (false) the instanceId to pendingPrimaryDataFetches.
      */
-    updatePendingPrimaryDataFetches (state, {increment = true}) {
-        if (!increment) {
-            state.pendingPrimaryDataFetches--;
+    updatePendingPrimaryDataFetches (state, {instanceId, add = true}) {
+        if (!add) {
+            state.pendingPrimaryDataFetches.delete(instanceId);
             return;
         }
 
-        state.pendingPrimaryDataFetches++;
+        state.pendingPrimaryDataFetches.add(instanceId);
     },
     /**
      * Adds the fetched dossier data into the existing data class object.

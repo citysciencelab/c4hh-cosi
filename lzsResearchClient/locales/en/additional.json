@@ -99,8 +99,7 @@
                         "download": "Download",
                         "preview": "Preview"
                       }
-                    },
-                    "loading": "Loading dataset {{current}} of {{total}} ..."
+                    }
                 }
             },
             "zipAndDownload": {

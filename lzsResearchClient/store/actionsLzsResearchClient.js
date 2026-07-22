@@ -215,7 +215,11 @@ export default {
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}`, params);
 
-        commit("updatePendingPrimaryDataFetches", {increment: true});
+        if (state.pendingPrimaryDataFetches.has(instanceId)) {
+            return;
+        }
+
+        commit("updatePendingPrimaryDataFetches", {instanceId: instanceId, add: true});
 
         try {
             await axios.get(url, {signal})
@@ -239,7 +243,7 @@ export default {
 
         }
         finally {
-            commit("updatePendingPrimaryDataFetches", {increment: false});
+            commit("updatePendingPrimaryDataFetches", {instanceId: instanceId, add: false});
         }
     },
     /**

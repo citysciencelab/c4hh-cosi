@@ -43,7 +43,7 @@ export default {
             }
         }
     },
-    emits: ["openDetails", "showPreview", "download", "clearOtherGeom", "showGeomAgain", "primaryDataFetched", "toggleAllRowsOnThisTable"],
+    emits: ["openDetails", "showPreview", "download", "clearOtherGeom", "showGeomAgain"],
     data () {
         return {
             currentSorting: {
@@ -109,8 +109,6 @@ export default {
                         instanceId: entry.instanceId,
                         archiveId: entry.archiveId
                     });
-
-                    this.$emit("primaryDataFetched");
                 }
             });
 
@@ -389,16 +387,6 @@ export default {
          * @param {Boolean} changeTo - Is the new checked value for the table.
          */
         async toggleAllRows (changeTo) {
-            const checkedUniqueInstanceIdsWithoutPrimaryData = [...new Set(
-                this.sortedData
-                    .filter(dataset => !dataset.primaryData)
-                    .map(dataset => dataset.instanceId)
-            )];
-
-            if (changeTo && checkedUniqueInstanceIdsWithoutPrimaryData.length > 0) {
-                this.$emit("toggleAllRowsOnThisTable", checkedUniqueInstanceIdsWithoutPrimaryData.length);
-            }
-
             this.sortedData.forEach(dataset => {
                 dataset.checked = changeTo;
             });
