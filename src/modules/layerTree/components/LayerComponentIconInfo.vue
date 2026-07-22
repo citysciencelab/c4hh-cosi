@@ -1,6 +1,7 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 
 /**
  * Represents an info button for a layer in the layertree.
@@ -34,7 +35,7 @@ export default {
         ...mapMutations("Modules/LayerSelection", ["setLayerInfoVisible"]),
 
         showLayerInformation () {
-            this.startLayerInformation(this.layerConf);
+            this.startLayerInformation(addSourceToPayload(this, this.layerConf));
             if (!this.isLayerTree) {
                 this.setLayerInfoVisible(true);
             }

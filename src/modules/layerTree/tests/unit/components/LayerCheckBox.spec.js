@@ -314,7 +314,8 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                     id: layer.id,
                     visibility: true
                 }
-            }]
+            }],
+            _source: LayerCheckBox.name
         };
         let checkbox = null;
 
@@ -344,7 +345,8 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                     id: layer.id,
                     visibility: false
                 }
-            }]
+            }],
+            _source: LayerCheckBox.name
         };
         let checkbox = null;
 
@@ -375,7 +377,8 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                     id: layer.id,
                     visibility: true
                 }
-            }]
+            }],
+            _source: LayerCheckBox.name
         };
         let checkbox = null;
 
@@ -402,7 +405,8 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                     id: layer.id,
                     visibility: true
                 }
-            }]
+            }],
+            _source: LayerCheckBox.name
         };
         let checkbox = null;
 
@@ -429,7 +433,8 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                     id: layer.id,
                     visibility: false
                 }
-            }]
+            }],
+            _source: LayerCheckBox.name
         };
         let radio = null;
 

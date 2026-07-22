@@ -310,7 +310,8 @@ describe("src/modules/LayerPills.vue", () => {
                         id: visibleLayers[0].id,
                         visibility: false
                     }
-                }]
+                }],
+                _source: LayerPillsComponent.name
             });
         });
 

@@ -214,6 +214,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
                 type: "layerSelection",
                 side: "mainMenu",
                 props: {
+                    "layerId": "1",
                     "name": layer.name
                 }
             }

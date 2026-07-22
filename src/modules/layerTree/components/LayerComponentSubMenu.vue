@@ -116,7 +116,7 @@ export default {
             this.changeCurrentComponent({
                 type: this.layerSelectionType,
                 side: this.menuSide,
-                props: {name: this.layerSelectionName}}
+                props: {layerId: this.layerConf.id, name: this.layerSelectionName}}
             );
             this.showLayer({layerId: this.layerConf.id});
         }

@@ -52,11 +52,6 @@ const Config = {
         changeLanguageOnStartWhen: ["querystring", "localStorage", "htmlTag"]
     },
     userTracking: {
-        global: {
-            privacy: {
-                "allowInputTracking": true
-            }
-        },
         matomo: {
             customDimension: [
                 {id: 1, name: "portal"}
@@ -74,7 +69,12 @@ const Config = {
             trackerScriptUrl: "https://matomo.be-on.de/matomo.js",
             trackerUrl: "https://matomo.be-on.de/matomo.php",
             trackInitialView: true
+        },
+        options: {
+            "enableInputTracking": true,
+            "enableLinkTracking": true
         }
+
     }
 };
 

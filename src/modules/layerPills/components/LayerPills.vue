@@ -2,6 +2,7 @@
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import layerTypes from "@core/layers/js/layerTypes.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 
 /**
  * Layer Pills: show enabled toplayers as Buttons on top of the map. Adds Ability to remove Layers and call Layerinformation without using Layertree or open Menu.
@@ -148,15 +149,18 @@ export default {
          * @returns {void}
          */
         removeLayerFromVisibleLayers (layer) {
-            this.replaceByIdInLayerConfig({
-                layerConfigs: [{
-                    id: layer.id,
-                    layer: {
+            this.replaceByIdInLayerConfig(addSourceToPayload(
+                this,
+                {
+                    layerConfigs: [{
                         id: layer.id,
-                        visibility: false
-                    }
-                }]
-            });
+                        layer: {
+                            id: layer.id,
+                            visibility: false
+                        }
+                    }]
+                }
+            ));
         },
         /**
          * starts the Module layerInformation for given Layer
@@ -165,7 +169,7 @@ export default {
          */
         showLayerInformationInMenu (layerConf) {
             if (layerConf.datasets || layerConf.typ?.startsWith("GROUP")) {
-                this.startLayerInformation(layerConf);
+                this.startLayerInformation(addSourceToPayload(this, layerConf));
             }
         },
         /**

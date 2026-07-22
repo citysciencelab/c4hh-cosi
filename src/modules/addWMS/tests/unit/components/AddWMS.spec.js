@@ -412,7 +412,8 @@ describe("src/modules/addWMS/components/AddWMS.vue", () => {
             expect(addLayerToLayerConfigSpy.calledOnce).to.be.true;
             expect(addLayerToLayerConfigSpy.firstCall.args[1]).to.deep.equals({
                 layerConfig: folder,
-                parentKey: "subjectlayer"
+                parentKey: "subjectlayer",
+                _source: AddWMSComponent.name
             });
 
         });

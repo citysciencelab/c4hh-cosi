@@ -4,6 +4,7 @@ import {WMSCapabilities} from "ol/format.js";
 import {intersects} from "ol/extent.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 import axios from "axios";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 import {deleteParams} from "@shared/js/utils/deleteUrlParams.js";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
@@ -290,7 +291,10 @@ export default {
          * @returns {void}
          */
         addLayerToTopicTree: function (folder) {
-            this.addLayerToLayerConfig({layerConfig: folder, parentKey: treeSubjectsKey}).then((addedLayer) => {
+            this.addLayerToLayerConfig(addSourceToPayload(
+                this,
+                {layerConfig: folder, parentKey: treeSubjectsKey}
+            )).then((addedLayer) => {
                 if (addedLayer) {
                     this.addSingleAlert({
                         content: this.showInLayerTree ? this.$t("common:modules.addWMS.completeMessageShowInLayerTree") : this.$t("common:modules.addWMS.completeMessage"),

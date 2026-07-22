@@ -2,7 +2,9 @@
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import LayerPreview from "@shared/modules/layerPreview/components/LayerPreview.vue";
 import baselayerHandler from "../../layerSelection/js/handleSingleBaselayer.js";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 import escapeId from "@shared/js/utils/escapeId.js";
+
 /**
  * Displays a checkbox to select a layer in layertree.
  * @module modules/layerTree/components/LayerCheckBox
@@ -91,7 +93,7 @@ export default {
             if (this.conf.baselayer) {
                 baselayerHandler.checkAndAdd(this.singleBaselayer, this.visibleBaselayerConfigs, layerConfigs);
             }
-            this.replaceByIdInLayerConfig({layerConfigs});
+            this.replaceByIdInLayerConfig(addSourceToPayload(this, {layerConfigs}));
         },
         /**
          * Listener for click on layer checkbox.

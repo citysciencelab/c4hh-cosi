@@ -1,6 +1,7 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
 import ScaleLine from "./ScaleLine.vue";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 
 /**
  * Footer that is displayed below the map. Links can be displayed here.
@@ -78,7 +79,10 @@ export default {
                 this.toggleMenu("secondaryMenu");
             }
 
-            this.changeCurrentComponent({type: "about", side: this.aboutModuleSide, props: {name: this.$t("common:modules.about.name")}});
+            this.changeCurrentComponent(addSourceToPayload(
+                this,
+                {type: "about", side: this.aboutModuleSide, props: {name: this.$t("common:modules.about.name")}}
+            ));
 
             // timeout is needed to scroll to the correct position of the imprint
             setTimeout(() => {
