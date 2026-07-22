@@ -662,10 +662,12 @@ export default {
             });
 
             if (!signal.aborted) {
+                const zipFileName = state.zipFileName[i18next.language] || state.zipFileName.de;
+
                 saveAs(
                     new Blob([zippedData], {type: "application/zip"}),
                     null,
-                    state.zipFileName + ".zip"
+                    zipFileName + ".zip"
                 );
             }
 
