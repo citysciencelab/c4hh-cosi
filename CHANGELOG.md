@@ -7,6 +7,7 @@
 ### __Breaking Changes__
 
 ### Added
+- package.json: new command `npm run deleteAllNodeModules` added.
 
 ### Changed
  - The following packages have been updated:
@@ -19,6 +20,7 @@
         - @turf/helpers": ^7.2.0 to ^7.3.5
         - @turf/intersect": ^7.2.0 to ^7.3.5
 - vcOblique: Replaced iframe-resizer package with CSS-based iframe sizing.
+- package.json: postinstall script detects package.json files automatically and does not fail, if one of the installs fails.
 
 ### Deprecated
 
