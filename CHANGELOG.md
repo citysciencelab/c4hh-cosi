@@ -31,6 +31,7 @@
         - vite: 8.0.14 to 8.1.4
 - Tests: Tests now fail on vue warnings.
 - Tests: excluded barchart and piechart tests due to issues with the prePushHook.
+- ResizeHandle: Simplified component by removing multi-directional resize infrastructure to support menu width resizing only (left/right positions).
 
 ### Deprecated
 
