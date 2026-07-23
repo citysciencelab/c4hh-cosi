@@ -27,6 +27,7 @@ import {Fill, Stroke, Style} from "ol/style";
 import {getArea} from "ol/sphere";
 
 import {mapGetters, mapActions, mapMutations} from "vuex";
+import Multiselect from "vue-multiselect";
 
 /**
  * Rectangle interaction class extending ExtentInteraction to handle rectangle drawing events.
@@ -81,7 +82,8 @@ export default {
         DrawEdit,
         ButtonGroup,
         SwitchInput,
-        LzsResearchClientSearchBar
+        LzsResearchClientSearchBar,
+        Multiselect
     },
     inject: {
         setCurrentTab: {from: TAB_SET_CURRENT, default: null}
@@ -108,7 +110,9 @@ export default {
             parcelNumberInputValue: "",
             archiveLayerOriginalState: {},
             bulkYearsLoading: false,
-            selectAllCancelled: false
+            selectAllCancelled: false,
+            districtParcels: [],
+            districtParcelsLoading: false
         };
     },
     computed: {
@@ -269,6 +273,31 @@ export default {
             }
 
             return false;
+        },
+        parcelDistrictOptions () {
+            if (!this.parcelSourceData) {
+                return [];
+            }
+            return Object.keys(this.parcelSourceData).map(name => ({
+                label: `${name} (${this.parcelSourceData[name].id})`,
+                value: this.parcelSourceData[name].id
+            }));
+        },
+        selectedParcelDistrictObject: {
+            get () {
+                if (!this.selectedParcelDistrict) {
+                    return null;
+                }
+                return this.parcelDistrictOptions.find(opt => opt.value === this.selectedParcelDistrict) || null;
+            },
+            set (val) {
+                this.setSelectedParcelDistrict(val ? val.value : null);
+            }
+        },
+        districtParcelNumbersSorted () {
+            return [...this.districtParcels]
+                .map(feature => Number(feature.properties.flstnrzae))
+                .sort((a, b) => a - b);
         }
     },
     watch: {
@@ -404,6 +433,41 @@ export default {
          */
         setSelectedParcelDistrict (parcelDistrict) {
             this.selectedParcelDistrict = parcelDistrict;
+            this.parcelNumberInputValue = "";
+
+            this.getParcelsByDistrict(parcelDistrict, this.alkisBaseUrl);
+        },
+        /**
+         * Fetches all parcels for a given district from the OAF Feature service.
+         * @param {string} district - The parcel district to fetch parcels for.
+         * @param {string} baseUrl - The base URL of the ALKIS service.
+         * @returns {Promise<void>}
+         */
+        async getParcelsByDistrict (district, baseUrl) {
+            if (!district || !baseUrl) {
+                return;
+            }
+
+            this.districtParcelsLoading = true;
+
+            try {
+                this.districtParcels = await getOAFFeature.getOAFFeatureGet(this.alkisBaseUrl, "Flurstueck", {
+                    limit: 10000,
+                    filterCrs: "http://www.opengis.net/def/crs/EPSG/0/25832",
+                    crs: "http://www.opengis.net/def/crs/EPSG/0/25832",
+                    filter: true,
+                    literalFilters: {gemaschl: "02" + this.selectedParcelDistrict},
+                    skipGeometry: true,
+                    propertyNames: ["flstnrzae"]
+                });
+            }
+            catch (error) {
+                console.warn("An error has occurred when fetching parcels for district", district, error);
+                this.districtParcels = [];
+            }
+            finally {
+                this.districtParcelsLoading = false;
+            }
         },
         /**
          * Initialize archive and form data structures from `dataClassList`.
@@ -1082,13 +1146,14 @@ export default {
                     literalFilters: {gemaschl: "02" + this.selectedParcelDistrict, flstnrzae: this.parcelNumberInputValue}
                 });
 
-                this.showSpinner = false;
-
                 return parcelGeoJson;
             }
             catch (error) {
                 console.warn("An error has occurred when requesting the parcel features", error);
                 return null;
+            }
+            finally {
+                this.showSpinner = false;
             }
         },
         /**
@@ -1463,63 +1528,67 @@ export default {
                         v-if="selectedButtonGroup === 'parcel'"
                         class="spatialSelectionButtons parcelSearch d-flex flex-column"
                     >
-                        <div>
+                        <div class="parcelSearchInputs">
                             <label for="parcelSearchSelect">
                                 {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictLabel") }}
                             </label>
 
-                            <select
+                            <Multiselect
                                 id="parcelSearchSelect"
-                                class="form-select archive"
-                                :value="selectedParcelDistrict"
-                                @change="setSelectedParcelDistrict($event.target.value)"
+                                v-model="selectedParcelDistrictObject"
+                                :options="parcelDistrictOptions"
+                                label="label"
+                                :show-labels="false"
+                                :searchable="true"
+                                :multiple="false"
+                                :close-on-select="true"
+                                :clear-on-select="false"
+                                :allow-empty="false"
+                                :preserve-search="true"
+                                :hide-selected="false"
+                                :internal-search="true"
+                                :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictPlaceholder')"
+                                :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictLabel')"
+                                @select="val => setSelectedParcelDistrict(val ? val.value : null)"
                             >
-                                <option
-                                    v-for="(_, name) in parcelSourceData"
-                                    :key="name"
-                                    :value="parcelSourceData[name].id"
-                                >
-                                    {{ name + " (" + parcelSourceData[name].id + ")" }}
-                                </option>
-                            </select>
-                        </div>
+                                <template #option="props">
+                                    <div class="attribute-option-wrapper">
+                                        <span :class="`attribute-check-icon ${props.option.value === selectedParcelDistrictObject?.value ? 'bi bi-check2' : ''}`" />
+                                        <span>{{ props.option.label }}</span>
+                                    </div>
+                                </template>
+                            </Multiselect>
 
-                        <label for="parcelNumber">
-                            {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel") }}
-                        </label>
+                            <label for="parcelNumber">
+                                {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel") }}
+                            </label>
 
-                        <div class="input-group">
-                            <input
+                            <Multiselect
                                 id="parcelNumber"
-                                ref="parcelNumberInput"
                                 v-model="parcelNumberInputValue"
-                                type="search"
-                                class="form-control"
+                                :disabled="!districtParcelNumbersSorted.length"
+                                :options="districtParcelNumbersSorted"
+                                :show-labels="false"
+                                :searchable="true"
+                                :multiple="false"
+                                :close-on-select="true"
+                                :clear-on-select="false"
+                                :preserve-search="true"
+                                :hide-selected="false"
+                                :allow-empty="false"
+                                :internal-search="true"
+                                :loading="districtParcelsLoading"
+                                :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberPlaceholder')"
                                 :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel')"
+                                @select="handleParcelSearchSubmit"
                             >
-                            <button
-                                v-if="parcelNumberInputValue"
-                                class="btn-icon input-icon reset-button"
-                                type="button"
-                                aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearchCancel.clearParcelSearch')"
-                                @click="clearParcelSearch(false)"
-                            >
-                                <i class="bi-x-lg fs-6" />
-                            </button>
-                            <button
-                                id="lzs-research-client-parcel-search-button"
-                                class="btn btn-primary"
-                                :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel')"
-                                type="button"
-                                :disabled="!parcelNumberInputValue || !selectedParcelDistrict"
-                                @click="handleParcelSearchSubmit"
-                                @keydown.enter="handleParcelSearchSubmit"
-                            >
-                                <i
-                                    class="bi-search"
-                                    role="img"
-                                />
-                            </button>
+                                <template #option="props">
+                                    <div class="attribute-option-wrapper">
+                                        <span :class="`attribute-check-icon ${props.option === parcelNumberInputValue ? 'bi bi-check2' : ''}`" />
+                                        <span>{{ props.option }}</span>
+                                    </div>
+                                </template>
+                            </Multiselect>
                         </div>
                     </div>
 
@@ -1562,6 +1631,8 @@ export default {
         </div>
     </div>
 </template>
+
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style lang="scss" scoped>
     #TabSearch {
@@ -1660,53 +1731,51 @@ export default {
                         display: none;
                     }
                 }
+            }
 
-                &.parcelSearch {
-                    div.input-group {
-                        position: relative;
+            div.parcelSearchInputs {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
 
-                        #lzs-research-client-parcel-search-button {
-                            border-top-right-radius: 5px;
-                            border-bottom-right-radius: 5px;
-                            position: relative;
+            :deep(.parcelSearchInputs) {
+                    .multiselect,
+                    .multiselect__input::placeholder,
+                    .multiselect__option {
+                        color: $black;
+                        font-weight: normal;
+                    }
 
+                    .multiselect__option {
+                        &:after,
+                        &--selected,
+                        &--selected:after {
+                            color: black;
+                            background: $light_grey_hover;
                         }
 
-                        .input-label {
-                            color: $placeholder-color;
-                        }
-
-                        input[type="search"] {
-                            -webkit-appearance: none;
-                            appearance: none;
-
-                            &::-webkit-search-cancel-button {
-                                display: none;
-                            }
-                        }
-
-                        .btn-icon {
-                            position: absolute;
-                            right: 40px;
-                            top: 40%;
-                            transform: translateY(-50%);
-                            background-color: rgba(0, 0, 0, 0);
-                            border: none;
-                            padding: 5px 0 0 10px;
-                            z-index: 5;
-                        }
-
-                        .input-icon {
-                            margin-left: -37px;
-                        }
-
-                        .reset-button {
-                            cursor: pointer;
+                        &--highlight,
+                        &--highlight:after {
+                            color: $white;
+                            background: $secondary;
                         }
                     }
 
+                    .multiselect__input:focus::placeholder {
+                        color: transparent;
+                    }
+
+                    .attribute-option-wrapper {
+                        display: flex;
+                        flex-direction: row;
+                        gap: 0.5rem;
+
+                        .attribute-check-icon {
+                            width: 16px;
+                        }
+                    }
                 }
-            }
 
             div.spatialSelection {
                 .level-switch {

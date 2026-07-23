@@ -68,6 +68,8 @@
                     "geometryAreaWarningMessage": "Die Fläche der eingezeichneten Geometrie beträgt {{ area }} km². Dies überschreitet die maximal erlaubte Fläche von {{ maxArea }} km². Bitte zeichnen Sie eine kleinere Fläche, um die Suche zu aktivieren.",
                     "selectParcelDistrictLabel": "Gemarkung",
                     "parcelNumberLabel": "Flurstücksnummer",
+                    "selectParcelDistrictPlaceholder": "Bitte die Gemarkung auswählen",
+                    "parcelNumberPlaceholder": "Bitte die Flurstücksnummer auswählen",
                     "parcelSearchNoResults": "Es wurden keine Flurstücksgeometrien für die eingegebene Gemarkung und Flurstücksnummer gefunden.",
                     "layerConfigNotFound": "Layer-Konfiguration für die Layer-ID {{ layerId }} konnte nicht gefunden werden.",
                     "selectAll": "Alles auswählen",
