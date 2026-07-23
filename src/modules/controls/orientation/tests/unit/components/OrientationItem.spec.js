@@ -14,8 +14,12 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     let store,
         onlyFilteredFeatures = false,
         showDirection = false,
+        showAccuracy = false,
+        geolocation,
         iconGeolocationMarker,
-        iconDirectionArrow;
+        iconDirectionArrow,
+        originalMapCollection,
+        mapMock;
     const mockAlertingActions = {
         addSingleAlert: sinon.stub()
     };
@@ -24,6 +28,18 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         iconGeolocationMarker = "bi-crosshair";
         iconDirectionArrow = "bi-arrow-up";
         showDirection = false;
+        showAccuracy = false;
+        geolocation = null;
+        mapMock = {
+            addLayer: sinon.stub(),
+            addOverlay: sinon.stub(),
+            removeLayer: sinon.stub(),
+            removeOverlay: sinon.stub()
+        };
+        originalMapCollection = globalThis.mapCollection;
+        globalThis.mapCollection = {
+            getMap: sinon.stub().returns(mapMock)
+        };
         store = createStore({
             namespaced: true,
             modules: {
@@ -33,7 +49,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
                         Orientation: {
                             namespaced: true,
                             getters: {
-                                geolocation: sinon.stub(),
+                                geolocation: () => geolocation,
                                 iconGeolocate: sinon.stub(),
                                 iconGeolocatePOI: sinon.stub(),
                                 iconGeolocationMarker: () => iconGeolocationMarker,
@@ -45,11 +61,20 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
                                 showPoiChoice: sinon.stub(),
                                 showPoiIcon: sinon.stub(),
                                 showDirection: () => showDirection,
-                                showAccuracy: () => false,
+                                showAccuracy: () => showAccuracy,
                                 zoomMode: sinon.stub(),
                                 onlyFilteredFeatures: () => onlyFilteredFeatures
                             }
                         }
+                    }
+                },
+                Maps: {
+                    namespaced: true,
+                    getters: {
+                        projection: () => ({
+                            getCode: () => "EPSG:25832"
+                        }
+                        )
                     }
                 },
                 Alerting: {
@@ -65,6 +90,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     });
 
     afterEach(() => {
+        globalThis.mapCollection = originalMapCollection;
         sinon.restore();
     });
 
@@ -116,6 +142,41 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         wrapper.vm.heading = Math.PI / 2;
 
         expect(wrapper.vm.markerDirectionStyle["--marker-heading-angle"]).to.equal("90deg");
+    });
+
+    it("shows accuracy layer with marker overlay when accuracy is enabled", () => {
+        showAccuracy = true;
+        geolocation = {
+            getAccuracyGeometry: sinon.stub().returns(null)
+        };
+        const wrapper = shallowMount(OrientationItemComponent, {
+            global: {
+                plugins: [store]
+            }});
+
+        wrapper.vm.showMarkerOverlay();
+
+        expect(mapMock.addOverlay.calledOnceWithExactly(wrapper.vm.marker)).to.be.true;
+        expect(mapMock.addLayer.calledOnce).to.be.true;
+        expect(wrapper.vm.accuracyLayer).to.not.equal(null);
+    });
+
+    it("removes accuracy layer when marker overlay is removed", () => {
+        showAccuracy = true;
+        geolocation = {
+            getAccuracyGeometry: sinon.stub().returns(null)
+        };
+        const wrapper = shallowMount(OrientationItemComponent, {
+            global: {
+                plugins: [store]
+            }});
+
+        wrapper.vm.showMarkerOverlay();
+        wrapper.vm.removeOverlay();
+
+        expect(mapMock.removeOverlay.calledOnceWithExactly(wrapper.vm.marker)).to.be.true;
+        expect(mapMock.removeLayer.calledOnce).to.be.true;
+        expect(wrapper.vm.accuracyLayer).to.equal(null);
     });
 
     describe("OrientationItem.vue methods", () => {

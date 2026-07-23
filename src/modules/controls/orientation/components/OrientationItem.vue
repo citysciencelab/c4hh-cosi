@@ -117,11 +117,7 @@ export default {
             geolocation: this.geolocation,
             listener: this.onAccuracyGeometryChange
         });
-        removeAccuracyLayerUtil({
-            accuracyLayer: this.accuracyLayer,
-            map: mapCollection.getMap("2D")
-        });
-        this.accuracyLayer = null;
+        this.removeOverlay();
     },
     methods: {
         ...mapMutations("Controls/Orientation", Object.keys(mutations)),
@@ -183,15 +179,28 @@ export default {
             geolocation.un("change:accuracyGeometry", this.onAccuracyGeometryChange);
         },
 
-        bindGeolocationListeners (geolocation) {
+        /**
+         * Shows marker overlay and accuracy layer on map.
+         * @returns {void}
+         */
+        showMarkerOverlay () {
+            const map = mapCollection.getMap("2D");
+
+            map.addOverlay(this.marker);
             if (this.showAccuracy) {
                 const {accuracyLayer} = initAccuracyLayerUtil({
                     accuracyFeature: this.accuracyFeature,
                     accuracyLayer: this.accuracyLayer,
-                    map: mapCollection.getMap("2D")
+                    map
                 });
 
                 this.accuracyLayer = accuracyLayer;
+                this.onAccuracyGeometryChange();
+            }
+        },
+
+        bindGeolocationListeners (geolocation) {
+            if (this.showAccuracy) {
                 geolocation.on("change:accuracyGeometry", this.onAccuracyGeometryChange);
             }
 
@@ -227,9 +236,9 @@ export default {
                 return;
             }
 
-            mapCollection.getMap("2D").addOverlay(this.marker);
             const geolocation = this.ensureGeolocationInstance();
 
+            this.showMarkerOverlay();
             this.unbindGeolocationListeners(geolocation);
             this.bindGeolocationListeners(geolocation);
             this.startTrackingSession(geolocation);
@@ -280,7 +289,14 @@ export default {
          * @returns {void}
          */
         removeOverlay () {
-            mapCollection.getMap("2D").removeOverlay(this.marker);
+            const map = mapCollection.getMap("2D");
+
+            map.removeOverlay(this.marker);
+            removeAccuracyLayerUtil({
+                accuracyLayer: this.accuracyLayer,
+                map
+            });
+            this.accuracyLayer = null;
         },
 
         /**
@@ -438,7 +454,7 @@ export default {
 
             if (this.poiModeCurrentPositionEnabled) {
                 this.$store.dispatch("Maps/removePointMarker");
-                mapCollection.getMap("2D").addOverlay(this.marker);
+                this.showMarkerOverlay();
                 if (this.geolocation === null) {
                     geolocation = new Geolocation({tracking: true, enableHighAccuracy: true, projection: Proj.get("EPSG:4326")});
                     this.setGeolocation(geolocation);
