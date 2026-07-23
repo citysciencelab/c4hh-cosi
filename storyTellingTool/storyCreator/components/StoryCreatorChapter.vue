@@ -839,11 +839,11 @@ export default {
                     :disabled="isButtonDisabled"
                     @click.native="getMapPosition()"
                 />
-                <div v-if="confirmedCoordinate.length && confirmedZoomlevel !== ''">
+                <div v-if="mode !== '3D' && confirmedCoordinate.length && confirmedZoomlevel !== ''">
                     {{ $t("additional:modules.storyCreator.chapter.currentPosition") }}
                 </div>
                 <div
-                    v-if="confirmedCoordinate.length && confirmedZoomlevel !== ''"
+                    v-if="mode !== '3D' && confirmedCoordinate.length && confirmedZoomlevel !== ''"
                     class="p-2 d-flex flex-row align-center"
                 >
                     <div class="p-1 fs-3">
