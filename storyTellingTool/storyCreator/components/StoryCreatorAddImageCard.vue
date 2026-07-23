@@ -59,11 +59,11 @@ export default {
             return Boolean(this.currentAsset?.id && this.currentAsset?.objectURL);
         },
         /**
-         * Returns true if the alt and copyright are not empty.
+         * Returns true if the alt and copyright are not empty and image is loaded.
          * @returns {Boolean} True if the alt and copyright are not empty.
          */
         enableAdd () {
-            if (this.image?.alt.trim() !== "" && this.image?.copyright.trim() !== "") {
+            if (this.image?.alt.trim() !== "" && this.image?.copyright.trim() !== "" && this.isImageLoaded) {
                 return true;
             }
 
@@ -175,7 +175,6 @@ export default {
                 @closed="isValidated = true"
             />
             <div
-                v-if="isImageLoaded"
                 class="d-flex justify-content-center gap-2"
             >
                 <FlatButton

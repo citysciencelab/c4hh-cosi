@@ -128,8 +128,11 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.findAllComponents({name: "InputText"}).length).to.equal(2);
         });
 
-        it("should render the FlatButton component only if isImageLoaded is true", async () => {
-            expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.false;
+        it("should render the save FlatButton disabled initially, and enable it when alt, copyright are set and image is loaded", async () => {
+            const saveButton = wrapper.findComponent({name: "FlatButton"});
+
+            expect(saveButton.exists()).to.be.true;
+            expect(saveButton.props("disabled")).to.be.true;
 
             await wrapper.setData({
                 uploadedAsset: {
@@ -140,10 +143,11 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
                     id: "test-uuid",
                     alt: "alt",
                     copyright: "copyright"
-                }
+                },
+                isImageLoaded: true
             });
 
-            expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
+            expect(saveButton.props("disabled")).to.be.false;
         });
 
         it("should not render AlertMessage components", () => {
@@ -158,16 +162,17 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
     });
 
     describe("Computed Properties", () => {
-        it("should set computed 'enableAdd' to false", () => {
+        it("should set computed 'enableAdd' to false initially", () => {
             expect(wrapper.vm.enableAdd).to.be.false;
         });
 
-        it("should set computed 'enableAdd' to true", async () => {
+        it("should set computed 'enableAdd' to true when alt, copyright are set and image is loaded", async () => {
             await wrapper.setData({
                 image: {
                     alt: "alt",
                     copyright: "copyright"
-                }
+                },
+                isImageLoaded: true
             });
 
             expect(wrapper.vm.enableAdd).to.be.true;
