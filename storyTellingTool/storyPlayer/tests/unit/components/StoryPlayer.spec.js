@@ -416,6 +416,16 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
 
             expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.true;
         });
+
+        it("should not render AlertMessage component", () => {
+            expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.false;
+        });
+
+        it("should render AlertMessage component", async () => {
+            await wrapper.setData({showImportWarning3D: [false, true]});
+
+            expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
+        });
     });
 
     describe("Methods", () => {

@@ -11,6 +11,7 @@
       "importButton": "Import",
       "importErrorTitle": "Import failed",
       "importErrorText": "Only ZIP files created with this application can be loaded.",
+      "importWarning3D": "The 3D Layer will not be loaded, because the 3d-modus is not configured in this portal.",
       "createdAt": "Created on:",
       "chapters": "Chapters",
       "emptyStory": "There are no stories yet."

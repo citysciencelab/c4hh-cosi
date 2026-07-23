@@ -1,4 +1,5 @@
 <script>
+import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMessage.vue";
 import axios from "axios";
 import {boundingExtent} from "ol/extent.js";
 import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
@@ -16,6 +17,7 @@ import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/
 export default {
     name: "StoryPlayer",
     components: {
+        AlertMessage,
         FlatButton,
         IconButton,
         StoryPlayerFeature,
@@ -32,6 +34,7 @@ export default {
             loadedContent: null,
             overlay: null,
             scroller: null,
+            showImportWarning3D: [],
             showMode: "",
             showStickyHeader: false,
             toolBodyScrollTop: 0
@@ -60,6 +63,7 @@ export default {
         ...mapGetters([
             "addLayerButton",
             "allLayerConfigs",
+            "controlsConfig",
             "layerConfigById",
             "visibleBaselayerConfigs"
         ]),
@@ -355,6 +359,15 @@ export default {
             // Updates the tool width
             if (this.currentChapter.stepWidth) {
                 this.setInitialWidth(this.currentChapter.stepWidth);
+            }
+
+            if (this.currentChapter.is3D && this.controlsConfig?.button3d !== true) {
+                this.showImportWarning3D[this.currentChapterIndex] = true;
+                return;
+            }
+
+            if (this.currentChapter.is3D && this.mode === "2D") {
+                this.changeMapMode("3D");
             }
 
             // Toggles 3D map mode
@@ -868,6 +881,14 @@ export default {
                             </div>
                         </div>
                     </div>
+                    <AlertMessage
+                        v-if="showImportWarning3D[index]"
+                        class="mt-2"
+                        :closeable="true"
+                        :text="$t('additional:modules.storyManager.importWarning3D')"
+                        type="warning"
+                        @closed="showImportWarning3D[index] = false"
+                    />
                     <div
                         v-if="index === currentChapterIndex && index < storyConf.chapters.length - 1"
                         class="d-flex justify-content-center py-2"

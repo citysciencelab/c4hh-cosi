@@ -22,10 +22,12 @@ export default {
     data () {
         return {
             currentView: "manager",
-            showImportError: false
+            showImportError: false,
+            showImportWarning3D: false
         };
     },
     computed: {
+        ...mapGetters(["controlsConfig"]),
         ...mapGetters("Modules/StoryManager", [
             "fixedStoryFiles",
             "fixedStoryLoaded",
@@ -252,6 +254,8 @@ export default {
                 return;
             }
 
+            this.showImportWarning3D = false;
+
             try {
                 const {storyJson, imageAssetsById} = await extractStoryZip(selectedFile);
 
@@ -262,7 +266,12 @@ export default {
                     },
                     ...this.storyList
                 ]);
+
                 this.showImportError = false;
+
+                if (Array.isArray(storyJson?.chapters)) {
+                    this.showImportWarning3D = storyJson?.chapters.some(chapter => chapter.is3D === true) && this.controlsConfig?.button3d !== true;
+                }
             }
             catch (error) {
                 this.showImportError = true;
@@ -355,6 +364,14 @@ export default {
                     :title="$t('additional:modules.storyManager.importErrorTitle')"
                     type="error"
                     @closed="showImportError = false"
+                />
+                <AlertMessage
+                    v-if="showImportWarning3D"
+                    class="mt-2"
+                    :closeable="true"
+                    :text="$t('additional:modules.storyManager.importWarning3D')"
+                    type="warning"
+                    @closed="showImportWarning3D = false"
                 />
             </div>
             <InfoText

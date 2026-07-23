@@ -142,6 +142,17 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
         it("should not find InfoText component", () => {
             expect(wrapper.findComponent({name: "InfoText"}).exists()).to.be.false;
         });
+
+        it("should not find AlertMessage component", () => {
+            expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.false;
+        });
+
+        it("should find AlertMessage component", async () => {
+            await wrapper.setData({showImportError: true, showImportWarning3D: true});
+
+            expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
+            expect(wrapper.findAllComponents({name: "AlertMessage"}).length).to.equal(2);
+        });
     });
 
     describe("Methods", () => {
