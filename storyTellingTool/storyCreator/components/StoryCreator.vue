@@ -58,11 +58,27 @@ export default {
             chapterContent: JSON.parse(JSON.stringify(this.story?.chapters || [])),
             imageLoaded: false,
             editingChapterIndex: false,
-            workingImageAssetsById: Object.assign({}, this.imageAssetsById)
+            workingImageAssetsById: Object.assign({}, this.imageAssetsById),
+            showAutosaveHint: false,
+            liveChapterTitle: null
         };
     },
     computed: {
         ...mapGetters("Modules/StoryManager", ["menuSide"]),
+        /**
+         * Returns the title of the chapter currently being edited, or a fallback.
+         * @returns {String} The current chapter title.
+         */
+        currentEditingChapterTitle () {
+            if (this.liveChapterTitle !== null) {
+                return this.liveChapterTitle || this.$t("additional:modules.storyCreator.chapter.title");
+            }
+            if (this.editingChapterIndex !== false) {
+                return this.chapterContent[this.editingChapterIndex]?.title
+                    || this.$t("additional:modules.storyCreator.chapter.title");
+            }
+            return this.$t("additional:modules.storyCreator.chapter.title");
+        },
         /**
          * Returns the story object for preview with the current data.
          * @returns {Object} the story object for preview.
@@ -86,6 +102,13 @@ export default {
                 this.$nextTick(() => {
                     this.title = newVal.substring(0, 200);
                 });
+            }
+        },
+        showAutosaveHint (val) {
+            if (val) {
+                setTimeout(() => {
+                    this.showAutosaveHint = false;
+                }, 5000);
             }
         }
     },
@@ -147,7 +170,16 @@ export default {
          * @returns {void}
          */
         addChapter () {
+            this._initialChapterSnapshot = null;
+            this.liveChapterTitle = null;
             this.currentView = "chapter";
+            this.$nextTick(() => {
+                const chapterComp = this.$refs.chapterComp;
+
+                if (chapterComp) {
+                    this._initialChapterSnapshot = JSON.stringify(chapterComp.collectChapterData());
+                }
+            });
         },
 
         /**
@@ -195,8 +227,16 @@ export default {
          */
         editChapter (index) {
             this.editingChapterIndex = index;
-
+            this._initialChapterSnapshot = null;
+            this.liveChapterTitle = null;
             this.currentView = "chapter";
+            this.$nextTick(() => {
+                const chapterComp = this.$refs.chapterComp;
+
+                if (chapterComp) {
+                    this._initialChapterSnapshot = JSON.stringify(chapterComp.collectChapterData());
+                }
+            });
         },
 
         /**
@@ -333,6 +373,55 @@ export default {
         },
 
         /**
+         * Auto-saves the current chapter data into chapterContent, then switches to story view.
+         * Used by breadcrumb navigation to preserve changes without emitting save-chapter.
+         * @returns {void}
+         */
+        autosaveChapterAndGoToStory () {
+            const chapterComp = this.$refs.chapterComp;
+            let hasChanges = false;
+
+            if (chapterComp) {
+                const chapter = chapterComp.collectChapterData();
+
+                if (this.editingChapterIndex !== false) {
+                    hasChanges = JSON.stringify(chapter) !== this._initialChapterSnapshot;
+                    this.chapterContent.splice(this.editingChapterIndex, 1, chapter);
+                }
+                else {
+                    hasChanges = true;
+                    this.chapterContent = [...this.chapterContent, chapter];
+                }
+                this.editingChapterIndex = false;
+            }
+            this.currentView = "story";
+            this.showAutosaveHint = hasChanges;
+        },
+        /**
+         * Auto-saves the current chapter (if in chapter view) and then saves the story.
+         * Used by the parent (StoryManager) when main-menu navigation is intercepted.
+         * @returns {void}
+         */
+        autosaveForNavigation () {
+            if (this.currentView === "chapter") {
+                const chapterComp = this.$refs.chapterComp;
+
+                if (chapterComp) {
+                    const chapter = chapterComp.collectChapterData();
+
+                    if (this.editingChapterIndex !== false) {
+                        this.chapterContent.splice(this.editingChapterIndex, 1, chapter);
+                    }
+                    else {
+                        this.chapterContent = [...this.chapterContent, chapter];
+                    }
+                    this.editingChapterIndex = false;
+                }
+                this.currentView = "story";
+            }
+            this.saveStory();
+        },
+        /**
          * Goes to home page of story creator.
          * @returns {void}
          */
@@ -370,7 +459,64 @@ export default {
 
 <template lang="html">
     <div id="story-creator">
+        <nav
+            class="story-breadcrumb d-flex align-items-center mb-1"
+            aria-label="breadcrumb"
+        >
+            <ol class="breadcrumb mb-0 small">
+                <li class="breadcrumb-item">
+                    <a
+                        href="#"
+                        class="story-breadcrumb__link"
+                        @click.prevent="autosaveForNavigation"
+                    >{{ $t('additional:modules.storyManager.title') }}</a>
+                </li>
+                <li
+                    v-if="currentView === 'story'"
+                    class="breadcrumb-item active"
+                    aria-current="page"
+                >
+                    {{ $t('additional:modules.storyCreator.storyNav') }}: {{ title }}
+                </li>
+                <template v-else-if="currentView === 'chapter'">
+                    <li class="breadcrumb-item">
+                        <a
+                            href="#"
+                            class="story-breadcrumb__link"
+                            @click.prevent="autosaveChapterAndGoToStory"
+                        >{{ $t('additional:modules.storyCreator.storyNav') }}: {{ title }}</a>
+                    </li>
+                    <li
+                        class="breadcrumb-item active"
+                        aria-current="page"
+                    >
+                        {{ $t('additional:modules.storyCreator.chapterNav') }}: {{ currentEditingChapterTitle }}
+                    </li>
+                </template>
+            </ol>
+        </nav>
         <div v-if="currentView === 'story'">
+            <div class="story-creator-hint-area mb-1">
+                <Transition name="hint-fade">
+                    <div
+                        v-if="showAutosaveHint"
+                        class="alert alert-info d-flex align-items-center gap-2 mb-0 py-1 px-2 small"
+                        role="alert"
+                    >
+                        <i
+                            class="bi bi-check-circle-fill flex-shrink-0"
+                            aria-hidden="true"
+                        />
+                        <span>{{ $t('additional:modules.storyCreator.autosaveHint') }}</span>
+                        <button
+                            type="button"
+                            class="btn-close btn-sm ms-2"
+                            :aria-label="$t('common:button.close')"
+                            @click="showAutosaveHint = false"
+                        />
+                    </div>
+                </Transition>
+            </div>
             <h5 class="mb-4">
                 {{ $t("additional:modules.storyCreator.labels.editStory") }}
             </h5>
@@ -501,12 +647,14 @@ export default {
         </div>
         <div v-else-if="currentView === 'chapter'">
             <StoryCreatorChapter
+                ref="chapterComp"
                 :edit-index="editingChapterIndex"
                 :create-image-asset="createImageAsset"
                 :image-assets-by-id="workingImageAssetsById"
                 :initial-chapter="editingChapterIndex !== false ? chapterContent[editingChapterIndex] : null"
                 @save-chapter="handleSaveChapter"
                 @cancel-chapter="handleCancelChapter"
+                @update:chapter-title="liveChapterTitle = $event"
             />
         </div>
     </div>
@@ -515,22 +663,87 @@ export default {
 <style lang="scss" scoped>
 .chapter-title-image-preview {
     cursor: pointer;
+
     .chapter-title-image-close {
         display: none;
     }
+
     &:hover {
         outline: 1px solid $light_grey;
+
         .chapter-title-image-close {
             display: block;
         }
     }
+
     img {
         max-height: 50vh;
         object-fit: contain;
     }
 }
+
 .chapter-list-item {
     padding-left: 2.5rem;
     padding-right: 2.5rem;
+}
+
+.story-creator-hint-area {
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.hint-fade-enter-active {
+    transition: opacity 0.4s ease;
+}
+
+.hint-fade-leave-active {
+    transition: opacity 1s ease;
+}
+
+.hint-fade-enter-from,
+.hint-fade-leave-to {
+    opacity: 0;
+}
+</style>
+
+<style lang="scss">
+.story-breadcrumb {
+    font-size: 1rem;
+    --bs-breadcrumb-divider: ">";
+
+    .breadcrumb {
+        flex-wrap: nowrap;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+
+        &-item + &-item::before {
+            color: $link-color;
+        }
+
+        &-item.active {
+            color: $dark_blue;
+            max-width: 20rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            display: inline-block;
+        }
+    }
+
+    &__link {
+        color: $link-color;
+        text-decoration: none;
+        max-width: 12rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        display: inline-block;
+
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }
 </style>

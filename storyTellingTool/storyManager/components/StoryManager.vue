@@ -27,7 +27,8 @@ export default {
             showImportError: false,
             showImportWarning3D: false,
             showLeaveToolModal: false,
-            pendingNavigation: null
+            pendingNavigation: null,
+            savedStoryIndex: null
         };
     },
     computed: {
@@ -70,6 +71,20 @@ export default {
          */
         isInEditMode () {
             return this.currentView === "creator";
+        }
+    },
+    watch: {
+        /**
+         * Auto-hides the autosave hint after 5 seconds.
+         * @param {Number|null} val - The newly saved story index.
+         * @returns {void}
+         */
+        savedStoryIndex (val) {
+            if (val !== null) {
+                setTimeout(() => {
+                    this.savedStoryIndex = null;
+                }, 5000);
+            }
         }
     },
     activated () {
@@ -180,14 +195,28 @@ export default {
          * @returns {void}
          */
         onSaveStory (storySnapshot, imageAssetsSnapshot) {
-            if (typeof this.currentStoryIndex === "number") {
-                const oldAssets = this.storyList[this.currentStoryIndex]?.imageAssetsById || {};
+            let hasChanges = true;
 
-                Object.keys(oldAssets).forEach(id => {
+            if (typeof this.currentStoryIndex === "number") {
+                const originalEntry = this.storyList[this.currentStoryIndex],
+                      originalAssets = originalEntry?.imageAssetsById || {};
+
+                Object.keys(originalAssets).forEach(id => {
                     if (!imageAssetsSnapshot[id]) {
-                        URL.revokeObjectURL(oldAssets[id].objectURL);
+                        URL.revokeObjectURL(originalAssets[id].objectURL);
                     }
                 });
+
+                const snapshotCopy = Object.assign({}, storySnapshot),
+                      originalCopy = Object.assign({}, originalEntry?.story);
+
+                delete snapshotCopy.created;
+                delete originalCopy.created;
+
+                const storyChanged = JSON.stringify(snapshotCopy) !== JSON.stringify(originalCopy),
+                      assetsChanged = JSON.stringify(Object.keys(imageAssetsSnapshot).sort()) !== JSON.stringify(Object.keys(originalAssets).sort());
+
+                hasChanges = storyChanged || assetsChanged;
             }
 
             const entry = {story: storySnapshot, imageAssetsById: imageAssetsSnapshot},
@@ -195,9 +224,13 @@ export default {
 
             if (typeof this.currentStoryIndex === "number") {
                 updatedList[this.currentStoryIndex] = entry;
+                if (hasChanges) {
+                    this.savedStoryIndex = this.currentStoryIndex;
+                }
             }
             else {
                 updatedList.unshift(entry);
+                this.savedStoryIndex = 0;
             }
             this.setStoryList(updatedList);
             this.setCurrentStoryIndex(undefined);
@@ -410,6 +443,7 @@ export default {
         />
         <StoryCreator
             v-if="currentView === 'creator'"
+            ref="storyCreator"
             :story="editingStory"
             :image-assets-by-id="editingImageAssetsById"
             @save-story="onSaveStory"
@@ -433,7 +467,28 @@ export default {
             />
             <hr>
             <div class="mt-2 mb-3">
-                <h5 class="d-flex align-items-center">
+                <div class="story-manager-hint-area mb-1">
+                    <Transition name="hint-fade">
+                        <div
+                            v-if="savedStoryIndex !== null"
+                            class="alert alert-info d-flex align-items-center gap-2 mb-0 py-1 px-2 small"
+                            role="alert"
+                        >
+                            <i
+                                class="bi bi-check-circle-fill flex-shrink-0"
+                                aria-hidden="true"
+                            />
+                            <span>{{ $t('additional:modules.storyCreator.autosaveHint') }}</span>
+                            <button
+                                type="button"
+                                class="btn-close btn-sm ms-2"
+                                :aria-label="$t('common:button.close')"
+                                @click="savedStoryIndex = null"
+                            />
+                        </div>
+                    </Transition>
+                </div>
+                <h5 class="d-flex align-items-center mb-2">
                     <i class="bi bi-play-btn me-2 fs-4 pt-1" />
                     {{ $t('additional:modules.storyManager.selectStoryTitle') }}
                 </h5>
@@ -503,3 +558,22 @@ export default {
         </template>
     </div>
 </template>
+
+<style scoped>
+.story-manager-hint-area {
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.hint-fade-enter-active {
+    transition: opacity 0.4s ease;
+}
+.hint-fade-leave-active {
+    transition: opacity 1s ease;
+}
+.hint-fade-enter-from,
+.hint-fade-leave-to {
+    opacity: 0;
+}
+</style>

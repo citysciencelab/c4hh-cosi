@@ -16,7 +16,6 @@ import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
 import StoryCreatorAddVideoCard from "./StoryCreatorAddVideoCard.vue";
 import tipTapJsonToHtml from "../shared/modules/tipTapEditor/js/tipTapJsonToHtml.js";
-import {Toast} from "bootstrap";
 
 export default {
     name: "StoryCreatorChapter",
@@ -65,7 +64,8 @@ export default {
     },
     emits: [
         "save-chapter",
-        "cancel-chapter"
+        "cancel-chapter",
+        "update:chapter-title"
     ],
     data () {
         return {
@@ -212,23 +212,23 @@ export default {
             deep: true
         },
         /**
-         * Initializes and displays the Bootstrap Toast. The toast will automatically hide after 4 seconds.
+         * Emits the current chapter title whenever it changes so parents can update breadcrumb navigation.
+         * @param {String} newVal - The new title value.
+         * @returns {void}
+         */
+        title (newVal) {
+            this.$emit("update:chapter-title", newVal);
+        },
+        /**
+         * Automatically hides the success alert after 4 seconds.
          * @param {Boolean} newVal - The new value of showAlert.
+         * @returns {void}
          */
         showAlert (newVal) {
             if (newVal) {
-                this.$nextTick(() => {
-                    const toastEl = this.$refs.toast;
-
-                    if (toastEl) {
-                        const toast = new Toast(toastEl);
-
-                        toast.show();
-                        setTimeout(() => {
-                            this.showAlert = false;
-                        }, 4000);
-                    }
-                });
+                setTimeout(() => {
+                    this.showAlert = false;
+                }, 4000);
             }
         }
     },
@@ -633,15 +633,16 @@ export default {
             this.closeContentEditor();
         },
         /**
-         * Saves the chapter and returns to the overview page.
-         * @returns {void}
+         * Collects and returns the current chapter data without emitting.
+         * Used by the parent via $refs for breadcrumb-based auto-save.
+         * @returns {Object} The chapter data object.
          */
-        saveChapter () {
+        collectChapterData () {
             const baseLayerId = this.selectedBaseLayer?.id,
                   subjectLayerIds = this.selectedLayers.map(layer => layer.layerId),
                   layers = baseLayerId ? [baseLayerId, ...subjectLayerIds] : subjectLayerIds;
 
-            const chapter = {
+            return {
                 title: this.title.trim() !== "" ? this.title : this.$t("additional:modules.storyCreator.chapter.title"),
                 map: {
                     center: [...this.confirmedCoordinate],
@@ -653,8 +654,13 @@ export default {
                 content: this.content,
                 is3D: this.is3DLayerExisted
             };
-
-            this.$emit("save-chapter", chapter);
+        },
+        /**
+         * Saves the chapter and returns to the overview page.
+         * @returns {void}
+         */
+        saveChapter () {
+            this.$emit("save-chapter", this.collectChapterData());
         },
         /**
          * Gets the 3d parameter for coordination and position.
@@ -819,6 +825,23 @@ export default {
 
 <template lang="html">
     <div class="chapter">
+        <div class="chapter-hint-area">
+            <Transition name="hint-fade">
+                <div
+                    v-if="showAlert"
+                    class="chapter-success-alert d-flex align-items-center gap-2 py-1 px-2 small"
+                    role="alert"
+                    aria-live="assertive"
+                    aria-atomic="true"
+                >
+                    <i
+                        class="bi bi-check-circle-fill flex-shrink-0"
+                        aria-hidden="true"
+                    />
+                    <span>{{ $t('additional:modules.storyCreator.chapter.successAlert') }}</span>
+                </div>
+            </Transition>
+        </div>
         <h5>
             {{ $t("additional:modules.storyCreator.chapter.editChapter") }}
         </h5>
@@ -865,24 +888,6 @@ export default {
             >
                 <i class="fs-4 bi bi-exclamation-circle pe-2" />
                 {{ $t("additional:modules.storyCreator.chapter.positionChangedHint") }}
-            </div>
-            <div
-                v-if="showAlert"
-                ref="toast"
-                class="toast align-items-center border-0"
-                role="alert"
-                aria-live="assertive"
-                aria-atomic="true"
-            >
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i
-                            class="bi bi-check-lg me-2 toast-icon"
-                            aria-hidden="true"
-                        />
-                        {{ $t('additional:modules.storyCreator.chapter.successAlert') }}
-                    </div>
-                </div>
             </div>
             <div class="row no-gutters mb-4 mt-3">
                 <label
@@ -1270,15 +1275,33 @@ export default {
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style lang="scss" scoped>
-.toast {
+.chapter-hint-area {
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.chapter-success-alert {
     background-color: $secondary;
     color: $white;
-    .toast-icon {
-        font-size: 1.15rem;
-        color: $white;
-        line-height: 1;
-    }
+    border-radius: 0.25rem;
+    width: 100%;
 }
+
+.hint-fade-enter-active {
+    transition: opacity 0.4s ease;
+}
+
+.hint-fade-leave-active {
+    transition: opacity 1s ease;
+}
+
+.hint-fade-enter-from,
+.hint-fade-leave-to {
+    opacity: 0;
+}
+
 .position-hint {
     color: $secondary;
 }

@@ -3,6 +3,7 @@
     "storyCreator": {
       "storyNav": "Story",
       "chapterNav": "Kapitel",
+      "autosaveHint": "Die Änderung wurde automatisch gespeichert.",
       "title": "Story Creator",
       "addChapter": "Kapitel hinzufügen",
       "saveStory": "Story speichern",

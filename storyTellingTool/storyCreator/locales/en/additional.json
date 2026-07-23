@@ -3,6 +3,7 @@
     "storyCreator": {
       "storyNav": "Story",
       "chapterNav": "Chapter",
+      "autosaveHint": "The change was automatically saved.",
       "title": "Story Creator",
       "addChapter": "Add Chapter",
       "saveStory": "Save story",

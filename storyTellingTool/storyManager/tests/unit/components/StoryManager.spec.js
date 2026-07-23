@@ -402,6 +402,53 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
         });
     });
 
+    describe("Save hint behavior", () => {
+        it("positive: onSaveStory sets savedStoryIndex when existing story data changed", () => {
+            const changedStory = {
+                title: "Changed Title",
+                description: "",
+                author: "",
+                imageSrc: "",
+                imageAlt: "",
+                imageCopyright: "",
+                chapters: []
+            };
+
+            store.state.Modules.StoryManager.currentStoryIndex = 1;
+            wrapper.vm.onSaveStory(changedStory, {});
+
+            expect(wrapper.vm.savedStoryIndex).to.equal(1);
+            expect(wrapper.vm.currentView).to.equal("manager");
+        });
+
+        it("negative: onSaveStory does not set savedStoryIndex when story data is unchanged", () => {
+            const originalStory = store.state.Modules.StoryManager.storyList[1].story,
+                unchangedSnapshot = Object.assign({}, originalStory, {created: "24.07.2026"});
+
+            store.state.Modules.StoryManager.currentStoryIndex = 1;
+            wrapper.vm.onSaveStory(unchangedSnapshot, {});
+
+            expect(wrapper.vm.savedStoryIndex).to.be.null;
+        });
+
+        it("positive: onSaveStory always sets savedStoryIndex for a new story", () => {
+            const newStory = {
+                title: "Brand New Story",
+                description: "",
+                author: "",
+                imageSrc: "",
+                imageAlt: "",
+                imageCopyright: "",
+                chapters: []
+            };
+
+            store.state.Modules.StoryManager.currentStoryIndex = undefined;
+            wrapper.vm.onSaveStory(newStory, {});
+
+            expect(wrapper.vm.savedStoryIndex).to.equal(0);
+        });
+    });
+
     describe("User Interaction", () => {
         it("should create new story when AddCardButton is clicked", async () => {
             const addCardBtn = wrapper.findComponent({name: "AddCardButton"});

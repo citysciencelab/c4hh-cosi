@@ -423,4 +423,46 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
             expect(newWrapper.vm.chapterContent).to.deep.equal([]);
         });
     });
+
+    describe("Breadcrumb, save and hint behavior", () => {
+        it("positive: autosaveChapterAndGoToStory switches currentView back to 'story'", () => {
+            // No ref needed: even without a rendered chapter component,
+            // the method must always switch currentView to 'story'.
+            wrapper.vm.currentView = "chapter";
+
+            wrapper.vm.autosaveChapterAndGoToStory();
+
+            expect(wrapper.vm.currentView).to.equal("story");
+        });
+
+        it("positive: autosaveChapterAndGoToStory sets showAutosaveHint to true when chapter data changed", async () => {
+            // Capture wrapper in a const before awaits to satisfy require-atomic-updates.
+            // Switch to chapter view first so Vue creates the $refs.chapterComp stub,
+            // then override collectChapterData on the existing stub instance.
+            const localWrapper = wrapper;
+
+            await localWrapper.setData({currentView: "chapter"});
+            await localWrapper.vm.$nextTick();
+            localWrapper.vm._initialChapterSnapshot = JSON.stringify({title: "Old Title", content: []});
+            localWrapper.vm.$refs.chapterComp.collectChapterData = sinon.stub().returns({title: "New Title", content: []});
+
+            localWrapper.vm.autosaveChapterAndGoToStory();
+
+            expect(localWrapper.vm.showAutosaveHint).to.be.true;
+        });
+
+        it("negative: autosaveChapterAndGoToStory keeps showAutosaveHint false when editing an existing chapter with unchanged data", async () => {
+            const chapterData = {title: "Same Title", content: []},
+                localWrapper = wrapper;
+
+            await localWrapper.setData({currentView: "chapter", editingChapterIndex: 0, chapterContent: [chapterData]});
+            await localWrapper.vm.$nextTick();
+            localWrapper.vm._initialChapterSnapshot = JSON.stringify(chapterData);
+            localWrapper.vm.$refs.chapterComp.collectChapterData = sinon.stub().returns(chapterData);
+
+            localWrapper.vm.autosaveChapterAndGoToStory();
+
+            expect(localWrapper.vm.showAutosaveHint).to.be.false;
+        });
+    });
 });
