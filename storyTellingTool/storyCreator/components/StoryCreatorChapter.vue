@@ -89,7 +89,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["addLayerButton", "allLayerConfigs", "allBaselayerConfigs", "visibleBaselayerConfigs", "configuredModules", "layerConfigById"]),
+        ...mapGetters(["addLayerButton", "allBaselayerConfigs", "allLayerConfigs", "configuredModules", "controlsConfig", "layerConfigById", "visibleBaselayerConfigs"]),
         ...mapGetters("Maps", ["mode"]),
         ...mapGetters("Modules/StoryManager", ["enableVideo", "originalLayerConfig", "subjectLayerCategory", "toolStoryWhitelist"]),
         /**
@@ -468,7 +468,7 @@ export default {
          * @returns {Object[]} A list of objects with following format: {layerId: x, label: y}
          */
         getLayerList () {
-            const rawLayers = getAndMergeAllRawLayers(),
+            const rawLayers = this.controlsConfig?.button3d !== true ? getAndMergeAllRawLayers().filter(layer => !layer.is3DLayer) : getAndMergeAllRawLayers(),
                   layerConfig = {
                       baselayer: {},
                       subjectlayer: {}

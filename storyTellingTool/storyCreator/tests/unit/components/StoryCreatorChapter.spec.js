@@ -98,6 +98,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 allBaselayerConfigs: () => [],
                 allLayerConfigs: () => [],
                 configuredModules: () => sinon.stub(),
+                controlsConfig: () => sinon.stub(),
                 layerConfigById: () => sinon.stub(),
                 visibleBaselayerConfigs: () => []
             },
