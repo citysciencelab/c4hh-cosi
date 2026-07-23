@@ -27,11 +27,12 @@ describe("addons/lzsResearchClient/tests/unit/LzsResearchClient.spec.js", () => 
                                 errorMessage: () => "",
                                 globalError: state => state.globalError ?? null,
                                 requestToken: state => state.requestToken,
+                                requestTokenExpireTime: state => state.requestTokenExpireTime,
                                 progressNow: () => -1,
                                 currentProgressValue: () => "",
                                 searchAttributeResponse: () => null,
-                                // TODO: add instanceId and primaryDataId
-                                selectedDetail: () => null
+                                selectedDetail: () => null,
+                                menuWidthOnStart: () => "25%"
                             },
                             mutations: {
                                 setShowLoadingSpinner (state, payload) {
@@ -48,6 +49,17 @@ describe("addons/lzsResearchClient/tests/unit/LzsResearchClient.spec.js", () => 
                                 fetchRequestToken: () => Promise.resolve("mocked-request-token")
                             }
                         }
+                    }
+                },
+                Menu: {
+                    namespaced: true,
+                    getters: {
+                        currentMenuWidth: () => sinon.stub().returns("25%"),
+                        currentSecondaryMenuWidth: () => sinon.stub().returns(0.25)
+                    },
+                    mutations: {
+                        setCurrentMenuWidth: sinon.stub(),
+                        setCurrentSecondaryMenuWidth: sinon.stub()
                     }
                 }
             }

@@ -24,7 +24,8 @@ export default {
             newSearchPerformed: false,
             tabWatcherAttached: false,
             unwatchTabContainer: null,
-            initialMenuWidth: "25%"
+            widthWithoutLzs: "",
+            lzsMenuWidth: ""
         };
     },
     computed: {
@@ -39,7 +40,8 @@ export default {
             "menuWidthOnStart"
         ]),
         ...mapGetters("Menu", [
-            "currentMenuWidth"
+            "currentMenuWidth",
+            "currentSecondaryMenuWidth"
         ]),
         errorOccured () {
             return this.errorMessage !== "";
@@ -84,6 +86,13 @@ export default {
             this.newSearchPerformed = true;
         }
     },
+    mounted () {
+        this.widthWithoutLzs = this.currentMenuWidth(this.$attrs.side);
+        this.lzsMenuWidth = this.menuWidthOnStart;
+
+        // Convert widthWithoutLzs to a decimal value for currentSecondaryMenuWidth
+        this.setCurrentSecondaryMenuWidth(parseFloat(this.widthWithoutLzs) / 100);
+    },
     /**
      * KeepAlive: This addon uses the Masterportal module caching feature,
      * see docs/Dev/vueComponents/ModuleCaching.md
@@ -121,8 +130,8 @@ export default {
         // Call handleTabChange to ensure the correct state is set for the active tab when the component is activated.
         this.handleTabChange(tabContainerRef, tabContainerRef.activeTabIdLocal, "tabSearch");
 
-        this.initialMenuWidth = this.currentMenuWidth(this.$attrs.side);
-        this.setCurrentMenuWidth({side: this.$attrs.side, width: this.menuWidthOnStart});
+        this.widthWithoutLzs = this.currentMenuPercentage();
+        this.setCurrentMenuWidth({side: this.$attrs.side, width: this.lzsMenuWidth});
     },
     /**
      * Triggered if component is deactivated.
@@ -147,7 +156,8 @@ export default {
             tabResult.hideGeom();
         }
 
-        this.setCurrentMenuWidth({side: this.$attrs.side, width: this.initialMenuWidth});
+        this.lzsMenuWidth = this.currentMenuPercentage();
+        this.setCurrentMenuWidth({side: this.$attrs.side, width: this.widthWithoutLzs});
     },
     methods: {
         ...mapActions("Modules/LzsResearchClient", [
@@ -157,7 +167,10 @@ export default {
             "setShowLoadingSpinner",
             "setErrorMessage"
         ]),
-        ...mapMutations("Menu", ["setCurrentMenuWidth"]),
+        ...mapMutations("Menu", [
+            "setCurrentMenuWidth",
+            "setCurrentSecondaryMenuWidth"
+        ]),
         hideErrorMessage () {
             this.setErrorMessage("");
         },
@@ -236,6 +249,13 @@ export default {
             const safetyMs = 3e4;
 
             return Date.now() >= expireTimeInMs - safetyMs;
+        },
+        /**
+         * Converts currentSecondaryMenuWidth to a percentage string.
+         * @returns {stringl} - The percentage string.
+         */
+        currentMenuPercentage () {
+            return `${this.currentSecondaryMenuWidth * 100}%`;
         }
     }
 };
