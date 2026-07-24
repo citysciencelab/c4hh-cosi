@@ -58,6 +58,7 @@ export default {
         closeIconTriggered (event) {
             if (event.type === "click" || event.which === 32 || event.which === 13) {
                 this.hidePoiChoice();
+                document.querySelector("#geolocatePOI").classList.remove("toggleButtonPressed");
             }
         },
         /**
