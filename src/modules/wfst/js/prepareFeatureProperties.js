@@ -76,9 +76,10 @@ async function prepareFeatureProperties (layer, featurePropertiesValues) {
 
 /**
  * Extracts the label for a property from the gfiAttributes configuration of the layer.
- * @param {FeatureProperty} property 
- * @param {string|object} gfiAttributeEntry 
- * @returns {string}
+ *
+ * @param {FeatureProperty} property the property to extract the label for.
+ * @param {string|object} gfiAttributeEntry the gfiAttributes entry for the property.
+ * @returns {string} The resolved label for the property.
  */
 function getLabelForProperty (property, gfiAttributeEntry) {
     if (typeof gfiAttributeEntry === "string") {
