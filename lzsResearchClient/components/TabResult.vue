@@ -72,7 +72,10 @@ export default {
 </script>
 
 <template>
-    <div id="TabResult">
+    <div
+        id="TabResult"
+        class="LayoutFrame"
+    >
         <ArchiveList
             ref="archiveList"
             :datasets="searchAttributeResponse"
@@ -84,7 +87,7 @@ export default {
             @openDetails="openDetails"
         />
 
-        <div class="searchButtons">
+        <div class="FixedContent">
             <FlatButton
                 :aria-label="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
                 :text="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
@@ -97,38 +100,9 @@ export default {
 <style lang="scss" scoped>
 
 #TabResult {
-    div.searchButtons {
-        display: flex;
-        gap: 0.5rem;
-        margin-top: 1rem;
-
-        *:nth-child(2) {
-            margin-left: auto;
-        }
-    }
-
-    :deep(.attribute-select) {
-        .multiselect,
-        .multiselect__input::placeholder,
-        .multiselect__option {
-            color: $black;
-            font-weight: normal;
-        }
-
-        .multiselect__option {
-            &:after,
-            &--selected,
-            &--selected:after {
-                color: black;
-                background: $light_grey_hover;
-            }
-
-            &--highlight,
-            &--highlight:after {
-                color: $white;
-                background: $secondary;
-            }
-        }
-    }
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 0.5rem;
 }
 </style>

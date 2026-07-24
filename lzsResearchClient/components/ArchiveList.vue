@@ -482,47 +482,55 @@ export default {
 </script>
 
 <template>
-    <div class="ArchiveList">
-        <div class="archiveListHeaderLine">
-            <p class="numberOfResults">
-                {{ numberOfResultsLabel }}
-                <span>{{ numberOfResults }}</span>
-            </p>
-            <FlatButton
-                id="idOpenOrCloseAccordions"
-                :aria="toggleAccordionText"
-                :text="toggleAccordionText"
-                :secondary="true"
-                @click="openAllAccordions = !openAllAccordions"
+    <div
+        id="ArchiveList"
+        class="InnerLayoutFrame"
+    >
+        <div
+            class="FixedContent archive-list-header"
+            padding-top="0"
+        >
+            <div class="archiveListHeaderLine">
+                <p class="numberOfResults">
+                    {{ numberOfResultsLabel }}
+                    <span>{{ numberOfResults }}</span>
+                </p>
+                <FlatButton
+                    id="idOpenOrCloseAccordions"
+                    :aria="toggleAccordionText"
+                    :text="toggleAccordionText"
+                    :secondary="true"
+                    @click="openAllAccordions = !openAllAccordions"
+                />
+            </div>
+            <div class="downloadHandlingContainer">
+                <SwitchInput
+                    v-if="numberOfResults > 0"
+                    id="idSelectAllSwitch"
+                    :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.selectAllAriaLabel')"
+                    :label="$t('additional:modules.lzsResearchClient.tabs.archiveList.selectAll')"
+                    :checked="selectAllIsChecked"
+                    :interaction="(evt) => toggleAllTables(evt.target.checked)"
+                />
+
+                <FlatButton
+                    v-if="numberOfResults > 0"
+                    id="tabResultDownloadButton"
+                    :disabled="progressNow >= 0 || !somethingCheckedForDownload || isFetchingPrimaryData || sumOfCheckedFilesProgress > 100"
+                    :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
+                    :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
+                    @click="downloadChecked()"
+                />
+            </div>
+
+            <SumOfCheckedFiles
+                v-if="somethingCheckedForDownload"
+                :checked-datasets="datasets.filter(data => data.checked)"
+                @update:progress-percentage="sumOfCheckedFilesProgress = $event"
             />
         </div>
-        <div class="downloadHandlingContainer">
-            <SwitchInput
-                v-if="numberOfResults > 0"
-                id="idSelectAllSwitch"
-                :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.selectAllAriaLabel')"
-                :label="$t('additional:modules.lzsResearchClient.tabs.archiveList.selectAll')"
-                :checked="selectAllIsChecked"
-                :interaction="(evt) => toggleAllTables(evt.target.checked)"
-            />
 
-            <FlatButton
-                v-if="numberOfResults > 0"
-                id="tabResultDownloadButton"
-                :disabled="progressNow >= 0 || !somethingCheckedForDownload || isFetchingPrimaryData || sumOfCheckedFilesProgress > 100"
-                :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
-                :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
-                @click="downloadChecked()"
-            />
-        </div>
-
-        <SumOfCheckedFiles
-            v-if="somethingCheckedForDownload"
-            :checked-datasets="datasets.filter(data => data.checked)"
-            @update:progress-percentage="sumOfCheckedFilesProgress = $event"
-        />
-
-        <div class="steps">
+        <div class="ScrollableContent steps">
             <div
                 v-for="(step, index) in archives"
                 :key="index"
@@ -633,14 +641,21 @@ export default {
 
 <style lang="scss" scoped>
 
-.ArchiveList {
+#ArchiveList {
+    .archive-list-header {
+        flex-direction: column;
+    }
+
     div.archiveListHeaderLine {
         display: flex;
         gap: 1rem;
         justify-content: space-between;
+        align-items: center;
+        padding-bottom: 0.5rem;
 
         p.numberOfResults {
-            margin-top: 1rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
 
             span {
                 display: inline-block;
@@ -657,9 +672,9 @@ export default {
         :deep(button#idOpenOrCloseAccordions) {
             padding-right: 0;
             padding-left: 0;
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0;
             min-height: unset;
+            height: 100%;
 
             span {
                 margin-right: 0.5rem;
@@ -726,6 +741,30 @@ export default {
             padding: 0.5rem 1rem;
             font-size: 1rem;
             margin-top: 0.5rem;
+        }
+    }
+
+    :deep(.attribute-select) {
+        .multiselect,
+        .multiselect__input::placeholder,
+        .multiselect__option {
+            color: $black;
+            font-weight: normal;
+        }
+
+        .multiselect__option {
+            &:after,
+            &--selected,
+            &--selected:after {
+                color: black;
+                background: $light_grey_hover;
+            }
+
+            &--highlight,
+            &--highlight:after {
+                color: $white;
+                background: $secondary;
+            }
         }
     }
 }

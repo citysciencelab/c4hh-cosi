@@ -1338,8 +1338,11 @@ export default {
             />
         </div>
 
-        <div v-else>
-            <div class="switch-container">
+        <div
+            v-else
+            class="LayoutFrame"
+        >
+            <div class="FixedContent switch-container">
                 <SwitchInput
                     id="idSearchModeSwitch"
                     :aria="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchModeSwitchLabel')"
@@ -1349,270 +1352,272 @@ export default {
                 />
             </div>
 
-            <div
-                v-if="attributeSearchModeIsActive"
-                id="searchFormWithAttributes"
-                class="searchFormWithAttributes"
-            >
-                <label for="archive">
-                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel") }}
-                </label>
-
-                <select
-                    id="archive"
-                    class="form-select archive"
-                    :value="selectedArchive"
-                    @change="setSelectedArchive($event.target.value)"
+            <div class="ScrollableContent">
+                <div
+                    v-if="attributeSearchModeIsActive"
+                    id="searchFormWithAttributes"
+                    class="searchFormWithAttributes"
                 >
-                    <option
-                        v-for="(_, name) in searchWithAttributeFormData"
-                        :key="name"
-                        :value="name"
+                    <label for="archive">
+                        {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel") }}
+                    </label>
+
+                    <select
+                        id="archive"
+                        class="form-select archive"
+                        :value="selectedArchive"
+                        @change="setSelectedArchive($event.target.value)"
                     >
-                        {{ name }}
-                    </option>
-                </select>
-
-                <div class="searchWithAttributeForm">
-                    <InputText
-                        v-for="attribute in searchWithAttributeFormData[selectedArchive]"
-                        :id="attribute.name"
-                        :key="attribute.name"
-                        v-model="attribute.value"
-                        :class-obj="['form-control' + (attribute.errorMessage.length > 0 ? ' is-invalid': ' is-valid')]"
-                        :label="getTranslationForAttributeWrapper(attribute.labelKey, attribute.name)"
-                        :placeholder="attribute.placeholder"
-                        :error-message="attribute.errorMessage"
-                        @input="validateSearchWithAttributeForm()"
-                    />
-                </div>
-            </div>
-
-            <div
-                v-if="!attributeSearchModeIsActive"
-                id="searchFormWithGeometry"
-                class="searchFormWithGeometry"
-            >
-                <div class="archiveYearsSelection">
-                    <div class="archiveSelection">
-                        <span>
-                            {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel') }}
-                        </span>
-
-                        <div
-                            class="archiveSelectionList"
-                            role="group"
-                            aria-label="archives"
+                        <option
+                            v-for="(_, name) in searchWithAttributeFormData"
+                            :key="name"
+                            :value="name"
                         >
-                            <div
-                                v-for="archive in archiveWithGeorefList"
-                                :key="archive.id"
-                                class="archiveCheckboxList"
-                            >
-                                <input
-                                    :id="`archiveCheckbox-${archive.id}`"
-                                    type="checkbox"
-                                    :value="archive.id"
-                                    :checked="selectedArchiveIds.includes(archive.id)"
-                                    :disabled="bulkYearsLoading && !selectAllCancelled"
-                                    @change="onSelectedArchiveIdsChange(archive.id, $event)"
-                                >
+                            {{ name }}
+                        </option>
+                    </select>
 
-                                <label :for="`archiveCheckbox-${archive.id}`">
-                                    {{ archive.name }}
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="yearsSelection">
-                        <span>
-                            {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectYearsLabel') }}
-                        </span>
-
-                        <div
-                            class="yearsSelectionList"
-                            role="group"
-                            aria-label="years"
-                        >
-                            <div
-                                v-for="yearObject in yearsList"
-                                :key="yearObject.year"
-                                class="yearCheckboxItem"
-                            >
-                                <input
-                                    :id="`yearCheckbox-${yearObject.year}`"
-                                    type="checkbox"
-                                    :value="yearObject.year"
-                                    :checked="selectedYears.includes(yearObject.year)"
-                                    :disabled="bulkYearsLoading && !selectAllCancelled"
-                                    @change="onSelectedYearsChange(yearObject.year, $event)"
-                                >
-
-                                <label :for="`yearCheckbox-${yearObject.year}`">
-                                    <span>
-                                        {{ yearObject.year }}
-                                    </span>
-                                    <span>
-                                        ({{ yearObject.archiveNames.join(", ") }})
-                                    </span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div
-                        v-if="bulkYearsLoading && !selectAllCancelled"
-                        class="loadingSpinner bulkLoadingSpinner"
-                    >
-                        <SpinnerItem
-                            custom-class="spinner"
-                            class="ms-3"
+                    <div class="searchWithAttributeForm">
+                        <InputText
+                            v-for="attribute in searchWithAttributeFormData[selectedArchive]"
+                            :id="attribute.name"
+                            :key="attribute.name"
+                            v-model="attribute.value"
+                            :class-obj="['form-control' + (attribute.errorMessage.length > 0 ? ' is-invalid': ' is-valid')]"
+                            :label="getTranslationForAttributeWrapper(attribute.labelKey, attribute.name)"
+                            :placeholder="attribute.placeholder"
+                            :error-message="attribute.errorMessage"
+                            @input="validateSearchWithAttributeForm()"
                         />
                     </div>
                 </div>
 
-                <div class="spatialSelection">
-                    <p class="spatialSelectionLabel">
-                        {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionLabel") }}
-                    </p>
+                <div
+                    v-if="!attributeSearchModeIsActive"
+                    id="searchFormWithGeometry"
+                    class="searchFormWithGeometry"
+                >
+                    <div class="archiveYearsSelection">
+                        <div class="archiveSelection">
+                            <span>
+                                {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel') }}
+                            </span>
 
-                    <ButtonGroup
-                        :buttons="buttonGroupLevels"
-                        :pre-checked-value="selectedButtonGroup"
-                        group="spatialSelectionGroups"
-                        class="level-switch"
-                        :selected-value="selectedSpatialButtonName"
-                        @set-selected-button="setSelectedButtonGroup"
-                    />
+                            <div
+                                class="archiveSelectionList"
+                                role="group"
+                                aria-label="archives"
+                            >
+                                <div
+                                    v-for="archive in archiveWithGeorefList"
+                                    :key="archive.id"
+                                    class="archiveCheckboxList"
+                                >
+                                    <input
+                                        :id="`archiveCheckbox-${archive.id}`"
+                                        type="checkbox"
+                                        :value="archive.id"
+                                        :checked="selectedArchiveIds.includes(archive.id)"
+                                        :disabled="bulkYearsLoading && !selectAllCancelled"
+                                        @change="onSelectedArchiveIdsChange(archive.id, $event)"
+                                    >
 
-                    <div
-                        v-if="selectedButtonGroup === 'geometry'"
-                        class="spatialSelectionButtons d-flex align-items-center"
-                    >
-                        <DrawTypes
-                            :source="lzsDrawLayerSource"
-                            :current-layout="lzsCurrentLayout"
-                            :draw-types="lzsDrawTypes"
-                            :draw-icons="lzsDrawIcons"
-                            :selected-draw-type="lzsSelectedDrawType"
-                            :selected-interaction="lzsSelectedInteraction"
-                            :set-selected-draw-type="setLzsSelectedDrawType"
-                            :set-selected-interaction="setLzsSelectedInteraction"
-                            :should-emit-events="true"
-                            @drawend="onDrawEnd"
-                        />
+                                    <label :for="`archiveCheckbox-${archive.id}`">
+                                        {{ archive.name }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
 
-                        <div class="deleteFeature">
-                            <DrawEdit
-                                :draw-edits="lzsDrawEdits"
-                                :draw-icons="lzsDrawIcons"
-                                :layer="lzsDrawLayer"
-                                :selected-interaction="lzsSelectedInteraction"
-                                :set-selected-interaction="setLzsSelectedInteraction"
-                                @click="removeSearchGeometry"
+                        <div class="yearsSelection">
+                            <span>
+                                {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectYearsLabel') }}
+                            </span>
+
+                            <div
+                                class="yearsSelectionList"
+                                role="group"
+                                aria-label="years"
+                            >
+                                <div
+                                    v-for="yearObject in yearsList"
+                                    :key="yearObject.year"
+                                    class="yearCheckboxItem"
+                                >
+                                    <input
+                                        :id="`yearCheckbox-${yearObject.year}`"
+                                        type="checkbox"
+                                        :value="yearObject.year"
+                                        :checked="selectedYears.includes(yearObject.year)"
+                                        :disabled="bulkYearsLoading && !selectAllCancelled"
+                                        @change="onSelectedYearsChange(yearObject.year, $event)"
+                                    >
+
+                                    <label :for="`yearCheckbox-${yearObject.year}`">
+                                        <span>
+                                            {{ yearObject.year }}
+                                        </span>
+                                        <span>
+                                            ({{ yearObject.archiveNames.join(", ") }})
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="bulkYearsLoading && !selectAllCancelled"
+                            class="loadingSpinner bulkLoadingSpinner"
+                        >
+                            <SpinnerItem
+                                custom-class="spinner"
+                                class="ms-3"
                             />
                         </div>
                     </div>
 
-                    <div
-                        v-if="selectedButtonGroup === 'address'"
-                        class="addressSearch"
-                    >
-                        <LzsResearchClientSearchBar
-                            @set-search-geometry="setSearchGeometry"
+                    <div class="spatialSelection">
+                        <p class="spatialSelectionLabel">
+                            {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionLabel") }}
+                        </p>
+
+                        <ButtonGroup
+                            :buttons="buttonGroupLevels"
+                            :pre-checked-value="selectedButtonGroup"
+                            group="spatialSelectionGroups"
+                            class="level-switch"
+                            :selected-value="selectedSpatialButtonName"
+                            @set-selected-button="setSelectedButtonGroup"
                         />
-                    </div>
 
-                    <div
-                        v-if="selectedButtonGroup === 'parcel'"
-                        class="spatialSelectionButtons parcelSearch d-flex flex-column"
-                    >
-                        <div class="parcelSearchInputs">
-                            <label for="parcelSearchSelect">
-                                {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictLabel") }}
-                            </label>
+                        <div
+                            v-if="selectedButtonGroup === 'geometry'"
+                            class="spatialSelectionButtons d-flex align-items-center"
+                        >
+                            <DrawTypes
+                                :source="lzsDrawLayerSource"
+                                :current-layout="lzsCurrentLayout"
+                                :draw-types="lzsDrawTypes"
+                                :draw-icons="lzsDrawIcons"
+                                :selected-draw-type="lzsSelectedDrawType"
+                                :selected-interaction="lzsSelectedInteraction"
+                                :set-selected-draw-type="setLzsSelectedDrawType"
+                                :set-selected-interaction="setLzsSelectedInteraction"
+                                :should-emit-events="true"
+                                @drawend="onDrawEnd"
+                            />
 
-                            <Multiselect
-                                id="parcelSearchSelect"
-                                v-model="selectedParcelDistrictObject"
-                                :options="parcelDistrictOptions"
-                                label="label"
-                                :show-labels="false"
-                                :searchable="true"
-                                :multiple="false"
-                                :close-on-select="true"
-                                :clear-on-select="false"
-                                :allow-empty="false"
-                                :preserve-search="true"
-                                :hide-selected="false"
-                                :internal-search="true"
-                                :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictPlaceholder')"
-                                :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictLabel')"
-                                @select="val => setSelectedParcelDistrict(val ? val.value : null)"
-                            >
-                                <template #option="props">
-                                    <div class="attribute-option-wrapper">
-                                        <span :class="`attribute-check-icon ${props.option.value === selectedParcelDistrictObject?.value ? 'bi bi-check2' : ''}`" />
-                                        <span>{{ props.option.label }}</span>
-                                    </div>
-                                </template>
-                            </Multiselect>
-
-                            <label for="parcelNumber">
-                                {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel") }}
-                            </label>
-
-                            <Multiselect
-                                id="parcelNumber"
-                                v-model="parcelNumberInputValue"
-                                :disabled="!districtParcelNumbersSorted.length"
-                                :options="districtParcelNumbersSorted"
-                                :show-labels="false"
-                                :searchable="true"
-                                :multiple="false"
-                                :close-on-select="true"
-                                :clear-on-select="false"
-                                :preserve-search="true"
-                                :hide-selected="false"
-                                :allow-empty="false"
-                                :internal-search="true"
-                                :loading="districtParcelsLoading"
-                                :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberPlaceholder')"
-                                :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel')"
-                                @select="handleParcelSearchSubmit"
-                            >
-                                <template #option="props">
-                                    <div class="attribute-option-wrapper">
-                                        <span :class="`attribute-check-icon ${props.option === parcelNumberInputValue ? 'bi bi-check2' : ''}`" />
-                                        <span>{{ props.option }}</span>
-                                    </div>
-                                </template>
-                            </Multiselect>
+                            <div class="deleteFeature">
+                                <DrawEdit
+                                    :draw-edits="lzsDrawEdits"
+                                    :draw-icons="lzsDrawIcons"
+                                    :layer="lzsDrawLayer"
+                                    :selected-interaction="lzsSelectedInteraction"
+                                    :set-selected-interaction="setLzsSelectedInteraction"
+                                    @click="removeSearchGeometry"
+                                />
+                            </div>
                         </div>
-                    </div>
 
-                    <p
-                        v-if="spatialAreaWarning"
-                        class="spatialAreaWarning"
-                    >
-                        {{ spatialAreaWarning }}
-                    </p>
+                        <div
+                            v-if="selectedButtonGroup === 'address'"
+                            class="addressSearch"
+                        >
+                            <LzsResearchClientSearchBar
+                                @set-search-geometry="setSearchGeometry"
+                            />
+                        </div>
+
+                        <div
+                            v-if="selectedButtonGroup === 'parcel'"
+                            class="spatialSelectionButtons parcelSearch d-flex flex-column"
+                        >
+                            <div class="parcelSearchInputs">
+                                <label for="parcelSearchSelect">
+                                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictLabel") }}
+                                </label>
+
+                                <Multiselect
+                                    id="parcelSearchSelect"
+                                    v-model="selectedParcelDistrictObject"
+                                    :options="parcelDistrictOptions"
+                                    label="label"
+                                    :show-labels="false"
+                                    :searchable="true"
+                                    :multiple="false"
+                                    :close-on-select="true"
+                                    :clear-on-select="false"
+                                    :allow-empty="false"
+                                    :preserve-search="true"
+                                    :hide-selected="false"
+                                    :internal-search="true"
+                                    :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictPlaceholder')"
+                                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictLabel')"
+                                    @select="val => setSelectedParcelDistrict(val ? val.value : null)"
+                                >
+                                    <template #option="props">
+                                        <div class="attribute-option-wrapper">
+                                            <span :class="`attribute-check-icon ${props.option.value === selectedParcelDistrictObject?.value ? 'bi bi-check2' : ''}`" />
+                                            <span>{{ props.option.label }}</span>
+                                        </div>
+                                    </template>
+                                </Multiselect>
+
+                                <label for="parcelNumber">
+                                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel") }}
+                                </label>
+
+                                <Multiselect
+                                    id="parcelNumber"
+                                    v-model="parcelNumberInputValue"
+                                    :disabled="!districtParcelNumbersSorted.length"
+                                    :options="districtParcelNumbersSorted"
+                                    :show-labels="false"
+                                    :searchable="true"
+                                    :multiple="false"
+                                    :close-on-select="true"
+                                    :clear-on-select="false"
+                                    :preserve-search="true"
+                                    :hide-selected="false"
+                                    :allow-empty="false"
+                                    :internal-search="true"
+                                    :loading="districtParcelsLoading"
+                                    :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberPlaceholder')"
+                                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel')"
+                                    @select="handleParcelSearchSubmit"
+                                >
+                                    <template #option="props">
+                                        <div class="attribute-option-wrapper">
+                                            <span :class="`attribute-check-icon ${props.option === parcelNumberInputValue ? 'bi bi-check2' : ''}`" />
+                                            <span>{{ props.option }}</span>
+                                        </div>
+                                    </template>
+                                </Multiselect>
+                            </div>
+                        </div>
+
+                        <p
+                            v-if="spatialAreaWarning"
+                            class="spatialAreaWarning"
+                        >
+                            {{ spatialAreaWarning }}
+                        </p>
+                    </div>
+                    <SwitchInput
+                        v-if="pointSelected"
+                        id="idSelectAllForPoint"
+                        name="selectAllForPoint"
+                        class="selectAllForPoint"
+                        :aria="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectAll')"
+                        :label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectAll')"
+                        :checked="selectAllChecked"
+                        :interaction="(evt) => toggleAllArchiveIds(evt.target.checked)"
+                    />
                 </div>
             </div>
 
-            <div class="searchButtons">
-                <SwitchInput
-                    v-if="pointSelected"
-                    id="idSelectAllForPoint"
-                    name="selectAllForPoint"
-                    :aria="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectAll')"
-                    :label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectAll')"
-                    :checked="selectAllChecked"
-                    :interaction="(evt) => toggleAllArchiveIds(evt.target.checked)"
-                />
+            <div class="FixedContent buttons-footer">
                 <div
-                    v-else
                     class="spacer-div"
                 />
                 <FlatButton
@@ -1636,15 +1641,12 @@ export default {
 
 <style lang="scss" scoped>
     #TabSearch {
-        padding: 1rem 0.5rem;
-        position: relative;
         height: 100%;
+        padding-top: 0.5rem;
 
         div.switch-container {
-            display: flex;
             flex-direction: column;
             align-items: end;
-            margin-bottom: 0.5rem;
         }
 
         div.searchFormWithAttributes {
@@ -1791,6 +1793,10 @@ export default {
                 }
             }
 
+            .selectAllForPoint {
+                padding-top: 1rem;
+            }
+
             div.addressSearch {
                 margin-top: 1rem;
                 margin-left: 0.25rem;
@@ -1808,16 +1814,7 @@ export default {
             }
         }
 
-        div.searchButtons {
-            display: flex;
-            gap: 0.5rem;
-            margin: 1rem 0;
-            align-items: center;
-
-            button {
-                margin-bottom: 0;
-            }
-
+        div.buttons-footer {
             *:nth-child(2) {
                 margin-left: auto;
             }

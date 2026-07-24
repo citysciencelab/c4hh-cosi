@@ -235,88 +235,95 @@ export default {
 </script>
 
 <template>
-    <div id="TabDetails">
-        <h4> {{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.title") }} </h4>
+    <div
+        id="TabDetails"
+        class="LayoutFrame"
+    >
+        <div class="FixedContent details-header">
+            <h4> {{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.title") }} </h4>
 
-        <table
-            v-if="getDetailsForSelectedDetail"
-            class="datasetInfoTable"
-        >
-            <tbody>
-                <tr>
-                    <td>{{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.datasetInfoTable.archive") }}</td>
-
-                    <td>{{ getNameForArchiveId(getDetailsForSelectedDetail?.archiveId) }}</td>
-                </tr>
-
-                <tr>
-                    <td>{{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.datasetInfoTable.datasetProtectionClass") }}</td>
-
-                    <td>{{ getDataProtectionClassForArchiveId(getDetailsForSelectedDetail?.archiveId)?.name }}</td>
-                </tr>
-
-                <tr
-                    v-for="(attribute, index) in (getDetailsForSelectedDetail?.attributes || [])"
-                    :id="`detail-tablerow-${index}`"
-                    :key="index"
-                >
-                    <td>{{ getTranslationForAttributeWrapper(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`, attribute.name) }}</td>
-
-                    <td>{{ attribute.value }}</td>
-                </tr>
-            </tbody>
-        </table>
-
-        <hr>
-
-        <div class="tableHeaderDetailsTable">
-            <p class="numberOfResults">
-                {{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.numberOfResults") }}
-
-                <span>{{ primaryDataCount }}</span>
-            </p>
-
-            <FlatButton
-                v-if="primaryDataCount > 0"
-                id="tabDetailsDownloadButton"
-                :disabled="progressNow >= 0 || !somethingCheckedForDownload || sumOfCheckedFilesProgress > 100"
-                :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
-                :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
-                @click="downloadChecked()"
-            />
-        </div>
-
-        <SumOfCheckedFiles
-            v-if="somethingCheckedForDownload"
-            :checked-datasets="[getAllFilesForDownload()]"
-            @update:progress-percentage="sumOfCheckedFilesProgress = $event"
-        />
-
-        <div class="contentDetailsTableContainer">
-            <div
-                v-if="showSpinner"
-                class="loadingDetailsSpinner"
+            <table
+                v-if="getDetailsForSelectedDetail"
+                class="datasetInfoTable"
             >
-                <SpinnerItem
-                    custom-class="spinner"
-                    class="ms-3"
-                />
+                <tbody>
+                    <tr>
+                        <td>{{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.datasetInfoTable.archive") }}</td>
 
-                <p>{{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.loading") }}</p>
+                        <td>{{ getNameForArchiveId(getDetailsForSelectedDetail?.archiveId) }}</td>
+                    </tr>
+
+                    <tr>
+                        <td>{{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.datasetInfoTable.datasetProtectionClass") }}</td>
+
+                        <td>{{ getDataProtectionClassForArchiveId(getDetailsForSelectedDetail?.archiveId)?.name }}</td>
+                    </tr>
+
+                    <tr
+                        v-for="(attribute, index) in (getDetailsForSelectedDetail?.attributes || [])"
+                        :id="`detail-tablerow-${index}`"
+                        :key="index"
+                    >
+                        <td>{{ getTranslationForAttributeWrapper(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`, attribute.name) }}</td>
+
+                        <td>{{ attribute.value }}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <hr>
+
+            <div class="tableHeaderDetailsTable">
+                <p class="numberOfResults">
+                    {{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.numberOfResults") }}
+
+                    <span>{{ primaryDataCount }}</span>
+                </p>
+
+                <FlatButton
+                    v-if="primaryDataCount > 0"
+                    id="tabDetailsDownloadButton"
+                    :disabled="progressNow >= 0 || !somethingCheckedForDownload || sumOfCheckedFilesProgress > 100"
+                    :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
+                    :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
+                    @click="downloadChecked()"
+                />
             </div>
 
-            <TabResultTable
-                v-if="primaryDataCount > 0"
-                :table-index="`details-table-${selectedDetail.primaryDataId || selectedDetail.instanceId}`"
-                :table-header="getTableHeaders()"
-                :table-datasets="tableDatasets"
-                :show-buttons="showTableButtons"
-                @showPreview="showPreview"
-                @download="downloadDataset"
+            <SumOfCheckedFiles
+                v-if="somethingCheckedForDownload"
+                :checked-datasets="[getAllFilesForDownload()]"
+                @update:progress-percentage="sumOfCheckedFilesProgress = $event"
             />
         </div>
 
-        <div class="buttonRowDetailsContainer">
+        <div class="ScrollableContent">
+            <div class="contentDetailsTableContainer">
+                <div
+                    v-if="showSpinner"
+                    class="loadingDetailsSpinner"
+                >
+                    <SpinnerItem
+                        custom-class="spinner"
+                        class="ms-3"
+                    />
+
+                    <p>{{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.loading") }}</p>
+                </div>
+
+                <TabResultTable
+                    v-if="primaryDataCount > 0"
+                    :table-index="`details-table-${selectedDetail.primaryDataId || selectedDetail.instanceId}`"
+                    :table-header="getTableHeaders()"
+                    :table-datasets="tableDatasets"
+                    :show-buttons="showTableButtons"
+                    @showPreview="showPreview"
+                    @download="downloadDataset"
+                />
+            </div>
+        </div>
+
+        <div class="FixedContent">
             <FlatButton
                 id="backToListButton"
                 :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabDetails.backButtonLabel')"
@@ -330,27 +337,34 @@ export default {
                 @click="returnToSearchTab()"
             />
         </div>
-
-        <ModalItem
-            :show-modal="showPreviewModal"
-            @modalHid="showPreviewModal = false"
-        >
-            <template #default>
-                <img
-                    v-if="previewImage"
-                    class="screenshotPreviewArea"
-                    :src="previewImage"
-                    :alt="$t('additional:modules.lzsResearchClient.tabs.tabDetail.previewAltText')"
-                >
-            </template>
-        </ModalItem>
     </div>
+
+    <ModalItem
+        :show-modal="showPreviewModal"
+        @modalHid="showPreviewModal = false"
+    >
+        <template #default>
+            <img
+                v-if="previewImage"
+                class="screenshotPreviewArea"
+                :src="previewImage"
+                :alt="$t('additional:modules.lzsResearchClient.tabs.tabDetail.previewAltText')"
+            >
+        </template>
+    </ModalItem>
 </template>
 
 <style lang="scss" scoped>
 
 #TabDetails {
-    margin-top: 1rem;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 0.5rem;
+
+    .details-header {
+        flex-direction: column;
+    }
 
     table.datasetInfoTable {
         width: 100%;
@@ -396,7 +410,6 @@ export default {
         }
     }
 
-    div.buttonRowDetailsContainer,
     div.tableHeaderDetailsTable {
         display: flex;
         justify-content: space-between;

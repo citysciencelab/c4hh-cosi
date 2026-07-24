@@ -296,6 +296,7 @@ export default {
         <template v-else-if="requestToken">
             <TabContainer
                 ref="tabContainer"
+                class="TabContainer"
                 :tabs="tabs"
                 initial-active-tab-id="tabSearch"
             />
@@ -314,8 +315,9 @@ export default {
 
 <style lang="scss" scoped>
 
-    #lzsResearchClient{
+    #lzsResearchClient {
         height: 100%;
+        overflow: hidden;
 
         div.alertError {
             color: #a94442;
@@ -359,6 +361,43 @@ export default {
                 background-color: white;
                 white-space: pre-line;
                 padding: 1.5rem;
+            }
+        }
+
+        div.TabContainer {
+            :deep(div.LayoutFrame) {
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: column;
+                position: relative;
+                min-height: 0;
+                height: 100%;
+                overflow: hidden;
+                padding-bottom: 2.5rem;
+
+                div.InnerLayoutFrame {
+                    flex: 1 1 auto;
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 0;
+                }
+
+                div.FixedContent {
+                    margin-top: auto;
+                    padding-top: 0.5rem;
+                    padding-bottom: 0.25rem;
+                    display: flex;
+                    gap: 0.5rem;
+                }
+
+                div.ScrollableContent {
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1 1 auto;
+                    min-height: 0;
+                    overflow: auto;
+                    padding-right: 0.5rem;
+                }
             }
         }
     }
