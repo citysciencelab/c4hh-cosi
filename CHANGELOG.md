@@ -31,7 +31,7 @@
     - devDependencies:
         - "docdash": "^2.0.2"
 - Login: Added new config.js parameter `includeCredentials`. If set to false, intercepted requests still get the Authorization header but do not send credentials (cookies), which can help prevent CORS errors.
-- NavTab: Added slot to display optional content (e.g., badges, counts) after the label.
+- NavTab: Added slot to display optional content (e.g. badges, counts) after the label.
 - SearchBar: Added new `searchInterfaceCsw` to search records of a CSW catalog.
 
 
@@ -47,6 +47,7 @@
         - vite: 8.0.14 to 8.1.4
 - Tests: 
     - Tests now fail on vue warnings.
+- SensorTheme: Replaced navigation pills with the shared NavTab component.
     - Excluded barchart and piechart tests due to issues with the prePushHook.
 - ResizeHandle: Simplified component by removing multi-directional resize infrastructure to support menu width resizing only (left/right positions).
 - Issue \#1641 : PortalFooter: The scaleline is displayed on mobile devices with a screen width of 320px or more.

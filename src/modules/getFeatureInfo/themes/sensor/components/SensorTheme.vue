@@ -2,9 +2,9 @@
 import axios from "axios";
 import {mapGetters} from "vuex";
 import dayjs from "dayjs";
-
-import SensorThemeChartsData from "./SensorThemeData.vue";
-import SensorThemeChartsBarChart from "./SensorThemeBarChart.vue";
+import SensorThemeData from "./SensorThemeData.vue";
+import SensorThemeBarChart from "./SensorThemeBarChart.vue";
+import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 import {processHistoricalDataByWeekdays} from "../js/processHistoricalDataByWeekdays.js";
 
 /**
@@ -25,8 +25,9 @@ import {processHistoricalDataByWeekdays} from "../js/processHistoricalDataByWeek
 export default {
     name: "SensorTheme",
     components: {
-        SensorThemeChartsData,
-        SensorThemeChartsBarChart
+        SensorThemeData,
+        SensorThemeBarChart,
+        NavTab
     },
     props: {
         feature: {
@@ -264,56 +265,39 @@ export default {
                 <br>
             </strong>
         </div>
-        <div>
-            <ul class="nav nav-pills">
-                <li
-                    class="nav-item"
-                    :value="dataName"
-                >
-                    <a
-                        data-bs-toggle="tab"
-                        href="#data"
-                        class="nav-link"
-                        :class="{
-                            active: isActiveTab('data')
-                        }"
-                        @click="setActiveTab"
-                    >
-                        {{ dataName }}
-                    </a>
-                </li>
-                <li
+        <div class="sensor-nav-tabs">
+            <ul
+                class="nav nav-tabs"
+                role="tablist"
+            >
+                <NavTab
+                    id="sensor-data-tab"
+                    :label="dataName"
+                    :active="isActiveTab('data')"
+                    target="#data"
+                    :interaction="() => { activeTab = 'data'; }"
+                />
+                <NavTab
                     v-for="(value, key) in chartvalues"
+                    :id="`sensor-chart-tab-${key}`"
                     :key="key"
-                    value="value?.title || value"
-                    class="nav-item"
-                    :class="{
-                        disabled: processedHistoricalDataByWeekday.length === 0
-                    }"
-                >
-                    <a
-                        class="nav-link"
-                        :data-bs-toggle="processedHistoricalDataByWeekday.length === 0 ? 'buttons' : 'tab'"
-                        :href="processedHistoricalDataByWeekday.length === 0 ? '#' : createHref(key)"
-                        :class="{
-                            active: isActiveTab(key)
-                        }"
-                        @click="setActiveTab"
-                    >
-                        {{ $t(value.title || value) }}
-                    </a>
-                </li>
+                    :label="$t(value.title || value)"
+                    :active="isActiveTab(key)"
+                    :disabled="processedHistoricalDataByWeekday.length === 0"
+                    :target="`#${key}`"
+                    :interaction="() => { activeTab = String(key); }"
+                />
             </ul>
         </div>
         <div>
-            <SensorThemeChartsData
+            <SensorThemeData
                 id="data"
                 key="sensorCharts-dataComponent"
                 :show="isActiveTab('data')"
                 :class="getTabPaneClasses('data')"
                 :feature="feature"
             />
-            <SensorThemeChartsBarChart
+            <SensorThemeBarChart
                 v-for="(value, key) in chartvalues"
                 :key="`sensorCharts-barChartComponent-${key}`"
                 :class="getTabPaneClasses(key)"
@@ -336,5 +320,8 @@ export default {
     }
     .gfi-theme-sensor {
         overflow: auto;
+    }
+    .sensor-nav-tabs {
+        margin-top: 1rem;
     }
 </style>

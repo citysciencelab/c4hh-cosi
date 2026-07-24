@@ -10,9 +10,7 @@ import nodePlugin from "eslint-plugin-n";
 const navTabLegacyExcludedFiles = [
     "src/shared/modules/tabs/components/NavTab.vue",
     "src/modules/featureLister/components/LayerListView.vue",
-    "src/modules/controls/orientation/components/poi/PoiOrientation.vue",
-    "src/modules/layerPills/components/LayerPills.vue",
-    "src/modules/getFeatureInfo/themes/sensor/components/SensorTheme.vue"
+    "src/modules/layerPills/components/LayerPills.vue"
 ];
 
 export default [
