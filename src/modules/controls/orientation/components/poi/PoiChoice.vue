@@ -58,15 +58,15 @@ export default {
         closeIconTriggered (event) {
             if (event.type === "click" || event.which === 32 || event.which === 13) {
                 this.hidePoiChoice();
-                document.querySelector("#geolocatePOI").classList.remove("toggleButtonPressed");
             }
         },
         /**
-         * Hides the modal.
+         * Hides the modal and removes the toggle button pressed class to the geolocate POI button.
          * @returns {void}
          */
         hidePoiChoice () {
             this.setShowPoiChoice(false);
+            document.querySelector("#geolocatePOI").classList.remove("toggleButtonPressed");
         },
 
         /**
@@ -103,7 +103,7 @@ export default {
          */
         triggerTrack () {
             this.$emit("track");
-            this.hidePoiChoice(false);
+            this.setShowPoiChoice(false);
 
             this.registerListener({
                 type: "click",
