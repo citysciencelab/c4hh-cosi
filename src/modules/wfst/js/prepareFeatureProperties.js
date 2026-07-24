@@ -11,7 +11,7 @@ import wfs from "@masterportal/masterportalapi/src/layer/wfs.js";
 async function prepareFeatureProperties (layer, featurePropertiesValues) {
     const isGfiAttributesIgnore = layer.gfiAttributes === "ignore",
         isGfiAttributesShowAll = layer.gfiAttributes === "showAll",
-        isGfiAttributesNestedObject = Object?.values(layer.gfiAttributes)?.find(gfiAttr => typeof gfiAttr === "object" && gfiAttr !== null && !Array.isArray(gfiAttr)),
+        isGfiAttributesObject = typeof layer.gfiAttributes === "object" && layer.gfiAttributes !== null && !Array.isArray(layer.gfiAttributes),
         url = layer.url;
     let properties,
         propertiesWithBooleans = [],
@@ -33,27 +33,31 @@ async function prepareFeatureProperties (layer, featurePropertiesValues) {
     }
 
     propertiesWithBooleans = properties.map(property => property.type === "boolean" && property.value === null ? {...property, valid: true, value: false} : property);
+
     if (isGfiAttributesShowAll) {
         preparedProperties = propertiesWithBooleans;
     }
-    else if (isGfiAttributesNestedObject) {
+    else if (isGfiAttributesObject) {
+        const layerGfiAttributesKeys = Object.keys(layer.gfiAttributes);
+
         preparedProperties = propertiesWithBooleans
             .reduce((array, property) => {
-                return property.type === "geometry" || Object.keys(layer.gfiAttributes[property.key]) !== undefined
-                    ? [...array, {
-                        ...property,
-                        label: typeof layer.gfiAttributes[property.key] === "string"
-                            ? layer.gfiAttributes[property.key]
-                            : layer.gfiAttributes[property.key]?.name}]
-                    : array;
+                if (property.type === "geometry") {
+                    return [...array, property];
+                }
+
+                if (!layerGfiAttributesKeys.includes(property.key)) {
+                    return array;
+                }
+
+                const gfiAttributeEntry = layer.gfiAttributes[property.key];
+                const label = getLabelForProperty(property, gfiAttributeEntry);
+
+                return [...array, {
+                    ...property,
+                    label
+                }];
             },
-            []);
-    }
-    else {
-        preparedProperties = propertiesWithBooleans
-            .reduce((array, property) => property.type === "geometry" || layer.gfiAttributes[property.key] !== undefined
-                ? [...array, {...property, label: layer.gfiAttributes[property.key]}]
-                : array,
             []);
     }
 
@@ -68,6 +72,24 @@ async function prepareFeatureProperties (layer, featurePropertiesValues) {
     }
 
     return preparedProperties;
+}
+
+/**
+ * Extracts the label for a property from the gfiAttributes configuration of the layer.
+ * @param {FeatureProperty} property 
+ * @param {string|object} gfiAttributeEntry 
+ * @returns {string}
+ */
+function getLabelForProperty (property, gfiAttributeEntry) {
+    if (typeof gfiAttributeEntry === "string") {
+        return gfiAttributeEntry;
+    }
+    if (typeof gfiAttributeEntry === "object" && !Array.isArray(gfiAttributeEntry)) {
+        return typeof gfiAttributeEntry?.name === "string"
+            ? gfiAttributeEntry.name
+            : property.label;
+    }
+    return property.label;
 }
 
 export default {prepareFeatureProperties};
