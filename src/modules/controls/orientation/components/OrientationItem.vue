@@ -265,6 +265,7 @@ export default {
                 geolocation,
                 listener: this.onAccuracyGeometryChange
             });
+            this.unbindGeolocationListeners(geolocation);
 
             this.tracking = false;
         },

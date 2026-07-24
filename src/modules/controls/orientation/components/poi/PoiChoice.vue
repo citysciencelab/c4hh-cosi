@@ -37,6 +37,15 @@ export default {
             }
         });
     },
+    unmounted () {
+        if (this.poiMode === "currentPosition") {
+            this.unregisterListener({
+                type: "click",
+                listener: this.mapClicked,
+                keyForBoundFunctions: "poiChoiceTriggerTrack"
+            });
+        }
+    },
     methods: {
         ...mapMutations("Controls/Orientation", Object.keys(mutations)),
         ...mapActions("Maps", ["registerListener", "unregisterListener"]),
