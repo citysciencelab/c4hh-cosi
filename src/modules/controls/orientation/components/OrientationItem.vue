@@ -456,6 +456,7 @@ export default {
             if (this.poiModeCurrentPositionEnabled) {
                 this.$store.dispatch("Maps/removePointMarker");
                 this.showMarkerOverlay();
+                document.querySelector("#geolocate").className += " toggleButtonPressed";
                 if (this.geolocation === null) {
                     geolocation = new Geolocation({tracking: true, enableHighAccuracy: true, projection: Proj.get("EPSG:4326")});
                     this.setGeolocation(geolocation);
@@ -470,6 +471,7 @@ export default {
             }
             else {
                 this.untrack();
+                document.querySelector("#geolocate").classList.remove("toggleButtonPressed");
             }
         },
 
