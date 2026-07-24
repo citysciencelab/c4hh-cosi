@@ -58,7 +58,7 @@ const state = {
     currentInputName: "",
     dataSources: [],
     description: "additional:modules.tools.simulationTool.toolDescription",
-    hasMouseMapInteractions: true,
+    hasMouseMapInteractions: false,
     hiddenSideMenus: [],
     icon: "bi-sliders2",
     img: {},

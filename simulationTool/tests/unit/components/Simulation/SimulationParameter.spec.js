@@ -6,6 +6,8 @@ import SimulationParameter from "../../../../components/Simulation/SimulationPar
 import sinon from "sinon";
 import axios from "axios";
 import getOAFFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import layerFactory from "@core/layers/js/layerFactory.js";
 
 describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", () => {
     let consoleWarnSpy, store;
@@ -237,12 +239,16 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                     title: "Simulation A",
                     inputs: {},
                     outputs: {},
-                    processes: []
+                    processes: [{id: "p1", url: "https://example.com/processes/p1"}]
                 }
             });
 
             const wrapper = factory.getMount();
 
+            await wrapper.setData({
+                isLoading: false,
+                processDescriptions: [{outputs: {result: {}}}]
+            });
             await wrapper.vm.$nextTick();
 
             expect(wrapper.find("#outputParam").exists()).to.be.true;
@@ -1201,6 +1207,140 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                         },
                         outputs: {},
                         response: "document"
+                    }
+                ]);
+            });
+        });
+
+        describe("loadRequiredOafInputs", () => {
+            it("should pass fetched FeatureCollection payload to setRequestBodyInput", async () => {
+                const wrapper = factory.getShallowMount(),
+                    setRequestBodyInputSpy = sinon.spy(wrapper.vm, "setRequestBodyInput"),
+                    fetchedFeatures = [
+                        {
+                            type: "Feature",
+                            geometry: {
+                                type: "Point",
+                                coordinates: [10, 53]
+                            },
+                            properties: {
+                                id: "feature-1"
+                            }
+                        },
+                        {
+                            type: "Feature",
+                            geometry: {
+                                type: "Point",
+                                coordinates: [11, 54]
+                            },
+                            properties: {
+                                id: "feature-2"
+                            }
+                        }
+                    ];
+
+                wrapper.vm.addLayerToLayerConfig = sinon.stub();
+                wrapper.vm.changeVisibility = sinon.stub();
+                Object.defineProperty(wrapper.vm, "simulation", {
+                    value: {
+                        id: "simulationId",
+                        inputs: {
+                            requiredInput: {
+                                required: true,
+                                source: {
+                                    url: "https://example.com/oaf",
+                                    collection: "buildings",
+                                    options: {}
+                                }
+                            }
+                        }
+                    },
+                    configurable: true
+                });
+                wrapper.vm.processDescriptions = [{
+                    inputs: {
+                        requiredInput: {
+                            title: "Required Input",
+                            schema: {
+                                allOf: [{format: "geojson-feature-collection"}]
+                            }
+                        }
+                    },
+                    outputs: {}
+                }];
+
+                sinon.stub(getOAFFeature, "getOAFFeatureGet").resolves(fetchedFeatures);
+                sinon.stub(layerCollection, "getLayerById").returns(undefined);
+                sinon.stub(layerCollection, "addLayer");
+                sinon.stub(layerFactory, "createLayer").returns({});
+
+                await wrapper.vm.loadRequiredOafInputs();
+
+                expect(setRequestBodyInputSpy.calledOnce).to.be.true;
+                expect(setRequestBodyInputSpy.firstCall.args).to.deep.equal([
+                    "requiredInput",
+                    "",
+                    {
+                        type: "FeatureCollection",
+                        features: fetchedFeatures
+                    }
+                ]);
+            });
+
+            it("should not call getOAFFeatureGet and should pass existing layer payload if required input layer already exists", async () => {
+                const wrapper = factory.getShallowMount(),
+                    existingLayer = {
+                        layer: {
+                            getSource: () => ({
+                                getFeatures: () => []
+                            })
+                        }
+                    },
+                    getOAFFeatureGetSpy = sinon.spy(getOAFFeature, "getOAFFeatureGet"),
+                    setRequestBodyInputSpy = sinon.spy(wrapper.vm, "setRequestBodyInput");
+
+                wrapper.vm.addLayerToLayerConfig = sinon.stub();
+                wrapper.vm.changeVisibility = sinon.stub();
+                Object.defineProperty(wrapper.vm, "simulation", {
+                    value: {
+                        id: "simulationId",
+                        inputs: {
+                            requiredInput: {
+                                required: true,
+                                source: {
+                                    url: "https://example.com/oaf",
+                                    collection: "buildings",
+                                    options: {}
+                                }
+                            }
+                        }
+                    },
+                    configurable: true
+                });
+                wrapper.vm.processDescriptions = [{
+                    inputs: {
+                        requiredInput: {
+                            title: "Required Input",
+                            schema: {
+                                allOf: [{format: "geojson-feature-collection"}]
+                            }
+                        }
+                    },
+                    outputs: {}
+                }];
+
+                sinon.stub(layerCollection, "getLayerById").returns(existingLayer);
+
+                await wrapper.vm.loadRequiredOafInputs();
+
+                expect(getOAFFeatureGetSpy.called).to.be.false;
+                expect(setRequestBodyInputSpy.calledOnce).to.be.true;
+                expect(setRequestBodyInputSpy.firstCall.args).to.deep.equal([
+                    "requiredInput",
+                    "",
+                    {
+                        type: "FeatureCollection",
+                        features: []
                     }
                 ]);
             });
