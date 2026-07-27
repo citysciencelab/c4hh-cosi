@@ -137,7 +137,9 @@ export default {
 
 <style lang="scss">
 #feature-popup {
-    max-height: 60h;
+    max-height: 60vh;
+    border-radius: 5px;
+    box-shadow: 0 8px 11px 2px rgba(0, 0, 0, 0.15);
 
     h5, .description {
         max-width: 500px;
