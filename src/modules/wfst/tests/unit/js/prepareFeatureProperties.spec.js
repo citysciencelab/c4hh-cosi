@@ -151,8 +151,7 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
                     true: "Ja",
                     false: "Nein"
                 }
-            },
-            datum: "Datum"
+            }
         };
         receivePossiblePropertiesStub.resolves([
             {
@@ -160,13 +159,6 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
                 label: "premiumflaeche",
                 required: false,
                 type: "boolean",
-                value: null
-            },
-            {
-                key: "datum",
-                label: "datum",
-                required: false,
-                type: "date",
                 value: null
             },
             {
@@ -181,10 +173,9 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
         const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation);
 
         expect(Array.isArray(properties)).to.be.true;
-        expect(properties.length).to.equal(3);
+        expect(properties.length).to.equal(2);
         expect(properties.find(({key}) => key === "premiumflaeche").label).to.equal("Premiumflaeche");
         expect(properties.find(({key}) => key === "premiumflaeche").value).to.equal(false);
-        expect(properties.find(({key}) => key === "datum").label).to.equal("Datum");
         expect(properties.find(({type}) => type === "geometry")).to.exist;
     });
     it("should set default values", async () => {
