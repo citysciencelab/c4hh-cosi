@@ -1,5 +1,5 @@
 const Config = {
-    addons: ["exampleControl", "bildungsatlas", "dataTable", "dipas", "exampleSearch", "populationRequest", "schulinfo", "sturmflut", "trafficCount", "trinkwasser", "userTracking", "verkehrsstaerken"],
+    addons: ["exampleControl", "bildungsatlas", "dataTable", "dipas", "exampleSearch", "populationRequest", "schulinfo", "sturmflut", "trafficCount", "trinkwasser", "verkehrsstaerken"],
     ignoredKeys: ["BOUNDEDBY", "SHAPE", "SHAPE_LENGTH", "SHAPE_AREA", "OBJECTID", "GLOBALID", "GEOMETRY", "SHP", "SHP_AREA", "SHP_LENGTH", "GEOM"],
     namedProjections: [
         // ETRS89 UTM
@@ -50,31 +50,6 @@ const Config = {
         },
         fallbackLanguage: "de",
         changeLanguageOnStartWhen: ["querystring", "localStorage", "htmlTag"]
-    },
-    userTracking: {
-        matomo: {
-            customDimension: [
-                {id: 1, name: "portal"}
-            ],
-            privacy: [
-                "noAbTesting",
-                "noCookies",
-                "noFormAnalytics",
-                "noHeatmap",
-                "noReferrerUrl",
-                "respectDoNotTrack",
-                "useRandomUserIdForSession"
-            ],
-            siteId: "237",
-            trackerScriptUrl: "https://matomo.be-on.de/matomo.js",
-            trackerUrl: "https://matomo.be-on.de/matomo.php",
-            trackInitialView: true
-        },
-        options: {
-            "enableInputTracking": true,
-            "enableLinkTracking": true
-        }
-
     }
 };
 

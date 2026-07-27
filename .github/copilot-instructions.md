@@ -39,7 +39,7 @@ src/
   core/layers/        ← Layer abstractions (Layer2d, Layer2dVector, WMS, etc.)
   modules/            ← Feature modules (50+: draw, print, filter, login, …)
   shared/             ← Shared Vue components & JS utilities (use these first)
-  plugins/            ← Vue plugins (matomo, i18next, …)
+  plugins/            ← Vue plugins (i18next, vuetify, …)
   assets/             ← SCSS (variables.scss, Bootstrap 5.3 theming)
   App.vue             ← Root component
   masterportal.js     ← Application entry point
