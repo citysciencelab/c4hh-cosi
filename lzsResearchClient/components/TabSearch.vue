@@ -28,7 +28,6 @@ import {getArea} from "ol/sphere";
 
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
-
 /**
  * Rectangle interaction class extending ExtentInteraction to handle rectangle drawing events.
  * It dispatches custom events "modifystart" and "modifyend" when the user starts and ends drawing an extent, respectively.
@@ -717,6 +716,8 @@ export default {
                             }
                         }]
                     });
+
+                    delete this.archiveLayerOriginalState[layerConfig.id];
                 }
             }
         },
@@ -1236,6 +1237,23 @@ export default {
                 return;
             }
 
+            const archiveLayerIds = Object.keys(this.archiveLayerOriginalState),
+                  layerVisible = !(archiveLayerIds.length > 0);
+
+            if (archiveLayerIds.length > 0) {
+                archiveLayerIds.forEach(id => {
+                    this.replaceByIdInLayerConfig({
+                        layerConfigs: [{
+                            id,
+                            layer: {
+                                visibility: false,
+                                showInLayerTree: true
+                            }
+                        }]
+                    });
+                });
+            }
+
             if (!existingLayer) {
                 if (configJsonLayer) {
                     this.archiveLayerOriginalState[layerId] = {
@@ -1256,7 +1274,7 @@ export default {
                             {...servicesJsonLayer,
                              ...{
                                  showInLayerTree: true,
-                                 visibility: true,
+                                 visibility: layerVisible,
                                  type: "layer"
                              }
                             },
@@ -1274,7 +1292,7 @@ export default {
                     layerConfigs: [{
                         id: layerId,
                         layer: {
-                            visibility: true,
+                            visibility: layerVisible,
                             showInLayerTree: true
                         }
                     }]
@@ -1291,7 +1309,7 @@ export default {
                     layerConfigs: [{
                         id: layerId,
                         layer: {
-                            visibility: true,
+                            visibility: layerVisible,
                             showInLayerTree: true
                         }
                     }]
