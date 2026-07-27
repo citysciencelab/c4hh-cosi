@@ -780,7 +780,7 @@ export default {
                                                 :style="getNumericalValueStyle(item, col.value)"
                                                 :color="getNumericalValueColor(item, col.value, col.invertColor)"
                                                 dark
-                                                dense
+                                                density="compact"
                                             />
                                         </div>
                                     </div>

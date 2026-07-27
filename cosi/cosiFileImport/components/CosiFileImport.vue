@@ -429,7 +429,7 @@ export default {
                 </p>
                 <v-select
                     v-model="currentCrs"
-                    dense
+                    density="compact"
                     :items="availableCrs"
                     item-title="name"
                     item-value="crs"
@@ -571,10 +571,9 @@ export default {
                                                     <span>{{ data.item.key }}</span>
                                                 </template>
                                                 <template
-                                                    slot="item"
-                                                    slot-scope="data"
+                                                    #item="{ item }"
                                                 >
-                                                    <span><strong>{{ data.item.key }}</strong>: {{ data.item.value }}</span>
+                                                    <span><strong>{{ item.key }}</strong>: {{ item.value }}</span>
                                                 </template>
                                             </v-select>
                                         </div>

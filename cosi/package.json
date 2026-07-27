@@ -23,19 +23,17 @@
     "d3-color": "^3.1.0",
     "d3-scale": "^4.0.2",
     "d3-scale-chromatic": "^3.1.0",
-    "fake-indexeddb": "^3.1.7",
     "file-saver": "^2.0.5",
     "html2canvas": "^1.4.1",
     "jszip": "^3.10.1",
-    "object-hash": "^2.1.1",
-    "pdfmake": "^0.2.20",
+    "pdfmake": "^0.3.11",
     "tableify": "^1.1.1",
     "turf-featurecollection": "^1.0.1",
     "vue-chartjs": "^5.3.3",
     "vue-draggable-next": "2.3.0",
-    "vue-inline-svg": "^2.1.0",
+    "vue-inline-svg": "^4.0.1",
     "vue-json-excel": "^0.3.0",
-    "vuetify": "3.11.x",
-    "xlsx": "^0.16.9"
+    "vuetify": "4.1.x",
+    "xlsx": "^0.18.5"
   }
 }

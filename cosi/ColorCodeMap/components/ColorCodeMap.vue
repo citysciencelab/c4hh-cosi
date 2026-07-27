@@ -440,7 +440,7 @@ export default {
                         v-if="selectedStatFeatures.length"
                         v-model="_selectedYear"
                         outlined
-                        dense
+                        density="compact"
                         :items="availableYears"
                         :title="$t('additional:modules.tools.colorCodeMap.yearsLabel')"
                         class="year_selection selection"
@@ -449,7 +449,7 @@ export default {
                         v-if="selectedStatFeatures.length"
                         v-model="lastYear"
                         outlined
-                        dense
+                        density="comfortable"
                         :items="availableYears"
                         clearable
                         class="year_selection selection"
@@ -462,7 +462,7 @@ export default {
                     :items="statsMapping"
                     item-text="value"
                     outlined
-                    dense
+                    density="comfortable"
                     hide-details
                 />
             </div>

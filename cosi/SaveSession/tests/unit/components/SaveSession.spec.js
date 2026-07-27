@@ -7,7 +7,6 @@ import SaveSessionStore from "../../../store/indexSaveSession";
 import Vuetify from "vuetify";
 import sinon from "sinon";
 // import Vue from "vue";
-require("fake-indexeddb/auto");
 
 // config.mocks.$t = key => key;
 

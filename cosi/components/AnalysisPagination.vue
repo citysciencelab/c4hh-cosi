@@ -78,12 +78,12 @@ export default {
                     tile
                     depressed
                     small
-                    color="grey lighten-1"
+                    color="grey-lighten-1"
                     :title="titles.add"
                     @click="$emit('addSet')"
                 >
                     <v-icon
-                        dense
+                        density="compact"
                     >
                         mdi-plus-box-outline
                     </v-icon>
@@ -95,13 +95,13 @@ export default {
                         tile
                         depressed
                         small
-                        color="green lighten-2"
+                        color="green-lighten-2"
                         :title="titles.downloads[i]"
                         @click="$emit('download' + type, activeSet)"
                     >
                         {{ type }}
                         <v-icon
-                            dense
+                            density="compact"
                         >
                             mdi-download
                         </v-icon>
@@ -112,12 +112,12 @@ export default {
                     tile
                     depressed
                     small
-                    color="green lighten-2"
+                    color="green-lighten-2"
                     :title="titles.downloadAll"
                     @click="$emit('downloadAll')"
                 >
                     <v-icon
-                        dense
+                        density="compact"
                     >
                         mdi-folder-download
                     </v-icon>
@@ -132,7 +132,7 @@ export default {
                     @click="$emit('removeSingle', activeSet)"
                 >
                     <v-icon
-                        dense
+                        density="compact"
                     >
                         mdi-close
                     </v-icon>
@@ -147,7 +147,7 @@ export default {
                     @click="$emit('removeAll')"
                 >
                     <v-icon
-                        dense
+                        density="compact"
                     >
                         mdi-folder-remove
                     </v-icon>

@@ -58,7 +58,7 @@ export default {
 <template>
     <v-sheet>
         <v-card>
-            <v-table dense>
+            <v-table density="compact">
                 <template #default>
                     <tbody class="detail-view-row">
                         <tr

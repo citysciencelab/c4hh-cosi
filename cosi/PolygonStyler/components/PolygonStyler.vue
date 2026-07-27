@@ -284,7 +284,7 @@ export default {
             :items="layerNameList"
             multiple
             outlined
-            dense
+            density="compact"
         />
         <v-data-table
             v-if="visibleTableItems.length > 0"

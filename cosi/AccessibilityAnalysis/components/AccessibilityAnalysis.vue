@@ -12,7 +12,7 @@ import {featureCollection as turfFeatureCollection} from "@turf/helpers";
 import {VExpandTransition} from "vuetify/components/transitions";
 import {VItemGroup, VItem} from "vuetify/components/VItemGroup";
 import dayjs from "dayjs";
-import deepEqual from "deep-equal";
+import deepEqual from "fast-deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import Feature from "ol/Feature";

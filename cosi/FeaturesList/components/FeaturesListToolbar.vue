@@ -164,7 +164,7 @@ export default {
                 <br>
                 <v-checkbox
                     v-model="sumUpLayers"
-                    dense
+                    density="compact"
                     hide-details
                     :label="$t('additional:modules.tools.cosi.featuresList.sumUpLayers')"
                     :title="$t('additional:modules.tools.cosi.featuresList.sumUpLayersTooltip')"

@@ -19,7 +19,6 @@ import DashboardChartView from "./DashboardChartView.vue";
 import DashboardTimeline from "./DashboardTimeline.vue";
 import DashboardToolbar from "./DashboardToolbar.vue";
 import exportXlsx from "../../utils/exportXlsx";
-import {generateChartForDistricts, generateChartForCorrelation, generateChartsForItems} from "../utils/chart";
 import getters from "../store/gettersDashboard.js";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import isObject from "@shared/js/utils/isObject.js";
@@ -295,57 +294,6 @@ export default {
             for (const field in this.fields) {
                 this.fields[field] = null;
             }
-        },
-
-        renderCharts (item) {
-            const
-                total = this.getTotalForAllTimestamps(item),
-                average = this.getAverageForAllTimestamps(item),
-                data = {
-                    ...item,
-                    total,
-                    average
-                },
-                chart = generateChartForDistricts(
-                    data,
-                    this.selectedColumns,
-                    this.selectedDistrictLevel.label,
-                    this.timestampPrefix
-                );
-
-            this.channelGraphData(chart);
-        },
-
-        renderGroupedCharts () {
-            if (this.selectedItems.length === 0) {
-                return;
-            }
-
-            const
-                datasets = this.selectedItems.map(item => ({
-                    ...item,
-                    total: this.getTotalForAllTimestamps(item),
-                    average: this.getAverageForAllTimestamps(item)
-                })),
-                charts = generateChartsForItems(
-                    datasets,
-                    this.selectedColumns,
-                    this.selectedDistrictLevel.label,
-                    this.timestampPrefix
-                );
-
-            this.channelGraphData(charts);
-        },
-
-        renderScatterplot () {
-            if (!(this.fields.B && this.fields.A)) {
-                return;
-            }
-
-            const correlation = this.calculateCorrelation(),
-                  chart = generateChartForCorrelation(correlation, this.fields.B.category, this.fields.A.category);
-
-            this.channelGraphData(chart);
         },
 
         onVisualizationChanged () {
