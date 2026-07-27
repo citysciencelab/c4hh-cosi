@@ -55,7 +55,7 @@ export default {
         commit("setProcessesLoading", true);
 
         try {
-            const response = await fetch(`${getters.simulationApiUrl}/processes/`, {
+            const response = await fetch(`${getters.simulationApiUrl}/processes`, {
                 headers: {
                     "content-type": "application/json",
                     ...additionalHeaders

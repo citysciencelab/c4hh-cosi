@@ -1,4 +1,5 @@
 import axios from "axios";
+import sanitizeConfiguredUrl from "./sanitizeConfiguredUrl.js";
 
 /**
  * Class representing an OGC API Process.
@@ -9,11 +10,14 @@ export default class OgcApiProcess {
     /**
      * Creates an instance of OgcApiProcess.
      * @constructor
-     * @param {string} baseUrl - The base URL of the OGC API. Be sure to include the trailing slash.
+     * @param {string} baseUrl - The base URL of the OGC API. Relative and absolute URLs are supported.
      * @param {string} processId - The ID of the process.
     */
     constructor (baseUrl, processId) {
-        this.baseUrl = baseUrl;
+        this.baseUrl = sanitizeConfiguredUrl(baseUrl, {
+            enforceTrailingSlash: true,
+            returnAbsolute: true
+        });
         this.processId = processId;
     }
 
@@ -26,7 +30,7 @@ export default class OgcApiProcess {
     async getDescription (accessToken) {
         try {
             const url = new URL(`processes/${this.processId}`, this.baseUrl),
-                response = await axios.get(url, {
+                response = await axios.get(url.toString(), {
                     headers: {
                         Authorization: `Bearer ${accessToken}`
                     }
@@ -107,7 +111,7 @@ export default class OgcApiProcess {
      */
     async execute (requestBody, accessToken) {
         const url = new URL(`processes/${this.processId}/execution`, this.baseUrl),
-            response = await axios.post(url, requestBody, {
+            response = await axios.post(url.toString(), requestBody, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
                 }
@@ -123,7 +127,7 @@ export default class OgcApiProcess {
      */
     async getJobStatus (jobID, accessToken) {
         const url = new URL(`jobs/${jobID}`, this.baseUrl),
-            response = await axios.get(url, {
+            response = await axios.get(url.toString(), {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
                 }
@@ -139,7 +143,7 @@ export default class OgcApiProcess {
      */
     async getJobResults (jobID, accessToken) {
         const url = new URL(`jobs/${jobID}/results`, this.baseUrl),
-            response = await axios.get(url, {headers: {
+            response = await axios.get(url.toString(), {headers: {
                 Authorization: `Bearer ${accessToken}`
             }});
 
