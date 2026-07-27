@@ -2,12 +2,21 @@
 import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
+import {vi} from "vitest";
 import SimulationParameter from "../../../../components/Simulation/SimulationParameter.vue";
 import sinon from "sinon";
 import axios from "axios";
 import getOAFFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import layerFactory from "@core/layers/js/layerFactory.js";
+
+const {deserializeHelperMock} = vi.hoisted(() => ({
+    deserializeHelperMock: vi.fn()
+}));
+
+vi.mock("../../../../js/deserializeFlatGeobufToGeoJsonFeatureCollection.js", () => ({
+    default: deserializeHelperMock
+}));
 
 describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", () => {
     let consoleWarnSpy, store;
@@ -1343,6 +1352,77 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                         features: []
                     }
                 ]);
+            });
+        });
+
+        describe("convertFlatGeobufOutputsIfNeeded", () => {
+            beforeEach(() => {
+                deserializeHelperMock.mockReset();
+            });
+
+            it("positive: converts flatgeobuf output via helper", async () => {
+                const wrapper = factory.getShallowMount(),
+                    expectedFeatureCollection = {
+                        type: "FeatureCollection",
+                        features: [{
+                            type: "Feature",
+                            geometry: {
+                                type: "Point",
+                                coordinates: [1, 2]
+                            },
+                            properties: {id: "a"}
+                        }]
+                    },
+                    flatGeobufPayload = {
+                        encoding: "base64",
+                        value: "Zm9v"
+                    },
+                    jobResults = {
+                        roads: flatGeobufPayload,
+                        untouched: {value: 42}
+                    };
+
+                wrapper.vm.simulation.outputs = {
+                    roads: {
+                        value: {
+                            format: {
+                                mediaType: "application/flatgeobuf"
+                            }
+                        }
+                    }
+                };
+
+                deserializeHelperMock.mockResolvedValue(expectedFeatureCollection);
+
+                const result = await wrapper.vm.convertFlatGeobufOutputsIfNeeded(jobResults);
+
+                expect(deserializeHelperMock).toHaveBeenCalledTimes(1);
+                expect(deserializeHelperMock).toHaveBeenCalledWith(flatGeobufPayload);
+                expect(result.roads).to.deep.equal(expectedFeatureCollection);
+                expect(result.untouched).to.deep.equal({value: 42});
+            });
+
+            it("negative: keeps output unchanged when mediaType is not flatgeobuf", async () => {
+                const wrapper = factory.getShallowMount(),
+                    nonFlatOutput = {value: "plain-json"},
+                    jobResults = {
+                        roads: nonFlatOutput
+                    };
+
+                wrapper.vm.simulation.outputs = {
+                    roads: {
+                        value: {
+                            format: {
+                                mediaType: "application/json"
+                            }
+                        }
+                    }
+                };
+
+                const result = await wrapper.vm.convertFlatGeobufOutputsIfNeeded(jobResults);
+
+                expect(deserializeHelperMock).not.toHaveBeenCalled();
+                expect(result.roads).to.equal(nonFlatOutput);
             });
         });
     });

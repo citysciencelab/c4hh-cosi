@@ -11,6 +11,7 @@ import InputText from "../../../../src/shared/modules/inputs/components/InputTex
 import isObject from "../../../../src/shared/js/utils/isObject.js";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
+import deserializeFlatGeobufToGeoJsonFeatureCollection from "../../js/deserializeFlatGeobufToGeoJsonFeatureCollection.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import OgcApiProcess from "../../js/ogcApiProcess.js";
@@ -18,6 +19,8 @@ import SectionHeader from "../SectionHeader.vue";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 import {infrastructureLayerId} from "../../layerIds.js";
+
+/** @typedef {import("../../types/ogcApi.processes.d.ts").Results} OGCApiProcessesResults */
 
 const geoJson = new GeoJSON();
 
@@ -667,6 +670,35 @@ export default {
         },
 
         /**
+         * Converts only FlatGeobuf outputs in job results into GeoJSON feature collections.
+         * Non-FlatGeobuf outputs are returned unchanged.
+         * @param {OGCApiProcessesResults} jobResults The job results from the backend.
+         * @returns {Promise<OGCApiProcessesResults>} The normalized job results.
+         */
+        async convertFlatGeobufOutputsIfNeeded (jobResults) {
+            if (!isObject(jobResults)) {
+                return jobResults;
+            }
+
+            const convertedResults = {...jobResults};
+
+            await Promise.all(Object.entries(convertedResults).map(async ([outputKey, outputValue]) => {
+                const outputMediaType = this.simulation?.outputs?.[outputKey]?.value?.format?.mediaType;
+
+                if (outputMediaType === "application/flatgeobuf") {
+                    const deserializedResult = await deserializeFlatGeobufToGeoJsonFeatureCollection(outputValue);
+
+                    convertedResults[outputKey] = deserializedResult ?? outputValue;
+                    return;
+                }
+
+                convertedResults[outputKey] = outputValue;
+            }));
+
+            return convertedResults;
+        },
+
+        /**
          * Initializes the process handlers for the simulation.
          * @returns {void}
          */
@@ -915,18 +947,21 @@ export default {
 
             newSimulation.jobs = Object.fromEntries(jobIDs.map(ID => [ID, {}]));
 
-            Object.values(newSimulation.jobs).forEach(async (job, index) => {
+            for (const [index, job] of Object.values(newSimulation.jobs).entries()) {
                 job.requestBody = JSON.parse(JSON.stringify(this.requestBodies[index]));
                 job.jobStatus = {status: initialStatuses[index]};
                 job.resultStyle = this.simulation.processes[index].resultStyle;
-                job.jobResults = await this.processHandlers[index].pollJobStatusAndGetResults(
+                const jobResults = await this.processHandlers[index].pollJobStatusAndGetResults(
                     this.accessToken,
                     jobIDs[index],
                     this.simulation.processes[index].pollingInterval,
                     jobStatus => this.onProgressUpdate(jobStatus, job)
                 );
+                const normalizedJobResults = await this.convertFlatGeobufOutputsIfNeeded(jobResults);
+
+                job.jobResults = normalizedJobResults;
                 this.jobStatusChanged();
-            });
+            }
         },
 
         /**
