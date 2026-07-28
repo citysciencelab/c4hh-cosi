@@ -42,10 +42,6 @@ export default {
                     "zoom"
                 ],
                 Modules: {
-                    ChartGenerator: [
-                        // "datasets",
-                        // "chartConfigs"
-                    ],
                     CalculateRatio: [
                         "dataSets"
                     ],

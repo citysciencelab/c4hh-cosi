@@ -315,7 +315,6 @@ export default {
         // ...mapActions("Modules/DistanceScoreService", ["getDistanceScore", "getFeatureValues"]),
         ...mapActions("Modules", ["setToolActive"]),
         ...mapActions("Maps", ["removeHighlightFeature", "addNewLayerIfNotExists"]),
-        ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
         ...chartMethods,
 
         getNumericalColumns () {

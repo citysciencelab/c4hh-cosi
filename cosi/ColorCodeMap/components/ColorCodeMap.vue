@@ -8,7 +8,6 @@ import ColorCodeLegend from "./ColorCodeLegend.vue";
 import {Fill, Stroke, Style, Text} from "ol/style.js";
 import {generateColorScale} from "../../utils/colorScale.js";
 import groupMapping from "../../utils/groupMapping";
-import ChartDataset from "../../ChartGenerator/classes/ChartDataset";
 import {mapDistrictNames} from "../../DistrictSelector/utils/prepareDistrictLevels";
 import {convertColor} from "@shared/js/utils/convertColor";
 
@@ -146,7 +145,6 @@ export default {
     methods: {
         ...mapActions("Modules/ColorCodeMap", Object.keys(actions)),
         ...mapMutations("Modules/ColorCodeMap", Object.keys(mutations)),
-        ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
 
         /**
@@ -330,36 +328,6 @@ export default {
 
             this.graphData.push(newDataset);
         },
-        /**
-         * @description Passes data to the Chart Generator Tool.
-         * @returns {Void} Function returns nothing.
-         */
-        loadToChartGenerator () {
-            const graphObj = new ChartDataset({
-                      id: "ccm" + this.selectedFeatures.map(district => {
-                          return district.id_;
-                      }).join("-"),
-                      name: [this.label] + " - " + this.dataCategory + " (" + this.$t("additional:modules.tools.colorCodeMap.title") + ")",
-                      type: ["LineChart", "BarChart", "PieChart"],
-                      color: ["#55eb34", "rgb(14, 150, 240)", "yellow"],
-                      beginAtZero: true,
-                      source: this.$t("additional:modules.tools.colorCodeMap.title"),
-                      scaleLabels: [this.selectedFeature, this.$t("additional:modules.tools.colorCodeMap.yearsLabel")],
-                      data: {
-                          labels: [],
-                          datasets: []
-                      }
-                  }),
-                  years = this.graphData[0].data.reduce((availableYears, val, i) => val ? [...availableYears, this.availableYears[i]] : availableYears, []);
-
-            graphObj.data.labels = years.reverse();
-            graphObj.data.datasets = this.graphData.map(dataset => ({
-                label: dataset.label,
-                data: [...dataset.data].filter(x => Boolean(x)).reverse()
-            }));
-
-            this.channelGraphData(graphObj);
-        },
 
         openMetadata () {
             this.metadataUrls.forEach(url => {
@@ -522,7 +490,6 @@ export default {
                 <button
                     class="graph_button"
                     :title="$t('additional:modules.tools.colorCodeMap.generateChart')"
-                    @click="loadToChartGenerator()"
                 >
                     <v-icon>
                         mdi-poll

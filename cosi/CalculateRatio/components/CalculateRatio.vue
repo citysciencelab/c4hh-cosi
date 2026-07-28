@@ -295,8 +295,6 @@ export default {
     methods: {
         ...mapMutations("Modules/CalculateRatio", Object.keys(mutations)),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
-        ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
-        ...mapMutations("Modules/ChartGenerator", ["setNewDataset"]),
 
         getVisibleLayerList () {
             this.layerIdList = this.getVisibleVectorLayers().map(layer => layer.getLayer().get("name"));
@@ -730,63 +728,6 @@ export default {
             });
 
             return prepareData;
-        },
-
-        /**
-         * @description Passes data to the Chart Generator Tool.
-         * @returns {Void} Function returns nothing.
-         */
-        loadToChartGenerator () {
-            const graphObj = {
-                      id: "calcratio-" + this.selectedFeatures.map(district => {
-                          return district.id_;
-                      }).join("-") + "-" + this.selectedFieldA.id + "-" + this.paramFieldA.name + "-" + this.selectedFieldB.id + "-" + this.paramFieldB.name,
-                      name: "Versorgungsanalyse - Visualisierung " + this.columnSelector.name + " (" + this.$t("additional:modules.tools.cosi.calculateRatio.title") + ")",
-                      type: ["LineChart", "BarChart"],
-                      color: "rainbow",
-                      source: this.$t("additional:modules.tools.cosi.calculateRatio.title"),
-                      scaleLabels: [this.columnSelector.name, "Jahre"],
-                      data: {
-                          labels: [...this.availableYears],
-                          datasets: []
-                      }
-                  },
-
-                  dataArray = [];
-
-            this.dataSets[this.activeSet].results.forEach(result => {
-                if (result) {
-                    dataArray.push(result.data);
-                }
-            });
-
-            this.availableYears.forEach(year => {
-                const dataPerYear = utils.calculateRatio(dataArray, year)
-                    .filter(dataset => dataset.scope);
-
-                dataPerYear.forEach(dataset => {
-                    const checkExisting = graphObj.data.datasets.find(set => set.label === dataset.scope);
-
-                    if (checkExisting) {
-                        checkExisting.data.push(dataset[this.columnSelector.key]);
-                    }
-                    else {
-                        const obj = {
-                            label: dataset.scope,
-                            data: [dataset[this.columnSelector.key]]
-                        };
-
-                        graphObj.data.datasets.push(obj);
-                    }
-                });
-            });
-
-            graphObj.data.labels.reverse();
-            graphObj.data.datasets.forEach(dataset => {
-                dataset.data.reverse();
-            });
-
-            this.channelGraphData(graphObj);
         },
 
         /**

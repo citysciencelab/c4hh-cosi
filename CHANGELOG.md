@@ -24,15 +24,17 @@
         - d3-array: ^3.1.1 to ^3.2.4
         - d3-color: ^3.0.1 to ^3.1.0
         - d3-scale-chromatic: ^3.0.0 to ^3.1.0
-        - jszip: ^3.7.1 to ^3.10.1
         - lodash: ^4.17.21 to ^4.18.1
-        - vue-chartjs: ^5.3.1 to ^5.3.3
 - vcOblique: Replaced iframe-resizer package with CSS-based iframe sizing.
 - package.json: postinstall script detects package.json files automatically and does not fail, if one of the installs fails.
 
 ### Deprecated
 
 ### Removed
+- ChartGenerator Modul: Code that is no longer needed 
+- The following packages have been removed in CoSI:
+    - jszip ^3.7.1
+    - vue-chartjs ^5.3.1
 
 ### Fixed
 

@@ -73,9 +73,6 @@ describe.skip("addons/cosi/SaveSession/components/SaveSession.vue", () => {
                     namespaced: true,
                     modules: {
                         SaveSession: SaveSessionStore,
-                        ChartGenerator: {
-                            namespaced: true
-                        },
                         CalculateRatio: {
                             namespaced: true
                         },
