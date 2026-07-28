@@ -1265,7 +1265,7 @@ export default {
                 id="cancel"
                 class="mb-4"
                 :icon="'bi-x-lg'"
-                :text="$t('additional:modules.storyCreator.chapter.cancel')"
+                :text="editIndex === false ? $t('additional:modules.storyCreator.chapter.cancelNew') : $t('additional:modules.storyCreator.chapter.cancelEdit')"
                 :secondary="true"
                 :interaction="() => cancelChapter()"
             />

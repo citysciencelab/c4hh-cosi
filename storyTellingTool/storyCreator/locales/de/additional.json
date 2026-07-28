@@ -63,6 +63,8 @@
         "zoomLevel": "Zoomstufe",
         "save": "Kapitel speichern",
         "cancel": "abbrechen",
+        "cancelNew": "Kapitel verwerfen",
+        "cancelEdit": "Änderungen verwerfen",
         "successAlert": "Die Kartenposition wurde erfolgreich übernommen!",
         "positionChangedHint": "Die Position entspricht nicht der aktuellen Ansicht der Karte.",
         "addContent": "Inhalte hinzufügen",

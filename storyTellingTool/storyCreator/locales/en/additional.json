@@ -62,6 +62,8 @@
         "zoomLevel": "Zoom level",
         "save": "Save chapter",
         "cancel": "Cancel",
+        "cancelNew": "Discard chapter",
+        "cancelEdit": "Discard changes",
         "successAlert": "The map position has been successfully saved!",
         "positionChangedHint": "The location does not match the current view of the map.",
         "addContent": "Add content",
