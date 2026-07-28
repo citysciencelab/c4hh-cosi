@@ -11,6 +11,11 @@ export default {
         }
     },
     emits: ["update:progressPercentage"],
+    data () {
+        return {
+            progressBarIsMoving: false
+        };
+    },
     computed: {
         ...mapGetters("Modules/LzsResearchClient", [
             "maxDownloadMB",
@@ -71,6 +76,30 @@ export default {
                 this.$emit("update:progressPercentage", val);
             }
         }
+    },
+    methods: {
+        /**
+         * Handles the transitionstart event for the progress bar.
+         * Sets the progressBarIsMoving flag to true when the width property is transitioning.
+         *
+         * @param {TransitionEvent} event - The transitionstart event object.
+         */
+        handleTransitionStart (event) {
+            if (event.propertyName === "width") {
+                this.progressBarIsMoving = true;
+            }
+        },
+        /**
+         * Handles the transitionend event for the progress bar.
+         * Sets the progressBarIsMoving flag to false when the width property has finished transitioning.
+         *
+         * @param {TransitionEvent} event - The transitionend event object.
+         */
+        handleTransitionEnd (event) {
+            if (event.propertyName === "width") {
+                this.progressBarIsMoving = false;
+            }
+        }
     }
 };
 </script>
@@ -88,8 +117,10 @@ export default {
         >
             <div
                 class="progress-bar"
-                :class="[isFetchingPrimaryData ? 'progress-bar-striped progress-bar-animated' : '']"
+                :class="[isFetchingPrimaryData || progressBarIsMoving ? 'progress-bar-striped progress-bar-animated' : '']"
                 :style="progressBarCss"
+                @transitionstart="handleTransitionStart"
+                @transitionend="handleTransitionEnd"
             />
         </div>
 

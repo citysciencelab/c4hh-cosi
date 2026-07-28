@@ -11,7 +11,8 @@ export default {
     },
     data () {
         return {
-            closeTimer: null
+            closeTimer: null,
+            progressBarIsMoving: false
         };
     },
     computed: {
@@ -85,6 +86,28 @@ export default {
             this.setProgressPhase("");
             this.setProgressCurrent(-1);
             this.setProgressTotal(-1);
+        },
+        /**
+         * Handles the transitionstart event for the progress bar.
+         * Sets the progressBarIsMoving flag to true when the width property is transitioning.
+         *
+         * @param {TransitionEvent} event - The transitionstart event object.
+         */
+        handleTransitionStart (event) {
+            if (event.propertyName === "width") {
+                this.progressBarIsMoving = true;
+            }
+        },
+        /**
+         * Handles the transitionend event for the progress bar.
+         * Sets the progressBarIsMoving flag to false when the width property has finished transitioning.
+         *
+         * @param {TransitionEvent} event - The transitionend event object.
+         */
+        handleTransitionEnd (event) {
+            if (event.propertyName === "width") {
+                this.progressBarIsMoving = false;
+            }
         }
     }
 };
@@ -109,8 +132,10 @@ export default {
                     >
                         <div
                             class="progress-bar"
-                            :class="[progressPhase !== 'done' && progressPhase !== 'error' ? 'progress-bar-striped progress-bar-animated' : '']"
+                            :class="[(progressPhase !== 'done' && progressPhase !== 'error') || progressBarIsMoving ? 'progress-bar-striped progress-bar-animated' : '']"
                             :style="progressBarCss"
+                            @transitionstart="handleTransitionStart"
+                            @transitionend="handleTransitionEnd"
                         />
                     </div>
                     <p id="result">
