@@ -480,9 +480,11 @@ export default {
                         @keypress.stop="toggleOneRow(dataset, !dataset.checked)"
                     >
                         <div class="item-content">
-                            {{
-                                (dataset.attributes.find(a => (a.id || a.name) === attrName) || {}).value || ''
-                            }}
+                            <span class="item-text">
+                                {{
+                                    (dataset.attributes.find(a => (a.id || a.name) === attrName) || {}).value || ''
+                                }}
+                            </span>
                         </div>
                     </td>
 
@@ -556,7 +558,7 @@ export default {
 
     table {
         width: 100%;
-        table-layout: fixed;
+        table-layout: auto;
         border-collapse: collapse;
 
         .checkbox-item {
@@ -574,16 +576,29 @@ export default {
         }
 
         .item-content {
-            min-width: 0;
-            width: 100%;
-            height: 100%;
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
             overflow: hidden;
-            white-space: nowrap;
-            text-overflow: ellipsis;
+            padding-right: 0.5rem;
+
+            .item-text {
+                min-width: 0;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
         }
 
         .action-item {
-            width: 4rem;
+            width: 2rem;
+            white-space: nowrap;
+            padding-right: 0.5rem;
+
+            &:last-child {
+                padding-right: 0;
+            }
         }
 
         th {
@@ -592,20 +607,16 @@ export default {
             }
 
             .th-content {
-                display: flex;
-                align-items: center;
-                gap: 1rem;
-                white-space: nowrap;
-                overflow: hidden;
-            }
+                gap: 0.5rem;
 
-            .th-title {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-                flex: 0 1 auto;
-                min-width: 0;
-                font-family: $font_family_accent;
+                .th-title {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    flex: 0 1 auto;
+                    min-width: 0;
+                    font-family: $font_family_accent;
+                }
             }
         }
 
