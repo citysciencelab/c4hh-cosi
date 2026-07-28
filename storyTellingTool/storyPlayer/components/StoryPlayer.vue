@@ -338,14 +338,19 @@ export default {
 
             if (!layerConf) {
                 layerConf = getAndMergeAllRawLayers().find(layer => layer.id === layerId);
-                await this.addLayerToLayerConfig({layerConfig: layerConf});
+
+                if (layerConf) {
+                    await this.addLayerToLayerConfig({layerConfig: layerConf});
+                }
             }
 
-            this.addOrReplaceLayer({
-                layerId: layerId,
-                visibility: true,
-                showInLayerTree: true
-            });
+            if (layerConf) {
+                this.addOrReplaceLayer({
+                    layerId: layerId,
+                    visibility: true,
+                    showInLayerTree: true
+                });
+            }
         },
         /**
          * Sets up the tool window and content for the selected chapter.

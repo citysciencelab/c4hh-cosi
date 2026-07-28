@@ -223,7 +223,12 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 allLayerConfigs: () => [],
                 configJs: state => state.configJs,
                 layerConfigsByAttributes: () => [],
-                layerConfigById: () => sinon.stub(),
+                layerConfigById: () => (id) => {
+                    if (id === "1") {
+                        return "conf";
+                    }
+                    return false;
+                },
                 visibleBaselayerConfigs: () => []
             },
             actions: {
@@ -485,7 +490,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 addLayerToLayerConfigStub = sinon.stub(wrapper.vm, "addLayerToLayerConfig");
 
             await wrapper.vm.enableLayer("1");
-            expect(addLayerToLayerConfigStub.called).to.be.true;
+            expect(addLayerToLayerConfigStub.called).to.be.false;
             expect(addOrReplaceLayerStub.called).to.be.true;
             addOrReplaceLayerStub.restore();
             addLayerToLayerConfigStub.restore();
