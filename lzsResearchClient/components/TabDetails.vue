@@ -328,12 +328,14 @@ export default {
                 id="backToListButton"
                 :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabDetails.backButtonLabel')"
                 :text="$t('additional:modules.lzsResearchClient.tabs.tabDetails.backButtonLabel')"
+                :secondary="true"
                 @click="returnToResultTab()"
             />
 
             <FlatButton
                 :aria-label="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
                 :text="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
+                :secondary="true"
                 @click="returnToSearchTab()"
             />
         </div>

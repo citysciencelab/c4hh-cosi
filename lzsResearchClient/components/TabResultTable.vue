@@ -564,15 +564,18 @@ export default {
         .checkbox-item {
             width: 3rem;
             padding: 0 1rem;
+            cursor: pointer;
 
             .checkbox-content {
                 display: flex;
                 align-items: center;
+                cursor: pointer;
             }
         }
 
         .flexible-item {
             position: relative;
+            cursor: pointer;
         }
 
         .item-content {

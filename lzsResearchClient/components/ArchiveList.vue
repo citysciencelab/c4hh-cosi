@@ -507,6 +507,7 @@ export default {
                 <SwitchInput
                     v-if="numberOfResults > 0"
                     id="idSelectAllSwitch"
+                    class="selectAllSwitch"
                     :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.selectAllAriaLabel')"
                     :label="$t('additional:modules.lzsResearchClient.tabs.archiveList.selectAll')"
                     :checked="selectAllIsChecked"
@@ -579,17 +580,26 @@ export default {
                                     :allow-empty="false"
                                     :close-on-select="true"
                                     :clear-on-select="false"
-                                    :internal-search="false"
+                                    :internal-search="true"
                                     @select="changeGroupBy(index)"
                                 >
                                     <template #singleLabel="props">
                                         <span>{{ getTranslationForAttributeWrapper(`additional:modules.lzsResearchClient.tabs.tabSearch.${props.option.toLowerCase()}`, props.option) }}</span>
                                     </template>
+
                                     <template #option="props">
                                         <div class="attribute-option-wrapper">
                                             <span :class="`attribute-check-icon ${props.option === step.attributeToGroupBy ? 'bi bi-check2' : ''}`" />
                                             <span>{{ getTranslationForAttributeWrapper(`additional:modules.lzsResearchClient.tabs.tabSearch.${props.option.toLowerCase()}`, props.option) }}</span>
                                         </div>
+                                    </template>
+
+                                    <template #noResult>
+                                        {{ $t('additional:modules.lzsResearchClient.multiselect.noResult') }}
+                                    </template>
+
+                                    <template #noOptions>
+                                        {{ $t('additional:modules.lzsResearchClient.multiselect.noOptions') }}
                                     </template>
                                 </Multiselect>
                             </div>
@@ -676,6 +686,10 @@ export default {
         gap: 2rem;
         align-items: center;
 
+        .selectAllSwitch > * {
+            cursor: pointer;
+        }
+
         button#tabResultDownloadButton {
             margin-bottom: 0;
         }
@@ -691,6 +705,7 @@ export default {
             margin-top: calc(0.5rem + 18px);
             width: 16.5px;
             height: 16.5px;
+            cursor: pointer;
         }
     }
 
@@ -708,6 +723,14 @@ export default {
 
                 .attribute-check-icon {
                     width: 16px;
+                }
+            }
+
+            :deep(.multiselect) {
+                cursor: text;
+
+                .multiselect__tags {
+                    cursor: text;
                 }
             }
         }

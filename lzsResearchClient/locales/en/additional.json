@@ -11,6 +11,10 @@
                 "content": "Please try again later."
             },
             "generalErrorMessage": "An unknown error has occured.",
+            "multiselect": {
+                "noResult": "No elements found. Consider changing the search query.",
+                "noOptions": "List is empty."
+            },
             "tabs": {
                 "backToSearchButtonLabel": "Back to search",
                 "tabDetails": {
@@ -73,9 +77,7 @@
                         "parcelNumberPlaceholder": "Please select a parcel number",
                         "parcelNumberLoadError": "An error occurred while loading parcel numbers for the district {{district}}. Please try again.",
                         "parcelRequestError": "An error occurred while fetching parcel geometries for the parcel {{parcelNumber}}. Please try again.",
-                        "parcelDistrictLoadError": "An error occurred while loading parcel districts. Please try again.",
-                        "multiselectNoResult": "No elements found. Consider changing the search query.",
-                        "multiselectNoOptions": "List is empty."
+                        "parcelDistrictLoadError": "An error occurred while loading parcel districts. Please try again."
                     },
                     "layerConfigNotFound": "Layer configuration for the specified layer ID {{ layerId }} could not be found.",
                     "selectAll": "Select all",

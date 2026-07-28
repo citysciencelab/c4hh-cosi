@@ -91,6 +91,7 @@ export default {
             <FlatButton
                 :aria-label="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
                 :text="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
+                :secondary="true"
                 @click="returnToSearchTab()"
             />
         </div>

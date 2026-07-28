@@ -11,6 +11,10 @@
                 "content": "Bitte versuchen Sie es später erneut."
             },
             "generalErrorMessage": "Es ist ein unbekannter Fehler aufgetreten.",
+            "multiselect": {
+                "noResult": "Keine Einträge gefunden. Bitte ändern Sie den Suchbegriff.",
+                "noOptions": "Liste ist leer."
+            },
             "tabs": {
                 "backToSearchButtonLabel": "Zurück zur Suche",
                 "tabDetails": {
@@ -73,9 +77,7 @@
                         "parcelNumberPlaceholder": "Bitte die Flurstücksnummer auswählen",
                         "parcelNumberLoadError": "Beim Laden der Flurstücksnummern für die Gemarkung {{district}} ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
                         "parcelRequestError": "Beim Abrufen der Flurstücksgeometrien für das Flurstück {{parcelNumber}} ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
-                        "parcelDistrictLoadError": "Beim Laden der Gemarkungen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
-                        "multiselectNoResult": "Keine Einträge gefunden. Bitte ändern Sie den Suchbegriff.",
-                        "multiselectNoOptions": "Liste ist leer."
+                        "parcelDistrictLoadError": "Beim Laden der Gemarkungen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
                     },
                     "layerConfigNotFound": "Layer-Konfiguration für die Layer-ID {{ layerId }} konnte nicht gefunden werden.",
                     "selectAll": "Alles auswählen",

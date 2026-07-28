@@ -90,8 +90,8 @@ export default {
     data () {
         return {
             attributeSearchModeIsActive: false,
-            selectedArchive: "",
-            searchWithAttributeFormData: {},
+            selectedArchive: null,
+            searchWithAttributeFormData: [],
             archives: {},
             showSpinner: false,
             isAttributeSearchFormValid: true,
@@ -1364,6 +1364,7 @@ export default {
             <div class="FixedContent top-header switch-container">
                 <SwitchInput
                     id="idSearchModeSwitch"
+                    class="searchModeSwitch"
                     :aria="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchModeSwitchLabel')"
                     :label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchModeSwitchLabel')"
                     :checked="attributeSearchModeIsActive"
@@ -1377,24 +1378,44 @@ export default {
                     id="searchFormWithAttributes"
                     class="searchFormWithAttributes"
                 >
-                    <label for="archive">
-                        {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel") }}
-                    </label>
+                    <div :class="`archive-select-container ${selectedArchive ? 'selected' : ''}`">
+                        <label for="archive-select">
+                            {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel") }}
+                        </label>
 
-                    <select
-                        id="archive"
-                        class="form-select archive"
-                        :value="selectedArchive"
-                        @change="setSelectedArchive($event.target.value)"
-                    >
-                        <option
-                            v-for="(_, name) in searchWithAttributeFormData"
-                            :key="name"
-                            :value="name"
+                        <Multiselect
+                            id="archive-select"
+                            v-model="selectedArchive"
+                            :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel')"
+                            :options="Object.keys(searchWithAttributeFormData)"
+                            name="archive-select"
+                            :multiple="false"
+                            :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel')"
+                            :show-labels="false"
+                            open-direction="bottom"
+                            :hide-selected="false"
+                            :allow-empty="false"
+                            :close-on-select="true"
+                            :clear-on-select="false"
+                            :internal-search="true"
+                            @select="a => setSelectedArchive(a)"
                         >
-                            {{ name }}
-                        </option>
-                    </select>
+                            <template #option="props">
+                                <div class="attribute-option-wrapper">
+                                    <span :class="`attribute-check-icon ${props.option === selectedArchive ? 'bi bi-check2' : ''}`" />
+                                    <span>{{ props.option }}</span>
+                                </div>
+                            </template>
+
+                            <template #noResult>
+                                {{ $t('additional:modules.lzsResearchClient.multiselect.noResult') }}
+                            </template>
+
+                            <template #noOptions>
+                                {{ $t('additional:modules.lzsResearchClient.multiselect.noOptions') }}
+                            </template>
+                        </Multiselect>
+                    </div>
 
                     <div class="searchWithAttributeForm">
                         <InputText
@@ -1590,11 +1611,11 @@ export default {
                                     </template>
 
                                     <template #noResult>
-                                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.multiselectNoResult') }}
+                                        {{ $t('additional:modules.lzsResearchClient.multiselect.noResult') }}
                                     </template>
 
                                     <template #noOptions>
-                                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.multiselectNoOptions') }}
+                                        {{ $t('additional:modules.lzsResearchClient.multiselect.noOptions') }}
                                     </template>
                                 </Multiselect>
 
@@ -1629,11 +1650,11 @@ export default {
                                     </template>
 
                                     <template #noResult>
-                                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.multiselectNoResult') }}
+                                        {{ $t('additional:modules.lzsResearchClient.multiselect.noResult') }}
                                     </template>
 
                                     <template #noOptions>
-                                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.multiselectNoOptions') }}
+                                        {{ $t('additional:modules.lzsResearchClient.multiselect.noOptions') }}
                                     </template>
                                 </Multiselect>
                             </div>
@@ -1673,6 +1694,7 @@ export default {
                 <FlatButton
                     :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
                     :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
+                    :secondary="true"
                     @click="resetForm()"
                 />
             </div>
@@ -1690,10 +1712,14 @@ export default {
             display: flex;
             flex-direction: column;
             align-items: end;
+
+            .searchModeSwitch > * {
+                cursor: pointer;
+            }
         }
 
         div.searchFormWithAttributes {
-            select.archive {
+           div.archive-select-container {
                 margin-bottom: 1rem;
             }
         }
@@ -1738,6 +1764,10 @@ export default {
                 align-items: center;
                 gap: 0.5rem;
                 white-space: nowrap;
+
+                > * {
+                    cursor: pointer;
+                }
             }
             .yearsSelection {
                 .yearsSelectionList {
@@ -1753,6 +1783,10 @@ export default {
                     align-items: center;
                     gap: 0.5rem;
                     white-space: nowrap;
+
+                    > * {
+                        cursor: pointer;
+                    }
                 }
             }
             div.noCommonYearError {
@@ -1784,44 +1818,6 @@ export default {
                 gap: 0.5rem;
             }
 
-            :deep(.parcelSearchInputs) {
-                    .multiselect,
-                    .multiselect__input::placeholder,
-                    .multiselect__option {
-                        color: $black;
-                        font-weight: normal;
-                    }
-
-                    .multiselect__option {
-                        &:after,
-                        &--selected,
-                        &--selected:after {
-                            color: black;
-                            background: $light_grey_hover;
-                        }
-
-                        &--highlight,
-                        &--highlight:after {
-                            color: $white;
-                            background: $secondary;
-                        }
-                    }
-
-                    .multiselect__input:focus::placeholder {
-                        color: transparent;
-                    }
-
-                    .attribute-option-wrapper {
-                        display: flex;
-                        flex-direction: row;
-                        gap: 0.5rem;
-
-                        .attribute-check-icon {
-                            width: 16px;
-                        }
-                    }
-                }
-
             div.spatialSelection {
                 .level-switch {
                     :deep(.btn-group) {
@@ -1838,6 +1834,10 @@ export default {
 
             .selectAllForPoint {
                 padding-top: 1rem;
+
+                > * {
+                    cursor: pointer;
+                }
             }
 
             div.addressSearch {
@@ -1860,6 +1860,54 @@ export default {
         div.buttons-footer {
             *:nth-child(2) {
                 margin-left: auto;
+            }
+        }
+
+        :deep(.archive-select-container), :deep(.parcelSearchInputs) {
+            &.selected {
+                .multiselect__tags {
+                    border-color: var(--bs-form-valid-border-color);
+                }
+            }
+
+            .multiselect,
+            .multiselect__input::placeholder,
+            .multiselect__option {
+                color: $black;
+                font-weight: normal;
+            }
+
+            .multiselect {
+                cursor: text;
+            }
+
+            .multiselect__option {
+                &:after,
+                &--selected,
+                &--selected:after {
+                    color: black;
+                    background: $light_grey_hover;
+                }
+
+                &--highlight,
+                &--highlight:after {
+                    color: $white;
+                    background: $secondary;
+                }
+            }
+
+            .multiselect__input:focus::placeholder {
+                color: transparent;
+            }
+
+            .attribute-option-wrapper {
+                display: flex;
+                flex-direction: row;
+                gap: 0.5rem;
+
+                .attribute-check-icon {
+                    width: 16px;
+                }
             }
         }
     }

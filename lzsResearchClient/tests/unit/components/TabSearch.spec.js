@@ -358,10 +358,6 @@ describe("addons/lzsResearchClient/tests/unit/components/tabs/TabSearch.spec.js"
             "AFIS-Einzelnachweise"
         ]);
 
-        const select = wrapper.find("select#archive");
-
-        expect(select.exists()).to.be.true;
-
         wrapper.vm.setSelectedArchive("AFIS-Einzelnachweise");
 
         await wrapper.vm.$nextTick();
