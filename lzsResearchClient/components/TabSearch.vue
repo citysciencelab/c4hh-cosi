@@ -1345,7 +1345,10 @@ export default {
 </script>
 
 <template>
-    <div id="TabSearch">
+    <div
+        id="TabSearch"
+        class="InnerLayoutFrame"
+    >
         <div
             v-if="showSpinner"
             class="loadingSpinner"
@@ -1358,9 +1361,9 @@ export default {
 
         <div
             v-else
-            class="LayoutFrame"
+            class="InnerLayoutFrame"
         >
-            <div class="FixedContent switch-container">
+            <div class="FixedContent top-header switch-container">
                 <SwitchInput
                     id="idSearchModeSwitch"
                     :aria="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchModeSwitchLabel')"
@@ -1660,9 +1663,9 @@ export default {
 <style lang="scss" scoped>
     #TabSearch {
         height: 100%;
-        padding-top: 0.5rem;
 
         div.switch-container {
+            display: flex;
             flex-direction: column;
             align-items: end;
         }

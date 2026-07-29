@@ -487,7 +487,7 @@ export default {
         class="InnerLayoutFrame"
     >
         <div
-            class="FixedContent archive-list-header"
+            class="FixedContent top-header archive-list-header"
             padding-top="0"
         >
             <div class="archiveListHeaderLine">
@@ -644,40 +644,28 @@ export default {
 #ArchiveList {
     .archive-list-header {
         flex-direction: column;
-    }
 
-    div.archiveListHeaderLine {
-        display: flex;
-        gap: 1rem;
-        justify-content: space-between;
-        align-items: center;
-        padding-bottom: 0.5rem;
+        div.archiveListHeaderLine {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.5rem;
 
-        p.numberOfResults {
-            margin-top: 0.5rem;
-            margin-bottom: 0.5rem;
+            p.numberOfResults {
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
 
-            span {
-                display: inline-block;
-                padding: 0.1rem 1rem;
-                border: 2px solid $secondary;
-                border-radius: 999px;
-                background: #fff;
-                font-weight: bold;
-                font-family: $font_family_accent;
-                margin-left: 1rem;
-            }
-        }
-
-        :deep(button#idOpenOrCloseAccordions) {
-            padding-right: 0;
-            padding-left: 0;
-            margin-bottom: 0;
-            min-height: unset;
-            height: 100%;
-
-            span {
-                margin-right: 0.5rem;
+                span {
+                    display: inline-block;
+                    padding: 0.1rem 1rem;
+                    border: 2px solid $secondary;
+                    border-radius: 999px;
+                    background: #fff;
+                    font-weight: bold;
+                    font-family: $font_family_accent;
+                    margin-left: 1rem;
+                }
             }
         }
     }

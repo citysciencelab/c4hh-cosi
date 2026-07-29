@@ -263,44 +263,48 @@ export default {
 
 <template lang="html">
     <div id="lzsResearchClient">
-        <div
-            v-if="errorOccured"
-            class="alertError"
-        >
-            <span>{{ errorMessage }}</span>
+        <div class="LayoutFrame">
+            <div class="FixedContent">
+                <div
+                    v-if="errorOccured"
+                    class="alertError"
+                >
+                    <span>{{ errorMessage }}</span>
 
-            <IconButton
-                :class-array="['btn-light', 'me-2', 'errorCloseButton']"
-                :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.goToDetails')"
-                icon="bi-x"
-                @click="hideErrorMessage"
-            />
+                    <IconButton
+                        :class-array="['btn-light', 'me-2', 'errorCloseButton']"
+                        :aria="$t('additional:modules.lzsResearchClient.tabs.archiveList.table.goToDetails')"
+                        icon="bi-x"
+                        @click="hideErrorMessage"
+                    />
+                </div>
+            </div>
+
+            <DownloadProgressBar />
+
+            <div
+                v-if="showLoadingSpinner"
+                class="loadingSpinner"
+            >
+                <SpinnerItem
+                    custom-class="spinner"
+                    class="ms-3"
+                />
+
+                <p v-if="loadingSpinnerText">
+                    {{ loadingSpinnerText }}
+                </p>
+            </div>
+
+            <template v-else-if="requestToken">
+                <TabContainer
+                    ref="tabContainer"
+                    class="TabContainer"
+                    :tabs="tabs"
+                    initial-active-tab-id="tabSearch"
+                />
+            </template>
         </div>
-
-        <DownloadProgressBar />
-
-        <div
-            v-if="showLoadingSpinner"
-            class="loadingSpinner"
-        >
-            <SpinnerItem
-                custom-class="spinner"
-                class="ms-3"
-            />
-
-            <p v-if="loadingSpinnerText">
-                {{ loadingSpinnerText }}
-            </p>
-        </div>
-
-        <template v-else-if="requestToken">
-            <TabContainer
-                ref="tabContainer"
-                class="TabContainer"
-                :tabs="tabs"
-                initial-active-tab-id="tabSearch"
-            />
-        </template>
 
         <ConfirmModal
             :show-modal="modalDismissed !== true && globalError !== null"
@@ -317,7 +321,9 @@ export default {
 
     #lzsResearchClient {
         height: 100%;
-        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
 
         div.alertError {
             color: #a94442;
@@ -332,6 +338,7 @@ export default {
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
+            gap: 0.5rem;
 
             :deep(button.errorCloseButton) {
                 opacity: .5;
@@ -364,40 +371,64 @@ export default {
             }
         }
 
-        div.TabContainer {
-            :deep(div.LayoutFrame) {
+        :deep(div.LayoutFrame) {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            min-height: 0;
+            overflow: hidden;
+
+            div.TabContainer {
+                height: unset;
+                display: flex;
+                flex-direction: column;
+                flex: 1 1 0%;
+                min-height: 0;
+
+                div.tab-content {
+                    height: unset;
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1 1 0%;
+                    min-height: 0;
+                }
+            }
+
+            div.InnerLayoutFrame {
                 flex: 1 1 auto;
                 display: flex;
                 flex-direction: column;
-                position: relative;
                 min-height: 0;
-                height: 100%;
-                overflow: hidden;
-                padding-bottom: 2.5rem;
+            }
 
-                div.InnerLayoutFrame {
-                    flex: 1 1 auto;
-                    display: flex;
-                    flex-direction: column;
-                    min-height: 0;
-                }
+            div.FixedContent {
+                display: flex;
+                flex-shrink: 0;
+                gap: 0.5rem;
 
-                div.FixedContent {
-                    margin-top: auto;
-                    padding-top: 0.5rem;
+                &.top-header {
+                    padding-top: 1rem;
                     padding-bottom: 0.25rem;
-                    display: flex;
-                    gap: 0.5rem;
                 }
 
-                div.ScrollableContent {
-                    display: flex;
-                    flex-direction: column;
-                    flex: 1 1 auto;
-                    min-height: 0;
-                    overflow: auto;
-                    padding-right: 0.5rem;
+                &.buttons-footer {
+                    padding-top: 0.5rem;
+                    padding-bottom: 0;
                 }
+
+                button {
+                    margin-bottom: 0;
+                }
+            }
+
+            div.ScrollableContent {
+                display: flex;
+                flex-direction: column;
+                flex: 1 1 auto;
+                min-height: 0;
+                overflow-y: auto;
+                padding-right: 0.5rem;
             }
         }
     }

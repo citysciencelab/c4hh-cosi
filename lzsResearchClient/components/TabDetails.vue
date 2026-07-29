@@ -237,9 +237,34 @@ export default {
 <template>
     <div
         id="TabDetails"
-        class="LayoutFrame"
+        class="InnerLayoutFrame"
     >
-        <div class="FixedContent details-header">
+        <div class="FixedContent top-header details-header">
+            <div class="tableHeaderDetailsTable">
+                <p class="numberOfResults">
+                    {{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.numberOfResults") }}
+
+                    <span>{{ primaryDataCount }}</span>
+                </p>
+
+                <FlatButton
+                    v-if="primaryDataCount > 0"
+                    id="tabDetailsDownloadButton"
+                    :disabled="progressNow >= 0 || !somethingCheckedForDownload || sumOfCheckedFilesProgress > 100"
+                    :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
+                    :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
+                    @click="downloadChecked()"
+                />
+            </div>
+
+            <SumOfCheckedFiles
+                v-if="somethingCheckedForDownload"
+                :checked-datasets="[getAllFilesForDownload()]"
+                @update:progress-percentage="sumOfCheckedFilesProgress = $event"
+            />
+        </div>
+
+        <div class="ScrollableContent">
             <h4> {{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.title") }} </h4>
 
             <table
@@ -273,31 +298,6 @@ export default {
 
             <hr>
 
-            <div class="tableHeaderDetailsTable">
-                <p class="numberOfResults">
-                    {{ $t("additional:modules.lzsResearchClient.tabs.tabDetails.numberOfResults") }}
-
-                    <span>{{ primaryDataCount }}</span>
-                </p>
-
-                <FlatButton
-                    v-if="primaryDataCount > 0"
-                    id="tabDetailsDownloadButton"
-                    :disabled="progressNow >= 0 || !somethingCheckedForDownload || sumOfCheckedFilesProgress > 100"
-                    :aria-label="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonAriaLabel')"
-                    :text="$t('additional:modules.lzsResearchClient.zipAndDownload.buttonText')"
-                    @click="downloadChecked()"
-                />
-            </div>
-
-            <SumOfCheckedFiles
-                v-if="somethingCheckedForDownload"
-                :checked-datasets="[getAllFilesForDownload()]"
-                @update:progress-percentage="sumOfCheckedFilesProgress = $event"
-            />
-        </div>
-
-        <div class="ScrollableContent">
             <div class="contentDetailsTableContainer">
                 <div
                     v-if="showSpinner"
@@ -323,7 +323,7 @@ export default {
             </div>
         </div>
 
-        <div class="FixedContent">
+        <div class="FixedContent buttons-footer">
             <FlatButton
                 id="backToListButton"
                 :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabDetails.backButtonLabel')"
@@ -358,29 +358,37 @@ export default {
 
 #TabDetails {
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding-top: 0.5rem;
 
     .details-header {
         flex-direction: column;
+
+        div.tableHeaderDetailsTable {
+            display: flex;
+            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 0.5rem;
+
+            p.numberOfResults {
+                margin-top: 0.5rem;
+                margin-bottom: 0.5rem;
+
+                span {
+                    display: inline-block;
+                    padding: 0.1rem 1rem;
+                    border: 2px solid $secondary;
+                    border-radius: 999px;
+                    background: #fff;
+                    font-weight: bold;
+                    font-family: $font_family_accent;
+                    margin-left: 1rem;
+                }
+            }
+        }
     }
 
     table.datasetInfoTable {
         width: 100%;
-    }
-
-    p.numberOfResults {
-        span {
-            display: inline-block;
-            padding: 0.1rem 1rem;
-            border: 2px solid $secondary;
-            border-radius: 999px;
-            background: #fff;
-            font-weight: bold;
-            font-family: $font_family_accent;
-            margin-left: 1rem;
-        }
     }
 
     div.TabResultTable {
@@ -408,11 +416,6 @@ export default {
             white-space: pre-line;
             padding: 1.5rem;
         }
-    }
-
-    div.tableHeaderDetailsTable {
-        display: flex;
-        justify-content: space-between;
     }
 }
 

@@ -74,7 +74,7 @@ export default {
 <template>
     <div
         id="TabResult"
-        class="LayoutFrame"
+        class="InnerLayoutFrame"
     >
         <ArchiveList
             ref="archiveList"
@@ -87,7 +87,7 @@ export default {
             @openDetails="openDetails"
         />
 
-        <div class="FixedContent">
+        <div class="FixedContent buttons-footer">
             <FlatButton
                 :aria-label="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
                 :text="$t('additional:modules.lzsResearchClient.tabs.backToSearchButtonLabel')"
@@ -101,8 +101,5 @@ export default {
 
 #TabResult {
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    padding-top: 0.5rem;
 }
 </style>
