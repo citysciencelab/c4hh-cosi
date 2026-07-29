@@ -328,6 +328,7 @@ export default {
             const transmissionMode = this.simulationConfig?.outputs?.[output]?.value?.transmissionMode || "value",
                   minZoom = this.simulationConfig?.outputs?.[output]?.minZoom,
                   legendURL = this.simulationConfig?.outputs?.[output]?.legendUrl || "",
+                  gfiAttributes = this.simulationConfig?.outputs?.[output]?.gfiAttributes,
                   outputResult = Object.values(this.jobs || {}).find(job => job?.jobResults?.[output]),
                   url = outputResult?.jobResults?.[output]?.href || outputResult?.jobResults?.[output]?.value?.links?.[0]?.href || "",
                   layerType = transmissionMode === "reference" ? "OAF" : "VECTORBASE",
@@ -345,6 +346,10 @@ export default {
                           id: layerId,
                           name: this.currentSimulation?.name || layerId
                       };
+
+            if (isObject(gfiAttributes)) {
+                layerAttributes.gfiAttributes = gfiAttributes;
+            }
 
             if (transmissionMode === "reference" && url === "") {
                 console.warn(`No reference URL found for result layer ${layerId}.`);

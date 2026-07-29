@@ -86,7 +86,7 @@ export default {
 
         try {
             const response = await fetch(
-                `${getters.simulationApiUrl}/jobs/?include_ensembles`,
+                `${getters.simulationApiUrl}/jobs?include_ensembles`,
                 {
                     headers: {
                         "content-type": "application/json",
