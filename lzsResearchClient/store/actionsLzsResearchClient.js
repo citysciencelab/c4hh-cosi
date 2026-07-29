@@ -380,14 +380,20 @@ export default {
      *
      * @returns {void}
      */
-    retrieveParcelSourceData ({commit, getters, dispatch}) {
+    retrieveParcelSourceData ({commit, getters, state}) {
         const {parcelSearchSelectSource} = getters;
+
+        commit("setParcelSourceDataLoading", true);
 
         axios.get(encodeURI(parcelSearchSelectSource))
             .then(response => {
                 commit("setParcelSourceData", response.data);
+                commit("setParcelSourceDataLoading", false);
             })
-            .catch(error => dispatch("axiosErrorHandling", error));
+            .catch(() => {
+                state.errorMessage = i18next.t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelDistrictLoadError");
+                commit("setParcelSourceDataLoading", false);
+            });
     },
     /**
      * Download selected primary data files (single item or array of items), show download

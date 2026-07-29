@@ -100,6 +100,7 @@ const state = {
     progressNow: -1,
     parcelSourceData: null,
     parcelSearchSelectSource: null,
+    parcelSourceDataLoading: false,
     pendingPrimaryDataFetches: new Set(),
 
     // Draw component

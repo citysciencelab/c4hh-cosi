@@ -133,7 +133,8 @@ export default {
             "addressSearchCoordinates",
             "maxGeometryArea",
             "parcelSourceData",
-            "alkisBaseUrl"
+            "alkisBaseUrl",
+            "parcelSourceDataLoading"
         ]),
         ...mapGetters("Maps", [
             "projectionCode",
@@ -249,10 +250,7 @@ export default {
             if (this.selectedButtonGroup === "geometry" && this.showAreaWarning) {
                 return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.geometryAreaWarningMessage", {maxArea: maxAreaInSquareKilometers, area: areaInSquareKilometers});
             }
-            if (this.selectedButtonGroup === "parcel" && this.showAreaWarning) {
-                return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearchNoResults");
 
-            }
             return null;
         },
         pointSelected () {
@@ -290,7 +288,7 @@ export default {
                 return this.parcelDistrictOptions.find(opt => opt.value === this.selectedParcelDistrict) || null;
             },
             set (val) {
-                this.setSelectedParcelDistrict(val ? val.value : null);
+                this.setSelectedParcelDistrict(val ? val : null);
             }
         },
         districtParcelNumbersSorted () {
@@ -423,18 +421,18 @@ export default {
          * Set the selected archive identifier.
          * @param {string} archive - The archive name to select.
          */
-        setSelectedArchive (archiv) {
-            this.selectedArchive = archiv;
+        setSelectedArchive (archive) {
+            this.selectedArchive = archive;
         },
         /**
          * Set the selected parcel area identifier.
-         * @param {string} parcelDistrict - The parcel district name to select.
+         * @param {object} parcelDistrict - The parcel district object to select.
          */
         setSelectedParcelDistrict (parcelDistrict) {
-            this.selectedParcelDistrict = parcelDistrict;
+            this.selectedParcelDistrict = parcelDistrict?.value ?? null;
             this.parcelNumberInputValue = "";
 
-            this.getParcelsByDistrict(parcelDistrict, this.alkisBaseUrl);
+            this.getParcelsByDistrict(parcelDistrict, this.alkisBaseUrl, parcelDistrict?.label);
         },
         /**
          * Fetches all parcels for a given district from the OAF Feature service.
@@ -442,10 +440,12 @@ export default {
          * @param {string} baseUrl - The base URL of the ALKIS service.
          * @returns {Promise<void>}
          */
-        async getParcelsByDistrict (district, baseUrl) {
+        async getParcelsByDistrict (district, baseUrl, districtLabel) {
             if (!district || !baseUrl) {
                 return;
             }
+
+            this.setErrorMessage("");
 
             this.districtParcelsLoading = true;
 
@@ -461,8 +461,9 @@ export default {
                 });
             }
             catch (error) {
-                console.warn("An error has occurred when fetching parcels for district", district, error);
+                this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelNumberLoadError", {district: districtLabel}));
                 this.districtParcels = [];
+                this.setSelectedParcelDistrict(null);
             }
             finally {
                 this.districtParcelsLoading = false;
@@ -1050,6 +1051,8 @@ export default {
          * @return {void}
          */
         setSelectedButtonGroup (group) {
+            this.setErrorMessage("");
+
             switch (group) {
                 case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries"):
                     this.selectedButtonGroup = "geometry";
@@ -1120,7 +1123,6 @@ export default {
          */
         clearParcelSearch (clearDistrict = false) {
             this.parcelNumberInputValue = "";
-            this.showAreaWarning = false;
 
             if (clearDistrict) {
                 this.setSelectedParcelDistrict(null);
@@ -1150,7 +1152,8 @@ export default {
                 return parcelGeoJson;
             }
             catch (error) {
-                console.warn("An error has occurred when requesting the parcel features", error);
+                this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelRequestError", {parcelNumber: this.parcelNumberInputValue}));
+                this.parcelNumberInputValue = "";
                 return null;
             }
             finally {
@@ -1163,7 +1166,7 @@ export default {
          */
         handleParcelSearchSubmit () {
             this.setSearchGeometry(null);
-            this.showAreaWarning = false;
+            this.setErrorMessage("");
 
             this.fetchParcelSearchResults()
                 .then((parcelGeoJson) => {
@@ -1199,11 +1202,6 @@ export default {
                                 padding: this.mapZoomToExtentPadding()
                             }
                         });
-                    }
-                    else {
-
-                        this.showAreaWarning = true;
-                        console.warn("No parcel geometry found in the search results.");
                     }
                 });
         },
@@ -1555,7 +1553,7 @@ export default {
                         >
                             <div class="parcelSearchInputs">
                                 <label for="parcelSearchSelect">
-                                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictLabel") }}
+                                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.selectParcelDistrictLabel") }}
                                 </label>
 
                                 <Multiselect
@@ -1572,9 +1570,17 @@ export default {
                                     :preserve-search="true"
                                     :hide-selected="false"
                                     :internal-search="true"
-                                    :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictPlaceholder')"
-                                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectParcelDistrictLabel')"
-                                    @select="val => setSelectedParcelDistrict(val ? val.value : null)"
+                                    :disabled="districtParcelsLoading"
+                                    :loading="parcelSourceDataLoading"
+                                    :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.selectParcelDistrictPlaceholder')"
+                                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.selectParcelDistrictLabel')"
+                                    @open="() => {
+                                        if (!parcelDistrictOptions.length) {
+                                            retrieveParcelSourceData();
+                                            setErrorMessage('');
+                                        }
+                                    }"
+                                    @select="val => setSelectedParcelDistrict(val)"
                                 >
                                     <template #option="props">
                                         <div class="attribute-option-wrapper">
@@ -1582,16 +1588,24 @@ export default {
                                             <span>{{ props.option.label }}</span>
                                         </div>
                                     </template>
+
+                                    <template #noResult>
+                                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.multiselectNoResult') }}
+                                    </template>
+
+                                    <template #noOptions>
+                                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.multiselectNoOptions') }}
+                                    </template>
                                 </Multiselect>
 
                                 <label for="parcelNumber">
-                                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel") }}
+                                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelNumberLabel") }}
                                 </label>
 
                                 <Multiselect
                                     id="parcelNumber"
                                     v-model="parcelNumberInputValue"
-                                    :disabled="!districtParcelNumbersSorted.length"
+                                    :disabled="!districtParcelNumbersSorted.length || districtParcelsLoading"
                                     :options="districtParcelNumbersSorted"
                                     :show-labels="false"
                                     :searchable="true"
@@ -1603,8 +1617,8 @@ export default {
                                     :allow-empty="false"
                                     :internal-search="true"
                                     :loading="districtParcelsLoading"
-                                    :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberPlaceholder')"
-                                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelNumberLabel')"
+                                    :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelNumberPlaceholder')"
+                                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelNumberLabel')"
                                     @select="handleParcelSearchSubmit"
                                 >
                                     <template #option="props">
@@ -1612,6 +1626,14 @@ export default {
                                             <span :class="`attribute-check-icon ${props.option === parcelNumberInputValue ? 'bi bi-check2' : ''}`" />
                                             <span>{{ props.option }}</span>
                                         </div>
+                                    </template>
+
+                                    <template #noResult>
+                                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.multiselectNoResult') }}
+                                    </template>
+
+                                    <template #noOptions>
+                                        {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.multiselectNoOptions') }}
                                     </template>
                                 </Multiselect>
                             </div>
