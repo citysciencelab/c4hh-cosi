@@ -1,6 +1,6 @@
 import Feature from "ol/Feature";
 import {GeoJSON} from "ol/format";
-import isObject from "../../../../src/shared/js/utils/isObject";
+import isObject from "@shared/js/utils/isObject";
 
 /**
  * Converts a feature to a raw GeoJSON Feature object or string.

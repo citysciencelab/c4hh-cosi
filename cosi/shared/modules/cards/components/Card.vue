@@ -208,6 +208,7 @@ export default {
                         />
                         <slot name="subjectData-menu" />
                     </div>
+                    <slot name="custom-icon-button" />
                     <div class="dropdown custom-dd">
                         <IconButton
                             class="p-1"

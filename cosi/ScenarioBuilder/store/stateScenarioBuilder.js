@@ -11,11 +11,8 @@ const state = {
     id: "ScenarioBuilder",
     name: "ScenarioBuilder",
     useIcons: true,
-    isVisibleInMenu: true,
-    renderToWindow: false,
-    resizableWindow: false,
     width: 0.45,
-    scenarios: [],
+    scenarioCards: [],
     activeScenario: null,
     guideLayer: null,
     geomAttributes: {
@@ -27,10 +24,6 @@ const state = {
             {key: "laenge_m", factorToM: 1},
             {key: "laenge_km", factorToM: 0.001}
         ]
-    },
-    readmeUrl: {
-        "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/009scenariobuilder.md",
-        "de-DE": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/009einrichtungenanlegen.md"
     },
     featureEditorDisabled: false
 };

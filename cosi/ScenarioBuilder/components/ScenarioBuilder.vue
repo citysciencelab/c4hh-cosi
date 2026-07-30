@@ -1,33 +1,31 @@
 <script>
-// import {getComponent} from "../../../../src/utils/getComponent";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AddCardButton from "../../shared/modules/cards/components/AddCardButton.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
-import {mapGetters, mapActions, mapMutations} from "vuex";
 import Card from "../../shared/modules/cards/components/Card.vue";
 import dayjs from "dayjs";
+import {downloadJsonToFile} from "../../utils/download";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import getters from "../store/gettersScenarioBuilder";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 import mutations from "../store/mutationsScenarioBuilder";
-import actions from "../store/actionsScenarioBuilder";
 import describeFeatureTypeByLayerId from "../../utils/describeFeatureType";
 import beautifyKey from "@shared/js/utils/beautifyKey.js";
 // import validateProp, {compareLayerMapping} from "../utils/validateProp";
 // import TypesMapping from "../../assets/mapping.types.json";
 import Feature from "ol/Feature";
-import {featureTagStyleMod, featureTagStyle, toggleTagsOnLayerVisibility} from "../utils/guideLayer";
-import getValuesForField from "../utils/getValuesForField";
+import {featureToGeoJson} from "../../utils/features/convertToGeoJson";
+import {addSimulationTag, clearGuideLayer, featureTagStyleMod, featureTagStyle, removeSimulationTag, toggleTagsOnLayerVisibility} from "../utils/guideLayer";
 import getFieldTypeForValue from "../utils/getFieldTypeForValue";
 import layerCollection from "@core/layers/js/layerCollection";
 import hash from "object-hash";
-// import ReferencePicker from "./ReferencePicker.vue";
 // import MoveFeatures from "./MoveFeatures.vue";
 // import FeatureEditor from "./FeatureEditor.vue";
-// import GeometryPicker from "../../components/GeometryPicker.vue";
 // import ScenarioManager from "./ScenarioManager.vue";
-import Scenario from "../classes/Scenario";
+// import Scenario from "../classes/Scenario";
 import ScenarioFeature from "../classes/ScenarioFeature";
 import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
@@ -49,6 +47,7 @@ export default {
         Card,
         DropdownAutocomplete,
         FlatButton,
+        IconButton,
         InputText,
         TagGroup,
         ToolInfo,
@@ -68,12 +67,9 @@ export default {
             editDialog: false,
             editFeature: null,
             map: undefined,
-            cards: [],
             showNewScenario: false,
             scenarioTitle: "",
             currentView: "scenario",
-            selectedScenario: null,
-            objectCards: [],
             currentObject: null,
             showNewObject: false,
             visibleLayerListForDropdown: [],
@@ -100,12 +96,20 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Language", ["currentLocale"]),
         ...mapGetters("Modules/ScenarioBuilder", Object.keys(getters)),
         ...mapGetters("Modules/FeaturesList", ["groupActiveLayer", "activeVectorLayerList"]),
         ...mapGetters("Maps", ["getLayerById", "projectionCode"]),
         ...mapGetters("Modules/Routing", ["geosearchReverse"]),
         ...mapGetters(["layerConfig", "visibleSubjectDataLayerConfigs"]),
+
+        /**
+         * Returns the currently active card from the cards array.
+         * @returns {Object} The active card object.
+         */
+        activeScenarioCard () {
+            return this.scenarioCards.find(card => card.status === "active");
+        },
+
         /**
          * Getter and Setter for the manuel coordinates Input for the geometry
          */
@@ -191,7 +195,7 @@ export default {
 
             this.currentObject.feature.set("name", newName);
 
-            const card = this.objectCards.find(
+            const card = this.activeScenarioCard.objects.find(
                 item => item.id === this.currentObject.feature.getId()
             );
 
@@ -266,7 +270,6 @@ export default {
     },
     methods: {
         ...mapMutations("Modules/ScenarioBuilder", Object.keys(mutations)),
-        ...mapActions("Modules/ScenarioBuilder", Object.keys(actions)),
         ...mapActions("Maps", ["addNewLayerIfNotExists", "placingPointMarker", "removePointMarker"]),
         ...mapMutations("Maps", ["setCenter"]),
 
@@ -274,22 +277,23 @@ export default {
         // validateProp, // the utils function validating the type of props and returning the relevant rules
         describeFeatureTypeByLayerId, // WFS describeFeatureType request based on the rawLayerList
 
+
         /**
          * Creates a new scenario, sets it as active, and adds a corresponding card.
          * @returns {void}
          */
-        addCard () {
-            const scenario = new Scenario(
-                this.scenarioTitle,
-                this.guideLayer,
-                {
-                    isActive: true
-                }
-            );
+        addScenarioCard () {
+            // const scenario = new Scenario(
+            //     this.scenarioTitle,
+            //     this.guideLayer,
+            //     {
+            //         isActive: true
+            //     }
+            // );
 
-            this.setActiveScenario(scenario);
+            // this.setActiveScenario(scenario);
 
-            this.cards.push({
+            this.scenarioCards.push({
                 title: this.scenarioTitle,
                 data: [
                     {value: this.scenarioTitle},
@@ -297,9 +301,17 @@ export default {
                 ],
                 downloadable: true,
                 icon: "bi bi-bounding-box",
-                removable: false
+                id: hash({
+                    title: this.scenarioTitle,
+                    created: dayjs().format("DD.MM.YYYY")
+                }),
+                objects: [],
+                removable: false,
+                status: "active"
             });
             this.showNewScenario = false;
+            this.scenarioTitle = "";
+            this.toggleCardStatus(this.scenarioCards.length - 1);
         },
         /**
          * Generates and adds a new object card based on the provided scenario feature.
@@ -310,7 +322,7 @@ export default {
             const feature = scenarioFeature.feature,
                   properties = feature.getProperties();
 
-            this.objectCards.push({
+            this.activeScenarioCard.objects.push({
                 id: feature.getId(),
                 icon: "bi bi-box",
                 label: properties.facility || this.selectedLayer.getLayer().get("name"),
@@ -318,24 +330,10 @@ export default {
                 scenarioFeature
             });
 
+            this.scenarioLayer.getSource().addFeature(feature);
+            addSimulationTag(feature, this.guideLayer, this.scenarioLayer);
         },
-        /**
-         * Sets the selected scenario and switches the view to the objects management panel.
-         * @param {Object} scenario - The scenario instance to open.
-         * @returns {void}
-         */
-        openScenario (scenario) {
-            this.selectedScenario = scenario;
-            this.currentView = "objects";
-        },
-        /**
-         * Resets the selected scenario and switches the view back to the scenario overview.
-         * @returns {void}
-         */
-        closeScenario () {
-            this.selectedScenario = null;
-            this.currentView = "scenario";
-        },
+
         /**
          * Creates or retrieves the scenario layer, configures its visibility and z-index, and assigns it.
          * @returns {void}
@@ -375,14 +373,7 @@ export default {
 
             return String(feature.getId() || "Unbenanntes Objekt");
         },
-        /**
-         * Removes a card from the cards array at the specified index.
-         * @param {Number} index - Index of the card to be removed
-         * @return {void}
-         */
-        removeCard (index) {
-            this.cards.splice(index, 1);
-        },
+
         /**
          * Loads and processes the feature description for a given layer.
          * @param {Object} layer - The layer object containing attributes and configuration.
@@ -394,8 +385,7 @@ export default {
 
             const required = [],
                   optional = [];
-            let geom = null,
-                desc = [];
+            let desc = [];
 
             if (layer.attributes?.typ === "OAF") {
                 desc = Object.entries(layer.attributes.gfiAttributes || {})
@@ -417,7 +407,7 @@ export default {
                     field.type?.includes("gml") ||
                     field.type?.includes("Geometry")
                 ) {
-                    geom = field;
+                    // Geometry field - no action needed
                 }
                 else if (field.minOccurs > 0) {
                     required.push(field);
@@ -552,9 +542,9 @@ export default {
 
             const scenarioFeature = new ScenarioFeature(feature, this.scenarioLayer, guideLayer);
 
-            this.activeScenario.addFeature(
-                scenarioFeature
-            );
+            // this.activeScenario.addFeature(
+            //     scenarioFeature
+            // );
 
             this.currentObject = scenarioFeature;
             this.addObjectCard(scenarioFeature);
@@ -720,6 +710,74 @@ export default {
                     this.featureProperties[key] = null;
                 });
             }
+        },
+
+
+        removeObjectCard (index) {
+            const feature = this.activeScenarioCard.objects[index].scenarioFeature.feature;
+
+            this.scenarioLayer.getSource().removeFeature(feature);
+            removeSimulationTag(feature, this.guideLayer);
+            this.activeScenarioCard.objects.splice(index, 1);
+        },
+
+        /**
+         * Removes a card from the cards array at the specified index.
+         * @param {Number} index - Index of the card to be removed
+         * @return {void}
+         */
+        removeScenarioCard (index) {
+            this.scenarioCards.splice(index, 1);
+        },
+
+        /**
+         * Creates a deep copy of a scenario card for download.
+         * Scenario features are converted to WKT.
+         * @param {Object} item - The scenario card to export.
+         * @returns {Object} The copied scenario card.
+         */
+        createScenarioDownloadCopy (item) {
+            return {
+                ...item,
+                objects: item.objects.map(obj => {
+                    return featureToGeoJson(obj.scenarioFeature.feature);
+                })
+            };
+        },
+
+        downloadScenario (item) {
+            const itemCopy = this.createScenarioDownloadCopy(item);
+
+            downloadJsonToFile(itemCopy, itemCopy.title + ".json");
+        },
+
+        /**
+         * Toggles the status of a card at the specified index.
+         * @param {Number} index - Index of the card to toggle
+         * @return {void}
+         */
+        toggleCardStatus (index) {
+            const activeIndex = this.scenarioCards.findIndex(card => card.status === "active");
+
+            if (activeIndex === index) {
+                return;
+            }
+
+            clearGuideLayer(this.guideLayer);
+            this.scenarioLayer.getSource().clear();
+
+            if (activeIndex !== -1 && activeIndex !== index) {
+                this.scenarioCards[activeIndex].status = "";
+            }
+            this.scenarioCards[index].status = "active";
+            this.scenarioLayer.getSource().addFeatures(this.scenarioCards[index].objects.map(obj => obj.scenarioFeature.feature));
+            this.scenarioCards[index].objects.forEach(obj => {
+                addSimulationTag(obj.scenarioFeature.feature, this.guideLayer, this.scenarioLayer);
+            });
+        },
+
+        toggleCurrentView (view) {
+            this.currentView = view;
         }
 
     }
@@ -728,20 +786,17 @@ export default {
 
 <template lang="html">
     <div id="manage-scenario">
-        <ToolInfo
-            :url="readmeUrl"
-            :locale="currentLocale"
-        />
+        <ToolInfo />
         <div v-if="currentView === 'scenario'">
             <h5>
                 {{ $t('additional:modules.tools.cosi.scenarioManager.title') }}
             </h5>
             <div
-                v-if="cards.length"
+                v-if="scenarioCards.length"
                 class="mb-4 py-2"
             >
                 <div
-                    v-for="(item, index) in cards"
+                    v-for="(item, index) in scenarioCards"
                     :key="item"
                 >
                     <Card
@@ -750,18 +805,29 @@ export default {
                         :downloadable="item.downloadable"
                         :icon="item.icon"
                         :visible="false"
-                        @click="openScenario(item)"
-                        @remove-set="removeCard(index)"
-                    />
+                        :status="item.status"
+                        @click="toggleCardStatus(index)"
+                        @remove-set="removeScenarioCard(index)"
+                        @download-set="downloadScenario(item)"
+                    >
+                        <template #custom-icon-button>
+                            <IconButton
+                                class="p-1"
+                                :aria="'Externen Link öffnen'"
+                                icon="bi bi-pencil"
+                                @click.stop="toggleCurrentView('objects')"
+                            />
+                        </template>
+                    </Card>
                 </div>
             </div>
             <AlertMessage
-                v-if="!cards.length"
+                v-if="!scenarioCards.length"
                 :text="$t('additional:modules.tools.cosi.scenarioManager.alertNoScenario')"
                 type="info"
             />
             <AddCardButton
-                class="pt-5 2 mb-4"
+                class="mb-4"
                 :text="$t('additional:modules.tools.cosi.scenarioManager.createNewScenario')"
                 @click="showNewScenario = true"
             />
@@ -773,6 +839,7 @@ export default {
                     :label="$t('additional:modules.tools.cosi.scenarioManager.addScenarioTitle')"
                     :placeholder="$t('additional:modules.tools.cosi.scenarioManager.addScenarioTitle')"
                     max-length="50"
+                    @keyup.enter="addScenarioCard"
                 />
                 <div class="d-flex justify-content-center">
                     <FlatButton
@@ -782,7 +849,7 @@ export default {
                         :aria-label="$t('additional:modules.tools.cosi.scenarioManager.addScenario')"
                         :disabled="!scenarioTitle.length"
                         :text="$t('additional:modules.tools.cosi.scenarioManager.addScenario')"
-                        :interaction="addCard"
+                        @click="addScenarioCard"
                     />
                 </div>
             </div>
@@ -797,15 +864,14 @@ export default {
                     type="button"
                     class="btn btn-link text-decoration-none p-0 d-inline-flex align-items-center gap-2"
                     :aria-label="$t('additional:modules.tools.cosi.objectManager.back')"
-                    :disabled="!scenarioTitle.length"
-                    @click="closeScenario"
+                    @click="toggleCurrentView('scenario')"
                 >
                     <i class="bi bi-arrow-left" />
                     <span>{{ $t('additional:modules.tools.cosi.objectManager.back') }}</span>
                 </button>
             </div>
             <h5 class="mb-4">
-                {{ selectedScenario.title + " - " }}
+                {{ activeScenarioCard.title + " - " }}
                 {{ $t('additional:modules.tools.cosi.objectManager.title') }}
             </h5>
 
@@ -817,13 +883,13 @@ export default {
             >
                 <div class="py-2">
                     <AlertMessage
-                        v-if="!objectCards.length"
+                        v-if="!activeScenarioCard.objects.length"
                         :text="$t('additional:modules.tools.cosi.objectManager.alertNoObject')"
                         type="info"
                     />
 
                     <div
-                        v-for="card in objectCards"
+                        v-for="(card, index) in activeScenarioCard.objects"
                         :key="card.id"
                         class="mb-3"
                     >
@@ -831,7 +897,7 @@ export default {
                             :icon="card.icon"
                             :label="card.label"
                             :text="card.text"
-                            @click:close="removeSelectionCard(card)"
+                            @click:close="removeObjectCard(index)"
                         />
                     </div>
                     <AddCardButton
