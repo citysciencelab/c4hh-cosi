@@ -19,7 +19,8 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         iconGeolocationMarker,
         iconDirectionArrow,
         originalMapCollection,
-        mapMock;
+        mapMock,
+        wrappers;
     const mockAlertingActions = {
         addSingleAlert: sinon.stub()
     };
@@ -30,6 +31,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
         showDirection = false;
         showAccuracy = false;
         geolocation = null;
+        wrappers = [];
         mapMock = {
             addLayer: sinon.stub(),
             addOverlay: sinon.stub(),
@@ -90,16 +92,29 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     });
 
     afterEach(() => {
+        wrappers.forEach(wrapper => wrapper.unmount());
         globalThis.mapCollection = originalMapCollection;
         sinon.restore();
     });
 
-
-    it("renders the Orientation component", () => {
+    /**
+     * Mounts OrientationItem component with test store and tracks wrapper for teardown.
+     * @returns {Object} Mounted wrapper.
+     */
+    function mountOrientationItem () {
         const wrapper = shallowMount(OrientationItemComponent, {
             global: {
                 plugins: [store]
-            }});
+            }
+        });
+
+        wrappers.push(wrapper);
+        return wrapper;
+    }
+
+
+    it("renders the Orientation component", () => {
+        const wrapper = mountOrientationItem();
 
         expect(wrapper.find(".orientationButtons").exists()).to.be.true;
         expect(wrapper.find("#geolocation_marker").exists()).to.be.true;
@@ -107,19 +122,13 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     });
 
     it("renders the Orientation button", () => {
-        const wrapper = shallowMount(OrientationItemComponent, {
-            global: {
-                plugins: [store]
-            }});
+        const wrapper = mountOrientationItem();
 
         expect(wrapper.find("#geolocate").exists()).to.be.true;
     });
 
     it("will not render the Poi Orientation button", () => {
-        const wrapper = shallowMount(OrientationItemComponent, {
-            global: {
-                plugins: [store]
-            }});
+        const wrapper = mountOrientationItem();
 
         expect(wrapper.find("#geolocatePOI").exists()).to.be.false;
     });
@@ -134,10 +143,7 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
 
     it("creates marker direction style from heading", () => {
         showDirection = true;
-        const wrapper = shallowMount(OrientationItemComponent, {
-            global: {
-                plugins: [store]
-            }});
+        const wrapper = mountOrientationItem();
 
         wrapper.vm.heading = Math.PI / 2;
 
@@ -147,12 +153,13 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     it("shows accuracy layer with marker overlay when accuracy is enabled", () => {
         showAccuracy = true;
         geolocation = {
-            getAccuracyGeometry: sinon.stub().returns(null)
+            getAccuracyGeometry: sinon.stub().returns(null),
+            un: sinon.stub(),
+            on: sinon.stub(),
+            setTracking: sinon.stub(),
+            getPosition: sinon.stub().returns(null)
         };
-        const wrapper = shallowMount(OrientationItemComponent, {
-            global: {
-                plugins: [store]
-            }});
+        const wrapper = mountOrientationItem();
 
         wrapper.vm.showMarkerOverlay();
 
@@ -164,12 +171,13 @@ describe("src/modules/controls/orientation/components/OrientationItem.vue", () =
     it("removes accuracy layer when marker overlay is removed", () => {
         showAccuracy = true;
         geolocation = {
-            getAccuracyGeometry: sinon.stub().returns(null)
+            getAccuracyGeometry: sinon.stub().returns(null),
+            un: sinon.stub(),
+            on: sinon.stub(),
+            setTracking: sinon.stub(),
+            getPosition: sinon.stub().returns(null)
         };
-        const wrapper = shallowMount(OrientationItemComponent, {
-            global: {
-                plugins: [store]
-            }});
+        const wrapper = mountOrientationItem();
 
         wrapper.vm.showMarkerOverlay();
         wrapper.vm.removeOverlay();
