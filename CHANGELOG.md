@@ -54,6 +54,7 @@
     - Fixed a bug that showed "show more" button on certain zoom sizes and refactored how LayerPills width is calculated.
     - Layers with showInLayerTree set to false are now consistently hidden from LayerPills.
 - OAF-Layer: Fixed legend entries being incomplete or changing on zoom. The legend now shows all style-rule-defined entries regardless of the currently loaded features in the map view.
+- Print: Grouped baselayers are no longer printed on top of other layers.
 
 ---
 
