@@ -74,10 +74,15 @@
                     "createNewObject": "Neues Planungsobjekt erstellen",
                     "titleEditObject": "Planungsobjekt bearbeiten",
                     "selectObject": "Planungsobjekt auswählen",
-                    "setFeatureHeadline": "Fachdaten Platzieren",
+                    "setFeatureHeadline": "Fachdaten platzieren",
                     "setFeature": "Für die Erstellung eines neuen Objekts bitte einen Standort auf der Karte auswählen.",
                     "addObjectTitle": "Objektname",
-                    "cancelPlacement": "Platzieren abbrechen"
+                    "cancelPlacement": "Platzieren abbrechen",
+                    "optionalInformation": "Optionale Informationen",
+                    "sourceDataOption": "Ausgangsdaten festlegen",
+                    "useExistingData": "aus bestehenden Fachdaten",
+                    "startWithEmptyData": "mit leeren Daten beginnen",
+                    "selectReferenceDataset": "Referenzdaten auswählen"
                 },
                 "dataTypes": {
                     "decimal": "Zahl",

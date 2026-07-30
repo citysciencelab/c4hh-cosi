@@ -38,7 +38,12 @@
                     "setFeatureHeadline": "Place subject data",
                     "setFeature": "To create a new object, please select a location on the map.",
                     "addObjectTitle": "Object name",
-                    "cancelPlacement": "Cancel Placement"
+                    "cancelPlacement": "Cancel Placement",
+                    "optionalInformation": "Optional information",
+                    "sourceDataOption": "Specify source data",
+                    "useExistingData": "from existing subject data",
+                    "startWithEmptyData": "start with empty data",
+                    "selectReferenceDataset": "Select reference dataset"
                 },
                 "moveFeatures": {
                     "title": "Einrichtungen verschieben",

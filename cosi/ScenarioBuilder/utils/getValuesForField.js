@@ -1,10 +1,10 @@
-// import {getFeatureGET as wfsGetFeature} from "@shared/js/api/wfs/getFeature.js";
+import getFeature from "@shared/js/api/wfs/getFeature.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
 import store from "../../../../src/app-store";
-// import {WFS} from "ol/format.js";
+import {WFS} from "ol/format.js";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 
-// const wfsReader = new WFS();
+const wfsReader = new WFS();
 
 /**
  * returns the map layer by ID
@@ -26,12 +26,12 @@ export default async function getValuesForField (field, layerId) {
     const rawLayer = rawLayerList.getLayerWhere({id: layerId});
 
     if (rawLayer) {
-        /* const response = await wfsGetFeature(rawLayer.url, {
+        const response = await getFeature.getFeatureGET(rawLayer.url, {
             featureType: rawLayer.featureType,
             version: rawLayer.version
         });
 
-        allFeatures = wfsReader.readFeatures(response); */
+        allFeatures = wfsReader.readFeatures(response);
     }
     else {
         const layer = layerById(layerId),

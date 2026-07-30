@@ -30,6 +30,7 @@ import hash from "object-hash";
 import Scenario from "../classes/Scenario";
 import ScenarioFeature from "../classes/ScenarioFeature";
 import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
+import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {unpackCluster} from "../../utils/features/unpackCluster";
 // import {getAddress} from "../../utils/geocode";
@@ -49,6 +50,7 @@ export default {
         DropdownAutocomplete,
         FlatButton,
         InputText,
+        TagGroup,
         ToolInfo,
         SimpleCard
     },
@@ -56,17 +58,12 @@ export default {
         return {
             workingLayer: null,
             featureTypeDesc: [],
-            featureTypeDescSorted: {
-                required: [],
-                optional: []
-            },
             featureProperties: {},
             beautifyKey: beautifyKey,
             // typesMapping: TypesMapping,
             geometry: undefined,
             valuesForFields: {},
             panel: [0, 1],
-            formValid: false,
             isCreated: false,
             editDialog: false,
             editFeature: null,
@@ -85,7 +82,21 @@ export default {
             placementMode: false,
             placementMapListener: null,
             objectTitle: "",
-            scenarioLayer: null
+            scenarioLayer: null,
+            sourceDataItems: [
+                {
+                    id: "existing",
+                    label: this.$t("additional:modules.tools.cosi.objectManager.useExistingData"),
+                    selected: true
+                },
+                {
+                    id: "empty",
+                    label: this.$t("additional:modules.tools.cosi.objectManager.startWithEmptyData"),
+                    selected: false
+                }
+            ],
+            selectedSourceData: "existing",
+            referenceFeature: null
         };
     },
     computed: {
@@ -111,9 +122,28 @@ export default {
                 title: layer.getLayer().get("name"),
                 value: layer
             }));
+        },
+        /**
+         * Returns reference features of the selected layer for the dropdown.
+         * @returns {Array[]} Dropdown items with title and feature value.
+         */
+        referenceItems () {
+            if (!this.selectedLayer) {
+                return [];
+            }
+
+            const source = this.selectedLayer.getLayer().getSource();
+
+            if (!source) {
+                return [];
+            }
+
+            return source.getFeatures().map(feature => ({
+                title: this.getFeatureTitle(feature),
+                value: feature
+            }));
         }
     },
-
     watch: {
         /**
          * Watcher function for the workingLayer.
@@ -321,12 +351,84 @@ export default {
             this.scenarioLayer = layer;
         },
         /**
+         * Returns a display title for a feature based on available properties.
+         * @param {Feature} feature - Feature to get the title from.
+         * @returns {String} Display title of the feature.
+         */
+        getFeatureTitle (feature) {
+            const props = feature.getProperties(),
+                  fields = [
+                      "name",
+                      "facility",
+                      "bezeichnung",
+                      "einrichtungsname",
+                      "titel"
+                  ];
+
+            for (const field of fields) {
+                if (props[field]) {
+                    return typeof props[field] === "object"
+                        ? JSON.stringify(props[field])
+                        : String(props[field]);
+                }
+            }
+
+            return String(feature.getId() || "Unbenanntes Objekt");
+        },
+        /**
          * Removes a card from the cards array at the specified index.
          * @param {Number} index - Index of the card to be removed
          * @return {void}
          */
         removeCard (index) {
             this.cards.splice(index, 1);
+        },
+        /**
+         * Loads and processes the feature description for a given layer.
+         * @param {Object} layer - The layer object containing attributes and configuration.
+         * @returns {void}
+         */
+        async loadFeatureDescription (layer) {
+            this.resetFeature();
+
+
+            const required = [],
+                  optional = [];
+            let geom = null,
+                desc = [];
+
+            if (layer.attributes?.typ === "OAF") {
+                desc = Object.entries(layer.attributes.gfiAttributes || {})
+                    .map(([name, label]) => ({
+                        name,
+                        label,
+                        type: "string",
+                        minOccurs: 0
+                    }));
+            }
+            else {
+                desc =
+                    await this.describeFeatureTypeByLayerId(layer.attributes?.id) ||
+                    this.getDescriptionBySource(layer.attributes?.id);
+            }
+
+            desc.forEach(field => {
+                if (
+                    field.type?.includes("gml") ||
+                    field.type?.includes("Geometry")
+                ) {
+                    geom = field;
+                }
+                else if (field.minOccurs > 0) {
+                    required.push(field);
+                }
+                else {
+                    optional.push(field);
+                }
+                this.featureProperties[field.name] = null;
+            });
+
+            this.featureTypeDesc = desc;
         },
         /* getVisibleLayerList () {
             this.layerIdList = this.getVisibleVectorLayers().map(layer => layer.getLayer().get("name"));
@@ -340,10 +442,11 @@ export default {
          * @param {Object} layer - The map layer where the new feature should be placed.
          * @returns {void}
          */
-        startPlacement (layer) {
+        async startPlacement (layer) {
             if (!layer) {
                 return;
             }
+            await this.loadFeatureDescription(layer);
             this.selectedLayer = layer;
             this.placementMode = true;
             this.map.on("click", this.placeFeature);
@@ -400,7 +503,6 @@ export default {
         resetFeature () {
             this.featureProperties = {};
             this.geometry = null;
-            this.formValid = false;
             // geomPickerResetLocation(this.$refs["geometry-picker"]);
             // geomPickerUnlisten(this.$refs["geometry-picker"]);
         },
@@ -493,27 +595,6 @@ export default {
         },
 
         /**
-         * Asynchronously Retrieves the avaialble values for each field of the featureType
-         * stores the result for use in select fields
-         * @param {Object[]} desc - the featureType description
-         * @returns {void}
-         */
-        asyncGetValuesForField (desc) {
-            this.valuesForFields = {};
-
-            for (const field of desc) {
-                getValuesForField(field.name, this.workingLayer.layerId)
-                    .then(items => {
-                        this.valuesForFields = {
-                            ...this.valuesForFields,
-                            [field.name]: items
-                        };
-                    });
-            }
-
-            // LoaderOverlay.hide();
-        },
-        /**
          * Resets the current creation state, clears map markers, and opens the panel to create a new object.
          * @returns {void}
          */
@@ -526,6 +607,7 @@ export default {
             this.placementMode = false;
             this.removePointMarker();
             this.showNewObject = true;
+            this.referenceFeature = null;
         },
 
         /**
@@ -535,14 +617,18 @@ export default {
          * @returns {void}
          */
         getDataFromReferenceFeature (feature) {
-            const referenceProps = feature.getProperties();
-
-            if (Object.prototype.hasOwnProperty.call(referenceProps, "geom")) {
-                delete referenceProps.geom;
+            if (!feature) {
+                return;
             }
 
-            this.featureProperties = referenceProps;
-            this.formValid = this.requiredFieldsSet();
+            const properties = feature.getProperties();
+
+            this.featureProperties = {};
+
+            this.featureTypeDesc.forEach(field => {
+                this.featureProperties[field.name] =
+                    properties[field.name] ?? null;
+            });
         },
 
         disableFeatureEditor (state) {
@@ -585,16 +671,6 @@ export default {
             return [];
         },
 
-        requiredFieldsSet () {
-            for (const field of this.featureTypeDescSorted.required) {
-                if (!this.featureProperties[field.name]) {
-                    return false;
-                }
-            }
-
-            return true;
-        },
-
         openEditDialog (evt) {
             this.editFeature = null;
             this.map.forEachFeatureAtPixel(evt.pixel, feature => {
@@ -618,7 +694,34 @@ export default {
         deleteFeature () {
             this.activeScenario.removeSimulatedFeature(this.editFeature);
             this.editDialog = false;
+        },
+        /**
+         * Sets the selected item, updates its selection state, and resets data if empty.
+         * @param {Object} selectedItem - The item to select, or null/undefined to clear selection.
+         */
+        setSelectedItems (selectedItem) {
+            if (!selectedItem?.id) {
+                this.sourceDataItems.forEach(item => {
+                    item.selected = false;
+                });
+                return;
+            }
+
+            this.selectedSourceData = selectedItem.id;
+
+            this.sourceDataItems.forEach(item => {
+                item.selected = item.id === selectedItem.id;
+            });
+
+            if (selectedItem.id === "empty") {
+                this.referenceFeature = null;
+
+                Object.keys(this.featureProperties).forEach(key => {
+                    this.featureProperties[key] = null;
+                });
+            }
         }
+
     }
 };
 </script>
@@ -781,15 +884,55 @@ export default {
                         </div>
                     </div>
                 </div>
-                <InputText
-                    v-if="currentObject"
-                    id="scenario-title"
-                    v-model="objectTitle"
-                    class="mt-2"
-                    :label="$t('additional:modules.tools.cosi.objectManager.addObjectTitle')"
-                    :placeholder="$t('additional:modules.tools.cosi.objectManager.addObjectTitle')"
-                    max-length="50"
-                />
+                <div v-if="currentObject">
+                    <InputText
+                        id="scenario-title"
+                        v-model="objectTitle"
+                        class="mt-2"
+                        :label="$t('additional:modules.tools.cosi.objectManager.addObjectTitle')"
+                        :placeholder="$t('additional:modules.tools.cosi.objectManager.addObjectTitle')"
+                        max-length="50"
+                    />
+                    <AccordionItem
+                        id="attributes"
+                        :is-open="true"
+                        :title="$t('additional:modules.tools.cosi.objectManager.optionalInformation')"
+                        icon="bi bi-info"
+                    >
+                        <TagGroup
+                            class="mb-3 mt-5"
+                            :items="sourceDataItems"
+                            :multiple="false"
+                            :label="$t('additional:modules.tools.cosi.objectManager.sourceDataOption')"
+                            @update:selected-items="setSelectedItems"
+                        />
+                        <DropdownAutocomplete
+                            v-if="selectedSourceData === 'existing'"
+                            v-model="referenceFeature"
+                            class="mt-3"
+                            :items="referenceItems"
+                            :label="$t('additional:modules.tools.cosi.objectManager.selectReferenceDataset')"
+                            @update:model-value="getDataFromReferenceFeature"
+                        />
+                        <div
+                            v-if="featureTypeDesc.length && (referenceFeature || selectedSourceData === 'empty')"
+                            class="mt-4"
+                        >
+                            <div
+                                v-for="field in featureTypeDesc"
+                                :key="field.name"
+                                class="mb-3"
+                            >
+                                <InputText
+                                    :id="field.name"
+                                    v-model="featureProperties[field.name]"
+                                    :label="field.label || beautifyKey(field.name)"
+                                    :placeholder="field.label || beautifyKey(field.name)"
+                                />
+                            </div>
+                        </div>
+                    </AccordionItem>
+                </div>
             </div>
         </div>
     </div>
