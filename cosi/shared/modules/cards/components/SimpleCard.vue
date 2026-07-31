@@ -2,6 +2,14 @@
 export default {
     name: "SimpleCard",
     props: {
+        closeable: {
+            type: Boolean,
+            default: true
+        },
+        hoverable: {
+            type: Boolean,
+            default: false
+        },
         icon: {
             type: String,
             default: null
@@ -10,17 +18,14 @@ export default {
             type: String,
             default: ""
         },
+        status: {
+            type: String,
+            required: false,
+            default: ""
+        },
         text: {
             type: String,
             default: ""
-        },
-        closeable: {
-            type: Boolean,
-            default: true
-        },
-        hoverable: {
-            type: Boolean,
-            default: false
         }
     },
     emits: ["click:close"]
@@ -30,7 +35,7 @@ export default {
 <template lang="html">
     <div
         class="card shadow"
-        :class="{hoverable}"
+        :class="[{hoverable}, status === 'active' ? 'card-active' : '']"
     >
         <div class="card-body p-2 d-flex flex-row align-center">
             <div

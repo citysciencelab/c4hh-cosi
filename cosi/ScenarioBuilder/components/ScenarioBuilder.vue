@@ -1,471 +1,104 @@
 <script>
-import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
-import AddCardButton from "../../shared/modules/cards/components/AddCardButton.vue";
-import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
-import Card from "../../shared/modules/cards/components/Card.vue";
-import dayjs from "dayjs";
-import {downloadJsonToFile} from "../../utils/download";
-import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
-import getters from "../store/gettersScenarioBuilder";
-import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
-import IconButton from "@shared/modules/buttons/components/IconButton.vue";
-import InputText from "@shared/modules/inputs/components/InputText.vue";
+import {addSimulationTag, clearGuideLayer, featureTagStyleMod, featureTagStyle, removeSimulationTag} from "../utils/guideLayer";
+import layerCollection from "@core/layers/js/layerCollection";
+import layerFactory from "@core/layers/js/layerFactory";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import mutations from "../store/mutationsScenarioBuilder";
-import describeFeatureTypeByLayerId from "../../utils/describeFeatureType";
-import beautifyKey from "@shared/js/utils/beautifyKey.js";
-// import validateProp, {compareLayerMapping} from "../utils/validateProp";
-// import TypesMapping from "../../assets/mapping.types.json";
-import Feature from "ol/Feature";
-import {featureToGeoJson} from "../../utils/features/convertToGeoJson";
-import {addSimulationTag, clearGuideLayer, featureTagStyleMod, featureTagStyle, removeSimulationTag, toggleTagsOnLayerVisibility} from "../utils/guideLayer";
-import getFieldTypeForValue from "../utils/getFieldTypeForValue";
-import layerCollection from "@core/layers/js/layerCollection";
-import hash from "object-hash";
-// import MoveFeatures from "./MoveFeatures.vue";
-// import FeatureEditor from "./FeatureEditor.vue";
-// import ScenarioManager from "./ScenarioManager.vue";
-// import Scenario from "../classes/Scenario";
-import ScenarioFeature from "../classes/ScenarioFeature";
-import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
-import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
+import ScenarioBuilderManager from "./ScenarioBuilderManager.vue";
+import ScenarioBuilderPlanner from "./ScenarioBuilderPlanner.vue";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
-import {unpackCluster} from "../../utils/features/unpackCluster";
-// import {getAddress} from "../../utils/geocode";
-// import LoaderOverlay from "../../../../src/utils/loaderOverlay.js";
-// import {getModelByAttributes} from "../../utils/radioBridge.js";
-import setGeomAttributes from "../../utils/features/setGeomAttributes";
-import VectorLayer from "ol/layer/Vector.js";
-import Point from "ol/geom/Point";
 
 export default {
     name: "ScenarioBuilder",
+
     components: {
-        AccordionItem,
-        AddCardButton,
-        AlertMessage,
-        Card,
-        DropdownAutocomplete,
-        FlatButton,
-        IconButton,
-        InputText,
-        TagGroup,
         ToolInfo,
-        SimpleCard
+        ScenarioBuilderManager,
+        ScenarioBuilderPlanner
     },
-    data () {
+
+    provide () {
         return {
-            workingLayer: null,
-            featureTypeDesc: [],
-            featureProperties: {},
-            beautifyKey: beautifyKey,
-            // typesMapping: TypesMapping,
-            geometry: undefined,
-            valuesForFields: {},
-            panel: [0, 1],
-            isCreated: false,
-            editDialog: false,
-            editFeature: null,
-            map: undefined,
-            showNewScenario: false,
-            scenarioTitle: "",
-            currentView: "scenario",
-            currentObject: null,
-            showNewObject: false,
-            visibleLayerListForDropdown: [],
-            selectedLayer: null,
-            visibleVectorLayers: [],
-            placementMode: false,
-            placementMapListener: null,
-            objectTitle: "",
-            scenarioLayer: null,
-            sourceDataItems: [
-                {
-                    id: "existing",
-                    label: this.$t("additional:modules.tools.cosi.objectManager.useExistingData"),
-                    selected: true
-                },
-                {
-                    id: "empty",
-                    label: this.$t("additional:modules.tools.cosi.objectManager.startWithEmptyData"),
-                    selected: false
-                }
-            ],
-            selectedSourceData: "existing",
-            referenceFeature: null
+            addFeatureToScenario: this.addFeatureToScenario,
+            removeFeatureFromScenario: this.removeFeatureFromScenario,
+            toggleCurrentView: this.toggleCurrentView
         };
     },
+
+    data () {
+        return {
+            // The current view of the ScenarioBuilder component. It can be either 'manager' or 'planner'.
+            currentView: "manager",
+            guideLayer: null,
+            // The layer that holds the features of the active scenario.
+            scenarioLayer: null
+        };
+    },
+
     computed: {
-        ...mapGetters("Modules/ScenarioBuilder", Object.keys(getters)),
-        ...mapGetters("Modules/FeaturesList", ["groupActiveLayer", "activeVectorLayerList"]),
-        ...mapGetters("Maps", ["getLayerById", "projectionCode"]),
-        ...mapGetters("Modules/Routing", ["geosearchReverse"]),
-        ...mapGetters(["layerConfig", "visibleSubjectDataLayerConfigs"]),
-
-        /**
-         * Returns the currently active card from the cards array.
-         * @returns {Object} The active card object.
-         */
-        activeScenarioCard () {
-            return this.scenarioCards.find(card => card.status === "active");
-        },
-
-        /**
-         * Getter and Setter for the manuel coordinates Input for the geometry
-         */
-        geomCoords: {
-            get () {
-                return this.geometry ? JSON.stringify(this.geometry.getCoordinates()) : undefined;
-            },
-            set (v) {
-                this.setGeomByInput(v);
-            }
-        },
-        layerItems () {
-            return this.visibleVectorLayers.map(layer => ({
-                title: layer.getLayer().get("name"),
-                value: layer
-            }));
-        },
-        /**
-         * Returns reference features of the selected layer for the dropdown.
-         * @returns {Array[]} Dropdown items with title and feature value.
-         */
-        referenceItems () {
-            if (!this.selectedLayer) {
-                return [];
-            }
-
-            const source = this.selectedLayer.getLayer().getSource();
-
-            if (!source) {
-                return [];
-            }
-
-            return source.getFeatures().map(feature => ({
-                title: this.getFeatureTitle(feature),
-                value: feature
-            }));
-        }
+        ...mapGetters("Modules/ScenarioBuilder", ["activeScenarioCard"])
     },
+
     watch: {
-        /**
-         * Watcher function for the workingLayer.
-         * Triggers the retrival of the featureType description and the available values.
-         * @param {Object} layerMap - the layerMap of the current working layer.
-         * @returns {void}
-         */
-        /* workingLayer (layerMap) {
-            // LoaderOverlay.show();
-            this.resetFeature();
-
-            this.describeFeatureTypeByLayerId(layerMap.layerId)
-                .then(desc => {
-                    const _desc = desc || this.getDescriptionBySource(layerMap.layerId),
-                          required = [],
-                          optional = [];
-                    let geom;
-
-                    for (const field of _desc) {
-                        if (compareLayerMapping(field, layerMap)) {
-                            required.push(field);
-                            this.featureProperties[field.name] = null;
-                        }
-                        else if (this.typesMapping[field.type] === "geom") {
-                            geom = field;
-                        }
-                        else {
-                            optional.push(field);
-                        }
-                    }
-                    this.featureTypeDescSorted = {required, optional, geom};
-                    this.featureTypeDesc = _desc;
-                    this.asyncGetValuesForField(_desc);
-                });
-        },*/
-        /**
-         * Updates the title of the current object and its corresponding card.
-         * @param {string} newName - The new name to set for the feature and card text.
-         * @returns {void}
-         */
-        objectTitle (newName) {
-            if (!this.currentObject) {
-                return;
+        activeScenarioCard (newCard) {
+            if (newCard) {
+                this.updateLayer();
             }
-
-            this.currentObject.feature.set("name", newName);
-
-            const card = this.activeScenarioCard.objects.find(
-                item => item.id === this.currentObject.feature.getId()
-            );
-
-            if (card) {
-                card.text = newName;
-            }
-        },
-        /**
-         * Synchronizes visible vector layers and resets the selected layer if it becomes hidden.
-         * @returns {void}
-         */
-        visibleSubjectDataLayerConfigs: {
-            handler () {
-                this.visibleVectorLayers = this.getVisibleVectorLayers();
-
-                if (!this.visibleVectorLayers.includes(this.selectedLayer)) {
-                    this.selectedLayer = null;
-                }
-            },
-            deep: true,
-            immediate: true
-        },
-        /**
-         * If the tool is active, activate the select interaction and add overlay to the districtLayers if necessary
-         * If the tool is not actvie, deactivate the interactions (select, drag box) and remove overlay if no districts are selected
-         * and update the extent of the selected features (districts).
-         * @param {boolean} newActive - Defines if the tool is active.
-         * @returns {void}
-         */
-        /* async active (newActive) {
-            if (newActive) {
-                if (this.geometry) {
-                    // wait for 2 ticks for the drawing layer to initialize
-                    await this.$nextTick();
-                    this.$refs["geometry-picker"].geometry.value = this.geometry;
-                    await this.$nextTick();
-                }
-            }
-            else {
-                const model = getComponent(this.id);
-
-                if (model) {
-                    model.set("isActive", false);
-                }
-                geomPickerUnlisten(this.$refs["geometry-picker"]);
-            }
-        }, */
-        activeVectorLayerList (layerList) {
-            if (this.guideLayer) {
-                toggleTagsOnLayerVisibility(this.guideLayer, layerList);
-            }
-        },
-        featureProperties: {
-            deep: true,
-            handler () {
-                this.isCreated = false;
-            }
-        },
-        geometry () {
-            this.isCreated = false;
-            // this.getAddress(geom);
         }
     },
-    /**
-     * Lifecycle function, triggers on component initialize. Creates necessary guide and drawing layers.
-     * @returns {void}
-     */
+
     async created () {
-        this.map = mapCollection.getMap("2D");
+        this.scenarioLayer = this.getLayerById("active-scenario");
+        this.getLayerById("active-scenario").getLayer().setVisible(true);
+        this.getLayerById("active-scenario").getLayer().setZIndex(10);
         await this.createGuideLayer();
-        await this.createScenarioLayer();
     },
+
     methods: {
         ...mapMutations("Modules/ScenarioBuilder", Object.keys(mutations)),
-        ...mapActions("Maps", ["addNewLayerIfNotExists", "placingPointMarker", "removePointMarker"]),
-        ...mapMutations("Maps", ["setCenter"]),
-
-        // compareLayerMapping, // the utils function that checks a prop against the layer map
-        // validateProp, // the utils function validating the type of props and returning the relevant rules
-        describeFeatureTypeByLayerId, // WFS describeFeatureType request based on the rawLayerList
-
+        ...mapActions("Maps", ["addNewLayerIfNotExists"]),
 
         /**
-         * Creates a new scenario, sets it as active, and adds a corresponding card.
-         * @returns {void}
+         * Adds a feature to the scenario layer and tags it for simulation.
+         * @param {Feature} feature - The feature to be added to the scenario.
          */
-        addScenarioCard () {
-            // const scenario = new Scenario(
-            //     this.scenarioTitle,
-            //     this.guideLayer,
-            //     {
-            //         isActive: true
-            //     }
-            // );
-
-            // this.setActiveScenario(scenario);
-
-            this.scenarioCards.push({
-                title: this.scenarioTitle,
-                data: [
-                    {value: this.scenarioTitle},
-                    {icon: "bi bi-pencil", label: "Erstellt: " + dayjs().format("DD.MM.YYYY")}
-                ],
-                downloadable: true,
-                icon: "bi bi-bounding-box",
-                id: hash({
-                    title: this.scenarioTitle,
-                    created: dayjs().format("DD.MM.YYYY")
-                }),
-                objects: [],
-                removable: false,
-                status: "active"
-            });
-            this.showNewScenario = false;
-            this.scenarioTitle = "";
-            this.toggleCardStatus(this.scenarioCards.length - 1);
-        },
-        /**
-         * Generates and adds a new object card based on the provided scenario feature.
-         * @param {Object} scenarioFeature - The scenario feature containing the map feature and properties.
-         * @returns {void}
-         */
-        addObjectCard (scenarioFeature) {
-            const feature = scenarioFeature.feature,
-                  properties = feature.getProperties();
-
-            this.activeScenarioCard.objects.push({
-                id: feature.getId(),
-                icon: "bi bi-box",
-                label: properties.facility || this.selectedLayer.getLayer().get("name"),
-                text: "Neues Objekt",
-                scenarioFeature
-            });
-
-            this.scenarioLayer.getSource().addFeature(feature);
-            addSimulationTag(feature, this.guideLayer, this.scenarioLayer);
+        addFeatureToScenario (feature) {
+            this.scenarioLayer.getLayerSource().addFeature(feature);
+            addSimulationTag(feature, this.guideLayer);
         },
 
         /**
-         * Creates or retrieves the scenario layer, configures its visibility and z-index, and assigns it.
+         * Clears all features from the scenario layer and removes any associated guide layer features.
          * @returns {void}
          */
-        async createScenarioLayer () {
-            const layer = await this.addNewLayerIfNotExists({
-                layerName: this.id + "_scenario_objects"
-            });
-
-            layer.setVisible(true);
-            layer.setZIndex(20);
-
-            this.scenarioLayer = layer;
+        clearFeaturesFromScenario () {
+            this.scenarioLayer.getLayerSource().clear();
+            clearGuideLayer(this.guideLayer);
         },
-        /**
-         * Returns a display title for a feature based on available properties.
-         * @param {Feature} feature - Feature to get the title from.
-         * @returns {String} Display title of the feature.
-         */
-        getFeatureTitle (feature) {
-            const props = feature.getProperties(),
-                  fields = [
-                      "name",
-                      "facility",
-                      "bezeichnung",
-                      "einrichtungsname",
-                      "titel"
-                  ];
 
-            for (const field of fields) {
-                if (props[field]) {
-                    return typeof props[field] === "object"
-                        ? JSON.stringify(props[field])
-                        : String(props[field]);
-                }
+        /**
+         * Gets a layer by its ID from the layer collection. If the layer does not exist,
+         * it creates a new vector-based layer with the specified ID, adds it to the layer collection,
+         * and then returns the newly created layer.         *
+         * @param {string} id - The unique identifier of the layer to get or create.
+         * @returns {Object} The layer object corresponding to the given ID.
+         */
+        getLayerById (id) {
+            if (typeof layerCollection.getLayerById(id) !== "undefined") {
+                return layerCollection.getLayerById(id);
             }
-
-            return String(feature.getId() || "Unbenanntes Objekt");
-        },
-
-        /**
-         * Loads and processes the feature description for a given layer.
-         * @param {Object} layer - The layer object containing attributes and configuration.
-         * @returns {void}
-         */
-        async loadFeatureDescription (layer) {
-            this.resetFeature();
-
-
-            const required = [],
-                  optional = [];
-            let desc = [];
-
-            if (layer.attributes?.typ === "OAF") {
-                desc = Object.entries(layer.attributes.gfiAttributes || {})
-                    .map(([name, label]) => ({
-                        name,
-                        label,
-                        type: "string",
-                        minOccurs: 0
-                    }));
-            }
-            else {
-                desc =
-                    await this.describeFeatureTypeByLayerId(layer.attributes?.id) ||
-                    this.getDescriptionBySource(layer.attributes?.id);
-            }
-
-            desc.forEach(field => {
-                if (
-                    field.type?.includes("gml") ||
-                    field.type?.includes("Geometry")
-                ) {
-                    // Geometry field - no action needed
-                }
-                else if (field.minOccurs > 0) {
-                    required.push(field);
-                }
-                else {
-                    optional.push(field);
-                }
-                this.featureProperties[field.name] = null;
+            const layer = layerFactory.createLayer({
+                typ: "VECTORBASE",
+                id: id,
+                name: id,
+                alwaysOnTop: true,
+                visibility: true
             });
 
-            this.featureTypeDesc = desc;
-        },
-        /* getVisibleLayerList () {
-            this.layerIdList = this.getVisibleVectorLayers().map(layer => layer.getLayer().get("name"));
-
-            this.layerIdList.forEach(name => {
-                this.visibleLayerListForDropdown.push(name);
-            });
-        },*/
-        /**
-         * Activates the placement mode for a specific layer and attaches the click event listener to the map.
-         * @param {Object} layer - The map layer where the new feature should be placed.
-         * @returns {void}
-         */
-        async startPlacement (layer) {
-            if (!layer) {
-                return;
-            }
-            await this.loadFeatureDescription(layer);
-            this.selectedLayer = layer;
-            this.placementMode = true;
-            this.map.on("click", this.placeFeature);
-        },
-        /**
-         * Handles the map click event to create a feature at the clicked coordinates and deactivates the placement mode.
-         * @param {Object} evt - The map click event object containing the coordinates.
-         * @returns {void}
-         */
-        placeFeature (evt) {
-            const geometry = new Point(evt.coordinate);
-
-            this.createFeature(geometry);
-            this.map.un("click", this.placeFeature);
-            this.placementMode = false;
+            layerCollection.addLayer(layer);
+            return layer;
         },
 
-        /**
-         * Returns all visible vector layers from the layer collection that are of supported types.
-         * Supported types include "WFS", "OAF", and "GeoJSON".
-         * @returns {Array} An array of visible vector layer objects.
-         */
-        getVisibleVectorLayers () {
-            const supportedLayerTypes = ["WFS", "OAF", "GeoJSON"];
-
-            return layerCollection.getLayers().filter(layer => {
-                return layer.getLayer() instanceof VectorLayer && layer?.attributes.visibility === true && layer?.attributes?.isNeverVisibleInTree !== true && supportedLayerTypes.includes(layer.get("typ"));
-            });
-        },
         /**
          * @description create a guide layer used for additional info to display on the map
          * @returns {void}
@@ -481,586 +114,59 @@ export default {
                 return [featureTagStyle(feature)];
             });
             newLayer.setZIndex(15);
-            this.setGuideLayer(newLayer);
+            this.guideLayer = newLayer;
 
             return newLayer;
         },
 
         /**
-         * Resets the new feature properties
-         * @returns {void}
+         * Removes a feature from the scenario layer and un-tags it from the guide layer.
+         * @param {Feature} feature - The feature to be removed from the scenario.
          */
-        resetFeature () {
-            this.featureProperties = {};
-            this.geometry = null;
-            // geomPickerResetLocation(this.$refs["geometry-picker"]);
-            // geomPickerUnlisten(this.$refs["geometry-picker"]);
-        },
-
-        /**
-         * Updates the geometry from the geomPicker in the data for later use when instantiating a new feature
-         * @param {module:ol/Geometry} geom the new geometry object
-         * @returns {void}
-         */
-        updateGeometry (geom) {
-            this.geometry = geom;
-        },
-
-        /**
-         * Creates a new simulated feature and adds it to the map
-         * @todo move to the scenarioFeature constructor?
-         * @returns {void}
-         */
-        createFeature (geometry) {
-            const guideLayer = this.guideLayer,
-                  feature = new Feature({geometry});
-            const sourceLayer = this.selectedLayer?.getLayer();
-
-            if (sourceLayer) {
-                const styleFn = sourceLayer.getStyle && typeof sourceLayer.getStyle === "function"
-                    ? sourceLayer.getStyle()
-                    : sourceLayer.getStyle;
-
-                if (typeof styleFn === "function") {
-                    feature.setStyle((resolution) => styleFn(feature, resolution));
-                }
-                else if (styleFn) {
-                    feature.setStyle(styleFn);
-                }
-            }
-
-            feature.set("isSimulation", true);
-            feature.set("sourceLayer", this.selectedLayer.getLayer().get("name"));
-            feature.set("sourceLayerId", this.selectedLayer.layerId);
-
-
-            this.setFeatureProperties(
-                feature,
-                this.featureProperties,
-                geometry
-            );
-
-            const scenarioFeature = new ScenarioFeature(feature, this.scenarioLayer, guideLayer);
-
-            // this.activeScenario.addFeature(
-            //     scenarioFeature
-            // );
-
-            this.currentObject = scenarioFeature;
-            this.addObjectCard(scenarioFeature);
-
-            this.removePointMarker();
-            this.$root.$emit("updateFeature");
-
-            this.isCreated = true;
-        },
-
-        /**
-         * @param {module:ol/Feature} feature - the feature whose properties to set
-         * @param {Object} properties - the dict of properties to add to the feature
-         * @param {module:ol/Geometry} geometry - the feature's geometry
-         * @returns {void}
-         */
-        setFeatureProperties (feature, properties, geometry) {
-            // delete potential geometry from properties
-            if (Object.hasOwnProperty.call(properties, "geometry")) {
-                delete properties.geometry;
-            }
-            // set properties
-            feature.setProperties(properties);
-            // flag as simulated
-            feature.set("isSimulation", true);
-            // create unique hash as ID
-            feature.setId(hash({...properties, geom: geometry}));
-
-            setGeomAttributes(feature, this.geomAttributes);
-            // // set additional attributes based on geometry
-            // if (geometry.getType() === "Polygon" || geometry.getType() === "MultiPolygon") {
-            //     const area = Math.round((geometry.getArea() + Number.EPSILON) * 100) / 100;
-
-            //     for (const attr of this.areaAttributes) {
-            //         feature.set(attr.key, area * attr.factorToSqm);
-            //     }
-            // }
-        },
-
-        /**
-         * Resets the current creation state, clears map markers, and opens the panel to create a new object.
-         * @returns {void}
-         */
-        openNewObject () {
-            this.resetFeature();
-            this.selectedLayer = null;
-            this.objectTitle = "";
-            this.currentObject = null;
-            this.isCreated = false;
-            this.placementMode = false;
-            this.removePointMarker();
-            this.showNewObject = true;
-            this.referenceFeature = null;
-        },
-
-        /**
-         * Sets a reference feature's properties as the properties of the feature to create
-         * deletes the original features geom if necessary
-         * @param {module:ol/Feature} feature - the feature picked as reference
-         * @returns {void}
-         */
-        getDataFromReferenceFeature (feature) {
-            if (!feature) {
-                return;
-            }
-
-            const properties = feature.getProperties();
-
-            this.featureProperties = {};
-
-            this.featureTypeDesc.forEach(field => {
-                this.featureProperties[field.name] =
-                    properties[field.name] ?? null;
-            });
-        },
-
-        disableFeatureEditor (state) {
-            this.setFeatureEditorDisabled(state);
-        },
-
-        mapDataTypes (type) {
-            return this.$t(`additional:modules.tools.cosi.dataTypes.${type}`);
-        },
-
-        /* async getAddress (geom) {
-            const address = await getAddress(geom, this.projectionCode, this.geosearchReverse.type);
-
-            if (address) {
-                for (const prop of this.workingLayer.addressField) {
-                    this.featureProperties[prop] = "";
-                }
-
-                this.$set(this.featureProperties, this.workingLayer.addressField[0], address);
-                this.$forceUpdate();
-            }
-        }, */
-
-        getDescriptionBySource (layerId) {
-            const layer = this.getLayerById({layerId: layerId}),
-                  feature = layer.getSource().getFeatures()[0];
-            let props, desc;
-
-            if (feature) {
-                props = feature.getProperties();
-                desc = Object.entries(props).map(prop => ({
-                    minOccurs: 0,
-                    name: prop[0],
-                    type: getFieldTypeForValue(prop[1])
-                }));
-
-                return desc;
-            }
-
-            return [];
-        },
-
-        openEditDialog (evt) {
-            this.editFeature = null;
-            this.map.forEachFeatureAtPixel(evt.pixel, feature => {
-                for (const feat of unpackCluster(feature)) {
-                    if (feat.get("isSimulation")) {
-                        this.editFeature = feat;
-                        this.editDialog = true;
-                    }
-                }
-            }, {
-                layerFilter: l => {
-                    return this.activeVectorLayerList.includes(l);
-                }
-            });
-
-            if (!this.editFeature) {
-                this.editDialog = false;
-            }
-        },
-
-        deleteFeature () {
-            this.activeScenario.removeSimulatedFeature(this.editFeature);
-            this.editDialog = false;
-        },
-        /**
-         * Sets the selected item, updates its selection state, and resets data if empty.
-         * @param {Object} selectedItem - The item to select, or null/undefined to clear selection.
-         */
-        setSelectedItems (selectedItem) {
-            if (!selectedItem?.id) {
-                this.sourceDataItems.forEach(item => {
-                    item.selected = false;
-                });
-                return;
-            }
-
-            this.selectedSourceData = selectedItem.id;
-
-            this.sourceDataItems.forEach(item => {
-                item.selected = item.id === selectedItem.id;
-            });
-
-            if (selectedItem.id === "empty") {
-                this.referenceFeature = null;
-
-                Object.keys(this.featureProperties).forEach(key => {
-                    this.featureProperties[key] = null;
-                });
-            }
-        },
-
-
-        removeObjectCard (index) {
-            const feature = this.activeScenarioCard.objects[index].scenarioFeature.feature;
-
-            this.scenarioLayer.getSource().removeFeature(feature);
+        removeFeatureFromScenario (feature) {
+            this.scenarioLayer.getLayerSource().removeFeature(feature);
             removeSimulationTag(feature, this.guideLayer);
-            this.activeScenarioCard.objects.splice(index, 1);
         },
 
         /**
-         * Removes a card from the cards array at the specified index.
-         * @param {Number} index - Index of the card to be removed
-         * @return {void}
+         * Toggles the current view between 'manager' and 'planner'.
+         * @param {string} view - The view to switch to.
+         * @returns {void}
          */
-        removeScenarioCard (index) {
-            this.scenarioCards.splice(index, 1);
-        },
-
-        /**
-         * Creates a deep copy of a scenario card for download.
-         * Scenario features are converted to WKT.
-         * @param {Object} item - The scenario card to export.
-         * @returns {Object} The copied scenario card.
-         */
-        createScenarioDownloadCopy (item) {
-            return {
-                ...item,
-                objects: item.objects.map(obj => {
-                    return featureToGeoJson(obj.scenarioFeature.feature);
-                })
-            };
-        },
-
-        downloadScenario (item) {
-            const itemCopy = this.createScenarioDownloadCopy(item);
-
-            downloadJsonToFile(itemCopy, itemCopy.title + ".json");
-        },
-
-        /**
-         * Toggles the status of a card at the specified index.
-         * @param {Number} index - Index of the card to toggle
-         * @return {void}
-         */
-        toggleCardStatus (index) {
-            const activeIndex = this.scenarioCards.findIndex(card => card.status === "active");
-
-            if (activeIndex === index) {
-                return;
-            }
-
-            clearGuideLayer(this.guideLayer);
-            this.scenarioLayer.getSource().clear();
-
-            if (activeIndex !== -1 && activeIndex !== index) {
-                this.scenarioCards[activeIndex].status = "";
-            }
-            this.scenarioCards[index].status = "active";
-            this.scenarioLayer.getSource().addFeatures(this.scenarioCards[index].objects.map(obj => obj.scenarioFeature.feature));
-            this.scenarioCards[index].objects.forEach(obj => {
-                addSimulationTag(obj.scenarioFeature.feature, this.guideLayer, this.scenarioLayer);
-            });
-        },
-
         toggleCurrentView (view) {
             this.currentView = view;
-        }
+        },
 
+        /**
+         *
+         * @return {void}
+         */
+        updateLayer () {
+            const {title, objects} = this.activeScenarioCard,
+                  layer = this.scenarioLayer.getLayer(),
+                  features = objects.map(obj => obj.feature);
+
+            this.scenarioLayer.set("name", title);
+            layer.set("name", title);
+
+            this.clearFeaturesFromScenario();
+
+            features.forEach(feature => {
+                this.addFeatureToScenario(feature);
+            });
+        }
     }
 };
 </script>
 
 <template lang="html">
-    <div id="manage-scenario">
+    <div id="scenario-builder">
         <ToolInfo />
-        <div v-if="currentView === 'scenario'">
-            <h5>
-                {{ $t('additional:modules.tools.cosi.scenarioManager.title') }}
-            </h5>
-            <div
-                v-if="scenarioCards.length"
-                class="mb-4 py-2"
-            >
-                <div
-                    v-for="(item, index) in scenarioCards"
-                    :key="item"
-                >
-                    <Card
-                        class="d-flex flex-column-reverse"
-                        :data="item.data"
-                        :downloadable="item.downloadable"
-                        :icon="item.icon"
-                        :visible="false"
-                        :status="item.status"
-                        @click="toggleCardStatus(index)"
-                        @remove-set="removeScenarioCard(index)"
-                        @download-set="downloadScenario(item)"
-                    >
-                        <template #custom-icon-button>
-                            <IconButton
-                                class="p-1"
-                                :aria="'Externen Link öffnen'"
-                                icon="bi bi-pencil"
-                                @click.stop="toggleCurrentView('objects')"
-                            />
-                        </template>
-                    </Card>
-                </div>
-            </div>
-            <AlertMessage
-                v-if="!scenarioCards.length"
-                :text="$t('additional:modules.tools.cosi.scenarioManager.alertNoScenario')"
-                type="info"
-            />
-            <AddCardButton
-                class="mb-4"
-                :text="$t('additional:modules.tools.cosi.scenarioManager.createNewScenario')"
-                @click="showNewScenario = true"
-            />
-            <hr class="mx-4">
-            <div v-if="showNewScenario">
-                <InputText
-                    id="scenario-title"
-                    v-model="scenarioTitle"
-                    :label="$t('additional:modules.tools.cosi.scenarioManager.addScenarioTitle')"
-                    :placeholder="$t('additional:modules.tools.cosi.scenarioManager.addScenarioTitle')"
-                    max-length="50"
-                    @keyup.enter="addScenarioCard"
-                />
-                <div class="d-flex justify-content-center">
-                    <FlatButton
-                        id="add-scenario"
-                        :icon="'bi bi-plus-circle'"
-                        type="button"
-                        :aria-label="$t('additional:modules.tools.cosi.scenarioManager.addScenario')"
-                        :disabled="!scenarioTitle.length"
-                        :text="$t('additional:modules.tools.cosi.scenarioManager.addScenario')"
-                        @click="addScenarioCard"
-                    />
-                </div>
-            </div>
-        </div>
-        <div
-            v-if="currentView === 'objects'"
-            class="px-3 py-2"
-        >
-            <div class="d-flex align-items-center mb-3">
-                <button
-                    id="back-to-overview"
-                    type="button"
-                    class="btn btn-link text-decoration-none p-0 d-inline-flex align-items-center gap-2"
-                    :aria-label="$t('additional:modules.tools.cosi.objectManager.back')"
-                    @click="toggleCurrentView('scenario')"
-                >
-                    <i class="bi bi-arrow-left" />
-                    <span>{{ $t('additional:modules.tools.cosi.objectManager.back') }}</span>
-                </button>
-            </div>
-            <h5 class="mb-4">
-                {{ activeScenarioCard.title + " - " }}
-                {{ $t('additional:modules.tools.cosi.objectManager.title') }}
-            </h5>
-
-            <AccordionItem
-                id="objects"
-                :is-open="true"
-                :title="$t('additional:modules.tools.cosi.objectManager.createdObjects')"
-                icon="bi bi-box"
-            >
-                <div class="py-2">
-                    <AlertMessage
-                        v-if="!activeScenarioCard.objects.length"
-                        :text="$t('additional:modules.tools.cosi.objectManager.alertNoObject')"
-                        type="info"
-                    />
-
-                    <div
-                        v-for="(card, index) in activeScenarioCard.objects"
-                        :key="card.id"
-                        class="mb-3"
-                    >
-                        <SimpleCard
-                            :icon="card.icon"
-                            :label="card.label"
-                            :text="card.text"
-                            @click:close="removeObjectCard(index)"
-                        />
-                    </div>
-                    <AddCardButton
-                        class="w-100"
-                        :text="$t('additional:modules.tools.cosi.objectManager.createNewObject')"
-                        @click="openNewObject"
-                    />
-                </div>
-            </AccordionItem>
-            <hr class="my-4">
-            <div
-                v-if="showNewObject"
-                class="mt-3"
-            >
-                <h5 class="mb-3">
-                    {{ $t('additional:modules.tools.cosi.objectManager.titleEditObject') }}
-                </h5>
-
-                <DropdownAutocomplete
-                    v-model="selectedLayer"
-                    class="flex-grow-1 mb-3"
-                    :items="layerItems"
-                    :label="$t('additional:modules.tools.cosi.objectManager.selectObject')"
-                    @update:model-value="startPlacement"
-                />
-                <div
-                    v-if="placementMode"
-                    class="toast-minimal p-3 mb-3 border-0"
-                    role="alert"
-                    aria-live="assertive"
-                    aria-atomic="true"
-                >
-                    <div class="d-flex align-items-start gap-5">
-                        <div class="pulse-indicator mt-1 ms-3" />
-                        <div class="d-flex flex-column align-items-start text-start">
-                            <h5 class="mb-2">
-                                {{ $t('additional:modules.tools.cosi.objectManager.setFeatureHeadline') }}
-                            </h5>
-                            <p class="mb-2 text-muted small lh-sm">
-                                {{ $t('additional:modules.tools.cosi.objectManager.setFeature') }}
-                            </p>
-                            <FlatButton
-                                id="cancel-placement"
-                                :class-array="['btn-small', 'mt-1']"
-                                icon="bi bi-x"
-                                type="button"
-                                :aria-label="$t('additional:modules.tools.cosi.objectManager.cancelPlacement')"
-                                :text="$t('additional:modules.tools.cosi.objectManager.cancelPlacement')"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div v-if="currentObject">
-                    <InputText
-                        id="scenario-title"
-                        v-model="objectTitle"
-                        class="mt-2"
-                        :label="$t('additional:modules.tools.cosi.objectManager.addObjectTitle')"
-                        :placeholder="$t('additional:modules.tools.cosi.objectManager.addObjectTitle')"
-                        max-length="50"
-                    />
-                    <AccordionItem
-                        id="attributes"
-                        :is-open="true"
-                        :title="$t('additional:modules.tools.cosi.objectManager.optionalInformation')"
-                        icon="bi bi-info"
-                    >
-                        <TagGroup
-                            class="mb-3 mt-5"
-                            :items="sourceDataItems"
-                            :multiple="false"
-                            :label="$t('additional:modules.tools.cosi.objectManager.sourceDataOption')"
-                            @update:selected-items="setSelectedItems"
-                        />
-                        <DropdownAutocomplete
-                            v-if="selectedSourceData === 'existing'"
-                            v-model="referenceFeature"
-                            class="mt-3"
-                            :items="referenceItems"
-                            :label="$t('additional:modules.tools.cosi.objectManager.selectReferenceDataset')"
-                            @update:model-value="getDataFromReferenceFeature"
-                        />
-                        <div
-                            v-if="featureTypeDesc.length && (referenceFeature || selectedSourceData === 'empty')"
-                            class="mt-4"
-                        >
-                            <div
-                                v-for="field in featureTypeDesc"
-                                :key="field.name"
-                                class="mb-3"
-                            >
-                                <InputText
-                                    :id="field.name"
-                                    v-model="featureProperties[field.name]"
-                                    :label="field.label || beautifyKey(field.name)"
-                                    :placeholder="field.label || beautifyKey(field.name)"
-                                />
-                            </div>
-                        </div>
-                    </AccordionItem>
-                </div>
-            </div>
-        </div>
+        <ScenarioBuilderManager
+            v-if="currentView === 'manager'"
+        />
+        <ScenarioBuilderPlanner
+            v-else-if="currentView === 'planner'"
+        />
     </div>
 </template>
-
-<style lang="scss" scoped>
-    #scenario-builder {
-        form {
-            .row {
-                margin-top: 0px;
-            }
-            .col-3 {
-                overflow: hidden;
-            }
-        }
-        .flex {
-            display: flex;
-            .flex-item {
-                margin: 0 2px 0 2px;
-            }
-        }
-    }
-    .back-to-overview {
-        color: $link-color;
-    }
-   .toast-minimal {
-        background: mix(#ffffff, $light_blue, 50%);
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.03);
-        transition: all 0.3s ease;
-            h5 {
-                color: $secondary;
-                font-family: $font_family_accent;
-            }
-    }
-    .pulse-indicator {
-        width: 10px;
-        height: 10px;
-        background-color: $secondary;
-        border-radius: 50%;
-        position: relative;
-        flex-shrink: 0;
-        &::after {
-            content: '';
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            top: 0;
-            left: 0;
-            background-color: $secondary;
-            border-radius: 50%;
-            animation: pulse-ring 1.8s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
-        }
-    }
-    @keyframes pulse-ring {
-        0% {
-            transform: scale(0.5);
-            opacity: 1;
-        }
-        80%, 100% {
-            transform: scale(2.8);
-            opacity: 0;
-        }
-    }
-</style>

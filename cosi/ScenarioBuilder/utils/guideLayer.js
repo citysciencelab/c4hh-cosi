@@ -54,12 +54,11 @@ export function featureTagStyleMod (feature) {
  * adds a new feature to the guidelayer to highlight simulated features
  * @param {module:ol/Feature} feature - the original scenario feature
  * @param {module:ol/Layer/Vector} layer - the drawing layer of the scenario builder
- * @param {module:ol/Layer/Vector} featureLayer - the layer the original feature belongs to
  * @returns {module:ol/Feature | null} the feature of the tag
  */
-export function addSimulationTag (feature, layer, featureLayer) {
-    if (!(feature.constructor === Feature && layer.constructor === VectorLayer && featureLayer.constructor === VectorLayer)) {
-        console.warn(`addSimulationTag: FeatureLayer must be of type "ol/Layer/Vector", got ${featureLayer.constructor}. Layer must be of type "ol/Layer/Vector", got ${layer.constructor}. Feature must be of type "ol/Feature, got ${feature.constructor}`);
+export function addSimulationTag (feature, layer) {
+    if (!(feature.constructor === Feature && layer.constructor === VectorLayer)) {
+        console.warn(`addSimulationTag: Layer must be of type "ol/Layer/Vector", got ${layer.constructor}. Feature must be of type "ol/Feature, got ${feature.constructor}`);
         return null;
     }
     const source = layer.getSource(),
@@ -69,8 +68,6 @@ export function addSimulationTag (feature, layer, featureLayer) {
     clonedFeature.setId(feature.getId());
     // link their geometries (works only if the original layer is NOT clustered)
     clonedFeature.setGeometry(feature.getGeometry());
-    // link the original layer for later use
-    clonedFeature.set("featureLayer", featureLayer);
     // remove feature's style if exists (automatically replace with layer style)
     clonedFeature.setStyle(null);
 
