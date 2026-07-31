@@ -6,6 +6,7 @@ import importedState from "@modules/fileImport/store/stateFileImport.js";
 import rawSources from "@modules/fileImport/tests/resources/rawSources.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 import {reset as resetUniqueId} from "@shared/js/utils/uniqueId.js";
+import layerCollection from "@core/layers/js/layerCollection.js";
 import sinon from "sinon";
 import {expect} from "chai";
 import fs from "fs";
@@ -49,6 +50,7 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
 
     beforeEach(() => {
         mapCollection.clear();
+        layerCollection.clear();
         resetUniqueId();
         dispatch = sinon.spy();
         layer.getSource().getFeatures().forEach(feature => layer.getSource().removeFeature(feature));
@@ -478,6 +480,9 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
     });
 
     describe("addLayerConfig", () => {
+        afterEach(() => {
+            sinon.restore();
+        });
         it("add layer config", async () => {
             const state = {
                 layerId: "importDrawLayer"
@@ -495,6 +500,31 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
                     visibility: true
                 },
                 parentKey: treeSubjectsKey
+            })).to.be.true;
+        });
+
+        it("checks if existing layer is restored to tree on re-upload", async () => {
+            const state = {
+                    layerId: "importDrawLayer"
+                },
+                rootGettersWithZIndex = {
+                    determineZIndex: sinon.stub().returns(5)
+                };
+
+            sinon.stub(layerCollection, "getLayerById").returns({attributes: {id: "importDrawLayer"}});
+
+            await addLayerConfig({state, dispatch, commit, rootGetters: rootGettersWithZIndex}, null);
+
+            expect(dispatch.calledWith("addLayerToLayerConfig")).to.be.false;
+            expect(dispatch.calledWith("replaceByIdInLayerConfig", {
+                layerConfigs: [{
+                    id: "importDrawLayer",
+                    layer: {
+                        visibility: true,
+                        showInLayerTree: true,
+                        zIndex: 5
+                    }
+                }]
             })).to.be.true;
         });
 
@@ -541,6 +571,33 @@ describe("src/modules/fileImport/store/actionsFileImport.js", () => {
             expect(dispatch.calledWith("addLayerToLayerConfig", {
                 layerConfig,
                 parentKey: treeSubjectsKey
+            })).to.be.true;
+        });
+
+        it("useDifferentLayers true: existing per-file layer is restored to tree on re-upload", async () => {
+            const state = {
+                    layerId: "importDrawLayer",
+                    useDifferentLayers: true
+                },
+                payload = "layerDaten.kml",
+                rootGettersWithZIndex = {
+                    determineZIndex: sinon.stub().returns(2)
+                };
+
+            sinon.stub(layerCollection, "getLayerById").returns({attributes: {id: "importDrawLayer_layerDaten"}});
+
+            await addLayerConfig({state, dispatch, commit, rootGetters: rootGettersWithZIndex}, payload);
+
+            expect(dispatch.calledWith("addLayerToLayerConfig")).to.be.false;
+            expect(dispatch.calledWith("replaceByIdInLayerConfig", {
+                layerConfigs: [{
+                    id: "importDrawLayer_layerDaten",
+                    layer: {
+                        visibility: true,
+                        showInLayerTree: true,
+                        zIndex: 2
+                    }
+                }]
             })).to.be.true;
         });
     });

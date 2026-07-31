@@ -68,6 +68,7 @@
     - Layers with showInLayerTree set to false are now consistently hidden from LayerPills.
 - OAF-Layer: Fixed legend entries being incomplete or changing on zoom. The legend now shows all style-rule-defined entries regardless of the currently loaded features in the map view.
 - Print: Grouped baselayers are no longer printed on top of other layers.
+- FileImport: importDrawLayer reappears in the layer tree when importing a file, even after being removed.
 
 ---
 
