@@ -36,7 +36,9 @@ export default {
         return {
             currentComponentSide: undefined,
             currentSearchInput: this.searchInput,
-            layerSelectionPlaceHolder: this.placeholder
+            layerSelectionPlaceHolder: this.placeholder,
+            searchRequested: false,
+            searchFinalizeTimer: null
         };
     },
     computed: {
@@ -156,6 +158,13 @@ export default {
             return this.searchActivated && this.searchResultsActive && this.searchResults?.length > 0;
         },
         /**
+         * Indicates whether at least one search interface request is still running.
+         * @returns {Boolean} True if any configured search interface is currently running.
+         */
+        isSearchRunning () {
+            return this.searchInterfaceInstances?.some(searchInterfaceInstance => searchInterfaceInstance.searchState === "running");
+        },
+        /**
          * Generates an OpenLayers Point geometry from addressSearchCoordinates.
          * @returns {module:ol/geom/Point~Point|null} The point geometry or null if no coordinates are available.
          */
@@ -192,8 +201,10 @@ export default {
         searchInputValue: {
             handler (value) {
                 if (value === "") {
+                    this.searchRequested = false;
                     this.removePointMarker();
                     this.removePolygonMarker();
+                    this.setErrorMessage("");
                 }
                 else {
                     this.checkCurrentComponent(this.currentComponentSide);
@@ -206,6 +217,53 @@ export default {
          */
         placeholder (newValue) {
             this.layerSelectionPlaceHolder = newValue;
+        },
+        /**
+         * Watcher for value of searchResults to set error message if no results are found.
+         */
+        searchResults (newValue) {
+            if (!this.searchActivated) {
+                this.setErrorMessage("");
+                return;
+            }
+
+            if (newValue.length > 0) {
+                clearTimeout(this.searchFinalizeTimer);
+                this.setErrorMessage("");
+                this.searchRequested = false;
+            }
+        },
+        /**
+         * React to state changes of individual interface instances.
+         */
+        searchInterfaceInstances: {
+            deep: true,
+            handler () {
+                clearTimeout(this.searchFinalizeTimer);
+
+                if (!this.searchRequested || !this.searchActivated) {
+                    return;
+                }
+
+                // Wait until no interface is running and give commits a little time
+                this.searchFinalizeTimer = setTimeout(() => {
+                    if (!this.searchRequested || !this.searchActivated) {
+                        return;
+                    }
+                    if (this.isSearchRunning) {
+                        return;
+                    }
+
+                    if (this.searchResults.length > 0) {
+                        this.setErrorMessage("");
+                    }
+                    else {
+                        this.setErrorMessage(i18next.t("additional:modules.lzsResearchClient.tabs.tabSearch.addressSearchNoResults"));
+                    }
+
+                    this.searchRequested = false;
+                }, 3000);
+            }
         }
     },
     created () {
@@ -213,8 +271,13 @@ export default {
             const minimumCharacters = parseInt(this.minCharacters, 10);
 
             if (!searchInput || searchInput !== this.searchInputValue || searchInput.length < minimumCharacters) {
+                this.searchRequested = false;
+                clearTimeout(this.searchFinalizeTimer);
                 return;
             }
+
+            clearTimeout(this.searchFinalizeTimer);
+            this.searchRequested = true;
             this.search({searchInput});
         }, 250);
     },
@@ -248,8 +311,12 @@ export default {
             "setSearchInput",
             "setSearchResultsActive",
             "setSearchSuggestions",
-            "setAddressSearchCoordinates"
+            "setAddressSearchCoordinates",
+            "setErrorMessage"
         ]),
+        beforeUnmount () {
+            clearTimeout(this.searchFinalizeTimer);
+        },
         /**
          * Handles search submit: selects a matching result or triggers a new search.
          * @returns {void}
@@ -339,12 +406,13 @@ export default {
             return matched;
         },
         clearSearch () {
+            this.searchRequested = false;
             this.searchInputValue = "";
             this.$refs.searchInput.focus();
 
             this.setAddressSearchCoordinates(null);
-
             this.$emit("set-search-geometry", null);
+            this.setErrorMessage("");
         },
         async getParcel (pointGeometry) {
             if (!pointGeometry) {

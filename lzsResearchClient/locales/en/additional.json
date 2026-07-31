@@ -69,6 +69,7 @@
                     "searchModeSwitchLabel": "Expert search mode",
                     "extentWarningMessage": "The map scale is smaller than 1:{{ scale }}. Please zoom in to enable searching within the map extent.",
                     "addressSearchCancel": "Cancel address search",
+                    "addressSearchNoResults": "No results found. Please check your input or your internet connection.",
                     "geometryAreaWarningMessage": "The area of the drawn geometry is {{ area }} km². This exceeds the maximum allowed area of {{ maxArea }} km². Please draw a smaller area to enable searching.",
                     "parcelSearch": {
                         "selectParcelDistrictLabel": "District",
