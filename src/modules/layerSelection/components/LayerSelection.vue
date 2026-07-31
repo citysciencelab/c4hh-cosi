@@ -271,19 +271,6 @@ export default {
         },
 
         /**
-         * Decides to show the tree node
-         * @param {Object} conf The configuration object containing necessary properties.
-         * @return {Boolean} true the tree node will be shown.
-         */
-        showTreeNode (conf) {
-            if (conf.type === "folder") {
-                return true;
-            }
-
-            return conf?.showInLayerTree !== false && conf?.visibility !== false;
-        },
-
-        /**
          * Toggles the state of the show-all checkbox based on the configuration provided.
          * @param {Object} conf The configuration object containing necessary properties.
          * @return {void}
@@ -432,7 +419,6 @@ export default {
                         :key="idx"
                     >
                         <LayerSelectionTreeNode
-                            v-if="showTreeNode(conf)"
                             :conf="conf"
                             :are-folders-selectable="areFoldersSelectable"
                             :show-select-all-check-box="selectAllConfId === conf.id && !deactivateShowAllCheckbox"

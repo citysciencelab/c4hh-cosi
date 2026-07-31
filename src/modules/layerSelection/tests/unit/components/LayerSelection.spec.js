@@ -780,20 +780,5 @@ describe("src/modules/layerSelection/components/LayerSelection.vue", () => {
 
             expect(wrapper.vm.deactivateShowAllCheckbox).to.be.false;
         });
-
-        describe("showTreeNode", () => {
-            it("return ture if it is a folder type", () => {
-                expect(wrapper.vm.showTreeNode({type: "folder"})).to.be.true;
-            });
-
-            it("return ture if it shows in tree and is visible", () => {
-                expect(wrapper.vm.showTreeNode({showInLayerTree: true})).to.be.true;
-                expect(wrapper.vm.showTreeNode({visible: true})).to.be.true;
-            });
-
-            it("return false if it does not show in tree and is invisible", () => {
-                expect(wrapper.vm.showTreeNode({showInLayerTree: false, visible: false})).to.be.false;
-            });
-        });
     });
 });
