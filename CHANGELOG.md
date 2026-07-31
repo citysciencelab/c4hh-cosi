@@ -29,9 +29,11 @@
         - @masterportal/masterportalapi: 2.62.0 to 2.63.0
     - devDependencies:
         - vite: 8.0.14 to 8.1.4
-- Tests: Tests now fail on vue warnings.
-- Tests: excluded barchart and piechart tests due to issues with the prePushHook.
+- Tests: 
+    - Tests now fail on vue warnings.
+    - Excluded barchart and piechart tests due to issues with the prePushHook.
 - ResizeHandle: Simplified component by removing multi-directional resize infrastructure to support menu width resizing only (left/right positions).
+- Issue \#1641 : PortalFooter: The scaleline is displayed on mobile devices with a screen width of 320px or more.
 
 ### Deprecated
 
@@ -45,6 +47,7 @@
 - Issue \#1632: Filter: Fix setting filter rules from URL Parameters.
 - Issue \#1634: url parameter `highlightFeaturesByAttributes` can now handle MultiPoint, MultiPolygon and MultiLineString features.
 - Issue \#1638: FolderCheckBox: Folder checkbox selection (isFolderSelectable) now adds layers in the same order as "add all".
+- Issue \#1641 : PortalFooter: if `alias_mobile` is not set at `urls` entry, link is not shown on mobile devices.
 - Control: Fixed a layout issue with the control module.
 - FeatureLister/NavTab: Disabled tabs are now non-interactive, and native nav-link tab markup is prevented by lint rules in favor of the shared NavTab component.
 - Filter: A bug has been fixed that prevented the geometry filter from working with multipolygons.
