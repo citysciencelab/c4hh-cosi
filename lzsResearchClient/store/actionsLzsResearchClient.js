@@ -206,7 +206,7 @@ export default {
      * @param {String} payload.instanceId - Instance identifier to request primarydata for.
      * @param {AbortSignal} payload.signal - AbortSignal to cancel the request if needed.
      */
-    async fetchPrimarydata ({state, commit, dispatch}, payload) {
+    async fetchPrimarydata ({state, commit}, payload) {
         const {archiveId, instanceId, signal} = payload,
             params = {
                 Token: state.requestToken,
@@ -215,32 +215,23 @@ export default {
             },
             url = buildEndpointUrl(`${state.apiBasePath}/rest/primarydata/${archiveId}/${instanceId}`, params);
 
-        if (state.pendingPrimaryDataFetches.has(instanceId)) {
-            return;
-        }
-
-        commit("updatePendingPrimaryDataFetches", {instanceId: instanceId, add: true});
+        commit("updatePendingPrimaryDataFetches", {instanceId: instanceId});
 
         try {
-            await axios.get(url, {signal})
-                .then(function (response) {
-                    const primaryDataIds = response?.data?.map(p => p.primaryDataId) || [];
+            const response = await axios.get(url, {signal});
+            const primaryDataIds = response?.data?.map(p => p.primaryDataId) || [];
 
-                    commit("addPrimaryDataToInstance", {
-                        selectedDetail: {instanceId: instanceId},
-                        primaryData: response?.data
-                    });
+            commit("addPrimaryDataToInstance", {
+                selectedDetail: {instanceId: instanceId},
+                primaryData: response?.data
+            });
 
-                    for (const primaryDataId of primaryDataIds) {
-                        commit("addPrimaryDataToInstance", {
-                            selectedDetail: {instanceId: instanceId, primaryDataId: primaryDataId},
-                            primaryData: response?.data
-                        });
-                    }
-                }).catch(function (error) {
-                    dispatch("axiosErrorHandling", error);
+            for (const primaryDataId of primaryDataIds) {
+                commit("addPrimaryDataToInstance", {
+                    selectedDetail: {instanceId: instanceId, primaryDataId: primaryDataId},
+                    primaryData: response?.data
                 });
-
+            }
         }
         finally {
             commit("updatePendingPrimaryDataFetches", {instanceId: instanceId, add: false});
@@ -324,7 +315,9 @@ export default {
      * @param {String} payload.srs - CRS to get the geometry.
      * @returns {Object} - information on the geometry of the instance, containing coordinates, type and crs
      */
-    async fetchGeometryForInstanceId ({state, dispatch}, payload) {
+    async fetchGeometryForInstanceId ({state}, payload) {
+        state.errorMessage = "";
+
         const convertedPayload = {
                 dataclassId: payload.archiveId,
                 dataclassInstanceId: payload.instanceId,
@@ -348,8 +341,8 @@ export default {
                     existingInstanceData.geom = response.data;
                     result = response.data;
                 }
-            }).catch(function (error) {
-                dispatch("axiosErrorHandling", error);
+            }).catch(function () {
+                state.errorMessage = i18next.t("additional:modules.lzsResearchClient.tabs.archiveList.table.loadErrors.position");
             });
 
         return result;

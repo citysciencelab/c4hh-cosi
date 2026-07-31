@@ -345,6 +345,7 @@ export default {
             flex-direction: row;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
             gap: 0.5rem;
 
             :deep(button.errorCloseButton) {

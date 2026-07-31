@@ -62,7 +62,13 @@ export default {
                 sumOfFiles += dataset.fileSizeBytes ?? 0;
             });
 
-            const uniqueArchiveIds = [...new Set(this.checkedDatasets?.map(d => d.archiveId) ?? [])];
+            const uniqueArchiveIds = [
+                ...new Set(
+                    this.checkedDatasets
+                        ?.filter(dataset => dataset.fileSizeBytes !== null && dataset.fileSizeBytes !== undefined)
+                        .map(dataset => dataset.archiveId) ?? []
+                )
+            ];
 
             sumOfFiles += calcMetadataBytesForArchives(uniqueArchiveIds, this.getDossierIdsForArchiveId);
 
@@ -105,9 +111,11 @@ export default {
 </script>
 
 <template>
-    <div id="SumOfCheckedFiles">
+    <div
+        v-if="sumOfFileSizes >= 0 && maxDownloadMB > -1"
+        id="SumOfCheckedFiles"
+    >
         <div
-            v-if="sumOfFileSizes >= 0 && maxDownloadMB > -1"
             class="progress"
             role="progressbar"
             :aria-label="$t('additional:modules.lzsResearchClient.sumOfCheckedFiles.progressAriaLabel', {percent: progressPercentage})"
@@ -124,10 +132,7 @@ export default {
             />
         </div>
 
-        <p
-            v-if="sumOfFileSizes >= 0 && maxDownloadMB > -1"
-            id="result"
-        >
+        <p id="result">
             {{ currentProgressInformation }}
         </p>
     </div>

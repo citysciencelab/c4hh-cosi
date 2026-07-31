@@ -81,8 +81,10 @@
                     },
                     "layerConfigNotFound": "Layer configuration for the specified layer ID {{ layerId }} could not be found.",
                     "selectAll": "Select all",
-                    "yearsLoadError": "Could not load years for the selected archives. Please try again.",
-                    "singleYearLoadError": "Could not load years for archive {{ archiveName }}. Please try again."
+                    "loadErrors": {
+                        "years": "An error occurred while loading the years for the selected archives. Please try again.",
+                        "singleYear": "An error occurred while loading the years for the archive {{ archiveName }}. Please try again."
+                    }
                 },
                 "tabResult": {
                     "label": "Results",
@@ -99,16 +101,22 @@
                     "selectOptionLabel": "Select option",
                     "selected": "{{sum}} selected (incl. metadata)",
                     "table": {
-                      "showPositionInMap": "Show / Hide position of dataset in map",
-                      "goToDetails": "Show details for this dataset",
-                      "showPreview": "Show preview",
-                      "download": "Download dataset",
-                      "headers": {
-                        "position": "Position",
-                        "details": "Details",
-                        "download": "Download",
-                        "preview": "Preview"
-                      }
+                        "showPositionInMap": "Show / Hide position of dataset in map",
+                        "goToDetails": "Show details for this dataset",
+                        "showPreview": "Show preview",
+                        "download": "Download dataset",
+                        "headers": {
+                            "position": "Position",
+                            "details": "Details",
+                            "download": "Download",
+                            "preview": "Preview"
+                      },
+                        "loadErrors": {
+                            "position": "An error occurred while loading the position of the dataset. Please try again.",
+                            "details": "An error occurred while loading the details. Please try again.",
+                            "checkedFiles": "An error occurred while selecting the files. Please try again.",
+                            "checkedSingleFile": "An error occurred while selecting the file. Please try again."
+                        }
                     }
                 }
             },

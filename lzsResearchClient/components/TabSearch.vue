@@ -649,7 +649,7 @@ export default {
                         const anyFailed = results.some(r => r.status === "rejected");
 
                         if (anyFailed) {
-                            this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.yearsLoadError"));
+                            this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.loadErrors.years"));
                         }
                         else {
                             this.setErrorMessage("");
@@ -695,7 +695,7 @@ export default {
 
                         const archiveName = this.archiveList.find(archive => archive.id === archiveId)?.name || archiveId;
 
-                        this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.singleYearLoadError", {archiveName}));
+                        this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.loadErrors.singleYear", {archiveName}));
                     }
                 }
 

@@ -99,21 +99,28 @@ export default {
         }
     },
     watch: {
-        selectedDetail (newValue) {
+        async selectedDetail (newValue) {
             if (newValue?.instanceId && !this.getDetailsForSelectedDetail?.primaryData) {
                 this.showSpinner = true;
-                this.fetchPrimarydata({
-                    archiveId: this.getDetailsForSelectedDetail?.archiveId,
-                    instanceId: newValue.instanceId
-                }).finally(() => {
+                try {
+                    await this.fetchPrimarydata({
+                        archiveId: this.getDetailsForSelectedDetail?.archiveId,
+                        instanceId: newValue.instanceId
+                    });
+                }
+                catch (error) {
+                    this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.archiveList.table.loadErrors.details"));
+                }
+                finally {
                     this.showSpinner = false;
-                });
+                }
             }
         }
     },
     methods: {
         ...mapMutations("Modules/LzsResearchClient", [
-            "setSelectedDetail"
+            "setSelectedDetail",
+            "setErrorMessage"
         ]),
         ...mapActions("Modules/LzsResearchClient", [
             "fetchPrimarydata",

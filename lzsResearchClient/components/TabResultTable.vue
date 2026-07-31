@@ -82,7 +82,8 @@ export default {
             "fetchPrimarydata"
         ]),
         ...mapMutations("Modules/LzsResearchClient", [
-            "setCheckedForDataset"
+            "setCheckedForDataset",
+            "setErrorMessage"
         ]),
         /**
          * Pushes "checked" values back into searchAttributeResponse using instanceId and primaryDataId.
@@ -91,24 +92,53 @@ export default {
          * @returns {void}
          */
         async syncCheckedToStore (dataset) {
+            this.setErrorMessage("");
             const relevantData = dataset ? [dataset] : this.sortedData,
                   fetchedInstanceIds = new Set();
 
-            const promises = relevantData.map(async (entry) => {
+            relevantData.forEach((entry) => {
+                const {instanceId, archiveId, primaryDataId, checked} = entry;
+
                 this.setCheckedForDataset({
-                    instanceId: entry.instanceId,
-                    primaryDataId: entry.primaryDataId,
-                    checked: Boolean(entry.checked),
-                    checkInstance: Boolean(entry.archiveId)
+                    instanceId,
+                    primaryDataId,
+                    checked: Boolean(checked),
+                    checkInstance: Boolean(archiveId)
                 });
+            });
 
-                if (entry.checked && !entry.primaryData && entry.archiveId && !fetchedInstanceIds.has(entry.instanceId)) {
-                    fetchedInstanceIds.add(entry.instanceId);
+            let errorOccurred = false;
+            const promises = relevantData.map(async (entry) => {
+                const {instanceId, archiveId, primaryDataId, checked, primaryData} = entry,
+                      isInitiallyChecked = Boolean(checked);
 
-                    await this.fetchPrimarydata({
-                        instanceId: entry.instanceId,
-                        archiveId: entry.archiveId
-                    });
+                if (isInitiallyChecked && !primaryData && archiveId && !fetchedInstanceIds.has(instanceId)) {
+                    fetchedInstanceIds.add(instanceId);
+
+                    try {
+                        await this.fetchPrimarydata({
+                            instanceId,
+                            archiveId
+                        });
+                    }
+                    catch (error) {
+                        this.setCheckedForDataset({
+                            instanceId,
+                            primaryDataId,
+                            checked: false,
+                            checkInstance: Boolean(archiveId)
+                        });
+                        // eslint-disable-next-line require-atomic-updates
+                        entry.checked = false;
+
+                        if (!errorOccurred) {
+                            this.setErrorMessage(this.$t(dataset
+                                ? "additional:modules.lzsResearchClient.tabs.archiveList.table.loadErrors.checkedSingleFile"
+                                : "additional:modules.lzsResearchClient.tabs.archiveList.table.loadErrors.checkedFiles"
+                            ));
+                            errorOccurred = true;
+                        }
+                    }
                 }
             });
 
@@ -144,6 +174,9 @@ export default {
                 }).then((geom) => {
                     if (geom) {
                         this.showGeomOnLayer(geom);
+                    }
+                    else {
+                        this.clearGeomIndicator();
                     }
                 });
             }

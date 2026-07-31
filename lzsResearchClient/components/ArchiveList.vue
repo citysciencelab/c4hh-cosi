@@ -442,7 +442,7 @@ export default {
          * @returns {String} - Human-readable file size string (e.g. "12,3 MB").
          */
         sumOfCheckedFileSizesForArchive (archiveId) {
-            const checkedForArchive = this.datasets.filter(d => d.archiveId === archiveId && d.checked);
+            const checkedForArchive = this.datasets.filter(d => d.archiveId === archiveId && d.checked && d.fileSizeBytes !== null && d.fileSizeBytes !== undefined);
             let sumOfFiles = 0;
 
             checkedForArchive.forEach(dataset => {

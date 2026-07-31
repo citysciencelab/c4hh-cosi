@@ -81,8 +81,10 @@
                     },
                     "layerConfigNotFound": "Layer-Konfiguration für die Layer-ID {{ layerId }} konnte nicht gefunden werden.",
                     "selectAll": "Alles auswählen",
-                    "yearsLoadError": "Es konnten keine Jahrgänge für die ausgewählten Archive geladen werden. Bitte versuchen Sie es erneut.",
-                    "singleYearLoadError": "Es konnten keine Jahrgänge für das Archiv {{ archiveName }} geladen werden. Bitte versuchen Sie es erneut."
+                    "loadErrors": {
+                        "years": "Beim Laden der Jahrgänge für die ausgewählten Archive ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                        "singleYear": "Beim Laden der Jahrgänge für das Archiv {{ archiveName }} ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+                    }
                 },
                 "tabResult": {
                     "label": "Ergebnisse",
@@ -99,16 +101,22 @@
                     "selectOptionLabel": "Option auswählen",
                     "selected": "{{sum}} ausgewählt (inkl. Metadaten)",
                     "table": {
-                      "showPositionInMap": "Position des Datensatzes in der Karte anzeigen / ausblenden",
-                      "goToDetails": "Details zum Datensatz anzeigen",
-                      "showPreview": "Vorschau anzeigen",
-                      "download": "Datensatz herunterladen",
-                      "headers": {
-                        "position": "Lage",
-                        "details": "Details",
-                        "download": "Download",
-                        "preview": "Vorschau"
-                      }
+                        "showPositionInMap": "Position des Datensatzes in der Karte anzeigen / ausblenden",
+                        "goToDetails": "Details zum Datensatz anzeigen",
+                        "showPreview": "Vorschau anzeigen",
+                        "download": "Datensatz herunterladen",
+                        "headers": {
+                            "position": "Lage",
+                            "details": "Details",
+                            "download": "Download",
+                            "preview": "Vorschau"
+                        },
+                        "loadErrors": {
+                            "position": "Beim Laden der Lage des Datensatzes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                            "details": "Beim Laden der Details ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                            "checkedFiles": "Beim Auswählen der Dateien ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                            "checkedSingleFile": "Beim Auswählen der Datei ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+                        }
                     }
                 }
             },
