@@ -43,6 +43,7 @@ export default {
             "currentMenuWidth",
             "currentSecondaryMenuWidth"
         ]),
+        ...mapGetters(["isMobile"]),
         errorOccured () {
             return this.errorMessage !== "";
         },
@@ -87,11 +88,13 @@ export default {
         }
     },
     mounted () {
-        this.widthWithoutLzs = this.currentMenuWidth(this.$attrs.side);
-        this.lzsMenuWidth = this.menuWidthOnStart;
+        if (!this.isMobile) {
+            this.widthWithoutLzs = this.currentMenuWidth(this.$attrs.side);
+            this.lzsMenuWidth = this.menuWidthOnStart;
 
-        // Convert widthWithoutLzs to a decimal value for currentSecondaryMenuWidth
-        this.setCurrentSecondaryMenuWidth(parseFloat(this.widthWithoutLzs) / 100);
+            // Convert widthWithoutLzs to a decimal value for currentSecondaryMenuWidth
+            this.setCurrentSecondaryMenuWidth(parseFloat(this.widthWithoutLzs) / 100);
+        }
     },
     /**
      * KeepAlive: This addon uses the Masterportal module caching feature,
@@ -130,8 +133,10 @@ export default {
         // Call handleTabChange to ensure the correct state is set for the active tab when the component is activated.
         this.handleTabChange(tabContainerRef, tabContainerRef.activeTabIdLocal, "tabSearch");
 
-        this.widthWithoutLzs = this.currentMenuPercentage();
-        this.setCurrentMenuWidth({side: this.$attrs.side, width: this.lzsMenuWidth});
+        if (!this.isMobile) {
+            this.widthWithoutLzs = this.currentMenuPercentage();
+            this.setCurrentMenuWidth({side: this.$attrs.side, width: this.lzsMenuWidth});
+        }
     },
     /**
      * Triggered if component is deactivated.
@@ -156,8 +161,10 @@ export default {
             tabResult.hideGeom();
         }
 
-        this.lzsMenuWidth = this.currentMenuPercentage();
-        this.setCurrentMenuWidth({side: this.$attrs.side, width: this.widthWithoutLzs});
+        if (!this.isMobile) {
+            this.lzsMenuWidth = this.currentMenuPercentage();
+            this.setCurrentMenuWidth({side: this.$attrs.side, width: this.widthWithoutLzs});
+        }
     },
     methods: {
         ...mapActions("Modules/LzsResearchClient", [
