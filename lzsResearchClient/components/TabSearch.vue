@@ -1227,7 +1227,7 @@ export default {
 
             if (!configJsonLayer && !servicesJsonLayer) {
                 this.addSingleAlert({
-                    content: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.layerConfigNotFound", {layerId}),
+                    content: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.loadErrors.layerConfigNotFound", {layerId}),
                     category: "warn",
                     once: true
                 });

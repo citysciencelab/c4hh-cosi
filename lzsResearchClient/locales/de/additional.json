@@ -80,11 +80,12 @@
                         "parcelRequestError": "Beim Abrufen der Flurstücksgeometrien für das Flurstück {{parcelNumber}} ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
                         "parcelDistrictLoadError": "Beim Laden der Gemarkungen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
                     },
-                    "layerConfigNotFound": "Layer-Konfiguration für die Layer-ID {{ layerId }} konnte nicht gefunden werden.",
                     "selectAll": "Alles auswählen",
                     "loadErrors": {
                         "years": "Beim Laden der Jahrgänge für die ausgewählten Archive ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
-                        "singleYear": "Beim Laden der Jahrgänge für das Archiv {{ archiveName }} ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+                        "singleYear": "Beim Laden der Jahrgänge für das Archiv {{ archiveName }} ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                        "layerConfigNotFound": "Layer-Konfiguration für die Layer-ID {{ layerId }} konnte nicht gefunden werden.",
+                        "search": "Beim Abrufen der Suchergebnisse ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
                     }
                 },
                 "tabResult": {

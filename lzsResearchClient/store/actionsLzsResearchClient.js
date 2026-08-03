@@ -65,7 +65,7 @@ export default {
      * @param {object} context - Vuex action context (state, commit, dispatch).
      * @param {object} payload - Search payload sent to the API.
      */
-    async searchByAttribute ({state, commit, dispatch}, payload) {
+    async searchByAttribute ({state, commit}, payload) {
         commit("setSearchAttributeResponse", []);
         const params = {
                 Token: state.requestToken,
@@ -96,8 +96,8 @@ export default {
 
                 result = true;
 
-            }).catch(function (error) {
-                dispatch("axiosErrorHandling", error);
+            }).catch(function () {
+                state.errorMessage = i18next.t("additional:modules.lzsResearchClient.tabs.tabSearch.loadErrors.search");
 
                 result = false;
             });
@@ -149,7 +149,7 @@ export default {
      * @param {object} payload - Search payload including geometry and attributes.
      * @returns {Promise} Axios response from the search API.
      */
-    async searchByGeometry ({state, commit, dispatch}, payload) {
+    async searchByGeometry ({state, commit}, payload) {
         commit("setSearchAttributeResponse", []);
 
         const params = {
@@ -190,8 +190,8 @@ export default {
 
                 result = true;
 
-            }).catch(function (error) {
-                dispatch("axiosErrorHandling", error);
+            }).catch(function () {
+                state.errorMessage = i18next.t("additional:modules.lzsResearchClient.tabs.tabSearch.loadErrors.search");
 
                 result = false;
             });

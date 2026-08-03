@@ -80,11 +80,12 @@
                         "parcelRequestError": "An error occurred while fetching parcel geometries for the parcel {{parcelNumber}}. Please try again.",
                         "parcelDistrictLoadError": "An error occurred while loading parcel districts. Please try again."
                     },
-                    "layerConfigNotFound": "Layer configuration for the specified layer ID {{ layerId }} could not be found.",
                     "selectAll": "Select all",
                     "loadErrors": {
                         "years": "An error occurred while loading the years for the selected archives. Please try again.",
-                        "singleYear": "An error occurred while loading the years for the archive {{ archiveName }}. Please try again."
+                        "singleYear": "An error occurred while loading the years for the archive {{ archiveName }}. Please try again.",
+                        "layerConfigNotFound": "Layer configuration for the specified layer ID {{ layerId }} could not be found.",
+                        "search": "An error occurred while fetching search results. Please try again."
                     }
                 },
                 "tabResult": {
