@@ -94,7 +94,7 @@ Settings for multilingualism of the portal interface.
 |----|--------|----|-------|-----------|
 |changeLanguageOnStartWhen|no|String[]|`["querystring", "localStorage", "navigator", "htmlTag"]`|Order of user language detection. See [i18next browser language detection documentation](https://github.com/i18next/i18next-browser-languageDetector) for details.|
 |debug|no|Boolean|`false`|Controls whether debug information regarding translations is logged to the console.|
-|enabled|yes|Boolean|`true`|Controls whether a button to switch the portal's language is provided.|
+|enabled|yes|Boolean|`true`|Determines whether a language switch button is displayed in the portal. Note: This option requires the Language module to be configured in config.json.|
 |fallbackLanguage|no|String|`"de"`|Fallback language used if contents are not available in the currently selected language.|
 |languages|yes|Object|`{ de: "deutsch", en: "englisch" }`|Language abbreviations. Please mind that matching locale files must exist.|
 |loadPath|no|String|`"/locales/{{lng}}/{{ns}}.json"`|Path to load language files from, or a function returning such a path: `function(lngs, namespaces) { return path; }`. `lng` and `ns` are read from the path, if given, as if from a static path. You may also provide a URL like `"https://localhost:9001/locales/{{lng}}/{{ns}}.json"`. See [i18next http backend documentation](https://github.com/i18next/i18next-http-backend) for details.|
