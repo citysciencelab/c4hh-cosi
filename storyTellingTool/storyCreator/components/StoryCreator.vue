@@ -326,7 +326,7 @@ export default {
             }
 
             return {
-                subject: val.map?.layers.length ? val.map.layers.length + " " + i18next.t("common:modules.layerSelection.datalayer") : "",
+                subject: val.map?.layers.length > 1 ? val.map.layers.length - 1 + " " + i18next.t("common:modules.layerSelection.datalayer") : "",
                 map: val.map?.center?.length ? i18next.t("additional:modules.storyCreator.labels.mapPosition") : "",
                 tool: toolName
             };

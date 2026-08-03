@@ -258,7 +258,7 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                     }
                 };
 
-                expect(wrapper.vm.getChapterOverviewCardItems(val).subject).to.equal("2 modules.layerSelection.datalayer");
+                expect(wrapper.vm.getChapterOverviewCardItems(val).subject).to.equal("1 modules.layerSelection.datalayer");
                 expect(wrapper.vm.getChapterOverviewCardItems(val).map).to.equal("modules.storyCreator.labels.mapPosition");
                 expect(wrapper.vm.getChapterOverviewCardItems(val).tool).to.equal("Tool");
             });
