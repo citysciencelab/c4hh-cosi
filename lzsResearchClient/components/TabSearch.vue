@@ -696,6 +696,7 @@ export default {
                         const archiveName = this.archiveList.find(archive => archive.id === archiveId)?.name || archiveId;
 
                         this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.loadErrors.singleYear", {archiveName}));
+                        return;
                     }
                 }
 
