@@ -134,11 +134,16 @@
                 "start": "Download vorbereiten ...",
                 "fetchPrimaryData": "{{ current }} von {{ total }} Dateien abgerufen ...",
                 "fetchDossierData": "Metadaten abrufen ...",
-                "downloading": "Dateien herunterladen ...",
-                "sumFileSizeError": "Die summierte Dateigröße ist größer als {{ maxFileSize }} (nämlich {{ sumFileSize }}). Das kann nicht auf einmal heruntergeladen werden.",
                 "downloadingFile": "{{ current }} von {{ total }} Dateien heruntergeladen ...",
                 "zipping": "Erzeuge das ZIP ...",
                 "done": "Erledigt!"
+            },
+            "errors": {
+                "fetchPrimaryData": "Beim Abrufen der Dateien ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                "fetchDossierData": "Beim Abrufen der Metadaten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                "downloading": "Beim Herunterladen der Dateien ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                "zipping": "Beim Erstellen des ZIP-Archivs ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                "sumFileSize": "Die summierte Dateigröße ist größer als {{ maxFileSize }} (nämlich {{ sumFileSize }}). Das kann nicht auf einmal heruntergeladen werden."
               }
             },
             "sumOfCheckedFiles": {

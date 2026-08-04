@@ -119,6 +119,22 @@ const mutations = {
         if (primaryDataset) {
             primaryDataset.checked = checked;
         }
+    },
+    /**
+     * Abort the ongoing download process, if any, and reset the progress state.
+     * @param {Object} state - The current state object.
+     * @param {Object} payload - The payload object containing the error information and message.
+     * @param {Error} payload.err - The error that caused the download to be aborted.
+     * @param {string} payload.message - A message describing the reason for the abort.
+     * @returns {void}
+     */
+    abortDownload (state, {err, message}) {
+        if (err.name === "AbortError" || err.name === "CanceledError") {
+            return;
+        }
+
+        state.progressPhase = "error";
+        state.errorMessage = message;
     }
 };
 

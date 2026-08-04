@@ -53,8 +53,16 @@ export default {
         }
     },
     watch: {
-        progressNow (val) {
-            if (val === 100) {
+        progressPhase (val) {
+            if (val === "done") {
+                this.closeTimer = setTimeout(() => {
+                    this.closeModal();
+                }, 1000);
+            }
+            else if (val === "error") {
+                this.setProgressNow(100);
+                this.downloadAbortController?.abort();
+
                 this.closeTimer = setTimeout(() => {
                     this.closeModal();
                 }, 1000);

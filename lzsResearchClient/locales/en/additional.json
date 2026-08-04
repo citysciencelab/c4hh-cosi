@@ -134,11 +134,16 @@
                 "start": "Preparing download...",
                 "fetchPrimaryData": "{{ current }} of {{ total }} files fetched...",
                 "fetchDossierData": "Fetching metadata...",
-                "downloading": "Downloading files...",
-                "sumFileSizeError": "The total file size {{ sumFileSize }} exceeds {{ maxFileSize }}. This cannot be downloaded at once.",
                 "downloadingFile": "{{ current }} of {{ total }} files downloaded...",
                 "zipping": "Building the zip...",
                 "done": "Done!"
+            },
+            "errors": {
+                "fetchPrimaryData": "An error occurred while fetching the files. Please try again.",
+                "fetchDossierData": "An error occurred while fetching the metadata. Please try again.",
+                "downloading": "An error occurred while downloading the files. Please try again.",
+                "zipping": "An error occurred while creating the zip archive. Please try again.",
+                "sumFileSize": "The total file size {{ sumFileSize }} exceeds {{ maxFileSize }}. This cannot be downloaded at once."
               }
             },
             "sumOfCheckedFiles": {

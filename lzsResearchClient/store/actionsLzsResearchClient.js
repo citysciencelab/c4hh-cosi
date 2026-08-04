@@ -245,7 +245,7 @@ export default {
      * @param {String} payload.dossierId - Dossier identifier to request metadata for.
      * @param {AbortSignal} payload.signal - AbortSignal to cancel the request if needed.
      */
-    async fetchDossierInformation ({state, commit, dispatch}, payload) {
+    async fetchDossierInformation ({state, commit}, payload) {
         const {archiveId, dossierId, signal} = payload,
             params = {
                 Token: state.requestToken,
@@ -261,8 +261,6 @@ export default {
                     dossierId: dossierId,
                     dossierData: response?.data
                 });
-            }).catch(function (error) {
-                dispatch("axiosErrorHandling", error);
             });
     },
     /**
@@ -411,7 +409,7 @@ export default {
      * @param {Object|Object[]} filesToDownload - Single result item or array of result items to download.
      * @returns {Promise<void>} Resolves when the ZIP has been created and download triggered.
      */
-    async downloadSelectedFiles ({state, getters, dispatch}, filesToDownload) {
+    async downloadSelectedFiles ({state, getters, commit, dispatch}, filesToDownload) {
         if (!filesToDownload || typeof filesToDownload !== "object") {
             return;
         }
@@ -468,6 +466,8 @@ export default {
                     state.progressPhase = "fetch";
                     state.progressCurrent = current;
                     state.progressTotal = totalInstances;
+                }).catch(async (err) => {
+                    commit("abortDownload", {err, message: i18next.t("additional:modules.lzsResearchClient.zipAndDownload.errors.fetchPrimaryData")});
                 })
             )
         );
@@ -530,7 +530,11 @@ export default {
         await Promise.all(
             archiveDossierPairs
                 .filter(({archiveId, dossierId}) => !getters.getDossierDataForArchiveId(archiveId, dossierId))
-                .map(({archiveId, dossierId}) => dispatch("fetchDossierInformation", {archiveId, dossierId, signal}))
+                .map(({archiveId, dossierId}) => dispatch("fetchDossierInformation", {
+                    archiveId, dossierId, signal
+                }).catch((err) => {
+                    commit("abortDownload", {err, message: i18next.t("additional:modules.lzsResearchClient.zipAndDownload.errors.fetchDossierData")});
+                }))
         );
 
         if (signal.aborted) {
@@ -560,14 +564,14 @@ export default {
         const knownTotalBytes = files.reduce((s, f) => s + (f.size || 0), 0);
 
         if (state.maxDownloadMB > -1 && knownTotalBytes / 1e6 > state.maxDownloadMB) {
-            state.errorMessage = i18next.t(
-                "additional:modules.lzsResearchClient.zipAndDownload.progress.sumFileSizeError",
+            const message = i18next.t(
+                "additional:modules.lzsResearchClient.zipAndDownload.errors.sumFileSize",
                 {
                     maxFileSize: getHumanReadableFileSize(state.maxDownloadMB * 1e6),
                     sumFileSize: getHumanReadableFileSize(knownTotalBytes)
                 });
-            state.progressNow = phaseEnd.done;
-            state.progressPhase = "error";
+
+            commit("abortDownload", {err: new Error("Total file size exceeds limit"), message: message});
             return;
         }
 
@@ -600,19 +604,6 @@ export default {
                     }
                 }, signal);
 
-                return {
-                    pathParts: file.pathParts,
-                    data
-                };
-            }
-            catch (err) {
-                console.error("error fetching files", file.url, err);
-                return {
-                    pathParts: file.pathParts,
-                    err
-                };
-            }
-            finally {
                 const current = ++completedFiles;
 
                 if (knownTotalBytes === 0) {
@@ -626,6 +617,18 @@ export default {
 
                 state.progressCurrent = current;
                 state.progressTotal = files.length;
+
+                return {
+                    pathParts: file.pathParts,
+                    data
+                };
+            }
+            catch (err) {
+                commit("abortDownload", {err, message: i18next.t("additional:modules.lzsResearchClient.zipAndDownload.errors.downloading")});
+                return {
+                    pathParts: file.pathParts,
+                    err
+                };
             }
         }));
 
@@ -670,23 +673,13 @@ export default {
                 );
             }
 
-
             // eslint-disable-next-line require-atomic-updates
             state.progressNow = phaseEnd.done;
             // eslint-disable-next-line require-atomic-updates
             state.progressPhase = "done";
         }
         catch (err) {
-            if (err instanceof DOMException && err.name === "AbortError") {
-                return;
-            }
-            // eslint-disable-next-line require-atomic-updates
-            state.errorMessage = err.message || String(err);
-            // eslint-disable-next-line require-atomic-updates
-            state.progressNow = phaseEnd.done;
-
-            // eslint-disable-next-line require-atomic-updates
-            state.progressPhase = "error";
+            commit("abortDownload", {err, message: i18next.t("additional:modules.lzsResearchClient.zipAndDownload.errors.zipping")});
         }
     }
 };
