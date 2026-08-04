@@ -11,6 +11,7 @@
  * @vue-prop {String} target - used to specify the id of the element shown by the navTab button (i.e. '#section-1').
  * @vue-prop {String} [value] - optional value attribute for the list element (e.g. &lt;li value="my-value"&gt;).
  * @vue-prop {Function} [interaction] - can be used to bind a function to an interaction with the navTab-button, to be executed on click.
+ * @vue-prop {String} [styleVariant] - optional styling variant for the NavTab button (e.g. 'blue')
  */
 export default {
     name: "NavTab",
@@ -52,6 +53,12 @@ export default {
             default: () => {
                 return true;
             }
+        },
+        styleVariant: {
+            type: String,
+            required: false,
+            default: undefined,
+            validator: v => !v || ["blue"].includes(v)
         }
     },
     methods: {
@@ -89,14 +96,16 @@ export default {
 
 <template>
     <li
-        class="nav-item"
+        :class="[
+            'nav-item',
+            styleVariant && `nav-item--${styleVariant}`
+        ]"
         role="presentation"
         :value="value"
     >
         <button
             :id="id"
-            class="nav-link"
-            :class="{active}"
+            :class="['nav-link', {active}, styleVariant && `nav-link--${styleVariant}`]"
             data-bs-toggle="tab"
             :data-bs-target="target"
             type="button"
@@ -131,11 +140,19 @@ export default {
             border: none;
             border-bottom: 3px solid $dark_blue;
             font-family: $font_family_accent;
+            &.nav-link--blue {
+                color: $link-color;
+                border-bottom-color: $link-color;
+            }
         }
 
         &:hover {
             background-color: $light_blue;
             border-radius: 0;
+        }
+
+        &--blue {
+            color: $link-color;
         }
     }
 </style>

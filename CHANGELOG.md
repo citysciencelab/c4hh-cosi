@@ -8,8 +8,10 @@
 ### __Breaking Changes__
 
 ### Added
+- NavTab: Added styleVariant prop for more styling options.
 
 ### Changed
+- GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.
 
 ### Deprecated
 
@@ -47,7 +49,6 @@
         - vite: 8.0.14 to 8.1.4
 - Tests: 
     - Tests now fail on vue warnings.
-- SensorTheme: Replaced navigation pills with the shared NavTab component.
     - Excluded barchart and piechart tests due to issues with the prePushHook.
 - ResizeHandle: Simplified component by removing multi-directional resize infrastructure to support menu width resizing only (left/right positions).
 - Issue \#1641 : PortalFooter: The scaleline is displayed on mobile devices with a screen width of 320px or more.

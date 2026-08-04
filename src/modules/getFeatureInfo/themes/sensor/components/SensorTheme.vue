@@ -220,17 +220,6 @@ export default {
         },
 
         /**
-         * Set the current tab id after clicking if the historicaldata be loaded
-         * @param {Object[]} evt The target of current click event.
-         * @returns {void}
-         */
-        setActiveTab (evt) {
-            if (evt?.target?.hash && this.processedHistoricalDataByWeekday.length > 0) {
-                this.activeTab = String(evt.target.hash.substring(1));
-            }
-        },
-
-        /**
          * Returns the classnames for the tab.
          * @param {Object|String} tab The name of the tab depending on property activeTab.
          * @returns {String} The classNames of the tab.
@@ -276,6 +265,7 @@ export default {
                     :active="isActiveTab('data')"
                     target="#data"
                     :interaction="() => { activeTab = 'data'; }"
+                    style-variant="blue"
                 />
                 <NavTab
                     v-for="(value, key) in chartvalues"
@@ -286,6 +276,7 @@ export default {
                     :disabled="processedHistoricalDataByWeekday.length === 0"
                     :target="`#${key}`"
                     :interaction="() => { activeTab = String(key); }"
+                    style-variant="blue"
                 />
             </ul>
         </div>
