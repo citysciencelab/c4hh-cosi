@@ -99,6 +99,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 allLayerConfigs: () => [],
                 configuredModules: () => sinon.stub(),
                 controlsConfig: () => sinon.stub(),
+                layerConfig: () => sinon.stub(),
                 layerConfigById: () => sinon.stub(),
                 visibleBaselayerConfigs: () => []
             },
@@ -764,6 +765,17 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         content: [{type: "paragraph", content: [{type: "text", text: "Keep me"}]}]
                     }
                 ]);
+            });
+        });
+
+        describe("removeLayerFromLayerConfig", () => {
+            it("should not call the function setLayerConfigByParentKey", () => {
+                const spySetLayerConfigByParentKey = sinon.spy(wrapper.vm, "setLayerConfigByParentKey");
+
+                wrapper.vm.removeLayerFromLayerConfig("123");
+
+                expect(spySetLayerConfigByParentKey.calledOnce).to.be.false;
+
             });
         });
 

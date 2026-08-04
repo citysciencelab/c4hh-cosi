@@ -16,6 +16,7 @@ import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
 import StoryCreatorAddVideoCard from "./StoryCreatorAddVideoCard.vue";
 import tipTapJsonToHtml from "../shared/modules/tipTapEditor/js/tipTapJsonToHtml.js";
+import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 
 export default {
     name: "StoryCreatorChapter",
@@ -89,7 +90,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["addLayerButton", "allBaselayerConfigs", "allLayerConfigs", "configuredModules", "controlsConfig", "layerConfigById", "visibleBaselayerConfigs"]),
+        ...mapGetters(["addLayerButton", "allBaselayerConfigs", "allLayerConfigs", "configuredModules", "controlsConfig", "layerConfig", "layerConfigById", "visibleBaselayerConfigs"]),
         ...mapGetters("Maps", ["mode"]),
         ...mapGetters("Modules/StoryManager", ["enableVideo", "originalLayerConfig", "subjectLayerCategory", "toolStoryWhitelist"]),
         /**
@@ -306,6 +307,7 @@ export default {
         ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapMutations("Modules/StoryManager", ["setOriginalLayerConfig"]),
+        ...mapMutations(["setLayerConfigByParentKey"]),
 
         getDirectVideo,
         getEmbedLink,
@@ -779,6 +781,18 @@ export default {
             this.content.splice(index, 1);
         },
         /**
+         * Removes a the layer from layer config.
+         * @param {String} layerId - The layer id.
+         * @returns {void}
+         */
+        removeLayerFromLayerConfig (layerId) {
+            if (this.layerConfig?.[treeSubjectsKey]) {
+                const layerConfig = this.layerConfig[treeSubjectsKey].elements.filter(element => element.id !== layerId);
+
+                this.setLayerConfigByParentKey({layerConfigs: {elements: layerConfig}, parentKey: treeSubjectsKey});
+            }
+        },
+        /**
          * Resets the layer config.
          * @returns {void}
          */
@@ -787,6 +801,12 @@ export default {
                 const layerConf = this.layerConfigById(layer.layerId);
 
                 this.removeLayer(layerConf);
+
+                this.$nextTick(() => {
+                    if (!this.originalLayerConfig.some(orilayer => orilayer.id === layer.layerId)) {
+                        this.removeLayerFromLayerConfig(layer.layerId);
+                    }
+                });
             });
             this.selectedLayers = [];
 
