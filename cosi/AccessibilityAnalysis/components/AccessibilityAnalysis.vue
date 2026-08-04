@@ -347,7 +347,9 @@ export default {
                               return JSON.stringify(existingCard.extent) === JSON.stringify(activeCard.extent);
                           });
 
-                    existedCard.subjectFeatureWKT = activeCard.bboxGeomWKT;
+                    if (existedCard) {
+                        existedCard.subjectFeatureWKT = activeCard.bboxGeomWKT;
+                    }
                 }
             },
             deep: true,
@@ -945,28 +947,42 @@ export default {
         exportAsGeoJson,
         /**
          * Removes the set from data sets.
-         * @param {index} Number - The index of data.
+         * @param {Number} index - The index of data.
          * @returns {void}
          */
         removeSet (index) {
-            if (this.activeSet === this.dataSets.length - 1) {
+            const indexToRemove = parseInt(index, 10),
+                  wasActive = this.activeSet === indexToRemove,
+                  wasBeforeActive = indexToRemove < this.activeSet,
+                  newDataSets = [...this.dataSets];
+
+            if (isNaN(indexToRemove) || indexToRemove < 0 || indexToRemove >= this.dataSets.length) {
+                return;
+            }
+
+            if (this.dataSets.length === 1) {
+                this.setActiveSet(null);
+                this.removeAllData();
+                return;
+            }
+
+            newDataSets.splice(indexToRemove, 1);
+            this.setDataSets(newDataSets);
+
+            if (wasActive) {
+                this.setActiveSet(null);
+                this.removeDataOnMap();
+                this.removePointMarker();
+            }
+            else if (wasBeforeActive) {
                 this.setActiveSet(this.activeSet - 1);
             }
-
-            this.dataSets.splice(index, 1);
-
-            if (this.dataSets.length === 0) {
-                this.removeAll();
-            }
-
         },
-        removeAll () {
-            this.removeDataOnMap();
-            this.removePointMarker();
-            this.showErrorAlert = false;
-            this.selectionCards = [];
-        },
-
+        /**
+         * Removes all data related to the accessibility analysis from the map.
+         * Resets coordinates, steps, and features, and clears the sources of the layers.
+         * @returns {void}
+         */
         removeDataOnMap () {
             this.setCoordinate([]);
             this.setSteps([0, 0, 0]);
@@ -975,7 +991,17 @@ export default {
             this.setDirectionFeatures([]);
             this.getLayerById("accessibility-directions").getLayer().getSource().clear();
         },
-
+        /**
+         * Performs a full reset.
+         * Clears map data, removes the point marker, hides error alerts, and empties all selection cards.
+         * @returns {void}
+         */
+        removeAll () {
+            this.removeDataOnMap();
+            this.removePointMarker();
+            this.showErrorAlert = false;
+            this.selectionCards = [];
+        },
         /**
          * Removes all the data.
          * @returns {void}
