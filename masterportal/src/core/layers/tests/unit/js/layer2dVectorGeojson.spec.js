@@ -2,6 +2,8 @@ import Cluster from "ol/source/Cluster.js";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 import {GeoJSON} from "ol/format.js";
+import Point from "ol/geom/Point.js";
+import Polygon from "ol/geom/Polygon.js";
 import sinon from "sinon";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
@@ -171,6 +173,59 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
 
             expect(features[0].getId()).to.equals("geojson-id-feature-id-0");
             expect(features[1].getId()).to.equals("geojson-id-feature-id-1");
+        });
+    });
+
+    describe("applyFeaturesFilter", () => {
+        const bboxGeometry = new Polygon([[[0, 0], [0, 20], [20, 20], [20, 0], [0, 0]]]);
+
+        /**
+         * Creates a feature inside the bboxGeometry above.
+         * @returns {module:ol/Feature~Feature} the feature.
+         */
+        function insideFeature () {
+            return new Feature({geometry: new Point([10, 10])});
+        }
+
+        /**
+         * Creates a feature outside the bboxGeometry above.
+         * @returns {module:ol/Feature~Feature} the feature.
+         */
+        function outsideFeature () {
+            return new Feature({geometry: new Point([100, 100])});
+        }
+
+        it("should remove the features outside the bboxGeometry from the source", () => {
+            const geojsonLayer = new Layer2dVectorGeojson({...attributes, bboxGeometry}),
+                features = [insideFeature(), outsideFeature()],
+                source = geojsonLayer.getLayer().getSource();
+
+            source.addFeatures(features);
+            geojsonLayer.applyFeaturesFilter({...attributes, bboxGeometry}, features);
+
+            expect(source.getFeatures()).to.deep.equals([features[0]]);
+        });
+
+        it("should keep all features if no bboxGeometry is set", () => {
+            const geojsonLayer = new Layer2dVectorGeojson(attributes),
+                features = [insideFeature(), outsideFeature()],
+                source = geojsonLayer.getLayer().getSource();
+
+            source.addFeatures(features);
+            geojsonLayer.applyFeaturesFilter(attributes, features);
+
+            expect(source.getFeatures()).to.deep.equals(features);
+        });
+
+        it("should remove the features from the underlying source of a cluster source", () => {
+            const geojsonLayer = new Layer2dVectorGeojson({...attributes, bboxGeometry, clusterDistance: 10}),
+                features = [insideFeature(), outsideFeature()],
+                source = geojsonLayer.getLayer().getSource().getSource();
+
+            source.addFeatures(features);
+            geojsonLayer.applyFeaturesFilter({...attributes, bboxGeometry, clusterDistance: 10}, features);
+
+            expect(source.getFeatures()).to.deep.equals([features[0]]);
         });
     });
 

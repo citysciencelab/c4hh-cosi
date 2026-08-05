@@ -31,10 +31,17 @@ function updateSource (model, app) {
                 model.attributes.isPointLayer
             );
         }
-        const filteredFeatures = model.featuresFilter(model.attributes, source.getFeatures());
+        const loadedFeatures = source.getFeatures(),
+            keptFeatures = new Set(model.featuresFilter(model.attributes, loadedFeatures));
 
-
-        source.addFeatures(filteredFeatures);
+        // WFS/OAF loaders apply featuresFilter themselves, so the source already holds
+        // exactly the filtered set and adding it again (what this did before) was a
+        // no-op. GeoJSON sources load through OpenLayers' plain url loader, which
+        // ignores featuresFilter - there the features outside the geometry are in the
+        // source and have to be taken out, or the layer ignores the selected Gebiet.
+        loadedFeatures
+            .filter(feature => !keptFeatures.has(feature))
+            .forEach(feature => source.removeFeature(feature));
         if (app) {
             // updateFeaturesList event is the best way I found to let app know when data has finished loading.
             // as updateFeaturesList may be triggered multiple times from different places as data loads, info where this event came from needs to be passed along

@@ -80,8 +80,36 @@ Layer2dVectorGeojson.prototype.afterLoading = function (attributes, features) {
                 feature.setId("geojson-" + attributes.id + "-feature-id-" + idx);
             }
         });
+        this.applyFeaturesFilter(attributes, features);
         this.prepareFeaturesFor3D(this.layer?.getSource().getFeatures());
     }
+};
+
+/**
+ * Drops the features rejected by featuresFilter from the layer source.
+ * A GeoJSON layer is loaded by OpenLayers' plain url loader, which - unlike the WFS
+ * and OAF loaders in masterportalapi - never calls the options.featuresFilter passed
+ * in getOptions, so a configured bboxGeometry had no effect at all. Only touches the
+ * source when there is a bboxGeometry, i.e. never for a plain GeoJSON layer.
+ * @param {Object} attributes The attributes of the layer configuration.
+ * @param {module:ol/Feature~Feature[]} features The loaded ol features.
+ * @returns {void}
+ */
+Layer2dVectorGeojson.prototype.applyFeaturesFilter = function (attributes, features) {
+    if (!attributes.bboxGeometry) {
+        return;
+    }
+    const layerSource = this.layer?.getSource(),
+        // with clusterDistance set, the layer source is a Cluster wrapping the real one
+        source = typeof layerSource?.getSource === "function" ? layerSource.getSource() : layerSource,
+        keptFeatures = new Set(this.featuresFilter(attributes, features));
+
+    if (typeof source?.removeFeature !== "function") {
+        return;
+    }
+    features
+        .filter(feature => !keptFeatures.has(feature))
+        .forEach(feature => source.removeFeature(feature));
 };
 
 /**
