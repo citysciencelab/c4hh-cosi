@@ -294,7 +294,14 @@ export default {
         // this.getVisibleLayerList();
 
         if (typeof this.selectedDistrictLevel !== "undefined") {
-            this.updateFeaturesList();
+            await this.updateFeaturesList();
+
+            // Statistical data is the more common denominator, so field B starts out on it
+            // when there is any. This is an initial default only — from the first calculation
+            // on, the switches are owned by the selection cards (see setCoverageParams).
+            if (this.featuresList.length !== 0) {
+                this.BSwitch = false;
+            }
         }
 
         if (this.facilityList.length === 0) {
@@ -397,10 +404,6 @@ export default {
                     }
                 });
             }
-
-            if (this.featuresList.length !== 0) {
-                this.BSwitch = false;
-            }
         },
 
         /**
@@ -491,8 +494,12 @@ export default {
                     resultHeaders: {},
                     results: {}
                 },
-                dataArray_A = this.coverageFunction("A"),
-                dataArray_B = this.coverageFunction("B");
+                // Which field reads a facility layer and which one statistical data is decided
+                // once, up front: evaluating a field can refresh the tool's state, and reading
+                // the flags per field would let field A's evaluation change field B's branch.
+                isFacility = {A: this.ASwitch, B: this.BSwitch},
+                dataArray_A = this.coverageFunction("A", isFacility.A),
+                dataArray_B = this.coverageFunction("B", isFacility.B);
             let
                 resultHeader_A = this.selectedFieldA,
                 resultHeader_B = this.selectedFieldB;
@@ -535,8 +542,8 @@ export default {
                 fActive_B: JSON.parse(JSON.stringify(this.fActive_B)),
                 faktorf_A: JSON.parse(JSON.stringify(this.faktorf_A)),
                 faktorf_B: JSON.parse(JSON.stringify(this.faktorf_B)),
-                ASwitch: JSON.parse(JSON.stringify(this.ASwitch)),
-                BSwitch: JSON.parse(JSON.stringify(this.BSwitch)),
+                ASwitch: isFacility.A,
+                BSwitch: isFacility.B,
                 perCalc_A: JSON.parse(JSON.stringify(this.perCalc_A)),
                 perCalc_B: JSON.parse(JSON.stringify(this.perCalc_B)),
                 facilityPropertyList_A: JSON.parse(JSON.stringify(this.facilityPropertyList_A)),
@@ -549,9 +556,10 @@ export default {
         /**
          * @description Fires when user hits calulcate button. Prepares data sets for calculation.
          * @param {String} letter "A" or "B" for selectedFieldA or selectedFieldB.
+         * @param {Boolean} isFacility True if the field reads a facility layer, false for statistical data.
          * @returns {Array} dataArray -> Array containing all collected data for all selected districts.
          */
-        coverageFunction (letter) {
+        coverageFunction (letter, isFacility) {
             const dataArray = [];
 
             this.selectedFeatures.forEach(district => {
@@ -563,7 +571,7 @@ export default {
                 this.calcHelper["faktorf_" + letter] = this["faktorf_" + letter];
                 this.calcHelper["perCalc_" + letter] = this["perCalc_" + letter];
 
-                if (this[letter + "Switch"]) {
+                if (isFacility) {
                     const findLayer = this.getVisibleVectorLayers().find(layer => layer.getLayer().get("name") === this["selectedField" + letter]),
                         layerFeatures = getLayerSource(findLayer.getLayer()).getFeatures(),
                         paramField = this["paramField" + letter],
@@ -656,11 +664,6 @@ export default {
                 selectedDistricts = this.selectedDistrictLevel.districts.filter(district => district.isSelected === true);
 
             this.selectedStatFeatures = selectedDistricts.map(district => district.statFeatures).flat();
-
-
-            if (this.selectedFeatures.length > 0) {
-                this.updateFeaturesList();
-            }
 
             this.selectedStatFeatures.forEach(feature => {
                 if (utils.unifyString(feature.getProperties()[this.keyOfAttrNameStats]) === utils.unifyString(districtName) && utils.unifyString(feature.get("kategorie")) === utils.unifyString(featureName)) {
