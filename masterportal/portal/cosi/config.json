@@ -327,6 +327,11 @@
                 "name": "Versorgung berechnen"
               },
               {
+                "type": "colorCodeMap",
+                "name": "Kartenvisualisierung",
+                "icon": "bi-map"
+              },
+              {
                 "type": "mpaddon"
               },
               {

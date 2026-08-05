@@ -142,6 +142,13 @@ export default {
     },
     mounted () {
         this.applyTranslationKey(this.name);
+
+        // This tool only exists while its menu entry is open, but the Versorgungsanalyse
+        // hands its result over from another entry. Without this the data would sit in the
+        // store unrendered, because only the watchers above ever draw it.
+        if (this.dataToColorCodeMap && this.colorCodeMapDataset.length > 0) {
+            this.renderDataFromCalculateRatio();
+        }
     },
     methods: {
         ...mapActions("Modules/ColorCodeMap", Object.keys(actions)),
@@ -253,7 +260,10 @@ export default {
                             color: [0, 0, 0],
                             width: 3
                         }),
-                        text: matchResults.data !== undefined ? parseFloat(matchResults.data).toLocaleString(this.currentLocale) : this.$t("additional:modules.tools.colorCodeMap.noData"),
+                        // currentLocale stays "" until the language menu has been opened once,
+                        // and toLocaleString("") throws a RangeError that aborts the whole
+                        // rendering loop — the districts then keep their original style
+                        text: matchResults.data !== undefined ? parseFloat(matchResults.data).toLocaleString(this.currentLocale || "de-DE") : this.$t("additional:modules.tools.colorCodeMap.noData"),
                         overflow: true
                     });
 
@@ -390,14 +400,10 @@ export default {
                         @click="minimize = !minimize"
                     >
                         <template v-if="minimize">
-                            <v-icon>
-                                mdi-plus
-                            </v-icon>
+                            <i class="bi bi-plus-lg" />
                         </template>
                         <template v-else>
-                            <v-icon>
-                                mdi-minus
-                            </v-icon>
+                            <i class="bi bi-dash-lg" />
                         </template>
                     </button>
                     <button
@@ -407,34 +413,28 @@ export default {
                         :title="$t('additional:modules.tools.colorCodeMap.toggleVisualization')"
                         @click="toggleVisualizationState"
                     >
-                        <v-icon
+                        <i
                             v-if="visualizationState"
-                        >
-                            mdi-eye-off
-                        </v-icon>
-                        <v-icon
+                            class="bi bi-eye-slash"
+                        />
+                        <i
                             v-else
-                        >
-                            mdi-eye
-                        </v-icon>
+                            class="bi bi-eye"
+                        />
                     </button>
                     <button
                         class="prev btn btn-default btn-sm"
                         :title="$t('additional:modules.tools.colorCodeMap.prev')"
                         @click="changeSelector(-1)"
                     >
-                        <v-icon>
-                            mdi-chevron-left
-                        </v-icon>
+                        <i class="bi bi-chevron-left" />
                     </button>
                     <button
                         class="next btn btn-default btn-sm"
                         :title="$t('additional:modules.tools.colorCodeMap.next')"
                         @click="changeSelector(1)"
                     >
-                        <v-icon>
-                            mdi-chevron-right
-                        </v-icon>
+                        <i class="bi bi-chevron-right" />
                     </button>
                     <v-select
                         v-if="selectedStatFeatures.length"
@@ -489,9 +489,7 @@ export default {
                     :title="$t('additional:modules.tools.colorCodeMap.infoTooltip')"
                     @click="showInfo"
                 >
-                    <v-icon>
-                        mdi-help-circle
-                    </v-icon>
+                    <i class="bi bi-question-circle" />
                 </button>
                 <div
                     v-if="visualizationState && !minimize"
@@ -503,16 +501,14 @@ export default {
                         :title="$t('additional:modules.tools.colorCodeMap.animate')"
                         @click="setPlayState(!playState)"
                     >
-                        <v-icon
+                        <i
                             v-if="!playState"
-                        >
-                            mdi-play-circle
-                        </v-icon>
-                        <v-icon
+                            class="bi bi-play-circle"
+                        />
+                        <i
                             v-else
-                        >
-                            mdi-pause-circle-outline
-                        </v-icon>
+                            class="bi bi-pause-circle"
+                        />
                     </button>
                     <input
                         v-model="playSpeed"
@@ -524,17 +520,13 @@ export default {
                     :title="$t('additional:modules.tools.colorCodeMap.generateChart')"
                     @click="loadToChartGenerator()"
                 >
-                    <v-icon>
-                        mdi-poll
-                    </v-icon>
+                    <i class="bi bi-bar-chart" />
                 </button>
                 <button
                     :title="$t('additional:modules.tools.colorCodeMap.metadata')"
                     @click="openMetadata()"
                 >
-                    <v-icon>
-                        mdi-information
-                    </v-icon>
+                    <i class="bi bi-info-circle" />
                 </button>
             </div>
         </div>

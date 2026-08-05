@@ -11,6 +11,8 @@ import mutations from "../store/mutationsCalculateRatio";
 import ResultManagement from "../../shared/modules/resultManagement/components/ResultManagement.vue";
 import utils from "../../utils";
 import DataTable from "./DataTable.vue";
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {exportAsGeoJson} from "../utils/exportResults.js";
 import getMappingJson from "../../utils/getMappingJson";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
@@ -29,6 +31,8 @@ export default {
         CalculateRatioSelection,
         ChartItem,
         DataTable,
+        DropdownAutocomplete,
+        FlatButton,
         ResultManagement,
         ToolInfo
     },
@@ -216,7 +220,10 @@ export default {
         },
         visualizationState (newState) {
             if (!newState) {
-                this.$store.commit("Tools/CalculateRatio/setDataToColorCodeMap", false);
+                // "Tools/..." is the pre-v3 module path; committing it was a silent no-op,
+                // so switching the visualization off in the map left this tool believing
+                // it was still on and the button could not switch it back on.
+                this.setDataToColorCodeMap(false);
             }
         },
         facilitiesMapping () {
@@ -736,8 +743,12 @@ export default {
                 this.setDataToColorCodeMap(!switchVar);
             }
             else {
-
                 this.setDataToColorCodeMap(!switchVar);
+
+                // The ColorCodeMap only reacts to this flag while its own menu entry is open,
+                // but the districts stay coloured either way — so reset them from here.
+                this.$store.commit("Modules/ColorCodeMap/setVisualizationState", false);
+                this.$store.dispatch("Modules/ColorCodeMap/renderVisualization");
             }
         },
 
@@ -749,14 +760,18 @@ export default {
             const prepareData = [];
 
             this.dataSets[this.activeSet].results.forEach(result => {
-                if (result.scope !== "Gesamt" || result.scope !== "Durschnitt") {
-                    const data = {
-                        name: result.scope,
-                        data: Math.round(1000 * result[this.columnSelector.key]) / 1000
-                    };
-
-                    prepareData.push(data);
+                // the aggregate rows match no district, and a district whose denominator is
+                // zero has no finite value to place on a colour scale — one Infinity would
+                // flatten the scale for every other district, so it stays uncoloured
+                if (result.scope === "Gesamt" || result.scope === "Durchschnitt"
+                    || !Number.isFinite(result[this.columnSelector.key])) {
+                    return;
                 }
+
+                prepareData.push({
+                    name: result.scope,
+                    data: Math.round(1000 * result[this.columnSelector.key]) / 1000
+                });
             });
 
             return prepareData;
@@ -934,6 +949,24 @@ export default {
                     :group="tableOrChart"
                     @show-view="value => tableOrChart = value"
                 />
+                <div class="d-flex flex-row align-items-center gap-3 mt-3 mb-1">
+                    <DropdownAutocomplete
+                        class="flex-grow-1"
+                        :items="availableColumns"
+                        item-title="name"
+                        :model-value="columnSelector"
+                        :label="$t('additional:modules.tools.cosi.calculateRatio.calculationType')"
+                        @update:model-value="value => columnSelector = value"
+                    />
+                    <FlatButton
+                        class="flex-shrink-0 mb-3"
+                        :icon="dataToColorCodeMap ? 'bi bi-map-fill' : 'bi bi-map'"
+                        :secondary="!dataToColorCodeMap"
+                        :text="$t('additional:modules.tools.cosi.calculateRatio.visualizeMap')"
+                        :title="$t('additional:modules.tools.cosi.calculateRatio.visualizeMap')"
+                        @click.native="loadToColorCodeMap()"
+                    />
+                </div>
             </template>
             <template #card>
                 <ul class="dropdown-menu">
