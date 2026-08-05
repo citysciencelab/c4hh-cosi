@@ -1,0 +1,29 @@
+{
+  "modules": {
+    "mpaddonGfi": {
+      "properties": "Properties",
+      "noProperties": "No attributes available.",
+      "comments": "Comments",
+      "loading": "Loading…",
+      "noComments": "No comments yet.",
+      "replyPlaceholder": "Reply…",
+      "post": "Send",
+      "posting": "Sending…",
+      "readOnly": "Read-only — you lack the permission to comment.",
+      "edited": "edited",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Really delete?",
+      "save": "Save",
+      "cancel": "Cancel",
+      "showFeature": "Show referenced feature",
+      "hideFeature": "Hide highlight",
+      "featureLoading": "Loading feature…",
+      "commentOnFeature": "Comment on this feature",
+      "commentPlaceholder": "Comment on this feature…",
+      "commentSaved": "Comment saved.",
+      "voteUp": "Agree",
+      "voteDown": "Disagree"
+    }
+  }
+}

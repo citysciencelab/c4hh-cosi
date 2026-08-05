@@ -1,5 +1,5 @@
 const Config = {
-    addons: ["toggleMouseHover", "dataTable", "exampleSearch", "populationRequest", "schulinfo", "districtSelector", "districtFinder", "accessibilityAnalysis", "dashboard", "featuresList", "distanceScoreService", "colorCodeMap", "areaSelector", "templateAdmin", "templateManager", "saveSession", "calculateRatio", "polygonStyler", "reportingTool", "cosiPrintLayoutSelection", "dipasProjects"],
+    addons: ["toggleMouseHover", "dataTable", "exampleSearch", "populationRequest", "schulinfo", "districtSelector", "districtFinder", "accessibilityAnalysis", "dashboard", "featuresList", "distanceScoreService", "colorCodeMap", "areaSelector", "templateAdmin", "templateManager", "saveSession", "calculateRatio", "polygonStyler", "reportingTool", "cosiPrintLayoutSelection", "dipasProjects", "mpaddon", "mpaddonGfi"],
     ignoredKeys: ["BOUNDEDBY", "SHAPE", "SHAPE_LENGTH", "SHAPE_AREA", "OBJECTID", "GLOBALID", "GEOMETRY", "SHP", "SHP_AREA", "SHP_LENGTH", "GEOM"],
     namedProjections: [
         // ETRS89 UTM

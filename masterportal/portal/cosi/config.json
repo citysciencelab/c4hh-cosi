@@ -325,6 +325,9 @@
                 "name": "Versorgung berechnen"
               },
               {
+                "type": "mpaddon"
+              },
+              {
                 "type": "polygonStyler"
               },
               {

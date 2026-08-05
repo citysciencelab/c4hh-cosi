@@ -1,0 +1,29 @@
+{
+  "modules": {
+    "mpaddonGfi": {
+      "properties": "Eigenschaften",
+      "noProperties": "Keine Sachdaten vorhanden.",
+      "comments": "Kommentare",
+      "loading": "Lade…",
+      "noComments": "Noch keine Kommentare.",
+      "replyPlaceholder": "Antworten…",
+      "post": "Senden",
+      "posting": "Sende…",
+      "readOnly": "Nur Lese-Zugriff — zum Kommentieren fehlt die Berechtigung.",
+      "edited": "bearbeitet",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "confirmDelete": "Wirklich löschen?",
+      "save": "Speichern",
+      "cancel": "Abbrechen",
+      "showFeature": "Referenziertes Objekt zeigen",
+      "hideFeature": "Markierung ausblenden",
+      "featureLoading": "Lade Objekt…",
+      "commentOnFeature": "Kommentar zu diesem Objekt",
+      "commentPlaceholder": "Kommentar zu diesem Objekt…",
+      "commentSaved": "Kommentar gespeichert.",
+      "voteUp": "Zustimmen",
+      "voteDown": "Ablehnen"
+    }
+  }
+}

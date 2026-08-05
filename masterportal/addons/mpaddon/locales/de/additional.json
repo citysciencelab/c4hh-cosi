@@ -1,0 +1,42 @@
+{
+  "modules": {
+    "mpaddon": {
+      "title": "Externes Backend",
+      "description": "Verbinden Sie sich mit einem entfernten PostGIS-Backend, um dessen Layer anzuzeigen und zu kommentieren.",
+      "backendUrl": "Backend-URL",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "signIn": "Anmelden",
+      "signingIn": "Anmeldung…",
+      "signOut": "Abmelden",
+      "layers": "Verfügbare Layer",
+      "loading": "Lade…",
+      "noLayers": "Keine Layer verfügbar.",
+      "add": "Hinzufügen",
+      "hide": "Ausblenden",
+      "commentsBadge": "Kommentar-Layer",
+      "featureCountTitle": "Anzahl der Objekte in diesem Layer",
+      "loadingFeatures": "Objekte werden geladen…",
+      "composeButton": "Kommentar hinzufügen",
+      "composeTitle": "Kommentar zu \"{{name}}\"",
+      "composeCancel": "Abbrechen",
+      "composeClickMap": "Klicken Sie auf die Karte, um die Position des Kommentars zu setzen.",
+      "composeMovePin": "Erneutes Klicken auf die Karte verschiebt die Position.",
+      "composePlaceholder": "Kommentar…",
+      "composeSend": "Senden",
+      "composeSending": "Sende…",
+      "mapControlTitle": "Kommentare",
+      "mapControlClose": "Kommentare schließen",
+      "mapControlNoPrimary": "Kein Kommentar-Datensatz verfügbar.",
+      "mapControlEmpty": "Noch keine Kommentare.",
+      "mapControlPlace": "Kommentar auf der Karte",
+      "mapControlPlacing": "Klicken Sie auf die Karte, um den Kommentar zu setzen…",
+      "mapControlBack": "Zurück",
+      "mapControlReplyPlaceholder": "Antworten…",
+      "mapControlReadOnly": "Nur Lese-Zugriff — zum Kommentieren fehlt die Berechtigung.",
+      "mapControlUnknownAuthor": "Unbekannt",
+      "voteUp": "Zustimmen",
+      "voteDown": "Ablehnen"
+    }
+  }
+}

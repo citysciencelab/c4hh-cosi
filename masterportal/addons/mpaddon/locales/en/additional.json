@@ -1,0 +1,42 @@
+{
+  "modules": {
+    "mpaddon": {
+      "title": "External backend",
+      "description": "Connect to a remote PostGIS backend to display and comment on its layers.",
+      "backendUrl": "Backend URL",
+      "email": "Email",
+      "password": "Password",
+      "signIn": "Sign in",
+      "signingIn": "Signing in…",
+      "signOut": "Sign out",
+      "layers": "Available layers",
+      "loading": "Loading…",
+      "noLayers": "No layers available.",
+      "add": "Add",
+      "hide": "Hide",
+      "commentsBadge": "Comment layer",
+      "featureCountTitle": "Number of features in this layer",
+      "loadingFeatures": "Loading features…",
+      "composeButton": "Add comment",
+      "composeTitle": "Comment on \"{{name}}\"",
+      "composeCancel": "Cancel",
+      "composeClickMap": "Click the map to set the comment's position.",
+      "composeMovePin": "Click the map again to move the position.",
+      "composePlaceholder": "Comment…",
+      "composeSend": "Send",
+      "composeSending": "Sending…",
+      "mapControlTitle": "Comments",
+      "mapControlClose": "Close comments",
+      "mapControlNoPrimary": "No comment dataset available.",
+      "mapControlEmpty": "No comments yet.",
+      "mapControlPlace": "Comment on the map",
+      "mapControlPlacing": "Click the map to place the comment…",
+      "mapControlBack": "Back",
+      "mapControlReplyPlaceholder": "Reply…",
+      "mapControlReadOnly": "Read-only — you do not have permission to comment.",
+      "mapControlUnknownAuthor": "Unknown",
+      "voteUp": "Agree",
+      "voteDown": "Disagree"
+    }
+  }
+}
