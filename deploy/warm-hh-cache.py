@@ -24,6 +24,8 @@ Needs only the Python 3 standard library.
 import json
 import re
 import sys
+import urllib.error
+import urllib.parse
 import urllib.request
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
@@ -66,6 +68,17 @@ def http_get(url, accept=None):
         with urllib.request.urlopen(req, timeout=180) as resp:
             stats[resp.headers.get("X-Cache-Status", "-")] += 1
             return resp.read()
+    except urllib.error.HTTPError as err:
+        if err.code == 404:
+            # Upstream says the resource does not exist - nothing to warm, and
+            # nothing we can fix here (style_v3.json references icons that were
+            # never published). Report it, but don't fail the run over it.
+            stats["MISSING"] += 1
+            print(f"  MISSING (404): {url[:160]}", file=sys.stderr)
+            return None
+        stats["ERROR"] += 1
+        print(f"  ERROR {err}: {url[:160]}", file=sys.stderr)
+        return None
     except Exception as err:  # noqa: BLE001 - keep warming, report at the end
         stats["ERROR"] += 1
         print(f"  ERROR {err}: {url[:160]}", file=sys.stderr)
@@ -147,14 +160,25 @@ def main():
     style_conf = re.search(r'styleConf:\s*"([^"]+)"', config_js)[1]
     img_path = re.search(r'wfsImgPath:\s*"([^"]+)"', config_js)[1]
     styles = json.loads(http_get(style_conf))
-    icons = sorted({m for m in re.findall(r'"imageName":\s*"([^"/]+\.\w{3,4})"', json.dumps(styles))})
+    # ensure_ascii=False: with the default the re-encoded JSON escapes umlauts, so
+    # "Icon-Spaß-am-Wasser.png" would be searched for as literal "Icon-Spaß-...".
+    icons = sorted({m for m in re.findall(r'"imageName":\s*"([^"/]+\.\w{3,4})"',
+                                          json.dumps(styles, ensure_ascii=False))})
     print(f"style_v3.json + {len(icons)} style icons")
     with ThreadPoolExecutor(WORKERS) as pool:
-        pool.map(lambda i: http_get(f"{img_path}{i}"), icons)
+        # quote(): non-ASCII icon names must be percent-encoded, urllib only speaks
+        # ASCII urls. The app's <img src> encodes them the same way, same cache key.
+        pool.map(lambda i: http_get(f"{img_path}{urllib.parse.quote(i)}"), icons)
 
     # --- extra WFS Fachdaten layers (masterportalapi wfs.js createUrl) ------
     for layer_id in EXTRA_WFS_LAYER_IDS:
-        svc = services[layer_id]
+        svc = services.get(layer_id)
+        if svc is None:
+            # A registry rebuild drops layers retired upstream; warming the rest is
+            # still worth more than aborting the whole run over one dead id.
+            stats["ERROR"] += 1
+            print(f"  ERROR unknown layer id {layer_id} in services.json", file=sys.stderr)
+            continue
         query = whatwg_urlencode([
             ("service", "WFS"), ("version", svc["version"]), ("request", "GetFeature"),
             ("srsName", SRS), ("typeName", svc["featureType"]),
@@ -171,14 +195,18 @@ def main():
                         + whatwg_urlencode([("limit", 400), ("crs", CRS)]))
         features = get_oaf_paged(boundary_url)
         names = district_names(features, level)
-        layer_ids = level["stats"]["layerIds"]
-        keys = level["stats"]["keyOfAttrName"]
-        print(f"{level['label']}: {len(names)} districts x {len(layer_ids)} stats collections")
+        # Self-hosted statistics (portal/cosi/assets/*.geojson, registered via
+        # tools/local-services.json) are served by this nginx itself - no Hamburg
+        # upstream to warm, and no OAF collection to page.
+        stat_layers = [(lid, key) for lid, key
+                       in zip(level["stats"]["layerIds"], level["stats"]["keyOfAttrName"])
+                       if services.get(lid, {}).get("typ") == "OAF"]
+        print(f"{level['label']}: {len(names)} districts x {len(stat_layers)} stats collections")
 
-        def stat_urls(level_names=names, ids=layer_ids, attr_keys=keys):
+        def stat_urls(level_names=names, stats_layers=stat_layers):
             # COSI getOAFFeatureGet: string-concatenated query, only the filter
             # value runs through encodeURIComponent (getOAFFeature.js:62-89).
-            for layer_id, key in zip(ids, attr_keys):
+            for layer_id, key in stats_layers:
                 svc = services[layer_id]
                 for name in level_names:
                     fltr = encode_uri_component(f"{key}='{name}'")
@@ -190,6 +218,8 @@ def main():
             pool.map(get_oaf_paged, stat_urls())
 
     print(f"\nDone. X-Cache-Status: {dict(stats)}")
+    if stats["MISSING"]:
+        print(f"{stats['MISSING']} resource(s) do not exist upstream (404) - see above.")
     if stats["ERROR"]:
         sys.exit(1)
 
