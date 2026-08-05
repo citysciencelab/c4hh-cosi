@@ -37,7 +37,23 @@ CRS = "http://www.opengis.net/def/crs/EPSG/0/25832"
 SRS = "EPSG:25832"
 # Fachdaten layers to warm besides the district machinery (WFS, loadingStrategy
 # "all" in config.json → a single deterministic GetFeature URL each).
-EXTRA_WFS_LAYER_IDS = ["5246", "8712"]  # HVV Haltestellen, Staatliche Schulen
+EXTRA_WFS_LAYER_IDS = [
+    "5246",   # HVV Haltestellen
+    "8712",   # Staatliche Schulen
+    # Soziale Infrastruktur — Zielgruppe Familien / Kinder / Jugendliche.
+    # Warmed for the "Versorgung mit sozialer Infrastruktur" scenario; harmless
+    # to keep, and missing entries here mean an empty map during an outage.
+    "19944",  # Eltern-Kind-Zentrum
+    "753",    # Kindertagesstätten
+    "34597",  # Familienbildung und -beratung
+    "19574",  # Öffentliche Bibliotheken
+    "33505",  # Haus der Jugend
+    "33526",  # Jugendklub
+    "33561",  # Jugendcafe
+    "33544",  # Kindertreff
+    "33507",  # Jugendangebot im Stadtteil- oder Kulturzentrum
+    "20179",  # Sozialräume
+]
 
 WORKERS = 8
 stats = Counter()
