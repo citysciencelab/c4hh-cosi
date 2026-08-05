@@ -268,7 +268,7 @@ export async function getPropertyNameList (layers) {
                 });
             }
         }
-        else if (layers[i].typ === "OAF") {
+        else if (layers[i].typ === "OAF" || layers[i].typ === "GeoJSON") {
             if (isObject(layers[i].gfiAttributes) && Object.keys(layers[i].gfiAttributes).length > 0) {
                 propertyNameList[i] = Object.keys(layers[i].gfiAttributes);
             }

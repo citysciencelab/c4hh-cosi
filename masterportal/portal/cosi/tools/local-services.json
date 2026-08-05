@@ -38,5 +38,26 @@
     "layerAttribution": "Kombinierter Datensatz aus mehreren WFS der FHH (siehe tools/build-combined-layer.py)",
     "legendURL": "",
     "datasets": []
+  },
+  {
+    "id": "cosi_sozialmonitoring_stadtteile",
+    "name": "Sozialmonitoring – Kennzahlen je Stadtteil (abgeleitet)",
+    "url": "./assets/sozialmonitoring-stadtteile.geojson",
+    "typ": "GeoJSON",
+    "gfiAttributes": {
+      "stadtteil": "Stadtteil",
+      "jahr": "Jahr",
+      "sm_statusindex_score": "Statusindex (Score 1–4, bevölkerungsgewichtet)",
+      "sm_dynamikindex_score": "Dynamikindex (Score −1–1, bevölkerungsgewichtet)",
+      "sm_anteil_niedrig_proz": "Anteil Bevölkerung in Gebieten mit niedrigem/sehr niedrigem Status (in %)",
+      "sm_bev_niedrig": "Bevölkerung in Gebieten mit niedrigem/sehr niedrigem Status",
+      "sm_bev_gesamt": "Vom Sozialmonitoring erfasste Bevölkerung",
+      "sm_gebiete_anz": "Statistische Gebiete",
+      "sm_gebiete_niedrig_anz": "Statistische Gebiete mit niedrigem/sehr niedrigem Status"
+    },
+    "gfiTheme": "default",
+    "layerAttribution": "Abgeleitet aus dem Sozialmonitoring der FHH (siehe tools/build-sozialmonitoring-stats.py)",
+    "legendURL": "",
+    "datasets": []
   }
 ]

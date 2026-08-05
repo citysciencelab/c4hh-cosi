@@ -3,6 +3,7 @@ import getFeature from "@shared/js/api/wfs/getFeature.js";
 import getMappingJson from "../../utils/getMappingJson.js";
 import oafRequest from "../../../../src/shared/js/api/oaf/getOAFFeature.js";
 import {parseFeatures} from "../utils/prepareStatsFeatures.js";
+import loadLocalStatFeatures from "../utils/loadLocalStatFeatures.js";
 import {mapDistrictNames} from "../utils/prepareDistrictLevels.js";
 import {equalTo} from "ol/format/filter";
 import {nextTick} from "vue";
@@ -57,6 +58,21 @@ const actions = {
                         );
 
                         olFeatures = oafRequest.readAllOAFToGeoJSON(response);
+                    }
+                    else if (districtLevel.stats.layers[j].typ === "GeoJSON") {
+                        // Self-hosted derived statistics (portal/cosi/tools/), e.g. the
+                        // Sozialmonitoring index aggregated to Stadtteil level. Fetched
+                        // once and filtered in memory - see loadLocalStatFeatures.
+                        olFeatures = await loadLocalStatFeatures(
+                            districtLevel.stats.layers[j].url,
+                            districtLevel.stats.keyOfAttrName[j],
+                            districtName
+                        );
+                    }
+                    else {
+                        // Unsupported layer type - do not silently reuse the previous
+                        // iteration's features for this district.
+                        olFeatures = [];
                     }
                     if (olFeatures.length > 0) {
                         await parseFeatures(olFeatures, districts[i], districtLevel);

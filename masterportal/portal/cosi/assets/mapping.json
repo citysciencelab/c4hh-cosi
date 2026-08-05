@@ -2309,5 +2309,54 @@
     "stadtteil": "31240",
     "bezirk": "31271",
     "valueType": "relative"
+  },
+  {
+    "category": "sm_anteil_niedrig_proz",
+    "value": "Anteil Bevölkerung in Gebieten mit niedrigem/sehr niedrigem Sozialstatus (in %)",
+    "group": "Sozialmonitoring (abgeleitet)",
+    "stadtteil": "cosi_sozialmonitoring_stadtteile",
+    "valueType": "relative"
+  },
+  {
+    "category": "sm_bev_niedrig",
+    "value": "Bevölkerung in Gebieten mit niedrigem/sehr niedrigem Sozialstatus",
+    "group": "Sozialmonitoring (abgeleitet)",
+    "stadtteil": "cosi_sozialmonitoring_stadtteile",
+    "valueType": "absolute"
+  },
+  {
+    "category": "sm_bev_gesamt",
+    "value": "Vom Sozialmonitoring erfasste Bevölkerung",
+    "group": "Sozialmonitoring (abgeleitet)",
+    "stadtteil": "cosi_sozialmonitoring_stadtteile",
+    "valueType": "absolute"
+  },
+  {
+    "category": "sm_statusindex_score",
+    "value": "Sozialmonitoring Statusindex (Score 1–4, bevölkerungsgewichtet)",
+    "group": "Sozialmonitoring (abgeleitet)",
+    "stadtteil": "cosi_sozialmonitoring_stadtteile",
+    "valueType": "relative"
+  },
+  {
+    "category": "sm_dynamikindex_score",
+    "value": "Sozialmonitoring Dynamikindex (Score −1–1, bevölkerungsgewichtet)",
+    "group": "Sozialmonitoring (abgeleitet)",
+    "stadtteil": "cosi_sozialmonitoring_stadtteile",
+    "valueType": "relative"
+  },
+  {
+    "category": "sm_gebiete_anz",
+    "value": "Statistische Gebiete im Stadtteil",
+    "group": "Sozialmonitoring (abgeleitet)",
+    "stadtteil": "cosi_sozialmonitoring_stadtteile",
+    "valueType": "absolute"
+  },
+  {
+    "category": "sm_gebiete_niedrig_anz",
+    "value": "Statistische Gebiete mit niedrigem/sehr niedrigem Sozialstatus",
+    "group": "Sozialmonitoring (abgeleitet)",
+    "stadtteil": "cosi_sozialmonitoring_stadtteile",
+    "valueType": "absolute"
   }
 ]
