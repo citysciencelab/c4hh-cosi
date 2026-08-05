@@ -38,6 +38,11 @@ from pathlib import Path
 PORTAL_DIR = Path(__file__).resolve().parent.parent
 CONFIG_JSON = PORTAL_DIR / "config.json"
 CACHE_DIR = PORTAL_DIR / "tools" / ".cache"
+# Hand-maintained service definitions that do not exist upstream (self-hosted
+# GeoJSON derived from several Hamburg sources, e.g. the combined "Jugendorte"
+# layer). Merged into the generated services.json so a regeneration does not
+# drop them; an entry here wins over an upstream entry with the same id.
+LOCAL_SERVICES_JSON = PORTAL_DIR / "tools" / "local-services.json"
 
 UPSTREAM = {
     "services": "https://geodienste.hamburg.de/services-internet.json",
@@ -99,14 +104,23 @@ def main():
     services_up = fetch("services", UPSTREAM["services"], args.refresh)
     rest_up = fetch("rest", UPSTREAM["rest"], args.refresh)
 
+    local_services = []
+    if LOCAL_SERVICES_JSON.exists():
+        local_services = json.loads(LOCAL_SERVICES_JSON.read_text(encoding="utf-8-sig"))
+    local_by_id = {str(e["id"]): e for e in local_services if isinstance(e, dict) and "id" in e}
+
     by_id = {str(e["id"]): e for e in services_up if isinstance(e, dict) and "id" in e}
+    by_id.update(local_by_id)
     refs = referenced_layer_ids(config)
 
     keep_ids = {r for r in refs if r in by_id}
-    not_public = sorted((r for r in refs if r.isdigit() and r not in by_id), key=lambda x: (len(x), x))
+    not_public = sorted(
+        (r for r in refs if r.isdigit() and r not in by_id), key=lambda x: (len(x), x))
 
-    # preserve upstream order; emit only kept entries
-    services_out = [e for e in services_up if str(e.get("id")) in keep_ids]
+    # preserve upstream order; emit only kept entries, then append our own
+    services_out = [e for e in services_up
+                    if str(e.get("id")) in keep_ids and str(e.get("id")) not in local_by_id]
+    services_out += [e for e in local_services if str(e.get("id")) in keep_ids]
 
     # rest-services: full upstream + our Valhalla entry (replace if already present)
     rest_out = [e for e in rest_up if str(e.get("id")) != "valhalla"]
@@ -125,6 +139,11 @@ def main():
     typs = Counter(e.get("typ") for e in services_out)
     print(f"\nservices.json:      {len(services_out)} layers kept "
           f"(of {len(by_id)} upstream)  typ={dict(typs)}")
+    if local_by_id:
+        used = sorted(i for i in local_by_id if i in keep_ids)
+        unused = sorted(i for i in local_by_id if i not in keep_ids)
+        print(f"local-services.json: {len(used)} merged {used}"
+              + (f"; not referenced by config.json: {unused}" if unused else ""))
     print(f"rest-services.json: {len(rest_out)} entries (incl. valhalla -> {args.valhalla_url})")
     print(f"\nreferenced but NOT in public registry — omitted ({len(not_public)}):")
     print("  " + ", ".join(not_public))

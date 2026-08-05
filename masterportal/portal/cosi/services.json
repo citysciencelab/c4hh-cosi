@@ -4925,7 +4925,7 @@
     "name": "XPlanung Bebauungspläne - Vektordarstellung",
     "url": "https://geodienste.hamburg.de/HH_WMS_Cache_PLIS_Geodaten",
     "typ": "WMS",
-    "layers": "xplan_bplan_vektor",
+    "layers": "vektordaten",
     "format": "image/png",
     "version": "1.3.0",
     "singleTile": false,
@@ -20207,14 +20207,31 @@
     "url": "https://api.hamburg.de/datasets/v1/betreuungsquote_kindertagesbetreuung",
     "collection": "betr_quoten_bezirke",
     "gfiAttributes": {
-      "jahr": "jahr",
-      "jahr_date": "Datum",
+      "jahr": "Jahr",
+      "jahr_date": {
+        "name": "Datum",
+        "condition": "contains",
+        "type": "date",
+        "format": "DD.MM.YYYY HH:mm:ss"
+      },
       "bezirk_id": "Bezirk Nummer",
       "bezirk_name": "Bezirk",
       "betr_quote_2_proz": "Regionale Betreuungsquote der 2-Jährigen (in %)",
       "betr_quote_unter3_proz": "Regionale Betreuungsquote der unter 3-Jährigen (in %)",
       "betr_quote_4_proz": "Regionale Betreuungsquote der 4-Jährigen (in %)",
-      "betr_quote_3_schuleintritt_proz": "Regionale Betreuungsquote der 3-Jährigen bis Schuleintritt (in %)"
+      "betr_quote_3_schuleintritt_proz": "Regionale Betreuungsquote der 3-Jährigen bis Schuleintritt (in %)",
+      "prio10_2_abs": "Prio10 Fälle 2-Jährige",
+      "prio10_2_proz": "Prio10 Fälle 2-Jährige (innerhalb der Altersgruppe in %)",
+      "prio10_unter3_abs": "Prio10 Fälle unter 3-Jährige",
+      "prio10_unter3_proz": "Prio10 Fälle unter 3-Jährige (innerhalb der Altersgruppe in %)",
+      "prio10_4_abs": "Prio10 Fälle 4-Jährige",
+      "prio10_4_proz": "Prio10 Fälle 4-Jährige (innerhalb der Altersgruppe in %)",
+      "egh_4_abs": "EGH Fälle 4-Jährige",
+      "egh_4_proz": "EGH Fälle 4-Jährige (innerhalb der Altersgruppe in %)",
+      "prio10_3_schuleintritt_abs": "Prio10 Fälle 3-Jährige bis Schuleintritt",
+      "prio10_3_schuleintritt_proz": "Prio10 Fälle 3-Jährige bis Schuleintritt (innerhalb der Altersgruppe in %)",
+      "egh_3_schuleintritt_abs": "EGH Fälle 3-Jährige bis Schuleintritt",
+      "egh_3_schuleintritt_proz": "EGH Fälle 3-Jährige bis Schuleintritt (innerhalb der Altersgruppe in %)"
     },
     "gfiTheme": "default",
     "datasets": [
@@ -20243,7 +20260,12 @@
     "collection": "betr_quoten_stadtteile",
     "gfiAttributes": {
       "jahr": "Jahr",
-      "jahr_date": "Datum",
+      "jahr_date": {
+        "name": "Datum",
+        "condition": "contains",
+        "type": "date",
+        "format": "DD.MM.YYYY"
+      },
       "stadtteil_id": "Stadtteil Nummer",
       "stadtteil_name": "Stadtteil",
       "bezirk_id": "Bezirk Nummer",
@@ -20251,7 +20273,19 @@
       "betr_quote_2_proz": "Regionale Betreuungsquote der 2-Jährigen (in %)",
       "betr_quote_unter3_proz": "Regionale Betreuungsquote der unter 3-Jährigen (in %)",
       "betr_quote_4_proz": "Regionale Betreuungsquote der 4-Jährigen (in %)",
-      "betr_quote_3_schuleintritt_proz": "Regionale Betreuungsquote der 3-Jährigen bis Schuleintritt (in %)"
+      "betr_quote_3_schuleintritt_proz": "Regionale Betreuungsquote der 3-Jährigen bis Schuleintritt (in %)",
+      "prio10_2_abs": "Prio10 Fälle 2-Jährige",
+      "prio10_2_proz": "Prio10 Fälle 2-Jährige (innerhalb der Altersgruppe in %)",
+      "prio10_unter3_abs": "Prio10 Fälle unter 3-Jährige",
+      "prio10_unter3_proz": "Prio10 Fälle unter 3-Jährige (innerhalb der Altersgruppe in %)",
+      "prio10_4_abs": "Prio10 Fälle 4-Jährige",
+      "prio10_4_proz": "Prio10 Fälle 4-Jährige (innerhalb der Altersgruppe in %)",
+      "egh_4_abs": "EGH Fälle 4-Jährige",
+      "egh_4_proz": "EGH Fälle 4-Jährige (innerhalb der Altersgruppe in %)",
+      "prio10_3_schuleintritt_abs": "Prio10 Fälle 3-Jährige bis Schuleintritt",
+      "prio10_3_schuleintritt_proz": "Prio10 Fälle 3-Jährige bis Schuleintritt (innerhalb der Altersgruppe in %)",
+      "egh_3_schuleintritt_abs": "EGH Fälle 3-Jährige bis Schuleintritt",
+      "egh_3_schuleintritt_proz": "EGH Fälle 3-Jährige bis Schuleintritt (innerhalb der Altersgruppe in %)"
     },
     "gfiTheme": "default",
     "datasets": [
@@ -22237,5 +22271,45 @@
         "kategorie_organisation": "Behörde für Arbeit, Gesundheit, Soziales, Familie und Integration (Sozialbehörde)"
       }
     ]
+  },
+  {
+    "id": "cosi_jugendorte",
+    "name": "Jugendorte (kombiniert)",
+    "url": "./assets/jugendorte.geojson",
+    "typ": "GeoJSON",
+    "gfiAttributes": {
+      "einrichtung": "Einrichtung",
+      "angebotstyp": "Angebotstyp",
+      "weitere_angebotstypen": "Weitere Angebote am Standort",
+      "traeger": "Träger",
+      "adresse": "Adresse",
+      "ort": "Ort",
+      "link": "Internet",
+      "internet": "Internet"
+    },
+    "gfiTheme": "default",
+    "layerAttribution": "Kombinierter Datensatz aus mehreren WFS der FHH (siehe tools/build-combined-layer.py)",
+    "legendURL": "",
+    "datasets": []
+  },
+  {
+    "id": "cosi_familienorte",
+    "name": "Familienorte (kombiniert)",
+    "url": "./assets/familienorte.geojson",
+    "typ": "GeoJSON",
+    "gfiAttributes": {
+      "einrichtung": "Einrichtung",
+      "angebotstyp": "Angebotstyp",
+      "kategorie_2": "Unterkategorie",
+      "weitere_angebotstypen": "Weitere Angebote am Standort",
+      "traeger": "Träger",
+      "adresse": "Adresse",
+      "ort": "Ort",
+      "link": "Internet"
+    },
+    "gfiTheme": "default",
+    "layerAttribution": "Kombinierter Datensatz aus mehreren WFS der FHH (siehe tools/build-combined-layer.py)",
+    "legendURL": "",
+    "datasets": []
   }
 ]

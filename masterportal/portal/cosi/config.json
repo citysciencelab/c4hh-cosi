@@ -1288,6 +1288,34 @@
               "name": "Bevölkerung und Gesellschaft",
               "type": "folder",
               "elements": [
+                  {
+                    "type": "folder",
+                    "name": "Kombinierte Angebotslayer (COSI)",
+                    "elements": [
+                      {
+                        "id": "cosi_jugendorte",
+                        "name": "Jugendorte (kombiniert)",
+                        "styleId": "33505",
+                        "isFacility": true,
+                        "alwaysOnTop": true,
+                        "searchField": "einrichtung",
+                        "mouseHoverField": ["einrichtung", "angebotstyp"],
+                        "addressField": ["adresse", "ort"],
+                        "loadingStrategy": "all"
+                      },
+                      {
+                        "id": "cosi_familienorte",
+                        "name": "Familienorte (kombiniert)",
+                        "styleId": "19944",
+                        "isFacility": true,
+                        "alwaysOnTop": true,
+                        "searchField": "einrichtung",
+                        "mouseHoverField": ["einrichtung", "angebotstyp"],
+                        "addressField": ["adresse", "ort"],
+                        "loadingStrategy": "all"
+                      }
+                    ]
+                  },
                 {
                   "name": "Angebote des freiwilligen Engagements",
                   "type": "folder",
@@ -1402,20 +1430,6 @@
                       "loadingStrategy": "all"
                     },
                     {
-                      "id": "19949",
-                      "name": "Kinder-Familienzentrum",
-                      "styleId": "19949",
-                      "isFacility": true,
-                      "alwaysOnTop": true,
-                      "searchField": "traeger",
-                      "mouseHoverField": [
-                        "einrichtung",
-                        "traeger"
-                      ],
-                      "addressField": ["adresse", "ort"],
-                      "loadingStrategy": "all"
-                    },
-                    {
                       "id": "19950",
                       "name": "Konfessionelle Familienbildungsstätte",
                       "styleId": "19950",
@@ -1433,34 +1447,6 @@
                       "id": "24190",
                       "name": "Lotsendienst an Geburtsklinik",
                       "styleId": "24190",
-                      "isFacility": true,
-                      "alwaysOnTop": true,
-                      "searchField": "traeger",
-                      "mouseHoverField": [
-                        "einrichtung",
-                        "traeger"
-                      ],
-                      "addressField": ["adresse", "ort"],
-                      "loadingStrategy": "all"
-                    },
-                    {
-                      "id": "19951",
-                      "name": "Mütterzentrum",
-                      "styleId": "19951",
-                      "isFacility": true,
-                      "alwaysOnTop": true,
-                      "searchField": "traeger",
-                      "mouseHoverField": [
-                        "einrichtung",
-                        "traeger"
-                      ],
-                      "addressField": ["adresse", "ort"],
-                      "loadingStrategy": "all"
-                    },
-                    {
-                      "id": "19952",
-                      "name": "Sonstige Angebote für Familien",
-                      "styleId": "19952",
                       "isFacility": true,
                       "alwaysOnTop": true,
                       "searchField": "traeger",
@@ -2586,24 +2572,6 @@
                   "loadingStrategy": "all"
                 },
                 {
-                  "id": "24058",
-                  "styleId": "24058",
-                  "name": "Bürgerhäuser",
-                  "searchField": [
-                    "einrichtung"
-                  ],
-                  "mouseHoverField": [
-                    "einrichtung"
-                  ],
-                  "addressField": [
-                    "adresse",
-                    "ort"
-                  ],
-                  "isFacility": true,
-                  "alwaysOnTop": true,
-                  "loadingStrategy": "all"
-                },
-                {
                   "id": "31105",
                   "styleId": "31105",
                   "name": "Fachberatungsstellen gegen sexualisierte Gewalt Hamburg",
@@ -2870,54 +2838,7 @@
                   "type": "folder",
                   "name": "Kultureinrichtungen",
                   "elements": [
-                    {
-                      "id": "31251",
-                      "styleId": "31251",
-                      "name": "Geschichtswerkstätten",
-                      "loadingStrategy": "all",
-                      "topic": "basic",
-                      "isFacility": true,
-                      "alwaysOnTop": true,
-                      "addressField": ["adresse", "ort"],
-                      "searchField": [
-                        "einrichtung"
-                      ],
-                      "mouseHoverField": [
-                        "einrichtung"
-                      ]
-                    },
-                    {
-                      "id": "31252",
-                      "styleId": "31252",
-                      "name": "Stadtteilkulturzentren",
-                      "loadingStrategy": "all",
-                      "topic": "basic",
-                      "isFacility": true,
-                      "alwaysOnTop": true,
-                      "addressField": ["adresse", "ort"],
-                      "searchField": [
-                        "einrichtung"
-                      ],
-                      "mouseHoverField": [
-                        "einrichtung"
-                      ]
-                    },
-                    {
-                      "id": "31253",
-                      "styleId": "31253",
-                      "name": "sonstige Kultureinrichtungen",
-                      "loadingStrategy": "all",
-                      "topic": "basic",
-                      "isFacility": true,
-                      "alwaysOnTop": true,
-                      "addressField": ["adresse", "ort"],
-                      "searchField": [
-                        "einrichtung"
-                      ],
-                      "mouseHoverField": [
-                        "einrichtung"
-                      ]
-                    }
+                    
                   ]
                 },
                 {

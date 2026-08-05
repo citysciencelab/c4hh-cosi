@@ -1,0 +1,42 @@
+[
+  {
+    "id": "cosi_jugendorte",
+    "name": "Jugendorte (kombiniert)",
+    "url": "./assets/jugendorte.geojson",
+    "typ": "GeoJSON",
+    "gfiAttributes": {
+      "einrichtung": "Einrichtung",
+      "angebotstyp": "Angebotstyp",
+      "weitere_angebotstypen": "Weitere Angebote am Standort",
+      "traeger": "Träger",
+      "adresse": "Adresse",
+      "ort": "Ort",
+      "link": "Internet",
+      "internet": "Internet"
+    },
+    "gfiTheme": "default",
+    "layerAttribution": "Kombinierter Datensatz aus mehreren WFS der FHH (siehe tools/build-combined-layer.py)",
+    "legendURL": "",
+    "datasets": []
+  },
+  {
+    "id": "cosi_familienorte",
+    "name": "Familienorte (kombiniert)",
+    "url": "./assets/familienorte.geojson",
+    "typ": "GeoJSON",
+    "gfiAttributes": {
+      "einrichtung": "Einrichtung",
+      "angebotstyp": "Angebotstyp",
+      "kategorie_2": "Unterkategorie",
+      "weitere_angebotstypen": "Weitere Angebote am Standort",
+      "traeger": "Träger",
+      "adresse": "Adresse",
+      "ort": "Ort",
+      "link": "Internet"
+    },
+    "gfiTheme": "default",
+    "layerAttribution": "Kombinierter Datensatz aus mehreren WFS der FHH (siehe tools/build-combined-layer.py)",
+    "legendURL": "",
+    "datasets": []
+  }
+]
