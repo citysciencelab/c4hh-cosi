@@ -3,8 +3,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-08-05 v3.25.0
 
 ### Added
 - package.json: new command `npm run deleteAllNodeModules` added.
@@ -28,15 +27,11 @@
 - vcOblique: Replaced iframe-resizer package with CSS-based iframe sizing.
 - package.json: postinstall script detects package.json files automatically and does not fail, if one of the installs fails.
 
-### Deprecated
-
 ### Removed
 - ChartGenerator Modul: Code that is no longer needed 
 - The following packages have been removed in CoSI:
     - jszip ^3.7.1
     - vue-chartjs ^5.3.1
-
-### Fixed
 
 ---
 
