@@ -57,7 +57,8 @@
                         "standardCharts": "Balken- / Linien- / Tortendiagramme erstellen",
                         "chartForMultipleRows": "Diagramm für ausgewählte Zeilen",
                         "correlationChart": "Korrelation / Streuungsdiagramm erstellen"
-                    }
+                    },
+                    "sumUpSelectedHint": "Es werden alle Kategorien aufsummiert, die oben unter \"Kategorie\" gefiltert sind. Bitte einen Namen vergeben."
                 }
             }
         }

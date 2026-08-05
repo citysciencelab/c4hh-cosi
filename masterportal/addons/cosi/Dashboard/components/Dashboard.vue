@@ -570,10 +570,19 @@ export default {
          * @returns {void}
          */
         onStartCalculation (calculationName, operation, category_A, category_B) {
-            const calcName = calculationName || getCalculationId({operation, category_A, category_B}),
+            const isSelectionOperation = operation === "sumUpSelected" || operation === "divideSelected",
                 field_A = this.items.find(item => item.category === category_A),
                 field_B = this.items.find(item => item.category === category_B),
-                selectedItems = this.selectedItems.length > 0 ? this.selectedItems : this.items;
+                // Selection based operations must only ever touch the categories the user
+                // filtered into the table - falling back to "all items" would silently sum
+                // every statistic in the dashboard.
+                fallbackItems = this.selectedItems.length > 0 ? this.selectedItems : this.items,
+                selectedItems = isSelectionOperation ? this.selectedItems : fallbackItems,
+                calcName = calculationName || getCalculationId({operation, category_A, category_B, selectedCategories: selectedItems.map(item => item.category)});
+
+            if (isSelectionOperation && selectedItems.length < 2) {
+                return;
+            }
 
             addCalculation.call(this, operation, {field_A, field_B, selectedItems}, calcName);
 

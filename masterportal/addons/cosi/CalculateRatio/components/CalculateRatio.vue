@@ -97,7 +97,7 @@ export default {
         ...mapGetters("Modules/Language", ["currentLocale"]),
         // ...mapGetters("Maps", ["getVisibleLayerList"]),
         ...mapGetters("Modules/CalculateRatio", Object.keys(getters)),
-        ...mapGetters("Modules/DistrictSelector", ["selectedDistrictLevel", "selectedFeatures", "label", "keyOfAttrName", "keyOfAttrNameStats", "loadend"]),
+        ...mapGetters("Modules/DistrictSelector", ["mapping", "selectedDistrictLevel", "selectedFeatures", "label", "keyOfAttrName", "keyOfAttrNameStats", "loadend"]),
         ...mapGetters("Modules/FeaturesList",
             {
             // facilitiesMapping: "mapping",
@@ -221,6 +221,16 @@ export default {
         },
         facilitiesMapping () {
             this.updateFacilities();
+        },
+        /**
+         * Picks up categories the user derived in the Dashboard while this tool was open.
+         * @returns {void}
+         */
+        mapping: {
+            handler () {
+                this.updateFeaturesList();
+            },
+            deep: true
         },
         filters () {
             this.prepareCoverage();
@@ -356,14 +366,23 @@ export default {
          * @returns {void}
          */
         async updateFeaturesList () {
-            const mappingJson = await getMappingJson();
+            // Prefer the DistrictSelector's live mapping over the static assets/mapping.json:
+            // it carries the same categories plus the ones the user derived in the Dashboard
+            // ("Berechnungen"), which are written to the districts' statFeatures and are therefore
+            // resolvable by getFeatureData().
+            const mappingJson = Array.isArray(this.mapping) && this.mapping.length > 0
+                ? this.mapping
+                : await getMappingJson();
 
             this.featuresList = [];
             this.featuresListNew = [];
 
             if (Array.isArray(mappingJson) && mappingJson.length > 0) {
                 mappingJson.forEach(attr => {
-                    if (attr[this.keyOfAttrNameStats] && attr.valueType === "absolute") {
+                    // Absolute values are the meaningful denominator for a supply ratio. Runtime
+                    // categories (isTemp) are offered regardless of valueType, because the user
+                    // defined them deliberately and knows their unit.
+                    if (attr[this.keyOfAttrNameStats] && (attr.valueType === "absolute" || attr.isTemp === true)) {
                         const findGrp = this.featuresList.find(el => el.title === attr.group);
 
                         if (findGrp) {

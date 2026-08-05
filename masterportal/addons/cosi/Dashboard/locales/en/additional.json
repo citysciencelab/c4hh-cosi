@@ -57,7 +57,8 @@
                         "standardCharts": "Create bar- / line- / pie chart",
                         "chartForMultipleRows": "Chart for selected rows",
                         "correlationChart": "Create correlation / scatter chart"
-                    }
+                    },
+                    "sumUpSelectedHint": "All categories currently filtered under \"Category\" above are summed up. Please provide a name."
                 }
             }
         }

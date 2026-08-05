@@ -941,7 +941,7 @@
     "stadtteil": "31240",
     "bezirk": "31271",
     "valueType": "relative",
-	  "calculation": {
+    "calculation": {
       "operation": "divide",
       "category_A": "Sozialversicherungspflichtig Beschäftigte",
       "category_B": "Bevölkerung 15 bis unter 65 Jahre",
@@ -1016,7 +1016,7 @@
     "stadtteil": "31240",
     "bezirk": "31271",
     "valueType": "relative",
-	  "calculation": {
+    "calculation": {
       "operation": "divide",
       "category_A": "Arbeitslose (SGB III + SGB II)",
       "category_B": "Bevölkerung 15 bis unter 65 Jahre",
@@ -1097,7 +1097,7 @@
     "stadtteil": "31240",
     "bezirk": "31271",
     "valueType": "relative",
-	"calculation": {
+    "calculation": {
       "operation": "divide",
       "category_A": "Arbeitslose im Rechtskreis SGB III",
       "category_B": "Bevölkerung 15 bis unter 65 Jahre",
@@ -1136,7 +1136,7 @@
     "stadtteil": "31240",
     "bezirk": "31271",
     "valueType": "relative",
-	  "calculation": {
+    "calculation": {
       "operation": "divide",
       "category_A": "Arbeitslose im Rechtskreis SGB II",
       "category_B": "Bevölkerung 15 bis unter 65 Jahre",
@@ -1193,7 +1193,7 @@
     "stadtteil": "31240",
     "bezirk": "31271",
     "valueType": "relative",
-	"calculation": {
+    "calculation": {
       "operation": "divide",
       "category_A": "Erwerbsfähige Leistungsempfänger/-innen nach SGB II",
       "category_B": "Bevölkerung 15 bis unter 65 Jahre",
@@ -1259,7 +1259,7 @@
     "stadtteil": "31240",
     "bezirk": "31271",
     "valueType": "relative",
-	  "calculation": {
+    "calculation": {
       "operation": "divide",
       "category_A": "Nicht erwerbsfähige Leistungsempfänger/-innen nach SGB II (überwiegend Kinder unter 15 Jahre)",
       "category_B": "Bevölkerung unter 15 Jahre",
@@ -2087,57 +2087,57 @@
   },
   {
     "category": "wanderungssaldo_u6",
-    "value": "Zu/Abwanderungen Familien",
+    "value": "Wanderungssaldo Familien mit Kindern unter 6 Jahren (je 100 Kinder u6)",
     "group": "Schulkennzahlen",
     "stat_gebiet": "31232",
     "stadtteil": "31240",
     "bezirk": "31271",
-    "valueType": "absolute"
+    "valueType": "relative"
   },
   {
     "category": "migrhintergrund_u3",
-    "value": "Kinder mit Migrationshintergund unter 3-Jährige",
+    "value": "Anteil Kinder mit Migrationshintergrund an den unter 3-Jährigen (in %)",
     "group": "Schulkennzahlen",
     "stat_gebiet": "31232",
     "stadtteil": "31240",
     "bezirk": "31271",
-    "valueType": "absolute"
+    "valueType": "relative"
   },
   {
     "category": "migrhintergrund_3_5",
-    "value": "Kinder mit Migrationshintergund 3 bis 5-Jährige",
+    "value": "Anteil Kinder mit Migrationshintergrund an den 3- bis 5-Jährigen (in %)",
     "group": "Schulkennzahlen",
     "stat_gebiet": "31232",
     "stadtteil": "31240",
     "bezirk": "31271",
-    "valueType": "absolute"
+    "valueType": "relative"
   },
   {
     "category": "migrhintergrund_6_9",
-    "value": "Kinder mit Migrationshintergund 6 bis 9-Jährige",
+    "value": "Anteil Kinder mit Migrationshintergrund an den 6- bis 9-Jährigen (in %)",
     "group": "Schulkennzahlen",
     "stat_gebiet": "31232",
     "stadtteil": "31240",
     "bezirk": "31271",
-    "valueType": "absolute"
+    "valueType": "relative"
   },
   {
     "category": "migrhintergrund_10_15",
-    "value": "Kinder mit Migrationshintergund 10 bis 15-Jährige",
+    "value": "Anteil Kinder mit Migrationshintergrund an den 10- bis 15-Jährigen (in %)",
     "group": "Schulkennzahlen",
     "stat_gebiet": "31232",
     "stadtteil": "31240",
     "bezirk": "31271",
-    "valueType": "absolute"
+    "valueType": "relative"
   },
   {
     "category": "migrhintergrund_u18",
-    "value": "Kinder mit Migrationshintergund unter 18-Jährige",
+    "value": "Anteil Kinder mit Migrationshintergrund an den unter 18-Jährigen (in %)",
     "group": "Schulkennzahlen",
     "stat_gebiet": "31232",
     "stadtteil": "31240",
     "bezirk": "31271",
-    "valueType": "absolute"
+    "valueType": "relative"
   },
   {
     "category": "nicht_dt_spr_kl1",
@@ -2150,39 +2150,39 @@
   },
   {
     "category": "alleinerz_u6",
-    "value": "Kinder Alleinerziehender unter 6-Jährige",
+    "value": "Anteil Kinder Alleinerziehender an den unter 6-Jährigen (in %)",
     "group": "Schulkennzahlen",
     "stat_gebiet": "31232",
     "stadtteil": "31240",
     "bezirk": "31271",
-    "valueType": "absolute"
+    "valueType": "relative"
   },
   {
     "category": "alleinerz_u10",
-    "value": "Kinder Alleinerziehender unter 10-Jährige",
+    "value": "Anteil Kinder Alleinerziehender an den unter 10-Jährigen (in %)",
     "group": "Schulkennzahlen",
     "stat_gebiet": "31232",
     "stadtteil": "31240",
     "bezirk": "31271",
-    "valueType": "absolute"
+    "valueType": "relative"
   },
   {
     "category": "alleinerz_u16",
-    "value": "Kinder Alleinerziehender unter 16-Jährige",
+    "value": "Anteil Kinder Alleinerziehender an den unter 16-Jährigen (in %)",
     "group": "Schulkennzahlen",
     "stat_gebiet": "31232",
     "stadtteil": "31240",
     "bezirk": "31271",
-    "valueType": "absolute"
+    "valueType": "relative"
   },
   {
     "category": "alleinerz_u18",
-    "value": "Kinder Alleinerziehender unter 18-Jährige",
+    "value": "Anteil Kinder Alleinerziehender an den unter 18-Jährigen (in %)",
     "group": "Schulkennzahlen",
     "stat_gebiet": "31232",
     "stadtteil": "31240",
     "bezirk": "31271",
-    "valueType": "absolute"
+    "valueType": "relative"
   },
   {
     "category": "anzahl_abschluss_bezug_osa",

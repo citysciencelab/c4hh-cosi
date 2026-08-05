@@ -60,7 +60,10 @@ const mutations = {
                 valueType: valueType,
                 isTemp: isTemp,
                 calculation: calculation,
-                ...Object.fromEntries(state.districtLevels.map(districtLevel => [districtLevel.stats.keyOfAttrName, true]))
+                // stats.keyOfAttrName is an array; the district level key is its first entry
+                // (see the keyOfAttrNameStats getter). Using the array itself would stringify
+                // it into a bogus key, hiding runtime categories from consumers such as CalculateRatio.
+                ...Object.fromEntries(state.districtLevels.map(districtLevel => [districtLevel.stats.keyOfAttrName[0], true]))
             });
         }
     },
