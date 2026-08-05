@@ -1,5 +1,7 @@
 <script>
 import getCswRecordById from "@shared/js/api/getCswRecordById.js";
+import {mapState} from "pinia";
+import {useCopyrightConstraintsStore} from "../store/copyrightConstraintsStore.js";
 import {mapGetters} from "vuex";
 
 /**
@@ -18,12 +20,14 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/CopyrightConstraints", [
+        ...mapState(useCopyrightConstraintsStore, [
             "cswUrl",
             "useLayerCswUrl"
         ]),
-        ...mapGetters(["visibleLayerConfigs"]),
-        getConstraints: function () {
+        ...mapGetters([
+            "visibleLayerConfigs"
+        ]),
+        getConstraints () {
             return this.constraints;
         }
     },

@@ -10,10 +10,14 @@
 ### Added
 - NavTab: Added styleVariant prop for more styling options.
 - i18next: added french language.
+- The following packages have been added:
+    - dependencies:
+        - "pinia": "^4.0.2"
 
 ### Changed
 - GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.
 - Filter: Snippet - DateRange. Replaced the native date inputs with vue-datepicker-next. Improved synchronization between datepicker and slider values so manually selected dates are preserved even when no exact value exists in initialDateRef. Added support for date, month, and year picker modes based on the configured format.
+- State management: Introduced Pinia alongside Vuex to support the gradual migration of module stores.
 
 ### Deprecated
 

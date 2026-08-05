@@ -66,7 +66,8 @@
     "vue-matomo": "^4.2.0",
     "vue-multiselect": "3.5.0",
     "vuedraggable": "^4.1.0",
-    "vuex": "^4.1.0"
+    "vuex": "^4.1.0",
+    "pinia": "^4.0.2"
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
