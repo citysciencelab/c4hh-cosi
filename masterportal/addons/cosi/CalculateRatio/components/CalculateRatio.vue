@@ -16,6 +16,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {exportAsGeoJson} from "../utils/exportResults.js";
 import getMappingJson from "../../utils/getMappingJson";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
+import {generateColorScale} from "../../utils/colorScale.js";
 import {getCenter} from "ol/extent";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import layerCollection from "@core/layers/js/layerCollection";
@@ -131,6 +132,35 @@ export default {
             }
 
             return options;
+        },
+
+        /**
+         * Colour ramp for the result set currently drawn on the map. Built from the same
+         * dataset and colour scheme the ColorCodeMap renders with, so the bar and the
+         * districts cannot drift apart. The map itself carries no legend for ratio data.
+         * @returns {Object|null} the css gradient plus its end labels, null if nothing is drawn.
+         */
+        mapLegend () {
+            if (!this.dataToColorCodeMap || this.colorCodeMapDataset.length === 0) {
+                return null;
+            }
+
+            const {legend} = generateColorScale(
+                    this.colorCodeMapDataset.map(entry => entry.data),
+                    this.$store.getters["Modules/ColorCodeMap/colorScheme"]
+                ),
+                values = legend?.values.filter(value => typeof value === "number") || [];
+
+            // a single district, or several with the same value, has no ramp to show
+            if (values.length < 2) {
+                return null;
+            }
+
+            return {
+                gradient: `linear-gradient(90deg, ${legend.colors.join(", ")})`,
+                low: values[0].toLocaleString("de-DE"),
+                high: values[values.length - 1].toLocaleString("de-DE")
+            };
         },
 
         /**
@@ -1000,6 +1030,18 @@ export default {
                         @click="loadToColorCodeMap()"
                     />
                 </div>
+                <div
+                    v-if="activeSet === index && mapLegend"
+                    class="ratio-legend d-flex align-items-center mb-3"
+                >
+                    <span>{{ mapLegend.low }}</span>
+                    <span
+                        class="ratio-legend__bar flex-grow-1 mx-2"
+                        :style="{background: mapLegend.gradient}"
+                    />
+                    <span>{{ mapLegend.high }}</span>
+                    <span class="ms-3 text-muted">{{ columnSelector.name }}</span>
+                </div>
                 <DataTable
                     v-if="tableOrChart === 'table' && activeSet === index"
                     class="mb-3"
@@ -1021,3 +1063,15 @@ export default {
         </ResultManagement>
     </div>
 </template>
+
+<style lang="scss" scoped>
+    .ratio-legend {
+        font-size: 12px;
+
+        .ratio-legend__bar {
+            height: 12px;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+        }
+    }
+</style>
