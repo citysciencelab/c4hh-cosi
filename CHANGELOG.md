@@ -4,8 +4,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-08-05 v3.25.0
 
 ### Added
 - Issue\#1604 Modules/Controls/Orientation: new parameter `showDirection` and `showAccuracy` configuration enable to display user orientation when they are moving and accuracy of location.
@@ -34,10 +33,6 @@
     - Excluded barchart and piechart tests due to issues with the prePushHook.
 - ResizeHandle: Simplified component by removing multi-directional resize infrastructure to support menu width resizing only (left/right positions).
 - Issue \#1641 : PortalFooter: The scaleline is displayed on mobile devices with a screen width of 320px or more.
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - Issue \#1522: Show publish date and creation date of metadata separately.
