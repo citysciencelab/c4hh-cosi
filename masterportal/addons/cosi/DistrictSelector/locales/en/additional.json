@@ -26,6 +26,7 @@
                 "populationProcessingFailed": "Population data could not be processed.",
                 "resetArea": "Reset Area",
                 "selectedAreas": "Selected Areas",
+                "statsLoadingFailed": "The following datasets could not be loaded for the \"{{level}}\" level: {{datasets}}. The affected statistics stay empty – the remaining data is complete.",
                 "statisticalData": "Statistical Data",
                 "subjectData": "Subject Data",
                 "tabLabelOne": "Areas for Statistical Data",

@@ -26,6 +26,7 @@
                   "populationProcessingFailed": "Die Einwohnerdaten konnten nicht korrekt verarbeitet werden.",
                   "resetArea": "Gebiet zurücksetzen",
                   "selectedAreas": "Ausgewählte Gebiete",
+                  "statsLoadingFailed": "Für die Ebene \"{{level}}\" konnten folgende Datensätze nicht geladen werden: {{datasets}}. Die betroffenen Kennzahlen bleiben leer – die übrigen Daten sind vollständig.",
                   "statisticalData": "Statistische Daten",
                   "subjectData": "Fachdaten",
                   "tabLabelOne": "Gebiete für Statistische Daten",
