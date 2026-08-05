@@ -125,6 +125,57 @@ const actions = {
                 district.setStyle(style);
             });
         }
+    },
+
+    /**
+     * Renders a Versorgungsanalyse result set on the district polygons.
+     * Lives in the store rather than in the component so that it does not depend on this
+     * tool's menu entry being open — the Versorgungsanalyse hands its result over from a
+     * different entry. This mirrors renderVisualization, which the Dashboard dispatches
+     * the same way.
+     * @param {Object} context the vuex context
+     * @param {Function} context.commit the commit function
+     * @param {Object} context.state the state of this module
+     * @param {Object} context.rootGetters the root getters
+     * @returns {void}
+     */
+    renderDataFromCalculateRatio ({commit, state, rootGetters}) {
+        const dataset = rootGetters["Modules/CalculateRatio/colorCodeMapDataset"],
+            keyOfAttrName = rootGetters["Modules/DistrictSelector/keyOfAttrName"],
+            colorScale = generateColorScale(dataset.map(entry => entry.data), state.colorScheme);
+
+        if (!state.visualizationState) {
+            commit("setVisualizationState", true);
+        }
+
+        rootGetters["Modules/DistrictSelector/selectedFeatures"].forEach(district => {
+            const styling = district.getStyle(),
+                match = dataset.find(entry => utils.unifyString(entry.name) === utils.unifyString(district.get(keyOfAttrName)));
+
+            if (!match) {
+                return;
+            }
+            const convertedColor = convertColor(colorScale.scale(match.data), "rgb");
+
+            styling.fill = new Fill({color: [...convertedColor, 0.75]});
+            styling.zIndex = 1;
+            styling.text = new Text({
+                font: "16px Calibri,sans-serif",
+                fill: new Fill({
+                    color: [255, 255, 255]
+                }),
+                stroke: new Stroke({
+                    color: [0, 0, 0],
+                    width: 3
+                }),
+                // the portal's locale is "" until the language menu has been opened once,
+                // and toLocaleString("") throws a RangeError that would abort the whole loop
+                text: match.data !== undefined ? parseFloat(match.data).toLocaleString("de-DE") : "",
+                overflow: true
+            });
+
+            district.setStyle(new Style(styling));
+        });
     }
 };
 

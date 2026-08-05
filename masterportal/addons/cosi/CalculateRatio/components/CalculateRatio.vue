@@ -257,9 +257,7 @@ export default {
 
             this.setResults(this.dataSets[newValue].results);
             this.setResultHeaders(this.dataSets[newValue].resultHeaders);
-            const data = this.getDataForColorCodeMap();
-
-            this.setColorCodeMapDataset(data);
+            this.updateColorCodeMap();
         },
         dataSets (newValue) {
             if (newValue.length === 0) {
@@ -273,9 +271,7 @@ export default {
          */
         columnSelector () {
             if (this.dataToColorCodeMap) {
-                const data = this.getDataForColorCodeMap();
-
-                this.setColorCodeMapDataset(data);
+                this.updateColorCodeMap();
             }
         },
 
@@ -285,9 +281,7 @@ export default {
          */
         selectedYear () {
             if (this.dataToColorCodeMap) {
-                const data = this.getDataForColorCodeMap();
-
-                this.setColorCodeMapDataset(data);
+                this.updateColorCodeMap();
             }
         }
     },
@@ -734,21 +728,38 @@ export default {
          * @returns {void}
          */
         loadToColorCodeMap () {
-            const switchVar = this.dataToColorCodeMap;
-
-            if (!switchVar) {
-                const data = this.getDataForColorCodeMap();
-
-                this.setColorCodeMapDataset(data);
-                this.setDataToColorCodeMap(!switchVar);
+            if (!this.dataToColorCodeMap) {
+                this.setDataToColorCodeMap(true);
+                this.updateColorCodeMap();
             }
             else {
-                this.setDataToColorCodeMap(!switchVar);
-
-                // The ColorCodeMap only reacts to this flag while its own menu entry is open,
-                // but the districts stay coloured either way — so reset them from here.
+                this.setDataToColorCodeMap(false);
                 this.$store.commit("Modules/ColorCodeMap/setVisualizationState", false);
                 this.$store.dispatch("Modules/ColorCodeMap/renderVisualization");
+            }
+        },
+
+        /**
+         * @description Picks the result column that is drawn on the map. The dropdown carries
+         * the display name only, so the column object is resolved from it here.
+         * @param {String} name display name of the column
+         * @returns {void}
+         */
+        selectColumn (name) {
+            this.columnSelector = this.availableColumns.find(column => column.name === name) || this.columnSelector;
+        },
+
+        /**
+         * @description Hands the active result set to the ColorCodeMap and redraws it.
+         * Both live in the ColorCodeMap's store, so this works whether or not that tool's
+         * menu entry is open — the same route the Dashboard takes for its row visualization.
+         * @returns {void}
+         */
+        updateColorCodeMap () {
+            this.setColorCodeMapDataset(this.getDataForColorCodeMap());
+
+            if (this.dataToColorCodeMap) {
+                this.$store.dispatch("Modules/ColorCodeMap/renderDataFromCalculateRatio");
             }
         },
 
@@ -949,24 +960,6 @@ export default {
                     :group="tableOrChart"
                     @show-view="value => tableOrChart = value"
                 />
-                <div class="d-flex flex-row align-items-center gap-3 mt-3 mb-1">
-                    <DropdownAutocomplete
-                        class="flex-grow-1"
-                        :items="availableColumns"
-                        item-title="name"
-                        :model-value="columnSelector"
-                        :label="$t('additional:modules.tools.cosi.calculateRatio.calculationType')"
-                        @update:model-value="value => columnSelector = value"
-                    />
-                    <FlatButton
-                        class="flex-shrink-0 mb-3"
-                        :icon="dataToColorCodeMap ? 'bi bi-map-fill' : 'bi bi-map'"
-                        :secondary="!dataToColorCodeMap"
-                        :text="$t('additional:modules.tools.cosi.calculateRatio.visualizeMap')"
-                        :title="$t('additional:modules.tools.cosi.calculateRatio.visualizeMap')"
-                        @click.native="loadToColorCodeMap()"
-                    />
-                </div>
             </template>
             <template #card>
                 <ul class="dropdown-menu">
@@ -987,6 +980,26 @@ export default {
                 </ul>
             </template>
             <template #after-card="{index}">
+                <div
+                    v-if="activeSet === index"
+                    class="d-flex flex-row align-items-center gap-3 mb-2"
+                >
+                    <DropdownAutocomplete
+                        class="flex-grow-1"
+                        :items="availableColumns.map(column => column.name)"
+                        :model-value="columnSelector.name"
+                        :label="$t('additional:modules.tools.cosi.calculateRatio.calculationType')"
+                        @update:model-value="selectColumn"
+                    />
+                    <FlatButton
+                        class="flex-shrink-0 mb-3"
+                        :icon="dataToColorCodeMap ? 'bi bi-map-fill' : 'bi bi-map'"
+                        :secondary="!dataToColorCodeMap"
+                        :text="$t('additional:modules.tools.cosi.calculateRatio.visualizeMap')"
+                        :title="$t('additional:modules.tools.cosi.calculateRatio.visualizeMap')"
+                        @click="loadToColorCodeMap()"
+                    />
+                </div>
                 <DataTable
                     v-if="tableOrChart === 'table' && activeSet === index"
                     class="mb-3"

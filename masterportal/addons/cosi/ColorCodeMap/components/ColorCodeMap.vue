@@ -5,12 +5,10 @@ import mutations from "../store/mutationsColorCodeMap";
 import actions from "../store/actionsColorCodeMap";
 import utils from "../../utils";
 import ColorCodeLegend from "./ColorCodeLegend.vue";
-import {Fill, Stroke, Style, Text} from "ol/style.js";
 import {generateColorScale} from "../../utils/colorScale.js";
 import groupMapping from "../../utils/groupMapping";
 import ChartDataset from "../../ChartGenerator/classes/ChartDataset";
 import {mapDistrictNames} from "../../DistrictSelector/utils/prepareDistrictLevels";
-import {convertColor} from "@shared/js/utils/convertColor";
 
 export default {
     name: "ColorCodeMap",
@@ -27,8 +25,6 @@ export default {
             colorScale: [],
             // Saves the last year when user changes year manually.
             // lastYear: null,
-            // Saves riginal Map Styling before ColorCodeMap changes stylingmodule namespace not found in mapGetters()
-            originalStyling: null,
             // Highest Value of selected feature among all selected districts
             hiVal: null,
             // Lowest Value of selected feature among all selected districts
@@ -116,19 +112,8 @@ export default {
                 this.animationOverYears(this.playSpeed);
             }
         },
-        dataToColorCodeMap (newState) {
-            if (newState) {
-                this.renderDataFromCalculateRatio();
-            }
-            else {
-                this.setVisualizationState(false);
-            }
-        },
-        colorCodeMapDataset () {
-            if (this.dataToColorCodeMap) {
-                this.renderDataFromCalculateRatio();
-            }
-        },
+        // no watchers on dataToColorCodeMap / colorCodeMapDataset: the Versorgungsanalyse
+        // dispatches the rendering itself, so it no longer depends on this component existing
         selectedFeature () {
             this.generateGraphData();
             this.renderVisualization();
@@ -142,13 +127,6 @@ export default {
     },
     mounted () {
         this.applyTranslationKey(this.name);
-
-        // This tool only exists while its menu entry is open, but the Versorgungsanalyse
-        // hands its result over from another entry. Without this the data would sit in the
-        // store unrendered, because only the watchers above ever draw it.
-        if (this.dataToColorCodeMap && this.colorCodeMapDataset.length > 0) {
-            this.renderDataFromCalculateRatio();
-        }
     },
     methods: {
         ...mapActions("Modules/ColorCodeMap", Object.keys(actions)),
@@ -222,56 +200,6 @@ export default {
             }
         },
 
-        /**
-         * @todo Generate Dynamic Legend for incoming data from CalculateRatio Component.
-         * @description Renders data on map from CalculateRatio Component.
-         * @returns {void}
-         */
-        renderDataFromCalculateRatio () {
-            if (!this.visualizationState) {
-                this.setVisualizationState(true);
-            }
-
-            const resultValues = this.colorCodeMapDataset.map(x => {
-                return x.data;
-            });
-
-            this.colorScale = this.getColorsByValues(resultValues);
-
-            // todo generate Legend for CC Data
-            this.selectedFeatures.forEach(district => {
-                const getStyling = district.getStyle(),
-                    matchResults = this.colorCodeMapDataset.find(x => utils.unifyString(x.name) === utils.unifyString(district.get(this.keyOfAttrName)));
-
-                if (matchResults) {
-                    if (this.originalStyling === null) {
-                        this.originalStyling = getStyling;
-                    }
-                    const convertedColor = convertColor(this.colorScale.scale(matchResults.data), "rgb");
-
-                    getStyling.fill = new Fill({color: [...convertedColor, 0.75]});
-                    getStyling.zIndex = 1;
-                    getStyling.text = new Text({
-                        font: "16px Calibri,sans-serif",
-                        fill: new Fill({
-                            color: [255, 255, 255]
-                        }),
-                        stroke: new Stroke({
-                            color: [0, 0, 0],
-                            width: 3
-                        }),
-                        // currentLocale stays "" until the language menu has been opened once,
-                        // and toLocaleString("") throws a RangeError that aborts the whole
-                        // rendering loop — the districts then keep their original style
-                        text: matchResults.data !== undefined ? parseFloat(matchResults.data).toLocaleString(this.currentLocale || "de-DE") : this.$t("additional:modules.tools.colorCodeMap.noData"),
-                        overflow: true
-                    });
-
-                    district.setStyle(new Style(getStyling));
-                }
-
-            });
-        },
         /**
          * @description Calculate dynamic colors for Array based on its values.
          * @param {*} values Array of ints.
