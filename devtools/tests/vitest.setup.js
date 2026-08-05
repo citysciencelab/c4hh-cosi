@@ -16,6 +16,7 @@ import {
     test as vitestTest,
     it as vitestIt
 } from "vitest";
+import {createChartJsMockModule, createChartJsAutoMockModule} from "./chartMocks.js";
 
 // Enable auto-unmount once
 if (!globalThis.__vitest_auto_unmount_initialized__) {
@@ -111,6 +112,9 @@ vi.mock("i18next", () => {
         default: i18nextMock
     };
 });
+
+vi.mock("chart.js", () => createChartJsMockModule());
+vi.mock("chart.js/auto", () => createChartJsAutoMockModule());
 
 // Provide a deterministic draggable stub for jsdom tests.
 // The real vuedraggable bundle touches document.currentScript at import-time.
@@ -210,10 +214,8 @@ if (typeof window !== "undefined") {
     }));
 }
 
-// Cesium and Chart.js mocks are in separate opt-in files:
-// - devtools/tests/cesiumMocks.js (for Cesium/OLCS/widgets)
-// - devtools/tests/chartMocks.js (for Chart.js)
-// Import them only in the spec files that need them.
+// Cesium mocks remain opt-in in devtools/tests/cesiumMocks.js.
+// Chart.js is mocked globally because the test runner uses shared module state.
 
 /**
  * Wraps Vitest test functions to support legacy done-callback tests.

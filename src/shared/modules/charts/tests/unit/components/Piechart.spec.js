@@ -1,8 +1,8 @@
 import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import "../../../../../../../devtools/tests/chartMocks.js";
-import ChartJs from "chart.js/auto";
 import {nextTick} from "vue";
+
+import ChartJs from "chart.js/auto";
 import PiechartItem from "@shared/modules/charts/components/PiechartItem.vue";
 
 
@@ -12,7 +12,7 @@ describe("src/share-components/charts/components/PiechartItem.vue", () => {
 
     beforeEach(() => {
         wrapper = shallowMount(PiechartItem, {
-            propsData: {
+            props: {
                 data: {
                     labels: [],
                     datasets: []
@@ -21,7 +21,7 @@ describe("src/share-components/charts/components/PiechartItem.vue", () => {
             }
         });
         doughnut = shallowMount(PiechartItem, {
-            propsData: {
+            props: {
                 data: {
                     labels: [],
                     datasets: []
@@ -33,7 +33,6 @@ describe("src/share-components/charts/components/PiechartItem.vue", () => {
     });
 
     afterEach(() => {
-        wrapper.unmount();
         doughnut.unmount();
     });
 

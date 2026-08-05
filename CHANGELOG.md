@@ -28,6 +28,7 @@
 - Issue \#1625: Fixed using configured styleId when mousehover on vectorlayers.
 - FileImport: importDrawLayer reappears in the layer tree when importing a file, even after being removed.
 - SearchBar: Fixed misaligned action icons in "Show all" results for street searches.
+- Fixed chart.js mocking and reestablished the formerly excluded barchart- and piechart-tests.
 
 ---
 

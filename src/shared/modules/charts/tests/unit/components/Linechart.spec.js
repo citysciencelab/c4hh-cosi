@@ -1,8 +1,8 @@
 import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import "../../../../../../../devtools/tests/chartMocks.js";
 import sinon from "sinon";
 import {nextTick} from "vue";
+
 import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 
 
