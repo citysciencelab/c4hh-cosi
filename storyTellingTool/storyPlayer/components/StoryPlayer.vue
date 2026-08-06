@@ -6,6 +6,7 @@ import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import {getDirectVideo, getEmbedLink} from "../../shared/utils/video.js";
+import LayerGroup from "ol/layer/Group.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
@@ -64,6 +65,7 @@ export default {
             "addLayerButton",
             "allLayerConfigs",
             "controlsConfig",
+            "layerConfigsByAttributes",
             "layerConfigById",
             "visibleBaselayerConfigs"
         ]),
@@ -255,14 +257,29 @@ export default {
             const layers = mapCollection.getMap("2D")?.getLayers(),
                   visibleLayerList = typeof layers?.getArray !== "function" ? [] : layers.getArray().filter(layer => {
                       return layer.getVisible() === true && layer.get("name") !== "markerPoint" && layer.get("name") !== "markerPolygon" && layer.get("id") !== this.visibleBaselayerConfigs[0]?.id;
-                  });
+                  }),
+                  groupLayers = this.layerConfigsByAttributes({typ: "GROUP"});
 
             visibleLayerList.forEach(layer => {
                 if (!this.addLayerButton.active) {
-                    this.addOrReplaceLayer({
-                        layerId: layer.get("id"),
-                        visibility: false
-                    });
+                    if (layer instanceof LayerGroup) {
+                        const childrenId = layer.getSource().map(childLayer => childLayer.get("id"));
+
+                        groupLayers.forEach(groupLayer => {
+                            if (groupLayer?.children.some(childlayer => childrenId.includes(childlayer.id))) {
+                                this.addOrReplaceLayer({
+                                    layerId: groupLayer.id,
+                                    visibility: false
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        this.addOrReplaceLayer({
+                            layerId: layer.get("id"),
+                            visibility: false
+                        });
+                    }
                 }
                 else {
                     const layerConf = this.layerConfigById(layer.get("id"));
@@ -329,28 +346,53 @@ export default {
             }
         },
         /**
-         * Enables a layer on the map
-         * @param {String} layerId the layer id to enable
+         * Enables a layer or group layer on the map
+         * @param {StringString[]} id the layer id(s) to enable
          * @returns {void}
          */
-        async enableLayer (layerId) {
-            let layerConf = this.layerConfigById(layerId);
-
-            if (!layerConf) {
-                layerConf = getAndMergeAllRawLayers().find(layer => layer.id === layerId);
-
-                if (layerConf) {
-                    await this.addLayerToLayerConfig({layerConfig: layerConf});
-                }
+        async enableLayer (id) {
+            if (typeof id !== "string" && (!Array.isArray(id) || !id.length)) {
+                return;
             }
 
-            if (layerConf) {
-                this.addOrReplaceLayer({
-                    layerId: layerId,
-                    visibility: true,
-                    showInLayerTree: true
-                });
-            }
+            const layerIds = typeof id === "string" ? [id] : id;
+
+            await Promise.all(
+                layerIds.map(async (layerId) => {
+                    let layerConf = this.layerConfigById(layerId);
+
+                    if (!layerConf) {
+                        const groupLayers = this.layerConfigsByAttributes({typ: "GROUP"});
+
+                        if (groupLayers.length) {
+                            groupLayers.forEach(groupLayer => {
+                                if (groupLayer?.children.some(layer => layer.id === layerId)) {
+                                    this.addOrReplaceLayer({
+                                        layerId: groupLayer.id,
+                                        visibility: true,
+                                        showInLayerTree: true
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            layerConf = getAndMergeAllRawLayers().find(layer => layer.id === layerId);
+
+                            if (layerConf) {
+                                this.addLayerToLayerConfig({layerConfig: layerConf});
+                            }
+                        }
+                    }
+
+                    if (layerConf) {
+                        this.addOrReplaceLayer({
+                            layerId: layerId,
+                            visibility: true,
+                            showInLayerTree: true
+                        });
+                    }
+                })
+            );
         },
         /**
          * Sets up the tool window and content for the selected chapter.

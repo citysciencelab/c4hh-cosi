@@ -222,7 +222,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 addLayerButton: () => sinon.stub(),
                 allLayerConfigs: () => [],
                 configJs: state => state.configJs,
-                layerConfigsByAttributes: () => [],
+                layerConfigsByAttributes: () => () => [],
                 layerConfigById: () => (id) => {
                     if (id === "1") {
                         return "conf";
@@ -485,11 +485,48 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             resetMenuStub.restore();
         });
 
-        it("should in enableLayer to call addLayerToLayerConfig and addOrReplaceLayer", async () => {
+        it("should not in enableLayer to call addLayerToLayerConfig and addOrReplaceLayer", async () => {
+            const addOrReplaceLayerStub = sinon.stub(wrapper.vm, "addOrReplaceLayer"),
+                addLayerToLayerConfigStub = sinon.stub(wrapper.vm, "addLayerToLayerConfig");
+
+            await wrapper.vm.enableLayer(null);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            await wrapper.vm.enableLayer(false);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            await wrapper.vm.enableLayer(0);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            await wrapper.vm.enableLayer({});
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            await wrapper.vm.enableLayer([]);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            await wrapper.vm.enableLayer(undefined);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            addOrReplaceLayerStub.restore();
+            addLayerToLayerConfigStub.restore();
+        });
+
+        it("should in enableLayer to call addLayerToLayerConfig and addOrReplaceLayer if the id is a string", async () => {
             const addOrReplaceLayerStub = sinon.stub(wrapper.vm, "addOrReplaceLayer"),
                 addLayerToLayerConfigStub = sinon.stub(wrapper.vm, "addLayerToLayerConfig");
 
             await wrapper.vm.enableLayer("1");
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.true;
+            addOrReplaceLayerStub.restore();
+            addLayerToLayerConfigStub.restore();
+        });
+
+        it("should in enableLayer to call addLayerToLayerConfig and addOrReplaceLayer if the id is an array", async () => {
+            const addOrReplaceLayerStub = sinon.stub(wrapper.vm, "addOrReplaceLayer"),
+                addLayerToLayerConfigStub = sinon.stub(wrapper.vm, "addLayerToLayerConfig");
+
+            await wrapper.vm.enableLayer(["1", "2"]);
             expect(addLayerToLayerConfigStub.called).to.be.false;
             expect(addOrReplaceLayerStub.called).to.be.true;
             addOrReplaceLayerStub.restore();
