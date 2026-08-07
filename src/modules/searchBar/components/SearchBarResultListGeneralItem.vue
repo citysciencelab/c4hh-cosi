@@ -42,10 +42,10 @@ export default {
 
 <template lang="html">
     <div :id="'search-bar-result-list-general-item' + searchResult.id">
-        <div class="d-flex flex-row bd-highlight bold">
+        <div class="d-flex flex-row align-items-center bold search-bar-result-list-general-row">
             <button
                 type="button"
-                class="btn btn-light d-flex"
+                class="btn btn-light d-flex search-bar-result-list-general-item-button"
                 :title="searchResult.toolTip ? searchResult.toolTip : searchResult.name"
                 :aria-label="searchResult.toolTip ? searchResult.toolTip : searchResult.name"
                 @click="handleClick"
@@ -63,7 +63,7 @@ export default {
                     {{ searchResult.name }}
                 </span>
             </button>
-            <div class="ms-auto mt-1 d-flex">
+            <div class="d-flex search-bar-result-list-general-actions">
                 <div
                     v-for="(action, i) in Object.keys(actions)"
                     :key="i"
@@ -80,18 +80,33 @@ export default {
 
 <style lang="scss" scoped>
 
+.search-bar-result-list-general-row {
+    width: 100%;
+}
+
+
 .btn {
     align-items: center;
     justify-content: left;
     white-space: nowrap;
     min-height: 2.5rem;
-    width: 80%;
+    width: 100%;
 
     .btn-title {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
+}
+
+.search-bar-result-list-general-item-button {
+    min-width: 0;
+}
+
+.search-bar-result-list-general-actions {
+    flex-shrink: 0;
+    align-items: center;
+    margin-left: 0.5rem;
 }
 
 .search-bar-result-list-general-image{

@@ -20,6 +20,7 @@
 ### Fixed
 - Issue \#1624: Fixed misleading parameter in config.js.md
 - FileImport: importDrawLayer reappears in the layer tree when importing a file, even after being removed.
+- SearchBar: Fixed misaligned action icons in "Show all" results for street searches.
 
 ---
 
