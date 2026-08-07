@@ -48,7 +48,7 @@ export default {
 
                 sortedSimulations.forEach(([simulationId, simulation]) => {
                     const listEntry = {
-                        scenarioName: scenario.name,
+                        scenarioName: this.$t(scenario.name),
                         scenarioId: scenario.id,
                         simulationId: simulationId,
                         simulationName: simulation.name

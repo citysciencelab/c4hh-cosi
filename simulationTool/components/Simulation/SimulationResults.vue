@@ -265,14 +265,40 @@ export default {
         });
     },
     methods: {
-        ...mapActions("Modules/SimulationTool", ["updateFeatures", "zoomToFeature"]),
+        ...mapActions("Modules/SimulationTool", [
+            "deleteSimulationFromPlanningScenario",
+            "updateFeatures",
+            "zoomToFeature"
+        ]),
         ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
         ...mapActions("Menu", ["changeCurrentComponent", "toggleMenu"]),
         ...mapActions(["addLayerToLayerConfig"]),
         ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
         ...mapMutations("Modules/SimulationTool", [
-            "setMode"
+            "setMode",
+            "setSimulationIdForResults"
         ]),
+
+        /**
+         * Deletes the current simulation and returns to simulation list.
+         * @returns {Promise<void>}
+         */
+        async deleteCurrentSimulation () {
+            const scenarioId = this.currentPlanningScenario?.id;
+            const simulationId = this.simulationIdForResults;
+
+            if (typeof scenarioId !== "string" || typeof simulationId !== "string") {
+                return;
+            }
+
+            await this.deleteSimulationFromPlanningScenario({
+                scenarioId,
+                simulationId
+            });
+
+            this.setSimulationIdForResults("");
+            this.setMode("simulationList");
+        },
 
         /**
          * Filters outputs to exclude those marked with hide: true in the simulation config.
@@ -1108,6 +1134,14 @@ export default {
                         :aria-label="$t('additional:modules.tools.simulationTool.showProperties')"
                         :text="$t('additional:modules.tools.simulationTool.showProperties')"
                         @click="() => setMode('simulationParameter')"
+                    />
+                    <FlatButton
+                        id="delete-simulation"
+                        secondary
+                        :icon="'bi bi-trash'"
+                        :aria-label="'löschen'"
+                        :text="'löschen'"
+                        @click="deleteCurrentSimulation"
                     />
                     <!-- If print module is available, show print button -->
                     <!--<FlatButton

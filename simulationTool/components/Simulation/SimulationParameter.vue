@@ -11,7 +11,6 @@ import InputText from "../../../../src/shared/modules/inputs/components/InputTex
 import isObject from "../../../../src/shared/js/utils/isObject.js";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
-import deserializeFlatGeobufToGeoJsonFeatureCollection from "../../js/deserializeFlatGeobufToGeoJsonFeatureCollection.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import OgcApiProcess from "../../js/ogcApiProcess.js";
@@ -19,8 +18,7 @@ import SectionHeader from "../SectionHeader.vue";
 import SpinnerItem from "../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 import SwitchInput from "../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 import {infrastructureLayerId} from "../../layerIds.js";
-
-/** @typedef {import("../../types/ogcApi.processes.d.ts").Results} OGCApiProcessesResults */
+import {upsertPlanningScenarioInIndexedDb} from "../../js/planningScenariosIndexedDb.js";
 
 const geoJson = new GeoJSON();
 
@@ -59,6 +57,7 @@ export default {
             "currentPlanningScenarioId",
             "planningScenarios",
             "previousComponentOfSimulation",
+            "shouldSaveSimulations",
             "simulations"
         ]),
         ...mapGetters("Modules/Login", ["accessToken"]),
@@ -270,6 +269,7 @@ export default {
         ...mapActions("Modules/SimulationTool", [
             "addFile",
             "jobStatusChanged",
+            "pollAndAssignSimulationJobsResults",
             "updateFeatures",
             "zoomToFeature"
         ]),
@@ -600,17 +600,6 @@ export default {
         },
 
         /**
-         * Event handler for progress update of the simulation.
-         * @param {Object} jobStatus The job status object.
-         * @param {Object} job The job object.
-         * @returns {void}
-         */
-        onProgressUpdate (jobStatus, job) {
-            job.jobStatus = jobStatus;
-            this.jobStatusChanged();
-        },
-
-        /**
          * Called when user drops a file in the upload container
          * @param {HTMLInputEvent} e event with the files
          * @returns {void}
@@ -667,35 +656,6 @@ export default {
                 return false;
             }
             return true;
-        },
-
-        /**
-         * Converts only FlatGeobuf outputs in job results into GeoJSON feature collections.
-         * Non-FlatGeobuf outputs are returned unchanged.
-         * @param {OGCApiProcessesResults} jobResults The job results from the backend.
-         * @returns {Promise<OGCApiProcessesResults>} The normalized job results.
-         */
-        async convertFlatGeobufOutputsIfNeeded (jobResults) {
-            if (!isObject(jobResults)) {
-                return jobResults;
-            }
-
-            const convertedResults = {...jobResults};
-
-            await Promise.all(Object.entries(convertedResults).map(async ([outputKey, outputValue]) => {
-                const outputMediaType = this.simulation?.outputs?.[outputKey]?.value?.format?.mediaType;
-
-                if (outputMediaType === "application/flatgeobuf") {
-                    const deserializedResult = await deserializeFlatGeobufToGeoJsonFeatureCollection(outputValue);
-
-                    convertedResults[outputKey] = deserializedResult ?? outputValue;
-                    return;
-                }
-
-                convertedResults[outputKey] = outputValue;
-            }));
-
-            return convertedResults;
         },
 
         /**
@@ -947,20 +907,27 @@ export default {
 
             newSimulation.jobs = Object.fromEntries(jobIDs.map(ID => [ID, {}]));
 
-            for (const [index, job] of Object.values(newSimulation.jobs).entries()) {
+            Object.values(newSimulation.jobs).forEach((job, index) => {
                 job.requestBody = JSON.parse(JSON.stringify(this.requestBodies[index]));
                 job.jobStatus = {status: initialStatuses[index]};
                 job.resultStyle = this.simulation.processes[index].resultStyle;
-                const jobResults = await this.processHandlers[index].pollJobStatusAndGetResults(
-                    this.accessToken,
-                    jobIDs[index],
-                    this.simulation.processes[index].pollingInterval,
-                    jobStatus => this.onProgressUpdate(jobStatus, job)
-                );
-                const normalizedJobResults = await this.convertFlatGeobufOutputsIfNeeded(jobResults);
+            });
 
-                job.jobResults = normalizedJobResults;
-                this.jobStatusChanged();
+            this.jobStatusChanged();
+
+            if (this.shouldSaveSimulations) {
+                await upsertPlanningScenarioInIndexedDb(scenario);
+            }
+
+            await this.pollAndAssignSimulationJobsResults({
+                jobs: Object.values(newSimulation.jobs),
+                jobIds: jobIDs,
+                processConfigs: this.simulation.processes,
+                simulationConfig: this.simulation
+            });
+
+            if (this.shouldSaveSimulations) {
+                await upsertPlanningScenarioInIndexedDb(scenario);
             }
         },
 
