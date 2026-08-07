@@ -222,6 +222,7 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 addLayerButton: () => sinon.stub(),
                 allLayerConfigs: () => [],
                 configJs: state => state.configJs,
+                layerConfig: () => sinon.stub(),
                 layerConfigsByAttributes: () => () => [],
                 layerConfigById: () => (id) => {
                     if (id === "1") {

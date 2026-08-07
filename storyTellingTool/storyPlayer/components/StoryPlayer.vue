@@ -14,6 +14,7 @@ import Overlay from "ol/Overlay.js";
 import StoryPlayerFeature from "./StoryPlayerFeature.vue";
 import StoryPlayerToolbar from "./StoryPlayerToolbar.vue";
 import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/tipTapJsonToHtml";
+import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 
 export default {
     name: "StoryPlayer",
@@ -65,8 +66,9 @@ export default {
             "addLayerButton",
             "allLayerConfigs",
             "controlsConfig",
-            "layerConfigsByAttributes",
+            "layerConfig",
             "layerConfigById",
+            "layerConfigsByAttributes",
             "visibleBaselayerConfigs"
         ]),
         ...mapGetters("Maps", ["mode"]),
@@ -177,10 +179,20 @@ export default {
 
             toolBody.scrollTop = 0;
         }
+
         this.deactivateSubjectLayer();
+
         if (!this.addLayerButton?.active) {
             this.updateLayerConfigs(this.originalLayerConfig);
         }
+        else {
+            this.allLayerConfigs.forEach(each => {
+                if (!this.originalLayerConfig.some(oriLayer => oriLayer.id === each.id)) {
+                    this.removeLayerFromLayerConfig(each.id);
+                }
+            });
+        }
+
         this.deactivateTool();
         this.closePopup();
         this.setToNorth();
@@ -200,9 +212,10 @@ export default {
             "setStoryConf",
             "setMode"
         ]),
+        ...mapMutations("Menu", ["setExpandedBySide"]),
+        ...mapMutations(["setLayerConfigByParentKey"]),
         ...mapActions("Alerting", ["addSingleAlert"]),
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
-        ...mapMutations("Menu", ["setExpandedBySide"]),
         ...mapActions("Maps", ["changeMapMode", "placingPointMarker", "removePointMarker", "zoomToExtent"]),
         ...mapActions(["addLayerToLayerConfig", "addOrReplaceLayer", "replaceByIdInLayerConfig", "updateLayerConfigs"]),
         ...mapActions("Menu", ["changeCurrentComponent", "resetMenu"]),
@@ -563,6 +576,18 @@ export default {
 
             mapCollection.getMap("2D").addOverlay(this.overlay);
             this.overlay.setPosition(val?.coordinate);
+        },
+        /**
+         * Removes the layer from layer config from id.
+         * @param {String} layerId - The layer id.
+         * @returns {void}
+         */
+        removeLayerFromLayerConfig (layerId) {
+            if (this.layerConfig?.[treeSubjectsKey]) {
+                const layerConfig = this.layerConfig[treeSubjectsKey].elements.filter(element => element.id !== layerId);
+
+                this.setLayerConfigByParentKey({layerConfigs: {elements: layerConfig}, parentKey: treeSubjectsKey});
+            }
         },
         /**
          * Scrolls the step into view
