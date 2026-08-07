@@ -74,7 +74,7 @@ const state = {
     filterGeometry: false,
     geometryFeature: undefined,
     jumpToId: undefined,
-    hasMouseMapInteractions: true,
+    hasMouseMapInteractions: false,
     neededUrlParams: ["rulesOfFilters", "selectedAccordions", "selectedGroups"],
     urlParams: "",
     closeGfi: false,
