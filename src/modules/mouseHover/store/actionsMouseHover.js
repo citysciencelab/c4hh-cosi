@@ -110,12 +110,12 @@ export default {
         }));
     },
     /**
-     * Highlights the given feeature depending on the geometry type by dispatching "Maps/highlightFeature".
+     * Highlights the given feature depending on the geometry type by dispatching "Maps/highlightFeature".
      * @param {Object} context the context
      * @param {Object} context.dispatch the dispatch
      * @param {Object} context.state the state
      * @param {Object} payload the state
-     * @param {Object} payload.feature openlayers feature to hioghlight
+     * @param {Object} payload.feature openlayers feature to highlight
      * @param {Object} payload.layer openlayers layer og the feature
      * @returns {void}
      */
@@ -138,6 +138,7 @@ export default {
         if (featureGeometryType === "LineString" || featureGeometryType === "MultiLineString") {
             highlightObject.type = "highlightLine";
         }
+        layer.id = layer.get("id");
         highlightObject.zoomLevel = styleObj.zoomLevel;
         if (rawLayer && rawLayer.styleId) {
             highlightObject.styleId = rawLayer.styleId;
