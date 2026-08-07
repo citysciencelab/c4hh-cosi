@@ -7,7 +7,7 @@ describe("addons/gfiThemes/waterStatistics/components/WaterStatistics.vue", () =
 
     beforeEach(() => {
         wrapper = shallowMount(WaterStatistics, {
-            propsData: {
+            props: {
                 feature: {
                     getMappedProperties: function () {
                         return {

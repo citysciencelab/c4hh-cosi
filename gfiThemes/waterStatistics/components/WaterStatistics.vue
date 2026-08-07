@@ -1,6 +1,13 @@
 <script>
+import TabContainer from "@shared/modules/tabs/components/TabContainer.vue";
+import TabBasicData from "./TabBasicData.vue";
+import TabGraphics from "./TabGraphics.vue";
+
 export default {
     name: "WaterStatistics",
+    components: {
+        TabContainer
+    },
     props: {
         feature: {
             type: Object,
@@ -8,6 +15,28 @@ export default {
         }
     },
     computed: {
+        tabs () {
+            return [
+                {
+                    id: "tabBasicData",
+                    contentId: "tabBasicDataContent",
+                    ref: "tabBasicData",
+                    label: this.$t("additional:addons.gfiThemes.waterStatistics.tabs.tabBasicData.label"),
+                    component: TabBasicData,
+                    propsForTabContent: {attributes: this.attributes, params: this.params},
+                    renderComponent: true
+                },
+                {
+                    id: "tabGraphics",
+                    contentId: "tabGraphicsContent",
+                    ref: "tabGraphics",
+                    label: this.$t("additional:addons.gfiThemes.waterStatistics.tabs.tabGraphics.label"),
+                    component: TabGraphics,
+                    propsForTabContent: {attributes: this.attributes, params: this.params},
+                    renderComponent: true
+                }
+            ];
+        },
         attributes () {
             return this.feature.getMappedProperties();
         },
@@ -20,9 +49,11 @@ export default {
 
 <template>
     <div class="water-statistics-theme">
-        {{ attributes }}
-
-        {{ params }}
+        <TabContainer
+            ref="tabContainer"
+            :tabs="tabs"
+            initial-active-tab-id="tabBasicData"
+        />
     </div>
 </template>
 

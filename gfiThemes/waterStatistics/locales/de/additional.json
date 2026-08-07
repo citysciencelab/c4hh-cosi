@@ -2,7 +2,15 @@
     "addons": {
         "gfiThemes": {
             "waterStatistics": {
-                "title": "Grundwassermessstellen"
+                "title": "Grundwassermessstellen",
+                "tabs": {
+                    "tabBasicData": {
+                        "label": "Grunddaten"
+                    },
+                    "tabGraphics": {
+                        "label": "Grafiken"
+                    }
+                }
             }
         }
     }

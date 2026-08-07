@@ -2,7 +2,15 @@
     "addons": {
         "gfiThemes": {
             "waterStatistics": {
-                "title": "Groundwater Monitoring Stations"
+                "title": "Groundwater Monitoring Stations",
+                "tabs": {
+                    "tabBasicData": {
+                        "label": "Basic Data"
+                    },
+                    "tabGraphics": {
+                        "label": "Graphics"
+                    }
+                }
             }
         }
     }
