@@ -9,6 +9,7 @@
 
 ### Added
 - NavTab: Added styleVariant prop for more styling options.
+- i18next: added french language.
 
 ### Changed
 - GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.
@@ -36,7 +37,6 @@
 - Login: Added new config.js parameter `includeCredentials`. If set to false, intercepted requests still get the Authorization header but do not send credentials (cookies), which can help prevent CORS errors.
 - NavTab: Added slot to display optional content (e.g. badges, counts) after the label.
 - SearchBar: Added new `searchInterfaceCsw` to search records of a CSW catalog.
-
 
 ### Changed
 - FeatureLister: Replaced the module-specific navigation tabs with the shared NavTab component.
