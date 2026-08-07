@@ -106,5 +106,19 @@ All other rules from the root config still apply: `no-console` (warn/error only)
 
 ---
 
+## Function Length & Review Guardrails
+
+For addons, apply the global function-size and complexity guardrails from `.github/copilot-instructions.md`.
+
+Addon-specific emphasis:
+
+- Keep feature logic split from portal integration glue code
+- Prefer small helpers in `addons/{name}/js/` when functions start mixing validation, mapping, and side effects
+- Use review comments to justify exceptional long functions when refactoring would reduce clarity
+
+These are review criteria (not lint errors).
+
+---
+
 ## Changelog
 Addon changes go into `addons/CHANGELOG.md` under `## Unreleased` (separate from the root `CHANGELOG.md`), using: `Added`, `Changed`, `Deprecated`, `Removed`, `Fixed`.

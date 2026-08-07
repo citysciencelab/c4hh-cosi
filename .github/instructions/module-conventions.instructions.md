@@ -127,6 +127,16 @@ function formatCoordinate (lon, lat) {
 
 When `@returns` is not `void`, always include a description of what is returned.
 
+## Function Length & Responsibility
+
+For modules, apply the global function-size and complexity guardrails from `.github/copilot-instructions.md`.
+
+Module-specific emphasis:
+
+- Prefer one responsibility per function and extract helpers when logic naturally separates
+- Keep helper functions close to usage: start module-local in `src/modules/{moduleName}/js/` (or in the local store file when tightly coupled), and move to `src/shared/js/utils/` once logic is reused across modules
+- Treat large action functions as refactoring candidates early to keep tests focused and readable
+
 ## Internationalization (A.7)
 
 Never hardcode user-visible text. Use i18n keys only:

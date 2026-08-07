@@ -98,6 +98,15 @@ Prefer the path aliases (`@appstore`, `@shared`, `@core`, `@modules`, `@plugins`
 - Stroustrup brace style: opening `{` on the same line as the statement, closing `}` on its own line, `else`/`catch` on the line **after** `}` — never `} else {` on the same line
 - Double-quoted strings (`@stylistic/quotes` defaults to `"double"`), semicolons required, file must end with a newline
 
+### Function Size & Complexity Guardrails (for coding and reviews)
+- Preferred function length: **10-30 lines**
+- Soft review threshold: **>40 lines** — check whether extraction into helper functions improves readability
+- Hard review trigger: **>60 lines** — requires explicit justification in review or refactoring
+- Prefer one responsibility per function; if a function contains clearly separable phases (e.g. validation, transformation, side effects), split them
+- Keep parameter lists short (prefer up to 4 parameters); use a config object if many optional values are needed
+- Watch complexity signals: deep nesting, many branches, mixed sync/async flow, and repeated condition patterns
+- If behavior needs both positive and negative paths, ensure both are covered by tests
+
 ### Vue template rules
 - **4-space indent** inside `<template>`; **max 1 attribute per line**
 - `<input type="text">` and `<input>` without `type` are **banned** — use `<InputText>` from `@shared/modules/inputs/components/InputText.vue`
