@@ -368,7 +368,7 @@ export class SensorThingsMqttConnector {
             mqttClient.options = {};
         }
 
-        utilsWebsocket.applyMqttAuthOptions(this.options);
+        utilsWebsocket.applyMqttAuthOptions(mqttClient.options);
 
         this.lastReconnectAt = now;
         mqttClient.reconnect();

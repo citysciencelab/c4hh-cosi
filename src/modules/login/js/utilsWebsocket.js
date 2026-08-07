@@ -19,7 +19,8 @@ function resolveWebsocketAuthUrl (mqttOptions) {
 
     const host = mqttOptions?.host || mqttOptions?.hostname,
         protocol = typeof mqttOptions?.protocol === "string" ? mqttOptions.protocol : "wss",
-        path = typeof mqttOptions?.path === "string" ? mqttOptions.path : "/";
+        path = typeof mqttOptions?.path === "string" ? mqttOptions.path : "/",
+        port = mqttOptions?.port;
 
     if (typeof host !== "string" || !host) {
         return "";
@@ -27,10 +28,17 @@ function resolveWebsocketAuthUrl (mqttOptions) {
 
     try {
         if (host.startsWith("ws://") || host.startsWith("wss://") || host.startsWith("http://") || host.startsWith("https://")) {
-            return new URL(path, host).toString();
+            const url = new URL(path, host);
+
+            if (port && !url.port) {
+                url.port = String(port);
+            }
+            return url.toString();
         }
 
-        return `${protocol}://${host}${path.startsWith("/") ? path : `/${path}`}`;
+        const portSuffix = port ? `:${port}` : "";
+
+        return `${protocol}://${host}${portSuffix}${path.startsWith("/") ? path : `/${path}`}`;
     }
     catch {
         return "";

@@ -21,6 +21,26 @@ describe("src/modules/login/js/utilsWebsocket", () => {
 
             expect(url).toBe("wss://iot.example.com/mqtt");
         });
+
+        it("should apply port option when host has no port", () => {
+            const url = utilsWebsocket.resolveWebsocketAuthUrl({
+                host: "wss://iot.example.com",
+                path: "/mqtt",
+                port: 8883
+            });
+
+            expect(url).toBe("wss://iot.example.com:8883/mqtt");
+        });
+
+        it("should not override port already present in host", () => {
+            const url = utilsWebsocket.resolveWebsocketAuthUrl({
+                host: "wss://iot.example.com:9001",
+                path: "/mqtt",
+                port: 8883
+            });
+
+            expect(url).toBe("wss://iot.example.com:9001/mqtt");
+        });
     });
 
     describe("shouldAddWebsocketToken", () => {
