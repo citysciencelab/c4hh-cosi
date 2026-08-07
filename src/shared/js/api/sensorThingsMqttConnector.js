@@ -1,3 +1,6 @@
+import utilsWebsocket from "@modules/login/js/utilsWebsocket.js";
+import store from "@appstore/index.js";
+
 /**
  * SensorThingsMqttConnector is a software layer to standardize the handling of mqtt v3.1, v3.1.1 and v5.0 for SensorThingsApi.
  * <pre>
@@ -38,6 +41,9 @@ export class SensorThingsMqttConnector {
         this.lastWarnTime = 0;
         this.httpClient = null;
         this.handlers = {};
+        this.tokenUpdatedListener = null;
+        this.lastReconnectAt = null;
+        this.reconnectDebounceMs = 2000;
     }
 
     /**
@@ -53,6 +59,7 @@ export class SensorThingsMqttConnector {
 
         if (typeof actualMqttLib?.connect === "function") {
             this.mqttClient = actualMqttLib.connect(this.options);
+            this.registerTokenUpdatedListener();
             return true;
         }
 
@@ -91,6 +98,8 @@ export class SensorThingsMqttConnector {
         if (!this.options?.hostname) {
             this.options.hostname = this.options.host;
         }
+
+        utilsWebsocket.applyMqttAuthOptions(this.options);
     }
 
     /**
@@ -307,6 +316,62 @@ export class SensorThingsMqttConnector {
         }
 
         this.mqttClient.end(force, options, onfinish);
+        this.unregisterTokenUpdatedListener();
+    }
+
+    /**
+     * Registers a listener for token update events.
+     * @returns {void}
+     */
+    registerTokenUpdatedListener () {
+        this.tokenUpdatedListener = store.watch(
+            (_, getters) => {
+                const token = getters["Modules/Login/accessToken"];
+
+                return token;
+            },
+            (newToken, oldToken) => {
+                if (newToken && oldToken !== newToken) {
+                    this.reconnectWithUpdatedAuth();
+                }
+            });
+    }
+
+    /**
+     * Unregisters the token update listener.
+     * @returns {void}
+     */
+    unregisterTokenUpdatedListener () {
+        if (typeof this.tokenUpdatedListener === "function") {
+            this.tokenUpdatedListener();
+            this.tokenUpdatedListener = null;
+        }
+    }
+
+    /**
+     * Applies latest auth credentials and reconnects the MQTT client.
+     * @returns {void}
+     */
+    reconnectWithUpdatedAuth () {
+        const mqttClient = this.mqttClient;
+        const now = Date.now();
+
+        if (!mqttClient || typeof mqttClient.reconnect !== "function") {
+            return;
+        }
+
+        if (typeof this.lastReconnectAt === "number" && now - this.lastReconnectAt < this.reconnectDebounceMs) {
+            return;
+        }
+
+        if (typeof mqttClient.options !== "object" || mqttClient.options === null) {
+            mqttClient.options = {};
+        }
+
+        utilsWebsocket.applyMqttAuthOptions(this.options);
+
+        this.lastReconnectAt = now;
+        mqttClient.reconnect();
     }
 
     /**
