@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks a successful data processing in the PopulationRequest tool.
@@ -12,7 +13,7 @@ export function handleSetProcessDataForPopulationRequest (payload) {
             category: "Tool",
             action: "Used tool successfully",
             name: "PopulationRequest",
-            _source: handleSetProcessDataForPopulationRequest.name
+            _source: assembleSourceInfoForEvent(handleSetProcessDataForPopulationRequest.name)
         });
     }
 }

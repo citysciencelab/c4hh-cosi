@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo.js";
-import {isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
 
 /**
  * Tracks switching the map mode between 2D and 3D.
@@ -16,6 +16,6 @@ export function handleChangeMapMode (payload) {
         category: "MapControls",
         action: "Changed map-mode",
         name: payload,
-        _source: handleChangeMapMode.name
+        _source: assembleSourceInfoForEvent(handleChangeMapMode.name)
     });
 }

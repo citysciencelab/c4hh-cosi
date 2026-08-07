@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks a successful position click on the map via the CoordToolkit (Query tab).
@@ -10,6 +11,6 @@ export function handlePositionClickedForCoordToolkit () {
         category: "Tool",
         action: "Used tool successfully",
         name: "CoordToolkit (Query-Tab)",
-        _source: handlePositionClickedForCoordToolkit.name
+        _source: assembleSourceInfoForEvent(handlePositionClickedForCoordToolkit.name)
     });
 }

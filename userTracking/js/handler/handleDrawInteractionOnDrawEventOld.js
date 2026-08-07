@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks a completed drawing action in the legacy Draw tool.
@@ -10,6 +11,6 @@ export function handleDrawInteractionOnDrawEventOld () {
         category: "Tool",
         action: "Used tool successfully",
         name: "Draw (Old)",
-        _source: handleDrawInteractionOnDrawEventOld.name
+        _source: assembleSourceInfoForEvent(handleDrawInteractionOnDrawEventOld.name)
     });
 }

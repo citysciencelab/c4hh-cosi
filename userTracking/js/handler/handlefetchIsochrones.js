@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks a successful isochrone calculation in the Routing tool (Reachability tab).
@@ -10,6 +11,6 @@ export function handlefetchIsochrones () {
         category: "Tool",
         action: "Used tool successfully",
         name: "Routing (Reachability-Tab)",
-        _source: handlefetchIsochrones.name
+        _source: assembleSourceInfoForEvent(handlefetchIsochrones.name)
     });
 }

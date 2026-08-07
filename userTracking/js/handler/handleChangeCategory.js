@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo.js";
-import {isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
 
 /**
  * Tracks switching a layertree category.
@@ -16,7 +16,7 @@ export function handleChangeCategory (payload) {
     trackMatomoEvent({
         category: "Layer",
         action: "Changed layertree category",
-        name: typeof i18next !== "undefined" ? i18next.t(payload.name) : payload.name,
-        _source: handleChangeCategory.name
+        name: payload.key,
+        _source: assembleSourceInfoForEvent(handleChangeCategory.name)
     });
 }

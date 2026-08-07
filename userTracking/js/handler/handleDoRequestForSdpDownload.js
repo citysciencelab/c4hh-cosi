@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks a successful download request in the SdpDownload tool.
@@ -10,6 +11,6 @@ export function handleDoRequestForSdpDownload () {
         category: "Tool",
         action: "Used tool successfully",
         name: "SdpDownload",
-        _source: handleDoRequestForSdpDownload.name
+        _source: assembleSourceInfoForEvent(handleDoRequestForSdpDownload.name)
     });
 }

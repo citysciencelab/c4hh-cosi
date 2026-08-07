@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks a successful route calculation in the Routing tool (Planning tab).
@@ -10,6 +11,6 @@ export function handleFetchDirections () {
         category: "Tool",
         action: "Used tool successfully",
         name: "Routing (Planning-Tab)",
-        _source: handleFetchDirections.name
+        _source: assembleSourceInfoForEvent(handleFetchDirections.name)
     });
 }

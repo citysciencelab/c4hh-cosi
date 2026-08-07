@@ -1,4 +1,14 @@
 /**
+ * Assembles an object with debugging information (function name and component name if available) for a tracking event.
+ * @param {String} funcName The name of the function that triggered the event.
+ * @param {String} [compName] The name of the component that triggered the event.
+ * @returns {Object} An object containing "funcName" and "compName" if available.
+ */
+export function assembleSourceInfoForEvent (funcName, compName) {
+    return compName ? {compName, funcName} : {funcName};
+}
+
+/**
  * Converts a text string to a URI-compatible representation.
  * Replaces German umlauts (ä→ae, ö→oe, ü→ue, ß→ss), converts letters following a space to uppercase,
  * and removes all characters not permitted in an unencoded URI segment (keeps A–Z, a–z, 0–9, "/", "-", "_", ".", "~").

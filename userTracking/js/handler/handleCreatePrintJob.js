@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo.js";
-import {isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
 
 /**
  * Tracks the creation of a print job.
@@ -20,18 +20,19 @@ export function handleCreatePrintJob (payload) {
     }
 
     const {payload: printPayload} = payload;
+    const _source = assembleSourceInfoForEvent(handleCreatePrintJob.name);
 
     trackMatomoEvent({
         category: "Tool",
         action: "Used tool successfully",
         name: "Print",
-        _source: handleCreatePrintJob.name
+        _source
     });
 
     trackMatomoEvent({
         category: "Tool",
         action: "Created printjob",
         name: `Mode: ${printPayload.attributes?.is3dMode ? "\"3D\"" : "\"2D\""}, Layout: "${printPayload.layout}"`,
-        _source: handleCreatePrintJob.name
+        _source
     });
 }

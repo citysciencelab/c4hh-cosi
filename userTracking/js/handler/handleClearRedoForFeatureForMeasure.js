@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks a completed measurement in the Measure tool.
@@ -10,6 +11,6 @@ export function handleClearRedoForFeatureForMeasure () {
         category: "Tool",
         action: "Used tool successfully",
         name: "Measure",
-        _source: handleClearRedoForFeatureForMeasure.name
+        _source: assembleSourceInfoForEvent(handleClearRedoForFeatureForMeasure.name)
     });
 }

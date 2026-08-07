@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo.js";
-import {getLayerInformation, getSourceFromPayload, isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, getLayerInformation, getSourceFromPayload, isPayloadValid} from "../util.js";
 
 /**
  * Tracks opening the layer information panel for a layer.
@@ -19,6 +19,6 @@ export function handleSetLayerInfo (payload, store) {
         category: "Layer",
         action: `Opened layer information via ${getSourceFromPayload(payload)}`,
         name: getLayerInformation(payload.id, store),
-        _source: handleSetLayerInfo.name
+        _source: assembleSourceInfoForEvent(handleSetLayerInfo.name, payload._source)
     });
 }

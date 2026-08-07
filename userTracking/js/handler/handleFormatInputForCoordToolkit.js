@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks a successful coordinate input format conversion in the CoordToolkit (Query tab).
@@ -10,6 +11,6 @@ export function handleFormatInputForCoordToolkit () {
         category: "Tool",
         action: "Used tool successfully",
         name: "CoordToolkit (Query-Tab)",
-        _source: handleFormatInputForCoordToolkit.name
+        _source: assembleSourceInfoForEvent(handleFormatInputForCoordToolkit.name)
     });
 }

@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo.js";
-import {getLayerInformation, isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, getLayerInformation, isPayloadValid} from "../util.js";
 
 /**
  * Tracks removing a layer from the layer tree.
@@ -18,6 +18,6 @@ export function handleRemoveLayer (payload, store) {
         category: "Layer",
         action: "Removed layer from layertree",
         name: getLayerInformation(payload.id, store),
-        _source: handleRemoveLayer.name
+        _source: assembleSourceInfoForEvent(handleRemoveLayer.name)
     });
 }

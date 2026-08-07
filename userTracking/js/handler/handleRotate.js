@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks clicking the map rotation button.
@@ -11,6 +12,6 @@ export function handleRotate (isClockwise) {
         category: "MapControls",
         action: "Clicked control",
         name: `Rotate ${isClockwise ? "" : "counter-"}clockwise`,
-        _source: handleRotate.name
+        _source: assembleSourceInfoForEvent(handleRotate.name)
     });
 }

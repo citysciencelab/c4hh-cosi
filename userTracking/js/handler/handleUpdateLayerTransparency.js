@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo.js";
-import {getLayerInformation, isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, getLayerInformation, isPayloadValid} from "../util.js";
 
 let timeoutId = null;
 
@@ -31,7 +31,7 @@ export function handleUpdateLayerTransparency (payload, store) {
             action: "Changed transparency",
             name: getLayerInformation(layerConf.id, store),
             value: parseInt(layerConf.transparency, 10),
-            _source: handleUpdateLayerTransparency.name
+            _source: assembleSourceInfoForEvent(handleUpdateLayerTransparency.name)
         });
         timeoutId = null;
     }, 500);

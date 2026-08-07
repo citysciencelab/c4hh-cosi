@@ -1,5 +1,5 @@
 import {trackMatomoEvent, trackMatomoPageView} from "../trackMatomo.js";
-import {convertToUriCompatible, getBaseUrl, getLayerInformation, isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, convertToUriCompatible, getBaseUrl, getLayerInformation, isPayloadValid} from "../util.js";
 
 /**
  * Tracks a page view (and menu event) whenever the content of the main or secondary menu changes.
@@ -26,7 +26,7 @@ export function handleChangeCurrentComponent (payload, store) {
  * and specific tool openings (streetSmart, vcOblique).
  * @param {Object} payload The action payload.
  * @param {Object} [payload.props] The properties of the component being displayed.
- * @param {String} [payload._source] Optional source identifier for the action.
+ * @param {String} [payload._source] The source component that triggered the action; included in the tracking event.
  * @param {String} payload.side The menu side (mainMenu or secondaryMenu).
  * @param {String} payload.type The type of the component being displayed.
  * @param {Object} store The Vuex store.
@@ -35,12 +35,13 @@ export function handleChangeCurrentComponent (payload, store) {
  */
 function handleActions (payload, store, funcName) {
     const {props, side, type} = payload;
+    const _source = assembleSourceInfoForEvent(funcName, payload._source);
 
     if (type === "searchBar") {
         trackMatomoEvent({
             category: "Layer",
             action: "Started typing into search bar",
-            _source: funcName
+            _source
         });
     }
     else if (props !== undefined && type === "layerSelection") {
@@ -49,14 +50,14 @@ function handleActions (payload, store, funcName) {
                 category: "Layer",
                 action: "Clicked on \"go-to-layertree\"-button",
                 name: getLayerInformation(props.layerId, store),
-                _source: funcName
+                _source
             });
         }
-        else {
+        else if (props.name.endsWith("addSubject")) {
             trackMatomoEvent({
                 category: "Layer",
                 action: "Clicked on \"Add layer\"-button",
-                _source: funcName
+                _source
             });
         }
     }
@@ -64,8 +65,8 @@ function handleActions (payload, store, funcName) {
         trackMatomoEvent({
             category: "Menu",
             action: `Clicked on item in ${payload._source ?? side}`,
-            name: typeof i18next !== "undefined" ? i18next.t(props.name) : props.name ?? "",
-            _source: funcName
+            name: type,
+            _source
         });
     }
 
@@ -74,7 +75,7 @@ function handleActions (payload, store, funcName) {
             category: "Tool",
             action: "Opened tool",
             name: "360DegreePanorama",
-            _source: funcName
+            _source
         });
     }
     else if (type === "vcOblique") {
@@ -82,7 +83,7 @@ function handleActions (payload, store, funcName) {
             category: "Tool",
             action: "Opened tool",
             name: "ObliqueAerialView",
-            _source: funcName
+            _source
         });
     }
 }
@@ -130,5 +131,5 @@ function handlePageView (payload, store, funcName) {
         url = `${getBaseUrl()}${side}${type !== "folder" ? `/${type}` : ""}${section}`;
 
     store.commit("UserTracking/addPageToHistory", {side, title, url});
-    trackMatomoPageView({url, title, _source: funcName});
+    trackMatomoPageView({url, title, _source: assembleSourceInfoForEvent(funcName)});
 }

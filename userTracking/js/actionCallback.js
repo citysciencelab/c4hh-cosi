@@ -1,8 +1,10 @@
+import {handleActivateActionforSearchBar} from "./handler/handleActivateActionforSearchBar.js";
 import {handleAddImportedFilename} from "./handler/handleAddImportedFilename.js";
 import {handleAddLayerToLayerConfig} from "./handler/handleAddLayerToLayerConfig.js";
 import {handleAddLayerToTopicTree} from "./handler/handleAddLayerToTopicTree.js";
 import {handleChangeCategory} from "./handler/handleChangeCategory.js";
 import {handleChangeCurrentComponent} from "./handler/handleChangeCurrentComponent.js";
+import {handleChangeLocale} from "./handler/handleChangeLocale.js";
 import {handleChangeMapMode} from "./handler/handleChangeMapMode.js";
 import {handleChangeVisibility} from "./handler/handleChangeVisibility.js";
 import {handleCreatePrintJob} from "./handler/handleCreatePrintJob.js";
@@ -75,6 +77,9 @@ export function actionCallback (action, store) {
             case "Modules/FileImport/addImportedFilename":
                 handleAddImportedFilename();
                 break;
+            case "Modules/Language/changeLocale":
+                handleChangeLocale(action.payload);
+                break;
             case "Modules/LayerSelection/changeVisibility":
                 handleChangeVisibility(action.payload, store);
                 break;
@@ -99,6 +104,9 @@ export function actionCallback (action, store) {
                 break;
             case "Modules/SdpDownload/doRequest":
                 handleDoRequestForSdpDownload();
+                break;
+            case "Modules/SearchBar/activateAction":
+                handleActivateActionforSearchBar(action.payload, store);
                 break;
             case "Modules/SearchBar/addLayerToTopicTree":
                 handleAddLayerToTopicTree(action.payload, store);

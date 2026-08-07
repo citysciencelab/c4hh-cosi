@@ -1,6 +1,6 @@
 import {mainMenu} from "@shared/js/utils/constants";
 import {trackMatomoEvent, trackMatomoPageView} from "../trackMatomo.js";
-import {isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
 
 /**
  * Tracks a search as a page view, debounced to avoid tracking every keystroke.
@@ -21,13 +21,15 @@ export function handleSearch (payload, store) {
         return;
     }
 
+    const _source = assembleSourceInfoForEvent(handleSearch.name);
+
     const searchBarInputTimeoutId = setTimeout(() => {
         // Actions
         trackMatomoEvent({
             category: "Layer",
             action: "Processed search",
             name: payload.searchInput,
-            _source: handleSearch.name
+            _source
         });
 
         // PageView
@@ -38,7 +40,7 @@ export function handleSearch (payload, store) {
         trackMatomoPageView({
             url: `${page.url}?q=${encodeURIComponent(payload.searchInput)}`,
             title: `${page.title}: ${payload.searchInput}`,
-            _source: handleSearch.name
+            _source
         });
     }, 500);
 

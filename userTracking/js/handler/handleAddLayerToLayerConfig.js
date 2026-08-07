@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
-import {isPayloadValid} from "../util";
+import {assembleSourceInfoForEvent, isPayloadValid} from "../util";
 
 /**
  * Tracks adding a WMS layer via the AddWMS tool.
@@ -17,8 +17,8 @@ export function handleAddLayerToLayerConfig (payload) {
         trackMatomoEvent({
             category: "Tool",
             action: "Used tool successfully",
-            name: "AddWMS",
-            _source: handleAddLayerToLayerConfig.name
+            name: payload._source,
+            _source: assembleSourceInfoForEvent(handleAddLayerToLayerConfig.name, payload._source)
         });
     }
 }

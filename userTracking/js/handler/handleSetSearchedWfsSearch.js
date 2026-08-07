@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks a successful WFS search execution in the WfsSearch tool.
@@ -12,7 +13,7 @@ export function handleSetSearchedWfsSearch (payload) {
             category: "Tool",
             action: "Used tool successfully",
             name: "WfsSearch",
-            _source: handleSetSearchedWfsSearch.name
+            _source: assembleSourceInfoForEvent(handleSetSearchedWfsSearch.name)
         });
     }
 }

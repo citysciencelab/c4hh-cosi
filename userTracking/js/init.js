@@ -3,7 +3,7 @@ import {actionCallback} from "./actionCallback.js";
 import {configCommands} from "./configCommands.js";
 import {mutationCallback} from "./mutationCallback.js";
 import {trackMatomoEvent} from "./trackMatomo.js";
-import {getBaseUrl, stripBodyParameterFromHref} from "./util.js";
+import {assembleSourceInfoForEvent, getBaseUrl, stripBodyParameterFromHref} from "./util.js";
 
 /**
  * Initializes user tracking based on the global "Config" object.
@@ -135,7 +135,7 @@ export function initializeLinkTracking () {
                     category: "Link",
                     action: "Triggered download",
                     name: `href: "${anchor.href.slice(5)} | class: "${className}" | id: "${id}"`,
-                    _source: initializeLinkTracking.name
+                    _source: assembleSourceInfoForEvent(initializeLinkTracking.name)
                 });
             }
             else {
@@ -145,7 +145,7 @@ export function initializeLinkTracking () {
                     category: "Link",
                     action: `Clicked on ${isMailToLink ? "mailto" : "external"} link`,
                     name: `href: "${isMailToLink ? stripBodyParameterFromHref(anchor.href) : anchor.href}" | class: "${className}" | id: "${id}"`,
-                    _source: initializeLinkTracking.name
+                    _source: assembleSourceInfoForEvent(initializeLinkTracking.name)
                 });
             }
         }

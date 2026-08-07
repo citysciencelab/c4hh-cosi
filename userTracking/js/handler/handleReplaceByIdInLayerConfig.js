@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo.js";
-import {getSourceFromPayload, isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, getSourceFromPayload, isPayloadValid} from "../util.js";
 
 /**
  * Tracks toggling a layer's visibility via the layer config.
@@ -27,7 +27,7 @@ export function handleReplaceByIdInLayerConfig (payload, store) {
             action: `Changed layer-visibility via ${getSourceFromPayload(payload)}`,
             name: `Layer: ${store.getters.layerConfigById(layer.id)?.name} (id: ${layer.id})`,
             value: layer.visibility ? 1 : 0,
-            _source: handleReplaceByIdInLayerConfig.name
+            _source: assembleSourceInfoForEvent(handleReplaceByIdInLayerConfig.name, payload._source)
         });
     }
 }

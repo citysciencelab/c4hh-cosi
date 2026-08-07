@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo.js";
-import {getLayerInformation, isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, getLayerInformation, isPayloadValid} from "../util.js";
 
 /**
  * Tracks a layer visibility change via the layer tree.
@@ -26,6 +26,6 @@ export function handleChangeVisibility (payload, store) {
             : "Removed layer via layertree"
         }`,
         name: getLayerInformation(payload.layerId, store),
-        _source: handleChangeVisibility.name
+        _source: assembleSourceInfoForEvent(handleChangeVisibility.name)
     });
 }

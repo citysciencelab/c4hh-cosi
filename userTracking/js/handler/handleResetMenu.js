@@ -1,5 +1,5 @@
 import {trackMatomoEvent, trackMatomoPageView} from "../trackMatomo.js";
-import {isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
 
 /**
  * Tracks resetting the menu and reports the resulting page view.
@@ -15,12 +15,14 @@ export function handleResetMenu (payload, store) {
 
     store.dispatch("UserTracking/forceClearSearchBarTimeout");
 
+    const _source = assembleSourceInfoForEvent(handleResetMenu.name);
+
     // Actions
     trackMatomoEvent({
         category: "Menu",
         action: "Clicked X-button (reset menu)",
         name: payload,
-        _source: handleResetMenu.name
+        _source
     });
 
     // PageView
@@ -31,6 +33,6 @@ export function handleResetMenu (payload, store) {
     trackMatomoPageView({
         url: page.url,
         title: page.title,
-        _source: handleResetMenu.name
+        _source
     });
 }

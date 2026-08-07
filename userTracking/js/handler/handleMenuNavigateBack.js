@@ -1,5 +1,5 @@
 import {trackMatomoEvent, trackMatomoPageView} from "../trackMatomo.js";
-import {getLayerSelectionUrlSegement, isPayloadValid} from "../util.js";
+import {assembleSourceInfoForEvent, getLayerSelectionUrlSegement, isPayloadValid} from "../util.js";
 
 /**
  * Tracks navigating back in the menu history and reports the resulting page view.
@@ -25,12 +25,14 @@ export function handleMenuNavigateBack (payload, store) {
         return;
     }
 
+    const _source = assembleSourceInfoForEvent(handleMenuNavigateBack.name);
+
     // Actions
     trackMatomoEvent({
         category: "Menu",
         action: "Clicked back-button",
         name: payload.side,
-        _source: handleMenuNavigateBack.name
+        _source
     });
 
     // PageView
@@ -50,6 +52,6 @@ export function handleMenuNavigateBack (payload, store) {
     trackMatomoPageView({
         url: `${page.url}${urlSegment}`,
         title: page.title,
-        _source: handleMenuNavigateBack.name
+        _source
     });
 }

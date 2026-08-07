@@ -1,6 +1,6 @@
 import {mainMenu} from "@shared/js/utils/constants";
 import {trackMatomoPageView} from "../trackMatomo.js";
-import {getLayerSelectionUrlSegement} from "../util.js";
+import {assembleSourceInfoForEvent, getLayerSelectionUrlSegement} from "../util.js";
 
 /**
  * Tracks navigating in the layer selection breadcrumb and reports the resulting page view.
@@ -26,6 +26,6 @@ export function handleLayerNavigate (payload, store) {
     trackMatomoPageView({
         url: `${page.url}${urlSegement}`,
         title: page.title,
-        _source: handleLayerNavigate.name
+        _source: assembleSourceInfoForEvent(handleLayerNavigate.name)
     });
 }

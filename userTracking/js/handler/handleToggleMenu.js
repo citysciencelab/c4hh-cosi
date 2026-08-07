@@ -1,5 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
-import {isPayloadValid} from "../util";
+import {assembleSourceInfoForEvent, isPayloadValid} from "../util";
 
 /**
  * Tracks clicking the menu toggle button.
@@ -16,6 +16,6 @@ export function handleToggleMenu (payload) {
         category: "Menu",
         action: "Clicked menu-toggle-button",
         name: payload,
-        _source: handleToggleMenu.name
+        _source: assembleSourceInfoForEvent(handleToggleMenu.name)
     });
 }

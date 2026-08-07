@@ -1,4 +1,5 @@
 import {trackMatomoEvent} from "../trackMatomo";
+import {assembleSourceInfoForEvent} from "../util";
 
 /**
  * Tracks a successful file import in the FileImport tool.
@@ -10,6 +11,6 @@ export function handleAddImportedFilename () {
         category: "Tool",
         action: "Used tool successfully",
         name: "FileImport",
-        _source: handleAddImportedFilename.name
+        _source: assembleSourceInfoForEvent(handleAddImportedFilename.name)
     });
 }
