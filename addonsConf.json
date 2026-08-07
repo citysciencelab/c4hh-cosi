@@ -89,6 +89,10 @@
     "path":"gfiThemes/verkehrsstaerken",
     "type": "gfiTheme"
   },
+  "waterStatistics": {
+    "path":"gfiThemes/waterStatistics",
+    "type": "gfiTheme"
+  },
   "verkehrsfunctions": {
     "type": "javascript"
   },
