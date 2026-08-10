@@ -121,6 +121,7 @@ export default {
      */
     highlightFeature ({dispatch, state}, {feature, layer}) {
         const {highlightVectorRulesPointLine, highlightVectorRulesPolygon} = state,
+            layerId = layer.get("id"),
             featureGeometryType = feature.getGeometry().getType(),
             featureId = feature.getId(),
             styleObj = featureGeometryType.toLowerCase().indexOf("polygon") > -1 ?
@@ -133,12 +134,12 @@ export default {
                 feature: feature,
                 scale: styleObj.image?.scale
             },
-            rawLayer = rawLayerList.getLayerWhere({id: layer.get("id")});
+            rawLayer = rawLayerList.getLayerWhere({id: layerId});
 
         if (featureGeometryType === "LineString" || featureGeometryType === "MultiLineString") {
             highlightObject.type = "highlightLine";
         }
-        layer.id = layer.get("id");
+        layer.id = layerId;
         highlightObject.zoomLevel = styleObj.zoomLevel;
         if (rawLayer && rawLayer.styleId) {
             highlightObject.styleId = rawLayer.styleId;
