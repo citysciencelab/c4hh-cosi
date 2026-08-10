@@ -1,5 +1,6 @@
 import {getWmsFeaturesByMimeType} from "@shared/js/utils/getWmsFeaturesByMimeType.js";
 import {getVisibleWmsLayersAtResolution} from "../../../../src/modules/getFeatureInfo/js/getLayers.js";
+import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 
 export default {
     /**
@@ -101,5 +102,21 @@ export default {
                     dispatch("Alerting/addSingleAlert", i18next.t("common:modules.getFeatureInfo.errorMessage"), {root: true});
                 }
             });
+    },
+    /**
+     * Removes a layer from the layer config.
+     * @param {Object} context - The vuex context.
+     * @param {String} layerId - The layer id.
+     * @returns {void}
+     */
+    removeLayerFromLayerConfig ({rootState, commit}, layerId) {
+        if (rootState.layerConfig?.[treeSubjectsKey]) {
+            const updatedElements = rootState.layerConfig[treeSubjectsKey].elements.filter(element => element.id !== layerId);
+
+            commit("setLayerConfigByParentKey", {
+                layerConfigs: {elements: updatedElements},
+                parentKey: treeSubjectsKey
+            }, {root: true});
+        }
     }
 };

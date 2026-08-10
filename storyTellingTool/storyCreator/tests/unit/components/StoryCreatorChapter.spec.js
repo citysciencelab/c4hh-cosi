@@ -7,7 +7,7 @@ import store from "@appstore/index.js";
 
 
 describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
-    let localStore, map, originalCesium, wrapper;
+    let localStore, map, originalCesium, wrapper, storyManagerActions;
 
     beforeAll(() => {
         i18next.init({
@@ -18,6 +18,9 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
     });
 
     beforeEach(() => {
+        storyManagerActions = {
+            removeLayerFromLayerConfig: sinon.spy()
+        };
         global.Cesium = {};
         global.Cesium.Cartographic = {
             fromCartesian: sinon.spy()
@@ -30,6 +33,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     modules: {
                         StoryManager: {
                             namespaced: true,
+                            actions: storyManagerActions,
                             getters: {
                                 currentChapter: (state) => state.currentChapter,
                                 enableVideo: (state) => state.enableVideo,
@@ -399,39 +403,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             });
         });
 
-        describe("getVisibleLayerList ", () => {
-            it("should return empty array", () => {
-                expect(wrapper.vm.getVisibleLayerList(undefined)).to.deep.equal([]);
-                expect(wrapper.vm.getVisibleLayerList(0)).to.deep.equal([]);
-                expect(wrapper.vm.getVisibleLayerList("")).to.deep.equal([]);
-                expect(wrapper.vm.getVisibleLayerList(true)).to.deep.equal([]);
-                expect(wrapper.vm.getVisibleLayerList({})).to.deep.equal([]);
-                expect(wrapper.vm.getVisibleLayerList(null)).to.deep.equal([]);
-                expect(wrapper.vm.getVisibleLayerList([])).to.deep.equal([]);
-            });
-
-            it("should return visible layers", () => {
-                const layers = {
-                    getArray: () => [
-                        {
-                            id: 1,
-                            getVisible: () => true,
-                            get: sinon.stub()
-                        },
-                        {
-                            id: 2,
-                            getVisible: () => false,
-                            get: sinon.stub()
-                        }
-                    ]
-
-                };
-
-                expect(wrapper.vm.getVisibleLayerList(layers).length).to.be.equal(1);
-                expect(wrapper.vm.getVisibleLayerList(layers)[0].id).to.be.equal(1);
-            });
-        });
-
         describe("handleContent", () => {
             it("should add content when editor index points to add position", async () => {
                 const newContent = {
@@ -765,17 +736,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         content: [{type: "paragraph", content: [{type: "text", text: "Keep me"}]}]
                     }
                 ]);
-            });
-        });
-
-        describe("removeLayerFromLayerConfig", () => {
-            it("should not call the function setLayerConfigByParentKey", () => {
-                const spySetLayerConfigByParentKey = sinon.spy(wrapper.vm, "setLayerConfigByParentKey");
-
-                wrapper.vm.removeLayerFromLayerConfig("123");
-
-                expect(spySetLayerConfigByParentKey.calledOnce).to.be.false;
-
             });
         });
 

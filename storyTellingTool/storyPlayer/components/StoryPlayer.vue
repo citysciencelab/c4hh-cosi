@@ -7,6 +7,7 @@ import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import {getDirectVideo, getEmbedLink} from "../../shared/utils/video.js";
+import {getVisibleLayerList} from "../../shared/utils/layerHelper.js";
 import LayerGroup from "ol/layer/Group.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import isObject from "@shared/js/utils/isObject.js";
@@ -15,7 +16,6 @@ import Overlay from "ol/Overlay.js";
 import StoryPlayerFeature from "./StoryPlayerFeature.vue";
 import StoryPlayerToolbar from "./StoryPlayerToolbar.vue";
 import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/tipTapJsonToHtml";
-import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 
 export default {
     name: "StoryPlayer",
@@ -221,6 +221,7 @@ export default {
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
         ...mapActions("Maps", ["changeMapMode", "placingPointMarker", "removePointMarker", "zoomToExtent"]),
         ...mapActions(["addLayerToLayerConfig", "addOrReplaceLayer", "replaceByIdInLayerConfig", "updateLayerConfigs"]),
+        ...mapActions("Modules/StoryManager", ["removeLayerFromLayerConfig"]),
         ...mapActions("Menu", ["changeCurrentComponent", "resetMenu"]),
 
         getDirectVideo,
@@ -271,9 +272,8 @@ export default {
          */
         deactivateSubjectLayer () {
             const layers = mapCollection.getMap("2D")?.getLayers(),
-                  visibleLayerList = typeof layers?.getArray !== "function" ? [] : layers.getArray().filter(layer => {
-                      return layer.getVisible() === true && layer.get("name") !== "markerPoint" && layer.get("name") !== "markerPolygon" && layer.get("id") !== this.visibleBaselayerConfigs[0]?.id;
-                  }),
+                  baselayerId = this.visibleBaselayerConfigs[0]?.id,
+                  visibleLayerList = getVisibleLayerList(layers, baselayerId),
                   groupLayers = this.layerConfigsByAttributes({typ: "GROUP"});
 
             visibleLayerList.forEach(layer => {
@@ -579,18 +579,6 @@ export default {
 
             mapCollection.getMap("2D").addOverlay(this.overlay);
             this.overlay.setPosition(val?.coordinate);
-        },
-        /**
-         * Removes the layer from layer config from id.
-         * @param {String} layerId - The layer id.
-         * @returns {void}
-         */
-        removeLayerFromLayerConfig (layerId) {
-            if (this.layerConfig?.[treeSubjectsKey]) {
-                const layerConfig = this.layerConfig[treeSubjectsKey].elements.filter(element => element.id !== layerId);
-
-                this.setLayerConfigByParentKey({layerConfigs: {elements: layerConfig}, parentKey: treeSubjectsKey});
-            }
         },
         /**
          * Scrolls the step into view

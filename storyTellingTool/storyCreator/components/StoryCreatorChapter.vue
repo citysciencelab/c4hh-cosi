@@ -7,6 +7,7 @@ import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import {getDirectVideo, getEmbedLink} from "../../shared/utils/video.js";
+import {getVisibleLayerList} from "../../shared/utils/layerHelper.js";
 import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
@@ -17,7 +18,6 @@ import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
 import StoryCreatorAddVideoCard from "./StoryCreatorAddVideoCard.vue";
 import tipTapJsonToHtml from "../shared/modules/tipTapEditor/js/tipTapJsonToHtml.js";
-import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 
 export default {
     name: "StoryCreatorChapter",
@@ -192,7 +192,7 @@ export default {
 
                 const layers = mapCollection.getMap("2D")?.getLayers();
 
-                this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
+                this.deactivateSubjectLayer(getVisibleLayerList(layers));
 
                 if (!Array.isArray(val)) {
                     return;
@@ -253,7 +253,7 @@ export default {
             this.setToNorth();
         }
 
-        this.deactivateSubjectLayer(this.getVisibleLayerList(layers));
+        this.deactivateSubjectLayer(getVisibleLayerList(layers));
 
         this.layerList = this.getLayerList();
         this.toolList = this.getToolList(this.configuredModules);
@@ -309,6 +309,7 @@ export default {
         ...mapActions("Maps", ["changeMapMode"]),
         ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
         ...mapActions("Modules/LayerTree", ["removeLayer"]),
+        ...mapActions("Modules/StoryManager", ["removeLayerFromLayerConfig"]),
         ...mapMutations("Modules/StoryManager", ["setOriginalLayerConfig"]),
         ...mapMutations(["setLayerConfigByParentKey"]),
 
@@ -343,18 +344,6 @@ export default {
                     });
                 }
             });
-        },
-        /**
-         * Gets visible layer list.
-         * @param {ol/layer[]} layers - The layers.
-         * @returns {Object} {visibleLayerList} The list of visible layers from the "2D" map.
-         */
-        getVisibleLayerList (layers) {
-            const visibleLayerList = typeof layers?.getArray !== "function" ? [] : layers.getArray().filter(layer => {
-                return layer.getVisible() === true && layer.get("name") !== "markerPoint" && layer.get("name") !== "markerPolygon";
-            });
-
-            return visibleLayerList;
         },
         /**
          * Opens a content add/edit component and stores context of the open editor.
@@ -782,18 +771,6 @@ export default {
             }
 
             this.content.splice(index, 1);
-        },
-        /**
-         * Removes a the layer from layer config.
-         * @param {String} layerId - The layer id.
-         * @returns {void}
-         */
-        removeLayerFromLayerConfig (layerId) {
-            if (this.layerConfig?.[treeSubjectsKey]) {
-                const layerConfig = this.layerConfig[treeSubjectsKey].elements.filter(element => element.id !== layerId);
-
-                this.setLayerConfigByParentKey({layerConfigs: {elements: layerConfig}, parentKey: treeSubjectsKey});
-            }
         },
         /**
          * Resets the layer config.
