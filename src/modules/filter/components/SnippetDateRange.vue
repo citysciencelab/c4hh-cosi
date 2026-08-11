@@ -209,10 +209,11 @@ export default {
                     this.adjustMinMax = [];
                 }
 
-                if (mindayjs.isValid() && (typeof this.adjustMinMax[0] === "undefined" || this.adjustMinMax[0].isBefore(mindayjs))) {
+                if (mindayjs.isValid() && (typeof this.adjustMinMax[0] === "undefined" || mindayjs.isBefore(this.adjustMinMax[0]))) {
                     this.adjustMinMax[0] = mindayjs;
                 }
-                if (maxdayjs.isValid() && (typeof this.adjustMinMax[1] === "undefined" || this.adjustMinMax[1].isAfter(maxdayjs))) {
+
+                if (maxdayjs.isValid() && (typeof this.adjustMinMax[1] === "undefined" || maxdayjs.isAfter(this.adjustMinMax[1]))) {
                     this.adjustMinMax[1] = maxdayjs;
                 }
 
@@ -220,31 +221,40 @@ export default {
                     return;
                 }
                 if (!this.isSelfSnippetId(adjusting?.snippetId)) {
-                    this.currentSliderMin = typeof this.adjustMinMax[0] !== "undefined" ? this.getSliderIdxCloseToFromDate(this.adjustMinMax[0].format(this.internalFormat)) : 0;
-                    this.currentSliderMax = typeof this.adjustMinMax[1] !== "undefined" ? this.getSliderIdxCloseToUntilDate(this.adjustMinMax[1].format(this.internalFormat)) : this.initialDateRef.length - 1;
+                    const finalMinDate = this.adjustMinMax[0];
+                    const finalMaxDate = this.adjustMinMax[1];
+
+                    this.currentSliderMin = typeof finalMinDate !== "undefined"
+                        ? this.getSliderIdxCloseToFromDate(finalMinDate.format(this.internalFormat))
+                        : 0;
+
+                    this.currentSliderMax = typeof finalMaxDate !== "undefined"
+                        ? this.getSliderIdxCloseToUntilDate(finalMaxDate.format(this.internalFormat))
+                        : this.initialDateRef.length - 1;
+
                     if (this.currentSliderMin > this.currentSliderMax) {
                         this.currentSliderMax = this.currentSliderMin;
                     }
-                    const minDate = this.getDateBySliderIndex(this.currentSliderMin);
-                    const maxDate = this.getDateBySliderIndex(this.currentSliderMax);
+
                     const currentFromDate = dayjs(this.dateFrom);
                     const currentUntilDate = dayjs(this.dateUntil);
 
-                    if (!this.hasRuleSet
-                        || this.currentSliderMin > this.sliderFrom
+                    if (
+                        !this.hasRuleSet
                         || !currentFromDate.isValid()
-                        || minDate !== null && currentFromDate.isBefore(dayjs(minDate))
+                        || currentFromDate.isBefore(finalMinDate)
                     ) {
                         this.sliderFrom = this.currentSliderMin;
-                        this.dateFrom = minDate;
+                        this.dateFrom = finalMinDate.toDate();
                     }
-                    if (!this.hasRuleSet
-                        || this.currentSliderMax < this.sliderUntil
+
+                    if (
+                        !this.hasRuleSet
                         || !currentUntilDate.isValid()
-                        || maxDate !== null && currentUntilDate.isAfter(dayjs(maxDate))
+                        || currentUntilDate.isAfter(finalMaxDate)
                     ) {
                         this.sliderUntil = this.currentSliderMax;
-                        this.dateUntil = maxDate;
+                        this.dateUntil = finalMaxDate.toDate();
                     }
                 }
 
