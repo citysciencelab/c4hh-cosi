@@ -45,7 +45,7 @@ To get started with the codebase, follow our tutorial: [Masterportal Tutorial](.
 
 ## Reporting Issues
 
-Use the [Bitbucket Issue Tracker](https://bitbucket.org/geowerkstatt-hamburg/masterportal/issues). Please include:
+Use the [OpenCode Issue Tracker](https://gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal/-/work_items). Please include:
 
 - A clear description of the problem or feature request
 - Steps to reproduce (for bugs)

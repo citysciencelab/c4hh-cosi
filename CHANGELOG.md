@@ -14,6 +14,7 @@
     - dependencies:
         - "pinia": "^4.0.2"
 - Readme: Information and link to issues in opencode added.
+- Security: Updated SECURITY.md to direct vulnerability reports to a private email address instead of the public issue tracker, and added a corresponding note in the README.
 
 ### Changed
 - GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.

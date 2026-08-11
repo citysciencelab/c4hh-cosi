@@ -4,14 +4,16 @@
 
 We take the security of this project very seriously. If you discover a vulnerability, please report it responsibly.
 
-You can report issues using the Bitbucket issue tracker: https://bitbucket.org/geowerkstatt-hamburg/masterportal/issues.
+**Do not report security vulnerabilities through the public issue tracker.** Publicly disclosing a vulnerability before a fix is available puts all users at risk.
 
-Please include: 
+Instead, please email us privately at [geodatenanwendungen@gv.hamburg.de](mailto:geodatenanwendungen@gv.hamburg.de) with the subject line "Security Vulnerability".
 
-- A description of the problem, affected components, impact
-- Steps to reproduce the issue  
-- Affected versions or components  
-- Suggested fixes, if known  
+Please include:
+
+- A description of the problem, affected components, and impact
+- Steps to reproduce the issue
+- Affected versions or components
+- Suggested fixes, if known
 
 We’ll confirm we received your report and will provide updates as we investigate and remediate the issue.
 

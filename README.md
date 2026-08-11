@@ -4,9 +4,6 @@ The Masterportal is a tool-kit to create geo web applications based on [OpenLaye
 
 The Masterportal is a project by [Geowerkstatt Hamburg](https://www.hamburg.de/geowerkstatt/).
 
-## Issuetracker - Issues is being removed by bitbucket on August 20, 2026
-All issues have been migrated to opencode. You can access them via this [link](https://gitlab.opencode.de/geowerkstatt-hamburg/masterportal/-/work_items), where you can also create new issues.
-
 
 ## MasterPortal Version 3
 
@@ -55,7 +52,12 @@ New LTS minor versions (based on the current version 3 development branch) are r
 
 ## Developer section
 ### Community
-* [Issue tracker](https://bitbucket.org/geowerkstatt-hamburg/masterportal/issues?status=new&status=open&status=submitted&is_spam=!spam)
+
+The Bitbucket issue tracker is being removed on August 20, 2026. All issues have been migrated to openCode. You can access them via the link listed below, where you can also create new issues.
+
+**Please do not report security vulnerabilities via the public issue tracker.** Instead, report them privately by email as described in our [Security Policy](./SECURITY.md).
+
+* [Issue tracker](https://gitlab.opencode.de/geowerkstatt-hamburg/masterportal/-/work_items)
 * [Community board (User forum)](https://discourse.opencode.de/t/ueber-die-kategorie-masterportal-projekt-413/1691)
 * [Former Community board (User forum is closed - read only!)](https://trello.com/c/qajdXkMa/110-willkommen)
 ### Contributing
