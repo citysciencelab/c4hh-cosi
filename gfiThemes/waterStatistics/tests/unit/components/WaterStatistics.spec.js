@@ -15,6 +15,9 @@ describe("addons/gfiThemes/waterStatistics/components/WaterStatistics.vue", () =
                     },
                     getTheme: function () {
                         return {};
+                    },
+                    getAttributesToShow: function () {
+                        return {};
                     }
                 }
             }

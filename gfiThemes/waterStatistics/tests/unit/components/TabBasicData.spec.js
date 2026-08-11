@@ -8,8 +8,7 @@ describe("addons/gfiThemes/waterStatistics/components/TabBasicData.vue", () => {
     beforeEach(() => {
         wrapper = shallowMount(TabBasicData, {
             props: {
-                attributes: {},
-                params: {}
+                attributes: {}
             }
         });
     });

@@ -23,7 +23,7 @@ export default {
                     ref: "tabBasicData",
                     label: this.$t("additional:addons.gfiThemes.waterStatistics.tabs.tabBasicData.label"),
                     component: TabBasicData,
-                    propsForTabContent: {attributes: this.attributes, params: this.params},
+                    propsForTabContent: {attributes: this.attributes},
                     renderComponent: true
                 },
                 {
@@ -38,7 +38,10 @@ export default {
             ];
         },
         attributes () {
-            return this.feature.getMappedProperties();
+            const definedAttributes = this.feature.getMappedProperties(),
+                  attributesToShow = this.feature.getAttributesToShow();
+
+            return Object.fromEntries(Object.values(attributesToShow).map(a => [a.name, definedAttributes[a.name]]));
         },
         params () {
             return this.feature?.getTheme().params;
