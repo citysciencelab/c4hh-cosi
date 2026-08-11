@@ -13,6 +13,7 @@
 - The following packages have been added:
     - dependencies:
         - "pinia": "^4.0.2"
+- Readme: Information and link to issues in opencode added.
 
 ### Changed
 - GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.
