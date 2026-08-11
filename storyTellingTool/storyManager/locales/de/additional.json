@@ -18,7 +18,13 @@
       "confirmLeaveTitle": "Story Manager verlassen?",
       "confirmLeaveContent": "Nicht gespeicherte Änderungen gehen verloren.",
       "confirmLeaveConfirm": "Verlassen",
-      "confirmLeaveCancel": "Abbrechen"
+      "confirmLeaveCancel": "Abbrechen",
+      "cookiebanner": {
+        "description": "Zum Abspielen dieses externen Videos auf unserer Webseite müssen Sie den folgenden Button anklicken. Wir möchten Sie darauf hinweisen, dass durch den Start des Videos Daten an externe Anbieter übermittelt werden.",
+        "playVideo": "Video jetzt laden",
+        "furtherInfo": "Weitere Informationen finden Sie in unserer",
+        "privacy": "Datenschutzerklärung"
+      }
     }
   }
 }

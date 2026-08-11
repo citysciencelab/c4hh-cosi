@@ -2,6 +2,7 @@
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AddElementDropdown from "../shared/modules/addElementDropdown/components/AddElementDropdown.vue";
 import buildTreeStructure from "@appstore/js/buildTreeStructure.js";
+import CookieBanner from "../../shared/cookiebanner/components/CookieBanner.vue";
 import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
@@ -23,6 +24,7 @@ export default {
     components: {
         AccordionItem,
         AddElementDropdown,
+        CookieBanner,
         Draggable: draggable,
         FlatButton,
         Multiselect,
@@ -80,6 +82,7 @@ export default {
             confirmedCoordinate: [],
             confirmedZoomlevel: "",
             is3DLayerExisted: false,
+            isCookieAllowed: document.cookie.split("; ").some(cookie => cookie.startsWith("username=storyvideo")),
             layerList: [],
             navigation3D: undefined,
             toolList: [],
@@ -815,6 +818,16 @@ export default {
             }
         },
         /**
+         * Set the cookie if external video is enabled.
+         * @returns {void}
+         */
+        setCookie () {
+            const maxAge = 7 * 24 * 60 * 60;
+
+            document.cookie = "username=storyvideo; max-age=" + maxAge + "; path=/";
+            this.isCookieAllowed = true;
+        },
+        /**
          * Set the mapView to north.
          * @returns {void}
          */
@@ -1218,14 +1231,23 @@ export default {
                                     class="video-container"
                                 >
                                     <iframe
+                                        v-if="isCookieAllowed"
                                         width="100%"
                                         height="100%"
                                         allow="autoplay"
                                         :src="getEmbedLink(element?.attrs?.link)"
                                         :title="element?.attrs?.title"
                                     />
+                                    <CookieBanner
+                                        v-if="!isCookieAllowed"
+                                        :source="getEmbedLink(element?.attrs?.link)"
+                                        @setCookie="setCookie"
+                                    />
                                 </div>
-                                <div class="mt-1 small">
+                                <div
+                                    v-if="isCookieAllowed"
+                                    class="mt-1 small"
+                                >
                                     {{ element?.attrs?.title }}
                                 </div>
                             </div>

@@ -2,6 +2,7 @@
 import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMessage.vue";
 import axios from "axios";
 import {boundingExtent} from "ol/extent.js";
+import CookieBanner from "../../shared/cookiebanner/components/CookieBanner.vue";
 import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
@@ -20,6 +21,7 @@ export default {
     name: "StoryPlayer",
     components: {
         AlertMessage,
+        CookieBanner,
         FlatButton,
         IconButton,
         StoryPlayerFeature,
@@ -33,6 +35,7 @@ export default {
             interval: null,
             isHovering: null,
             isChangeFrom3D: false,
+            isCookieAllowed: document.cookie.split("; ").some(cookie => cookie.startsWith("username=storyvideo")),
             loadedContent: null,
             overlay: null,
             scroller: null,
@@ -745,6 +748,17 @@ export default {
          */
         setToNorth () {
             mapCollection.getMapView("2D").animate({rotation: 0});
+        },
+
+        /**
+         * Set the cookie if external video is enabled.
+         * @returns {void}
+         */
+        setCookie () {
+            const maxAge = 7 * 24 * 60 * 60;
+
+            document.cookie = "username=storyvideo; max-age=" + maxAge + "; path=/";
+            this.isCookieAllowed = true;
         }
     }
 };
@@ -938,14 +952,23 @@ export default {
                                             class="video-container"
                                         >
                                             <iframe
+                                                v-if="isCookieAllowed"
                                                 width="100%"
                                                 height="100%"
                                                 allow="autoplay"
                                                 :src="getEmbedLink(item?.attrs?.link)"
                                                 :title="item?.attrs?.title"
                                             />
+                                            <CookieBanner
+                                                v-if="!isCookieAllowed"
+                                                :source="getEmbedLink(item?.attrs?.link)"
+                                                @setCookie="setCookie"
+                                            />
                                         </div>
-                                        <div class="mt-1 small">
+                                        <div
+                                            v-if="isCookieAllowed"
+                                            class="mt-1 small"
+                                        >
                                             {{ item?.attrs?.title }}
                                         </div>
                                     </div>

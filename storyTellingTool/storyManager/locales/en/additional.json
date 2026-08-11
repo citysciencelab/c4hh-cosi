@@ -18,7 +18,12 @@
       "confirmLeaveTitle": "Leave story manager?",
       "confirmLeaveContent": "Unsaved changes will be lost.",
       "confirmLeaveConfirm": "Leave",
-      "confirmLeaveCancel": "Cancel"
+      "confirmLeaveCancel": "Cancel",
+      "cookiebanner": {
+        "description": "To play this external video on our website, you must click on the button below. Please note that when you start the video, data will be transmitted to external providers.",
+        "playVideo": "Play video now",
+        "furtherInfo": "Privacy Policy"
+      }
     }
   }
 }
