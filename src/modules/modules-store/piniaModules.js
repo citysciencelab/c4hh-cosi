@@ -1,3 +1,4 @@
+import {useAboutStore} from "../about/store/aboutStore.js";
 import {useCopyrightConstraintsStore} from "../copyrightConstraints/store/copyrightConstraintsStore.js";
 import {useLayerInformationStore} from "../layerInformation/store/layerInformationStore.js";
 
@@ -14,6 +15,7 @@ import {useLayerInformationStore} from "../layerInformation/store/layerInformati
  * @module modules/piniaModules
  */
 const piniaModuleStores = {
+    about: useAboutStore,
     copyrightConstraints: useCopyrightConstraintsStore,
     layerInformation: useLayerInformationStore
 };

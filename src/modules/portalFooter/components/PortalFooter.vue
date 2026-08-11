@@ -1,5 +1,7 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
+import {mapState} from "pinia";
+import {useAboutStore} from "@modules/about/store/aboutStore.js";
 import ScaleLine from "./ScaleLine.vue";
 import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 
@@ -28,7 +30,7 @@ export default {
             "mainMenu",
             "secondaryMenu"
         ]),
-        ...mapGetters("Modules/About", [
+        ...mapState(useAboutStore, [
             "hideImprintInFooter"
         ]),
         /**
