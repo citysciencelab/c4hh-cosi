@@ -27,28 +27,71 @@ const raw = fs.readFileSync(filePath, "utf8");
 const osv = JSON.parse(raw);
 
 const findings = [];
+const seenFindingKeys = new Set();
+
+/**
+ * Determines the numeric CVSS base score of a vulnerability.
+ * The preferred source is the "max_severity" of the vulnerability group, because osv-scanner
+ * already resolved it to a number there. The "severity" entries of a vulnerability may contain
+ * a CVSS vector string (e.g. "CVSS:3.1/AV:N/...") instead of a number, which must not be parsed
+ * as a score. If no numeric score can be determined, null is returned.
+ * @param {Object} vuln The vulnerability as reported by osv-scanner.
+ * @param {Object[]} groups The vulnerability groups of the package the vulnerability belongs to.
+ * @returns {Number|null} The CVSS base score or null if it is unknown.
+ */
+function getCvssScore (vuln, groups) {
+    const group = (groups || []).find(candidate => (candidate.ids || []).includes(vuln.id)),
+        groupScore = Number(group?.max_severity);
+
+    if (Number.isFinite(groupScore)) {
+        return groupScore;
+    }
+
+    for (const entry of vuln.severity || []) {
+        const entryScore = Number(entry.score);
+
+        if (Number.isFinite(entryScore)) {
+            return entryScore;
+        }
+    }
+
+    return null;
+}
 
 /**
  * Tries to normalize OSV scan results into a flat array.
+ * A repository wide scan reports the same vulnerability once per lock file, so identical
+ * findings are collected only once.
  */
 for (const result of osv.results || []) {
     for (const pkg of result.packages || []) {
+        const packageName = pkg.package?.name || "unknown-package",
+            ecosystem = pkg.package?.ecosystem || "unknown-ecosystem",
+            version = pkg.package?.version || "unknown-version";
+
         for (const vuln of pkg.vulnerabilities || []) {
+            const id = vuln.id || "unknown-id",
+                findingKey = `${ecosystem}|${packageName}|${version}|${id}`;
+
+            if (seenFindingKeys.has(findingKey)) {
+                continue;
+            }
+            seenFindingKeys.add(findingKey);
+
             findings.push({
-                packageName: pkg.package?.name || "unknown-package",
-                ecosystem: pkg.package?.ecosystem || "unknown-ecosystem",
-                id: vuln.id || "unknown-id",
+                packageName,
+                ecosystem,
+                version,
+                id,
                 summary: vuln.summary || "",
                 details: vuln.details || "",
-                severity: Array.isArray(vuln.severity) && vuln.severity.length > 0
-                    ? vuln.severity.map(s => `${s.type}:${s.score}`).join(", ")
-                    : "unknown"
+                cvssScore: getCvssScore(vuln, pkg.groups)
             });
         }
     }
 }
 
-console.log(`Total vulnerabilities found: ${findings.length}`);
+console.log(`Total unique vulnerabilities found: ${findings.length}`);
 
 // If your osv-scanner output shape differs, adapt parsing here.
 if (findings.length === 0) {
@@ -66,16 +109,8 @@ if (findings.length === 0) {
 // 9 => only CRITICAL vulnerabilities
 const minCvssScore = Number(process.env.OSV_MIN_CVSS_SCORE || 4);
 
-const relevantFindings = findings.filter(f => {
-    const severity = (f.severity || "").toUpperCase();
-
-    const scores = [...severity.matchAll(/(\d+(?:\.\d+)?)/g)]
-        .map(match => Number(match[1]));
-
-    f.cvssScore = Math.max(...scores, 0);
-
-    return scores.length === 0 || f.cvssScore >= minCvssScore;
-});
+// Findings without a known score are always reported, so that they are not silently dropped.
+const relevantFindings = findings.filter(f => f.cvssScore === null || f.cvssScore >= minCvssScore);
 
 if (relevantFindings.length === 0) {
     console.log(
@@ -93,7 +128,7 @@ const maxIdx = String(relevantFindings.length).length + 1;
 const formattedFindingLines = relevantFindings.map((f, index) => {
     const num = `${index + 1}.`.padEnd(maxIdx + 1);
     const pkg = f.packageName.padEnd(maxPkg);
-    const cvss = `CVSS:${f.cvssScore}`.padEnd(8);
+    const cvss = `CVSS:${f.cvssScore === null ? "n/a" : f.cvssScore}`.padEnd(8);
     const id = f.id.padEnd(maxId);
 
     return `${num} ${pkg} | ${cvss} | ${id} | ${f.summary}`;
