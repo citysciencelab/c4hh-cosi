@@ -90,44 +90,26 @@ const maxPkg = Math.max(...relevantFindings.map(f => f.packageName.length));
 const maxId = Math.max(...relevantFindings.map(f => f.id.length));
 const maxIdx = String(relevantFindings.length).length + 1;
 
-relevantFindings.forEach((f, index) => {
+const formattedFindingLines = relevantFindings.map((f, index) => {
     const num = `${index + 1}.`.padEnd(maxIdx + 1);
     const pkg = f.packageName.padEnd(maxPkg);
     const cvss = `CVSS:${f.cvssScore}`.padEnd(8);
     const id = f.id.padEnd(maxId);
 
-    console.log(`${num} ${pkg} | ${cvss} | ${id} | ${f.summary}`);
+    return `${num} ${pkg} | ${cvss} | ${id} | ${f.summary}`;
 });
+
+formattedFindingLines.forEach(line => console.log(line));
 
 
 const highestCount = relevantFindings.length;
 
-const summary = `[Security] OSV findings in ${bitbucketRepoFullName}: ${highestCount} finding(s) above CVSS ${minCvssScore}`;
+const summary = `${highestCount} findings above CVSS ${minCvssScore}`;
 
-const topFindingsText = relevantFindings
-    .slice(0, 10)
-    .map((f, index) =>
-        `${index + 1}. ${f.packageName} | CVSS:${f.cvssScore} | ${f.id} | ${f.severity}`
-    )
-    .join("\n");
-
-const description = `
-Automated security finding from Bitbucket Pipeline.
-
-Repository: ${bitbucketRepoFullName}
-Branch: ${bitbucketBranch}
-Commit: ${bitbucketCommit}
-Build: ${bitbucketBuildNumber}
-
-Detected vulnerabilities above CVSS ${minCvssScore}:
-${topFindingsText}
-
-Next steps:
-- Review osv-result.json artifact
-- Validate exploitability in project context
-- Decide remediation strategy
-- Create dependency upgrade/fix task if confirmed
-`.trim();
+const description = [
+    `Relevant findings above CVSS ${minCvssScore}:`,
+    ...formattedFindingLines
+].join("\n");
 
 const auth = Buffer.from(`${jiraUserEmail}:${jiraApiToken}`).toString("base64");
 
@@ -145,11 +127,14 @@ const body = {
             version: 1,
             content: [
                 {
-                    type: "paragraph",
-                    content: description.split("\n").map(line => ({
+                    type: "codeBlock",
+                    attrs: {
+                        language: "text"
+                    },
+                    content: [{
                         type: "text",
-                        text: line
-                    }))
+                        text: description
+                    }]
                 }
             ]
         },
