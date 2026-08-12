@@ -1,5 +1,6 @@
 <script>
 import TabContainer from "@shared/modules/tabs/components/TabContainer.vue";
+import {mapActions} from "vuex";
 import TabBasicData from "./TabBasicData.vue";
 import TabGraphics from "./TabGraphics.vue";
 
@@ -32,7 +33,7 @@ export default {
                     ref: "tabGraphics",
                     label: this.$t("additional:addons.gfiThemes.waterStatistics.tabs.tabGraphics.label"),
                     component: TabGraphics,
-                    propsForTabContent: {attributes: this.attributes, params: this.params},
+                    propsForTabContent: {params: this.params, allAttributes: this.allAttributes},
                     renderComponent: true
                 }
             ];
@@ -45,7 +46,25 @@ export default {
         },
         params () {
             return this.feature?.getTheme().params;
+        },
+        allAttributes () {
+            return this.feature.getProperties();
         }
+    },
+    mounted () {
+        const oafParams = this.params?.themeTabs?.find(tab => tab.type === "timeline")?.oafParams;
+
+        const queryParams = {
+            url: oafParams?.url,
+            collections: oafParams?.collection
+        };
+
+        this.queryOafSchema({params: queryParams});
+    },
+    methods: {
+        ...mapActions("Modules/WaterStatistics", [
+            "queryOafSchema"
+        ])
     }
 };
 </script>

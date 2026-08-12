@@ -1,12 +1,35 @@
 import {shallowMount} from "@vue/test-utils";
+import {createStore} from "vuex";
 import {expect} from "chai";
+import sinon from "sinon";
 import WaterStatistics from "../../../components/WaterStatistics.vue";
 
 describe("addons/gfiThemes/waterStatistics/components/WaterStatistics.vue", () => {
-    let wrapper;
+    let store, wrapper;
 
     beforeEach(() => {
+        store = createStore({
+            namespaced: true,
+            modules: {
+                Modules: {
+                    namespaced: true,
+                    modules: {
+                        WaterStatistics: {
+                            namespaced: true,
+                            actions: {
+                                queryOaf: sinon.spy(),
+                                queryOafSchema: sinon.spy()
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         wrapper = shallowMount(WaterStatistics, {
+            global: {
+                plugins: [store]
+            },
             props: {
                 feature: {
                     getMappedProperties: function () {
@@ -14,10 +37,19 @@ describe("addons/gfiThemes/waterStatistics/components/WaterStatistics.vue", () =
                         };
                     },
                     getTheme: function () {
-                        return {};
+                        return {
+                            params: {
+                                themeTabs: []
+                            }
+                        };
                     },
                     getAttributesToShow: function () {
-                        return {};
+                        return {
+                        };
+                    },
+                    getProperties: function () {
+                        return {
+                        };
                     }
                 }
             }
