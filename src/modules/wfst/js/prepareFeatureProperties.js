@@ -9,13 +9,12 @@ import wfs from "@masterportal/masterportalapi/src/layer/wfs.js";
  * @returns {FeatureProperty[]} If layer.gfiAttributes !== "ignore", then an array of prepared feature properties; else and empty array.
  */
 async function prepareFeatureProperties (layer, featurePropertiesValues) {
-    const isGfiAttributesIgnore = layer.gfiAttributes === "ignore",
-        isGfiAttributesShowAll = layer.gfiAttributes === "showAll",
-        isGfiAttributesObject = typeof layer.gfiAttributes === "object" && layer.gfiAttributes !== null && !Array.isArray(layer.gfiAttributes),
-        url = layer.url;
-    let properties,
-        propertiesWithBooleans = [],
-        preparedProperties = [];
+    const isGfiAttributesIgnore = layer.gfiAttributes === "ignore";
+    const isGfiAttributesShowAll = layer.gfiAttributes === "showAll";
+    const url = layer.url;
+    let properties;
+    let propertiesWithBooleans = [];
+    let preparedProperties = [];
 
     if (isGfiAttributesIgnore) {
         return [];
@@ -37,7 +36,7 @@ async function prepareFeatureProperties (layer, featurePropertiesValues) {
     if (isGfiAttributesShowAll) {
         preparedProperties = propertiesWithBooleans;
     }
-    else if (isGfiAttributesObject) {
+    else {
         const layerGfiAttributesKeys = Object.keys(layer.gfiAttributes);
 
         preparedProperties = propertiesWithBooleans
