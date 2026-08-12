@@ -239,6 +239,8 @@ export default {
          * @return {void}
          */
         parseLayerStructure: function (folder, object, level) {
+            const showImportedLayersInLayerList = this.showInLayerTree;
+
             if (Object.prototype.hasOwnProperty.call(object, "Layer")) {
                 const subFolder = {
                     type: "folder",
@@ -274,7 +276,7 @@ export default {
                     isExternal: true,
                     featureCount: this.featureCount,
                     infoFormat: this.infoFormat,
-                    showInLayerTree: this.showInLayerTree,
+                    showInLayerTree: showImportedLayersInLayerList,
                     maxScale: object?.MaxScaleDenominator?.toString(),
                     minScale: object?.MinScaleDenominator?.toString(),
                     legendURL: object?.Style?.[0].LegendURL?.[0].OnlineResource?.toString(),

@@ -381,6 +381,42 @@ describe("src/modules/addWMS/components/AddWMS.vue", () => {
                 ]
             });
         });
+
+        it("should make imported layers directly available in layer list if showInLayerTree is configured", () => {
+            const folder = {
+                    type: "folder",
+                    name: "part 1",
+                    elements: []
+                },
+                object = {
+                    MaxScaleDenominator: undefined,
+                    MinScaleDenominator: undefined,
+                    Name: "geb_sum",
+                    Style: [
+                        {
+                            LegendURL: [
+                                {
+                                    Format: "image/png",
+                                    OnlineResource: "https://geodienste.hamburg.de/HH_WMS_Solaratlas?request=GetLegendGraphic&version=1.3.0&service=WMS&layer=geb_sum&style=style_solaratlas_geb_sum&format=image/png"
+                                }
+                            ],
+                            Name: "style_solaratlas_geb_sum",
+                            Title: "style_solaratlas_geb_sum"
+                        }
+                    ],
+                    Title: "geb_sum"
+                },
+                level = 1;
+
+            showInLayerTree = true;
+
+            wrapper.vm.wmsUrl = "https://geodienste.hamburg.de/HH_WMS_Solaratlas";
+            wrapper.vm.version = "1.3.0";
+            wrapper.vm.infoFormat = "text/xml";
+            wrapper.vm.parseLayerStructure(folder, object, level);
+
+            expect(folder.elements[0].showInLayerTree).to.be.true;
+        });
     });
 
     describe("addLayerToTopicTree", () => {

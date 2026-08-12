@@ -17,7 +17,9 @@
         "startModule": {
           "secondaryMenu": [
             {
-              "type": "addWMS"
+              "type": "addWMS",
+              "showInLayerTree": true,
+              "visibility": true
             }
           ]
         },

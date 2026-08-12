@@ -32,7 +32,11 @@ export default function getActionsLayerConfig () {
             dispatch("updateLayerConfigZIndex", {layerContainer, maxZIndex});
 
             if (matchingLayer === undefined) {
-                layerConfig.zIndex = maxZIndex + 1;
+                const nestedExternalConfigsCount = zIndexManager.assignZIndexToNestedExternalConfigs(layerConfig, maxZIndex);
+
+                if (!zIndexManager.hasNumericZIndex(layerConfig)) {
+                    layerConfig.zIndex = maxZIndex + nestedExternalConfigsCount + 1;
+                }
                 if (state.layerConfig[parentKey]) {
                     state.layerConfig[parentKey].elements.push(layerConfig);
                 }

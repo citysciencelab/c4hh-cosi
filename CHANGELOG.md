@@ -52,6 +52,7 @@
 - SearchBar: Added new `searchInterfaceCsw` to search records of a CSW catalog.
 
 ### Changed
+- Issue \#1641 : PortalFooter: The scaleline is displayed on mobile devices with a screen width of 320px or more.
 - FeatureLister: Replaced the module-specific navigation tabs with the shared NavTab component.
 - Repository: Added repository rules to enforce consistent contribution and review standards.
 - services.json-md: Corrected and extended dodumentation of OAF layer.
@@ -65,7 +66,10 @@
     - Tests now fail on vue warnings.
     - Excluded barchart and piechart tests due to issues with the prePushHook.
 - ResizeHandle: Simplified component by removing multi-directional resize infrastructure to support menu width resizing only (left/right positions).
-- Issue \#1641 : PortalFooter: The scaleline is displayed on mobile devices with a screen width of 320px or more.
+
+### Deprecated
+
+### Removed
 
 ### Fixed
 - Issue \#1522: Show publish date and creation date of metadata separately.
@@ -74,6 +78,7 @@
 - Issue \#1630: Fixed parseMissingKeyHandler misinterpreting decimal numbers as time values (e.g. "0.58 m" became "0:58 m"). The time format replacement now requires two-digit hours only.
 - Issue \#1632: Filter: Fix setting filter rules from URL Parameters.
 - Issue \#1634: url parameter `highlightFeaturesByAttributes` can now handle MultiPoint, MultiPolygon and MultiLineString features.
+- Issue \#1635: AddWMS: Fixed visibility and showInLayerTree to correctly control imported layer visibility and tree placement. Newly imported external layers now receive proper zIndex assignment when visibility or showInLayerTree is enabled.
 - Issue \#1638: FolderCheckBox: Folder checkbox selection (isFolderSelectable) now adds layers in the same order as "add all".
 - Issue \#1641 : PortalFooter: if `alias_mobile` is not set at `urls` entry, link is not shown on mobile devices.
 - Control: Fixed a layout issue with the control module.
