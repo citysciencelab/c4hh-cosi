@@ -17,7 +17,6 @@ import GetFeatureInfo from "../getFeatureInfo/store/indexGetFeatureInfo.js";
 import GraphicalSelect from "@shared/modules/graphicalSelect/store/indexGraphicalSelect.js";
 import Language from "../language/store/indexLanguage.js";
 import LayerClusterToggler from "../layerClusterToggler/store/indexLayerClusterToggler.js";
-import LayerInformation from "../layerInformation/store/indexLayerInformation.js";
 import LayerPills from "../layerPills/store/indexLayerPills.js";
 import LayerPreview from "@shared/modules/layerPreview/store/indexLayerPreview.js";
 import LayerSelection from "../layerSelection/store/indexLayerSelection.js";
@@ -68,7 +67,6 @@ export default {
         GraphicalSelect: {...GraphicalSelect},
         Language: {...Language},
         LayerClusterToggler: {...LayerClusterToggler},
-        LayerInformation: {...LayerInformation},
         LayerPills: {...LayerPills},
         LayerPreview: {...LayerPreview},
         LayerSelection: {...LayerSelection},

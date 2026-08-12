@@ -1,11 +1,14 @@
 import {createStore} from "vuex";
+import {createPinia, setActivePinia} from "pinia";
 import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import LayerInfoContactButton from "@modules/layerTree/components/LayerInfoContactButton.vue";
-
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 describe("src/modules/layerTree/components/LayerInfoContactButton.vue", () => {
     let store,
+        pinia,
+        layerInformationStore,
         pointOfContact,
         publisher,
         isModuleAvailable,
@@ -18,6 +21,19 @@ describe("src/modules/layerTree/components/LayerInfoContactButton.vue", () => {
 
     beforeEach(() => {
         isModuleAvailable = true;
+        pinia = createPinia();
+        setActivePinia(pinia);
+        layerInformationStore = useLayerInformationStore();
+        layerInformationStore.layerInfo = {
+            "metaIdArray": [],
+            "url": [
+                "https://wms.example.org/",
+                "https://wfs.example.org/?evil=1",
+                "./local.geojson"
+            ],
+            "typ": ["WMS", "WFS", "GeoJSON"],
+            "layerNames": ["X-WMS", "X-WFS", ""]
+        };
         store = createStore({
             namespaced: true,
             modules: {
@@ -26,14 +42,6 @@ describe("src/modules/layerTree/components/LayerInfoContactButton.vue", () => {
                     namespaced: true,
                     modules: {
                         namespaced: true,
-                        LayerInformation: {
-                            namespaced: true,
-                            getters: {
-                                layerInfo: () => ({"metaIdArray": [], "url": ["https://wms.example.org/", "https://wfs.example.org/?evil=1", "./local.geojson"], "typ": ["WMS", "WFS", "GeoJSON"], "layerNames": ["X-WMS", "X-WFS", ""]}),
-                                pointOfContact: () => pointOfContact,
-                                publisher: () => publisher
-                            }
-                        },
                         Contact: {
                             namespaced: true,
                             getters: {
@@ -89,10 +97,12 @@ describe("src/modules/layerTree/components/LayerInfoContactButton.vue", () => {
             "country": "DEU"
         };
         publisher = "";
+        layerInformationStore.pointOfContact = pointOfContact;
+        layerInformationStore.publisher = publisher;
 
         const wrapper = mount(LayerInfoContactButton, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData
         });
@@ -103,10 +113,12 @@ describe("src/modules/layerTree/components/LayerInfoContactButton.vue", () => {
     it("should not show contact button if no contact information is in the metadata", async () => {
         pointOfContact = "";
         publisher = "";
+        layerInformationStore.pointOfContact = pointOfContact;
+        layerInformationStore.publisher = publisher;
 
         const wrapper = mount(LayerInfoContactButton, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData
         });
@@ -127,10 +139,12 @@ describe("src/modules/layerTree/components/LayerInfoContactButton.vue", () => {
         };
         publisher = "";
         isModuleAvailable = false;
+        layerInformationStore.pointOfContact = pointOfContact;
+        layerInformationStore.publisher = publisher;
 
         const wrapper = mount(LayerInfoContactButton, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData
         });
@@ -140,14 +154,19 @@ describe("src/modules/layerTree/components/LayerInfoContactButton.vue", () => {
 
     it("should return contact message with publisher name when contactPublisherName is true and contactName exists", () => {
         contactPublisherName = true;
+        layerInformationStore.pointOfContact = {
+            "name": "Behörde ABC"
+        };
 
         const wrapper = mount(LayerInfoContactButton, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData
         });
 
-        expect(wrapper.componentVM.infoMessage).to.equal("common:modules.layerInformation.contactPublisherBehörde ABC");
+        expect(wrapper.componentVM.infoMessage).to.equal(
+            "common:modules.layerInformation.contactPublisherBehörde ABC"
+        );
     });
 });

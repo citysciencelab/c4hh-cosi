@@ -1,5 +1,7 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapActions as mapPiniaActions} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 import layerTypes from "@core/layers/js/layerTypes.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
@@ -90,8 +92,7 @@ export default {
     methods: {
         ...mapMutations("Modules/LayerPills", ["setVisibleSubjectDataLayers"]),
         ...mapActions(["initializeModule", "replaceByIdInLayerConfig"]),
-        ...mapActions("Modules/LayerInformation", ["startLayerInformation"]),
-
+        ...mapPiniaActions(useLayerInformationStore, ["startLayerInformation"]),
         /**
          * Initializes and registers a ResizeObserver for the layer pills container.
          * Ensures that the observer is created only once and only after the container

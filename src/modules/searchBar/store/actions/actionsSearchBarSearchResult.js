@@ -12,6 +12,7 @@ import applyTileStyle from "@shared/js/utils/applyTileStyle.js";
 import remove3DFeatureHighlight from "@shared/js/utils/remove3DFeatureHighlight.js";
 import {convertColor} from "@shared/js/utils/convertColor.js";
 import {fetchCswRecordXml, buildAlertPayload, alertCswFetchError, addLayersFromOnlineResources} from "./addLayerFromCswRecordHelper.js";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 /**
  * Contains actions that communicate with other components after an interaction, such as onClick or onHover, with a search result.
@@ -288,7 +289,7 @@ export default {
         const layerConfig = await dispatch("retrieveLayerConfig", {layerId, source});
 
         if (layerConfig) {
-            dispatch("Modules/LayerInformation/startLayerInformation", layerConfig, {root: true});
+            useLayerInformationStore().startLayerInformation(layerConfig);
             commit("Modules/LayerSelection/setLayerInfoVisible", true, {root: true});
         }
         else {

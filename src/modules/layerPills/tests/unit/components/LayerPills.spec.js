@@ -3,6 +3,8 @@ import {shallowMount, mount, config} from "@vue/test-utils";
 import LayerPillsComponent from "@modules/layerPills/components/LayerPills.vue";
 import {expect} from "chai";
 import sinon from "sinon";
+import {createPinia, setActivePinia} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 config.global.directives = {"bs-tooltip": {mounted: () => { /* stub */ }}};
 
@@ -10,6 +12,8 @@ let observeSpy, disconnectSpy, ResizeObserverStub;
 
 describe("src/modules/LayerPills.vue", () => {
     let store,
+        pinia,
+        layerInformationStore,
         wrapper,
         visibleLayers,
         active,
@@ -36,7 +40,7 @@ describe("src/modules/LayerPills.vue", () => {
                 }
             },
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             props: {
                 ...props
@@ -72,6 +76,10 @@ describe("src/modules/LayerPills.vue", () => {
         replaceByIdInLayerConfigSpy = sinon.spy();
         setVisibleSubjectDataLayersSpy = sinon.spy();
         startLayerInformationSpy = sinon.spy();
+        pinia = createPinia();
+        setActivePinia(pinia);
+        layerInformationStore = useLayerInformationStore();
+        layerInformationStore.startLayerInformation = startLayerInformationSpy;
         visibleLayers = [
             {id: 0, name: "layer1", typ: "WMS", showInLayerTree: true},
             {id: 1, name: "layer2", typ: "WMS", showInLayerTree: true},
@@ -104,12 +112,6 @@ describe("src/modules/LayerPills.vue", () => {
                             namespaced: true,
                             getters: {
                                 layerTreeSortedLayerConfigs: () => () => visibleLayers
-                            }
-                        },
-                        LayerInformation: {
-                            namespaced: true,
-                            actions: {
-                                startLayerInformation: startLayerInformationSpy
                             }
                         }
                     }
@@ -162,7 +164,7 @@ describe("src/modules/LayerPills.vue", () => {
         it("should set up ResizeObserver and observe container on mounted", () => {
             wrapper = mount(LayerPillsComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 attachTo: document.body
             });
@@ -173,7 +175,7 @@ describe("src/modules/LayerPills.vue", () => {
         it("should disconnect ResizeObserver on beforeUnmount", () => {
             wrapper = mount(LayerPillsComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 attachTo: document.body
             });
@@ -226,7 +228,7 @@ describe("src/modules/LayerPills.vue", () => {
         it("count close-buttons", () => {
             wrapper = mount(LayerPillsComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }});
 
             expect(wrapper.findAll(".close-button").length).to.equals(visibleSubjectDataLayers.length);
@@ -317,7 +319,7 @@ describe("src/modules/LayerPills.vue", () => {
 
         it("does not show toggle button when there is enough space", async () => {
             wrapper = mount(LayerPillsComponent, {
-                global: {plugins: [store]},
+                global: {plugins: [store, pinia]},
                 attachTo: document.body
             });
 
@@ -342,7 +344,7 @@ describe("src/modules/LayerPills.vue", () => {
             visibleSubjectDataLayers = [{name: "l1"}, {name: "l2"}];
 
             wrapper = mount(LayerPillsComponent, {
-                global: {plugins: [store]},
+                global: {plugins: [store, pinia]},
                 attachTo: document.body
             });
 
@@ -426,7 +428,7 @@ describe("src/modules/LayerPills.vue", () => {
                     }
                 },
                 global: {
-                    plugins: [store],
+                    plugins: [store, pinia],
                     directives: {"bs-tooltip": bsTooltipStub}
                 }
             });

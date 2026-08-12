@@ -2,7 +2,7 @@ import store from "@appstore/index.js";
 import changeCase from "@shared/js/utils/changeCase.js";
 import processUrlParams from "@shared/js/utils/processUrlParams.js";
 import isMobile from "@shared/js/utils/isMobile.js";
-
+import {getPiniaModuleStore} from "@modules/modules-store/piniaModules.js";
 /**
  * Here the urlParams for the menu are processed.
  *
@@ -61,6 +61,17 @@ function setAttributesToComponent (params) {
         }
         else if (store._actions[`Modules/${type}/restoreFromUrlParams`]) {
             store.dispatch(`Modules/${type}/restoreFromUrlParams`, attributes, {root: true});
+        }
+        else {
+            const usePiniaStore = getPiniaModuleStore(menuSideParams.CURRENTCOMPONENT);
+
+            if (usePiniaStore) {
+                const piniaStore = usePiniaStore();
+
+                if (typeof piniaStore.restoreFromUrlParams === "function") {
+                    piniaStore.restoreFromUrlParams(attributes);
+                }
+            }
         }
     });
 }

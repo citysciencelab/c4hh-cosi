@@ -2,12 +2,14 @@ import {createStore} from "vuex";
 import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
+import {createPinia, setActivePinia} from "pinia";
 
 import LayerComponentSubMenu from "@modules/layerTree/components/LayerComponentSubMenu.vue";
 
 
 describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
-    let changeCurrentComponentStub,
+    let pinia,
+        changeCurrentComponentStub,
         layer,
         layerConfigStub,
         propsData,
@@ -28,6 +30,8 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         };
 
     beforeEach(() => {
+        pinia = createPinia();
+        setActivePinia(pinia);
         layer = {
             id: "1",
             name: "layer",
@@ -143,7 +147,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         showFolderPath = false;
         wrapper = shallowMount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -162,7 +166,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         });
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -176,7 +180,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         layer.parentId = "folder-1";
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -189,7 +193,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         showFolderPath = true;
         wrapper = shallowMount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -202,7 +206,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         layer.parentId = "folder-1";
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -229,7 +233,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
     it("renders the remove-layer", () => {
         wrapper = shallowMount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -240,7 +244,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
     it("should remove layer if remove layer button is clicked", async () => {
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -253,7 +257,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
     it("renders the transparency", () => {
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -269,7 +273,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
 
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -311,7 +315,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
 
         wrapper = shallowMount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: {
                 layerConf: layer1
@@ -337,7 +341,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
 
         wrapper = shallowMount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: {
                 layerConf: layer1
@@ -352,7 +356,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         it("getPath - no folders --> no path", () => {
             wrapper = shallowMount(LayerComponentSubMenu, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 propsData
             });
@@ -365,7 +369,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
 
             wrapper = shallowMount(LayerComponentSubMenu, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 propsData
             });
@@ -375,7 +379,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         it("getNamesOfParentFolder returns array with folder names", () => {
             wrapper = shallowMount(LayerComponentSubMenu, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 propsData
             });
@@ -385,7 +389,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         it("getNamesOfParentFolder returns empty array if parentId is undefined of folder is unknown", () => {
             wrapper = shallowMount(LayerComponentSubMenu, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 propsData
             });

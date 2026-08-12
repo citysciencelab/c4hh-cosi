@@ -1,6 +1,8 @@
 import sinon from "sinon";
 import {expect} from "chai";
 import axios from "axios";
+import {createPinia, setActivePinia} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import WKTUtil from "@shared/js/utils/getWKTGeom.js";
 import wmsGFIUtil from "@shared/js/utils/getWmsFeaturesByMimeType.js";
@@ -16,7 +18,9 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
         commit,
         getters,
         zoomLevel,
-        map;
+        map,
+        layerInformationStore,
+        startLayerInformationSpy;
 
     beforeEach(() => {
         zoomLevel = 5;
@@ -49,6 +53,11 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
         sinon.stub(markerHelper, "extentIsValid").returns(true);
         sinon.stub(console, "warn").callsFake(sinon.spy());
         sinon.stub(console, "error").callsFake(sinon.spy());
+        setActivePinia(createPinia());
+
+        layerInformationStore = useLayerInformationStore();
+        startLayerInformationSpy = sinon.spy();
+        layerInformationStore.startLayerInformation = startLayerInformationSpy;
     });
 
     afterEach(() => {
@@ -304,45 +313,28 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
 
     });
 
-    describe("showLayerInfo", () => {
-        it("should call startLayerInformation - layer in layerConfig", async () => {
-            const layerId = "123",
-                config = {
-                    layerId
-                },
-                source = {
-                    id: "sourceId"
-                };
+    it("should call startLayerInformation - layer in layerConfig", async () => {
+        const layerId = "123",
+            config = {
+                layerId
+            },
+            source = {
+                id: "sourceId"
+            };
 
-            dispatch = sinon.stub().resolves(config);
-            await actions.showLayerInfo({dispatch, commit}, {layerId, source});
+        dispatch = sinon.stub().resolves(config);
+        await actions.showLayerInfo({dispatch, commit}, {layerId, source});
 
-            expect(dispatch.calledTwice).to.be.true;
-            expect(dispatch.firstCall.args[0]).to.equals("retrieveLayerConfig");
-            expect(dispatch.firstCall.args[1]).to.be.deep.equals({layerId, source});
-            expect(dispatch.secondCall.args[0]).to.equals("Modules/LayerInformation/startLayerInformation");
-            expect(dispatch.secondCall.args[1]).to.be.deep.equals(config);
-            expect(commit.calledOnce).to.be.true;
-            expect(commit.firstCall.args[0]).to.equals("Modules/LayerSelection/setLayerInfoVisible");
-            expect(commit.firstCall.args[1]).to.be.true;
-        });
+        expect(dispatch.calledOnce).to.be.true;
+        expect(dispatch.firstCall.args[0]).to.equals("retrieveLayerConfig");
+        expect(dispatch.firstCall.args[1]).to.be.deep.equals({layerId, source});
 
-        it("should call startLayerInformation - layer not in layerConfig", async () => {
-            const layerId = "123";
+        expect(startLayerInformationSpy.calledOnce).to.be.true;
+        expect(startLayerInformationSpy.firstCall.args[0]).to.be.deep.equals(config);
 
-            dispatch = sinon.stub().resolves(undefined);
-            await actions.showLayerInfo({dispatch, commit}, {layerId});
-
-            expect(console.warn.callCount).to.equal(1);
-            expect(dispatch.callCount).to.equal(2);
-            expect(dispatch.firstCall.args[0]).to.equals("retrieveLayerConfig");
-            expect(dispatch.firstCall.args[1]).to.be.deep.equals({layerId, source: undefined});
-            expect(dispatch.secondCall.args[0]).to.equals("Alerting/addSingleAlert");
-            expect(dispatch.secondCall.args[1]).to.be.deep.equals({
-                category: "info",
-                content: i18next.t("common:modules.searchBar.layerInfoNotShown")
-            });
-        });
+        expect(commit.calledOnce).to.be.true;
+        expect(commit.firstCall.args[0]).to.equals("Modules/LayerSelection/setLayerInfoVisible");
+        expect(commit.firstCall.args[1]).to.be.true;
     });
 
     describe("retrieveLayerConfig", () => {

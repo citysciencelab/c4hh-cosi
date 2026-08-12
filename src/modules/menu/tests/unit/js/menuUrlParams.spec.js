@@ -2,6 +2,8 @@ import menuUrlParams from "@modules/menu/js/menuUrlParams.js";
 import store from "@appstore/index.js";
 import {expect} from "chai";
 import sinon from "sinon";
+import {createPinia, setActivePinia} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 
 describe("src/modules/menu/js/menuUrlParams.js", () => {
@@ -83,6 +85,26 @@ describe("src/modules/menu/js/menuUrlParams.js", () => {
                 menuSide: "secondaryMenu",
                 foo: "bar"
             });
+        });
+
+        it("call 'restoreFromUrlParams' of a Pinia component which cannot be opened by menu", () => {
+            const params = {
+                    MENU: "{\"main\":{\"currentComponent\":\"root\"},\"secondary\":{\"currentComponent\":\"layerInformation\",\"attributes\":{\"menuSide\":\"secondaryMenu\",\"foo\":\"bar\"}}}"
+                },
+                pinia = createPinia();
+
+            setActivePinia(pinia);
+
+            const layerInformationStore = useLayerInformationStore(),
+                restoreFromUrlParamsSpy = sinon.stub(layerInformationStore, "restoreFromUrlParams");
+
+            menuUrlParams.setAttributesToComponent(params);
+
+            expect(restoreFromUrlParamsSpy.calledOnce).to.be.true;
+            expect(restoreFromUrlParamsSpy.calledWith({
+                menuSide: "secondaryMenu",
+                foo: "bar"
+            })).to.be.true;
         });
 
 

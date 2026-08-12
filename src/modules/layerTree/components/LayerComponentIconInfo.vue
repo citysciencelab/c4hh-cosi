@@ -1,5 +1,7 @@
 <script>
-import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapMutations} from "vuex";
+import {mapActions, mapState} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 
@@ -25,13 +27,13 @@ export default {
         }
     },
     computed: {
-        ...mapGetters("Modules/LayerInformation", ["icon"]),
+        ...mapState(useLayerInformationStore, ["icon"]),
         showInfoIcon () {
             return this.layerConf?.datasets !== false;
         }
     },
     methods: {
-        ...mapActions("Modules/LayerInformation", ["startLayerInformation"]),
+        ...mapActions(useLayerInformationStore, ["startLayerInformation"]),
         ...mapMutations("Modules/LayerSelection", ["setLayerInfoVisible"]),
 
         showLayerInformation () {

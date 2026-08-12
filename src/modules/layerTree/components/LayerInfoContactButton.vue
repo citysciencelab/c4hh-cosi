@@ -1,6 +1,8 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import {mapState} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 /**
  * Button to open contact module with specific email parameters relating to layer information
@@ -25,7 +27,7 @@ export default {
     },
     computed: {
         ...mapGetters(["isModuleAvailable", "portalConfig"]),
-        ...mapGetters("Modules/LayerInformation", [
+        ...mapState(useLayerInformationStore, [
             "layerInfo",
             "pointOfContact",
             "publisher"

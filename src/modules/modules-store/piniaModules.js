@@ -1,4 +1,5 @@
 import {useCopyrightConstraintsStore} from "../copyrightConstraints/store/copyrightConstraintsStore.js";
+import {useLayerInformationStore} from "../layerInformation/store/layerInformationStore.js";
 
 /**
  * Registry of modules that have been migrated from Vuex to Pinia.
@@ -13,7 +14,8 @@ import {useCopyrightConstraintsStore} from "../copyrightConstraints/store/copyri
  * @module modules/piniaModules
  */
 const piniaModuleStores = {
-    copyrightConstraints: useCopyrightConstraintsStore
+    copyrightConstraints: useCopyrightConstraintsStore,
+    layerInformation: useLayerInformationStore
 };
 
 /**

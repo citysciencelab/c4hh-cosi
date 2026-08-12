@@ -1,11 +1,13 @@
 <script>
-import LegendSingleLayer from "../../legend/components/LegendSingleLayer.vue";
+import LegendSingleLayer from "@modules/legend/components/LegendSingleLayer.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapActions as mapPiniaActions, mapState} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 import {isWebLink} from "@shared/js/utils/urlHelper.js";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 import {buildMetaURLs} from "@shared/js/utils/metaUrlHelper.js";
-import LayerInfoContactButton from "../../layerTree/components/LayerInfoContactButton.vue";
+import LayerInfoContactButton from "@modules/layerTree/components/LayerInfoContactButton.vue";
 
 /**
  * The Layer Information that gives the user information, links and the legend for a layer
@@ -39,7 +41,7 @@ export default {
     },
     computed: {
         ...mapGetters(["configJs", "layerConfigById"]),
-        ...mapGetters("Modules/LayerInformation", [
+        ...mapState(useLayerInformationStore, [
             "abstractText",
             "customText",
             "dateCreation",
@@ -171,11 +173,17 @@ export default {
     },
 
     methods: {
-        ...mapActions("Modules/LayerInformation", ["setConfigParams", "additionalSingleLayerInfo", "getAbstractInfo"]),
+        ...mapPiniaActions(useLayerInformationStore, ["setConfigParams", "additionalSingleLayerInfo", "getAbstractInfo"]),
         ...mapActions("Modules/Legend", ["createLegendForLayerInfo"]),
-        ...mapMutations("Modules/LayerInformation", ["setMetaDataCatalogueId", "setSelectedLayerIndex"]),
         ...mapMutations("Modules/Legend", ["setLayerInfoLegend"]),
         ...mapActions("Menu", ["changeCurrentComponent"]),
+        setMetaDataCatalogueId (value) {
+            useLayerInformationStore().metaDataCatalogueId = value;
+        },
+
+        setSelectedLayerIndex (value) {
+            useLayerInformationStore().selectedLayerIndex = value;
+        },
         isWebLink,
 
         /**

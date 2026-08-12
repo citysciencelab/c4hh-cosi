@@ -5,10 +5,12 @@ import sinon from "sinon";
 import {treeBaselayersKey, treeSubjectsKey} from "@shared/js/utils/constants.js";
 import LayerTreeNode from "@modules/layerTree/components/LayerTreeNode.vue";
 import gettersLayerTree from "@modules/layerTree/store/gettersLayerTree.js";
+import {createPinia, setActivePinia} from "pinia";
 
 
 describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
-    let store,
+    let pinia,
+        store,
         wrapper,
         mapMode,
         layerBG_1,
@@ -29,6 +31,8 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
         allowBaselayerDrag;
 
     beforeEach(() => {
+        pinia = createPinia();
+        setActivePinia(pinia);
         mapMode = "2D";
         removeLayerSpy = sinon.spy();
         setRemoveOnSpillSpy = sinon.spy();
@@ -229,7 +233,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
 
                 wrapper = mount(LayerTreeNode, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 });
 
@@ -246,7 +250,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
 
                 wrapper = mount(LayerTreeNode, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 });
 
@@ -258,7 +262,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
     it("renders a simple layer", () => {
         wrapper = mount(LayerTreeNode, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -280,7 +284,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
         subjectDataLayers = layersWithFolder;
         wrapper = mount(LayerTreeNode, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -304,7 +308,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
         subjectDataLayers = layers2D.concat(layers3D);
         wrapper = mount(LayerTreeNode, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -328,7 +332,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
         it("removeLayerOnSpill - calls removeLayer if showLayerAddButton is true", () => {
             wrapper = mount(LayerTreeNode, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }
             });
             wrapper.vm.removeLayerOnSpill({oldIndex: 1});
@@ -338,7 +342,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
             addLayerButton.active = true;
             wrapper = mount(LayerTreeNode, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }
             });
             wrapper.vm.removeLayerOnSpill({oldIndex: 1});
@@ -349,7 +353,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
         it("hideTooltip - should hide the corresponding tooltip of the event item", async () => {
             wrapper = mount(LayerTreeNode, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }
             });
             const eventItem = document.createElement("div"),
@@ -487,7 +491,7 @@ describe("src/modules/layerTree/components/LayerTreeNode.vue", () => {
 
             wrapper = mount(LayerTreeNode, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }
             });
 

@@ -1,6 +1,7 @@
 <script>
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
-import {mapActions, mapMutations} from "vuex";
+import {mapActions} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 /**
  * Represents an sub menu button for a layer in the layertree.
@@ -30,8 +31,11 @@ export default {
         }
     },
     methods: {
-        ...mapActions("Modules/LayerInformation", ["setMetadataURL", "additionalSingleLayerInfo"]),
-        ...mapMutations("Modules/LayerInformation", ["setLayerInfo"])
+        ...mapActions(useLayerInformationStore, [
+            "setMetadataURL",
+            "additionalSingleLayerInfo",
+            "setLayerInfo"
+        ])
     }
 };
 </script>

@@ -6,10 +6,12 @@ import {treeBaselayersKey, treeSubjectsKey} from "@shared/js/utils/constants.js"
 import getNestedValues from "@shared/js/utils/getNestedValues.js";
 import LayerTreeComponent from "@modules/layerTree/components/LayerTree.vue";
 import LayerTree from "@modules/layerTree/store/indexLayerTree.js";
+import {createPinia, setActivePinia} from "pinia";
 
 
 describe("src/modules/layerTree/components/LayerTree.vue", () => {
-    let allLayerConfigsStructured,
+    let pinia,
+        allLayerConfigsStructured,
         layerConfigs,
         store,
         wrapper,
@@ -27,6 +29,8 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
         treeType;
 
     beforeEach(() => {
+        pinia = createPinia();
+        setActivePinia(pinia);
         mapMode = "2D";
         treeType = "";
         addLayerButton = {
@@ -278,7 +282,7 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
         layersBG = [];
         wrapper = shallowMount(LayerTreeComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -295,7 +299,7 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
         };
         wrapper = shallowMount(LayerTreeComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -307,7 +311,7 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
     it("no layer button - renders the LayerTree with 2D layers as children - check layers", () => {
         wrapper = mount(LayerTreeComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -323,7 +327,7 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
         subjectDataLayers = layersWithFolder;
         wrapper = mount(LayerTreeComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -348,7 +352,7 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
         };
         wrapper = mount(LayerTreeComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -369,7 +373,7 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
         };
         wrapper = shallowMount(LayerTreeComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -385,7 +389,7 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
         };
         wrapper = shallowMount(LayerTreeComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -396,7 +400,7 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
         it("should reverse all layer configs also in sub folder", () => {
             wrapper = shallowMount(LayerTreeComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }
             });
 
@@ -471,7 +475,7 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
             allLayerConfigsStructured = (value) => value === "subjectlayer" ? layerConfigs : baselayerConfigs;
             wrapper = shallowMount(LayerTreeComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }
             });
 
@@ -567,7 +571,7 @@ describe("src/modules/layerTree/components/LayerTree.vue", () => {
             allLayerConfigsStructured = (value) => value === "subjectlayer" ? layerConfigs : baselayerConfigs;
             wrapper = shallowMount(LayerTreeComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }
             });
 
