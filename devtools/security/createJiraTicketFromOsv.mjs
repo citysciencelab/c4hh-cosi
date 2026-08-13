@@ -4,7 +4,7 @@ import {normalizeFindings} from "./osvFindings.mjs";
 import {classifyFindings, loadSuppressions} from "./osvSuppressions.mjs";
 
 const jiraBaseUrl = process.env.JIRA_BASE_URL;
-const jiraUserEmail = process.env.JIRA_USER_EMAIL;
+const jiraUserEmail = "ahmed.alqassass@gv.hamburg.de";
 const jiraApiToken = process.env.JIRA_API_TOKEN;
 const jiraProjectKey = process.env.JIRA_PROJECT_KEY;
 const jiraIssueType = process.env.JIRA_ISSUE_TYPE || "Task";
