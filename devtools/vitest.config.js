@@ -51,7 +51,8 @@ export default defineConfig(mode => mergeConfig(
             hookTimeout: 5000, // reduce from 20000 to 5000 ms
             include: [
                 "src/**/*.spec.js",
-                "addons/**/*.spec.js"
+                "addons/**/*.spec.js",
+                "devtools/**/*.spec.js"
             ],
             exclude: [
                 // an G31: https://lgv-hamburg.atlassian.net/browse/G31DEV1-3566

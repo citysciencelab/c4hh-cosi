@@ -459,6 +459,7 @@ export default [
         rules: {
             "func-style": "off",
             "no-console": "off",
+            "n/no-process-env": "off",
             "n/no-process-exit": "off"
         }
     },
