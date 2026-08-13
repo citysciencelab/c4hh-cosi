@@ -545,6 +545,8 @@ $checkbox-check-url: url("#{$checkbox-check-icon}");
     border: 1px solid $dark_blue;
     border-radius: 0;
     background-color: transparent;
+    align-self: center;
+    margin-top: 0;
 }
 
 .bi-square-like-checkbox:checked {
