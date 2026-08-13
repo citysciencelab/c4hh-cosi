@@ -299,7 +299,7 @@ export default {
                                     :key="`${property.key}-checkbox-input`"
                                     :type="getInputType(property.type)"
                                     :checked="['true', true].includes(property.value) ? true : false"
-                                    class="form-control-checkbox"
+                                    class="form-check-input bi-square-like-checkbox"
                                     @input="event => setFeaturesBatchProperty({key: property.key, type: getInputType(property.type), value: event.target.checked})"
                                 >
                                 <input
@@ -361,7 +361,7 @@ export default {
                                     :key="`${property.key}-checkbox-input`"
                                     :type="getInputType(property.type)"
                                     :checked="['true', true].includes(property.value) ? true : false"
-                                    class="form-control-checkbox"
+                                    class="form-check-input bi-square-like-checkbox"
                                     @input="event => updateFeatureProperty({
                                         key: property.key,
                                         type: getInputType(property.type),
@@ -535,6 +535,33 @@ h3 {
 .scrollable-list li {
   padding: 2px 0;
 }
+
+$checkbox-check-icon: "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpolyline points='3.75,8.5 6.5,11.25 12.25,4.75' fill='none' stroke='%23151C27' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.2'/%3e%3c/svg%3e";
+$checkbox-check-url: url("#{$checkbox-check-icon}");
+
+.bi-square-like-checkbox {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid $dark_blue;
+    border-radius: 0;
+    background-color: transparent;
+}
+
+.bi-square-like-checkbox:checked {
+    border-color: $dark_blue;
+    background-color: transparent;
+    background-image: $checkbox-check-url;
+}
+
+.bi-square-like-checkbox:focus {
+    border-color: $dark_blue;
+}
+
+
+.bi-square-like-checkbox:focus:checked {
+    background-image: $checkbox-check-url;
+}
+
 #modal-button-left {
     float:left;
     margin: 0 12px 0 0;
