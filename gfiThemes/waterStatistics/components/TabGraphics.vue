@@ -21,9 +21,9 @@ export default {
                     return;
                 }
 
-                const oafParams = this.params.themeTabs?.find(tab => tab.type === "timeline")?.oafParams,
+                const oafParams = this.params?.oafParams,
                       // TODO chartTheme muss angepasst werden, wenn mehrere Charts in einem Tab vorhanden sind und es ein Dropdown gibt
-                      chartParams = this.params.themeTabs?.find(tab => tab.type === "timeline")?.chartThemes[0],
+                      chartParams = this.params?.chartThemes?.[0],
                       queryAttribute = chartParams?.queryParams?.literalFilters?.queryAttribute;
 
                 const queryParams = {
