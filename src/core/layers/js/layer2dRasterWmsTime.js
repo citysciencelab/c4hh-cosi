@@ -610,10 +610,10 @@ Layer2dRasterWmsTimeLayer.prototype.visibilityChanged = function (newValue) {
         remainingLayerConfig = getLayerConfigById(remainingLayerId),
         shouldReactivateCompare = newValue === true
             && !store.getters["Modules/LayerSwiper/active"]
-            && layerConfig?.visibility !== false
-            && remainingLayerConfig?.visibility !== false
-            && layerConfig?.showInLayerTree !== false
-            && remainingLayerConfig?.showInLayerTree !== false;
+            && layerConfig?.visibility === true
+            && remainingLayerConfig?.visibility === true
+            && layerConfig?.showInLayerTree === true
+            && remainingLayerConfig?.showInLayerTree === true;
 
     if (newValue === false && store.getters["Modules/LayerSwiper/active"]) {
         if (layerConfig?.showInLayerTree === false || typeof layerConfig === "undefined") {

@@ -40,6 +40,7 @@
 - FileImport: importDrawLayer reappears in the layer tree when importing a file, even after being removed.
 - SearchBar: Fixed misaligned action icons in "Show all" results for street searches.
 - CopyrightConstraints: Fixed license metadata display where JSON was being shown as raw text instead of formatted license information and removed empty constraint entries from the list.
+- WMS-Time: Re-activating an already-used WMS-Time layer no longer auto-enables time series comparison or adds a second layer unexpectedly.
 
 ---
 ## 2026-08-19 v3.25.1

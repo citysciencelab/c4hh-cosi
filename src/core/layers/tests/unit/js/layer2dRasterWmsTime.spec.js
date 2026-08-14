@@ -1160,7 +1160,7 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
         [
             {swiper: true, showInTree: false, input: false, expectRemove: true, desc: "calls removeLayer if hidden from tree"},
             {swiper: false, showInTree: false, input: false, expectRemove: false, desc: "does NOT call removeLayer if swiper inactive"},
-            {swiper: false, showInTree: true, input: true, expectRemove: false, expectToggle: true, desc: "reactivates swiper on visible"}
+            {swiper: false, showInTree: true, input: true, expectRemove: false, expectToggle: false, desc: "does not auto-reactivate swiper on visible"}
         ].forEach(({swiper, showInTree, input, expectRemove, expectToggle, desc}) => {
             it(`should match behavior: ${desc}`, () => {
                 store.getters["Modules/LayerSwiper/active"] = swiper;
@@ -1176,10 +1176,46 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
                 if (expectRemove) {
                     expect(removeLayerStub.calledOnce).to.be.true;
                 }
-                if (expectToggle) {
-                    expect(dispatchStub.calledWith("Modules/WmsTime/toggleSwiper")).to.be.true;
+                if (typeof expectToggle === "boolean") {
+                    expect(dispatchStub.calledWith("Modules/WmsTime/toggleSwiper")).to.equal(expectToggle);
                 }
             });
+        });
+
+        it("should reactivate swiper if second layer is explicitly set visible", () => {
+            store.getters["Modules/LayerSwiper/active"] = false;
+            store.getters.layerConfigById.callsFake(id => {
+                if (id === attributes.id || id === attributes.id + "_secondLayer") {
+                    return {visibility: true, showInLayerTree: true, time: {playbackDelay: 1}};
+                }
+                return undefined;
+            });
+            const layer = new Layer2dRasterWmsTime({...attributes, id: attributes.id + "_secondLayer"});
+
+            layer.visibilityChanged(true);
+
+            expect(dispatchStub.calledWith("Modules/WmsTime/toggleSwiper", attributes.id + "_secondLayer")).to.be.true;
+        });
+
+        it("should reactivate swiper if base layer is explicitly set visible after second layer", () => {
+            store.getters["Modules/LayerSwiper/active"] = false;
+            store.getters["Modules/WmsTime/defaultDimensionName"] = "TIME";
+            store.getters.layerConfigById.callsFake(id => {
+                if (id === attributes.id || id === attributes.id + "_secondLayer") {
+                    return {visibility: true, showInLayerTree: true, time: {playbackDelay: 1}};
+                }
+                return undefined;
+            });
+            sinon.stub(layerCollection, "getLayerById").returns({
+                getLayerSource: () => ({
+                    getParams: () => ({TIME: "2020"})
+                })
+            });
+            const layer = new Layer2dRasterWmsTime(attributes);
+
+            layer.visibilityChanged(true);
+
+            expect(dispatchStub.calledWith("Modules/WmsTime/toggleSwiper", attributes.id)).to.be.true;
         });
     });
 
