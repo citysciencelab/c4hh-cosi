@@ -19,16 +19,6 @@ export default {
         };
     },
     methods: {
-        toggleLink () {
-            if (this.editor?.isActive("link")) {
-                this.editor?.chain().focus().extendMarkRange("link").unsetLink().run();
-                this.showLinkInput = false;
-                this.linkUrl = "";
-            }
-            else {
-                this.openLinkInput();
-            }
-        },
         openLinkInput () {
             this.linkUrl = this.editor?.getAttributes("link").href ?? "";
             this.showLinkInput = true;
@@ -156,7 +146,7 @@ export default {
                 :aria-label="editor?.isActive('link') ? 'remove link' : 'set link'"
                 class="btn btn-primary rounded-3"
                 :class="{ 'is-active': editor?.isActive('link') }"
-                @click="toggleLink"
+                @click="openLinkInput"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
