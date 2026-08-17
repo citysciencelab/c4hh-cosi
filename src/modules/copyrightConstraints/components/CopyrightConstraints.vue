@@ -29,6 +29,10 @@ export default {
         ]),
         getConstraints () {
             return this.constraints;
+        },
+        filteredConstraints () {
+            return this.constraints.filter((constraint) => constraint.title && (constraint.accessConstraints || constraint.pointOfContact || constraint.useConstraints?.length > 0)
+            );
         }
     },
     watch: {
@@ -110,16 +114,16 @@ export default {
         <div v-if="ready">
             <p>{{ $t("common:modules.copyrightConstraints.info") }}</p>
             <div
-                v-if="getConstraints.length > 0"
-                :key="getConstraints.length"
+                v-if="filteredConstraints.length > 0"
+                :key="filteredConstraints.length"
             >
                 <ul class="copyrightConstraints_layerList">
                     <li
-                        v-for="(constraintsPerLayer, index) in getConstraints"
+                        v-for="(constraintsPerLayer, index) in filteredConstraints"
                         :key="index"
                     >
                         {{ constraintsPerLayer.title }}
-                        <div v-if="constraintsPerLayer.accessConstraints">
+                        <div v-if="constraintsPerLayer.accessConstraints || constraintsPerLayer.useConstraints?.length > 0">
                             <ul class="copyrightConstraints_constraintsList">
                                 <li
                                     v-if="constraintsPerLayer.accessConstraints"
@@ -204,5 +208,9 @@ export default {
 
     .copyright-details {
         white-space: pre-line;
+    }
+
+    .copyrightConstraints_constraintsList {
+        padding-bottom: 1rem;
     }
 </style>

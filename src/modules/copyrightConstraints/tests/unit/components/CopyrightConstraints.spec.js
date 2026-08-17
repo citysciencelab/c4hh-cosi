@@ -156,24 +156,54 @@ describe("src/modules/copyrightConstraints/components/CopyrightConstraints.vue",
         expect(wrapper.classes()).to.contain("infoText");
     });
 
-    it("shows not specified message for empty csw response", async () => {
+    it("shows not specified message when constraints are missing but contact exists", async () => {
         const wrapper = mount(CopyrightConstraints, {
             global: {
                 plugins: [store, pinia]
-            }});
-
-        let messageElement = wrapper.find("ul.copyrightConstraints_layerList li div div i");
-
-        await wrapper.vm.getMetaData({
-            md_id: "B6A59A2B-2D40-4676-9094-0EB73039ED34"
+            }
         });
 
+        const constraintWithMissingAccess = {
+            md_id: "test-id",
+            title: "Test Layer",
+            accessConstraints: undefined,
+            useConstraints: [],
+            pointOfContact: {
+                name: "Test Organization",
+                email: "test@example.com"
+            }
+        };
+
+        await wrapper.setData({constraints: [constraintWithMissingAccess]});
         await wrapper.vm.$nextTick();
 
-        messageElement = wrapper.find("ul.copyrightConstraints_layerList li div div i");
+        const messageElement = wrapper.find("ul.copyrightConstraints_layerList li div div i");
 
         expect(messageElement.exists()).to.be.true;
         expect(messageElement.text()).to.be.equals("common:modules.copyrightConstraints.notSpecified");
+    });
+
+    it("filters out constraints with no meaningful data", async () => {
+        const wrapper = mount(CopyrightConstraints, {
+            global: {
+                plugins: [store, pinia]
+            }
+        });
+
+        const emptyConstraint = {
+            md_id: "test-id",
+            title: "Test Layer",
+            accessConstraints: undefined,
+            useConstraints: [],
+            pointOfContact: undefined
+        };
+
+        await wrapper.setData({constraints: [emptyConstraint]});
+        await wrapper.vm.$nextTick();
+
+        const layerList = wrapper.find("ul.copyrightConstraints_layerList");
+
+        expect(layerList.exists()).to.be.false;
     });
 
     describe("copyrightConstraints.vue methods", () => {

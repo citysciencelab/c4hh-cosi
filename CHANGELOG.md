@@ -36,7 +36,7 @@
 - Issue \#1631: Property preparation in wfst tool can now handle objects in gfiAttributes and saves geometry without having to configure it in gfiAttributes.
 - FileImport: importDrawLayer reappears in the layer tree when importing a file, even after being removed.
 - SearchBar: Fixed misaligned action icons in "Show all" results for street searches.
-- CopyrightConstraints: Fixed license metadata display where JSON was being shown as raw text instead of formatted license information.
+- CopyrightConstraints: Fixed license metadata display where JSON was being shown as raw text instead of formatted license information and removed empty constraint entries from the list.
 
 ---
 
