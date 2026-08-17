@@ -286,7 +286,8 @@
       "contactName": "Name",
       "contactPhone": "Phone",
       "contactEmail": "E-Mail",
-      "wait": "Please wait"
+      "wait": "Please wait",
+      "license": "License"
     },
     "draw": {
       "description": "Create important markers or mark areas",

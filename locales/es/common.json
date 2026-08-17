@@ -285,7 +285,8 @@
       "contactName": "Nombre",
       "contactPhone": "Tel.",
       "contactEmail": "Correo electrónico",
-      "wait": "Un momento, por favor"
+      "wait": "Un momento, por favor",
+      "license": "Licencia"
     },
     "draw": {
       "description": "Cree marcaciones importantes o marque superficies",

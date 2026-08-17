@@ -285,7 +285,8 @@
       "contactName": "Naam",
       "contactPhone": "Tel.",
       "contactEmail": "E-Mail",
-      "wait": "Een lütten Momang bidde"
+      "wait": "Een lütten Momang bidde",
+      "license": "Lizenz"
     },
     "draw": {
       "description": "Wichtige Markern maken oder Flächen kennteken",

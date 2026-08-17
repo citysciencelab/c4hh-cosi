@@ -286,7 +286,8 @@
       "contactName": "Name",
       "contactPhone": "Tel.",
       "contactEmail": "E-Mail",
-      "wait": "Einen Moment bitte"
+      "wait": "Einen Moment bitte",
+      "license": "Lizenz"
     },
     "draw": {
       "description": "Erstellen Sie wichtige Markierungen oder kennzeichnen Sie Flächen",

@@ -285,7 +285,8 @@
       "contactName": "İsim",
       "contactPhone": "Tel.",
       "contactEmail": "E-posta",
-      "wait": "Lütfen bekleyin"
+      "wait": "Lütfen bekleyin",
+      "license": "Lisans"
     },
     "draw": {
       "description": "Önemli işaretlemeler oluşturun veya alanları işaretleyin",

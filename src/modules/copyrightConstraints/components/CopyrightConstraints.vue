@@ -130,8 +130,19 @@ export default {
                                     v-for="(useConstraint, useIndex) in constraintsPerLayer.useConstraints"
                                     :key="useIndex"
                                     class="copyright-details"
-                                    v-html="useConstraint.trim()"
-                                />
+                                >
+                                    <template v-if="typeof useConstraint === 'object'">
+                                        <div>
+                                            {{ $t("common:modules.copyrightConstraints.license") }}: <a
+                                                :href="useConstraint.url"
+                                                target="_new"
+                                            >{{ useConstraint.url }}</a>
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div v-html="useConstraint.trim()" />
+                                    </template>
+                                </li>
                             </ul>
                         </div>
                         <div v-else>

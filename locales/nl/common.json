@@ -256,7 +256,8 @@
       "contactName": "naam",
       "contactPhone": "Tel.",
       "contactEmail": "e-mail",
-      "wait": "Een ogenblik alstublieft"
+      "wait": "Een ogenblik alstublieft",
+      "license": "Licentie"
     },
     "draw": {
       "description": "Maak belangrijke markeringen of markeer gebieden",

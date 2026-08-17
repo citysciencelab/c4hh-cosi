@@ -285,7 +285,8 @@
       "contactName": "Nome",
       "contactPhone": "Tel.",
       "contactEmail": "E-mail",
-      "wait": "Un momento per favore"
+      "wait": "Un momento per favore",
+      "license": "Licenza"
     },
     "draw": {
       "description": "Crea annotazioni importanti o evidenzia aree",

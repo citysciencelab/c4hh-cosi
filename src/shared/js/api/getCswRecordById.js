@@ -101,18 +101,37 @@ function parseConstraints (json, parseLinks = false) {
                 if (Array.isArray(otherConstraints)) {
                     use = [];
                     otherConstraints.forEach(otherConstraint => {
-                        let useConstraint = otherConstraint?.CharacterString?.getValue() || "";
+                        const useConstraint = otherConstraint?.CharacterString?.getValue() || "";
 
-                        if (parseLinks) {
-                            useConstraint = setWebLinks(useConstraint);
-                        }
-                        use.push(useConstraint);
+                        use.push(processUseConstraint(useConstraint, parseLinks));
                     });
                 }
             }
         });
     }
     return {access, use};
+}
+
+/**
+ * Processes a use constraint string - parses JSON if present, otherwise applies link parsing
+ * @param {String} constraint - the constraint string
+ * @param {Boolean} parseLinks - whether to parse links in plain text
+ * @returns {String} processed constraint
+ */
+function processUseConstraint (constraint, parseLinks) {
+    try {
+        const parsed = JSON.parse(constraint);
+
+        if (parsed.url) {
+            return parsed;
+        }
+    }
+    catch {
+        if (parseLinks) {
+            return setWebLinks(constraint);
+        }
+    }
+    return constraint;
 }
 
 /**
