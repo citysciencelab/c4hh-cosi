@@ -1,4 +1,5 @@
 <script>
+import ButtonGroup from "../../../../components/ButtonGroup.vue";
 import draggable from "vuedraggable";
 import {Dropdown} from "bootstrap";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
@@ -7,6 +8,7 @@ import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 export default {
     name: "ToolBar",
     components: {
+        ButtonGroup,
         Draggable: draggable,
         FlatButton,
         SwitchInput
@@ -34,6 +36,14 @@ export default {
         settingItems: {
             type: Array,
             required: true
+        },
+        groupButtons: {
+            type: Array,
+            required: false,
+            default: () => [
+                {"value": "table", "icon": "bi-table", "name": "Tabelle"},
+                {"value": "chart", "icon": "bi-bar-chart", "name": "Diagramm"}
+            ]
         },
         showDetail: {
             type: [Boolean, Object],
@@ -232,6 +242,12 @@ export default {
             class="mb-3"
         />
         <div class="d-flex">
+            <ButtonGroup
+                class="mb-3 me-3"
+                :buttons="groupButtons"
+                group="tableDiagramm"
+                @show-view="$emit('showView', $event)"
+            />
             <SwitchInput
                 v-if="showDetail"
                 id="show-detail"
