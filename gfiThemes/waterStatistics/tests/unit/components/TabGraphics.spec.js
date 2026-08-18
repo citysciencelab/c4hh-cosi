@@ -19,6 +19,16 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                             namespaced: true,
                             actions: {
                                 queryOaf
+                            },
+                            getters: {
+                                dataLoading: () => false,
+                                oafSchema: () => ({
+                                    properties: {
+                                        gid: {},
+                                        datum_as_date: {},
+                                        messstellennummer: {}
+                                    }
+                                })
                             }
                         }
                     }
@@ -110,5 +120,67 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                 dateField: "datum_as_date"
             }
         });
+    });
+
+    it("should return all properties from oafSchema when excludeCsvParams is not given", () => {
+        expect(wrapper.vm.getCsvParams()).to.deep.equal([
+            "gid",
+            "datum_as_date",
+            "messstellennummer"
+        ]);
+    });
+
+    it("should exclude the given excludeCsvParams from the oafSchema properties", async () => {
+        await wrapper.setProps({
+            params: {
+                ...params,
+                chartThemes: [
+                    {
+                        ...params.chartThemes[0],
+                        excludeCsvParams: ["gid"]
+                    }
+                ]
+            }
+        });
+
+        expect(wrapper.vm.getCsvParams()).to.deep.equal([
+            "datum_as_date",
+            "messstellennummer"
+        ]);
+    });
+
+    it("should only return properties which are set in the oafSchema", async () => {
+        await wrapper.setProps({
+            params: {
+                ...params,
+                chartThemes: [
+                    {
+                        ...params.chartThemes[0],
+                        excludeCsvParams: ["gid", "abc"]
+                    }
+                ]
+            }
+        });
+
+        expect(wrapper.vm.getCsvParams()).to.deep.equal([
+            "datum_as_date",
+            "messstellennummer"
+        ]);
+    });
+
+    it("should return csvParams directly when set on the chart theme", async () => {
+        await wrapper.setProps({
+            params: {
+                ...params,
+                chartThemes: [
+                    {
+                        ...params.chartThemes[0],
+                        csvParams: ["messstellennummer"]
+                    }
+                ]
+            }
+        });
+
+        expect(wrapper.vm.getCsvParams()).to.deep.equal(["messstellennummer"]);
     });
 });

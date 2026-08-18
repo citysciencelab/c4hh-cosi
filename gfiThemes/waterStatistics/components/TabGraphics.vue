@@ -1,10 +1,14 @@
 <script>
 import {mapGetters, mapActions} from "vuex";
 import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 
 export default {
     name: "TabGraphics",
     components: {
+        FlatButton,
+        SpinnerItem,
         LinechartItem
     },
     props: {
@@ -20,7 +24,11 @@ export default {
     computed: {
         ...mapGetters("Modules/WaterStatistics", [
             "statisticValues",
-            "oafSchema"
+            "oafSchema",
+            "dataLoading"
+        ]),
+        ...mapGetters("Maps", [
+            "projectionCode"
         ]),
         currentChartTheme () {
             // TODO chartTheme muss angepasst werden, wenn mehrere Charts in einem Tab vorhanden sind und es ein Dropdown gibt
@@ -233,6 +241,46 @@ export default {
                 default:
                     return leftValue;
             }
+        },
+        csvDownload () {
+            const oafParams = this.params?.oafParams,
+                  chartParams = this.params?.chartThemes?.[0],
+                  queryAttribute = chartParams?.queryParams?.literalFilters?.queryAttribute;
+
+            const queryParams = {
+                url: oafParams?.url,
+                collections: oafParams?.collection,
+                queryField: queryAttribute,
+                queryProperties: this.getCsvParams(),
+                literalFilters: {
+                    sortby: chartParams?.queryParams?.literalFilters?.sortBy
+                },
+                queryValue: this.allAttributes[queryAttribute],
+                queryCrs: oafParams?.filterCRS,
+                dateField: chartParams?.chartParams?.xAxis
+            };
+
+            this.queryOaf({params: queryParams, queryPurpose: "downloadCsv", epsg: this.projectionCode});
+        },
+
+        /**
+         * Returns the CSV parameter names based on the OAF schema and chart parameters.
+         * @returns {string[]} Array of CSV parameter names
+         */
+        getCsvParams () {
+            const chartParams = this.params?.chartThemes?.[0];
+
+            if (chartParams?.csvParams?.length) {
+                return chartParams?.csvParams;
+            }
+
+            const csvParamsToExclude = chartParams?.excludeCsvParams,
+                  allProperties = Object.keys(this.oafSchema?.properties || {}),
+                  csvParams = csvParamsToExclude?.length
+                      ? allProperties.filter(p => !csvParamsToExclude.includes(p))
+                      : allProperties;
+
+            return csvParams;
         }
     }
 };
@@ -247,11 +295,42 @@ export default {
             :data="chartData"
             :given-options="lineChartOptions"
         />
+
+        <div class="downloadArea d-flex">
+            <FlatButton
+                aria="Alle Daten des aktuell dargestellten Zeitbereichs im CSV-Format herunterladen"
+                icon="bi-cloud-arrow-down-fill"
+                title="Alle Daten des aktuell dargestellten Zeitbereichs im CSV-Format herunterladen"
+                :interaction="() => csvDownload()"
+                text="Download CSV"
+            />
+
+            <SpinnerItem
+                v-if="dataLoading"
+                custom-class="spinner"
+                class="ms-3"
+            />
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 #TabGraphics {
+    .diagram {
+        height: 400px;
+        width: 100%;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
+
+    div.downloadArea {
+        margin-top: 1rem;
+
+        .spinner {
+            margin-top: 0.5rem;
+        }
+    }
 
 }
 </style>

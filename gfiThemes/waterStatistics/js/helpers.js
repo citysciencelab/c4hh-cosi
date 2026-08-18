@@ -11,6 +11,24 @@ function convertToLocalDateLiteral (date) {
     return y + "-" + m + "-" + day;
 }
 
+/**
+ * Guards a CSV field value against Excel's locale-based auto reformatting
+ * (date auto-detection, and "." being misread as a thousands separator)
+ * by wrapping any numeric-looking value in a text-forcing formula.
+ *
+ * @param {*} value The raw property value.
+ * @returns {*} The original value, or an Excel text-literal formula if it looks numeric.
+ */
+function guardAgainstExcelDateAutoFormat (value) {
+    const NUMERIC_LIKE_PATTERN = /^-?\d+(\.\d+)?$/;
+
+    if (typeof value === "number" || (typeof value === "string" && NUMERIC_LIKE_PATTERN.test(value.trim()))) {
+        return String(value).replace(".", ",");
+    }
+    return value;
+}
+
 export {
-    convertToLocalDateLiteral
+    convertToLocalDateLiteral,
+    guardAgainstExcelDateAutoFormat
 };
