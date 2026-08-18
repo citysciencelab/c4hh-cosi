@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import {markRaw} from "vue";
 import Card from "../../shared/modules/cards/components/Card.vue";
 import {geoJsonCollectionToFeatures} from "../../utils/features/convertFromGeoJson";
 import dayjs from "dayjs";
@@ -152,7 +153,7 @@ export default {
                 }
             }
 
-            return geoJsonCollectionToFeatures(featureCollection);
+            return geoJsonCollectionToFeatures(featureCollection).map(feature => markRaw(feature));
         },
 
         /**

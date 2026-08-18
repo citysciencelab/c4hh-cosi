@@ -58,10 +58,15 @@ export default {
                 "#D55E00",
                 "#512DA8"
             ],
+            processedContributions: [],
+            computedContributions: [],
             isProjectExpanded: false,
             isPointAnalyseActive: false,
             openedPanel: undefined,
             selectedCategories: this.project.categories,
+            visibleCount: 30,
+            pageSize: 30,
+            observer: null,
             votingLegend: {
                 positiv: {
                     color: "#63CC63",
@@ -115,26 +120,12 @@ export default {
             }));
         },
         /**
-         * Filters the project contributions based on the selected categories.
-         * @returns {Object[]} An array of filtered contribution property objects.
+         * Slice of computedContributions that is actually rendered, to avoid mounting
+         * hundreds of expansion panels at once. Grows automatically via IntersectionObserver.
+         * @returns {Object[]} The currently visible contributions.
          */
-        contributions () {
-            const contributions = this.items.map(feature => {
-                const votingPro = parseInt(feature.get("votingPro"), 10),
-                      votingContra = parseInt(feature.get("votingContra"), 10),
-                      votingResultType = this.getVotingResultType(votingPro, votingContra),
-                      {id, color, icon} = this.votingLegend[votingResultType];
-
-                feature.set("isSelected", false);
-                feature.set("votingResultValue", votingPro - votingContra);
-                feature.set("votingResult", id);
-                feature.set("color", color);
-                feature.set("icon", icon);
-
-                return feature.getProperties();
-            });
-
-            return contributions.filter(k => this.selectedCategories.includes(k.category));
+        visibleContributions () {
+            return this.computedContributions.slice(0, this.visibleCount);
         }
     },
     watch: {
@@ -144,7 +135,7 @@ export default {
                 return;
             }
 
-            const contribution = this.contributions[this.openedPanel],
+            const contribution = this.computedContributions[this.openedPanel],
                   foundFeature = this.items.find(feature => feature.get("id") === contribution.id),
                   extent = foundFeature.getGeometry().getExtent();
 
@@ -160,20 +151,77 @@ export default {
         this.createHoverInteraction();
         this.contributionsLayer = getLayerById("dipas-contributions").getLayer();
         this.map = mapCollection.getMap("2D");
+        this.updateProcessedContributions();
     },
     mounted () {
         this.scrollToContributionPanel("contributions");
         this.contributionsLayer.setStyle(this.getContributionColorByCategory);
         this.addFeaturesToLayer(this.items, this.contributionsLayer);
         this.select.setActive(true);
+
+        this.observer = new IntersectionObserver(entries => {
+            if (entries[0].isIntersecting && this.visibleCount < this.computedContributions.length) {
+                this.visibleCount += this.pageSize;
+            }
+        });
+        this.$nextTick(() => this.observeSentinel());
+    },
+    updated () {
+        this.observeSentinel();
     },
     unmounted () {
         this.select.setActive(false);
         this.hover.setActive(false);
         this.contributionsLayer.getSource().clear();
+        this.observer?.disconnect();
     },
     methods: {
         ...mapActions("Maps", ["zoomToExtent", "addInteraction"]),
+
+        /**
+         * Recalculates the processed contributions.
+         * @returns {void}
+         */
+        updateProcessedContributions () {
+            this.processedContributions = this.items.map(feature => {
+                const votingPro = parseInt(feature.get("votingPro"), 10),
+                      votingContra = parseInt(feature.get("votingContra"), 10),
+                      votingResultType = this.getVotingResultType(votingPro, votingContra),
+                      {id, color, icon} = this.votingLegend[votingResultType];
+
+                feature.set("isSelected", false);
+                feature.set("votingResultValue", votingPro - votingContra);
+                feature.set("votingResult", id);
+                feature.set("color", color);
+                feature.set("icon", icon);
+
+                return feature.getProperties();
+            });
+
+            this.updateContributions();
+        },
+
+        /**
+         * Cheap re-filter of the already-processed contributions.
+         * Called on every category-filter change. Resets the visible slice
+         * @returns {void}
+         */
+        updateContributions () {
+            this.computedContributions = this.processedContributions.filter(k => this.selectedCategories.includes(k.category));
+            this.visibleCount = this.pageSize;
+        },
+
+        /**
+         * (Re-)attaches the IntersectionObserver to the current sentinel element,
+         * so newly rendered/removed sentinel nodes keep triggering lazy loading.
+         * @returns {void}
+         */
+        observeSentinel () {
+            this.observer?.disconnect();
+            if (this.$refs.loadMoreSentinel) {
+                this.observer.observe(this.$refs.loadMoreSentinel);
+            }
+        },
 
         /**
          * Adds multiple features to a specified layer and makes the layer visible.
@@ -317,7 +365,7 @@ export default {
          * @returns {Number[]} Array with interval boundaries [min, threshold1, threshold2, max].
          */
         getVotingClassificationThresholds () {
-            const values = this.contributions.map(c => Math.abs(c.votingResultValue)),
+            const values = this.computedContributions.map(c => Math.abs(c.votingResultValue)),
                   min = Math.min(...values),
                   max = Math.max(...values),
                   range = max - min,
@@ -371,7 +419,11 @@ export default {
             }
 
             const id = selectedFeature.get("id"),
-                  index = this.contributions.findIndex(item => item.id === id);
+                  index = this.computedContributions.findIndex(item => item.id === id);
+
+            if (index >= this.visibleCount) {
+                this.visibleCount = index + this.pageSize;
+            }
 
             this.openedPanel = index;
             this.scrollToContributionPanel(`contribution-panel-${id}`);
@@ -422,6 +474,7 @@ export default {
             this.select.getFeatures().clear();
             this.selectedCategories = tag.map(v => v.label);
             this.openedPanel = undefined;
+            this.updateContributions();
 
             this.contributionsLayer.getSource().changed();
         },
@@ -499,7 +552,7 @@ export default {
             @update:selected-items="updateCategory"
         />
         <AlertMessage
-            v-if="contributions.length === 0"
+            v-if="computedContributions.length === 0"
             :text="$t('additional:modules.tools.cosi.dipasProjects.noContributions')"
             type="noData"
         />
@@ -507,7 +560,7 @@ export default {
             class="cont-wrapper pt-3"
         >
             <span class="ps-3">
-                {{ $t('additional:modules.tools.cosi.dipasProjects.numberOfContribution', { count: contributions.length }) }}
+                {{ $t('additional:modules.tools.cosi.dipasProjects.numberOfContribution', { count: computedContributions.length }) }}
             </span>
             <v-expansion-panels
                 v-model="openedPanel"
@@ -516,7 +569,7 @@ export default {
                 class="custom-panels"
             >
                 <v-expansion-panel
-                    v-for="i in contributions"
+                    v-for="i in visibleContributions"
                     :id="`contribution-panel-${i.id}`"
                     :key="i.id"
                     @mouseover="updateHoverFeatureCollection(i, true)"
@@ -631,6 +684,10 @@ export default {
                     </v-expansion-panel-text>
                 </v-expansion-panel>
             </v-expansion-panels>
+            <div
+                v-if="visibleCount < computedContributions.length"
+                ref="loadMoreSentinel"
+            />
         </div>
         <div class="d-flex justify-content-center my-4 pt-3">
             <FlatButton
@@ -644,7 +701,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-
     .legend-icon-border {
         border-width: 1px;
         border-color: #000 !important;
@@ -658,7 +714,6 @@ export default {
         color: $secondary;
         font-family: $font_family_accent;
     }
-
     .type {
         color: $dark-grey;
         font-family: $font_family_accent;
@@ -697,5 +752,4 @@ export default {
             display: none;
         }
     }
-
 </style>
