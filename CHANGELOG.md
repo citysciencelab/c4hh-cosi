@@ -15,7 +15,6 @@
         - "pinia": "^4.0.2"
 
 ### Changed
-- Build: Changed chunking of modules and packages during build time to prevent an unhealthy amount of <script>-tags in the resulting index.html and decrease load time of built portals.
 - GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.
 - Filter: Snippet - DateRange. Replaced the native date inputs with vue-datepicker-next. Improved synchronization between datepicker and slider values so manually selected dates are preserved even when no exact value exists in initialDateRef. Added support for date, month, and year picker modes based on the configured format.
 - State management: Introduced Pinia alongside Vuex to support the gradual migration of module stores.
@@ -40,6 +39,10 @@
 - CopyrightConstraints: Fixed license metadata display where JSON was being shown as raw text instead of formatted license information and removed empty constraint entries from the list.
 
 ---
+## 2026-08-19 v3.25.1
+
+### Changed
+- Build: Changed chunking of modules and packages during build time to prevent an unhealthy amount of <script>-tags in the resulting index.html and decrease load time of built portals.
 
 ## 2026-08-05 v3.25.0
 
