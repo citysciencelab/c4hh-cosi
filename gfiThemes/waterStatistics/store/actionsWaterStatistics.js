@@ -31,39 +31,48 @@ const actions = {
      * @returns {Promise<void>} Resolves when query handling is finished.
      */
     async queryOaf ({commit, state, dispatch}, {params, queryPurpose, epsg}) {
-        if (state.abortController) {
-            state.abortController.abort();
+        if (!queryPurpose) {
+            if (state.abortController) {
+                state.abortController.abort();
+            }
+            commit("setAbortController", new AbortController());
         }
 
         commit("setAbortController", new AbortController());
 
         commit("setDataLoading", true);
 
-        let startDate, endDate;
+        let startDate, endDate, filter;
 
-        if (!params.startDate) {
+        if (!params.startDate && params.endDate) {
             const now = new Date(),
                 start = new Date(now);
 
             start.setMonth(start.getMonth() - 12);
 
             startDate = convertToLocalDateLiteral(start);
-            endDate = convertToLocalDateLiteral(now);
+            endDate = convertToLocalDateLiteral(params.endDate ? new Date(params.endDate) : now);
+        }
+        else if (!params.startDate && !params.endDate) {
+            filter = `${params.queryField} = ${params.queryValue}`;
         }
         else {
             startDate = convertToLocalDateLiteral(new Date(params.startDate));
-            endDate = convertToLocalDateLiteral(new Date(params.endDate));
+            endDate = params.endDate ? convertToLocalDateLiteral(new Date(params.endDate)) : convertToLocalDateLiteral(new Date());
         }
 
-        const filter = `${params.queryField} = ${params.queryValue} AND ${params.dateField} >= DATE('${startDate}') AND ${params.dateField} <= DATE('${endDate}')`,
-            queryParams = {
-                limit: 1000,
-                filter,
-                filterCrs: params.queryCrs,
-                properties: params.queryProperties,
-                signal: state.abortController.signal,
-                literalFilters: params.literalFilters
-            };
+        if (!filter) {
+            filter = `${params.queryField} = ${params.queryValue} AND ${params.dateField} >= DATE('${startDate}') AND ${params.dateField} <= DATE('${endDate}')`;
+        }
+
+        const queryParams = {
+            limit: 1000,
+            filter,
+            filterCrs: params.queryCrs,
+            properties: params.queryProperties,
+            signal: state.abortController.signal,
+            literalFilters: params.literalFilters
+        };
 
         if (params.queryProperties?.includes("geom") || epsg) {
             queryParams.crs = params.queryCrs;
@@ -81,6 +90,35 @@ const actions = {
                     commit("setCsvData", statValues);
                     dispatch("exportStatisticValuesToCsv", {epsg: epsg});
                     break;
+                case "getAllData": {
+                    const allYears = [...new Set(statValues?.map(feature => {
+                            return new Date(feature?.properties?.[params.dateField]).getFullYear();
+                        }))],
+                        earliestDate = new Date(statValues[0].properties[params.dateField]),
+                        latestDate = new Date(statValues[statValues.length - 1].properties[params.dateField]),
+                        now = new Date(),
+                        twelveMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 12, now.getDate());
+
+                    commit("setDateRange", {
+                        startDate: statValues?.[0]?.properties?.[params.dateField] ?? null,
+                        endDate: statValues?.[statValues.length - 1]?.properties?.[params.dateField] ?? null,
+                        allYears: allYears,
+                        allMonths: [...Array(12).keys()].map(i => ({
+                            value: i + 1,
+                            label: ["Jan", "Feb", "Mär", "Apr", "Mai", "Jun", "Jul", "Aug", "Sep", "Okt", "Nov", "Dez"][i]
+                        })),
+                        allDataStartMonth: earliestDate.getMonth() + 1,
+                        endMonth: latestDate.getMonth() + 1,
+                        allDataStartYear: earliestDate.getFullYear(),
+                        endYear: latestDate.getFullYear(),
+                        twelveMonthsAgoMonth: twelveMonthsAgo.getMonth() + 1,
+                        twelveMonthsAgoYear: twelveMonthsAgo.getFullYear()
+                    });
+
+                    commit("setAllData", statValues);
+
+                    break;
+                }
                 default:
                     commit("setStatisticValues", statValues);
             }
@@ -223,6 +261,7 @@ const actions = {
         }
         catch (error) {
             dispatch("csvErrorHandler", error?.message || String(error), {root: true});
+            commit("setDataLoading", false);
         }
         finally {
             commit("setDataLoading", false);

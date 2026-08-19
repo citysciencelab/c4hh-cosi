@@ -1,5 +1,5 @@
 <script>
-import {mapGetters, mapActions} from "vuex";
+import {mapGetters, mapActions, mapMutations} from "vuex";
 import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
@@ -24,7 +24,14 @@ export default {
     },
     data () {
         return {
-            percentile: null
+            percentile: null,
+            filterRange: "last-year",
+            rangeStartDate: undefined,
+            rangeEndDate: undefined,
+            filterStartMonth: undefined,
+            filterEndMonth: undefined,
+            filterStartYear: undefined,
+            filterEndYear: undefined
         };
     },
     computed: {
@@ -32,7 +39,9 @@ export default {
             "statisticValues",
             "oafSchema",
             "dataLoading",
-            "percentiles"
+            "percentiles",
+            "dateRange",
+            "allData"
         ]),
         ...mapGetters("Maps", [
             "projectionCode"
@@ -323,6 +332,89 @@ export default {
             }
 
             return leftScaleRange;
+        },
+
+        /**
+         * Gets and sets the selected start month.
+         * Returns the explicitly set filter start month, or derives it from the dateRange based on the selected filter range.
+         * @type {number|null}
+         */
+        selectedStartMonth: {
+            get () {
+                if (this.filterStartMonth !== undefined) {
+                    return this.filterStartMonth;
+                }
+                if (this.filterRange === "last-year") {
+                    return this.dateRange?.twelveMonthsAgoMonth ?? null;
+                }
+                if (this.filterRange === "all-time") {
+                    return this.dateRange?.allDataStartMonth ?? null;
+                }
+                return null;
+            },
+            set (value) {
+                this.filterStartMonth = value;
+            }
+        },
+        /**
+         * Gets and sets the selected end month.
+         * Returns the explicitly set filter end month, or derives it from the dateRange based on the selected filter range.
+         * @type {number|null}
+         */
+        selectedEndMonth: {
+            get () {
+                if (this.filterEndMonth !== undefined) {
+                    return this.filterEndMonth;
+                }
+                if (this.filterRange === "last-year" || this.filterRange === "all-time") {
+                    return this.dateRange?.endMonth ?? null;
+                }
+                return null;
+            },
+            set (value) {
+                this.filterEndMonth = value;
+            }
+        },
+        /**
+         * Gets and sets the selected start year.
+         * Returns the explicitly set filter start year, or derives it from the dateRange based on the selected filter range.
+         * @type {number|null}
+         */
+        selectedStartYear: {
+            get () {
+                if (this.filterStartYear !== undefined) {
+                    return this.filterStartYear;
+                }
+                if (this.filterRange === "last-year") {
+                    return this.dateRange?.twelveMonthsAgoYear ?? null;
+                }
+                if (this.filterRange === "all-time") {
+                    return this.dateRange?.allDataStartYear ?? null;
+                }
+                return null;
+            },
+            set (value) {
+                this.filterStartYear = value;
+            }
+        },
+        /**
+         * Gets and sets the selected end year.
+         * Returns the explicitly set filter end year, or derives it from the dateRange based on the selected filter range.
+         * @type {number|null}
+         */
+        selectedEndYear: {
+            get () {
+                if (this.filterEndYear !== undefined) {
+                    return this.filterEndYear;
+                }
+                if (this.filterRange === "last-year" || this.filterRange === "all-time") {
+                    return this.dateRange?.endYear ?? null;
+                }
+                return null;
+            },
+            set (value) {
+                this.filterEndYear = value;
+            }
         }
     },
     watch: {
@@ -333,26 +425,29 @@ export default {
                     return;
                 }
 
-                const oafParams = this.params?.oafParams,
-                      chartTheme = this.currentChartTheme,
-                      queryAttribute = chartTheme?.queryParams?.literalFilters?.queryAttribute;
+                this.filterRange = "last-year";
+                this.filterStartMonth = undefined;
+                this.filterEndMonth = undefined;
+                this.filterStartYear = undefined;
+                this.filterEndYear = undefined;
 
-                const queryParams = {
-                    url: oafParams?.url,
-                    collections: oafParams?.collection,
-                    queryField: queryAttribute,
-                    queryProperties: chartTheme?.queryParams?.properties,
-                    literalFilters: {
-                        sortby: chartTheme?.queryParams?.literalFilters?.sortBy
-                    },
-                    queryValue: newAttributes[queryAttribute],
-                    queryCrs: oafParams?.filterCRS,
-                    dateField: chartTheme?.chartParams?.xAxis
-                };
-
-                this.queryOaf({params: queryParams});
+                // run query to get the all data for the current feature (based on the current chart theme and its query attribute)
+                this.runQueryOaf({
+                    queryPurpose: "getAllData"
+                });
 
                 this.getPercentilesForThisData();
+            },
+            immediate: true
+        },
+        allData: {
+            deep: true,
+            handler (newAllData, oldAllData) {
+                if (newAllData === oldAllData) {
+                    return;
+                }
+
+                this.filterFromAllData(this.selectedStartYear, this.selectedStartMonth, this.selectedEndYear, this.selectedEndMonth);
             },
             immediate: true
         },
@@ -383,6 +478,12 @@ export default {
         ...mapActions("Modules/WaterStatistics", [
             "queryOaf",
             "queryPercentiles"
+        ]),
+        ...mapActions("Alerting", [
+            "addSingleAlert"
+        ]),
+        ...mapMutations("Modules/WaterStatistics", [
+            "setStatisticValues"
         ]),
         /**
          * Find the minimal or maximal numeric value for the provided axisKey inside statisticValues.
@@ -474,27 +575,20 @@ export default {
                     return leftValue;
             }
         },
+        /**
+         * Downloads CSV data by running an OAF query with the current date range and CSV parameters.
+         */
         csvDownload () {
-            const oafParams = this.params?.oafParams,
-                  chartParams = this.params?.chartThemes?.[0],
-                  queryAttribute = chartParams?.queryParams?.literalFilters?.queryAttribute;
+            const csvProperties = this.getCsvParams();
 
-            const queryParams = {
-                url: oafParams?.url,
-                collections: oafParams?.collection,
-                queryField: queryAttribute,
-                queryProperties: this.getCsvParams(),
-                literalFilters: {
-                    sortby: chartParams?.queryParams?.literalFilters?.sortBy
-                },
-                queryValue: this.allAttributes[queryAttribute],
-                queryCrs: oafParams?.filterCRS,
-                dateField: chartParams?.chartParams?.xAxis
-            };
-
-            this.queryOaf({params: queryParams, queryPurpose: "downloadCsv", epsg: this.projectionCode});
+            this.runQueryOaf({
+                queryProperties: csvProperties,
+                startDate: this.rangeStartDate,
+                endDate: this.rangeEndDate,
+                queryPurpose: "downloadCsv",
+                epsg: this.projectionCode
+            });
         },
-
         /**
          * Returns the CSV parameter names based on the OAF schema and chart parameters.
          * @returns {string[]} Array of CSV parameter names
@@ -538,6 +632,119 @@ export default {
 
                 return compareValue === givenValue;
             });
+        },
+        /**
+         * Sets date range to last year and runs OAF query.
+         */
+        setDateLastYear () {
+            this.filterRange = "last-year";
+            this.filterStartMonth = undefined;
+            this.filterEndMonth = undefined;
+            this.filterStartYear = undefined;
+            this.filterEndYear = undefined;
+
+            this.rangeStartDate = undefined;
+            this.rangeEndDate = new Date(Date.now());
+            this.filterFromAllData(this.dateRange.twelveMonthsAgoYear, this.dateRange.twelveMonthsAgoMonth, this.dateRange.endYear, this.dateRange.endMonth);
+        },
+        /**
+         * Sets date range to all time and runs OAF query.
+         */
+        setDateAllTime () {
+            this.filterRange = "all-time";
+            this.filterStartMonth = undefined;
+            this.filterEndMonth = undefined;
+            this.filterStartYear = undefined;
+            this.filterEndYear = undefined;
+
+            const endDate = new Date(),
+                  startDate = new Date(this.dateRange.allDataStartYear, this.dateRange.allDataStartMonth - 1, 1);
+
+            this.rangeStartDate = startDate;
+            this.rangeEndDate = endDate;
+
+            this.filterFromAllData(this.dateRange.allDataStartYear, this.dateRange.allDataStartMonth, this.dateRange.endYear, this.dateRange.endMonth);
+        },
+        /**
+         * Runs an OAF query with the specified parameters.
+         * @param {Object} options - Query options
+         * @param {string[]} [options.queryProperties] - Properties to query
+         * @param {Date} [options.startDate] - Start date for query range
+         * @param {Date} [options.endDate] - End date for query range
+         * @param {string} [options.queryPurpose] - Purpose of the query
+         * @param {string} [options.epsg] - EPSG code for projection
+         */
+        runQueryOaf ({queryProperties, startDate, endDate, queryPurpose, epsg} = {}) {
+            const oafParams = this.params?.oafParams,
+                  chartParams = this.currentChartTheme,
+                  queryAttribute = chartParams?.queryParams?.literalFilters?.queryAttribute;
+
+            const queryParams = {
+                url: oafParams?.url,
+                collections: oafParams?.collection,
+                queryField: queryAttribute,
+                queryProperties: queryProperties || chartParams?.queryParams?.properties,
+                literalFilters: {
+                    sortby: chartParams?.queryParams?.literalFilters?.sortBy
+                },
+                queryValue: this.allAttributes[queryAttribute],
+                queryCrs: oafParams?.filterCRS,
+                dateField: chartParams?.chartParams?.xAxis,
+                startDate,
+                endDate
+            };
+
+            this.queryOaf({params: queryParams, queryPurpose, epsg});
+        },
+        /**
+         * Sets a manual filter range for the specified date period and runs the OAF query.
+         * @param {number} startYear - The start year
+         * @param {number} startMonth - The start month (1-12)
+         * @param {number} endYear - The end year
+         * @param {number} endMonth - The end month (1-12)
+         */
+        filterByManualRange (startYear, startMonth, endYear, endMonth) {
+            if (startYear > endYear || (startYear === endYear && startMonth > endMonth)) {
+                this.addSingleAlert({
+                    class: "Info",
+                    displayClass: "info",
+                    content: "Der Endzeitraum muss nach dem Startzeitraum liegen."
+                });
+                return;
+            }
+
+            this.filterRange = "manual";
+            this.filterStartYear = startYear;
+            this.filterStartMonth = startMonth;
+            this.filterEndYear = endYear;
+            this.filterEndMonth = endMonth;
+
+            const startDate = new Date(startYear, startMonth - 1, 1),
+                  endDate = new Date(endYear, endMonth, 0);
+
+            this.rangeStartDate = startDate;
+            this.rangeEndDate = endDate;
+
+            this.filterFromAllData(startYear, startMonth, endYear, endMonth);
+        },
+        /**
+         * Filters the locally available data by a manual date range and updates statistic values.
+         * @param {number} startYear - The start year.
+         * @param {number} startMonth - The start month (1-12).
+         * @param {number} endYear - The end year.
+         * @param {number} endMonth - The end month (1-12).
+         * @returns {void}
+         */
+        filterFromAllData (startYear, startMonth, endYear, endMonth) {
+            const startDate = new Date(Date.UTC(startYear, startMonth - 1, 1)),
+                  endDate = new Date(Date.UTC(endYear, endMonth, 0));
+            const queryData = this.allData.filter((item) => {
+                const itemDate = new Date(item.properties[this.currentChartTheme.chartParams.xAxis]);
+
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+
+            this.setStatisticValues(queryData);
         }
     }
 };
@@ -548,12 +755,121 @@ export default {
         id="TabGraphics"
         class="row chart line"
     >
+        <div class="filter">
+            <div class="manual-date-range">
+                <div class="date-selects">
+                    <div class="d-flex align-items-center filter-from-select">
+                        <label for="start-month-select">
+                            Von:
+                        </label>
+
+                        <select
+                            v-model="selectedStartMonth"
+                            class="start-month-select"
+                        >
+                            <option
+                                v-for="month in dateRange.allMonths"
+                                :key="month.value"
+                                :value="month.value"
+                            >
+                                {{ month.label }}
+                            </option>
+                        </select>
+
+                        <select
+                            v-model="selectedStartYear"
+                            class="start-year-select"
+                        >
+                            <option
+                                v-for="year in dateRange.allYears"
+                                :key="year"
+                                :value="year"
+                            >
+                                {{ year }}
+                            </option>
+                        </select>
+                    </div>
+
+                    <div
+                        class="filter-to-select"
+                    >
+                        <label for="end-month-select">
+                            Bis:
+                        </label>
+
+                        <select
+                            v-model="selectedEndMonth"
+                            class="end-month-select"
+                        >
+                            <option
+                                v-for="month in dateRange.allMonths"
+                                :key="month.value"
+                                :value="month.value"
+                            >
+                                {{ month.label }}
+                            </option>
+                        </select>
+                        <select
+                            v-model="selectedEndYear"
+                            class="end-year-select"
+                        >
+                            <option
+                                v-for="year in dateRange.allYears"
+                                :key="year"
+                                :value="year"
+                            >
+                                {{ year }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <FlatButton
+                    id="apply-date-range"
+                    aria="Anwenden"
+                    title="Anwenden"
+                    text="Anwenden"
+                    @click="filterByManualRange(selectedStartYear, selectedStartMonth, selectedEndYear, selectedEndMonth)"
+                />
+            </div>
+
+            <div
+                id="filter-btn-group"
+                class="btn-group btn-group-sm"
+                role="group"
+            >
+                <button
+                    id="last-year"
+                    :class="{ active: filterRange === 'last-year' }"
+                    class="btn btn-secondary"
+                    aria="Letzte 12 Monate"
+                    title="Letzte 12 Monate"
+                    text="Letzte 12 Monate"
+                    @click="setDateLastYear"
+                >
+                    Letzte 12 Monate
+                </button>
+
+                <button
+                    id="all-time"
+                    :class="{ active: filterRange === 'all-time' }"
+                    class="btn btn-secondary"
+                    aria="Gesamte Zeitreihe"
+                    title="Gesamte Zeitreihe"
+                    text="Gesamte Zeitreihe"
+                    @click="setDateAllTime"
+                >
+                    Gesamte Zeitreihe
+                </button>
+            </div>
+        </div>
+
         <LinechartItem
             :data="chartData"
             :given-options="lineChartOptions"
         />
 
-        <div class="downloadArea d-flex">
+        <div class="downloadArea">
             <FlatButton
                 aria="Alle Daten des aktuell dargestellten Zeitbereichs im CSV-Format herunterladen"
                 icon="bi-cloud-arrow-down-fill"
@@ -561,25 +877,100 @@ export default {
                 :interaction="() => csvDownload()"
                 text="Download CSV"
             />
+        </div>
 
-            <SpinnerItem
-                v-if="dataLoading"
-                custom-class="spinner"
-                class="ms-3"
-            />
+        <div
+            v-if="dataLoading"
+            class="spinner-wrapper"
+        >
+            <SpinnerItem custom-class="spinner" />
         </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
 #TabGraphics {
-    div.downloadArea {
-        margin-top: 1rem;
+    position: relative; // ensure the spinner-wrapper is positioned correctly within this container
+    div.filter {
+        margin-bottom: 10px;
 
-        .spinner {
-            margin-top: 0.5rem;
+        button {
+            border: 1px solid #adadad;
+            &.active {
+                color: $white;
+            }
+            &:hover {
+                color: $white;
+            }
+        }
+
+        .btn-group {
+            padding: 8px;
+        }
+
+        div.manual-date-range {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            border: 1px dashed lightgray;
+            margin-top: 10px;
+            padding: 10px;
+
+            .date-selects {
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            select {
+                padding: 4px 2px;
+                border-radius: 4px;
+                border: 1px solid #adadad;
+            }
+
+            .filter-from-select,
+            .filter-to-select {
+                display: flex;
+                align-items: center;
+                gap: 5px;
+            }
+
+            label {
+                min-width: 2.5rem; // same width for "Von:" and "Bis:" so the selects start at the same x-position
+            }
+
+            #apply-date-range {
+                align-self: center;
+                margin-bottom: 0;
+            }
         }
     }
 
+    .diagram {
+        height: 400px;
+        width: 100%;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
+
+    div.downloadArea {
+        margin-top: 1rem;
+    }
+
+    div.spinner-wrapper {
+        position: absolute;
+        inset: 0; // top/right/bottom/left: 0
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(255, 255, 255, 0.7); // optional dimming layer
+        z-index: 10;
+        margin-top: 0;
+    }
 }
 </style>
