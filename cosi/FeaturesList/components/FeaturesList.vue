@@ -280,14 +280,18 @@ export default {
             this.additionalColumns = this.getColumns(this.getActiveLayers(), "additionalValues");
         },
 
-        items (newItems) {
-            if (newItems.length > 0 && newItems.some(item => item.group === "DIPAS")) {
-                this.dipasInFeaturesList = true;
-            }
-            else {
-                this.dipasInFeaturesList = false;
-            }
-            this.showDistanceScoreFeatures();
+        items: {
+            hander (newItems) {
+                if (newItems.length > 0 && newItems.some(item => item.group === "DIPAS")) {
+                    this.dipasInFeaturesList = true;
+                }
+                else {
+                    this.dipasInFeaturesList = false;
+                }
+                this.showDistanceScoreFeatures();
+            },
+            deep: true,
+            immediate: true
         },
 
         layerFilter () {
@@ -442,6 +446,9 @@ export default {
                     return false;
                 }
                 if (this.selected.length > 0 && !this.selected.includes(item)) {
+                    return false;
+                }
+                if (this.districtFilter.length > 0 && !this.districtFilter.some(district => district === item.district)) {
                     return false;
                 }
                 if (this.layerFilter.length > 0 && !this.layerFilter.map(l => l.layerId).includes(item.layerId)) {
