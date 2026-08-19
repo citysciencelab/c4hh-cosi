@@ -57,7 +57,7 @@ The Bitbucket issue tracker is being removed on August 20, 2026. All issues have
 
 **Please do not report security vulnerabilities via the public issue tracker.** Instead, report them privately by email as described in our [Security Policy](./SECURITY.md).
 
-* [Issue tracker](https://gitlab.opencode.de/geowerkstatt-hamburg/masterportal/-/work_items)
+* [Issue tracker](https://gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal/-/work_items)
 * [Community board (User forum)](https://discourse.opencode.de/t/ueber-die-kategorie-masterportal-projekt-413/1691)
 * [Former Community board (User forum is closed - read only!)](https://trello.com/c/qajdXkMa/110-willkommen)
 ### Contributing
