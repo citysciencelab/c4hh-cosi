@@ -45,9 +45,9 @@ describe("addons/storyTellingTool/shared/utils/video.js", () => {
         });
 
         it("should return embed youtube link", () => {
-            expect(getEmbedLink("https://www.youtube.com/watch?v=test")).to.equal("https://www.youtube.com/embed/test");
-            expect(getEmbedLink("https://youtu.be/test")).to.equal("https://www.youtube.com/embed/test");
-            expect(getEmbedLink("https://www.youtube.com/embed/test")).to.equal("https://www.youtube.com/embed/test");
+            expect(getEmbedLink("https://www.youtube.com/watch?v=test")).to.equal("https://www.youtube-nocookie.com/embed/test");
+            expect(getEmbedLink("https://youtu.be/test")).to.equal("https://www.youtube-nocookie.com/embed/test");
+            expect(getEmbedLink("https://www.youtube.com/embed/test")).to.equal("https://www.youtube-nocookie.com/embed/test");
         });
     });
 });

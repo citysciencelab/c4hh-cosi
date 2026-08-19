@@ -16,10 +16,15 @@ export default {
 </script>
 
 <template lang="html">
-    <div class="cookie-banner text-center d-flex flex-column align-items-center">
-        {{ $t("additional:modules.storyManager.cookiebanner.description") }}
+    <div class="cookie-banner text-center d-flex flex-column align-items-center p-4">
+        <div>
+            {{ $t("additional:modules.storyManager.cookiebanner.description") }}
+        </div>
+        <div class="player position-relative mt-3">
+            <span />
+        </div>
         <FlatButton
-            class="mt-3"
+            class="mt-4"
             :aria-label="$t('additional:modules.storyManager.cookiebanner.playVideo')"
             :text="$t('additional:modules.storyManager.cookiebanner.playVideo')"
             @click.stop="$emit('setCookie')"
@@ -27,6 +32,7 @@ export default {
         {{ $t("additional:modules.storyManager.cookiebanner.furtherInfo") }}
         <a
             :href="privacy"
+            class="text-decoration-underline"
             target="_blank"
             @click.stop
         >
@@ -36,5 +42,33 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.cookie-banner{
+    background: $light_blue;
+    .player {
+        background: $secondary;
+        border: none;
+        width: 65px;
+        height: 49px;
+        border-radius: 8px;
+        opacity: 0.5;
+        span {
+            width: 0;
+            height: 0;
+            border-top: 12px solid transparent;
+            border-left: 20px solid #fff;
+            border-bottom: 12px solid transparent;
+            position: absolute;
+            top: 24%;
+            left: 38%;
+        }
+    }
+
+    a {
+        color: $dark_blue;
+        &:hover {
+            color: $secondary;
+        }
+    }
+}
 
 </style>

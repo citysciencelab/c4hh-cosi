@@ -62,7 +62,7 @@ function getEmbedLink (url) {
         return url;
     }
 
-    return "https://www.youtube.com/embed/" + videoId;
+    return "https://www.youtube-nocookie.com/embed/" + videoId;
 }
 
 export {
