@@ -50,9 +50,11 @@ export default {
         /**
          * Generates and adds a new object card based on the provided scenario feature.
          * @param {Object} scenarioFeature - The scenario feature containing the map feature and properties.
+         * @param {String} name - The fallback label for the object.
+         * @param {String} layerId - The associated layer id.
          * @returns {void}
          */
-        addObjectCard (feature, name) {
+        addObjectCard (feature, name, layerId) {
             const properties = feature.getProperties();
 
             this.activeScenarioCard.objects.push({
@@ -61,7 +63,12 @@ export default {
                 label: properties.facility || name,
                 text: "Neues Objekt",
                 feature,
-                status: ""
+                status: "",
+                layerId: layerId,
+                sourceDataMode: "empty",
+                referenceFeatureId: null,
+                manualFeatureProperties: {},
+                referenceFeatureProperties: {}
             });
 
             this.$emit("toggle-object-status", this.activeScenarioCard.objects.length - 1);
@@ -81,7 +88,7 @@ export default {
             feature.setId(hash({...this.featureProperties, geom: geometry}));
             this.setFeatureStyle(feature, selectedLayer.getLayer());
 
-            this.addObjectCard(feature, selectedLayer.getLayer().get("name"));
+            this.addObjectCard(feature, selectedLayer.getLayer().get("name"), selectedLayer.getLayer().get("id"));
         },
 
         /**

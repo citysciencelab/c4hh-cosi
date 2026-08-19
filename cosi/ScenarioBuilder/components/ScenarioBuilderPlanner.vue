@@ -54,6 +54,11 @@ export default {
     },
 
     watch: {
+        activeObjectCard (newCard) {
+            if (newCard) {
+                this.restoreSelectedLayer();
+            }
+        },
         featureProperties: {
             handler (newProperties) {
                 if (!this.activeObjectCard) {
@@ -91,6 +96,7 @@ export default {
 
     mounted () {
         this.visibleVectorLayers = this.getVisibleVectorLayers();
+        this.restoreSelectedLayer();
     },
 
     methods: {
@@ -125,6 +131,26 @@ export default {
          */
         loadFeatureDescription (layer) {
             this.featureProperties = this.getEditableFeaturePropertiesFromSource(layer);
+        },
+
+        /**
+         * Restores the previously selected layer from the active object card.
+         * @returns {void}
+         */
+        restoreSelectedLayer () {
+            const layerId = this.activeObjectCard?.layerId;
+
+            if (!layerId) {
+                return;
+            }
+
+            this.selectedLayer = this.visibleVectorLayers.find(
+                layer => layer.getLayer().get("id") === layerId
+            );
+
+            if (this.selectedLayer) {
+                this.loadFeatureDescription(this.selectedLayer);
+            }
         },
 
         setIsLocationActive (value) {
@@ -198,7 +224,6 @@ export default {
         />
         <ScenarioBuilderPlannerProps
             v-if="!isLocationActive && activeObjectCard"
-            :feature-properties="featureProperties"
             :selected-layer="selectedLayer"
         />
     </template>
