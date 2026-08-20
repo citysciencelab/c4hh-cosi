@@ -3,6 +3,7 @@ import {mapGetters, mapActions} from "vuex";
 import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
+import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
 
 export default {
     name: "TabGraphics",
@@ -30,15 +31,49 @@ export default {
         ...mapGetters("Maps", [
             "projectionCode"
         ]),
+        /**
+         * Returns the active chart theme (first theme from params.chartThemes).
+         * @returns {Object|undefined} chart theme object or undefined when not available.
+         */
         currentChartTheme () {
             // TODO chartTheme muss angepasst werden, wenn mehrere Charts in einem Tab vorhanden sind und es ein Dropdown gibt
             return this.params?.chartThemes[0];
         },
+        /**
+         * Indicates whether a right Y axis is configured for the current chart theme.
+         * @returns {boolean} indicator for right axis
+         */
         hasRightAxis () {
-            return this.currentChartTheme.chartParams?.yAxisRight && typeof this.currentChartTheme.chartParams?.yAxisRight === "string";
+            const key = this.currentChartTheme?.chartParams?.yAxisRight;
+
+            return Boolean(typeof key === "string" && key.trim().length > 0);
         },
+        getLineChartTitle () {
+            const prefix = this.oafSchema?.properties?.[this.currentChartTheme.queryParams?.literalFilters?.queryAttribute]?.title,
+                  value = this.allAttributes?.[this.currentChartTheme.queryParams?.literalFilters?.queryAttribute];
+
+            return prefix + " " + value;
+        },
+        /**
+         * Chart.js options for the line chart, including scales and axis titles.
+         *  overwrites default options set in the LinechartItem component
+         * @returns {Object} options to use for the line chart
+         */
         lineChartOptions () {
+            const stepLeft = this.stepSizeLeft;
+            const stepRight = this.stepSizeRight;
+
             return {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: this.getLineChartTitle,
+                        font: {
+                            size: 20,
+                            family: "'MasterPortalFont Bold', 'Arial Narrow', Arial, sans-serif"
+                        }
+                    }
+                },
                 scales: {
                     y: {
                         type: "linear",
@@ -52,7 +87,12 @@ export default {
                         max: this.maxScaleLeft,
                         ticks: {
                             precision: 2,
-                            stepSize: this.stepSizeLeft
+                            stepSize: stepLeft,
+                            callback: function (value) {
+                                const decimal = stepLeft < 0.05 ? 2 : 1;
+
+                                return thousandsSeparator(value.toFixed(decimal));
+                            }
                         }
                     },
                     yRight: {
@@ -71,12 +111,21 @@ export default {
                         },
                         ticks: {
                             precision: 2,
-                            stepSize: this.stepSizeLeft
+                            stepSize: stepRight,
+                            callback: function (value) {
+                                const decimal = stepRight < 0.05 ? 2 : 1;
+
+                                return thousandsSeparator(value.toFixed(decimal));
+                            }
                         }
                     }
                 }
             };
         },
+        /**
+         * Assembles chart data (labels and datasets) from statisticValues.
+         * @returns {{labels: Array, datasets: Array}} chart data for LinechartItem
+         */
         chartData () {
             const labels = [],
                   left_data = [],
@@ -111,9 +160,9 @@ export default {
                     label: this.lineChartOptions.scales.yRight.title.text,
                     data: right_data,
                     hoverOffset: 4,
-                    backgroundColor: "#00FFFF",
-                    borderColor: "#00FFFF",
-                    borderWidth: 2,
+                    backgroundColor: "#3C5F94",
+                    borderColor: "#3C5F94",
+                    borderWidth: 0,
                     pointStyle: false,
                     yAxisID: "yRight"
                 });
@@ -124,43 +173,92 @@ export default {
                 datasets: datasets
             };
         },
+        /**
+         * Minimal numeric value for the configured left Y axis (derived from statisticValues).
+         * @returns {number} minimal value
+         */
         minDataValueLeft () {
             return this.findMinOrMax(this.currentChartTheme.chartParams?.yAxisLeft);
         },
+        /**
+         * Maximal numeric value for the configured left Y axis (derived from statisticValues).
+         * @returns {number} maximal value
+         */
         maxDataValueLeft () {
             return this.findMinOrMax(this.currentChartTheme.chartParams?.yAxisLeft, false);
         },
+        /**
+         * Step size chosen for left axis ticks based on the data range.
+         * @returns {number} step size
+         */
         stepSizeLeft () {
             const deltaLeft = this.maxDataValueLeft - this.minDataValueLeft;
 
-            if (deltaLeft < 0.5) {
-                return 0.01;
-            }
-            else if (deltaLeft < 1) {
-                return 0.1;
-            }
-            else if (deltaLeft < 2) {
-                return 0.2;
-            }
-            return 0.5;
+            return this.findStepSizeFromDelta(deltaLeft);
         },
+        /**
+         * Minimal scale boundary for the left axis (rounded down with padding).
+         * @returns {number} minimal scale boundary
+         */
         minScaleLeft () {
-            return Math.floor(this.minDataValueLeft) - this.stepSizeLeft;
+            const padding = this.stepSizeLeft > 0.05 ? this.stepSizeLeft : 0;
+
+            return Math.floor(this.minDataValueLeft * 10) / 10 - padding;
         },
+        /**
+         * Maximal scale boundary for the left axis (rounded up with padding).
+         * @returns {number} maximal scale boundary
+         */
         maxScaleLeft () {
-            return Math.ceil(this.maxDataValueLeft) + this.stepSizeLeft;
+            const padding = this.stepSizeLeft > 0.05 ? this.stepSizeLeft : 0;
+
+            return Math.ceil(this.maxDataValueLeft * 10) / 10 + padding;
         },
+        /**
+         * Minimal numeric value for the configured right Y axis (derived from statisticValues).
+         * @returns {number} minimal value
+         */
         minDataValueRight () {
             return this.hasRightAxis ? this.findMinOrMax(this.currentChartTheme.chartParams?.yAxisRight) : 0;
         },
+        /**
+         * Maximal numeric value for the configured right Y axis (derived from statisticValues).
+         * @returns {number} maximal value
+         */
         maxDataValueRight () {
             return this.hasRightAxis ? this.findMinOrMax(this.currentChartTheme.chartParams?.yAxisRight, false) : 0;
         },
+        /**
+         * Minimal scale boundary for the right axis transformed from left axis scale.
+         * @returns {number} minimal scale boundary
+         */
         minScaleRight () {
-            return this.applyRightAxisTransform(this.minScaleLeft);
+            const tMin = this.applyRightAxisTransform(this.minScaleLeft);
+            const tMax = this.applyRightAxisTransform(this.maxScaleLeft);
+
+            return Math.min(tMin, tMax);
         },
+        /**
+         * Maximal scale boundary for the right axis transformed from left axis scale.
+         * @returns {number} maximal scale boundary
+         */
         maxScaleRight () {
-            return this.applyRightAxisTransform(this.maxScaleLeft);
+            const tMin = this.applyRightAxisTransform(this.minScaleLeft);
+            const tMax = this.applyRightAxisTransform(this.maxScaleLeft);
+
+            return Math.max(tMin, tMax);
+        },
+        /**
+         * Step size chosen for right axis ticks based on the data range.
+         * @returns {number} step size
+         */
+        stepSizeRight () {
+            const delta = this.maxScaleRight - this.minScaleRight;
+
+            if (delta <= 0) {
+                return this.stepSizeLeft;
+            }
+            return this.findStepSizeFromDelta(delta);
         }
     },
     watch: {
@@ -172,21 +270,20 @@ export default {
                 }
 
                 const oafParams = this.params?.oafParams,
-                      // TODO chartTheme muss angepasst werden, wenn mehrere Charts in einem Tab vorhanden sind und es ein Dropdown gibt
-                      chartParams = this.params?.chartThemes?.[0],
-                      queryAttribute = chartParams?.queryParams?.literalFilters?.queryAttribute;
+                      chartTheme = this.currentChartTheme,
+                      queryAttribute = chartTheme?.queryParams?.literalFilters?.queryAttribute;
 
                 const queryParams = {
                     url: oafParams?.url,
                     collections: oafParams?.collection,
                     queryField: queryAttribute,
-                    queryProperties: chartParams?.queryParams?.properties,
+                    queryProperties: chartTheme?.queryParams?.properties,
                     literalFilters: {
-                        sortby: chartParams?.queryParams?.literalFilters?.sortBy
+                        sortby: chartTheme?.queryParams?.literalFilters?.sortBy
                     },
                     queryValue: newAttributes[queryAttribute],
                     queryCrs: oafParams?.filterCRS,
-                    dateField: chartParams?.chartParams?.xAxis
+                    dateField: chartTheme?.chartParams?.xAxis
                 };
 
                 this.queryOaf({params: queryParams});
@@ -198,6 +295,13 @@ export default {
         ...mapActions("Modules/WaterStatistics", [
             "queryOaf"
         ]),
+        /**
+         * Find the minimal or maximal numeric value for the provided axisKey inside statisticValues.
+         * Non-numeric and missing values are ignored. Returns 0 if no valid numbers found.
+         * @param {string} axisKey - property name in dataset.properties to evaluate
+         * @param {boolean} [findMin=true] - when true find minimum, when false find maximum
+         * @returns {number} minimal or maximal numeric value or 0 if none
+         */
         findMinOrMax (axisKey, findMin = true) {
             if (!axisKey || !this.statisticValues || !this.statisticValues.length) {
                 return 0;
@@ -222,6 +326,37 @@ export default {
 
             return minOrMaxValue === infinityValue ? 0 : minOrMaxValue;
         },
+        /**
+         * Determine the tick step size for an axis based on the provided data range (delta).
+         * Uses the project's threshold rules:
+         * - delta < 0.5  => 0.01
+         * - delta < 1    => 0.1
+         * - delta < 2    => 0.2
+         * - otherwise    => 0.5
+         *
+         * @param {number} delta - Difference between maximum and minimum values on the axis.
+         * @returns {number} Recommended step size for axis ticks.
+         */
+        findStepSizeFromDelta (delta) {
+            if (delta < 0.5) {
+                return 0.01;
+            }
+            else if (delta < 1) {
+                return 0.1;
+            }
+            else if (delta < 2) {
+                return 0.2;
+            }
+            return 0.5;
+        },
+        /**
+         * Transform a left-axis numeric value to the right-axis scale using the
+         * configured rightAxisTransform in the current chart theme.
+         * Supported operators: "subtract", "add", "multiply".
+         * If no transform is configured the input value is returned unchanged.
+         * @param {number} leftValue - value on the left axis to transform
+         * @returns {number} transformed value for the right axis
+         */
         applyRightAxisTransform (leftValue) {
             const transform = this.currentChartTheme.chartParams?.rightAxisTransform;
 
@@ -316,14 +451,6 @@ export default {
 
 <style lang="scss" scoped>
 #TabGraphics {
-    .diagram {
-        height: 400px;
-        width: 100%;
-        background-color: #f5f5f5;
-        border: 1px solid #ccc;
-        margin-bottom: 20px;
-    }
-
     div.downloadArea {
         margin-top: 1rem;
 

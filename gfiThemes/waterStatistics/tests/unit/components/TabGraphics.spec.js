@@ -1,13 +1,65 @@
 import {createStore} from "vuex";
 import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
+import {reactive} from "vue";
 import sinon from "sinon";
 import TabGraphics from "../../../components/TabGraphics.vue";
 
 describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
-    let store, wrapper, queryOaf, params;
+    let store, wrapper, queryOaf, params, statisticValuesMock;
 
     beforeEach(() => {
+        statisticValuesMock = reactive([
+            {
+                "type": "Feature",
+                "id": 106420,
+                "geometry": null,
+                "properties": {
+                    "messstellennummer": 2200,
+                    "wasserstand_mnhn": 15.19,
+                    "wasserstand_mugok": 10.29,
+                    "datum_as_date": "2025-08-21",
+                    "klassifikation_gwstand": "sehr hoch"
+                }
+            },
+            {
+                "type": "Feature",
+                "id": 106421,
+                "geometry": null,
+                "properties": {
+                    "messstellennummer": 2200,
+                    "wasserstand_mnhn": 15.17,
+                    "wasserstand_mugok": 10.31,
+                    "datum_as_date": "2025-08-22",
+                    "klassifikation_gwstand": "sehr hoch"
+                }
+            },
+            {
+                "type": "Feature",
+                "id": 106422,
+                "geometry": null,
+                "properties": {
+                    "messstellennummer": 2200,
+                    "wasserstand_mnhn": 15.17,
+                    "wasserstand_mugok": 10.31,
+                    "datum_as_date": "2025-08-23",
+                    "klassifikation_gwstand": "sehr hoch"
+                }
+            },
+            {
+                "type": "Feature",
+                "id": 106423,
+                "geometry": null,
+                "properties": {
+                    "messstellennummer": 2200,
+                    "wasserstand_mnhn": 15.16,
+                    "wasserstand_mugok": 10.32,
+                    "datum_as_date": "2025-08-24",
+                    "klassifikation_gwstand": "hoch"
+                }
+            }
+        ]);
+
         queryOaf = sinon.spy();
 
         store = createStore({
@@ -26,9 +78,12 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                                     properties: {
                                         gid: {},
                                         datum_as_date: {},
-                                        messstellennummer: {}
+                                        messstellennummer: {"title": "Messstellennummer", "description": "Nummer der Messstelle"},
+                                        wasserstand_mnhn: {"title": "Wasserstand in m ü. NHN", "description": "Tagesmittelwert des Wasserstands NHN"},
+                                        wasserstand_mugok: {"title": "Wasserstand in m u. GOK", "description": "Tagesmittelwert des Wasserstands (GOK)"}
                                     }
-                                })
+                                }),
+                                statisticValues: () => statisticValuesMock
                             }
                         }
                     }
@@ -64,7 +119,11 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                         xAxis: "datum_as_date",
                         yAxisLeft: "wasserstand_mnhn",
                         yAxisRight: "wasserstand_mugok",
-                        yAxisRightEquation: ""
+                        rightAxisTransform: {
+                            referenceAttribute: "gok",
+                            operator: "subtract",
+                            factor: 1
+                        }
                     }
                 }
             ]
@@ -126,7 +185,9 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
         expect(wrapper.vm.getCsvParams()).to.deep.equal([
             "gid",
             "datum_as_date",
-            "messstellennummer"
+            "messstellennummer",
+            "wasserstand_mnhn",
+            "wasserstand_mugok"
         ]);
     });
 
@@ -137,7 +198,7 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                 chartThemes: [
                     {
                         ...params.chartThemes[0],
-                        excludeCsvParams: ["gid"]
+                        excludeCsvParams: ["gid", "wasserstand_mnhn", "wasserstand_mugok"]
                     }
                 ]
             }
@@ -164,7 +225,9 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
 
         expect(wrapper.vm.getCsvParams()).to.deep.equal([
             "datum_as_date",
-            "messstellennummer"
+            "messstellennummer",
+            "wasserstand_mnhn",
+            "wasserstand_mugok"
         ]);
     });
 
@@ -182,5 +245,88 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
         });
 
         expect(wrapper.vm.getCsvParams()).to.deep.equal(["messstellennummer"]);
+    });
+
+    it("should detect if a right axis shall be drawn", async () => {
+        expect(wrapper.vm.hasRightAxis).to.be.true;
+
+        await wrapper.setProps({
+            params: {
+                ...params,
+                chartThemes: [
+                    {
+                        ...params.chartThemes[0],
+                        chartParams: {
+                            yAxisRight: false
+                        }
+                    }
+                ]
+            }
+        });
+
+        expect(wrapper.vm.hasRightAxis).to.be.false;
+
+        await wrapper.setProps({
+            params: {
+                ...params,
+                chartThemes: [
+                    {
+                        ...params.chartThemes[0],
+                        chartParams: {
+                            yAxisRight: ""
+                        }
+                    }
+                ]
+            }
+        });
+
+        expect(wrapper.vm.hasRightAxis).to.be.false;
+    });
+
+    it("should get the correct line chart title", async () => {
+        await wrapper.setProps({
+            allAttributes: {
+                messstellennummer: "12345"
+            }
+        });
+
+        expect(wrapper.vm.getLineChartTitle).to.equal("Messstellennummer 12345");
+    });
+
+    it("should get the correct line chart axis values for the left axis", async () => {
+        expect(wrapper.vm.minDataValueLeft).to.equal(15.16);
+        expect(wrapper.vm.maxDataValueLeft).to.equal(15.19);
+        expect(wrapper.vm.stepSizeLeft).to.equal(0.01);
+        expect(wrapper.vm.minScaleLeft).to.equal(15.1);
+        expect(wrapper.vm.maxScaleLeft).to.equal(15.2);
+
+        statisticValuesMock[0].properties.wasserstand_mnhn = 20.9;
+
+        expect(wrapper.vm.maxDataValueLeft).to.equal(20.9);
+        expect(wrapper.vm.stepSizeLeft).to.equal(0.5);
+        expect(wrapper.vm.minScaleLeft).to.equal(14.6);
+        expect(wrapper.vm.maxScaleLeft).to.equal(21.4);
+    });
+
+    it("should get the correct line chart axis values for the right axis", async () => {
+        await wrapper.setProps({
+            allAttributes: {
+                gok: 25.48
+            }
+        });
+
+        expect(wrapper.vm.minDataValueRight).to.equal(10.29);
+        expect(wrapper.vm.maxDataValueRight).to.equal(10.32);
+        expect(wrapper.vm.stepSizeRight).to.equal(0.01);
+        expect(Number(wrapper.vm.minScaleRight.toFixed(2))).to.equal(10.28);
+        expect(Number(wrapper.vm.maxScaleRight.toFixed(2))).to.equal(10.38);
+
+        statisticValuesMock[0].properties.wasserstand_mugok = 19.9;
+        statisticValuesMock[0].properties.wasserstand_mnhn = 24.8;
+
+        expect(wrapper.vm.maxDataValueRight).to.equal(19.9);
+        expect(wrapper.vm.stepSizeRight).to.equal(0.5);
+        expect(Number(wrapper.vm.minScaleRight.toFixed(2))).to.equal(0.18);
+        expect(Number(wrapper.vm.maxScaleRight.toFixed(2))).to.equal(10.88);
     });
 });
