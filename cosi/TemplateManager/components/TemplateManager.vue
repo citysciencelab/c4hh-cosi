@@ -278,7 +278,9 @@ export default {
     async created () {
         this.setMapping(await getMappingJson());
 
-        this.setDefaultActiveLayerIds(this.getVisibleLayers().map(x => x?.getLayer().getProperties()?.id));
+        if (!this.defaultActiveLayerIds.length) {
+            this.setDefaultActiveLayerIds(this.getVisibleLayers().map(x => x?.getLayer().getProperties()?.id));
+        }
     },
     updated () {
         this.showTemplateImport(true);
@@ -292,6 +294,7 @@ export default {
         ...mapMutations("Modules/TemplateManager", Object.keys(mutations)),
         ...mapActions("Modules/TemplateManager", Object.keys(actions)),
         ...mapActions("Menu", ["changeCurrentComponent"]),
+        ...mapMutations("Menu", ["setNavigationHistoryBySide"]),
         ...mapMutations("Modules/Dashboard", ["setCalculations", "setStatsFeatureFilter"]),
         ...mapActions("Modules/DistrictSelector", ["setDistrictsByName"]),
         ...mapMutations("Modules/DistrictSelector", ["setMapping", "setSelectedDistrictLevelId"]),
@@ -399,12 +402,9 @@ export default {
                   time = new Date().getTime(),
                   visibleLayerIds = this.saveTemplate[this.selectedTemplateIndex].activeLayer.map(layer => layer.id);
 
-            if (this.useTemplatesForMapping) {
-                template.meta.time = time;
+            template.meta.time = time;
 
-                this.createMappingByTemplates(this.templates, await getMappingJson());
-            }
-
+            this.createMappingByTemplates(this.templates, await getMappingJson());
             this.openTool(startingTool, active);
             this.loadLayer(visibleLayerIds, active, this.templates);
         },
@@ -451,10 +451,24 @@ export default {
             }
 
             if (typeof startingTool === "string") {
-                store.dispatch("Menu/changeCurrentComponent", {type: startingTool, side: "secondaryMenu", props: {name: startingTool}}, {root: true});
+                this.changeCurrentComponent({
+                    type: startingTool,
+                    side: "secondaryMenu",
+                    props: {
+                        name: startingTool
+                    }
+                });
+                this.setNavigationHistoryBySide({side: "secondaryMenu", newHistory: [{type: "root", props: []}]});
             }
             else if (typeof this.toolToOpen === "string") {
-                store.dispatch("Menu/changeCurrentComponent", {type: this.toolToOpen, side: "secondaryMenu", props: {name: this.toolToOpen}}, {root: true});
+                this.changeCurrentComponent({
+                    type: this.toolToOpen,
+                    side: "secondaryMenu",
+                    props: {
+                        name: this.toolToOpen
+                    }
+                });
+                this.setNavigationHistoryBySide({side: "secondaryMenu", newHistory: [{type: "root", props: []}]});
             }
         },
 
