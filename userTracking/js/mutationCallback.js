@@ -1,5 +1,4 @@
 import {handleClearRedoForFeatureForMeasure} from "./handler/handleClearRedoForFeatureForMeasure.js";
-import {handleSetLayerInfo} from "./handler/handleSetLayerInfo.js";
 import {handleSetProcessDataForPopulationRequest} from "./handler/handleSetProcessDataForPopulationRequest.js";
 import {handleSetSearchedWfsSearch} from "./handler/handleSetSearchedWfsSearch.js";
 
@@ -8,15 +7,11 @@ import {handleSetSearchedWfsSearch} from "./handler/handleSetSearchedWfsSearch.j
  * @param {Object} mutation The committed Vuex mutation.
  * @param {String} mutation.type The type identifier of the mutation.
  * @param {*} mutation.payload The payload carried by the mutation.
- * @param {Object} store The Vuex store.
  * @returns {void}
  */
-export function mutationCallback (mutation, store) {
+export function mutationCallback (mutation) {
     try {
         switch (mutation.type) {
-            case "Modules/LayerInformation/setLayerInfo":
-                handleSetLayerInfo(mutation.payload, store);
-                break;
             case "Modules/Measure/clearRedoForFeature":
                 handleClearRedoForFeatureForMeasure();
                 break;

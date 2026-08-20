@@ -2,12 +2,12 @@
 
 This addon is currently still in development and thus being an experimental feature.
 
-It integrates [Matomo](https://matomo.org/) (formerly Piwik) analytics into the Masterportal. It automatically tracks relevant user interactions by subscribing to Vuex store actions and mutations and forwarding events to a configured Matomo instance.
+It integrates [Matomo](https://matomo.org/) (formerly Piwik) analytics into the Masterportal. It automatically tracks relevant user interactions by subscribing to Vuex store actions and mutations as well as to Pinia store actions and forwarding events to a configured Matomo instance.
 
 ## Features
 
 - **Matomo Integration**: Injects the Matomo tracking script at runtime and initializes the tracker with the configured site ID and endpoint URLs.
-- **Automatic Event Tracking**: Subscribes to Vuex store actions and mutations and sends tracking events to Matomo without any additional manual instrumentation in the portal code.
+- **Automatic Event Tracking**: Subscribes to Vuex store actions and mutations as well as to Pinia store actions and sends tracking events to Matomo without any additional manual instrumentation in the portal code.
 - **Page View Tracking**: Records synthetic page views with structured URLs that reflect the current navigation state of the portal (active menu component, layer selection folder, search query).
 - **Link Tracking**: Optionally intercepts clicks on external links, mailto links, and blob download links and tracks them as Matomo events. Activated via `options.enableLinkTracking`.
 - **Privacy Controls**: Supports a range of configurable privacy settings (e.g. cookie-free tracking, Do Not Track support, consent requirement).

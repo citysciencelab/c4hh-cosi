@@ -1,14 +1,22 @@
 import store from "../../../src/app-store/index.js";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 import {actionCallback} from "./actionCallback.js";
 import {configCommands} from "./configCommands.js";
 import {mutationCallback} from "./mutationCallback.js";
+import {piniaActionCallback} from "./piniaActionCallback.js";
 import {trackMatomoEvent} from "./trackMatomo.js";
 import {assembleSourceInfoForEvent, getBaseUrl, stripBodyParameterFromHref} from "./util.js";
 
 /**
+ * The Pinia store composables whose actions are observed for tracking.
+ * @type {Function[]}
+ */
+const piniaStoresToObserve = [useLayerInformationStore];
+
+/**
  * Initializes user tracking based on the global "Config" object.
  * If a Matomo configuration is present, Matomo is initialized.
- * Subscribes to Vuex store actions and mutations so that relevant interactions are tracked.
+ * Subscribes to Vuex store actions and mutations as well as to Pinia store actions so that relevant interactions are tracked.
  * @returns {void}
  */
 export function initializeUserTracking () {
@@ -25,8 +33,13 @@ export function initializeUserTracking () {
         }
 
         if (isAvailable) {
-            store.subscribe(mutation => mutationCallback(mutation, store));
+            store.subscribe(mutation => mutationCallback(mutation));
             store.subscribeAction({after: action => actionCallback(action, store)});
+            piniaStoresToObserve.forEach(useStore => {
+                useStore().$onAction(({name, args, store: piniaStore, after}) => {
+                    after(() => piniaActionCallback({name, args, storeId: piniaStore.$id}, store));
+                });
+            });
 
             if (options?.enableLinkTracking) {
                 initializeLinkTracking();
