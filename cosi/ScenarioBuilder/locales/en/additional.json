@@ -78,7 +78,8 @@
                     "pruneSimulatedFeatures": "Einrichtungen löschen",
                     "helpPruneSimulatedFeatures": "Alle simulierten Einrichtungen dieses Szenarios löschen",
                     "pruneAllFeaturesWarning": "Wollen Sie wirklich alle erstellten Einrichtungen in diesem Szenario löschen?",
-                    "noActiveScenario": "Bitte wählen Sie ein Szenario oder legen Sie ein neues an."
+                    "noActiveScenario": "Bitte wählen Sie ein Szenario oder legen Sie ein neues an.",
+                    "planningObject": "Planning objects"
                 },
                 "dataTypes": {
                     "decimal": "number",

@@ -73,7 +73,13 @@ export default {
         >
             <Card
                 class="d-flex flex-column-reverse"
-                :data="item.data"
+                :data="[
+                    ...item.data,
+                    {
+                        icon: 'bi bi-box',
+                        label: $t('additional:modules.tools.cosi.scenarioManager.planningObject') + ': ' + item.objects.length
+                    }
+                ]"
                 :downloadable="item.downloadable"
                 :icon="item.icon"
                 :visible="false"

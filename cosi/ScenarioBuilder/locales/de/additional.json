@@ -64,7 +64,8 @@
                     "pruneAllFeaturesWarning": "Wollen Sie wirklich alle Daten in diesem Szenario löschen?",
                     "pruneNeighborhoodsWarning": "Wollen Sie wirklich alle erstellten Wohnquartiere in diesem Szenario löschen?",
                     "pruneSimulatedFeaturesWarning": "Wollen Sie wirklich alle erstellten Einrichtungen in diesem Szenario löschen?",
-                    "noActiveScenario": "Bitte wählen Sie ein Szenario oder legen Sie ein neues an."
+                    "noActiveScenario": "Bitte wählen Sie ein Szenario oder legen Sie ein neues an.",
+                    "planningObject": "Planungsobjekte"
                 },
                 "objectManager": {
                     "title": "Szenario bearbeiten",
