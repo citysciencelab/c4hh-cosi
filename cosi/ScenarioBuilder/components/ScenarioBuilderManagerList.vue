@@ -13,7 +13,7 @@ export default {
         Card,
         IconButton
     },
-    inject: ["toggleCurrentView"],
+    inject: ["removeFeatureFromScenario", "toggleCurrentView"],
     computed: {
         ...mapGetters("Modules/ScenarioBuilder", ["scenarioCards"])
     },
@@ -46,6 +46,11 @@ export default {
          * @return {void}
          */
         removeScenarioCard (index) {
+            const scenarioCard = this.scenarioCards[index];
+
+            scenarioCard.objects.forEach(obj => {
+                this.removeFeatureFromScenario(obj.feature);
+            });
             this.scenarioCards.splice(index, 1);
         },
 
