@@ -153,6 +153,15 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
             expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
             expect(wrapper.findAllComponents({name: "AlertMessage"}).length).to.equal(2);
         });
+
+        it("should not find Toast component", () => {
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.false;
+        });
+
+        it("should find Toast component", async () => {
+            await wrapper.setData({"savedStoryIndex": 1});
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.true;
+        });
     });
 
     describe("Methods", () => {

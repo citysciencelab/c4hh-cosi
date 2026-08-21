@@ -120,6 +120,15 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
 
             expect(titleImage.exists()).to.be.true;
         });
+
+        it("should not find Toast component", () => {
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.false;
+        });
+
+        it("should find Toast component", async () => {
+            await wrapper.setData({"showAutosaveHint": true});
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.true;
+        });
     });
 
     describe("Component methods", () => {

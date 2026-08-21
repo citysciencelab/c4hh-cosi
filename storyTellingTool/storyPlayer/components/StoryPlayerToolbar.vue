@@ -1,11 +1,13 @@
  <script>
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {mapGetters} from "vuex";
+import Toast from "../../shared/toasts/components/ToastsElement.vue";
 
 export default {
     name: "StoryPlayerToolbar",
     components: {
-        IconButton
+        IconButton,
+        Toast
     },
     data () {
         return {
@@ -16,6 +18,20 @@ export default {
     computed: {
         ...mapGetters("Modules/ShareView", ["url"]),
         ...mapGetters("Modules/StoryPlayer", ["fixedStoryPath"])
+    },
+    watch: {
+        /**
+         * Auto-hides the copied hint after 5 seconds.
+         * @param {Boolean} val - The newly saved story index.
+         * @returns {void}
+         */
+        linkCopied (val) {
+            if (val) {
+                setTimeout(() => {
+                    this.linkCopied = false;
+                }, 5000);
+            }
+        }
     },
     mounted () {
         document.addEventListener("fullscreenchange", this.fullScreenChangeHandler);
@@ -38,9 +54,6 @@ export default {
             if (window.isSecureContext) {
                 navigator.clipboard.writeText(this.url + "#");
                 this.linkCopied = true;
-                // setTimeout(() => {
-                //     this.linkCopied = false;
-                // }, 2000);
             }
             else {
                 this.addSingleAlert({
@@ -120,12 +133,12 @@ export default {
                 :interaction="copyToClipboard"
             />
         </div>
-        <span
+        <Toast
             v-if="linkCopied"
-            class="badge rounded-pill mt-1 p-2"
-        >
-            {{ $t('additional:modules.storyPlayer.copyStoryLinkSuccess') }}
-        </span>
+            class="toast"
+            type="success"
+            :text="$t('additional:modules.storyPlayer.copyStoryLinkSuccess')"
+        />
     </div>
 </template>
 

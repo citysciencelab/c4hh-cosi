@@ -9,6 +9,7 @@ import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InfoText from "../../shared/card/components/InfoText.vue";
 import {mapGetters, mapMutations, mapActions} from "vuex";
 import StoryCreator from "../../storyCreator/components/StoryCreator.vue";
+import Toast from "../../shared/toasts/components/ToastsElement.vue";
 
 export default {
     name: "StoryManager",
@@ -19,7 +20,8 @@ export default {
         FlatButton,
         InfoCard,
         InfoText,
-        StoryCreator
+        StoryCreator,
+        Toast
     },
     data () {
         return {
@@ -430,8 +432,14 @@ export default {
 <template lang="html">
     <div
         id="story-manager"
-        class="d-flex flex-column"
+        class="d-flex flex-column position-relative"
     >
+        <Toast
+            v-if="savedStoryIndex !== null"
+            class="position-fixed toast"
+            type="info"
+            :text="$t('additional:modules.storyCreator.autosaveHint')"
+        />
         <ConfirmModal
             :show-modal="showLeaveToolModal"
             :modal-title="$t('additional:modules.storyManager.confirmLeaveTitle')"
@@ -467,27 +475,6 @@ export default {
             />
             <hr>
             <div class="mt-2 mb-3">
-                <div class="story-manager-hint-area mb-1">
-                    <Transition name="hint-fade">
-                        <div
-                            v-if="savedStoryIndex !== null"
-                            class="alert alert-info d-flex align-items-center gap-2 mb-0 py-1 px-2 small"
-                            role="alert"
-                        >
-                            <i
-                                class="bi bi-check-circle-fill flex-shrink-0"
-                                aria-hidden="true"
-                            />
-                            <span>{{ $t('additional:modules.storyCreator.autosaveHint') }}</span>
-                            <button
-                                type="button"
-                                class="btn-close btn-sm ms-2"
-                                :aria-label="$t('common:button.close')"
-                                @click="savedStoryIndex = null"
-                            />
-                        </div>
-                    </Transition>
-                </div>
                 <h5 class="d-flex align-items-center mb-2">
                     <i class="bi bi-play-btn me-2 fs-4 pt-1" />
                     {{ $t('additional:modules.storyManager.selectStoryTitle') }}
@@ -559,7 +546,12 @@ export default {
     </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
+.toast {
+    top: 10px;
+    right: 140px;
+    z-index: 10;
+}
 .story-manager-hint-area {
     min-height: 2.5rem;
     display: flex;

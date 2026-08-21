@@ -11,6 +11,7 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import store from "@appstore/index.js";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
+import Toast from "../../shared/toasts/components/ToastsElement.vue";
 
 export default {
     name: "StoryCreator",
@@ -22,7 +23,8 @@ export default {
         InfoText,
         InputText,
         StoryCreatorAddImageCard,
-        StoryCreatorChapter
+        StoryCreatorChapter,
+        Toast
     },
     props: {
         /**
@@ -198,6 +200,7 @@ export default {
                 this.chapterContent = [...this.chapterContent, chapter];
             }
             this.currentView = "story";
+            this.showAutosaveHint = true;
         },
 
         /**
@@ -458,7 +461,13 @@ export default {
 </script>
 
 <template lang="html">
-    <div id="story-creator">
+    <div id="story-creator position-relative">
+        <Toast
+            v-if="showAutosaveHint"
+            class="position-fixed toast"
+            type="info"
+            :text="$t('additional:modules.storyCreator.autosaveHint')"
+        />
         <nav
             class="story-breadcrumb d-flex align-items-center mb-1"
             aria-label="breadcrumb"
@@ -496,27 +505,6 @@ export default {
             </ol>
         </nav>
         <div v-if="currentView === 'story'">
-            <div class="story-creator-hint-area mb-1">
-                <Transition name="hint-fade">
-                    <div
-                        v-if="showAutosaveHint"
-                        class="alert alert-info d-flex align-items-center gap-2 mb-0 py-1 px-2 small"
-                        role="alert"
-                    >
-                        <i
-                            class="bi bi-check-circle-fill flex-shrink-0"
-                            aria-hidden="true"
-                        />
-                        <span>{{ $t('additional:modules.storyCreator.autosaveHint') }}</span>
-                        <button
-                            type="button"
-                            class="btn-close btn-sm ms-2"
-                            :aria-label="$t('common:button.close')"
-                            @click="showAutosaveHint = false"
-                        />
-                    </div>
-                </Transition>
-            </div>
             <h5 class="mb-4">
                 {{ $t("additional:modules.storyCreator.labels.editStory") }}
             </h5>
@@ -661,6 +649,11 @@ export default {
 </template>
 
 <style lang="scss" scoped>
+.toast {
+    top: 10px;
+    right: 140px;
+    z-index: 10;
+}
 .chapter-title-image-preview {
     cursor: pointer;
 

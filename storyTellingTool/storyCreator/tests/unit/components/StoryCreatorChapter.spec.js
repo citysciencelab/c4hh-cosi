@@ -228,6 +228,15 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
             expect(btn.attributes("disabled")).to.not.be.undefined;
         });
+
+        it("should not find Toast component", () => {
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.false;
+        });
+
+        it("should find Toast component", async () => {
+            await wrapper.setData({"showToast": true});
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.true;
+        });
     });
 
     describe("Computed", () => {

@@ -18,6 +18,7 @@ import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
 import StoryCreatorAddVideoCard from "./StoryCreatorAddVideoCard.vue";
 import tipTapJsonToHtml from "../shared/modules/tipTapEditor/js/tipTapJsonToHtml.js";
+import Toast from "../../shared/toasts/components/ToastsElement.vue";
 
 export default {
     name: "StoryCreatorChapter",
@@ -31,7 +32,8 @@ export default {
         StoryCreatorAddFeatureCard,
         StoryCreatorAddImageCard,
         StoryCreatorAddTextCard,
-        StoryCreatorAddVideoCard
+        StoryCreatorAddVideoCard,
+        Toast
     },
     props: {
         /**
@@ -88,7 +90,7 @@ export default {
             toolList: [],
             selectedLayers: [],
             selectedTool: "",
-            showAlert: false,
+            showToast: false,
             title: this.$t("additional:modules.storyCreator.chapter.title")
         };
     },
@@ -224,14 +226,14 @@ export default {
             this.$emit("update:chapter-title", newVal);
         },
         /**
-         * Automatically hides the success alert after 4 seconds.
-         * @param {Boolean} newVal - The new value of showAlert.
+         * Automatically hides the info toast after 4 seconds.
+         * @param {Boolean} newVal - The new value of showToast.
          * @returns {void}
          */
-        showAlert (newVal) {
+        showToast (newVal) {
             if (newVal) {
                 setTimeout(() => {
-                    this.showAlert = false;
+                    this.showToast = false;
                 }, 4000);
             }
         }
@@ -481,7 +483,7 @@ export default {
 
             this.confirmedCoordinate = [...this.coordinate];
             this.confirmedZoomlevel = this.zoomlevel;
-            this.showAlert = true;
+            this.showToast = true;
             this.navigation3D = this.get3DParameter();
         },
         /**
@@ -822,8 +824,8 @@ export default {
                 return;
             }
 
-            if (this.showAlert) {
-                this.showAlert = false;
+            if (this.showToast) {
+                this.showToast = false;
             }
 
             this.zoomlevel = mapView.getZoom();
@@ -835,23 +837,6 @@ export default {
 
 <template lang="html">
     <div class="chapter">
-        <div class="chapter-hint-area">
-            <Transition name="hint-fade">
-                <div
-                    v-if="showAlert"
-                    class="chapter-success-alert d-flex align-items-center gap-2 py-1 px-2 small"
-                    role="alert"
-                    aria-live="assertive"
-                    aria-atomic="true"
-                >
-                    <i
-                        class="bi bi-check-circle-fill flex-shrink-0"
-                        aria-hidden="true"
-                    />
-                    <span>{{ $t('additional:modules.storyCreator.chapter.successAlert') }}</span>
-                </div>
-            </Transition>
-        </div>
         <h5>
             {{ $t("additional:modules.storyCreator.chapter.editChapter") }}
         </h5>
@@ -891,6 +876,11 @@ export default {
                         </div>
                     </div>
                 </div>
+                <Toast
+                    v-if="showToast"
+                    type="info"
+                    :text="$t('additional:modules.storyCreator.chapter.successAlert')"
+                />
             </div>
             <div
                 v-if="positionChanged"

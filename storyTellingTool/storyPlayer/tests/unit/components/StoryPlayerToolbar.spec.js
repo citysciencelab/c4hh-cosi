@@ -48,6 +48,16 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayerToolbar.spec.js", 
 
         sinon.restore();
     });
+    describe("Dom", () => {
+        it("should not find Toast component", () => {
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.false;
+        });
+
+        it("should find Toast component", async () => {
+            await wrapper.setData({"linkCopied": true});
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.true;
+        });
+    });
 
     describe("Methods", () => {
         describe("copyToClipboard", () => {
