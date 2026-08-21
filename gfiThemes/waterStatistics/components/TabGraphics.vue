@@ -22,11 +22,17 @@ export default {
             required: true
         }
     },
+    data () {
+        return {
+            percentile: null
+        };
+    },
     computed: {
         ...mapGetters("Modules/WaterStatistics", [
             "statisticValues",
             "oafSchema",
-            "dataLoading"
+            "dataLoading",
+            "percentiles"
         ]),
         ...mapGetters("Maps", [
             "projectionCode"
@@ -60,8 +66,8 @@ export default {
          * @returns {Object} options to use for the line chart
          */
         lineChartOptions () {
-            const stepLeft = this.stepSizeLeft;
-            const stepRight = this.stepSizeRight;
+            const deltaLeft = this.maxScaleLeft - this.minScaleLeft;
+            const deltaRight = this.maxScaleRight - this.minScaleRight;
 
             return {
                 plugins: {
@@ -87,9 +93,9 @@ export default {
                         max: this.maxScaleLeft,
                         ticks: {
                             precision: 2,
-                            stepSize: stepLeft,
+                            stepSize: this.stepSizeLeft,
                             callback: function (value) {
-                                const decimal = stepLeft < 0.05 ? 2 : 1;
+                                const decimal = deltaLeft < 10 ? 2 : 1;
 
                                 return thousandsSeparator(value.toFixed(decimal));
                             }
@@ -111,9 +117,9 @@ export default {
                         },
                         ticks: {
                             precision: 2,
-                            stepSize: stepRight,
+                            stepSize: this.stepSizeRight,
                             callback: function (value) {
-                                const decimal = stepRight < 0.05 ? 2 : 1;
+                                const decimal = deltaRight < 10 ? 2 : 1;
 
                                 return thousandsSeparator(value.toFixed(decimal));
                             }
@@ -192,24 +198,39 @@ export default {
          * @returns {number} step size
          */
         stepSizeLeft () {
-            const deltaLeft = this.maxDataValueLeft - this.minDataValueLeft;
-
-            return this.findStepSizeFromDelta(deltaLeft);
+            return this.findStepSizeFromDelta(this.maxDataValueLeft, this.minDataValueLeft);
         },
         /**
          * Minimal scale boundary for the left axis (rounded down with padding).
+         * If percentile data is available, uses the lowest P10 value found in
+         * this.percentile.perzentile and decreases it by 10%.
+         * Falls back to the data-derived min value (rounded) when percentile data is missing
+         * or minDataValueLeft is below the value calculated from percentiles
          * @returns {number} minimal scale boundary
          */
         minScaleLeft () {
+            if (this.leftScaleRangeFromPercentiles.min && this.leftScaleRangeFromPercentiles.min < this.minDataValueLeft) {
+                return this.leftScaleRangeFromPercentiles.min;
+            }
+
             const padding = this.stepSizeLeft > 0.05 ? this.stepSizeLeft : 0;
 
             return Math.floor(this.minDataValueLeft * 10) / 10 - padding;
         },
         /**
-         * Maximal scale boundary for the left axis (rounded up with padding).
+         * Maximal scale boundary for the left axis.
+         * If percentile data is available, uses the highest P90 value found in
+         * this.percentile.perzentile and increases it by 10%.
+         * Falls back to the data-derived max value (rounded) when percentile data is missing
+         * or maxDataValueLeft is above the value calculated from percentiles.
+         *
          * @returns {number} maximal scale boundary
          */
         maxScaleLeft () {
+            if (this.leftScaleRangeFromPercentiles.max && this.leftScaleRangeFromPercentiles.max > this.maxDataValueLeft) {
+                return this.leftScaleRangeFromPercentiles.max;
+            }
+
             const padding = this.stepSizeLeft > 0.05 ? this.stepSizeLeft : 0;
 
             return Math.ceil(this.maxDataValueLeft * 10) / 10 + padding;
@@ -258,7 +279,50 @@ export default {
             if (delta <= 0) {
                 return this.stepSizeLeft;
             }
-            return this.findStepSizeFromDelta(delta);
+            return this.findStepSizeFromDelta(this.maxScaleRight, this.minScaleRight);
+        },
+        /**
+         * Computes a left scale range (min/max) from percentile entries (P10 / P90).
+         * Returns {min: number|null, max: number|null}.
+         * @returns {{min: number|null, max: number|null}} minimal and maximal value for the left scale
+         */
+        leftScaleRangeFromPercentiles () {
+            const leftScaleRange = {
+                min: null,
+                max: null
+            };
+
+            const pArray = this.percentile?.perzentile;
+
+            if (Array.isArray(pArray) && pArray.length) {
+                let maxP90 = Number.NEGATIVE_INFINITY,
+                    minP10 = Number.POSITIVE_INFINITY;
+
+                for (let i = 0; i < pArray.length; i++) {
+                    const entry = pArray[i],
+                          raw10 = entry?.P10,
+                          raw90 = entry?.P90,
+                          num10 = typeof raw10 === "number" ? raw10 : Number.parseFloat(raw10),
+                          num90 = typeof raw90 === "number" ? raw90 : Number.parseFloat(raw90);
+
+                    if (!Number.isNaN(num90) && num90 > maxP90) {
+                        maxP90 = num90;
+                    }
+                    if (!Number.isNaN(num10) && num10 < minP10) {
+                        minP10 = num10;
+                    }
+                }
+
+                if (maxP90 !== Number.NEGATIVE_INFINITY) {
+                    leftScaleRange.max = maxP90 + Math.abs(maxP90) * 0.1;
+                }
+
+                if (minP10 !== Number.POSITIVE_INFINITY) {
+                    leftScaleRange.min = minP10 - Math.abs(minP10) * 0.1;
+                }
+            }
+
+            return leftScaleRange;
         }
     },
     watch: {
@@ -287,13 +351,38 @@ export default {
                 };
 
                 this.queryOaf({params: queryParams});
+
+                this.getPercentilesForThisData();
+            },
+            immediate: true
+        },
+        percentiles: {
+            deep: true,
+            handler (newPercentiles, oldPercentiles) {
+                if (newPercentiles === oldPercentiles) {
+                    return;
+                }
+
+                this.getPercentilesForThisData();
             },
             immediate: true
         }
     },
+    mounted () {
+        if (this.percentiles) {
+            return;
+        }
+
+        const percentilePath = this.currentChartTheme?.chartParams?.percentiles;
+
+        if (percentilePath) {
+            this.queryPercentiles({params: {url: percentilePath}});
+        }
+    },
     methods: {
         ...mapActions("Modules/WaterStatistics", [
-            "queryOaf"
+            "queryOaf",
+            "queryPercentiles"
         ]),
         /**
          * Find the minimal or maximal numeric value for the provided axisKey inside statisticValues.
@@ -327,18 +416,26 @@ export default {
             return minOrMaxValue === infinityValue ? 0 : minOrMaxValue;
         },
         /**
-         * Determine the tick step size for an axis based on the provided data range (delta).
-         * Uses the project's threshold rules:
-         * - delta < 0.5  => 0.01
-         * - delta < 1    => 0.1
-         * - delta < 2    => 0.2
-         * - otherwise    => 0.5
+         * Determine the tick step size for an axis from the provided max and min values.
          *
-         * @param {number} delta - Difference between maximum and minimum values on the axis.
+         * Thresholds:
+         * - delta === 0 -> 10 (fallback when range is zero)
+         * - delta < 0.5  -> 0.01
+         * - delta < 1    -> 0.1
+         * - delta < 2    -> 0.2
+         * - otherwise    -> 0.5
+         *
+         * @param {number} max - Maximum value on the axis.
+         * @param {number} min - Minimum value on the axis.
          * @returns {number} Recommended step size for axis ticks.
          */
-        findStepSizeFromDelta (delta) {
-            if (delta < 0.5) {
+        findStepSizeFromDelta (max, min) {
+            const delta = max - min;
+
+            if (delta === 0) {
+                return 10;
+            }
+            else if (delta < 0.5) {
                 return 0.01;
             }
             else if (delta < 1) {
@@ -416,6 +513,31 @@ export default {
                       : allProperties;
 
             return csvParams;
+        },
+        /**
+         * Find and set the percentile entry that corresponds to the current feature's query attribute.
+         *
+         * Compares the configured query attribute value (from the active chart theme)
+         * against entries in this.percentiles (array). Numeric values are normalized
+         * to strings for a consistent comparison with attribute values that may be
+         * strings or numbers. If a matching entry is found it is assigned to
+         * this.percentile, otherwise this.percentile is set to null.
+         *
+         * @returns {void}
+         */
+        getPercentilesForThisData () {
+            const queryAttribute = this.currentChartTheme.queryParams?.literalFilters?.queryAttribute;
+
+            this.percentile = this.percentiles?.find(data => {
+                const compareValue = typeof data[queryAttribute] === "number"
+                          ? data[queryAttribute].toString()
+                          : data[queryAttribute],
+                      givenValue = typeof this.allAttributes?.[queryAttribute] === "number"
+                          ? this.allAttributes?.[queryAttribute].toString()
+                          : this.allAttributes?.[queryAttribute];
+
+                return compareValue === givenValue;
+            });
         }
     }
 };

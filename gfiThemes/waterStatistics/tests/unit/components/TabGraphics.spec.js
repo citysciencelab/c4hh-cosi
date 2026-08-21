@@ -6,7 +6,7 @@ import sinon from "sinon";
 import TabGraphics from "../../../components/TabGraphics.vue";
 
 describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
-    let store, wrapper, queryOaf, params, statisticValuesMock;
+    let store, wrapper, queryOaf, queryPercentiles, params, statisticValuesMock, percentilesMock;
 
     beforeEach(() => {
         statisticValuesMock = reactive([
@@ -60,7 +60,69 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
             }
         ]);
 
+        percentilesMock = [
+            {
+                "messstellennummer": 2200,
+                "perzentile": [
+                    {
+                        "MIN": 14.45,
+                        "P10": 14.55,
+                        "P25": 14.59,
+                        "P75": 15,
+                        "P90": 15.13,
+                        "MAX": 15.37
+                    },
+                    {
+                        "MIN": 14.45,
+                        "P10": 14.57,
+                        "P25": 14.62,
+                        "P75": 15.11,
+                        "P90": 15.23,
+                        "MAX": 15.37
+                    },
+                    {
+                        "MIN": 14.45,
+                        "P10": 14.56,
+                        "P25": 14.66,
+                        "P75": 15.21,
+                        "P90": 15.32,
+                        "MAX": 15.37
+                    }
+                ]
+            },
+            {
+                "messstellennummer": 3381,
+                "perzentile": [
+                    {
+                        "MIN": 9.82,
+                        "P10": 10.62,
+                        "P25": 10.75,
+                        "P75": 11.26,
+                        "P90": 11.67,
+                        "MAX": 11.94
+                    },
+                    {
+                        "MIN": 9.82,
+                        "P10": 10.62,
+                        "P25": 10.94,
+                        "P75": 11.66,
+                        "P90": 11.77,
+                        "MAX": 11.94
+                    },
+                    {
+                        "MIN": 9.82,
+                        "P10": 10.62,
+                        "P25": 11.15,
+                        "P75": 11.59,
+                        "P90": 11.85,
+                        "MAX": 11.94
+                    }
+                ]
+            }
+        ];
+
         queryOaf = sinon.spy();
+        queryPercentiles = sinon.spy();
 
         store = createStore({
             modules: {
@@ -70,7 +132,8 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                         WaterStatistics: {
                             namespaced: true,
                             actions: {
-                                queryOaf
+                                queryOaf,
+                                queryPercentiles
                             },
                             getters: {
                                 dataLoading: () => false,
@@ -83,7 +146,8 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                                         wasserstand_mugok: {"title": "Wasserstand in m u. GOK", "description": "Tagesmittelwert des Wasserstands (GOK)"}
                                     }
                                 }),
-                                statisticValues: () => statisticValuesMock
+                                statisticValues: () => statisticValuesMock,
+                                percentiles: () => percentilesMock
                             }
                         }
                     }
@@ -306,6 +370,8 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
         expect(wrapper.vm.stepSizeLeft).to.equal(0.5);
         expect(wrapper.vm.minScaleLeft).to.equal(14.6);
         expect(wrapper.vm.maxScaleLeft).to.equal(21.4);
+
+        expect(wrapper.vm.leftScaleRangeFromPercentiles).to.deep.equal({min: null, max: null});
     });
 
     it("should get the correct line chart axis values for the right axis", async () => {
@@ -328,5 +394,65 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
         expect(wrapper.vm.stepSizeRight).to.equal(0.5);
         expect(Number(wrapper.vm.minScaleRight.toFixed(2))).to.equal(0.18);
         expect(Number(wrapper.vm.maxScaleRight.toFixed(2))).to.equal(10.88);
+    });
+
+    it("should find the percentiles for this dataset", async () => {
+        await wrapper.setProps({
+            params: {
+                ...params,
+                chartThemes: [
+                    {
+                        ...params.chartThemes[0],
+                        chartParams: {
+                            yAxisLeft: "wasserstand_mnhn",
+                            percentiles: "data available"
+                        }
+                    }
+                ]
+            },
+            allAttributes: {
+                messstellennummer: "2200"
+            }
+        });
+
+        wrapper.vm.getPercentilesForThisData();
+
+        expect(wrapper.vm.percentile).to.be.an("object");
+        expect(wrapper.vm.percentile).to.deep.equal(percentilesMock[0]);
+        expect(wrapper.vm.leftScaleRangeFromPercentiles).to.deep.equal({min: 13.095, max: 16.852});
+        expect(wrapper.vm.minScaleLeft).to.equal(13.095);
+        expect(wrapper.vm.maxScaleLeft).to.equal(16.852);
+    });
+
+    it("should fall back to scale calculation form data when data our of percentiles", async () => {
+        percentilesMock[0].perzentile.forEach(percentage => {
+            percentage.P10 = percentage.P10 + 3;
+        });
+
+        await wrapper.setProps({
+            params: {
+                ...params,
+                chartThemes: [
+                    {
+                        ...params.chartThemes[0],
+                        chartParams: {
+                            yAxisLeft: "wasserstand_mnhn",
+                            percentiles: "data available"
+                        }
+                    }
+                ]
+            },
+            allAttributes: {
+                messstellennummer: "2200"
+            }
+        });
+
+        wrapper.vm.getPercentilesForThisData();
+
+        expect(wrapper.vm.percentile).to.be.an("object");
+        expect(wrapper.vm.percentile).to.deep.equal(percentilesMock[0]);
+        expect(wrapper.vm.leftScaleRangeFromPercentiles).to.deep.equal({min: 15.795, max: 16.852});
+        expect(wrapper.vm.minScaleLeft).to.equal(15.1);
+        expect(wrapper.vm.maxScaleLeft).to.equal(16.852);
     });
 });

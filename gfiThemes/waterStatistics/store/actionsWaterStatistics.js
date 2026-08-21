@@ -2,6 +2,7 @@ import {convertToLocalDateLiteral, guardAgainstExcelDateAutoFormat} from "../js/
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature.js";
 import {convertJsonToCsv} from "@shared/js/utils/convertJsonToCsv.js";
 import {createCsvBlob, downloadBlobPerNavigator, downloadBlobPerHTML5} from "@shared/modules/buttons/js/exportButtonUtils.js";
+import axios from "axios";
 
 const actions = {
     /**
@@ -129,6 +130,36 @@ const actions = {
                     content: `Fehler beim Abrufen notwendiger Daten für ${params.collections}. Bitte versuchen Sie es erneut.`
                 }, {root: true});
             });
+    },
+    /**
+     * Fetches percentile data from the given URL and stores it in the module state.
+     *
+     * Performs an HTTP GET to payload.params.url and commits the returned
+     * response.data.data via the "setPercentiles" mutation. On error the
+     * exception is logged and an alert is dispatched via the Alerting module.
+     *
+     * @function
+     * @param {Object} context - Vuex action context.
+     * @param {Function} context.commit - Vuex commit function.
+     * @param {Function} context.dispatch - Vuex dispatch function.
+     * @param {Object} payload - Action payload.
+     * @param {Object} payload.params - Parameters object.
+     * @param {string} payload.params.url - Endpoint URL returning percentile JSON.
+     * @returns {Promise<void>} Resolves when the request has completed and state updated.
+     */
+    async queryPercentiles ({commit, dispatch}, {params}) {
+        try {
+            const response = await axios.get(params.url);
+
+            commit("setPercentiles", response.data.data);
+        }
+        catch (error) {
+            console.error(error);
+            dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                content: "Fehler beim Abrufen notwendiger Daten für die Grafik. Bitte versuchen Sie es erneut."
+            }, {root: true});
+        }
     },
     /**
      * Exports the current statistic values (OAF features) as a CSV file download.
