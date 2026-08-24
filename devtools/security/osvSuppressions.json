@@ -2,104 +2,14 @@
   "schemaVersion": 1,
   "entries": [
     {
-      "id": "GHSA-gcfj-64vw-6mp9",
-      "package": "axios",
+      "id": "GHSA-848j-6mx2-7j84",
+      "package": "elliptic",
       "ecosystem": "npm",
-      "status": "upstream-blocked",
-      "reason": "Node HTTP adapter, which is not part of the browser build. Resolves with the next patched axios release.",
+      "status": "wont-fix",
+      "reason": "Reachability check found PKCE SHA-256 hashing only via crypto polyfill; no ECDSA signing/verification path is used in application code.",
       "addedBy": "geodatenanwendungen@gv.hamburg.de",
-      "addedOn": "2026-08-13",
-      "reviewBy": "2026-11-13"
-    },
-    {
-      "id": "GHSA-f4gw-2p7v-4548",
-      "package": "axios",
-      "ecosystem": "npm",
-      "status": "upstream-blocked",
-      "reason": "Node HTTP adapter, which is not part of the browser build. Resolves with the next patched axios release.",
-      "addedBy": "geodatenanwendungen@gv.hamburg.de",
-      "addedOn": "2026-08-13",
-      "reviewBy": "2026-11-13"
-    },
-    {
-      "id": "GHSA-hcpx-6fm6-wx23",
-      "package": "axios",
-      "ecosystem": "npm",
-      "status": "upstream-blocked",
-      "reason": "Form data serialization, which the codebase does not use. Resolves with the next patched axios release.",
-      "addedBy": "geodatenanwendungen@gv.hamburg.de",
-      "addedOn": "2026-08-13",
-      "reviewBy": "2026-11-13"
-    },
-    {
-      "id": "GHSA-42h9-826w-cgv3",
-      "package": "axios",
-      "ecosystem": "npm",
-      "status": "upstream-blocked",
-      "reason": "Form data serialization, which the codebase does not use. Resolves with the next patched axios release.",
-      "addedBy": "geodatenanwendungen@gv.hamburg.de",
-      "addedOn": "2026-08-13",
-      "reviewBy": "2026-11-13"
-    },
-    {
-      "id": "GHSA-pmv8-rq9r-6j72",
-      "package": "axios",
-      "ecosystem": "npm",
-      "status": "upstream-blocked",
-      "reason": "Form data serialization, which the codebase does not use. Resolves with the next patched axios release.",
-      "addedBy": "geodatenanwendungen@gv.hamburg.de",
-      "addedOn": "2026-08-13",
-      "reviewBy": "2026-11-13"
-    },
-    {
-      "id": "GHSA-jqh4-m9w3-8hp9",
-      "package": "axios",
-      "ecosystem": "npm",
-      "status": "upstream-blocked",
-      "reason": "Applies to streamed uploads with a configured body length limit, which the codebase does not set. Resolves with the next patched axios release.",
-      "addedBy": "geodatenanwendungen@gv.hamburg.de",
-      "addedOn": "2026-08-13",
-      "reviewBy": "2026-11-13"
-    },
-    {
-      "id": "GHSA-mwf2-3pr3-8698",
-      "package": "axios",
-      "ecosystem": "npm",
-      "status": "upstream-blocked",
-      "reason": "Applies to streamed uploads with a configured body length limit, which the codebase does not set. Resolves with the next patched axios release.",
-      "addedBy": "geodatenanwendungen@gv.hamburg.de",
-      "addedOn": "2026-08-13",
-      "reviewBy": "2026-11-13"
-    },
-    {
-      "id": "GHSA-mmx7-hfxf-jppx",
-      "package": "axios",
-      "ecosystem": "npm",
-      "status": "upstream-blocked",
-      "reason": "Requires request configuration from untrusted input; portal configuration is operator-controlled. Resolves with the next patched axios release.",
-      "addedBy": "geodatenanwendungen@gv.hamburg.de",
-      "addedOn": "2026-08-13",
-      "reviewBy": "2026-11-13"
-    },
-    {
-      "id": "GHSA-7q8q-rj6j-mhjq",
-      "package": "axios",
-      "ecosystem": "npm",
-      "status": "upstream-blocked",
-      "reason": "Requires request configuration from untrusted input; portal configuration is operator-controlled. Resolves with the next patched axios release.",
-      "addedBy": "geodatenanwendungen@gv.hamburg.de",
-      "addedOn": "2026-08-13",
-      "reviewBy": "2026-11-13"
-    },
-    {
-      "id": "GHSA-xj6q-8x83-jv6g",
-      "package": "axios",
-      "ecosystem": "npm",
-      "status": "upstream-blocked",
-      "reason": "Requires request configuration from untrusted input; portal configuration is operator-controlled. Resolves with the next patched axios release.",
-      "addedBy": "geodatenanwendungen@gv.hamburg.de",
-      "addedOn": "2026-08-13",
-      "reviewBy": "2026-11-13"
+      "addedOn": "2026-08-24",
+      "reviewBy": "2027-08-24"
     },
     {
       "id": "GHSA-3jxr-9vmj-r5cp",
