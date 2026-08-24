@@ -65,7 +65,6 @@ The following user interactions are tracked as Matomo events automatically.
 | `Opened tool` | `ObliqueAerialView` | The vcOblique (oblique aerial view) tool was opened. |
 | `Used tool successfully` | `AddWMS` | A WMS layer was successfully added via the AddWMS tool. |
 | `Used tool successfully` | `CoordToolkit (Query-Tab)` | A coordinate was formatted or a position was clicked in the CoordToolkit. |
-| `Used tool successfully` | `Draw (Old)` | A drawing was completed in the legacy Draw tool. |
 | `Used tool successfully` | `FileImport` | A file was successfully imported via the FileImport tool. |
 | `Used tool successfully` | `Measure` | A measurement was finalized in the Measure tool. |
 | `Used tool successfully` | `PopulationRequest` | Data was successfully processed in the PopulationRequest tool. |
@@ -74,6 +73,30 @@ The following user interactions are tracked as Matomo events automatically.
 | `Used tool successfully` | `Routing (Reachability-Tab)` | Isochrones were calculated in the Routing tool (Reachability tab). |
 | `Used tool successfully` | `SdpDownload` | A download was requested in the SdpDownload tool. |
 | `Used tool successfully` | `WfsSearch` | A search was executed in the WfsSearch tool. |
+
+##### Draw
+
+Draw tool interactions are also tracked under the `Tool` category, but are listed separately here since both the legacy Draw tool and the new Draw tool (2026) are covered. The `Name` field reflects which version was used: `Draw (Old)` for the legacy tool, `Draw ({version})` (e.g. `Draw (2026)`) for the new tool. Rows marked "legacy tool only" are not yet wired up for the new Draw tool.
+
+| Action | Name | Trigger |
+|--------|------|---------|
+| `Used tool successfully` | `Draw (Old)` / `Draw ({version})` | A drawing was completed. |
+| `Cleared draw layer` | `Draw (Old)` | The draw layer was cleared (legacy tool only). |
+| `Pressed Download-Button` | `Draw (Old)` | The drawn features were downloaded (legacy tool only). |
+| `Pressed Undo-Button` / `Pressed Redo-Button` | `Draw (Old)` | The undo or redo button was pressed (legacy tool only). |
+| `Changed download format to: {format}` | `Draw (Old)` | The download format was changed (legacy tool only). |
+| `Changed draw type to: {drawType}` | `Draw (Old)` | The draw type (e.g. point, line, polygon) was changed (legacy tool only). |
+| `Changed interaction to: {interaction}` | `Draw (Old)` | An interaction (e.g. draw, edit, delete) was toggled (legacy tool only). |
+| `Changed circle-method to: {method}` / `Changed square-method to: {method}` | `Draw (Old)` / `Draw ({version})` | The method used to draw a circle or square was changed. |
+| `Changed circle-radius` / `Changed outer circle-radius` | `Draw (Old)` / `Draw ({version})` | The inner or outer circle radius was changed (debounced, 500 ms). The value field contains the radius. |
+| `Changed unit to: {unit}` | `Draw (Old)` / `Draw ({version})` | The measurement unit was changed. |
+| `Changed fill-color` / `Changed outer fill-color` / `Changed stroke-color` / `Changed outer stroke-color` | `Draw (Old)` / `Draw ({version})` | A fill or stroke color was changed (debounced, 500 ms). The value field contains the packed RGB color. |
+| `Changed fill transparency` / `Changed outer fill transparency` | `Draw (Old)` / `Draw ({version})` | The fill transparency/opacity was changed (debounced, 500 ms). The value field contains the transparency percentage. |
+| `Changed font to: {fontName}` | `Draw (Old)` / `Draw ({version})` | The font was changed. |
+| `Changed font-size` | `Draw (Old)` / `Draw ({version})` | The font size was changed. The value field contains the font size. |
+| `Changed stroke width` / `Changed outer stroke width` | `Draw (Old)` / `Draw ({version})` | The stroke width was changed (debounced, 500 ms). The value field contains the stroke width. |
+| `Changed text` | `Draw (Old)` / `Draw ({version})` | The text of a text drawing was changed (debounced, 500 ms). |
+| `Changed visibility to: on/off` | `Draw (Old)` / `Draw ({version})` | The draw layer's visibility was toggled. |
 
 #### Link
 

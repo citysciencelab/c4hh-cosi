@@ -9,7 +9,23 @@ import {handleChangeMapMode} from "./handler/handleChangeMapMode.js";
 import {handleChangeVisibility} from "./handler/handleChangeVisibility.js";
 import {handleCreatePrintJob} from "./handler/handleCreatePrintJob.js";
 import {handleDoRequestForSdpDownload} from "./handler/handleDoRequestForSdpDownload.js";
-import {handleDrawInteractionOnDrawEventOld} from "./handler/handleDrawInteractionOnDrawEventOld.js";
+import {handleDrawClearLayer} from "./handler/handleDrawClearLayer.js";
+import {handleDrawClickDownload} from "./handler/handleDrawClickDownload.js";
+import {handleDrawInteractionOld} from "./handler/handleDrawInteractionOld.js";
+import {handleDrawRedoAndUndo} from "./handler/handleDrawRedoAndUndo.js";
+import {handleDrawSetCircleRadius} from "./handler/handleDrawSetCircleRadius.js";
+import {handleDrawSetColor} from "./handler/handleDrawSetColor.js";
+import {handleDrawSetDownloadFormat} from "./handler/handleDrawSetDownloadFormat.js";
+import {handleDrawSetDrawType} from "./handler/handleDrawSetDrawType.js";
+import {handleDrawSetFillTransparency} from "./handler/handleDrawSetFillTransparency.js";
+import {handleDrawSetFontName} from "./handler/handleDrawSetFontName.js";
+import {handleDrawSetFontSize} from "./handler/handleDrawSetFontSize.js";
+import {handleDrawSetInteraction} from "./handler/handleDrawSetInteraction.js";
+import {handleDrawSetShapeMethod} from "./handler/handleDrawSetShapeMethod.js";
+import {handleDrawSetStrokeWidth} from "./handler/handleDrawSetStrokeWidth.js";
+import {handleDrawSetText} from "./handler/handleDrawSetText.js";
+import {handleDrawSetUnit} from "./handler/handleDrawSetUnit.js";
+import {handleDrawSetVisibility} from "./handler/handleDrawSetVisibility.js";
 import {handleFetchDirections} from "./handler/handleFetchDirections.js";
 import {handlefetchIsochrones} from "./handler/handlefetchIsochrones.js";
 import {handleFormatInputForCoordToolkit} from "./handler/handleFormatInputForCoordToolkit.js";
@@ -23,6 +39,7 @@ import {handleRotate} from "./handler/handleRotate.js";
 import {handleSearch} from "./handler/handleSearch.js";
 import {handleToggleMenu} from "./handler/handleToggleMenu.js";
 import {handleUpdateLayerTransparency} from "./handler/handleUpdateLayerTransparency.js";
+import {convertRgbStringToPackedColorValue} from "./util.js";
 
 /**
  * Evaluates a dispatched Vuex action and triggers the corresponding Matomo tracking event.
@@ -71,8 +88,105 @@ export function actionCallback (action, store) {
             case "Modules/CoordToolkit/positionClicked":
                 handlePositionClickedForCoordToolkit();
                 break;
+            case "Modules/Draw_old/clearLayer":
+                handleDrawClearLayer();
+                break;
             case "Modules/Draw_old/drawInteractionOnDrawEvent":
-                handleDrawInteractionOnDrawEventOld();
+                handleDrawInteractionOld(action.payload, store);
+                break;
+            case "Modules/Draw_old/fileDownloaded":
+                handleDrawClickDownload();
+                break;
+            case "Modules/Draw_old/redoLastStep":
+                handleDrawRedoAndUndo(false);
+                break;
+            case "Modules/Draw_old/setCircleMethod":
+                handleDrawSetShapeMethod({
+                    method: action.payload.target.value,
+                    shape: "circle"
+                });
+                break;
+            case "Modules/Draw_old/setCircleRadius":
+                handleDrawSetCircleRadius({isOuter: false, value: action.payload});
+                break;
+            case "Modules/Draw_old/setCircleOuterRadius":
+                handleDrawSetCircleRadius({isOuter: true, value: action.payload});
+                break;
+            case "Modules/Draw_old/setColor":
+                handleDrawSetColor({
+                    isOuter: false,
+                    type: "fill",
+                    value: convertRgbStringToPackedColorValue(
+                        action.payload.target.value
+                    )
+                });
+                break;
+            case "Modules/Draw_old/setColorContour":
+                handleDrawSetColor({
+                    isOuter: false,
+                    type: "stroke",
+                    value: convertRgbStringToPackedColorValue(
+                        action.payload.target.value
+                    )
+                });
+                break;
+            case "Modules/Draw_old/setDownloadSelectedFormat":
+                handleDrawSetDownloadFormat(action.payload);
+                break;
+            case "Modules/Draw_old/setDrawType":
+                handleDrawSetDrawType(
+                    action.payload.target.options[action.payload.target.selectedIndex].id
+                        .replace("draw", "")
+                        .replace("write", "")
+                );
+                break;
+            case "Modules/Draw_old/setFont":
+                handleDrawSetFontName(action.payload.target.value);
+                break;
+            case "Modules/Draw_old/setFontSize":
+                handleDrawSetFontSize(action.payload.target.value);
+                break;
+            case "Modules/Draw_old/setOpacity":
+                handleDrawSetFillTransparency({
+                    isOuter: false,
+                    value: Math.round((1 - parseFloat(action.payload.target.value, 10)) * 100)
+                });
+                break;
+            case "Modules/Draw_old/setOuterColorContour":
+                handleDrawSetColor({
+                    isOuter: true,
+                    type: "stroke",
+                    value: convertRgbStringToPackedColorValue(
+                        action.payload.target.value
+                    )
+                });
+                break;
+            case "Modules/Draw_old/setSquareMethod":
+                handleDrawSetShapeMethod({
+                    method: action.payload.target.value,
+                    shape: "square"
+                });
+                break;
+            case "Modules/Draw_old/setStrokeWidth":
+                handleDrawSetStrokeWidth({
+                    isOuter: false,
+                    value: parseInt(action.payload.target.value, 10)
+                });
+                break;
+            case "Modules/Draw_old/setText":
+                handleDrawSetText();
+                break;
+            case "Modules/Draw_old/setUnit":
+                handleDrawSetUnit(action.payload.target.value);
+                break;
+            case "Modules/Draw_old/toggleInteraction":
+                handleDrawSetInteraction(action.payload);
+                break;
+            case "Modules/Draw_old/undoLastStep":
+                handleDrawRedoAndUndo(true);
+                break;
+            case "Modules/Draw_old/updateDrawLayerVisible":
+                handleDrawSetVisibility(action.payload.value);
                 break;
             case "Modules/FileImport/addImportedFilename":
                 handleAddImportedFilename();

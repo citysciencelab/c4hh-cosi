@@ -10,7 +10,8 @@ import {assembleSourceInfoForEvent, getLayerInformation, isPayloadValid} from ".
  * @param {String} payload.actionArgs.layerId The id of the layer to be shown in the tree.
  * @param {Object} store The vuex store.
  * @returns {void}
- */export function handleActivateActionforSearchBar (payload, store) {
+ */
+export function handleActivateActionforSearchBar (payload, store) {
     if (
         !isPayloadValid({funcName: handleActivateActionforSearchBar.name, payload})
         || !payload.actionArgs) {

@@ -1,3 +1,5 @@
+import {trackMatomoEvent} from "./trackMatomo";
+
 /**
  * Assembles an object with debugging information (function name and component name if available) for a tracking event.
  * @param {String} funcName The name of the function that triggered the event.
@@ -6,6 +8,73 @@
  */
 export function assembleSourceInfoForEvent (funcName, compName) {
     return compName ? {compName, funcName} : {funcName};
+}
+
+/**
+ * Tracks a Matomo event for the Draw tool (category "Tool").
+ * @param {String} action The Matomo action text describing what happened.
+ * @param {Object} params The parameter object.
+ * @param {String} params.funcName The name of the calling handler function, used as "_source".
+ * @param {Number} [params.value] The numeric value to attach to the event, if any.
+ * @param {String} [params.version] The draw tool version (e.g. "2026"), undefined for the legacy tool.
+ * @returns {void}
+ */
+export function trackDrawToolEvent (action, {funcName, value, version}) {
+    trackMatomoEvent({
+        category: "Tool",
+        action,
+        name: getDrawToolNameFromVersion(version),
+        ...value !== undefined ? {value} : {},
+        _source: assembleSourceInfoForEvent(funcName)
+    });
+}
+
+const drawToolEventTimeouts = new Map();
+
+/**
+ * Debounces (500 ms) a Matomo event for the Draw tool, keyed per calling handler function so that
+ * concurrent debounced handlers (e.g. stroke width and text) do not cancel each other's pending timeouts.
+ * @param {String} action The Matomo action text describing what happened.
+ * @param {Object} params The parameter object.
+ * @param {String} params.funcName The name of the calling handler function, used as debounce key and "_source".
+ * @param {Number} [params.value] The numeric value to attach to the event, if any.
+ * @param {String} [params.version] The draw tool version (e.g. "2026"), undefined for the legacy tool.
+ * @returns {void}
+ */
+export function trackDrawToolEventDebounced (action, {funcName, value, version}) {
+    if (drawToolEventTimeouts.has(funcName)) {
+        clearTimeout(drawToolEventTimeouts.get(funcName));
+    }
+
+    drawToolEventTimeouts.set(funcName, setTimeout(() => {
+        trackDrawToolEvent(action, {funcName, value, version});
+        drawToolEventTimeouts.delete(funcName);
+    }, 500));
+}
+
+/**
+ * Converts an [r, g, b] array into a single packed integer (0xRRGGBB), as used for Matomo event values.
+ * Throws error if the array does not have exactly 3 entries.
+ * @param {Number[]} rgbArr The RGB array, e.g. [255, 0, 0].
+ * @returns {Number} The packed color value.
+ */
+export function convertRgbArrayToPackedColorValue (rgbArr) {
+    if (!Array.isArray(rgbArr) || rgbArr.length !== 3) {
+        throw new Error(`${convertRgbArrayToPackedColorValue.name}: invalid rgb value`);
+    }
+
+    return (rgbArr[0] << 16) | (rgbArr[1] << 8) | rgbArr[2];
+}
+
+/**
+ * Converts a comma-separated "r,g,b" string into a single packed integer (0xRRGGBB).
+ * @param {String} rgbAsString The RGB string, e.g. "255,0,0".
+ * @returns {Number} The packed color value.
+ */
+export function convertRgbStringToPackedColorValue (rgbAsString) {
+    return convertRgbArrayToPackedColorValue(
+        rgbAsString.split(",").map(value => parseInt(value, 10))
+    );
 }
 
 /**
@@ -30,6 +99,15 @@ export function convertToUriCompatible (text) {
  */
 export function getBaseUrl () {
     return `${window.location.origin}${window.location.pathname}`;
+}
+
+/**
+ * Builds the Matomo event "name" value identifying which Draw tool version was used.
+ * @param {String} [version] The draw tool version (e.g. "2026"); undefined for the legacy tool.
+ * @returns {String} "Draw (Old)" for the legacy tool, or "Draw ({version})" otherwise.
+ */
+export function getDrawToolNameFromVersion (version) {
+    return version ? `Draw (${version})` : "Draw (Old)";
 }
 
 /**
