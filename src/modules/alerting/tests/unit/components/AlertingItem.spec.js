@@ -199,6 +199,7 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
                         addSingleAlert: sinon.spy(),
                         cleanup: sinon.stub(),
                         addAlertsFromConfig: sinon.stub(),
+                        addModuleOpenAlertsFromConfig: sinon.stub(),
                         alertHasBeenRead: sinon.stub(),
                         activateDisplayOnEventAlerts: sinon.stub()
                     },
@@ -212,6 +213,7 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
                         sortedAlerts: () => () => sortedAlerts,
                         type: () => "alerting",
                         initialAlerts: () => [],
+                        moduleOpenAlerts: () => ({}),
                         displayOnEventList: () => [
                             {
                                 "type": "Test/displayOnEventsAction",

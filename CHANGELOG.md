@@ -15,6 +15,7 @@
         - "pinia": "^4.0.2"
 - Readme: Information and link to issues in opencode added.
 - Security: Updated SECURITY.md to direct vulnerability reports to a private email address instead of the public issue tracker, and added a corresponding note in the README.
+- Alerting: Added first-open alerts for modules via `config.js` (`alerting.moduleOpenAlerts`).
 
 ### Changed
 - GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.
@@ -74,10 +75,6 @@
     - Tests now fail on vue warnings.
     - Excluded barchart and piechart tests due to issues with the prePushHook.
 - ResizeHandle: Simplified component by removing multi-directional resize infrastructure to support menu width resizing only (left/right positions).
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - Issue \#1522: Show publish date and creation date of metadata separately.

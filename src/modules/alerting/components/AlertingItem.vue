@@ -31,6 +31,7 @@ export default {
             "displayedAlerts",
             "fetchBroadcastUrl",
             "initialAlerts",
+            "moduleOpenAlerts",
             "initialClosed",
             "localStorageDisplayedAlertsKey",
             "showTheModal",
@@ -76,6 +77,7 @@ export default {
         }
 
         this.addAlertsFromConfig(this.initialAlerts);
+        this.addModuleOpenAlertsFromConfig(this.moduleOpenAlerts);
     },
     unmounted () {
         if (this.unsubscribeAction) {
@@ -86,6 +88,7 @@ export default {
         ...mapActions(["initializeModule"]),
         ...mapActions("Alerting", [
             "addAlertsFromConfig",
+            "addModuleOpenAlertsFromConfig",
             "addSingleAlert",
             "alertHasBeenRead",
             "cleanup",

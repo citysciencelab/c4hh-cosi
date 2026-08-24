@@ -35,12 +35,22 @@ Overrides the alert module's default values.
 |----|--------|----|-------|-----------|
 |fetchBroadcastUrl|no|String|`false`|The alerting module will initially use a linked configuration file from this URL, if set. For more information see **[Alerting](../../Dev/vueComponents/Alerting.md)**|
 |initialAlerts|no|**[initialAlerts](#alertinginitialalerts)**||Alerts that are displayed when the portal is started|
+|moduleOpenAlerts|no|**[moduleOpenAlerts](#alertingmoduleopenalerts)**||Alerts that are displayed when a module is opened for the first time.|
 |localStorageDisplayedAlertsKey|no|String|`"displayedAlerts"`|Arbitrary key used to store information regarding the alerting module in the browser's local storage.|
 
 ```js title="Example"
 {
     alerting: {
         fetchBroadcastUrl: "./resources/newsFeedPortalAlerts.json",
+        moduleOpenAlerts: {
+            "compare-features-release": {
+                moduleType: "compareFeatures",
+                title: "common:modules.compareFeatures.title",
+                content: "common:modules.compareFeatures.feedback.newToolInfo",
+                once: true,
+                mustBeConfirmed: true
+            }
+        },
         initialAlerts: {
             qs-release: {
                 category: "Portal zur Abnahme!",
@@ -53,6 +63,21 @@ Overrides the alert module's default values.
     }
 }
 ```
+
+***
+
+### alerting.moduleOpenAlerts
+Alerts that are displayed when a specific menu module is opened.
+
+|Name|Required|Type|Default|Description|
+|----|--------|----|-------|-----------|
+|moduleType|yes|String||Type of the module that triggers the alert on open, e.g. `"compareFeatures"` or `"print"`.|
+|content|yes|String||Alert text or i18n key.|
+|title|no|String|`""`|Optional title text or i18n key.|
+|category|no|String|`"info"`|Alert category.|
+|mustBeConfirmed|no|Boolean|`false`|If `true`, users can hide the message via "do not show again" toggle.|
+|once|no|Boolean|`true`|If `true`, the alert is shown only once (persisted in local storage).|
+|onceInSession|no|Boolean|`true`|If `true`, the alert is shown only once per browser session.|
 
 ***
 

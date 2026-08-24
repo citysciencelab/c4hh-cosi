@@ -134,6 +134,46 @@ Configuration of alerts within config.json example:
 ```
 
 
+## Universal "first open" alerts from config.js
+
+You can configure alerts that are shown when a module is opened.
+
+Configure them in `config.js` under `alerting.moduleOpenAlerts`:
+
+```js
+{
+    alerting: {
+    moduleOpenAlerts: {
+      "compare-features-release": {
+        moduleType: "compareFeatures",
+        title: "common:modules.compareFeatures.title",
+        content: "common:modules.compareFeatures.feedback.newToolInfo",
+        once: true,
+        mustBeConfirmed: true
+      }
+    }
+    }
+}
+```
+
+Each entry supports:
+
+|Name|Required|Type|Description|
+|----|--------|----|-----------|
+|moduleType|yes|String|Module type that triggers the alert, e.g. `"compareFeatures"`.|
+|content|yes|String|Alert text or i18n key.|
+|title|no|String|Title text or i18n key.|
+|category|no|String|Alert category, default `"info"`.|
+|mustBeConfirmed|no|Boolean|Whether user can disable it with "do not show again" behavior.|
+|once|no|Boolean|Show only once across visits (default `true`).|
+|onceInSession|no|Boolean|Show only once per session (default `true`).|
+
+Internally this uses `displayOnEvent` with `Menu/changeCurrentComponent`.
+The alias `modul` is also supported for backward compatibility.
+If `moduleOpenAlerts` is configured as an object map, each object key is treated as `alertId` and included in the hash for once/localStorage behavior.
+Using an object map is recommended when you want an explicit id that can be changed later to force a new once-alert.
+
+
 ## Alerts on events
 
 Alerts are possible for almost any event.
