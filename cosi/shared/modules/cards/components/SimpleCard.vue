@@ -57,7 +57,7 @@ export default {
                 type="button"
                 class="btn-close align-self-start"
                 aria-label="Close"
-                @click="$emit('click:close')"
+                @click.stop="$emit('click:close')"
             />
         </div>
     </div>

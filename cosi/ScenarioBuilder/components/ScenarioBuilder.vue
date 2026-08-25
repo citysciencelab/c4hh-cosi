@@ -21,7 +21,8 @@ export default {
         return {
             addFeatureToScenario: this.addFeatureToScenario,
             removeFeatureFromScenario: this.removeFeatureFromScenario,
-            toggleCurrentView: this.toggleCurrentView
+            toggleCurrentView: this.toggleCurrentView,
+            updateSimulationTag: this.updateSimulationTag
         };
     },
 
@@ -29,9 +30,12 @@ export default {
         return {
             // The current view of the ScenarioBuilder component. It can be either 'manager' or 'planner'.
             currentView: "manager",
+            // The guide layer used for displaying additional information on the map.
             guideLayer: null,
             // The layer that holds the features of the active scenario.
-            scenarioLayer: null
+            scenarioLayer: null,
+            // The ID of the scenario layer, used for identification and retrieval.
+            scenarioLayerId: "active-scenario"
         };
     },
 
@@ -40,17 +44,17 @@ export default {
     },
 
     watch: {
-        activeScenarioCard (newCard) {
-            if (newCard) {
-                this.updateLayer();
+        activeScenarioCard (newScenarioCard) {
+            if (newScenarioCard) {
+                this.updateScenarioLayer(newScenarioCard, this.scenarioLayer);
             }
         }
     },
 
     async created () {
-        this.scenarioLayer = this.getLayerById("active-scenario");
-        this.getLayerById("active-scenario").getLayer().setVisible(true);
-        this.getLayerById("active-scenario").getLayer().setZIndex(10);
+        this.scenarioLayer = this.getLayerById(this.scenarioLayerId);
+        this.getLayerById(this.scenarioLayerId).getLayer().setVisible(true);
+        this.getLayerById(this.scenarioLayerId).getLayer().setZIndex(10);
         await this.createGuideLayer();
     },
 
@@ -138,22 +142,32 @@ export default {
         },
 
         /**
-         *
+         * Updates the scenario layer with the features from the active scenario card.
+         * @param {Object} activeScenarioCard - The active scenario card containing the title and objects.
+         * @param {Object} scenarioLayer - The layer to update with the active scenario's features.
          * @return {void}
          */
-        updateLayer () {
-            const {title, objects} = this.activeScenarioCard,
-                  layer = this.scenarioLayer.getLayer(),
+        updateScenarioLayer (activeScenarioCard, scenarioLayer) {
+            const {title, objects} = activeScenarioCard,
+                  layer = scenarioLayer.getLayer(),
                   features = objects.map(obj => obj.feature);
 
-            this.scenarioLayer.set("name", title);
+            scenarioLayer.set("name", title);
             layer.set("name", title);
-
             this.clearFeaturesFromScenario();
-
             features.forEach(feature => {
                 this.addFeatureToScenario(feature);
             });
+        },
+
+        /**
+         * Updates the simulation tag for a given feature by first removing
+         * any existing simulation tag and then adding a new one.
+         * @param {Feature} feature - The feature to update the simulation tag for.
+         */
+        updateSimulationTag (feature) {
+            removeSimulationTag(feature, this.guideLayer);
+            addSimulationTag(feature, this.guideLayer);
         }
     }
 };
@@ -167,6 +181,7 @@ export default {
         />
         <ScenarioBuilderPlanner
             v-else-if="currentView === 'planner'"
+            :scenario-layer-id="scenarioLayerId"
         />
     </div>
 </template>

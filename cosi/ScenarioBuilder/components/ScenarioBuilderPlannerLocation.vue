@@ -5,6 +5,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import hash from "object-hash";
 import {mapActions, mapGetters} from "vuex";
 import Point from "ol/geom/Point";
+import {setStyleByLayer} from "../../utils/features/setStyleByLayer.js";
 
 export default {
     components: {
@@ -29,7 +30,7 @@ export default {
         }
     },
 
-    emits: ["set-selected-layer", "set-is-location-active", "toggle-object-status"],
+    emits: ["add-object-card", "set-selected-layer", "set-is-location-active", "toggle-object-status"],
 
     data () {
         return {
@@ -48,34 +49,6 @@ export default {
         ]),
 
         /**
-         * Generates and adds a new object card based on the provided scenario feature.
-         * @param {Object} scenarioFeature - The scenario feature containing the map feature and properties.
-         * @param {String} name - The fallback label for the object.
-         * @param {String} layerId - The associated layer id.
-         * @returns {void}
-         */
-        addObjectCard (feature, name, layerId) {
-            const properties = feature.getProperties();
-
-            this.activeScenarioCard.objects.push({
-                id: feature.getId(),
-                icon: "bi bi-box",
-                label: properties.facility || name,
-                text: "Neues Objekt",
-                feature,
-                status: "",
-                layerId: layerId,
-                sourceDataMode: "empty",
-                referenceFeatureId: null,
-                manualFeatureProperties: {},
-                referenceFeatureProperties: {}
-            });
-
-            this.$emit("toggle-object-status", this.activeScenarioCard.objects.length - 1);
-            this.addFeatureToScenario(feature);
-        },
-
-        /**
          * Creates a new feature with the given geometry and associates it with the selected layer.
          * @param {Object} geometry - The geometry object for the new feature.
          * @param {Object} selectedLayer - The selected map layer.
@@ -86,9 +59,9 @@ export default {
             feature.setProperties(this.featureProperties);
             feature.set("isSimulation", true);
             feature.setId(hash({...this.featureProperties, geom: geometry}));
-            this.setFeatureStyle(feature, selectedLayer.getLayer());
+            setStyleByLayer(feature, selectedLayer.getLayer());
 
-            this.addObjectCard(feature, selectedLayer.getLayer().get("name"), selectedLayer.getLayer().get("id"));
+            this.$emit("add-object-card", feature, selectedLayer.getLayer().get("name"), selectedLayer.getLayer().get("id"));
         },
 
         /**
@@ -103,21 +76,6 @@ export default {
             this.unregisterListener({type: "click", listener: this.placeFeature, keyForBoundFunctions: "123456"});
             this.isMapClickActive = false;
             this.$emit("set-is-location-active", false);
-        },
-
-        setFeatureStyle (feature, layer) {
-            if (layer) {
-                const styleFn = layer.getStyle && typeof layer.getStyle === "function"
-                    ? layer.getStyle()
-                    : layer.getStyle;
-
-                if (typeof styleFn === "function") {
-                    feature.setStyle((resolution) => styleFn(feature, resolution));
-                }
-                else if (styleFn) {
-                    feature.setStyle(styleFn);
-                }
-            }
         },
 
         /**

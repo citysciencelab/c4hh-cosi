@@ -98,7 +98,7 @@ export default {
                         class="p-1"
                         :aria="'Externen Link öffnen'"
                         icon="bi bi-pencil"
-                        @click.stop="toggleCurrentView('planner')"
+                        @click.stop="toggleActiveScenario(index); toggleCurrentView('planner')"
                     />
                 </template>
             </Card>
