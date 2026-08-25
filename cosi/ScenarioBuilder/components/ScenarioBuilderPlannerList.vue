@@ -55,7 +55,7 @@ export default {
         >
             <SimpleCard
                 hoverable
-                :icon="card.icon"
+                :icon-src="card.iconSrc"
                 :label="card.label"
                 :status="card.status"
                 :text="card.text"

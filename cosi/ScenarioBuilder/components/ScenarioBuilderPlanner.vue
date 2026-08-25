@@ -4,8 +4,9 @@ import AddCardButton from "../../shared/modules/cards/components/AddCardButton.v
 import {computed} from "vue";
 import {getLayerSource} from "../../utils/layer/getLayerSource.js";
 import highlightVectorFeature from "../../utils/highlightVectorFeature";
-import {mapActions, mapGetters} from "vuex";
+import Icon from "ol/style/Icon.js";
 import layerCollection from "@core/layers/js/layerCollection";
+import {mapActions, mapGetters} from "vuex";
 import ScenarioBuilderPlannerHeader from "./ScenarioBuilderPlannerHeader.vue";
 import ScenarioBuilderPlannerList from "./ScenarioBuilderPlannerList.vue";
 import ScenarioBuilderPlannerLocation from "./ScenarioBuilderPlannerLocation.vue";
@@ -148,11 +149,13 @@ export default {
          * @returns {void}
          */
         addObjectCard (feature, name, layerId, isModified = false) {
-            const properties = feature.getProperties();
+            const properties = feature.getProperties(),
+                  iconSrc = this.getFeatureIconSrc(feature);
 
             this.activeScenarioCard.objects.push({
                 id: feature.getId(),
                 icon: "bi bi-box",
+                iconSrc,
                 label: properties.facility || name,
                 text: "Neues Objekt",
                 feature,
@@ -167,6 +170,22 @@ export default {
 
             this.toggleObjectStatus(this.activeScenarioCard.objects.length - 1);
             this.addFeatureToScenario(feature);
+        },
+
+        /**
+         * Resolves the icon image source from a feature's style, if present.
+         * @param {ol/Feature} feature - The feature to read the style from.
+         * @returns {String|undefined} the icon image source, if any.
+         */
+        getFeatureIconSrc (feature) {
+            const styleFn = feature.getStyle(),
+                  style = typeof styleFn === "function" ? styleFn(feature, 0) : styleFn,
+                  resolvedStyle = Array.isArray(style) ? style[0] : style;
+
+            if (resolvedStyle?.getImage()?.constructor === Icon) {
+                return resolvedStyle.getImage().getSrc();
+            }
+            return undefined;
         },
 
         /**

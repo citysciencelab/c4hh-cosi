@@ -14,6 +14,10 @@ export default {
             type: String,
             default: null
         },
+        iconSrc: {
+            type: String,
+            default: null
+        },
         label: {
             type: String,
             default: ""
@@ -38,11 +42,17 @@ export default {
         :class="[{hoverable}, status === 'active' ? 'card-active' : '']"
     >
         <div class="card-body p-2 d-flex flex-row align-center">
-            <div
-                v-if="icon"
-                class="p-1 fs-3"
-            >
-                <i :class="icon" />
+            <div class="p-1 fs-3">
+                <img
+                    v-if="iconSrc"
+                    :src="iconSrc"
+                    alt=""
+                    class="card-icon-img"
+                >
+                <i
+                    v-else
+                    :class="icon"
+                />
             </div>
             <div class="ps-4 py-1 flex-grow-1">
                 <div class="label">
@@ -65,4 +75,10 @@ export default {
 
 <style lang="scss" scoped>
     @import "../assets/style.scss";
+
+    .card-icon-img {
+        width: 1.5rem;
+        height: 1.5rem;
+        object-fit: contain;
+    }
 </style>

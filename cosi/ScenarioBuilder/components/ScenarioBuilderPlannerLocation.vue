@@ -6,6 +6,7 @@ import hash from "object-hash";
 import {mapActions, mapGetters} from "vuex";
 import Point from "ol/geom/Point";
 import {setStyleByLayer} from "../../utils/features/setStyleByLayer.js";
+import Icon from "ol/style/Icon";
 
 export default {
     components: {
@@ -47,6 +48,23 @@ export default {
             "registerListener",
             "unregisterListener"
         ]),
+
+        /**
+         * Resolves the icon image source from a feature's style, if present.
+         * @param {ol/Feature} feature - The feature to read the style from.
+         * @returns {String|undefined} the icon image source, if any.
+         */
+        getFeatureIconSrc (feature) {
+            const styleFn = feature.getStyle(),
+                  style = typeof styleFn === "function" ? styleFn(feature, 0) : styleFn,
+                  resolvedStyle = Array.isArray(style) ? style[0] : style;
+
+            if (resolvedStyle?.getImage()?.constructor === Icon) {
+                return resolvedStyle.getImage().getSrc();
+            }
+
+            return undefined;
+        },
 
         /**
          * Creates a new feature with the given geometry and associates it with the selected layer.
