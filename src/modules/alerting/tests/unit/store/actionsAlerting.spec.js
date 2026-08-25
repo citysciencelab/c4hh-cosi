@@ -129,6 +129,42 @@ describe("src/modules/alerting/store/actionsAlerting.js", () => {
         expect(commit.getCall(3).args).to.eql(["setReadyToShow", false]);
     });
 
+    it("cleanup with onceInSession:true moves alert to seenInSessionAlerts", () => {
+        const state = {
+            alerts: [
+                {
+                    hash: "123",
+                    mustBeConfirmed: false,
+                    once: false,
+                    onceInSession: true
+                }
+            ]
+        };
+
+        actions.cleanup({state, commit});
+        expect(commit.calledThrice).to.be.true;
+        expect(commit.getCall(0).args).to.eql(["addToSeenInSessionAlerts", {hash: "123", mustBeConfirmed: false, once: false, onceInSession: true}]);
+        expect(commit.getCall(1).args).to.eql(["removeFromAlerts", {hash: "123", mustBeConfirmed: false, once: false, onceInSession: true}]);
+        expect(commit.getCall(2).args).to.eql(["setReadyToShow", false]);
+    });
+
+    it("cleanup does not move mustBeConfirmed:true onceInSession alerts", () => {
+        const state = {
+            alerts: [
+                {
+                    hash: "123",
+                    mustBeConfirmed: true,
+                    once: false,
+                    onceInSession: true
+                }
+            ]
+        };
+
+        actions.cleanup({state, commit});
+        expect(commit.calledOnce).to.be.true;
+        expect(commit.getCall(0).args).to.eql(["setReadyToShow", false]);
+    });
+
     it("setAlertAsRead", () => {
         const state = {
             alerts: [
@@ -235,6 +271,21 @@ describe("src/modules/alerting/store/actionsAlerting.js", () => {
         expect(commit.calledTwice).to.be.true;
         expect(commit.firstCall.args[0]).to.eql("Modules/News/addNews");
         expect(commit.firstCall.args[1].content).to.eql("123");
+    });
+
+    it("addSingleAlert does not re-add an alert already seen this session, even after it was cleaned up from state.alerts", () => {
+        // pre-computed buildAlertHashSeed value for {content: "123", onceInSession: true, isNews: true, displayCategory: "info"} (see actionsAlerting.js)
+        const expectedHash = "40c9c0e635a6b01d468a552d8d3e5465824fb02a",
+            state = {
+                alerts: [],
+                displayedAlerts: [],
+                seenInSessionAlerts: {[expectedHash]: true},
+                availableCategories: ["news", "success", "warning", "error", "info"]
+            },
+            checkValue = actions.addSingleAlert({state, commit}, {content: "123", onceInSession: true, isNews: true});
+
+        expect(checkValue).to.be.false;
+        expect(state.alerts.length).to.eql(0);
     });
 
     it("addSingleAlert doesnt show alert with already existing hash", () => {

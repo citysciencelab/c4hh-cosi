@@ -72,6 +72,15 @@ describe("src/modules/alerting/store/mutationsAlerting.js", () => {
 
         expect(state.displayedAlerts).to.have.all.keys("exist", "added");
     });
+    it("addToSeenInSessionAlerts", async function () {
+        const state = {
+            seenInSessionAlerts: {exist: true}
+        };
+
+        mutations.addToSeenInSessionAlerts(state, {hash: "added"});
+
+        expect(state.seenInSessionAlerts).to.eql({exist: true, added: true});
+    });
     it("setDisplayedAlerts", async function () {
         const state = {
             displayedAlerts: {}

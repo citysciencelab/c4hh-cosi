@@ -64,13 +64,19 @@ function hasDisplayedAlertHashInStorage (storageKey, alertHash) {
 /**
  * Checks if an already displayed alert may be displayed again.
  * @param {Object} alertToCheck The alert to check as object{hash, once, ...}
+ * @param {Object} [seenInSessionAlerts={}] hash-keyed map of onceInSession alerts already shown in the current session
  * @returns {Boolean} True if the given alert may be displayed again
  */
-function checkAlertViewRestriction (alertToCheck) {
+function checkAlertViewRestriction (alertToCheck, seenInSessionAlerts = {}) {
     const storageKey = store.getters["Alerting/localStorageDisplayedAlertsKey"];
 
     // if hash is already in localStorage then alert is not shown
     if (hasDisplayedAlertHashInStorage(storageKey, alertToCheck.hash)) {
+        return false;
+    }
+
+    // onceInSession alerts must not reappear after they have been cleaned up from state.alerts
+    if (alertToCheck.onceInSession === true && Object.hasOwn(seenInSessionAlerts, alertToCheck.hash)) {
         return false;
     }
 
@@ -238,6 +244,10 @@ export default {
                 commit("addToDisplayedAlerts", singleAlert);
                 commit("removeFromAlerts", singleAlert);
             }
+            else if (!singleAlert.mustBeConfirmed && singleAlert.onceInSession === true) {
+                commit("addToSeenInSessionAlerts", singleAlert);
+                commit("removeFromAlerts", singleAlert);
+            }
         });
 
         if (localStorage[storageKey]) {
@@ -323,7 +333,7 @@ export default {
         isUnique = findSingleAlertByHash(state.alerts, alertProtoClone.hash) === false;
         onceInSession = !isUnique ? alertProtoClone.onceInSession : false;
         isInTime = checkAlertLifespan(alertProtoClone);
-        isNotRestricted = checkAlertViewRestriction(alertProtoClone);
+        isNotRestricted = checkAlertViewRestriction(alertProtoClone, state.seenInSessionAlerts);
 
         if (alertProtoClone.isNews) {
             commit("Modules/News/addNews", alertProtoClone, {root: true});

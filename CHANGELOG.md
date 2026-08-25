@@ -37,6 +37,7 @@
 - Issue \#1624: Fixed misleading parameter in config.js.md
 - Issue \#1625: Fixed using configured styleId when mousehover on vectorlayers.
 - Issue \#1631: Property preparation in wfst tool can now handle objects in gfiAttributes and saves geometry without having to configure it in gfiAttributes.
+- Issue \#1643: Alerting: Fixed a stale `onceInSession` alert (e.g. a layer attribution hint) reappearing together with a new alert once the modal had already been closed.
 - FileImport: importDrawLayer reappears in the layer tree when importing a file, even after being removed.
 - SearchBar: Fixed misaligned action icons in "Show all" results for street searches.
 - CopyrightConstraints: Fixed license metadata display where JSON was being shown as raw text instead of formatted license information and removed empty constraint entries from the list.

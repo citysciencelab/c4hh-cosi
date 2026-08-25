@@ -20,6 +20,7 @@
  * @property {String} alertWindowTitle shown title of the main alert/modal window
  * @property {Object[]} alerts array of current loaded alerts
  * @property {Object} displayedAlerts object of available alerts
+ * @property {Object} seenInSessionAlerts hash-keyed map of onceInSession alerts already shown in the current session
  * @property {Boolean/String} fetchBroadcastUrl URL of the alert json
  * @property {Object} initialAlerts, array of initial alerts
  * @property {Object|Object[]} moduleOpenAlerts alerts that should be shown on first opening specific modules
@@ -51,6 +52,7 @@ export default {
     alerts: [],
     alertWindowTitle: "common:modules.alerting.alertWindowTitle",
     displayedAlerts: {},
+    seenInSessionAlerts: {},
     fetchBroadcastUrl: false,
     initialAlerts: {},
     moduleOpenAlerts: {},
