@@ -16,6 +16,8 @@ import layerCollection from "@core/layers/js/layerCollection";
 import {VSnackbar} from "vuetify/components/VSnackbar";
 import SimpleCard from "../../shared/modules/cards/components/SimpleCard.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
+import {mapActions as mapPiniaActions, mapState} from "pinia";
+import {useAboutStore} from "@modules/about/store/aboutStore.js";
 
 export default {
     name: "SaveSession",
@@ -46,8 +48,7 @@ export default {
                         "dataSets"
                     ],
                     ScenarioBuilder: [
-                        // "scenarios",
-                        // "active"
+                        "scenarioCards"
                     ],
                     DistrictSelector: [
                         "selectedTabItem",
@@ -101,15 +102,16 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/About", ["version"]),
         ...mapGetters("Modules/Language", ["currentLocale"]),
         ...mapGetters("Modules/SaveSession", Object.keys(getters)),
-        // ...mapGetters("Modules/ScenarioBuilder", {simGuideLayer: "guideLayer"}),
+        // ...mapGetters("Modules/ScenarioBuilder", ["scenarioCards"]),
         // ...mapGetters("Modules/ResidentialSimulation", {simNeighborhoodLayer: "drawingLayer"}),
         ...mapGetters("Modules/DistrictSelector", ["selectedDistrictLevel", "districtLevels", "selectedDistrictNames"]),
         ...mapGetters("Maps", ["getLayerById", "getVisibleLayerList"]),
-        ...mapGetters("Modules/TemplateManager", ["useTemplatesForMapping"]),
-        ...mapGetters(["layerConfig"])
+        ...mapGetters(["layerConfig"]),
+        ...mapState(useAboutStore, [
+            "version"
+        ])
     },
     watch: {
         autoSave () {
@@ -153,11 +155,11 @@ export default {
     },
     methods: {
         ...mapActions("Maps", ["addNewLayerIfNotExists", "registerListener", "unregisterListener"]),
-        ...mapActions("Modules/About", ["currentMasterportalVersionNumber"]),
         ...mapActions("Modules/SaveSession", Object.keys(actions)),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
         ...mapActions("Modules/DistrictSelector", ["setDistrictsByName"]),
         ...mapMutations("Modules/SaveSession", Object.keys(mutations)),
+        ...mapPiniaActions(useAboutStore, ["currentMasterportalVersionNumber"]),
         ...parseState,
         downloadJsonToFile,
 
@@ -178,7 +180,6 @@ export default {
         save () {
             this.saveDialog = false;
             this.state = serializeState(this.storePaths, this.$store, this.deepFeatures);
-
             this.session.state = JSON.stringify(this.state);
             this.session.meta.created = new Date().toLocaleString();
             this.session.meta.date = new Date();
