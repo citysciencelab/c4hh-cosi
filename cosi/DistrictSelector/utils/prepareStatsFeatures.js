@@ -32,7 +32,6 @@ export async function parseFeatures (olFeatures, district, districtLevel) {
      */
     else {
         olFeatures.forEach(prepareStatsFeatures);
-
         // add statFeatures to district
         district.statFeatures.push(...olFeatures);
         // store original data on the district as a copy
@@ -94,7 +93,7 @@ export async function createStatFeaturesFromLTF (ltfFeatures, districtLevel) {
  * @returns {void}
  */
 export async function updateStatFeaturesFromLTF (ltfFeatures, statFeatures) {
-    const lftFeatureKeys = Object.keys(ltfFeatures[0].getProperties()),
+    const lftFeatureKeys = [...new Set(ltfFeatures.flatMap(feature => Object.keys(feature.getProperties())))],
         mappingJson = await getMappingJson();
 
     if (Array.isArray(mappingJson) && mappingJson.length > 0) {
