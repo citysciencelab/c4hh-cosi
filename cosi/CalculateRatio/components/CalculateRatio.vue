@@ -544,7 +544,10 @@ export default {
 
                 if (this[letter + "Switch"]) {
                     const findLayer = this.getVisibleVectorLayers().find(layer => layer.getLayer().get("name") === this["selectedField" + letter]),
-                          layerFeatures = getLayerSource(findLayer.getLayer()).getFeatures();
+                          layerFeatures = getLayerSource(findLayer.getLayer()).getFeatures(),
+                          paramField = this["paramField" + letter],
+                          // the selection only carries the display name, the feature property is the id from the layer config
+                          paramKey = findLayer?.attributes?.numericalValues?.find(value => value.name === paramField?.name)?.id || paramField?.name?.toLowerCase();
 
                     this.calcHelper["type_" + letter] = "facility";
                     this.featureVals = [];
@@ -560,7 +563,7 @@ export default {
                                         typeof feature.getProperties()[this["paramField" + letter]] !== "string"
                                     ) {
                                         const
-                                            value = feature.getProperties()[this["paramField" + letter].name.toLowerCase()],
+                                            value = feature.getProperties()[paramKey],
                                             valueTransformed = typeof value === "string" ? parseFloat(value.replace(/[^0-9.]/g, "")) : value;
 
                                         this.featureVals.push(valueTransformed);
@@ -580,7 +583,11 @@ export default {
                     const checkForLackingData = utils.compensateLackingData(this.featureVals);
 
                     if (checkForLackingData === "error") {
-                        this.showAlert("Warnung für das Gebiet: " + district + this.$t("additional:modules.tools.cosi.calculateRatio.noData"));
+                        this.addSingleAlert({
+                            category: "Warnung",
+                            content: "<strong>" + name + ":</strong> " + this.$t("additional:modules.tools.cosi.calculateRatio.noData"),
+                            displayClass: "warning"
+                        });
                         return;
                     }
                     this.calcHelper["param" + letter + "_count"] = this.featureVals.length;
