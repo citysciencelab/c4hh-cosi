@@ -1,26 +1,31 @@
 import {beforeEach, describe, expect, it, vi} from "vitest";
 
-const {deserializeMock} = vi.hoisted(() => ({
-    deserializeMock: vi.fn()
-}));
+/**
+ * Imports the subject under test after registering a module mock.
+ * @param {import("vitest").Mock} deserializeMock The deserialize mock.
+ * @returns {Promise<Function>} The deserializer function.
+ */
+async function importSubjectWithMock (deserializeMock) {
+    vi.doMock("flatgeobuf", () => ({
+        geojson: {
+            deserialize: deserializeMock
+        }
+    }));
 
-vi.mock("flatgeobuf", () => ({
-    geojson: {
-        deserialize: deserializeMock
-    }
-}));
-
-import deserializeFlatGeobufToGeoJsonFeatureCollection from "../../../js/deserializeFlatGeobufToGeoJsonFeatureCollection.js";
+    return (await import("../../../js/deserializeFlatGeobufToGeoJsonFeatureCollection.js")).default;
+}
 
 describe("addons/simulationTool/js/deserializeFlatGeobufToGeoJsonFeatureCollection.js", () => {
     beforeEach(() => {
-        deserializeMock.mockReset();
+        vi.resetModules();
+        vi.clearAllMocks();
     });
 
     it("positive: decodes base64 payload and returns a feature collection", async () => {
+        const deserializeMock = vi.fn();
         const payload = {
                 encoding: "base64",
-                value: btoa(String.fromCharCode(1, 2, 3))
+                value: Buffer.from([1, 2, 3]).toString("base64")
             },
             expectedFeature = {
                 type: "Feature",
@@ -31,6 +36,8 @@ describe("addons/simulationTool/js/deserializeFlatGeobufToGeoJsonFeatureCollecti
                 }
             };
         let receivedBytes;
+
+        const deserializeFlatGeobufToGeoJsonFeatureCollection = await importSubjectWithMock(deserializeMock);
 
         deserializeMock.mockImplementation(async function * (typedArray) {
             receivedBytes = typedArray;
@@ -48,6 +55,8 @@ describe("addons/simulationTool/js/deserializeFlatGeobufToGeoJsonFeatureCollecti
     });
 
     it("negative: returns null when payload is not base64 encoded", async () => {
+        const deserializeMock = vi.fn(),
+            deserializeFlatGeobufToGeoJsonFeatureCollection = await importSubjectWithMock(deserializeMock);
         const payload = {
             encoding: "utf-8",
             value: "not-base64"
