@@ -28,7 +28,17 @@ function guardAgainstExcelDateAutoFormat (value) {
     return value;
 }
 
+/**
+ * Pads a number with leading zeros to ensure it is at least two digits long.
+ * @param {*} n - The number to pad.
+ * @returns {string} The padded number as a string.
+ */
+function pad (n) {
+    return String(n).padStart(2, "0");
+}
+
 export {
     convertToLocalDateLiteral,
-    guardAgainstExcelDateAutoFormat
+    guardAgainstExcelDateAutoFormat,
+    pad
 };

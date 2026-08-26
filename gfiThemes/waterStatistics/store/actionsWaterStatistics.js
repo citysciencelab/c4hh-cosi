@@ -1,4 +1,4 @@
-import {convertToLocalDateLiteral, guardAgainstExcelDateAutoFormat} from "../js/helpers";
+import {convertToLocalDateLiteral, guardAgainstExcelDateAutoFormat, pad} from "../js/helpers";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature.js";
 import {convertJsonToCsv} from "@shared/js/utils/convertJsonToCsv.js";
 import {createCsvBlob, downloadBlobPerNavigator, downloadBlobPerHTML5} from "@shared/modules/buttons/js/exportButtonUtils.js";
@@ -88,7 +88,7 @@ const actions = {
             switch (queryPurpose) {
                 case "downloadCsv":
                     commit("setCsvData", statValues);
-                    dispatch("exportStatisticValuesToCsv", {epsg: epsg});
+                    dispatch("exportStatisticValuesToCsv", {queryProperties: params.queryProperties, epsg: epsg});
                     break;
                 case "getAllData": {
                     const allYears = [...new Set(statValues?.map(feature => {
@@ -211,7 +211,7 @@ const actions = {
      * @param {String} payload.epsg EPSG code for the coordinate reference system (optional).
      * @returns {void}
      */
-    async exportStatisticValuesToCsv ({state, dispatch, commit}, {epsg}) {
+    async exportStatisticValuesToCsv ({state, dispatch, commit}, {queryProperties, epsg}) {
         // let Vue flush the DOM so the spinner actually renders before the
         // (synchronous) CSV/blob work runs
         await new Promise(resolve => setTimeout(resolve, 0));
@@ -225,11 +225,20 @@ const actions = {
                         coordinates = feature?.geometry?.coordinates || {},
                         exportValues = {};
 
-                    Object.keys(properties).forEach(key => {
-                        const propertyDescription = state.oafSchema?.properties?.[key]?.title || key;
+                    if (!queryProperties || queryProperties.length === 0) {
+                        Object.keys(properties).forEach(key => {
+                            const propertyDescription = state.oafSchema?.properties?.[key]?.title || key;
 
-                        exportValues[propertyDescription] = guardAgainstExcelDateAutoFormat(properties[key]);
-                    });
+                            exportValues[propertyDescription] = guardAgainstExcelDateAutoFormat(properties[key]);
+                        });
+                    }
+                    else {
+                        queryProperties.forEach(key => {
+                            const propertyDescription = state.oafSchema?.properties?.[key]?.title || key;
+
+                            exportValues[propertyDescription] = guardAgainstExcelDateAutoFormat(properties[key]) ?? "-";
+                        });
+                    }
 
                     if (coordinates.length >= 2) {
                         exportValues["X-Koordinate"] = guardAgainstExcelDateAutoFormat(coordinates[0]);
@@ -247,7 +256,7 @@ const actions = {
 
             const blob = createCsvBlob(csvText),
                 now = new Date(),
-                filename = now.toISOString().replace(/[-:T]/g, "").split(".")[0].replace(/^(\d{8})/, "$1_"),
+                filename = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`,
                 csvFilename = `${filename}.csv`;
 
             if (!downloadBlobPerNavigator(blob, csvFilename)) {

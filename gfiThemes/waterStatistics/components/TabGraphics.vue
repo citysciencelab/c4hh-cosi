@@ -581,6 +581,16 @@ export default {
         csvDownload () {
             const csvProperties = this.getCsvParams();
 
+            if (this.filterRange === "last-year") {
+                const startYear = this.dateRange.twelveMonthsAgoYear,
+                      startMonth = this.dateRange.twelveMonthsAgoMonth,
+                      endYear = this.dateRange.endYear,
+                      endMonth = this.dateRange.endMonth;
+
+                this.rangeStartDate = new Date(Date.UTC(startYear, startMonth - 1, 1));
+                this.rangeEndDate = new Date(Date.UTC(endYear, endMonth, 0));
+            }
+
             this.runQueryOaf({
                 queryProperties: csvProperties,
                 startDate: this.rangeStartDate,
