@@ -4,13 +4,15 @@ import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
+import TabGraphicsDisclaimerModal from "./TabGraphicsDisclaimerModal.vue";
 
 export default {
     name: "TabGraphics",
     components: {
         FlatButton,
         SpinnerItem,
-        LinechartItem
+        LinechartItem,
+        TabGraphicsDisclaimerModal
     },
     props: {
         params: {
@@ -31,7 +33,8 @@ export default {
             filterStartMonth: undefined,
             filterEndMonth: undefined,
             filterStartYear: undefined,
-            filterEndYear: undefined
+            filterEndYear: undefined,
+            showDisclaimerModal: false
         };
     },
     computed: {
@@ -62,6 +65,18 @@ export default {
             const key = this.currentChartTheme?.chartParams?.yAxisRight;
 
             return Boolean(typeof key === "string" && key.trim().length > 0);
+        },
+        /**
+         * Indicates whether a disclaimer is configured.
+         * @returns {boolean} indicator for disclaimer
+         */
+        hasDisclaimer () {
+            return Boolean(
+                this.params?.disclaimer &&
+                    typeof this.params?.disclaimer === "object" &&
+                    Object.hasOwn(this.params.disclaimer, "text") &&
+                    Object.hasOwn(this.params.disclaimer, "data")
+            );
         },
         getLineChartTitle () {
             const prefix = this.oafSchema?.properties?.[this.currentChartTheme.queryParams?.literalFilters?.queryAttribute]?.title,
@@ -96,7 +111,11 @@ export default {
                         position: "left",
                         title: {
                             display: true,
-                            text: this.oafSchema?.properties?.[this.currentChartTheme.chartParams.yAxisLeft]?.title ?? ""
+                            text: this.oafSchema?.properties?.[this.currentChartTheme.chartParams.yAxisLeft]?.title ?? "",
+                            font: {
+                                size: 14,
+                                family: "MasterPortalFont, Arial, sans-serif"
+                            }
                         },
                         min: this.minScaleLeft,
                         max: this.maxScaleLeft,
@@ -117,7 +136,11 @@ export default {
                         position: "right",
                         title: {
                             display: true,
-                            text: this.oafSchema?.properties?.[this.currentChartTheme.chartParams.yAxisRight]?.title ?? ""
+                            text: this.oafSchema?.properties?.[this.currentChartTheme.chartParams.yAxisRight]?.title ?? "",
+                            font: {
+                                size: 14,
+                                family: "MasterPortalFont, Arial, sans-serif"
+                            }
                         },
                         min: this.minScaleRight,
                         max: this.maxScaleRight,
@@ -415,6 +438,29 @@ export default {
             set (value) {
                 this.filterEndYear = value;
             }
+        },
+        /**
+         * Parse disclaimer.text and split into before / linkText / after parts.
+         * Expects a single <link>...</link> placeholder to denote the clickable fragment.
+         * @returns {{before: string, linkText: string, after: string}} the parts of the disclaimer info text
+         */
+        disclaimerParts () {
+            if (!this.hasDisclaimer) {
+                return {before: "", linkText: "", after: ""};
+            }
+
+            const text = this.params.disclaimer.text ?? "",
+                  match = text.match(/^(.*?)<link>(.*?)<\/link>(.*)$/s);
+
+            if (match) {
+                return {
+                    before: match[1],
+                    linkText: match[2],
+                    after: match[3]
+                };
+            }
+
+            return {before: text, linkText: "", after: ""};
         }
     },
     watch: {
@@ -879,6 +925,36 @@ export default {
             :given-options="lineChartOptions"
         />
 
+        <div
+            v-if="hasDisclaimer"
+            class="dataDisclaimerContainer"
+        >
+            <p>
+                <span v-if="disclaimerParts.before">
+                    {{ disclaimerParts.before }}
+                </span>
+
+                <button
+                    v-if="disclaimerParts.linkText"
+                    class="disclaimer-link btn btn-link p-0"
+                    type="button"
+                    @click="showDisclaimerModal = !showDisclaimerModal"
+                >
+                    {{ disclaimerParts.linkText }}
+                </button>
+
+                <span v-if="disclaimerParts.after">
+                    {{ disclaimerParts.after }}
+                </span>
+            </p>
+
+            <TabGraphicsDisclaimerModal
+                :params="params"
+                :show="showDisclaimerModal"
+                @close="showDisclaimerModal = false"
+            />
+        </div>
+
         <div class="downloadArea">
             <FlatButton
                 aria="Alle Daten des aktuell dargestellten Zeitbereichs im CSV-Format herunterladen"
@@ -964,6 +1040,16 @@ export default {
         background-color: #f5f5f5;
         border: 1px solid #ccc;
         margin-bottom: 20px;
+    }
+
+    div.dataDisclaimerContainer {
+        display: flex;
+        justify-content: center;
+        margin-top: 1rem;
+
+        p, p > button.btn {
+            font-size: 1rem;
+        }
     }
 
     div.downloadArea {

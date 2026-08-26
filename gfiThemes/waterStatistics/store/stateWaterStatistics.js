@@ -7,6 +7,7 @@
  * @property {Object|null} oafSchema - The schema of the OAF collection, if loaded.
  * @property {Array} csvData - The array of statistic values to be exported as CSV.
  * @property {Array} percentiles - The array of percentiles to class the measurement for each dataset.
+ * @property {Object} disclaimerData - The object of json notated blocks for the text for the disclaimer, normalized to allowed content.
  * @property {boolean} dataLoading - Indicates whether data is currently being loaded.
  * @property {Object} dateRange - An object containing date range information for the statistics.
  */
@@ -17,6 +18,7 @@ const state = {
     oafSchema: null,
     csvData: [],
     percentiles: null,
+    disclaimerData: null,
     dataLoading: false,
     dateRange: {
         startDate: null,

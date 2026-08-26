@@ -210,6 +210,10 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                 collection: "grundwassermessstellen",
                 filterCRS: "http://www.opengis.net/def/crs/EPSG/0/25832"
             },
+            disclaimer: {
+                text: "",
+                data: ""
+            },
             chartThemes: [
                 {
                     chartId: 1,
@@ -610,6 +614,120 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
 
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal([]);
             });
+        });
+    });
+
+    describe("disclaimer methods", () => {
+        it("should detect if disclaimer shall be shown", async () => {
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    disclaimer: null
+                }
+            });
+
+            expect(wrapper.vm.hasDisclaimer).to.be.false;
+            expect(wrapper.find("div.dataDisclaimerContainer").exists()).to.be.false;
+
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    disclaimer: {}
+                }
+            });
+
+            expect(wrapper.vm.hasDisclaimer).to.be.false;
+            expect(wrapper.find("div.dataDisclaimerContainer").exists()).to.be.false;
+
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    disclaimer: {
+                        text: "blabla"
+                    }
+                }
+            });
+
+            expect(wrapper.vm.hasDisclaimer).to.be.false;
+            expect(wrapper.find("div.dataDisclaimerContainer").exists()).to.be.false;
+
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    disclaimer: {
+                        text: "blabla",
+                        data: "blabla"
+                    }
+                }
+            });
+
+            expect(wrapper.vm.hasDisclaimer).to.be.true;
+            expect(wrapper.find("div.dataDisclaimerContainer").exists()).to.be.true;
+        });
+
+        it("should find all parts of the disclaimer text", async () => {
+            const disclaimerParts = {before: "", linkText: "", after: ""};
+
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    disclaimer: {}
+                }
+            });
+            expect(wrapper.vm.disclaimerParts).to.deep.equal(disclaimerParts);
+
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    disclaimer: {
+                        text: "blabla",
+                        data: "blabla"
+                    }
+                }
+            });
+            disclaimerParts.before = "blabla";
+            expect(wrapper.vm.disclaimerParts).to.deep.equal(disclaimerParts);
+
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    disclaimer: {
+                        text: "blabla<link>text</link>",
+                        data: "blabla"
+                    }
+                }
+            });
+            disclaimerParts.before = "blabla";
+            disclaimerParts.linkText = "text";
+            expect(wrapper.vm.disclaimerParts).to.deep.equal(disclaimerParts);
+
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    disclaimer: {
+                        text: "<link>text</link> blabla",
+                        data: "blabla"
+                    }
+                }
+            });
+            disclaimerParts.before = "";
+            disclaimerParts.linkText = "text";
+            disclaimerParts.after = " blabla";
+            expect(wrapper.vm.disclaimerParts).to.deep.equal(disclaimerParts);
+
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    disclaimer: {
+                        text: "Ungeprüfte Rohdaten. Bitte beachten Sie den <link>Haftungsausschluss</link>.",
+                        data: "blabla"
+                    }
+                }
+            });
+            disclaimerParts.before = "Ungeprüfte Rohdaten. Bitte beachten Sie den ";
+            disclaimerParts.linkText = "Haftungsausschluss";
+            disclaimerParts.after = ".";
+            expect(wrapper.vm.disclaimerParts).to.deep.equal(disclaimerParts);
         });
     });
 });

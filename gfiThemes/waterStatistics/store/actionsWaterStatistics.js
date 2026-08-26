@@ -277,6 +277,91 @@ const actions = {
         }
     },
     /**
+     * Fetches disclaimer JSON from a given URL, validates and normalizes it.
+     * Only allowed block types ("p","h2") and segment types ("text","strong") are returned.
+     * Returns disclaimer from state if it has already been loaded and normalized before.
+     * Returns an empty array on any error.
+     *
+     * @param {Object} context Vuex action context.
+     * @param {Function} context.commit Vuex commit function.
+     * @param {Function} context.dispatch Vuex dispatch function.
+     * @param {Object} payload Action payload.
+     * @param {string} payload.url URL to the disclaimer JSON file.
+     * @returns {Promise<Array>} Normalized blocks array.
+     */
+    async fetchDisclaimer ({state, commit, dispatch}, {url}) {
+        if (!url || typeof url !== "string") {
+            return [];
+        }
+
+        if (state.disclaimerData) {
+            return state.disclaimerData;
+        }
+
+        try {
+            const resp = await axios.get(url, {withCredentials: true}),
+                json = resp && resp.data ? resp.data : null;
+
+            if (!json || !Array.isArray(json.blocks)) {
+                return [];
+            }
+
+            const allowedBlockTypes = new Set(["p", "h2"]),
+                allowedSegmentTypes = new Set(["text", "strong"]),
+                blocks = [];
+
+            for (let i = 0; i < json.blocks.length; i++) {
+                const block = json.blocks[i];
+
+                if (!block ||
+                    typeof block.type !== "string" ||
+                    !allowedBlockTypes.has(block.type) ||
+                    !Array.isArray(block.content)) {
+                    continue;
+                }
+
+                const normalizedContent = [];
+
+                for (let j = 0; j < block.content.length; j++) {
+                    const seg = block.content[j];
+
+                    if (!seg ||
+                        typeof seg.type !== "string" ||
+                        typeof seg.text !== "string" ||
+                        !allowedSegmentTypes.has(seg.type)) {
+                        continue;
+                    }
+
+                    // Keep plain text only; do not allow HTML in text fields
+                    normalizedContent.push({
+                        type: seg.type,
+                        text: String(seg.text)
+                    });
+                }
+
+                if (normalizedContent.length > 0) {
+                    blocks.push({
+                        type: block.type,
+                        content: normalizedContent
+                    });
+                }
+            }
+
+            commit("setDisclaimerData", blocks);
+
+            return blocks;
+        }
+        catch (error) {
+            console.error(error);
+
+            dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                content: "Fehler beim Abrufen der Daten für den Haftungsausschluss. Bitte versuchen Sie es erneut."
+            }, {root: true});
+            return [];
+        }
+    },
+    /**
      * Handles CSV export errors by logging a warning and dispatching an alert.
      *
      * @param {Object} context Vuex action context.
