@@ -917,6 +917,31 @@ describe("src/modules/print/js/buildSpec", function () {
         it("should return \"styleId\" if styleList is not available", function () {
             expect(buildSpec.getStyleAttributes(vectorLayer, pointFeatures[0], false)).to.eql(["styleId"]);
         });
+
+        it("should return default if conditions are set without properties", function () {
+            const styleObject = {
+                    rules: [
+                        {
+                            conditions: {
+                                sequence: [0, 100]
+                            },
+                            style: {}
+                        }
+                    ]
+                },
+                getStyleObjectStub = sinon.stub(buildSpec, "getStyleObject").returns(styleObject),
+                warnStub = sinon.stub(console, "warn");
+
+            vectorLayer.set("id", "testLayer");
+            vectorLayer.set("styleId", "testStyle");
+
+            expect(buildSpec.getStyleAttributes(vectorLayer, pointFeatures[0])).to.eql(["default"]);
+            expect(warnStub.calledOnce).to.be.true;
+            expect(warnStub.firstCall.args[0]).to.include("Print: Missing conditions.properties");
+
+            warnStub.restore();
+            getStyleObjectStub.restore();
+        });
     });
     describe("getStyleObject", function () {
         const styleObj = {
