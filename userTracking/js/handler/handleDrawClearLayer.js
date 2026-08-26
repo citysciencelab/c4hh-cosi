@@ -7,5 +7,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawClearLayer (version) {
-    trackDrawToolEvent("Cleared draw layer", {funcName: handleDrawClearLayer.name, version});
+    const funcName = "handleDrawClearLayer";
+
+    trackDrawToolEvent("Cleared draw layer", {funcName, version});
 }

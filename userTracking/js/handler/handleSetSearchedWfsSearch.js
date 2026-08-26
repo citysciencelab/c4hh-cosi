@@ -8,12 +8,14 @@ import {assembleSourceInfoForEvent} from "../util";
  * @returns {void}
  */
 export function handleSetSearchedWfsSearch (payload) {
+    const funcName = "handleSetSearchedWfsSearch";
+
     if (payload) {
         trackMatomoEvent({
             category: "Tool",
             action: "Used tool successfully",
             name: "WfsSearch",
-            _source: assembleSourceInfoForEvent(handleSetSearchedWfsSearch.name)
+            _source: assembleSourceInfoForEvent(funcName)
         });
     }
 }

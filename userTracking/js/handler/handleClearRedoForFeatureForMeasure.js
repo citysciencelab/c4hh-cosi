@@ -7,10 +7,12 @@ import {assembleSourceInfoForEvent} from "../util";
  * @returns {void}
  */
 export function handleClearRedoForFeatureForMeasure () {
+    const funcName = "handleClearRedoForFeatureForMeasure";
+
     trackMatomoEvent({
         category: "Tool",
         action: "Used tool successfully",
         name: "Measure",
-        _source: assembleSourceInfoForEvent(handleClearRedoForFeatureForMeasure.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

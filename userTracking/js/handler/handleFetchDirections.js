@@ -7,10 +7,12 @@ import {assembleSourceInfoForEvent} from "../util";
  * @returns {void}
  */
 export function handleFetchDirections () {
+    const funcName = "handleFetchDirections";
+
     trackMatomoEvent({
         category: "Tool",
         action: "Used tool successfully",
         name: "Routing (Planning-Tab)",
-        _source: assembleSourceInfoForEvent(handleFetchDirections.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

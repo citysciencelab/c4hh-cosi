@@ -8,5 +8,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawRedoAndUndo (isUndo, version) {
-    trackDrawToolEvent(`Pressed ${isUndo ? "Undo" : "Redo"}-Button`, {funcName: handleDrawRedoAndUndo.name, version});
+    const funcName = "handleDrawRedoAndUndo";
+
+    trackDrawToolEvent(`Pressed ${isUndo ? "Undo" : "Redo"}-Button`, {funcName, version});
 }

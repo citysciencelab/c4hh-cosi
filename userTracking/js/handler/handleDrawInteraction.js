@@ -7,5 +7,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawInteraction (version) {
-    trackDrawToolEvent("Used tool successfully", {funcName: handleDrawInteraction.name, version});
+    const funcName = "handleDrawInteraction";
+
+    trackDrawToolEvent("Used tool successfully", {funcName, version});
 }

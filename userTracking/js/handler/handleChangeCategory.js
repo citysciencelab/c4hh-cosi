@@ -9,7 +9,9 @@ import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
  * @returns {void}
  */
 export function handleChangeCategory (payload) {
-    if (!isPayloadValid({funcName: handleChangeCategory.name, payload})) {
+    const funcName = "handleChangeCategory";
+
+    if (!isPayloadValid({funcName, payload})) {
         return;
     }
 
@@ -17,6 +19,6 @@ export function handleChangeCategory (payload) {
         category: "Layer",
         action: "Changed layertree category",
         name: payload.key,
-        _source: assembleSourceInfoForEvent(handleChangeCategory.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

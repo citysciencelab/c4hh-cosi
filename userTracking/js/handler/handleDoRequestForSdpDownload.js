@@ -7,10 +7,12 @@ import {assembleSourceInfoForEvent} from "../util";
  * @returns {void}
  */
 export function handleDoRequestForSdpDownload () {
+    const funcName = "handleDoRequestForSdpDownload";
+
     trackMatomoEvent({
         category: "Tool",
         action: "Used tool successfully",
         name: "SdpDownload",
-        _source: assembleSourceInfoForEvent(handleDoRequestForSdpDownload.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

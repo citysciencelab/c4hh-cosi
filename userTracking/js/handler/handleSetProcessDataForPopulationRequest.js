@@ -8,12 +8,14 @@ import {assembleSourceInfoForEvent} from "../util";
  * @returns {void}
  */
 export function handleSetProcessDataForPopulationRequest (payload) {
+    const funcName = "handleSetProcessDataForPopulationRequest";
+
     if (payload !== undefined) {
         trackMatomoEvent({
             category: "Tool",
             action: "Used tool successfully",
             name: "PopulationRequest",
-            _source: assembleSourceInfoForEvent(handleSetProcessDataForPopulationRequest.name)
+            _source: assembleSourceInfoForEvent(funcName)
         });
     }
 }

@@ -11,9 +11,10 @@ import {trackDrawToolEventDebounced} from "../util";
  * @returns {void}
  */
 export function handleDrawSetColor ({isOuter, type, value, version}) {
-    trackDrawToolEventDebounced(`Changed${isOuter ? " outer " : " "}${type}-color`, {
-        funcName: handleDrawSetColor.name,
-        value,
-        version
-    });
+    const funcName = "handleDrawSetColor";
+
+    trackDrawToolEventDebounced(
+        `Changed${isOuter ? " outer " : " "}${type}-color`,
+        {funcName, value, version}
+    );
 }

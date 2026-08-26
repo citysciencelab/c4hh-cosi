@@ -12,6 +12,8 @@ import {assembleSourceInfoForEvent, getLayerSelectionUrlSegement} from "../util.
  * @returns {void}
  */
 export function handleLayerNavigate (payload, store) {
+    const funcName = "handleLayerNavigate";
+
     if (
         payload?.doNotTrack
         || payload?.lastFolderName === ""
@@ -26,6 +28,6 @@ export function handleLayerNavigate (payload, store) {
     trackMatomoPageView({
         url: `${page.url}${urlSegement}`,
         title: page.title,
-        _source: assembleSourceInfoForEvent(handleLayerNavigate.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

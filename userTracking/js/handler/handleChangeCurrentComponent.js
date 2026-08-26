@@ -12,12 +12,14 @@ import {assembleSourceInfoForEvent, convertToUriCompatible, getBaseUrl, getLayer
  * @returns {void}
  */
 export function handleChangeCurrentComponent (payload, store) {
-    if (!isPayloadValid({funcName: handleChangeCurrentComponent.name, payload})) {
+    const funcName = "handleChangeCurrentComponent";
+
+    if (!isPayloadValid({funcName, payload})) {
         return;
     }
 
-    handleActions(payload, store, handleChangeCurrentComponent.name);
-    handlePageView(payload, store, handleChangeCurrentComponent.name);
+    handleActions(payload, store, funcName);
+    handlePageView(payload, store, funcName);
 }
 
 /**

@@ -23,6 +23,6 @@ export function piniaActionCallback (action, store) {
         }
     }
     catch (error) {
-        console.error(`Pinia-store callback failed for action "${actionType}"`);
+        console.error(`Pinia-store callback failed for action "${actionType}": ${error.stack}`);
     }
 }

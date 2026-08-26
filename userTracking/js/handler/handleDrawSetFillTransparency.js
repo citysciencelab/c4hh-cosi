@@ -10,9 +10,10 @@ import {trackDrawToolEventDebounced} from "../util";
  * @returns {void}
  */
 export function handleDrawSetFillTransparency ({isOuter, value, version}) {
-    trackDrawToolEventDebounced(`Changed${isOuter ? " outer " : " "}fill transparency`, {
-        funcName: handleDrawSetFillTransparency.name,
-        value,
-        version
-    });
+    const funcName = "handleDrawSetFillTransparency";
+
+    trackDrawToolEventDebounced(
+        `Changed${isOuter ? " outer " : " "}fill transparency`,
+        {funcName, value, version}
+    );
 }

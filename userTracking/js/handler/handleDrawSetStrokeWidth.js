@@ -10,9 +10,10 @@ import {trackDrawToolEventDebounced} from "../util";
  * @returns {void}
  */
 export function handleDrawSetStrokeWidth ({isOuter, value, version}) {
-    trackDrawToolEventDebounced(`Changed${isOuter ? " outer " : " "}stroke width`, {
-        funcName: handleDrawSetStrokeWidth.name,
-        value,
-        version
-    });
+    const funcName = "handleDrawSetStrokeWidth";
+
+    trackDrawToolEventDebounced(
+        `Changed${isOuter ? " outer " : " "}stroke width`,
+        {funcName, value, version}
+    );
 }

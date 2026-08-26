@@ -8,5 +8,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawSetInteraction (interaction, version) {
-    trackDrawToolEvent(`Changed interaction to: ${interaction}`, {funcName: handleDrawSetInteraction.name, version});
+    const funcName = "handleDrawSetInteraction";
+
+    trackDrawToolEvent(`Changed interaction to: ${interaction}`, {funcName, version});
 }

@@ -8,5 +8,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawSetUnit (unit, version) {
-    trackDrawToolEvent(`Changed unit to: ${unit}`, {funcName: handleDrawSetUnit.name, version});
+    const funcName = "handleDrawSetUnit";
+
+    trackDrawToolEvent(`Changed unit to: ${unit}`, {funcName, version});
 }

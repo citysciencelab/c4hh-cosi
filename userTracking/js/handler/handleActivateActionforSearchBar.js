@@ -12,8 +12,10 @@ import {assembleSourceInfoForEvent, getLayerInformation, isPayloadValid} from ".
  * @returns {void}
  */
 export function handleActivateActionforSearchBar (payload, store) {
+    const funcName = "handleActivateActionforSearchBar";
+
     if (
-        !isPayloadValid({funcName: handleActivateActionforSearchBar.name, payload})
+        !isPayloadValid({funcName, payload})
         || !payload.actionArgs) {
         return;
     }
@@ -23,7 +25,7 @@ export function handleActivateActionforSearchBar (payload, store) {
             category: "Layer",
             action: "Clicked on \"show-layers-of-folder\"-button",
             name: getLayerInformation(payload.actionArgs.layerId, store),
-            _source: assembleSourceInfoForEvent(handleActivateActionforSearchBar.name)
+            _source: assembleSourceInfoForEvent(funcName)
         });
     }
 }

@@ -7,10 +7,12 @@ import {assembleSourceInfoForEvent} from "../util";
  * @returns {void}
  */
 export function handlefetchIsochrones () {
+    const funcName = "handlefetchIsochrones";
+
     trackMatomoEvent({
         category: "Tool",
         action: "Used tool successfully",
         name: "Routing (Reachability-Tab)",
-        _source: assembleSourceInfoForEvent(handlefetchIsochrones.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

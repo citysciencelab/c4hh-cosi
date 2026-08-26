@@ -121,6 +121,8 @@ export function initializeMatomo (config) {
  * @returns {void}
  */
 export function initializeLinkTracking () {
+    const funcName = "initializeLinkTracking";
+
     document.body.addEventListener("click", ({target}) => {
         const anchor = target.closest("a");
 
@@ -148,7 +150,7 @@ export function initializeLinkTracking () {
                     category: "Link",
                     action: "Triggered download",
                     name: `href: "${anchor.href.slice(5)} | class: "${className}" | id: "${id}"`,
-                    _source: assembleSourceInfoForEvent(initializeLinkTracking.name)
+                    _source: assembleSourceInfoForEvent(funcName)
                 });
             }
             else {
@@ -158,7 +160,7 @@ export function initializeLinkTracking () {
                     category: "Link",
                     action: `Clicked on ${isMailToLink ? "mailto" : "external"} link`,
                     name: `href: "${isMailToLink ? stripBodyParameterFromHref(anchor.href) : anchor.href}" | class: "${className}" | id: "${id}"`,
-                    _source: assembleSourceInfoForEvent(initializeLinkTracking.name)
+                    _source: assembleSourceInfoForEvent(funcName)
                 });
             }
         }

@@ -7,10 +7,12 @@ import {assembleSourceInfoForEvent} from "../util";
  * @returns {void}
  */
 export function handleAddImportedFilename () {
+    const funcName = "handleAddImportedFilename";
+
     trackMatomoEvent({
         category: "Tool",
         action: "Used tool successfully",
         name: "FileImport",
-        _source: assembleSourceInfoForEvent(handleAddImportedFilename.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

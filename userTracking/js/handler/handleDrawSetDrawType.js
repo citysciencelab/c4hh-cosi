@@ -8,5 +8,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawSetDrawType (drawType, version) {
-    trackDrawToolEvent(`Changed draw type to: ${drawType}`, {funcName: handleDrawSetDrawType.name, version});
+    const funcName = "handleDrawSetDrawType";
+
+    trackDrawToolEvent(`Changed draw type to: ${drawType}`, {funcName, version});
 }

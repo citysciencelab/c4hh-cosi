@@ -20,6 +20,12 @@ It integrates [Matomo](https://matomo.org/) (formerly Piwik) analytics into the 
 
 The following user interactions are tracked as Matomo events automatically.
 
+#### Client
+
+| Action | Name | Value | Trigger |
+|--------|------|-------|---------|
+| `Credibility is good` / `Credibility is bad` | `Reasons: {reasons}` (comma-separated list of matched indicators, or `none`) | Credibility score | Sent once per session, based on a client-side heuristic (`checkClientCredibility`) that estimates whether the client is a real user or an automated client (bot, crawler, headless browser). |
+
 #### Layer
 
 | Action | Name | Trigger |

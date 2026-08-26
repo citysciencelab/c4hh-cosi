@@ -52,6 +52,7 @@ const Config = {
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
+| `enableCredibilityCheck` | `Boolean` | no | If `true`, the bot-detection-score is calculated and send to the matomo server once. |
 | `enableInputTracking` | `Boolean` | no | If `true`, search bar input is tracked as events and page views (debounced, 500 ms). Defaults to `false`. |
 | `enableLinkTracking` | `Boolean` | no | If `true`, clicks on external links, mailto links, and blob download links are tracked as Matomo events. Defaults to `false`. |
 

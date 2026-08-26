@@ -11,7 +11,9 @@ import {assembleSourceInfoForEvent, getLayerInformation, getSourceFromPayload, i
  * @returns {void}
  */
 export function handleSetLayerInfo (payload, store) {
-    if (!isPayloadValid({funcName: handleSetLayerInfo.name, payload})) {
+    const funcName = "handleSetLayerInfo";
+
+    if (!isPayloadValid({funcName, payload})) {
         return;
     }
 
@@ -19,6 +21,6 @@ export function handleSetLayerInfo (payload, store) {
         category: "Layer",
         action: `Opened layer information via ${getSourceFromPayload(payload)}`,
         name: getLayerInformation(payload.id, store),
-        _source: assembleSourceInfoForEvent(handleSetLayerInfo.name, payload._source)
+        _source: assembleSourceInfoForEvent(funcName, payload._source)
     });
 }

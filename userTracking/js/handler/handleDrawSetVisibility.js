@@ -8,5 +8,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawSetVisibility (isVisible, version) {
-    trackDrawToolEvent(`Changed visibility to: ${isVisible ? "on" : "off"}`, {funcName: handleDrawSetVisibility.name, version});
+    const funcName = "handleDrawSetVisibility";
+
+    trackDrawToolEvent(`Changed visibility to: ${isVisible ? "on" : "off"}`, {funcName, version});
 }

@@ -176,6 +176,6 @@ export function mutationCallback (mutation) {
         }
     }
     catch (error) {
-        console.error(`Vuex-store callback failed for mutation "${mutation.type}"`);
+        console.error(`Vuex-store callback failed for mutation "${mutation.type}": ${error.stack}`);
     }
 }

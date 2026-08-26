@@ -11,8 +11,10 @@ import {assembleSourceInfoForEvent, getLayerInformation, isPayloadValid} from ".
  * @returns {void}
  */
 export function handleChangeVisibility (payload, store) {
+    const funcName = "handleChangeVisibility";
+
     if (
-        !isPayloadValid({funcName: handleChangeVisibility.name, payload})
+        !isPayloadValid({funcName, payload})
         || payload.value === undefined
         || payload.layerId === undefined
     ) {
@@ -26,6 +28,6 @@ export function handleChangeVisibility (payload, store) {
             : "Removed layer via layertree"
         }`,
         name: getLayerInformation(payload.layerId, store),
-        _source: assembleSourceInfoForEvent(handleChangeVisibility.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

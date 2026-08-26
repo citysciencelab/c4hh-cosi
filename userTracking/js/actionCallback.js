@@ -233,6 +233,6 @@ export function actionCallback (action, store) {
         }
     }
     catch (error) {
-        console.error(`Vuex-store callback failed for action "${action.type}"`);
+        console.error(`Vuex-store callback failed for action "${action.type}": ${error.stack}`);
     }
 }

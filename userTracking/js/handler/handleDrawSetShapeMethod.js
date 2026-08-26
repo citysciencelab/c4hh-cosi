@@ -10,5 +10,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawSetShapeMethod ({method, shape, version}) {
-    trackDrawToolEvent(`Changed ${shape}-method to: ${method}`, {funcName: handleDrawSetShapeMethod.name, version});
+    const funcName = "handleDrawSetShapeMethod";
+
+    trackDrawToolEvent(`Changed ${shape}-method to: ${method}`, {funcName, version});
 }

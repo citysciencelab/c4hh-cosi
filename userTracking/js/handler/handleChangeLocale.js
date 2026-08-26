@@ -11,8 +11,10 @@ import {assembleSourceInfoForEvent, isPayloadValid} from "../util";
  * @returns {void}
  */
 export function handleChangeLocale (payload) {
+    const funcName = "handleChangeLocale";
+
     if (
-        !isPayloadValid({funcName: handleChangeLocale.name, payload})
+        !isPayloadValid({funcName, payload})
         || payload.doNotTrack
         || !payload.language) {
         return;
@@ -22,6 +24,6 @@ export function handleChangeLocale (payload) {
         category: "Menu",
         action: "Changed language",
         name: payload.language,
-        _source: assembleSourceInfoForEvent(handleChangeLocale.name, payload._source)
+        _source: assembleSourceInfoForEvent(funcName, payload._source)
     });
 }

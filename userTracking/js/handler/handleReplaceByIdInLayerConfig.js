@@ -15,7 +15,9 @@ import {assembleSourceInfoForEvent, getSourceFromPayload, isPayloadValid} from "
  * @returns {void}
  */
 export function handleReplaceByIdInLayerConfig (payload, store) {
-    if (!isPayloadValid({funcName: handleReplaceByIdInLayerConfig.name, payload})) {
+    const funcName = "handleReplaceByIdInLayerConfig";
+
+    if (!isPayloadValid({funcName, payload})) {
         return;
     }
 
@@ -27,7 +29,7 @@ export function handleReplaceByIdInLayerConfig (payload, store) {
             action: `Changed layer-visibility via ${getSourceFromPayload(payload)}`,
             name: `Layer: ${store.getters.layerConfigById(layer.id)?.name} (id: ${layer.id})`,
             value: layer.visibility ? 1 : 0,
-            _source: assembleSourceInfoForEvent(handleReplaceByIdInLayerConfig.name, payload._source)
+            _source: assembleSourceInfoForEvent(funcName, payload._source)
         });
     }
 }

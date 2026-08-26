@@ -10,7 +10,9 @@ import {assembleSourceInfoForEvent, getLayerInformation, isPayloadValid} from ".
  * @returns {void}
  */
 export function handleAddLayerToTopicTree (payload, store) {
-    if (!isPayloadValid({funcName: handleAddLayerToTopicTree.name, payload})) {
+    const funcName = "handleAddLayerToTopicTree";
+
+    if (!isPayloadValid({funcName, payload})) {
         return;
     }
 
@@ -21,7 +23,7 @@ export function handleAddLayerToTopicTree (payload, store) {
             category: "Layer",
             action: "Added layer via search",
             name: getLayerInformation(layerId, store),
-            _source: assembleSourceInfoForEvent(handleAddLayerToTopicTree.name)
+            _source: assembleSourceInfoForEvent(funcName)
         });
     }
 }

@@ -8,10 +8,12 @@ import {assembleSourceInfoForEvent} from "../util";
  * @returns {void}
  */
 export function handleRotate (isClockwise) {
+    const funcName = "handleRotate";
+
     trackMatomoEvent({
         category: "MapControls",
         action: "Clicked control",
         name: `Rotate ${isClockwise ? "" : "counter-"}clockwise`,
-        _source: assembleSourceInfoForEvent(handleRotate.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

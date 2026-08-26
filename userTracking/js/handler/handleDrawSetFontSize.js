@@ -8,5 +8,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawSetFontSize (value, version) {
-    trackDrawToolEvent("Changed font-size", {funcName: handleDrawSetFontSize.name, value, version});
+    const funcName = "handleDrawSetFontSize";
+
+    trackDrawToolEvent("Changed font-size", {funcName, value, version});
 }

@@ -8,7 +8,9 @@ import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
  * @returns {void}
  */
 export function handleChangeMapMode (payload) {
-    if (!isPayloadValid({funcName: handleChangeMapMode.name, isArrayOrObject: false, payload})) {
+    const funcName = "handleChangeMapMode";
+
+    if (!isPayloadValid({funcName, isArrayOrObject: false, payload})) {
         return;
     }
 
@@ -16,6 +18,6 @@ export function handleChangeMapMode (payload) {
         category: "MapControls",
         action: "Changed map-mode",
         name: payload,
-        _source: assembleSourceInfoForEvent(handleChangeMapMode.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

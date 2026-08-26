@@ -8,5 +8,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawSetDownloadFormat (payload, version) {
-    trackDrawToolEvent(`Changed download format to: ${payload}`, {funcName: handleDrawSetDownloadFormat.name, version});
+    const funcName = "handleDrawSetDownloadFormat";
+
+    trackDrawToolEvent(`Changed download format to: ${payload}`, {funcName, version});
 }

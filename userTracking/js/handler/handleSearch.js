@@ -11,17 +11,19 @@ import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
  * @returns {void}
  */
 export function handleSearch (payload, store) {
+    const funcName = "handleSearch";
+
     store.dispatch("UserTracking/forceClearSearchBarTimeout");
 
     if (
         !Config?.userTracking?.options?.enableInputTracking
-        || !isPayloadValid({funcName: handleSearch.name, payload})
+        || !isPayloadValid({funcName, payload})
         || !payload.searchInput
     ) {
         return;
     }
 
-    const _source = assembleSourceInfoForEvent(handleSearch.name);
+    const _source = assembleSourceInfoForEvent(funcName);
 
     const searchBarInputTimeoutId = setTimeout(() => {
         // Actions

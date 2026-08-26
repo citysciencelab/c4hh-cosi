@@ -12,15 +12,17 @@ import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
  * @returns {void}
  */
 export function handleCreatePrintJob (payload) {
+    const funcName = "handleCreatePrintJob";
+
     if (
-        !isPayloadValid({funcName: handleCreatePrintJob.name, payload})
+        !isPayloadValid({funcName, payload})
         || !payload.payload
     ) {
         return;
     }
 
     const {payload: printPayload} = payload;
-    const _source = assembleSourceInfoForEvent(handleCreatePrintJob.name);
+    const _source = assembleSourceInfoForEvent(funcName);
 
     trackMatomoEvent({
         category: "Tool",

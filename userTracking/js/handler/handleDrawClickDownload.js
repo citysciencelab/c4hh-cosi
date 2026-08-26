@@ -7,5 +7,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawClickDownload (version) {
-    trackDrawToolEvent("Pressed Download-Button", {funcName: handleDrawClickDownload.name, version});
+    const funcName = "handleDrawClickDownload";
+
+    trackDrawToolEvent("Pressed Download-Button", {funcName, version});
 }

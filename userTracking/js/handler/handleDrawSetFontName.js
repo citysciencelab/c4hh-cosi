@@ -8,5 +8,7 @@ import {trackDrawToolEvent} from "../util";
  * @returns {void}
  */
 export function handleDrawSetFontName (fontName, version) {
-    trackDrawToolEvent(`Changed font to: ${fontName}`, {funcName: handleDrawSetFontName.name, version});
+    const funcName = "handleDrawSetFontName";
+
+    trackDrawToolEvent(`Changed font to: ${fontName}`, {funcName, version});
 }

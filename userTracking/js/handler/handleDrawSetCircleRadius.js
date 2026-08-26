@@ -10,9 +10,10 @@ import {trackDrawToolEventDebounced} from "../util";
  * @returns {void}
  */
 export function handleDrawSetCircleRadius ({isOuter, value, version}) {
-    trackDrawToolEventDebounced(`Changed${isOuter ? " outer " : " "}circle-radius`, {
-        funcName: handleDrawSetCircleRadius.name,
-        value,
-        version
-    });
+    const funcName = "handleDrawSetCircleRadius";
+
+    trackDrawToolEventDebounced(
+        `Changed${isOuter ? " outer " : " "}circle-radius`,
+        {funcName, value, version}
+    );
 }

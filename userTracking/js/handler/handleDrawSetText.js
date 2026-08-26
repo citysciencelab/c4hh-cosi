@@ -7,5 +7,7 @@ import {trackDrawToolEventDebounced} from "../util";
  * @returns {void}
  */
 export function handleDrawSetText (version) {
-    trackDrawToolEventDebounced("Changed text", {funcName: handleDrawSetText.name, version});
+    const funcName = "handleDrawSetText";
+
+    trackDrawToolEventDebounced("Changed text", {funcName, version});
 }

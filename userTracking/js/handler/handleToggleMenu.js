@@ -8,7 +8,9 @@ import {assembleSourceInfoForEvent, isPayloadValid} from "../util";
  * @returns {void}
  */
 export function handleToggleMenu (payload) {
-    if (!isPayloadValid({funcName: handleToggleMenu.name, isArrayOrObject: false, payload})) {
+    const funcName = "handleToggleMenu";
+
+    if (!isPayloadValid({funcName, isArrayOrObject: false, payload})) {
         return;
     }
 
@@ -16,6 +18,6 @@ export function handleToggleMenu (payload) {
         category: "Menu",
         action: "Clicked menu-toggle-button",
         name: payload,
-        _source: assembleSourceInfoForEvent(handleToggleMenu.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

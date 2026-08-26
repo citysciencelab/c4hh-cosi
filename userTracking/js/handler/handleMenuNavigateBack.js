@@ -19,13 +19,15 @@ import {assembleSourceInfoForEvent, getLayerSelectionUrlSegement, isPayloadValid
  * @returns {void}
  */
 export function handleMenuNavigateBack (payload, store) {
+    const funcName = "handleMenuNavigateBack";
+
     store.dispatch("UserTracking/forceClearSearchBarTimeout");
 
-    if (!isPayloadValid({funcName: handleMenuNavigateBack.name, payload}) || payload.doNotTrack) {
+    if (!isPayloadValid({funcName, payload}) || payload.doNotTrack) {
         return;
     }
 
-    const _source = assembleSourceInfoForEvent(handleMenuNavigateBack.name);
+    const _source = assembleSourceInfoForEvent(funcName);
 
     // Actions
     trackMatomoEvent({

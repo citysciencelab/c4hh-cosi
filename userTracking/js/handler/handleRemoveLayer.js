@@ -10,7 +10,9 @@ import {assembleSourceInfoForEvent, getLayerInformation, isPayloadValid} from ".
  * @returns {void}
  */
 export function handleRemoveLayer (payload, store) {
-    if (!isPayloadValid({funcName: handleRemoveLayer.name, payload})) {
+    const funcName = "handleRemoveLayer";
+
+    if (!isPayloadValid({funcName, payload})) {
         return;
     }
 
@@ -18,6 +20,6 @@ export function handleRemoveLayer (payload, store) {
         category: "Layer",
         action: "Removed layer from layertree",
         name: getLayerInformation(payload.id, store),
-        _source: assembleSourceInfoForEvent(handleRemoveLayer.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

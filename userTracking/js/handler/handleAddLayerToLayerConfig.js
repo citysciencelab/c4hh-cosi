@@ -9,7 +9,9 @@ import {assembleSourceInfoForEvent, isPayloadValid} from "../util";
  * @returns {void}
  */
 export function handleAddLayerToLayerConfig (payload) {
-    if (!isPayloadValid({funcName: handleAddLayerToLayerConfig.name, payload})) {
+    const funcName = "handleAddLayerToLayerConfig";
+
+    if (!isPayloadValid({funcName, payload})) {
         return;
     }
 
@@ -18,7 +20,7 @@ export function handleAddLayerToLayerConfig (payload) {
             category: "Tool",
             action: "Used tool successfully",
             name: payload._source,
-            _source: assembleSourceInfoForEvent(handleAddLayerToLayerConfig.name, payload._source)
+            _source: assembleSourceInfoForEvent(funcName, payload._source)
         });
     }
 }

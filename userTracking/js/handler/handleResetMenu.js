@@ -9,13 +9,15 @@ import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
  * @returns {void}
  */
 export function handleResetMenu (payload, store) {
-    if (!isPayloadValid({funcName: handleResetMenu.name, isArrayOrObject: false, payload})) {
+    const funcName = "handleResetMenu";
+
+    if (!isPayloadValid({funcName, isArrayOrObject: false, payload})) {
         return;
     }
 
     store.dispatch("UserTracking/forceClearSearchBarTimeout");
 
-    const _source = assembleSourceInfoForEvent(handleResetMenu.name);
+    const _source = assembleSourceInfoForEvent(funcName);
 
     // Actions
     trackMatomoEvent({

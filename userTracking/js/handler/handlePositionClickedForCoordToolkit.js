@@ -7,10 +7,12 @@ import {assembleSourceInfoForEvent} from "../util";
  * @returns {void}
  */
 export function handlePositionClickedForCoordToolkit () {
+    const funcName = "handlePositionClickedForCoordToolkit";
+
     trackMatomoEvent({
         category: "Tool",
         action: "Used tool successfully",
         name: "CoordToolkit (Query-Tab)",
-        _source: assembleSourceInfoForEvent(handlePositionClickedForCoordToolkit.name)
+        _source: assembleSourceInfoForEvent(funcName)
     });
 }

@@ -14,7 +14,9 @@ let timeoutId = null;
  * @returns {void}
  */
 export function handleUpdateLayerTransparency (payload, store) {
-    if (!isPayloadValid({funcName: handleUpdateLayerTransparency.name, payload})) {
+    const funcName = "handleUpdateLayerTransparency";
+
+    if (!isPayloadValid({funcName, payload})) {
         return;
     }
 
@@ -31,7 +33,7 @@ export function handleUpdateLayerTransparency (payload, store) {
             action: "Changed transparency",
             name: getLayerInformation(layerConf.id, store),
             value: parseInt(layerConf.transparency, 10),
-            _source: assembleSourceInfoForEvent(handleUpdateLayerTransparency.name)
+            _source: assembleSourceInfoForEvent(funcName)
         });
         timeoutId = null;
     }, 500);
