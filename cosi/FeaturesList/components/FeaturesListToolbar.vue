@@ -82,6 +82,7 @@ export default {
 <template lang="html">
     <ToolBar
         :optional-button="locationScoreButton"
+        :show-detail="{visibility: true}"
         v-bind="$attrs"
     >
         <template #filterMenu>

@@ -51,7 +51,7 @@ export default {
             default: false
         }
     },
-    emits: ["exportTable", "update:setting-items", "showView"],
+    emits: ["exportTable", "update:setting-items", "showView", "showDetails"],
     data () {
         return {
             optionalDropdownInstance: null,
@@ -253,7 +253,7 @@ export default {
                 id="show-detail"
                 :aria="$t('additional:modules.tools.cosi.dashboard.dietailView')"
                 :checked="showDetail.visibility"
-                :interaction="() => {}"
+                :interaction="() => $emit('showDetails', !showDetail.visibility)"
                 :label="$t('additional:modules.tools.cosi.dashboard.dietailView')"
                 class="mb-3 pt-1"
             />

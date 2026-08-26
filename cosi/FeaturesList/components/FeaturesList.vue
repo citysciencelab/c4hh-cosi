@@ -127,7 +127,10 @@ export default {
             distScoreLayer: null,
             exportDetails: false,
             dipasInFeaturesList: true,
-            sumUpLayers: false
+            sumUpLayers: false,
+            withDetails: {
+                visibility: true
+            }
         };
     },
     computed: {
@@ -673,6 +676,9 @@ export default {
         },
         setDistrictFilter (value) {
             this.districtFilter = value;
+        },
+        setWithDetails (value) {
+            this.withDetails = value;
         }
     }
 };
@@ -697,7 +703,8 @@ export default {
                 @setSearch="setSearch"
                 @createCharts="createCharts"
                 @createDipasCharts="createDipasCharts"
-                @exportTable="exportTable(true)"
+                @exportTable="exportTable(withDetails.visibility)"
+                @showDetails="setWithDetails({visibility: !withDetails.visibility})"
             />
             <v-divider />
             <div id="features-list">
@@ -723,7 +730,10 @@ export default {
                             @click:row="handleClickRow"
                             @current-items="setFilteredItems"
                         >
-                            <template #expanded-row="{columns: {length: colspan}, item }">
+                            <template
+                                v-if="withDetails.visibility"
+                                #expanded-row="{columns: {length: colspan}, item }"
+                            >
                                 <td
                                     class="detail-view"
                                     :colspan
