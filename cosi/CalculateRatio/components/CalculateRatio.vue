@@ -553,7 +553,7 @@ export default {
                     this.featureVals = [];
                     layerFeatures.forEach(feature => {
 
-                        if (this.isFeatureActive(feature)) {
+                        if (this.isFeatureActive(feature, findLayer)) {
                             const layerGeometry = getCenter(feature.getGeometry().getExtent());
 
                             if (geometry.intersectsCoordinate(layerGeometry)) {
