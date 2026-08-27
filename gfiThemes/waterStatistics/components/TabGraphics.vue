@@ -27,6 +27,7 @@ export default {
     data () {
         return {
             percentile: null,
+            percentileChartBasis: {},
             filterRange: "last-year",
             rangeStartDate: undefined,
             rangeEndDate: undefined,
@@ -34,7 +35,8 @@ export default {
             filterEndMonth: undefined,
             filterStartYear: undefined,
             filterEndYear: undefined,
-            showDisclaimerModal: false
+            showDisclaimerModal: false,
+            offscreenKey: 0
         };
     },
     computed: {
@@ -49,6 +51,7 @@ export default {
         ...mapGetters("Maps", [
             "projectionCode"
         ]),
+        ...mapGetters(["isMobile"]),
         /**
          * Returns the active chart theme (first theme from params.chartThemes).
          * @returns {Object|undefined} chart theme object or undefined when not available.
@@ -85,13 +88,33 @@ export default {
             return prefix + " " + value;
         },
         /**
+         * Returns the display title for the left Y axis derived from the OAF schema.
+         * Falls back to an empty string when no title is configured.
+         *
+         * @returns {string} Left axis title or empty string.
+         */
+        leftAxisTitle () {
+            return this.oafSchema?.properties?.[this.currentChartTheme.chartParams?.yAxisLeft]?.title ?? "";
+        },
+        /**
+         * Returns the display title for the right Y axis derived from the OAF schema.
+         * Falls back to an empty string when no title is configured.
+         *
+         * @returns {string} Right axis title or empty string.
+         */
+        rightAxisTitle () {
+            return this.oafSchema?.properties?.[this.currentChartTheme.chartParams?.yAxisRight]?.title ?? "";
+        },
+        /**
          * Chart.js options for the line chart, including scales and axis titles.
          *  overwrites default options set in the LinechartItem component
          * @returns {Object} options to use for the line chart
          */
         lineChartOptions () {
-            const deltaLeft = this.maxScaleLeft - this.minScaleLeft;
-            const deltaRight = this.maxScaleRight - this.minScaleRight;
+            const deltaLeft = this.maxScaleLeft - this.minScaleLeft,
+                  deltaRight = this.maxScaleRight - this.minScaleRight,
+                  hasPercentile = Boolean(this.percentile),
+                  percentileLineTitles = hasPercentile ? Object.values(this.percentileChartBasis).map(value => value.title) : [];
 
             return {
                 plugins: {
@@ -102,6 +125,42 @@ export default {
                             size: 20,
                             family: "'MasterPortalFont Bold', 'Arial Narrow', Arial, sans-serif"
                         }
+                    },
+                    legend: {
+                        display: hasPercentile,
+                        position: "bottom",
+                        labels: {
+                            filter: function (legendItem) {
+                                return percentileLineTitles.includes(legendItem.text);
+                            }
+                        },
+                        /**
+                         * Show a small tooltip at the mouse position when hovering legend items.
+                         * @param {MouseEvent} evt
+                         * @param {Object} item not used in this function
+                         * @param {Object} legend
+                         */
+                        onHover: (evt, _, legend) => {
+                            if (!evt) {
+                                return;
+                            }
+                            this.showLegendTooltip(evt, legend && legend.chart ? legend.chart : null);
+                        },
+                        /**
+                         * Remove tooltip when leaving legend.
+                         */
+                        onLeave: () => {
+                            this.hideLegendTooltip();
+                        },
+                        /**
+                         * Sync legend item visibility settings between the visible chart and the offscreen export chart.
+                         * @param {MouseEvent} evt not used in this function
+                         * @param {Object} legendItem
+                         * @param {Object} legend
+                         */
+                        onClick: (_, legendItem, legend) => {
+                            this.updateOffscreenChart(legendItem, legend);
+                        }
                     }
                 },
                 scales: {
@@ -111,7 +170,7 @@ export default {
                         position: "left",
                         title: {
                             display: true,
-                            text: this.oafSchema?.properties?.[this.currentChartTheme.chartParams.yAxisLeft]?.title ?? "",
+                            text: this.leftAxisTitle,
                             font: {
                                 size: 14,
                                 family: "MasterPortalFont, Arial, sans-serif"
@@ -136,7 +195,7 @@ export default {
                         position: "right",
                         title: {
                             display: true,
-                            text: this.oafSchema?.properties?.[this.currentChartTheme.chartParams.yAxisRight]?.title ?? "",
+                            text: this.rightAxisTitle,
                             font: {
                                 size: 14,
                                 family: "MasterPortalFont, Arial, sans-serif"
@@ -182,7 +241,7 @@ export default {
             }
 
             datasets.push({
-                label: this.lineChartOptions.scales.y.title.text,
+                label: this.leftAxisTitle,
                 data: left_data,
                 hoverOffset: 4,
                 backgroundColor: "#3C5F9433",
@@ -195,7 +254,7 @@ export default {
 
             if (this.hasRightAxis) {
                 datasets.push({
-                    label: this.lineChartOptions.scales.yRight.title.text,
+                    label: this.rightAxisTitle,
                     data: right_data,
                     hoverOffset: 4,
                     backgroundColor: "#3C5F94",
@@ -203,6 +262,53 @@ export default {
                     borderWidth: 0,
                     pointStyle: false,
                     yAxisID: "yRight"
+                });
+            }
+
+            // add percentile lines when configured
+            if (this.percentile && this.percentile.perzentile && this.percentileChartBasis && Object.keys(this.percentileChartBasis).length) {
+                // map percentile entries by month key "01".."12"
+                const pEntries = Array.isArray(this.percentile.perzentile) ? this.percentile.perzentile : [],
+                      byMonth = new Map();
+
+                pEntries.forEach(entry => {
+                    const key = String(entry?.PRZ_REFERENZMONAT ?? "").padStart(2, "0");
+
+                    if (key) {
+                        byMonth.set(key, entry);
+                    }
+                });
+
+                Object.keys(this.percentileChartBasis).forEach(key => {
+                    const meta = this.percentileChartBasis[key],
+                          data = labels.map(lbl => {
+                              const mKey = this.monthKeyFromLabel(lbl),
+                                    entry = mKey ? byMonth.get(mKey) : null,
+                                    val = entry && Object.prototype.hasOwnProperty.call(entry, key) ? entry[key] : null;
+
+                              if (typeof val === "number") {
+                                  return val;
+                              }
+                              if (val === null) {
+                                  return null;
+                              }
+                              const parsed = Number.parseFloat(val);
+
+                              return Number.isNaN(parsed) ? null : parsed;
+                          });
+
+                    datasets.push({
+                        label: meta?.title ?? key,
+                        data: data,
+                        borderColor: meta?.color ? `#${meta.color}` : "#000000",
+                        borderWidth: 1.5,
+                        borderDash: [5, 3],
+                        pointRadius: 0,
+                        tension: 0.15,
+                        fill: false,
+                        yAxisID: "y",
+                        hidden: true
+                    });
                 });
             }
 
@@ -504,6 +610,10 @@ export default {
                     return;
                 }
 
+                if (!this.isMobile) {
+                    this.increaseSidebarWidth();
+                }
+
                 this.filterRange = "last-year";
                 this.filterStartMonth = undefined;
                 this.filterEndMonth = undefined;
@@ -557,7 +667,8 @@ export default {
         ...mapActions("Modules/WaterStatistics", [
             "queryOaf",
             "queryPercentiles",
-            "addChartToPdf"
+            "addChartToPdf",
+            "increaseSidebarWidth"
         ]),
         ...mapActions("Alerting", [
             "addSingleAlert"
@@ -722,6 +833,10 @@ export default {
 
                 return compareValue === givenValue;
             });
+
+            if (this.percentile) {
+                this.generatePercentileChartBasis();
+            }
         },
         /**
          * Sets date range to last year and runs OAF query.
@@ -895,6 +1010,227 @@ export default {
                 useHamburgDesign: pdfParams?.useHamburgDesign,
                 logoPath: pdfParams?.base64LogoPath
             });
+        },
+        /*
+         * Generates a mapping of percentile keys to display metadata used by the chart.
+         *
+         * Reads the first percentile entry (this.percentile.perzentile[0]) to discover which
+         * percentile keys exist (ignores keys containing an underscore). For each detected key
+         * a basis entry is created on this.percentileChartBasis with the shape:
+         *   { [key]: { title: string|null, color: string|null } }
+         *
+         * The function mutates this.percentileChartBasis in-place and returns nothing.
+         *
+         * @returns {void}
+         */
+        generatePercentileChartBasis () {
+            if (this.percentile && this.percentile.perzentile && this.percentile.perzentile.length > 0) {
+                // this.percentileChartBasis is an object, holding title and color for the lines in the chart
+                // {
+                // "MIN": {
+                //     "title": "unterhalb Minimum",
+                //     "color": "A900E6"
+                // },
+                // "P10": {
+                //     "title": "sehr niedrig",
+                //     "color": "FF0000"
+                // },
+                // "P25": {
+                //     "title": "niedrig",
+                //     "color": "FFFF00"
+                // }
+                const datasets = Object.keys(this.percentile.perzentile[0])?.filter(key => {
+                    return key.indexOf("_") === -1;
+                });
+
+                this.percentileChartBasis = {};
+
+                datasets.forEach(datasetKey => {
+                    this.percentileChartBasis[datasetKey] = {
+                        title: this.percentile.perzentile[0][`${datasetKey}_DESCR`],
+                        color: this.percentile.perzentile[0][`${datasetKey}_HEX`]
+                    };
+                });
+
+            }
+        },
+        /**
+         * Try to derive month key ("01".."12") from a label.
+         * Falls back to null when unknown.
+         * @param {string} label
+         * @returns {string|null} month key or null
+         */
+        monthKeyFromLabel (label) {
+            if (!label) {
+                return null;
+            }
+            const str = String(label).trim();
+
+            // try YYYY-MM or YYYY-MM-DD
+            const iso = str.match(/^(\d{4})-(\d{2})(-\d{2})?/);
+
+            if (iso) {
+                return iso[2];
+            }
+
+            // try MM/YYYY or MM.YYYY or DD/MM/YYYY or DD.MM.YYYY
+            const euro = str.match(/(^|\D)(\d{1,2})([/.]\d{4})/);
+
+            if (euro) {
+                return String(Number(euro[2])).padStart(2, "0");
+            }
+
+            // try Date parse
+            const d = new Date(str);
+
+            if (!Number.isNaN(d.getTime())) {
+                return String(d.getMonth() + 1).padStart(2, "0");
+            }
+            return null;
+        },
+        /**
+         * Show a small tooltip near the mouse cursor explaining the legend action.
+         * Creates a single DOM node with id 'tabgraphics-percentile-tooltip'.
+         * Accepts optional chart param to translate canvas-relative coordinates.
+         * @param {MouseEvent} evt
+         * @param {Object|null} chart
+         */
+        showLegendTooltip (evt, chart = null) {
+            try {
+                const id = "tabgraphics-percentile-tooltip";
+                let tip = document.getElementById(id);
+
+                if (!tip) {
+                    tip = document.createElement("div");
+                    tip.id = id;
+                    tip.style.position = "fixed";
+                    tip.style.pointerEvents = "none";
+                    tip.style.background = "rgba(0,0,0,0.75)";
+                    tip.style.color = "#ffffff";
+                    tip.style.padding = "0.25rem 0.5rem";
+                    tip.style.borderRadius = "0.25rem";
+                    tip.style.fontSize = "0.875rem";
+                    tip.style.zIndex = "4000";
+                    tip.style.transition = "transform 0.08s ease, opacity 0.08s ease";
+                    tip.style.opacity = "0";
+                    tip.textContent = "Perzentilen ein-/ausblenden";
+                    document.body.appendChild(tip);
+                }
+
+                const offsetX = 12,
+                      offsetY = 12;
+
+                // Determine viewport coordinates:
+                // If chart and canvas are provided and event coordinates are canvas-local,
+                // translate by canvas bounding rect. Otherwise fall back to clientX/clientY.
+                let left = 0,
+                    top = 0;
+
+                const canvasRect = chart && chart.canvas && typeof chart.canvas.getBoundingClientRect === "function"
+                    ? chart.canvas.getBoundingClientRect()
+                    : null;
+
+                if (canvasRect && typeof evt.x === "number" && typeof evt.y === "number") {
+                    left = canvasRect.left + evt.x + offsetX;
+                    top = canvasRect.top + evt.y + offsetY;
+                }
+                else if (typeof evt.clientX === "number" && typeof evt.clientY === "number") {
+                    left = evt.clientX + offsetX;
+                    top = evt.clientY + offsetY;
+                }
+                else {
+                    // best-effort fallback using pageX/pageY
+                    left = (evt.pageX || 0) + offsetX;
+                    top = (evt.pageY || 0) + offsetY;
+                }
+
+                // keep tooltip within viewport
+                const rect = tip.getBoundingClientRect();
+                const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+                const vh = Math.max(document.documentElement.clientHeight || 0, window.innerHeight || 0);
+
+                if (left + rect.width + 8 > vw) {
+                    left = vw - rect.width - 8;
+                }
+                if (top + rect.height + 8 > vh) {
+                    top = vh - rect.height - 8;
+                }
+
+                tip.style.left = `${left}px`;
+                tip.style.top = `${top}px`;
+                // small visible animation
+                requestAnimationFrame(() => {
+                    tip.style.opacity = "1";
+                    tip.style.transform = "translateY(0)";
+                });
+            }
+            catch (e) {
+                console.error(e);
+            }
+        },
+
+        /**
+         * Hides and removes the legend tooltip if present.
+         */
+        hideLegendTooltip () {
+            try {
+                const id = "tabgraphics-percentile-tooltip",
+                      tip = document.getElementById(id);
+
+                if (!tip) {
+                    return;
+                }
+
+                tip.style.opacity = "0";
+                // remove after transition
+                setTimeout(() => {
+                    if (tip && tip.parentNode) {
+                        tip.parentNode.removeChild(tip);
+                    }
+                }, 120);
+            }
+            catch (e) {
+                console.error(e);
+            }
+        },
+        /**
+         * Synchronize visibility between the visible chart and the hidden export chart
+         * when a legend item is clicked.
+         *
+         * This method toggles the clicked dataset's visibility on the visible Chart.js
+         * instance (using the chart meta), mirrors the resulting hidden flag into the
+         * reactive chartData.datasets[].hidden so the offscreen chart receives the change,
+         * and schedules a remount/update of the offscreen LinechartItem by incrementing
+         * offscreenKey on the next tick.
+         *
+         * Note: the function intentionally avoids mutating computed properties directly
+         * outside of mirroring the hidden flag and uses $nextTick to prevent synchronous
+         * reactive cycles with Chart.js internal mutations.
+         *
+         * @param {Object} legendItem - Chart.js legend item object (contains datasetIndex).
+         * @param {Object} legend - Chart.js legend context (contains chart reference).
+         * @returns {void}
+         */
+        updateOffscreenChart (legendItem, legend) {
+            try {
+                const ci = legend.chart,
+                      idx = legendItem.datasetIndex,
+                      meta = ci.getDatasetMeta(idx);
+
+                meta.hidden = meta.hidden === null ? !ci.data.datasets[idx].hidden : !meta.hidden;
+                ci.update();
+
+                if (this.chartData && this.chartData.datasets && this.chartData.datasets[idx]) {
+                    this.chartData.datasets[idx].hidden = meta.hidden;
+                }
+
+                this.$nextTick(() => {
+                    this.offscreenKey++;
+                });
+            }
+            catch (e) {
+                console.error(e);
+            }
         }
     }
 
@@ -1074,6 +1410,7 @@ export default {
             >
                 <LinechartItem
                     ref="offscreenLineChart"
+                    :key="offscreenKey"
                     :data="chartData"
                     :given-options="offscreenChartOptions"
                     :width="800"
@@ -1094,6 +1431,7 @@ export default {
 <style lang="scss" scoped>
 #TabGraphics {
     position: relative; // ensure the spinner-wrapper is positioned correctly within this container
+
     div.filter {
         margin-bottom: 10px;
 
@@ -1149,14 +1487,6 @@ export default {
                 margin-bottom: 0;
             }
         }
-    }
-
-    .diagram {
-        height: 400px;
-        width: 100%;
-        background-color: #f5f5f5;
-        border: 1px solid #ccc;
-        margin-bottom: 20px;
     }
 
     div.dataDisclaimerContainer {

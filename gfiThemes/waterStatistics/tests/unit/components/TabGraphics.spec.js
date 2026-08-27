@@ -92,28 +92,67 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                 "messstellennummer": 2200,
                 "perzentile": [
                     {
+                        "PRZ_REFERENZMONAT": "01",
                         "MIN": 14.45,
+                        "MIN_DESCR": "unterhalb Minimum",
+                        "MIN_HEX": "A900E6",
                         "P10": 14.55,
+                        "P10_DESCR": "sehr niedrig",
+                        "P10_HEX": "FF0000",
                         "P25": 14.59,
+                        "P25_DESCR": "niedrig",
+                        "P25_HEX": "FFFF00",
                         "P75": 15,
+                        "P75_DESCR": "hoch",
+                        "P75_HEX": "00C5FF",
                         "P90": 15.13,
-                        "MAX": 15.37
+                        "P90_DESCR": "sehr hoch",
+                        "P90_HEX": "005CE6",
+                        "MAX": 15.37,
+                        "MAX_DESCR": "oberhalb Maximum",
+                        "MAX_HEX": "4C0073"
                     },
                     {
+                        "PRZ_REFERENZMONAT": "02",
                         "MIN": 14.45,
+                        "MIN_DESCR": "unterhalb Minimum",
+                        "MIN_HEX": "A900E6",
                         "P10": 14.57,
+                        "P10_DESCR": "sehr niedrig",
+                        "P10_HEX": "FF0000",
                         "P25": 14.62,
+                        "P25_DESCR": "niedrig",
+                        "P25_HEX": "FFFF00",
                         "P75": 15.11,
+                        "P75_DESCR": "hoch",
+                        "P75_HEX": "00C5FF",
                         "P90": 15.23,
-                        "MAX": 15.37
+                        "P90_DESCR": "sehr hoch",
+                        "P90_HEX": "005CE6",
+                        "MAX": 15.37,
+                        "MAX_DESCR": "oberhalb Maximum",
+                        "MAX_HEX": "4C0073"
                     },
                     {
+                        "PRZ_REFERENZMONAT": "03",
                         "MIN": 14.45,
+                        "MIN_DESCR": "unterhalb Minimum",
+                        "MIN_HEX": "A900E6",
                         "P10": 14.56,
+                        "P10_DESCR": "sehr niedrig",
+                        "P10_HEX": "FF0000",
                         "P25": 14.66,
+                        "P25_DESCR": "niedrig",
+                        "P25_HEX": "FFFF00",
                         "P75": 15.21,
+                        "P75_DESCR": "hoch",
+                        "P75_HEX": "00C5FF",
                         "P90": 15.32,
-                        "MAX": 15.37
+                        "P90_DESCR": "sehr hoch",
+                        "P90_HEX": "005CE6",
+                        "MAX": 15.37,
+                        "MAX_DESCR": "oberhalb Maximum",
+                        "MAX_HEX": "4C0073"
                     }
                 ]
             },
@@ -121,28 +160,67 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                 "messstellennummer": 3381,
                 "perzentile": [
                     {
+                        "PRZ_REFERENZMONAT": "01",
                         "MIN": 9.82,
+                        "MIN_DESCR": "unterhalb Minimum",
+                        "MIN_HEX": "A900E6",
                         "P10": 10.62,
+                        "P10_DESCR": "sehr niedrig",
+                        "P10_HEX": "FF0000",
                         "P25": 10.75,
+                        "P25_DESCR": "niedrig",
+                        "P25_HEX": "FFFF00",
                         "P75": 11.26,
+                        "P75_DESCR": "hoch",
+                        "P75_HEX": "00C5FF",
                         "P90": 11.67,
-                        "MAX": 11.94
+                        "P90_DESCR": "sehr hoch",
+                        "P90_HEX": "005CE6",
+                        "MAX": 11.94,
+                        "MAX_DESCR": "oberhalb Maximum",
+                        "MAX_HEX": "4C0073"
                     },
                     {
+                        "PRZ_REFERENZMONAT": "02",
                         "MIN": 9.82,
+                        "MIN_DESCR": "unterhalb Minimum",
+                        "MIN_HEX": "A900E6",
                         "P10": 10.62,
+                        "P10_DESCR": "sehr niedrig",
+                        "P10_HEX": "FF0000",
                         "P25": 10.94,
+                        "P25_DESCR": "niedrig",
+                        "P25_HEX": "FFFF00",
                         "P75": 11.66,
+                        "P75_DESCR": "hoch",
+                        "P75_HEX": "00C5FF",
                         "P90": 11.77,
-                        "MAX": 11.94
+                        "P90_DESCR": "sehr hoch",
+                        "P90_HEX": "005CE6",
+                        "MAX": 11.94,
+                        "MAX_DESCR": "oberhalb Maximum",
+                        "MAX_HEX": "4C0073"
                     },
                     {
+                        "PRZ_REFERENZMONAT": "03",
                         "MIN": 9.82,
+                        "MIN_DESCR": "unterhalb Minimum",
+                        "MIN_HEX": "A900E6",
                         "P10": 10.62,
+                        "P10_DESCR": "sehr niedrig",
+                        "P10_HEX": "FF0000",
                         "P25": 11.15,
+                        "P25_DESCR": "niedrig",
+                        "P25_HEX": "FFFF00",
                         "P75": 11.59,
+                        "P75_DESCR": "hoch",
+                        "P75_HEX": "00C5FF",
                         "P90": 11.85,
-                        "MAX": 11.94
+                        "P90_DESCR": "sehr hoch",
+                        "P90_HEX": "005CE6",
+                        "MAX": 11.94,
+                        "MAX_DESCR": "oberhalb Maximum",
+                        "MAX_HEX": "4C0073"
                     }
                 ]
             }
@@ -164,7 +242,8 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                             actions: {
                                 queryOaf,
                                 queryPercentiles,
-                                addChartToPdf
+                                addChartToPdf,
+                                increaseSidebarWidth: sinon.stub()
                             },
                             getters: {
                                 dataLoading: () => false,
@@ -203,6 +282,9 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                         addSingleAlert
                     }
                 }
+            },
+            getters: {
+                isMobile: () => false
             }
         });
 
@@ -459,64 +541,105 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
         expect(Number(wrapper.vm.maxScaleRight.toFixed(2))).to.equal(10.88);
     });
 
-    it("should find the percentiles for this dataset", async () => {
-        await wrapper.setProps({
-            params: {
-                ...params,
-                chartThemes: [
-                    {
-                        ...params.chartThemes[0],
-                        chartParams: {
-                            yAxisLeft: "wasserstand_mnhn",
-                            percentiles: "data available"
+    describe("percentiles handling", () => {
+        it("should find the percentiles for this dataset", async () => {
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    chartThemes: [
+                        {
+                            ...params.chartThemes[0],
+                            chartParams: {
+                                yAxisLeft: "wasserstand_mnhn",
+                                percentiles: "data available"
+                            }
                         }
-                    }
-                ]
-            },
-            allAttributes: {
-                messstellennummer: "2200"
-            }
+                    ]
+                },
+                allAttributes: {
+                    messstellennummer: "2200"
+                }
+            });
+
+            wrapper.vm.getPercentilesForThisData();
+
+            expect(wrapper.vm.percentile).to.be.an("object");
+            expect(wrapper.vm.percentile).to.deep.equal(percentilesMock[0]);
+            expect(wrapper.vm.leftScaleRangeFromPercentiles).to.deep.equal({min: 13.095, max: 16.852});
+            expect(wrapper.vm.minScaleLeft).to.equal(13.095);
+            expect(wrapper.vm.maxScaleLeft).to.equal(16.852);
         });
 
-        wrapper.vm.getPercentilesForThisData();
+        it("should fall back to scale calculation form data when data our of percentiles", async () => {
+            percentilesMock[0].perzentile.forEach(percentage => {
+                percentage.P10 = percentage.P10 + 3;
+            });
 
-        expect(wrapper.vm.percentile).to.be.an("object");
-        expect(wrapper.vm.percentile).to.deep.equal(percentilesMock[0]);
-        expect(wrapper.vm.leftScaleRangeFromPercentiles).to.deep.equal({min: 13.095, max: 16.852});
-        expect(wrapper.vm.minScaleLeft).to.equal(13.095);
-        expect(wrapper.vm.maxScaleLeft).to.equal(16.852);
-    });
-
-    it("should fall back to scale calculation form data when data our of percentiles", async () => {
-        percentilesMock[0].perzentile.forEach(percentage => {
-            percentage.P10 = percentage.P10 + 3;
-        });
-
-        await wrapper.setProps({
-            params: {
-                ...params,
-                chartThemes: [
-                    {
-                        ...params.chartThemes[0],
-                        chartParams: {
-                            yAxisLeft: "wasserstand_mnhn",
-                            percentiles: "data available"
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    chartThemes: [
+                        {
+                            ...params.chartThemes[0],
+                            chartParams: {
+                                yAxisLeft: "wasserstand_mnhn",
+                                percentiles: "data available"
+                            }
                         }
-                    }
-                ]
-            },
-            allAttributes: {
-                messstellennummer: "2200"
-            }
+                    ]
+                },
+                allAttributes: {
+                    messstellennummer: "2200"
+                }
+            });
+
+            wrapper.vm.getPercentilesForThisData();
+
+            expect(wrapper.vm.percentile).to.be.an("object");
+            expect(wrapper.vm.percentile).to.deep.equal(percentilesMock[0]);
+            expect(wrapper.vm.leftScaleRangeFromPercentiles).to.deep.equal({min: 15.795, max: 16.852});
+            expect(wrapper.vm.minScaleLeft).to.equal(15.1);
+            expect(wrapper.vm.maxScaleLeft).to.equal(16.852);
         });
 
-        wrapper.vm.getPercentilesForThisData();
+        it("should find the correct basis data from the percentiles for this dataset", async () => {
+            await wrapper.setProps({
+                params: {
+                    ...params,
+                    chartThemes: [
+                        {
+                            ...params.chartThemes[0],
+                            chartParams: {
+                                yAxisLeft: "wasserstand_mnhn",
+                                percentiles: "data available"
+                            }
+                        }
+                    ]
+                },
+                allAttributes: {
+                    messstellennummer: "2200"
+                }
+            });
 
-        expect(wrapper.vm.percentile).to.be.an("object");
-        expect(wrapper.vm.percentile).to.deep.equal(percentilesMock[0]);
-        expect(wrapper.vm.leftScaleRangeFromPercentiles).to.deep.equal({min: 15.795, max: 16.852});
-        expect(wrapper.vm.minScaleLeft).to.equal(15.1);
-        expect(wrapper.vm.maxScaleLeft).to.equal(16.852);
+            wrapper.vm.generatePercentileChartBasis();
+
+            expect(wrapper.vm.percentileChartBasis).to.be.an("object");
+            expect(Object.keys(wrapper.vm.percentileChartBasis)).to.have.lengthOf(6);
+            expect(wrapper.vm.percentileChartBasis.MIN).to.deep.equal({"title": "unterhalb Minimum", "color": "A900E6"});
+        });
+
+        it("should find the correct month key from the date field", () => {
+            expect(wrapper.vm.monthKeyFromLabel("20.05.2014")).to.equal("05");
+            expect(wrapper.vm.monthKeyFromLabel("20.5.2014")).to.equal("05");
+            expect(wrapper.vm.monthKeyFromLabel("05.2014")).to.equal("05");
+            expect(wrapper.vm.monthKeyFromLabel("5.2014")).to.equal("05");
+            expect(wrapper.vm.monthKeyFromLabel("20/05/2014")).to.equal("05");
+            expect(wrapper.vm.monthKeyFromLabel("20/5/2014")).to.equal("05");
+            expect(wrapper.vm.monthKeyFromLabel("05/2014")).to.equal("05");
+            expect(wrapper.vm.monthKeyFromLabel("5/2014")).to.equal("05");
+            expect(wrapper.vm.monthKeyFromLabel("2014-05-20")).to.equal("05");
+            expect(wrapper.vm.monthKeyFromLabel("2014-05")).to.equal("05");
+        });
     });
 
     describe("filter methods", () => {

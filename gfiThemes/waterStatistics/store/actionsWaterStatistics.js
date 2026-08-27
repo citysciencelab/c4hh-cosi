@@ -490,6 +490,75 @@ const actions = {
         finally {
             commit("setDataLoading", false);
         }
+    },
+    /*
+     * Increase the menu sidebar width to accommodate the GFI panel.
+     *
+     * Determines the current menu side via the root getter "Modules/GetFeatureInfo/menuSide"
+     * and stores the previous width in state.menuWidthWithoutGfi. If a previously selected
+     * target width for the GFI panel exists (state.menuWidthSelectedForGfi) the function
+     * commits a mutation to set the current menu width accordingly.
+     *
+     * @param {Object} context - Vuex action context.
+     * @param {Function} context.commit - Vuex commit function.
+     * @param {Function} context.rootGetters - Vuex rootGetters accessor.
+     * @param {Object} context.state - Vuex module state.
+     * @returns {void}
+     */
+    increaseSidebarWidth ({commit, rootGetters, state}) {
+        const currentMenuSide = rootGetters["Modules/GetFeatureInfo/menuSide"];
+
+        if (currentMenuSide === "secondaryMenu") {
+            state.menuWidthWithoutGfi = rootGetters["Menu/currentSecondaryMenuWidth"] > 0
+                ? `${rootGetters["Menu/currentSecondaryMenuWidth"] * 100}%`
+                : "25%";
+        }
+        else {
+            state.menuWidthWithoutGfi = rootGetters["Menu/currentMainMenuWidth"] > 0
+                ? `${rootGetters["Menu/currentMainMenuWidth"] * 100}%`
+                : "25%";
+        }
+
+        if (state.menuWidthSelectedForGfi && currentMenuSide) {
+            commit("Menu/setCurrentMenuWidth", {
+                side: currentMenuSide,
+                width: state.menuWidthSelectedForGfi
+            }, {root: true});
+        }
+    },
+    /**
+     * Reset the menu sidebar width after closing or reducing the GFI panel.
+     *
+     * Restores a previously saved menu width (state.menuWidthSelectedForGfi) based on the
+     * current menu side. If a stored "without GFI" width exists, commits a mutation to set
+     * the current menu width to that value.
+     *
+     * @param {Object} context - Vuex action context.
+     * @param {Function} context.commit - Vuex commit function.
+     * @param {Function} context.rootGetters - Vuex rootGetters accessor.
+     * @param {Object} context.state - Vuex module state.
+     * @returns {void}
+     */
+    resetSidebarWidth ({commit, rootGetters, state}) {
+        const currentMenuSide = rootGetters["Modules/GetFeatureInfo/menuSide"];
+
+        if (currentMenuSide === "secondaryMenu") {
+            state.menuWidthSelectedForGfi = rootGetters["Menu/currentSecondaryMenuWidth"] > 0
+                ? `${rootGetters["Menu/currentSecondaryMenuWidth"] * 100}%`
+                : state.menuWidthOnStart;
+        }
+        else {
+            state.menuWidthSelectedForGfi = rootGetters["Menu/currentMainMenuWidth"] > 0
+                ? `${rootGetters["Menu/currentMainMenuWidth"] * 100}%`
+                : state.menuWidthOnStart;
+        }
+
+        if (state.menuWidthWithoutGfi && currentMenuSide) {
+            commit("Menu/setCurrentMenuWidth", {
+                side: currentMenuSide,
+                width: state.menuWidthWithoutGfi
+            }, {root: true});
+        }
     }
 };
 

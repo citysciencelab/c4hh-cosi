@@ -73,14 +73,23 @@ describe("addons/gfiThemes/waterStatistics/components/WaterStatistics.vue", () =
                             namespaced: true,
                             actions: {
                                 queryOaf: sinon.spy(),
-                                queryOafSchema: sinon.spy()
+                                queryOafSchema: sinon.spy(),
+                                increaseSidebarWidth: sinon.stub(),
+                                resetSidebarWidth: sinon.stub()
                             },
                             getters: {
-                                oafSchema: () => null
+                                oafSchema: () => null,
+                                menuWidthOnStart: () => "40%"
+                            },
+                            mutations: {
+                                setMenuWidthSelectedForGfi: sinon.stub()
                             }
                         }
                     }
                 }
+            },
+            getters: {
+                isMobile: () => false
             }
         });
 

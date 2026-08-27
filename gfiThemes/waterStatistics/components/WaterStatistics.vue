@@ -1,6 +1,6 @@
 <script>
 import TabContainer from "@shared/modules/tabs/components/TabContainer.vue";
-import {mapActions, mapGetters} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import TabBasicData from "./TabBasicData.vue";
 import TabGraphics from "./TabGraphics.vue";
 
@@ -17,8 +17,10 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/WaterStatistics", [
-            "oafSchema"
+            "oafSchema",
+            "menuWidthOnStart"
         ]),
+        ...mapGetters(["isMobile"]),
         tabs () {
             const tabParams = this.params?.themeTabs?.map(tab => {
                 const tabProps = tab.type === "gfiAttributes"
@@ -69,10 +71,25 @@ export default {
               };
 
         this.queryOafSchema({params: queryParams});
+
+        if (!this.isMobile) {
+            this.setMenuWidthSelectedForGfi(this.menuWidthOnStart);
+            this.increaseSidebarWidth();
+        }
+    },
+    unmounted () {
+        if (!this.isMobile) {
+            this.resetSidebarWidth();
+        }
     },
     methods: {
         ...mapActions("Modules/WaterStatistics", [
-            "queryOafSchema"
+            "queryOafSchema",
+            "increaseSidebarWidth",
+            "resetSidebarWidth"
+        ]),
+        ...mapMutations("Modules/WaterStatistics", [
+            "setMenuWidthSelectedForGfi"
         ])
     }
 };
