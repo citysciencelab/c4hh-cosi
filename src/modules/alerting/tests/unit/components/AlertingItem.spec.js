@@ -229,7 +229,8 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
                     },
                     mutations: {
                         setInitialClosed: sinon.stub(),
-                        setShowTheModal: sinon.stub()
+                        setShowTheModal: sinon.stub(),
+                        setAlertsOnEvent: sinon.stub()
                     }
                 },
                 Modules: {
@@ -358,6 +359,12 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
                 wrapper.vm.onModalClose();
                 await wrapper.vm.$nextTick();
                 expect(wrapper.findAll(".singleAlertWrapper").length).to.equal(0);
+            });
+
+            it("resets alert mode to initial on close", () => {
+                wrapper.vm.sortedAlertsSwitch = "onEvent";
+                wrapper.vm.onModalClose();
+                expect(wrapper.vm.sortedAlertsSwitch).to.equal("initial");
             });
         });
 

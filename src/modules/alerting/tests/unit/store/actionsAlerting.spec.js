@@ -227,7 +227,7 @@ describe("src/modules/alerting/store/actionsAlerting.js", () => {
         expect(storeCommitStub.calledWith("Alerting/addToDisplayedAlerts")).to.be.true;
     });
 
-    it("addSingleAlert does not store once:true alerts immediately when mustBeConfirmed is true", () => {
+    it("addSingleAlert stores once:true initial alerts immediately when mustBeConfirmed is true", () => {
         const state = {
                 alerts: [],
                 displayedAlerts: [],
@@ -238,7 +238,32 @@ describe("src/modules/alerting/store/actionsAlerting.js", () => {
                 content: "123",
                 displayFrom: false,
                 once: true,
-                mustBeConfirmed: true
+                mustBeConfirmed: true,
+                initial: true
+            });
+
+        expect(checkValue).to.be.true;
+        expect(storeCommitStub.calledWith("Alerting/addToDisplayedAlerts")).to.be.true;
+    });
+
+    it("addSingleAlert does not store module-open once:true alerts immediately when mustBeConfirmed is true", () => {
+        const state = {
+                alerts: [],
+                displayedAlerts: [],
+                availableCategories: ["news", "success", "warning", "error", "info"]
+            },
+            checkValue = actions.addSingleAlert({state, commit}, {
+                hash: "module-open-with-confirm",
+                content: "123",
+                displayFrom: false,
+                once: true,
+                mustBeConfirmed: true,
+                displayOnEvent: {
+                    type: "Menu/changeCurrentComponent",
+                    value: {
+                        type: "print"
+                    }
+                }
             });
 
         expect(checkValue).to.be.true;

@@ -69,6 +69,8 @@ function hasDisplayedAlertHashInStorage (storageKey, alertHash) {
  */
 function checkAlertViewRestriction (alertToCheck, seenInSessionAlerts = {}) {
     const storageKey = store.getters["Alerting/localStorageDisplayedAlertsKey"];
+    const isModuleOpenAlert = typeof alertToCheck.displayOnEvent === "object" &&
+        alertToCheck.displayOnEvent?.type === "Menu/changeCurrentComponent";
 
     // if hash is already in localStorage then alert is not shown
     if (hasDisplayedAlertHashInStorage(storageKey, alertToCheck.hash)) {
@@ -85,8 +87,9 @@ function checkAlertViewRestriction (alertToCheck, seenInSessionAlerts = {}) {
         return true;
     }
 
-    // displayed and restricted to only a single time
-    if (alertToCheck.once === true && alertToCheck.mustBeConfirmed !== true) {
+    // for initial alerts and other legacy alerts: keep old once behavior (persist immediately)
+    // for module-open alerts: persist once only after explicit confirmation
+    if (alertToCheck.once === true && (!isModuleOpenAlert || alertToCheck.mustBeConfirmed !== true)) {
         store.commit("Alerting/addToDisplayedAlerts", alertToCheck);
     }
 
@@ -236,10 +239,15 @@ export default {
      * @param {Object} commit commit
      * @returns {void}
      */
-    cleanup: function ({state, commit}) {
-        const storageKey = state.localStorageDisplayedAlertsKey;
+    cleanup: function ({state, commit}, {visibleAlertHashes} = {}) {
+        const storageKey = state.localStorageDisplayedAlertsKey,
+            hasVisibleFilter = Array.isArray(visibleAlertHashes);
 
         state.alerts.forEach(singleAlert => {
+            if (hasVisibleFilter && !visibleAlertHashes.includes(singleAlert.hash)) {
+                return;
+            }
+
             if (!singleAlert.mustBeConfirmed && singleAlert.initialConfirmed !== false && singleAlert.initial !== undefined && singleAlert.once === true) {
                 commit("addToDisplayedAlerts", singleAlert);
                 commit("removeFromAlerts", singleAlert);
@@ -346,7 +354,7 @@ export default {
         displayAlert = isUnique && isInTime && isNotRestricted;
         if (displayAlert) {
             if ((newAlert.multipleAlert !== true && !newAlert.initial && state.initialClosed === true) || (newAlert.multipleAlert === true && hasInitAlert === true && state.initialClosed === true)) {
-                state.alerts = [];
+                state.alerts = state.alerts.filter(singleAlert => Object.hasOwn(singleAlert, "displayOnEvent"));
             }
             if (!hasDisplayedAlertHashInStorage(state.localStorageDisplayedAlertsKey, alertProtoClone.hash)) {
                 commit("addToAlerts", alertProtoClone);

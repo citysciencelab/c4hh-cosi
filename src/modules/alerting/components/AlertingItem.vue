@@ -164,7 +164,14 @@ export default {
          * @returns {void}
          */
         onModalClose: function () {
-            this.cleanup();
+            const visibleAlertHashes = this.sortedAlerts(this.sortedAlertsSwitch)
+                .flatMap(alertCategory => alertCategory.content)
+                .map(singleAlert => singleAlert.hash)
+                .filter(singleAlertHash => typeof singleAlertHash === "string" && singleAlertHash.length > 0);
+
+            this.cleanup({visibleAlertHashes});
+            this.sortedAlertsSwitch = "initial";
+            this.$store.commit("Alerting/setAlertsOnEvent", []);
             this.$store.commit("Alerting/setInitialClosed", true);
         },
         /**
