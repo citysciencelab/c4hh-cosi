@@ -35,6 +35,7 @@ const state = {
     defaultActiveLayerIds: [],
     icon: "bi-folder2-open",
     id: "templateManager",
+    description: "",
     isVisibleInMenu: true,
     importedTemplateNames: [],
     name: "Vorlagen Manager",

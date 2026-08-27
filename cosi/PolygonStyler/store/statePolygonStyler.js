@@ -14,6 +14,7 @@ const state = {
     deactivateGFI: false,
     icon: "bi-pencil-square",
     id: "polygonStyler",
+    description: "",
     isVisibleInMenu: true,
     name: "Flächen Stylen",
     renderToWindow: false,

@@ -27,8 +27,7 @@ const state = {
     // defaults for config.json parameters
     name: "Versorgungsanalyse",
     icon: "bi-sliders2",
-    renderToWindow: true,
-    resizableWindow: false,
+    description: "",
     isVisibleInMenu: true,
     deactivateGFI: true,
     yearSelector: "jahr_",

@@ -9,6 +9,7 @@
  */
 const state = {
     deactivateGFI: false,
+    description: "",
     icon: "bi-house-door",
     id: "featuresList",
     isVisibleInMenu: true,
