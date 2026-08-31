@@ -50,6 +50,7 @@ export default {
         return {
             featureProperties: {},
             isLocationActive: false,
+            isSubjectDataSelected: false,
             selectedLayer: null,
             visibleVectorLayers: []
         };
@@ -384,12 +385,14 @@ export default {
         icon="bi bi-box"
     >
         <ScenarioBuilderPlannerList
+            :is-location-active="isSubjectDataSelected"
             @set-is-location-active="setIsLocationActive($event)"
             @toggle-object-status="toggleObjectStatus($event)"
         />
         <AddCardButton
             class="w-100"
             :text="$t('additional:modules.tools.cosi.objectManager.createNewObject')"
+            :disabled="isSubjectDataSelected"
             @click="startCreateObject"
         />
     </AccordionItem>
@@ -403,9 +406,11 @@ export default {
             :feature-properties="featureProperties"
             :layer-items="layerItems"
             :selected-layer="selectedLayer"
+            :is-subject-data-selected="isSubjectDataSelected"
             @add-object-card="addObjectCard"
             @set-selected-layer="selectedLayer = $event"
             @set-is-location-active="setIsLocationActive($event)"
+            @subject-data-selected="isSubjectDataSelected = $event"
             @toggle-object-status="toggleObjectStatus($event)"
         />
         <ScenarioBuilderPlannerProps

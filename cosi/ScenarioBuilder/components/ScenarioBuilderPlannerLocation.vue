@@ -28,19 +28,21 @@ export default {
         selectedLayer: {
             type: Object,
             default: null
+        },
+        isSubjectDataSelected: {
+            type: Boolean,
+            default: false
         }
     },
 
-    emits: ["add-object-card", "set-selected-layer", "set-is-location-active", "toggle-object-status"],
-
-    data () {
-        return {
-            isMapClickActive: false
-        };
-    },
+    emits: ["add-object-card", "set-selected-layer", "set-is-location-active", "subject-data-selected", "toggle-object-status"],
 
     computed: {
         ...mapGetters("Modules/ScenarioBuilder", ["activeScenarioCard"])
+    },
+
+    beforeUnmount () {
+        this.stopPlacement();
     },
 
     methods: {
@@ -64,6 +66,16 @@ export default {
             }
 
             return undefined;
+        },
+        /**
+         * Cancels the current placement and resets the layer selection.
+         * @returns {void}
+         */
+        cancelPlacement () {
+            this.stopPlacement();
+
+            this.$emit("set-selected-layer", null);
+            this.$emit("subject-data-selected", false);
         },
 
         /**
@@ -91,9 +103,9 @@ export default {
             const geometry = new Point(evt.coordinate);
 
             this.createFeature(geometry, this.selectedLayer);
-            this.unregisterListener({type: "click", listener: this.placeFeature, keyForBoundFunctions: "123456"});
-            this.isMapClickActive = false;
+            this.stopPlacement();
             this.$emit("set-is-location-active", false);
+            this.$emit("subject-data-selected", false);
         },
 
         /**
@@ -107,8 +119,19 @@ export default {
             }
 
             this.$emit("set-selected-layer", layer);
-            this.isMapClickActive = true;
+            this.$emit("subject-data-selected", true);
             this.registerListener({type: "click", listener: this.placeFeature, keyForBoundFunctions: "123456"});
+        },
+        /**
+         * Stops the active map placement listener.
+         * @returns {void}
+         */
+        stopPlacement () {
+            this.unregisterListener({
+                type: "click",
+                listener: this.placeFeature,
+                keyForBoundFunctions: "123456"
+            });
         }
     }
 };
@@ -122,7 +145,7 @@ export default {
         @update:model-value="startLocation"
     />
     <div
-        v-if="isMapClickActive"
+        v-if="isSubjectDataSelected"
         class="toast-minimal p-3 mb-3 border-0"
         role="alert"
         aria-live="assertive"
@@ -144,6 +167,7 @@ export default {
                     type="button"
                     :aria-label="$t('additional:modules.tools.cosi.objectManager.cancelPlacement')"
                     :text="$t('additional:modules.tools.cosi.objectManager.cancelPlacement')"
+                    @click="cancelPlacement"
                 />
             </div>
         </div>

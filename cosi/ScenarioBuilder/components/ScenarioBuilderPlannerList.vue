@@ -10,6 +10,12 @@ export default {
     },
 
     inject: ["removeFeatureFromScenario"],
+    props: {
+        isLocationActive: {
+            type: Boolean,
+            default: false
+        }
+    },
 
     emits: ["set-is-location-active", "toggle-object-status"],
 
@@ -56,6 +62,7 @@ export default {
             <SimpleCard
                 hoverable
                 :icon-src="card.iconSrc"
+                :disabled="isLocationActive"
                 :label="card.label"
                 :status="card.status"
                 :text="card.text"

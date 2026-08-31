@@ -6,6 +6,10 @@ export default {
             type: Boolean,
             default: true
         },
+        disabled: {
+            type: Boolean,
+            default: false
+        },
         hoverable: {
             type: Boolean,
             default: false
@@ -39,7 +43,7 @@ export default {
 <template lang="html">
     <div
         class="card shadow"
-        :class="[{hoverable}, status === 'active' ? 'card-active' : '']"
+        :class="[{hoverable}, {disabled}, status === 'active' ? 'card-active' : '']"
     >
         <div class="card-body p-2 d-flex flex-row align-center">
             <div class="p-1 fs-3">
@@ -80,5 +84,11 @@ export default {
         width: 1.5rem;
         height: 1.5rem;
         object-fit: contain;
+    }
+
+    .disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        pointer-events: none;
     }
 </style>
