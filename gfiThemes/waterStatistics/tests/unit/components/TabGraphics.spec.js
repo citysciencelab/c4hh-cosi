@@ -6,7 +6,7 @@ import sinon from "sinon";
 import TabGraphics from "../../../components/TabGraphics.vue";
 
 describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
-    let store, wrapper, queryOaf, queryPercentiles, params, statisticValuesMock, percentilesMock, addSingleAlert, setStatisticValues, allDataMock;
+    let store, wrapper, queryOaf, queryPercentiles, params, statisticValuesMock, percentilesMock, addSingleAlert, setStatisticValues, allDataMock, addChartToPdf;
 
     beforeEach(() => {
         statisticValuesMock = reactive([
@@ -152,6 +152,7 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
         queryPercentiles = sinon.spy();
         addSingleAlert = sinon.spy();
         setStatisticValues = sinon.spy();
+        addChartToPdf = sinon.spy();
 
         store = createStore({
             modules: {
@@ -162,7 +163,8 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                             namespaced: true,
                             actions: {
                                 queryOaf,
-                                queryPercentiles
+                                queryPercentiles,
+                                addChartToPdf
                             },
                             getters: {
                                 dataLoading: () => false,
@@ -728,6 +730,118 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
             disclaimerParts.linkText = "Haftungsausschluss";
             disclaimerParts.after = ".";
             expect(wrapper.vm.disclaimerParts).to.deep.equal(disclaimerParts);
+        });
+    });
+
+    describe("captureChartImage and downloadChartAsPdf", () => {
+        let toDataURL, offscreenEl;
+
+        beforeEach(() => {
+            toDataURL = sinon.stub().returns("data:image/png;base64,xxx");
+            offscreenEl = {
+                toDataURL,
+                width: 800,
+                height: 400
+            };
+            wrapper.vm.$.refs.offscreenLineChart = {$el: offscreenEl};
+
+            // requestAnimationFrame is not implemented in jsdom by default
+            sinon.stub(global, "requestAnimationFrame").callsFake(cb => {
+                cb();
+                return 0;
+            });
+        });
+
+        describe("captureChartImage", () => {
+            it("should return null when the offscreen chart ref is not available", async () => {
+                wrapper.vm.$.refs.offscreenLineChart = null;
+
+                const result = await wrapper.vm.captureChartImage();
+
+                expect(result).to.be.null;
+            });
+
+            it("should return imgData, width and height from the offscreen canvas", async () => {
+                const result = await wrapper.vm.captureChartImage();
+
+                expect(toDataURL.calledOnceWith("image/png")).to.be.true;
+                expect(result).to.deep.equal({
+                    imgData: "data:image/png;base64,xxx",
+                    width: 800,
+                    height: 400
+                });
+            });
+        });
+
+        describe("downloadChartAsPdf", () => {
+            it("should not call addChartToPdf when captureChartImage returns null", async () => {
+                sinon.stub(wrapper.vm, "captureChartImage").resolves(null);
+
+                await wrapper.vm.downloadChartAsPdf();
+
+                expect(addChartToPdf.called).to.be.false;
+                wrapper.vm.captureChartImage.restore();
+            });
+
+            it("should call addChartToPdf with an empty titleArray when no pdfParams are configured", async () => {
+                await wrapper.vm.downloadChartAsPdf();
+
+                expect(addChartToPdf.calledOnce).to.be.true;
+                expect(addChartToPdf.firstCall.args[1]).to.deep.equal({
+                    imgData: "data:image/png;base64,xxx",
+                    width: 800,
+                    height: 400,
+                    titleArray: [],
+                    useHamburgDesign: undefined,
+                    logoPath: undefined
+                });
+            });
+
+            it("should build titleArray entries with label and unit when configured", async () => {
+                await wrapper.setProps({
+                    allAttributes: {
+                        messstellennummer: "12345",
+                        gok: 25.48,
+                        test: "value"
+                    },
+                    params: {
+                        ...params,
+                        chartThemes: [
+                            {
+                                ...params.chartThemes[0],
+                                pdfParams: {
+                                    useHamburgDesign: true,
+                                    base64LogoPath: "data:image/png;base64,logo",
+                                    titleAttributes: {
+                                        messstellennummer: {
+                                            label: "Messstelle"
+                                        },
+                                        gok: {
+                                            label: "GOK",
+                                            unit: "m"
+                                        },
+                                        test: ""
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                });
+
+                // eslint-disable-next-line require-atomic-updates -- synchronous test setup, no concurrent access
+                wrapper.vm.$.refs.offscreenLineChart = {$el: offscreenEl};
+
+                await wrapper.vm.downloadChartAsPdf();
+
+                expect(addChartToPdf.lastCall.args[1]).to.deep.equal({
+                    imgData: "data:image/png;base64,xxx",
+                    width: 800,
+                    height: 400,
+                    titleArray: ["Messstelle: 12345", "GOK: 25.48 m", "value"],
+                    useHamburgDesign: true,
+                    logoPath: "data:image/png;base64,logo"
+                });
+            });
         });
     });
 });

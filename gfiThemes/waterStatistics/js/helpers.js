@@ -37,8 +37,20 @@ function pad (n) {
     return String(n).padStart(2, "0");
 }
 
+/**
+ * Generates a filename based on the current date and time.
+ * @returns {string} A filename in the format YYYYMMDDHHmmss.
+ */
+function getFilenameByDate () {
+    const now = new Date(),
+        filename = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+
+    return filename;
+}
+
 export {
     convertToLocalDateLiteral,
     guardAgainstExcelDateAutoFormat,
-    pad
+    pad,
+    getFilenameByDate
 };

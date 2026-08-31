@@ -1,0 +1,15 @@
+{
+  "name": "waterStatistics",
+  "version": "0.1.0",
+  "description": "GFI Theme to visualize statistics",
+  "title": "Water Statistics",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+  },
+  "scripts": {},
+  "dependencies": {
+    "pdfmake": "^0.2.6"
+  }
+}

@@ -1,8 +1,13 @@
-import {convertToLocalDateLiteral, guardAgainstExcelDateAutoFormat, pad} from "../js/helpers";
+import {convertToLocalDateLiteral, guardAgainstExcelDateAutoFormat, getFilenameByDate} from "../js/helpers";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature.js";
 import {convertJsonToCsv} from "@shared/js/utils/convertJsonToCsv.js";
 import {createCsvBlob, downloadBlobPerNavigator, downloadBlobPerHTML5} from "@shared/modules/buttons/js/exportButtonUtils.js";
 import axios from "axios";
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import {getFooterSvg, getSvgHeader} from "../js/getSvg";
+
+pdfMake.vfs = pdfFonts.vfs;
 
 const actions = {
     /**
@@ -255,8 +260,7 @@ const actions = {
             }
 
             const blob = createCsvBlob(csvText),
-                now = new Date(),
-                filename = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`,
+                filename = getFilenameByDate(),
                 csvFilename = `${filename}.csv`;
 
             if (!downloadBlobPerNavigator(blob, csvFilename)) {
@@ -375,6 +379,117 @@ const actions = {
             category: "error",
             content: "Fehler beim Erzeugen der CSV-Datei. Bitte versuchen Sie es erneut."
         }, {root: true});
+    },
+    /**
+     * Generates and downloads a PDF containing a chart image.
+     * @param {Object} context Vuex action context.
+     * @param {Function} context.dispatch Vuex dispatch function.
+     * @param {Function} context.commit Vuex commit function.
+     * @param {Object} payload Action payload.
+     * @param {string} payload.imgData base64 PNG data URL of the chart.
+     * @param {number} payload.width pixel width of the source canvas.
+     * @param {number} payload.height pixel height of the source canvas.
+     * @param {string} [payload.title] title to render above the chart image.
+     * @param {boolean} [payload.useHamburgDesign] whether to apply the Hamburg design style to the PDF.
+     * @param {string} [payload.logoPath] path (configured in config.json) to a text file containing the header logo as a "data:image/..." URL.
+     * @returns {Promise<void>}
+     */
+    async addChartToPdf ({dispatch, commit}, {imgData, width, height, titleArray, useHamburgDesign, logoPath}) {
+        if (!imgData) {
+            return;
+        }
+
+        commit("setDataLoading", true);
+
+        let logoImage = "";
+
+        if (logoPath) {
+            try {
+                const response = await axios.get(logoPath, {responseType: "text"});
+
+                logoImage = typeof response.data === "string" ? response.data.trim() : "";
+            }
+            catch (error) {
+                console.error(error);
+                dispatch("Alerting/addSingleAlert", {
+                    category: "error",
+                    content: "Fehler beim Abrufen des Logos für den PDF-Export."
+                }, {root: true});
+            }
+        }
+
+        const pageWidthLandscape = 842, // A4 height (842pt) becomes the page width in landscape
+            pageMargin = 40, // default pdfmake margin (left + right, 40pt each side)
+            pageContentWidth = pageWidthLandscape - pageMargin * 2,
+            imgHeight = (height / width) * pageContentWidth,
+            docDefinition = {
+                pageOrientation: "landscape",
+                content: [
+                    {
+                        columns: [
+                            ...titleArray.map((title, i) => [
+                                {text: title, style: "header", alignment: "center", width: "auto"},
+                                i < titleArray.length - 1 ? {text: "", width: "*"} : null
+                            ]).flat().filter(Boolean)
+                        ]
+                    },
+                    {
+                        image: imgData,
+                        width: pageContentWidth,
+                        height: imgHeight
+                    },
+                    {
+                        text: `Erstellt am: ${new Date().toLocaleDateString()}`,
+                        fontSize: 12,
+                        alignment: "right",
+                        margin: [0, 20, 0, 0]
+                    }
+                ],
+                styles: {
+                    header: {
+                        fontSize: 16,
+                        bold: true,
+                        margin: [10, 20, 0, 10]
+                    }
+                }
+            };
+
+        docDefinition.pageMargins = [40, 70, 40, 40]; // extra top space for header logo
+
+        // Add Header logo if logoImage was successfully resolved
+        // /////////////////////
+        if (logoImage) {
+            docDefinition.header = () => getSvgHeader(logoImage);
+        }
+
+        // Add Footer if useHamburgDesign is true
+        // /////////////////////
+        if (useHamburgDesign) {
+            docDefinition.footer = () => {
+                return getFooterSvg();
+            };
+        }
+
+        try {
+            const filename = getFilenameByDate();
+
+            pdfMake.createPdf(docDefinition).download(`${filename}.pdf`);
+
+            // no JS event exists for "save dialog appeared/closed" for blob
+            // downloads, so keep the spinner up for a short, perceptible
+            // minimum duration instead
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+        catch (error) {
+            console.error(error);
+            dispatch("Alerting/addSingleAlert", {
+                category: "error",
+                content: "Fehler beim Erzeugen des PDF-Exports. Bitte versuchen Sie es erneut."
+            }, {root: true});
+        }
+        finally {
+            commit("setDataLoading", false);
+        }
     }
 };
 

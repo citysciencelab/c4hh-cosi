@@ -461,6 +461,37 @@ export default {
             }
 
             return {before: text, linkText: "", after: ""};
+        },
+        /**
+         * Options for the hidden export chart: same as the visible chart, but fixed size and no animation.
+         * @returns {Object} chart options for the offscreen export chart
+         */
+        offscreenChartOptions () {
+            return {
+                ...this.lineChartOptions,
+                plugins: {
+                    ...this.lineChartOptions.plugins,
+                    title: {
+                        ...this.lineChartOptions.plugins.title,
+                        display: false
+                    }
+                },
+                responsive: false,
+                maintainAspectRatio: false,
+                animation: false
+            };
+        },
+        /**
+         * Fixed pixel height for the offscreen export chart, derived from the visible chart's aspect ratio.
+         * @returns {number} height in px for the 800px-wide export chart
+         */
+        offscreenChartHeight () {
+            const canvas = this.$refs.lineChart?.$el,
+                  aspectRatio = canvas?.clientHeight && canvas?.clientWidth
+                      ? canvas.clientHeight / canvas.clientWidth
+                      : 0.5;
+
+            return Math.round(800 * aspectRatio);
         }
     },
     watch: {
@@ -525,7 +556,8 @@ export default {
     methods: {
         ...mapActions("Modules/WaterStatistics", [
             "queryOaf",
-            "queryPercentiles"
+            "queryPercentiles",
+            "addChartToPdf"
         ]),
         ...mapActions("Alerting", [
             "addSingleAlert"
@@ -803,8 +835,69 @@ export default {
             });
 
             this.setStatisticValues(queryData);
+        },
+        /**
+         * Captures the hidden, fixed-width export chart as a PNG data URL.
+         * @returns {Promise<{imgData: string, width: number, height: number}|null>} chart image data, or null if unavailable
+         */
+        async captureChartImage () {
+            const canvas = this.$refs.offscreenLineChart?.$el;
+
+            if (!canvas) {
+                return null;
+            }
+
+            // let Vue apply the latest data/options to the hidden chart, then let
+            // Chart.js actually paint before reading pixels
+            await this.$nextTick();
+            await new Promise(resolve => requestAnimationFrame(resolve));
+
+            return {
+                imgData: canvas.toDataURL("image/png"),
+                width: canvas.width,
+                height: canvas.height
+            };
+        },
+        /**
+         * Triggers PDF generation for the current chart via the store action.
+         * @returns {void}
+         */
+        async downloadChartAsPdf () {
+            const chartImage = await this.captureChartImage(),
+                  pdfParams = this.currentChartTheme?.pdfParams;
+
+            if (!chartImage) {
+                return;
+            }
+
+            let attributeString = "",
+                titleArray = [];
+
+            if (pdfParams) {
+                titleArray = Object.keys(pdfParams?.titleAttributes).map(param => {
+                    if (pdfParams?.titleAttributes?.[param]?.label) {
+                        attributeString = pdfParams?.titleAttributes?.[param]?.label + ": " + this.allAttributes?.[param];
+                    }
+                    else {
+                        attributeString = this.allAttributes?.[param];
+                    }
+
+                    if (pdfParams?.titleAttributes?.[param]?.unit) {
+                        attributeString += " " + pdfParams?.titleAttributes?.[param]?.unit;
+                    }
+                    return attributeString;
+                });
+            }
+
+            this.addChartToPdf({
+                ...chartImage,
+                titleArray: titleArray,
+                useHamburgDesign: pdfParams?.useHamburgDesign,
+                logoPath: pdfParams?.base64LogoPath
+            });
         }
     }
+
 };
 </script>
 
@@ -923,6 +1016,7 @@ export default {
         </div>
 
         <LinechartItem
+            ref="lineChart"
             :data="chartData"
             :given-options="lineChartOptions"
         />
@@ -965,6 +1059,27 @@ export default {
                 :interaction="() => csvDownload()"
                 text="Download CSV"
             />
+
+            <FlatButton
+                aria="Grafik als PDF herunterladen"
+                icon="bi-file-earmark-pdf-fill"
+                title="Grafik als PDF herunterladen"
+                :interaction="() => downloadChartAsPdf()"
+                text="Download PDF"
+            />
+
+            <div
+                class="offscreen-chart"
+                aria-hidden="true"
+            >
+                <LinechartItem
+                    ref="offscreenLineChart"
+                    :data="chartData"
+                    :given-options="offscreenChartOptions"
+                    :width="800"
+                    :height="offscreenChartHeight"
+                />
+            </div>
         </div>
 
         <div
@@ -1056,6 +1171,17 @@ export default {
 
     div.downloadArea {
         margin-top: 1rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        align-items: center;
+
+        div.offscreen-chart {
+            position: absolute;
+            left: -9999px;
+            top: -9999px;
+            pointer-events: none;
+        }
     }
 
     div.spinner-wrapper {
