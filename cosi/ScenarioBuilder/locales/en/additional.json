@@ -35,6 +35,7 @@
                     "createNewObject": "Create a new planning object",
                     "titleEditObject": "Edit planning object",
                     "selectObject": "Select planning object",
+                    "selectObjectType": "Select planning type",
                     "setFeatureHeadline": "Place subject data",
                     "setFeature": "To create a new object, please select a location on the map.",
                     "addObjectTitle": "Object name",

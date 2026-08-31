@@ -60,7 +60,7 @@ export default {
         ...mapGetters(["visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Modules/ScenarioBuilder", ["activeObjectCard", "activeScenarioCard", "nameProperties"]),
 
-        layerItems () {
+        layerList () {
             return this.visibleVectorLayers.map(layer => ({
                 title: layer.getLayer().get("name"),
                 value: layer
@@ -87,8 +87,7 @@ export default {
                 Object.entries(newProperties).forEach(([key, value]) => {
                     this.activeObjectCard.feature.set(key, value);
                 });
-            },
-            deep: true
+            }
         },
 
         selectedLayer (newLayer) {
@@ -369,7 +368,6 @@ export default {
             if (activeIndex !== -1 && activeIndex !== index) {
                 this.activeScenarioCard.objects[activeIndex].status = "";
             }
-            // was passiert wenn keine object cards mehr vorhanden
             this.activeScenarioCard.objects[index].status = "active";
         }
     }
@@ -385,8 +383,7 @@ export default {
         icon="bi bi-box"
     >
         <ScenarioBuilderPlannerList
-            :is-location-active="isSubjectDataSelected"
-            @set-is-location-active="setIsLocationActive($event)"
+            :is-subject-data-selected="isSubjectDataSelected"
             @toggle-object-status="toggleObjectStatus($event)"
         />
         <AddCardButton
@@ -403,10 +400,8 @@ export default {
         </h5>
         <ScenarioBuilderPlannerLocation
             v-if="isLocationActive"
-            :feature-properties="featureProperties"
-            :layer-items="layerItems"
-            :selected-layer="selectedLayer"
             :is-subject-data-selected="isSubjectDataSelected"
+            :layer-list="layerList"
             @add-object-card="addObjectCard"
             @set-selected-layer="selectedLayer = $event"
             @set-is-location-active="setIsLocationActive($event)"

@@ -75,6 +75,7 @@
                     "createNewObject": "Neues Planungsobjekt erstellen",
                     "titleEditObject": "Planungsobjekt bearbeiten",
                     "selectObject": "Planungsobjekt auswählen",
+                    "selectObjectType": "Planungstyp auswählen",
                     "setFeatureHeadline": "Fachdaten platzieren",
                     "setFeature": "Für die Erstellung eines neuen Objekts bitte einen Standort auf der Karte auswählen.",
                     "addObjectTitle": "Objektname",

@@ -11,13 +11,13 @@ export default {
 
     inject: ["removeFeatureFromScenario"],
     props: {
-        isLocationActive: {
+        isSubjectDataSelected: {
             type: Boolean,
             default: false
         }
     },
 
-    emits: ["set-is-location-active", "toggle-object-status"],
+    emits: ["toggle-object-status"],
 
     computed: {
         ...mapGetters("Modules/ScenarioBuilder", ["activeScenarioCard"])
@@ -43,7 +43,6 @@ export default {
          */
         toggleObjectStatus (index) {
             this.$emit("toggle-object-status", index);
-            this.$emit("set-is-location-active", false);
         }
     }
 };
@@ -62,7 +61,7 @@ export default {
             <SimpleCard
                 hoverable
                 :icon-src="card.iconSrc"
-                :disabled="isLocationActive"
+                :disabled="isSubjectDataSelected"
                 :label="card.label"
                 :status="card.status"
                 :text="card.text"
