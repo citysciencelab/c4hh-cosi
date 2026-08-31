@@ -66,7 +66,7 @@ const actions = {
         }
 
         const queryParams = {
-            limit: 1000,
+            limit: 10000,
             filter,
             filterCrs: params.queryCrs,
             properties: params.queryProperties,

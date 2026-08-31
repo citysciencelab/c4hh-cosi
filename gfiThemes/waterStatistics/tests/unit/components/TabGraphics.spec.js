@@ -277,7 +277,7 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
             }
         });
 
-        expect(queryOaf.getCall(1).args[1]).to.deep.equal({
+        expect(queryOaf.lastCall.args[1]).to.deep.equal({
             params: {
                 url: "https://some/oaf/api",
                 collections: "grundwassermessstellen",

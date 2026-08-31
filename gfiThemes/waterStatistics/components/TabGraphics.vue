@@ -467,7 +467,9 @@ export default {
         allAttributes: {
             deep: true,
             handler (newAttributes, oldAttributes) {
-                if (newAttributes === oldAttributes) {
+                const queryAttribute = this.currentChartTheme.queryParams?.literalFilters?.queryAttribute;
+
+                if (newAttributes?.[queryAttribute] === oldAttributes?.[queryAttribute]) {
                     return;
                 }
 
