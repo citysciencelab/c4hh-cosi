@@ -45,7 +45,7 @@ export default {
             const definedAttributes = this.feature.getMappedProperties(),
                   attributesToShow = this.feature.getAttributesToShow();
 
-            return Object.fromEntries(Object.values(attributesToShow).map(a => [a.name, definedAttributes[a.name]]));
+            return Object.fromEntries(Object.keys(attributesToShow).map(key => [this.oafSchema?.properties?.[key]?.title, definedAttributes[key]]));
         },
         params () {
             return this.feature?.getTheme().params;
