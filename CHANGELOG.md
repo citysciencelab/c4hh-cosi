@@ -15,6 +15,7 @@
 ### Removed
 
 ### Fixed
+- gfiThemes: The printServerUrl from combinedGfiPrintConfig.json in the combinedGFI theme now takes precedence over the printServerUrl from the layer config, if available.
 
 ---
 
