@@ -4838,7 +4838,9 @@ Beim Bearbeiten eines Features / Hinzufügen von Attributen zu einem neuen Featu
             "value":"meine Kategorie"
         }
     ],
-    "lockedFields": ["name", "gemeinde"]
+    "lockedFields": {
+        "1234": ["feldname1", "feldname2"]
+    }
 }
 ```
 
