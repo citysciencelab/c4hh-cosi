@@ -3,19 +3,10 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-09-02 v3.26.0
 
 ### Added
 - userTracking: Added new feature for tracking user behavior with matomo (see userTracking/README.md for details).
-
-### Changed
-
-### Deprecated
-
-### Removed
-
-### Fixed
 
 ## 2026-08-19 v3.25.1
 
