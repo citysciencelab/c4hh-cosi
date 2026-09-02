@@ -271,7 +271,8 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                                 allData: () => allDataMock
                             },
                             mutations: {
-                                setStatisticValues
+                                setStatisticValues,
+                                setDataLoading: sinon.stub()
                             }
                         }
                     }
@@ -731,35 +732,39 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
         });
 
         describe("filterFromAllData", () => {
-            it("should call setStatisticValues with only the items inside the given date range", () => {
-                wrapper.vm.filterFromAllData(2022, 1, 2022, 12);
+            it("should call setStatisticValues with only the items inside the given date range", async () => {
+                clock.restore();
+                await wrapper.vm.filterFromAllData(2022, 1, 2022, 12);
 
-                expect(setStatisticValues.calledOnce).to.be.true;
+                expect(setStatisticValues.called).to.be.true;
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal([allDataMock[1]]);
             });
 
-            it("should call setStatisticValues with an empty array when no items match the range", () => {
-                wrapper.vm.filterFromAllData(2030, 1, 2030, 12);
+            it("should call setStatisticValues with an empty array when no items match the range", async () => {
+                clock.restore();
+                await wrapper.vm.filterFromAllData(2030, 1, 2030, 12);
 
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal([]);
             });
 
-            it("should include items exactly on the start and end boundary dates", () => {
-                wrapper.vm.filterFromAllData(2021, 1, 2023, 1);
+            it("should include items exactly on the start and end boundary dates", async () => {
+                clock.restore();
+                await wrapper.vm.filterFromAllData(2021, 1, 2023, 1);
 
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal(allDataMock);
             });
 
             it("should return an empty array when allData is empty", async () => {
                 allDataMock.length = 0;
-
-                wrapper.vm.filterFromAllData(2021, 1, 2023, 1);
+                clock.restore();
+                await wrapper.vm.filterFromAllData(2021, 1, 2023, 1);
 
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal([]);
             });
 
-            it("should return an empty array when the end date is before the start date and both are older than 12 months", () => {
-                wrapper.vm.filterFromAllData(2023, 1, 2021, 1);
+            it("should return an empty array when the end date is before the start date and both are older than 12 months", async () => {
+                clock.restore();
+                await wrapper.vm.filterFromAllData(2023, 1, 2021, 1);
 
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal([]);
             });

@@ -1,6 +1,9 @@
 <script>
 import {mapGetters, mapActions, mapMutations} from "vuex";
-import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
+// currently using local copy of LinechartItem to allow plugin registration
+// can be switched lateron, when pull request to masterportal core component has been merged
+// import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
+import LinechartItem from "./reusable/LinechartItem.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
@@ -41,7 +44,65 @@ export default {
             filterEndYear: undefined,
             showDisclaimerModal: false,
             offscreenKey: 0,
-            showTable: false
+            showTable: false,
+            hoverCrosshairPlugin: {
+                id: "hoverCrosshair",
+                afterDraw (chart, _args, options) {
+                    if (!options || options.enabled === false) {
+                        return;
+                    }
+
+                    const ctx = chart.ctx,
+                          active = typeof chart.getActiveElements === "function" ? chart.getActiveElements() : (chart.tooltip && chart.tooltip._active) || [];
+
+                    if (!active || active.length === 0) {
+                        return;
+                    }
+
+                    // print crosshair only for the main dataset line
+                    if (active[0].datasetIndex > 0) {
+                        return;
+                    }
+
+                    // active entry shape may differ; try to read element coordinates
+                    const activeEl = active[0].element || active[0];
+
+                    if (!activeEl) {
+                        return;
+                    }
+
+                    const x = activeEl.x;
+                    const y = activeEl.y;
+
+                    if (typeof x !== "number" || typeof y !== "number") {
+                        return;
+                    }
+
+                    ctx.save();
+                    ctx.strokeStyle = options.color || "rgba(0,0,0,0.6)";
+                    ctx.lineWidth = options.lineWidth ?? 1;
+                    if (Array.isArray(options.dash)) {
+                        ctx.setLineDash(options.dash);
+                    }
+                    const area = chart.chartArea;
+
+                    if (options.drawVertical !== false) {
+                        ctx.beginPath();
+                        ctx.moveTo(x, area.top);
+                        ctx.lineTo(x, area.bottom);
+                        ctx.stroke();
+                    }
+
+                    if (options.drawHorizontal) {
+                        ctx.beginPath();
+                        ctx.moveTo(area.left, y);
+                        ctx.lineTo(area.right, y);
+                        ctx.stroke();
+                    }
+
+                    ctx.restore();
+                }
+            }
         };
     },
     computed: {
@@ -205,6 +266,74 @@ export default {
                         onClick: (_, legendItem, legend) => {
                             this.updateOffscreenChart(legendItem, legend);
                         }
+                    },
+                    tooltip: {
+                        mode: "nearest",
+                        intersect: false,
+                        yAlign: "bottom",
+                        caretPadding: 8,
+                        filter: function (tooltipItem) {
+                            return !percentileLineTitles.includes(tooltipItem.dataset.label);
+                        },
+                        callbacks: {
+                            title: (items) => {
+                                if (items && items.length) {
+                                    return String(items[0].label);
+                                }
+                                return "";
+                            },
+                            beforeBody: (items) => {
+                                if (!items || !items.length) {
+                                    return [];
+                                }
+
+                                const chart = items[0].chart,
+                                      dataIndex = items[0].dataIndex,
+                                      leftDataset = chart.data.datasets[0],
+                                      rightDataset = this.hasRightAxis ? chart.data.datasets[1] : null;
+
+                                /**
+                                 * Reads the raw numeric value of a dataset at the given index.
+                                 * @param {Object} dataset chart.js dataset
+                                 * @param {number} index index into dataset.data
+                                 * @returns {number|null} numeric value or null
+                                 */
+                                function findValue (dataset, index) {
+                                    if (!dataset) {
+                                        return null;
+                                    }
+
+                                    const raw = dataset.data[index],
+                                          val = raw && typeof raw === "object" && raw.y !== undefined ? raw.y : raw;
+
+                                    if (val === null || val === undefined || Number.isNaN(Number(val))) {
+                                        return null;
+                                    }
+                                    return Number(val);
+                                }
+
+                                const leftVal = findValue(leftDataset, dataIndex),
+                                      rightVal = rightDataset ? findValue(rightDataset, dataIndex) : null,
+                                      lines = [];
+
+                                if (leftDataset) {
+                                    lines.push(`${leftDataset.label}: ${leftVal === null ? "-" : thousandsSeparator(leftVal.toFixed(2))}`);
+                                }
+                                if (rightDataset) {
+                                    lines.push(`${rightDataset.label}: ${rightVal === null ? "-" : thousandsSeparator(rightVal.toFixed(2))}`);
+                                }
+
+                                return lines;
+                            },
+                            label: () => ""
+                        }
+                    },
+                    hoverCrosshair: {
+                        enabled: true,
+                        drawVertical: true,
+                        drawHorizontal: true,
+                        color: "rgba(60,95,148)",
+                        dash: [2, 2]
                     }
                 },
                 scales: {
@@ -745,7 +874,8 @@ export default {
             "addSingleAlert"
         ]),
         ...mapMutations("Modules/WaterStatistics", [
-            "setStatisticValues"
+            "setStatisticValues",
+            "setDataLoading"
         ]),
         /**
          * Find the minimal or maximal numeric value for the provided axisKey inside statisticValues.
@@ -1011,7 +1141,12 @@ export default {
          * @param {number} endMonth - The end month (1-12).
          * @returns {void}
          */
-        filterFromAllData (startYear, startMonth, endYear, endMonth) {
+        async filterFromAllData (startYear, startMonth, endYear, endMonth) {
+            this.setDataLoading(true);
+
+            await this.$nextTick();
+            await new Promise(resolve => setTimeout(resolve, 0));
+
             const startDate = new Date(Date.UTC(startYear, startMonth - 1, 1)),
                   endDate = new Date(Date.UTC(endYear, endMonth, 0));
             const queryData = this.allData.filter((item) => {
@@ -1021,6 +1156,8 @@ export default {
             });
 
             this.setStatisticValues(queryData);
+
+            this.setDataLoading(false);
         },
         /**
          * Captures the hidden, fixed-width export chart as a PNG data URL.
@@ -1473,6 +1610,7 @@ export default {
             ref="lineChart"
             :data="chartData"
             :given-options="lineChartOptions"
+            :given-plugins="[hoverCrosshairPlugin]"
         />
 
         <TableComponent
