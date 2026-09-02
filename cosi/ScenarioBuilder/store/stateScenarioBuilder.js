@@ -1,6 +1,7 @@
 /**
  * User type definition
  * @typedef {Object} ScenarioBuilderState
+ * @property {ol/layer} guideLayer - guide layer used for additional info to display on the map.
  */
 const state = {
     hasMouseMapInteractions: true,
@@ -20,7 +21,8 @@ const state = {
             {key: "laenge_m", factorToM: 1},
             {key: "laenge_km", factorToM: 0.001}
         ]
-    }
+    },
+    guideLayer: null
 };
 
 export default state;

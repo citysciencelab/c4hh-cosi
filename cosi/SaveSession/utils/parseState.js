@@ -47,6 +47,7 @@ export default {
                     switch (`${key}/${attr}`) {
                         case "ScenarioBuilder/scenarioCards":
                             this.$store.commit(mutation, this.parseScenarios(state[key][attr]));
+                            this.$store.dispatch("Modules/ScenarioBuilder/updateScenarioLayer");
                             break;
                         case "Maps/layerIds":
                             this.$nextTick(() => {
@@ -196,8 +197,6 @@ export default {
 
                 object.feature = finalFeature;
             });
-
-            scenario.status = "";
         });
 
         return scenarios;
