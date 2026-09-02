@@ -4,8 +4,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-09-02 v3.26.0
 
 ### Added
 - NavTab: Added styleVariant prop for more styling options.
@@ -25,8 +24,6 @@
 - The following packages have been updated:
     - dependencies:
         - Axios: 1.16.0 to 1.19.0.
-
-### Deprecated
 
 ### Removed
 - The following packages have been removed:
