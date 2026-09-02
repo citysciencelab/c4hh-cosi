@@ -7,6 +7,7 @@
 ### __Breaking Changes__
 
 ### Added
+- userTracking: Added new feature for tracking user behavior with matomo (see userTracking/README.md for details).
 
 ### Changed
 
@@ -22,7 +23,6 @@
 
 ### Added
 - package.json: new command `npm run deleteAllNodeModules` added.
-- userTracking: Added new experimental feature for tracking user behavior with matomo (see userTracking/README.md for details).
 
 ### Changed
  - The following packages have been updated:
