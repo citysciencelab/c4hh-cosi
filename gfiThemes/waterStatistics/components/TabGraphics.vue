@@ -81,6 +81,45 @@ export default {
                     Object.hasOwn(this.params.disclaimer, "data")
             );
         },
+        /**
+         * Determines whether the statistic data contain any data points.
+         *
+         * Returns true when statisticValues has at least one dataset with a parameter
+         * that shall be displayed on the left or right axis.
+         *
+         * @returns {boolean} True if chart contains data points, otherwise false.
+         */
+        hasData () {
+            const leftAxisParameter = this.currentChartTheme.chartParams?.yAxisLeft,
+                  rightAxisParameter = this.currentChartTheme.chartParams?.yAxisRight;
+
+            if (this.statisticValues &&
+                this.statisticValues.length > 0 &&
+                this.statisticValues.some((val) => {
+                    return (
+                        Object.hasOwn(val.properties, leftAxisParameter) &&
+                        val.properties[leftAxisParameter] !== undefined
+                    ) ||
+                        (
+                            rightAxisParameter &&
+                            Object.hasOwn(val.properties, rightAxisParameter) &&
+                            val.properties[rightAxisParameter] !== undefined
+                        );
+                })
+            ) {
+                return true;
+            }
+
+            return false;
+        },
+        /**
+         * Builds the title for the line chart by combining the schema title of the
+         * configured query attribute with the corresponding attribute value of the current feature.
+         *
+         * Example result: "Messstellennummer 2050"
+         *
+         * @returns {string} Concatenated chart title.
+         */
         getLineChartTitle () {
             const prefix = this.oafSchema?.properties?.[this.currentChartTheme.queryParams?.literalFilters?.queryAttribute]?.title,
                   value = this.allAttributes?.[this.currentChartTheme.queryParams?.literalFilters?.queryAttribute];
@@ -1351,6 +1390,13 @@ export default {
             </div>
         </div>
 
+        <p
+            v-if="!hasData"
+            class="noDataInfo"
+        >
+            Für den ausgewählten Zeitraum liegen keine Daten vor.
+        </p>
+
         <LinechartItem
             ref="lineChart"
             :data="chartData"
@@ -1487,6 +1533,11 @@ export default {
                 margin-bottom: 0;
             }
         }
+    }
+
+    p.noDataInfo {
+        text-align: center;
+        color: $light_red;
     }
 
     div.dataDisclaimerContainer {

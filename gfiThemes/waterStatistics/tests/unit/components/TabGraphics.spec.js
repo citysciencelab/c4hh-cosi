@@ -456,6 +456,29 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
         expect(wrapper.vm.getCsvParams()).to.deep.equal(["messstellennummer"]);
     });
 
+    it("should detect if data are available and show an info message otherwise", async () => {
+        expect(wrapper.vm.hasData).to.be.true;
+        expect(wrapper.find("p.noDataInfo").exists()).to.be.false;
+
+        delete statisticValuesMock[0].properties.wasserstand_mnhn;
+        delete statisticValuesMock[0].properties.wasserstand_mugok;
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.hasData).to.be.true;
+        expect(wrapper.find("p.noDataInfo").exists()).to.be.false;
+
+        statisticValuesMock.forEach(dataset => {
+            delete dataset.properties.wasserstand_mnhn;
+            delete dataset.properties.wasserstand_mugok;
+        });
+
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.hasData).to.be.false;
+        expect(wrapper.find("p.noDataInfo").exists()).to.be.true;
+    });
+
     it("should detect if a right axis shall be drawn", async () => {
         expect(wrapper.vm.hasRightAxis).to.be.true;
 
