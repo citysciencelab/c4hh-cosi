@@ -23,8 +23,6 @@
 ### Added
 - userTracking: Added new feature for tracking user behavior with matomo (see userTracking/README.md for details).
 
-## 2026-08-19 v3.25.1
-
 ## 2026-08-05 v3.25.0
 
 ### Added
