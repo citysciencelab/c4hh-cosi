@@ -1,9 +1,8 @@
 <script>
 import HrCard from "../../shared/components/HrCard.vue";
-import HrFooter from "../../shared/components/HrFooter.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
-import {mapGetters} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 import ProjectsEdit from "./ProjectsEdit.vue";
 
 export default {
@@ -11,14 +10,12 @@ export default {
     name: "Projects",
     components: {
         HrCard,
-        HrFooter,
         HrHeader,
         HrSnackbar,
         ProjectsEdit
     },
     data () {
         return {
-            currentView: "main",
             showSnackbar: false,
             snackbarMessage: "",
             snackbarColor: "success",
@@ -26,12 +23,14 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/Projects", ["criteria"])
+        ...mapGetters("Modules/Projects", ["criteria", "currentView"])
     },
     mounted () {
         this.chosenCriteria = [this.criteria[1], this.criteria[0]];
     },
     methods: {
+        ...mapMutations("Modules/Projects", ["setCurrentView"]),
+
         /**
          * Gets the background color.
          * @param {Object[]} val the chosen criteria.
@@ -49,15 +48,6 @@ export default {
             });
 
             return this.criteria[Math.min(...index)].color;
-        },
-
-        /**
-         * Handles the save action.
-         * @returns {void}
-         */
-        onSave () {
-            this.showSnackbarMessage("Projekt wurde erfolgreich gespeichert.");
-            this.currentView = "main";
         },
 
         /**
@@ -81,12 +71,12 @@ export default {
             <HrHeader
                 :text="$t('additional:modules.projects.description')"
                 :button-text="$t('additional:modules.projects.createProject')"
-                @click:button="currentView = 'edit'"
+                @click:button="setCurrentView('edit')"
             />
             <HrCard
                 title="Projektname"
                 edit-aria-label="Projekt bearbeiten"
-                @click:edit="currentView = 'edit'"
+                @click:edit="setCurrentView('edit')"
             >
                 <template #above-title>
                     <div class="d-flex flex-wrap gap-2">
@@ -197,15 +187,8 @@ export default {
         </div>
 
         <div v-else-if="currentView === 'edit'">
-            <ProjectsEdit />
-            <HrFooter
-                v-model:snackbar-visible="showSnackbar"
-                :cancel-text="$t('additional:modules.projects.cancelButtonLabel')"
-                :save-text="$t('additional:modules.projects.saveButtonLabel')"
-                :snackbar-message="snackbarMessage"
-                :snackbar-color="snackbarColor"
-                @click:save="onSave"
-                @click:cancel="currentView = 'main'"
+            <ProjectsEdit
+                @showSnackbarMessage="showSnackbarMessage"
             />
         </div>
 

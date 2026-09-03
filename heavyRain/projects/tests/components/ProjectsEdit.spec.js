@@ -63,6 +63,20 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
 
             expect(wrapper.findComponent({name: "FileUpload"}).exists()).to.be.true;
         });
+
+        it("should render footer component", () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            expect(wrapper.findComponent({name: "HrFooter"}).exists()).to.be.true;
+        });
+
+        it("should render HrSnackbar component", async () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            wrapper.setData({"showSnackbar": true});
+
+            expect(wrapper.findComponent({name: "HrSnackbar"}).exists()).to.be.true;
+        });
     });
 
     describe("Computed Properties", () => {
@@ -96,6 +110,24 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
             }]});
 
             expect(wrapper.vm.strokeColor).to.deep.equal([213, 94, 0]);
+        });
+
+        it("should set invalid to true if there are required fields with empty text ", async () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            wrapper.vm.onSave();
+
+            expect(wrapper.vm.invalid).to.be.true;
+        });
+
+        it("should set invalid to true if there are required fields with empty text ", async () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            await wrapper.setData({projectName: "name", creator: "creator", contactPerson: "contactPerson"});
+
+            wrapper.vm.onSave();
+
+            expect(wrapper.vm.invalid).to.be.false;
         });
     });
 });
