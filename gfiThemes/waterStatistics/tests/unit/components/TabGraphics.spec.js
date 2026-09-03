@@ -989,5 +989,79 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                 });
             });
         });
+
+        describe("table generation", () => {
+            beforeEach(async () => {
+                await wrapper.setProps({
+                    params: {
+                        ...params,
+                        chartThemes: [
+                            {
+                                ...params.chartThemes[0],
+                                tableParams: ["datum_as_date", "messstellennummer", "wasserstand_mnhn", "klassifikation_gwstand"]
+                            }
+                        ]
+                    }
+                });
+            });
+
+            it("should build headers with displayName from oafSchema title", () => {
+                expect(wrapper.vm.tableData.headers).to.deep.equal([
+                    {name: "datum_as_date", displayName: "datum_as_date", index: 0},
+                    {name: "messstellennummer", displayName: "Messstellennummer", index: 1},
+                    {name: "wasserstand_mnhn", displayName: "Wasserstand in m ü. NHN", index: 2},
+                    {name: "klassifikation_gwstand", displayName: "klassifikation_gwstand", index: 3}
+                ]);
+            });
+
+            it("should return empty headers and an item per dataset (with no keys) when tableParams is not configured", async () => {
+                await wrapper.setProps({
+                    params: {
+                        ...params,
+                        chartThemes: [
+                            {
+                                ...params.chartThemes[0],
+                                tableParams: undefined
+                            }
+                        ]
+                    }
+                });
+
+                expect(wrapper.vm.tableData).to.deep.equal({
+                    headers: [],
+                    items: statisticValuesMock.map(() => ({}))
+                });
+            });
+
+            it("should build items from statisticValues using only the configured tableParams keys", () => {
+                expect(wrapper.vm.tableData.items).to.deep.equal([
+                    {datum_as_date: "21/08/2025", messstellennummer: 2200, wasserstand_mnhn: 15.19, klassifikation_gwstand: "sehr hoch"},
+                    {datum_as_date: "22/08/2025", messstellennummer: 2200, wasserstand_mnhn: 15.17, klassifikation_gwstand: "sehr hoch"},
+                    {datum_as_date: "23/08/2025", messstellennummer: 2200, wasserstand_mnhn: 15.17, klassifikation_gwstand: "sehr hoch"},
+                    {datum_as_date: "24/08/2025", messstellennummer: 2200, wasserstand_mnhn: 15.16, klassifikation_gwstand: "hoch"}
+                ]);
+            });
+
+            it("should format date-like values as DD/MM/YYYY", () => {
+                expect(wrapper.vm.checkValueAndFormatDate("2025-08-21")).to.equal("21/08/2025");
+            });
+
+            it("should return '-' for null or undefined values", () => {
+                expect(wrapper.vm.checkValueAndFormatDate(null)).to.equal("-");
+                expect(wrapper.vm.checkValueAndFormatDate(undefined)).to.equal("-");
+            });
+
+            it("should return non-date values unchanged", () => {
+                expect(wrapper.vm.checkValueAndFormatDate("sehr hoch")).to.equal("sehr hoch");
+                expect(wrapper.vm.checkValueAndFormatDate(2200)).to.equal(2200);
+            });
+
+            it("should return an empty items array when statisticValues is empty", async () => {
+                statisticValuesMock.length = 0;
+                await wrapper.vm.$nextTick();
+
+                expect(wrapper.vm.tableData.items).to.deep.equal([]);
+            });
+        });
     });
 });

@@ -5,6 +5,8 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
 import TabGraphicsDisclaimerModal from "./TabGraphicsDisclaimerModal.vue";
+import TableComponent from "@shared/modules/table/components/TableComponent.vue";
+import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 
 export default {
     name: "TabGraphics",
@@ -12,7 +14,9 @@ export default {
         FlatButton,
         SpinnerItem,
         LinechartItem,
-        TabGraphicsDisclaimerModal
+        TabGraphicsDisclaimerModal,
+        TableComponent,
+        SwitchInput
     },
     props: {
         params: {
@@ -36,7 +40,8 @@ export default {
             filterStartYear: undefined,
             filterEndYear: undefined,
             showDisclaimerModal: false,
-            offscreenKey: 0
+            offscreenKey: 0,
+            showTable: false
         };
     },
     computed: {
@@ -637,6 +642,33 @@ export default {
                       : 0.5;
 
             return Math.round(800 * aspectRatio);
+        },
+        /**
+         * Assembles table data (headers and items) from statisticValues, using
+         * currentChartTheme.tableParams (array of property keys) to define the columns.
+         * @returns {{headers: Array, items: Array}} table data for TableComponent
+         */
+        tableData () {
+            const tableParams = this.currentChartTheme?.tableParams || [],
+                  headers = tableParams.map((key, index) => ({
+                      name: key,
+                      displayName: this.oafSchema?.properties?.[key]?.title ?? key,
+                      index
+                  })),
+                  items = (this.statisticValues || []).map((dataset) => {
+                      const item = {};
+
+                      tableParams.forEach((key) => {
+                          item[key] = this.checkValueAndFormatDate(dataset?.properties?.[key]);
+                      });
+
+                      return item;
+                  });
+
+            return {
+                headers,
+                items
+            };
         }
     },
     watch: {
@@ -1270,9 +1302,40 @@ export default {
             catch (e) {
                 console.error(e);
             }
+        },
+        /**
+         * Formats a value as "DD/MM/YYYY" if it represents a valid date (Date instance
+         * or ISO-like date string). Returns the original value unchanged if there is a value, if not returns "-".
+         * @param {*} value - value to check/format
+         * @returns {*} formatted date string or the original value
+         */
+        checkValueAndFormatDate (value) {
+            if (value === null || value === undefined) {
+                return "-";
+            }
+            if (!(value instanceof Date) && typeof value !== "string") {
+                if (typeof value === "number") {
+                    return Math.round(value * 100) / 100;
+                }
+                return value;
+            }
+            if (typeof value === "string" && !(/^\d{4}-\d{2}-\d{2}/).test(value)) {
+                return value;
+            }
+
+            const date = value instanceof Date ? value : new Date(value);
+
+            if (Number.isNaN(date.getTime())) {
+                return value;
+            }
+
+            const day = String(date.getDate()).padStart(2, "0"),
+                  month = String(date.getMonth() + 1).padStart(2, "0"),
+                  year = date.getFullYear();
+
+            return `${day}/${month}/${year}`;
         }
     }
-
 };
 </script>
 
@@ -1390,6 +1453,14 @@ export default {
             </div>
         </div>
 
+        <SwitchInput
+            id="show-table-switch"
+            :label="showTable ? 'Ganglinie anzeigen' : 'Tabelle anzeigen'"
+            :aria="showTable ? 'Ganglinie anzeigen' : 'Tabelle anzeigen'"
+            :checked="showTable"
+            :interaction="() => { showTable = !showTable; }"
+        />
+
         <p
             v-if="!hasData"
             class="noDataInfo"
@@ -1398,9 +1469,15 @@ export default {
         </p>
 
         <LinechartItem
+            v-if="!showTable"
             ref="lineChart"
             :data="chartData"
             :given-options="lineChartOptions"
+        />
+
+        <TableComponent
+            v-else
+            :data="tableData"
         />
 
         <div
@@ -1443,6 +1520,7 @@ export default {
             />
 
             <FlatButton
+                v-if="!showTable"
                 aria="Grafik als PDF herunterladen"
                 icon="bi-file-earmark-pdf-fill"
                 title="Grafik als PDF herunterladen"
@@ -1576,6 +1654,61 @@ export default {
         background-color: rgba(255, 255, 255, 0.7); // optional dimming layer
         z-index: 10;
         margin-top: 0;
+    }
+
+    :deep(.form-switch) {
+        display: flex;
+        align-items: center;
+        flex-direction: row-reverse; // shows label first (left), switch second (right)
+        margin-left: auto;
+        margin-bottom: 0.25rem;
+
+        .form-check-input {
+            margin-left: 0; // remove bootstrap's default negative pull-back, not needed in flex layout
+        }
+
+        .form-check-label {
+            margin: 0;
+        }
+    }
+    :deep(.fixed) {
+        max-height: 450px;
+        overflow-y: auto;
+    }
+
+    :deep(table) {
+       width: auto;
+
+        th.fixedWidth {
+            min-width: 100px;
+            height: 1rem;
+            text-align: center;
+            background-color: $secondary;
+            color: $white;
+            vertical-align: middle;
+
+            .th-style {
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                line-clamp: inherit;
+                -webkit-box-orient: vertical;
+                font-size: clamp(0.8rem, 1.2vw, 0.875rem);
+                white-space: normal;
+                line-height: 1rem;
+                margin: 0.5rem !important;
+                overflow: hidden;
+                hyphens: auto;
+                overflow-wrap: break-word;
+            }
+        }
+
+        td {
+            text-align: center;
+        }
+
+       tbody tr:nth-of-type(even):not(.fixed-row):not(.fixed) > td {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
     }
 }
 </style>
