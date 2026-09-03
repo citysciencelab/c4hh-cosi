@@ -949,7 +949,7 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                 });
             });
 
-            it("should build titleArray entries with label and unit when configured", async () => {
+            it("should build titleArray entries with label and postfix when configured", async () => {
                 await wrapper.setProps({
                     allAttributes: {
                         messstellennummer: "12345",
@@ -970,7 +970,7 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                                         },
                                         gok: {
                                             label: "GOK",
-                                            unit: "m"
+                                            postfix: "m"
                                         },
                                         test: ""
                                     }

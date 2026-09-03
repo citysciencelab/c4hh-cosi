@@ -1205,8 +1205,8 @@ export default {
                         attributeString = this.allAttributes?.[param];
                     }
 
-                    if (pdfParams?.titleAttributes?.[param]?.unit) {
-                        attributeString += " " + pdfParams?.titleAttributes?.[param]?.unit;
+                    if (pdfParams?.titleAttributes?.[param]?.postfix) {
+                        attributeString += " " + pdfParams?.titleAttributes?.[param]?.postfix;
                     }
                     return attributeString;
                 });
