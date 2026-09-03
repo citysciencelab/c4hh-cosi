@@ -5,6 +5,18 @@ const mutations = {
     ...generateSimpleMutations(stateLayerSlider),
 
     /**
+     * Applies a configuration object to the current layer slider state.
+     * @param {Object} state the state
+     * @param {Object} config the configuration object
+     * @returns {void}
+     */
+    setConfiguredProperties (state, config) {
+        if (config instanceof Object) {
+            Object.assign(state, JSON.parse(JSON.stringify(config)));
+        }
+    },
+
+    /**
      * Setter for the activeLayer.
      * The current progressbar is also set by the layerId index.
      * @param {Object} state the state

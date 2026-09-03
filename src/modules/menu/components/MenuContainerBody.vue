@@ -148,8 +148,11 @@ export default {
         <keep-alive :include="keepAliveComponents">
             <component
                 :is="currentComponentName"
+                :key="menu.navigation.currentComponent.props?.path?.join('-') || menu.navigation.currentComponent.props?.name || currentComponent"
                 class="menu-body-component"
                 :side="side"
+                :config="menu.navigation.currentComponent.props || {}"
+                v-bind="menu.navigation.currentComponent.props || {}"
             />
         </keep-alive>
         <MenuContainerBodyRoot

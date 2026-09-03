@@ -82,11 +82,15 @@ export default {
 
                 const stateProperties = this.$store.state.Modules[changeCase.upperFirst(item.type)];
 
-                if (item.type === "customMenuElement" && !Object.prototype.hasOwnProperty.call(properties, "icon")) {
-                    properties.icon = this.customMenuElementIcon;
-                }
                 if (typeof stateProperties === "object") {
-                    properties = stateProperties;
+                    properties = {
+                        ...stateProperties,
+                        ...item
+                    };
+                }
+
+                if (item.type === "customMenuElement" && !Object.prototype.hasOwnProperty.call(item, "icon")) {
+                    properties.icon = this.customMenuElementIcon;
                 }
             }
             return properties;

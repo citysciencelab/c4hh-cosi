@@ -43,6 +43,12 @@ export default {
         FilterList,
         IconButton
     },
+    props: {
+        config: {
+            type: Object,
+            default: () => ({})
+        }
+    },
     data () {
         return {
             mapHandler: new MapHandler({
@@ -101,6 +107,8 @@ export default {
         }
     },
     mounted () {
+        this.applyConfiguredState();
+
         const selectedFilterIds = [];
 
         getFeaturesOfAdditionalGeometries(this.geometrySelectorOptions.additionalGeometries).then(additionalGeometries => {
@@ -160,6 +168,9 @@ export default {
             this.unregisterMapMoveListeners();
         }
     },
+    activated () {
+        this.applyConfiguredState();
+    },
     methods: {
         ...mapMutations("Modules/Filter", Object.keys(mutations)),
         ...mapActions("Modules/Filter", [
@@ -172,6 +183,15 @@ export default {
         ...mapActions("Maps", ["registerListener", "unregisterListener"]),
         hasUnfixedRules,
         isRule,
+
+        /**
+         * Applies the menu-provided configuration to the filter state.
+         * @returns {void}
+         */
+        applyConfiguredState () {
+            this.setConfiguredProperties(this.config);
+        },
+
         /**
          * Generates the layer rules.
          * @param {Object[]} rules The rules of filter.
