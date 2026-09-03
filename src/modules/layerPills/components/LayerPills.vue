@@ -255,6 +255,8 @@ export default {
             <button
                 v-if="showToggleButton"
                 class="nav-link"
+                :aria-label="showAllLayers ? $t('common:modules.layerPills.hide') : $t('common:modules.layerPills.showMore')"
+                :aria-expanded="showAllLayers ? 'true' : 'false'"
                 @click="toggleLayerVisibility"
             >
                 <i

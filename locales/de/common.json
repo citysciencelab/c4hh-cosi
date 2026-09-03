@@ -162,6 +162,10 @@
         "buttonTitle2d": "2D",
         "buttonTitle3d": "3D"
       },
+      "expandable": {
+        "show": "Weitere Werkzeuge anzeigen",
+        "hide": "Weitere Werkzeuge ausblenden"
+      },
       "fullScreen": {
         "enable": "Vollbild aktivieren",
         "disable": "Vollbild deaktivieren"
@@ -654,6 +658,8 @@
     "layerPills": {
       "next": "Nächsten Layer anzeigen",
       "previous": "Vorherigen Layer anzeigen",
+      "showMore": "Alle Layer anzeigen",
+      "hide": "Layer einklappen",
       "remove": "Layer entfernen"
     },
     "layerSelection": {

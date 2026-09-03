@@ -319,7 +319,7 @@ export default {
                     'previewImg'
                 ]"
                 :src="getPreviewUrl()"
-                alt="previewImg"
+                :alt="layerName"
             >
         </div>
 

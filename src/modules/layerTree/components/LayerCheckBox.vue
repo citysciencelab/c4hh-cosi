@@ -130,16 +130,7 @@ export default {
             :custom-class="conf.preview?.customClass ? conf.preview?.customClass : null"
             @preview-clicked="clicked()"
         />
-        <label
-            :class="['pt-4']"
-            :for="'layer-tree-layer-preview-' + conf.id"
-            tabindex="0"
-            :aria-label="layerName"
-        >
-            <span>
-                {{ $t(conf.shortname || conf.name) }}
-            </span>
-        </label>
+        <span class="pt-4">{{ $t(layerName) }}</span>
     </div>
     <button
         v-else
@@ -149,7 +140,6 @@ export default {
         :aria-label="$t(layerName)"
         :disabled="disabled"
         class="btn d-flex w-100 layer-tree-layer-title pe-2 p-1 btn-light"
-        :title="$t(layerName)"
         @click="clicked()"
         @keydown.enter.prevent="clicked()"
         @keydown.space.prevent="clicked()"
@@ -172,11 +162,8 @@ export default {
         />
         <span
             :class="['layer-tree-layer-label', 'mt-0 d-flex flex-column align-self-start', isBold ? 'font-bold' : '']"
-        >
-            <span
-                v-html="$t(conf.shortname || conf.htmlName || conf.name)"
-            />
-        </span>
+            v-html="$t(conf.shortname || conf.htmlName || conf.name)"
+        />
     </button>
 </template>
 
@@ -188,11 +175,8 @@ export default {
     }
     .layer-tree-layer-label {
         overflow: hidden;
-        span {
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+        white-space: nowrap;
+        text-overflow: ellipsis;
     }
 
 </style>

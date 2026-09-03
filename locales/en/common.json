@@ -162,6 +162,10 @@
         "buttonTitle2d": "2D",
         "buttonTitle3d": "3D"
       },
+      "expandable": {
+        "show": "Show more controls",
+        "hide": "Hide additional controls"
+      },
       "fullScreen": {
         "enable": "Enable fullscreen",
         "disable": "Disable fullscreen"
@@ -653,6 +657,8 @@
     "layerPills": {
       "next": "Show next layers",
       "previous": "Show previous layers",
+      "showMore": "Show all layers",
+      "hide": "Collapse layers",
       "remove": "Remove layer"
     },
     "layerSelection": {

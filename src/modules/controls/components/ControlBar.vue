@@ -161,7 +161,10 @@ export default {
                 class="btn-group-vertical"
                 role="group"
             >
-                <div v-show="activatedExpandable">
+                <div
+                    v-show="activatedExpandable"
+                    id="control-bar-expandable-controls"
+                >
                     <div
                         v-for="(control, index) in categorizedControls.expandable"
                         :key="index"
@@ -176,6 +179,9 @@ export default {
                 <button
                     type="button"
                     class="btn control-icon-controls bootstrap-icon my-1 control-button-controls btn-light"
+                    :aria-label="activatedExpandable ? $t('common:modules.controls.expandable.hide') : $t('common:modules.controls.expandable.show')"
+                    :aria-expanded="activatedExpandable ? 'true' : 'false'"
+                    aria-controls="control-bar-expandable-controls"
                     @click="setActivatedExpandable(!activatedExpandable)"
                 >
                     <i class="bi-three-dots" />

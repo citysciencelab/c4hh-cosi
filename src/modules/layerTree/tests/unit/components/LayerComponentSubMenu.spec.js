@@ -264,8 +264,9 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
 
         expect(wrapper.find("#layer-component-icon-sub-menu-transparency-container-" + propsData.layerConf.id).exists()).to.be.true;
         expect(wrapper.find(".transparency-container > i").classes()).to.includes("bi-droplet-half");
-        expect(wrapper.find(".transparency-container > label").exists()).to.be.true;
+        expect(wrapper.find(".transparency-container .transparency-text").exists()).to.be.true;
         expect(wrapper.find(".transparency-container input").exists()).to.be.true;
+        expect(wrapper.find(".transparency-container input").attributes("aria-label")).to.not.be.undefined;
     });
 
     it("set value to input field", () => {
