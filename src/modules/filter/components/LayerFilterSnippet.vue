@@ -1356,6 +1356,19 @@ export default {
 
                 this.setPostSnippetKey(this.postSnippetKey + 1);
             }
+        },
+
+        /**
+         * Handles the change of the searchInMapExtent input.
+         * @param {Boolean} val the new value of the option.
+         * @returns {void}
+         */
+        onFilterInMapExtentChange (val) {
+            this.setSearchInMapExtent(val);
+            this.setIsFilterOnMove(val);
+            if (this.isStrategyActive() && this.hasUnfixedRules(this.filterRules)) {
+                this.handleActiveStrategy();
+            }
         }
     }
 };
@@ -1418,7 +1431,7 @@ export default {
                     :info="layerConfig.searchInMapExtentInfo"
                     :filter-id="layerConfig.filterId"
                     :preselected="getSearchInMapExtent()"
-                    @command-changed="val => {setSearchInMapExtent(val); setIsFilterOnMove(val)}"
+                    @command-changed="onFilterInMapExtentChange"
                 />
             </div>
             <div
