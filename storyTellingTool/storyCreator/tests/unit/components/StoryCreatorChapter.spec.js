@@ -758,5 +758,29 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 expect(wrapper.vm.selectedLayers.length).to.be.equal(0);
             });
         });
+
+        describe("openContentEditorForAdd", () => {
+            it("should add a divider without opening the content editor", async () => {
+                await wrapper.setData({
+                    content: [],
+                    openContentEditor: {
+                        type: "",
+                        index: null
+                    }
+                });
+
+                wrapper.vm.openContentEditorForAdd("divider");
+
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "divider"
+                    }
+                ]);
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+            });
+        });
     });
 });

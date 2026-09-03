@@ -900,6 +900,9 @@ export default {
                                         class="mb-3"
                                         v-html="tipTapJsonToHtml(item)"
                                     />
+                                    <hr
+                                        v-else-if="item.type === 'divider'"
+                                    >
                                     <div
                                         v-else-if="item.type === 'feature'"
                                     >

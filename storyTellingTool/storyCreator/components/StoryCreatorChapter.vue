@@ -104,10 +104,10 @@ export default {
          */
         allowedActions () {
             if (this.enableVideo) {
-                return ["text", "image", "feature", "video"];
+                return ["text", "divider", "image", "feature", "video"];
             }
 
-            return ["text", "image", "feature"];
+            return ["text", "divider", "image", "feature"];
         },
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
@@ -353,6 +353,13 @@ export default {
          * @returns {void}
          */
         openContentEditorForAdd (type) {
+            if (type === "divider") {
+                this.content.push({
+                    type: "divider"
+                });
+                return;
+            }
+
             this.openContentEditor = {
                 type,
                 index: this.content.length
@@ -1098,6 +1105,27 @@ export default {
                             </div>
                         </div>
                         <div
+                            v-else-if="element.type === 'divider'"
+                            class="chapter-content-item__wrapper"
+                        >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
+                            <div
+                                class="p-4 rounded-3 chapter-content-item__preview chapter-content-item--hoverable"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-2 chapter-content-item__close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
+                                <hr class="my-0 me-4">
+                            </div>
+                        </div>
+                        <div
                             v-else-if="element.type === 'feature'"
                             class="chapter-content-item__wrapper"
                         >
@@ -1391,6 +1419,15 @@ export default {
     }
 }
 
+.chapter-content-item--hoverable:hover {
+    outline: 1px solid $light_grey;
+}
+.chapter-content-item__wrapper:has(.chapter-content-item--hoverable) {
+    .drag-handle {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
 .chapter-content-item__preview:hover .chapter-content-item__close,
 .chapter-content-item__preview:focus-within .chapter-content-item__close {
     opacity: 0.5;
