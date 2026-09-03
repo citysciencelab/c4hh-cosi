@@ -3,6 +3,7 @@ import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vu
 import AddCardButton from "../../shared/modules/cards/components/AddCardButton.vue";
 import {computed} from "vue";
 import {getLayerSource} from "../../utils/layer/getLayerSource.js";
+import {getNameProperty} from "../../utils/features/getNameProperty.js";
 import highlightVectorFeature from "../../utils/highlightVectorFeature";
 import Icon from "ol/style/Icon.js";
 import layerCollection from "@core/layers/js/layerCollection";
@@ -26,7 +27,7 @@ export default {
         ScenarioBuilderPlannerProps
     },
 
-    inject: ["addFeatureToScenario", "updateSimulationTag"],
+    inject: ["addFeatureToScenario", "removeFeatureFromScenario", "updateSimulationTag"],
 
     provide () {
         return {
@@ -154,22 +155,21 @@ export default {
 
             this.activeScenarioCard.objects.push({
                 id: feature.getId(),
-                icon: "bi bi-box",
                 iconSrc,
                 label: properties.facility || name,
-                text: "Neues Objekt",
+                text: getNameProperty(feature, this.nameProperties)?.value || "Neues Objekt",
                 feature,
-                originProperties: isModified ? this.getOriginProperties(feature.getId(), layerId) : {},
-                status: "",
+                isVisible: isModified || feature.get("isSimulation"),
                 layerId: layerId,
-                sourceDataMode: "empty",
-                referenceFeatureId: null,
+                originProperties: this.getOriginProperties(feature, layerId),
+                status: "",
+                sourceDataMode: !feature.get("isSimulation") ? "existing" : "empty",
+                referenceFeatureId: feature.getId(),
                 manualFeatureProperties: {},
-                referenceFeatureProperties: {}
+                referenceFeatureProperties: this.getOriginProperties(feature, layerId)
             });
 
             this.toggleObjectStatus(this.activeScenarioCard.objects.length - 1);
-            this.addFeatureToScenario(feature);
         },
 
         /**
@@ -190,15 +190,19 @@ export default {
 
         /**
          * Retrieves the original properties of a feature from its source layer.
-         * @param {String|Number} featureId - The id of the feature.
+         * If the feature is a simulation, returns an empty object.
+         * @param {ol/Feature} feature - The feature whose original properties are to be retrieved.
          * @param {String} layerId - The id of the layer.
          * @returns {Object} The original properties of the feature.
          */
-        getOriginProperties (featureId, layerId) {
+        getOriginProperties (feature, layerId) {
+            if (feature.get("isSimulation")) {
+                return {};
+            }
             const olLayer = layerCollection.getLayerById(layerId).getLayer(),
-                  feature = getLayerSource(olLayer).getFeatureById(featureId);
+                  originFeature = getLayerSource(olLayer).getFeatureById(feature.getId());
 
-            return feature.getProperties();
+            return originFeature.getProperties();
         },
 
         /**
@@ -221,23 +225,41 @@ export default {
          * @returns {void}
          */
         onSelect (evt) {
-            const feature = evt.selected[0];
+            const selectedFeature = evt.selected[0],
+                  deselectedFeature = evt.deselected[0];
 
-            if (!feature) {
-                return;
+            if (deselectedFeature) {
+                this.runDeselection(deselectedFeature);
             }
+            if (selectedFeature) {
+                this.runSelection(selectedFeature);
+            }
+        },
+
+        runDeselection (feature) {
+            this.removeHighlightFeature();
+
+            if (!feature.get("isSimulation") && !feature.get("isModified")) {
+                for (const unpackedFeature of unpackCluster(feature)) {
+                    this.removeObjectCard(unpackedFeature.getId());
+                }
+            }
+        },
+
+        runSelection (feature) {
             const layer = this.select.getLayer(feature);
             let objectCardIndex = -1;
 
-            for (const selectedFeature of unpackCluster(feature)) {
-                objectCardIndex = this.getObjectCardIndexByFeature(selectedFeature);
+            for (const unpackedFeature of unpackCluster(feature)) {
+                objectCardIndex = this.getObjectCardIndexByFeature(unpackedFeature);
                 if (objectCardIndex !== -1) {
                     this.toggleObjectStatus(objectCardIndex);
                     break;
                 }
+                else {
+                    this.addObjectCard(unpackedFeature, layer.get("name"), layer.get("id"), false);
+                }
             }
-
-            this.removeHighlightFeature();
             highlightVectorFeature(feature, layer.get("id"));
         },
 
@@ -260,12 +282,10 @@ export default {
 
                     originalFeature.set("isModified", true);
                     setStyleByLayer(originalFeature, layer);
-                    this.addObjectCard(originalFeature, layer.get("name"), layer.get("id"), true);
-
+                    this.activeObjectCard.isVisible = true;
+                    this.addFeatureToScenario(originalFeature);
                 }
-                else {
-                    this.updateSimulationTag(originalFeature);
-                }
+                this.updateSimulationTag(originalFeature);
             }
             this.removeHighlightFeature();
         },
@@ -315,6 +335,24 @@ export default {
          */
         loadFeatureDescription (layer) {
             this.featureProperties = this.getEditableFeaturePropertiesFromSource(layer);
+        },
+
+        /**
+         * Removes an object card from the active scenario card and
+         * removes the associated feature from the scenario layer.
+         * @param {String|Number} cardId - Id of the object card to remove
+         */
+        removeObjectCard (cardId) {
+            const index = this.activeScenarioCard.objects.findIndex(card => card.id === cardId);
+
+            if (index === -1) {
+                return;
+            }
+
+            const feature = this.activeScenarioCard.objects[index].feature;
+
+            this.removeFeatureFromScenario(feature);
+            this.activeScenarioCard.objects.splice(index, 1);
         },
 
         /**
@@ -384,6 +422,7 @@ export default {
     >
         <ScenarioBuilderPlannerList
             :is-subject-data-selected="isSubjectDataSelected"
+            @remove-object-card="removeObjectCard($event)"
             @toggle-object-status="toggleObjectStatus($event)"
         />
         <AddCardButton

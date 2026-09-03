@@ -15,7 +15,7 @@ export default {
         TagGroup
     },
 
-    inject: ["featureProperties"],
+    inject: ["addFeatureToScenario", "featureProperties"],
 
     props: {
         selectedLayer: {
@@ -25,7 +25,7 @@ export default {
     },
 
     computed: {
-        ...mapGetters("Modules/ScenarioBuilder", ["activeObjectCard"]),
+        ...mapGetters("Modules/ScenarioBuilder", ["activeObjectCard", "nameProperties"]),
 
         editableFieldNames () {
             return Object.keys(this.featureProperties || {});
@@ -154,17 +154,9 @@ export default {
          * @returns {String} Display title of the feature.
          */
         getFeatureTitle (feature) {
-            const props = feature.getProperties(),
-                  fields = [
-                      "name",
-                      "Name",
-                      "facility",
-                      "bezeichnung",
-                      "einrichtungsname",
-                      "titel"
-                  ];
+            const props = feature.getProperties();
 
-            for (const field of fields) {
+            for (const field of this.nameProperties) {
                 if (props[field]) {
                     return typeof props[field] === "object"
                         ? JSON.stringify(props[field])
@@ -271,6 +263,11 @@ export default {
                 this.activeObjectCard[propertyStore] = {};
             }
             this.activeObjectCard[propertyStore][fieldName] = value;
+            if (!this.activeObjectCard.isVisible) {
+                this.activeObjectCard.feature.set("isModified", true);
+                this.addFeatureToScenario(this.activeObjectCard.feature);
+                this.activeObjectCard.isVisible = true;
+            }
         }
     }
 };
@@ -281,6 +278,7 @@ export default {
         id="scenario-title"
         v-model="activeObjectCard.text"
         class="mt-2"
+        :disabled="!activeObjectCard.isVisible || !activeObjectCard.feature.get('isSimulation')"
         :label="$t('additional:modules.tools.cosi.objectManager.addObjectTitle')"
         :placeholder="$t('additional:modules.tools.cosi.objectManager.addObjectTitle')"
         max-length="50"
@@ -292,6 +290,7 @@ export default {
         icon="bi bi-info"
     >
         <TagGroup
+            v-if="activeObjectCard.isVisible && activeObjectCard.feature.get('isSimulation')"
             class="mb-3 mt-5"
             :items="sourceDataItems"
             :multiple="false"
@@ -299,7 +298,7 @@ export default {
             @update:selected-items="setSelectedItems"
         />
         <DropdownAutocomplete
-            v-if="sourceDataMode === 'existing'"
+            v-if="sourceDataMode === 'existing' && activeObjectCard.isVisible && activeObjectCard.feature.get('isSimulation')"
             class="mt-3"
             :items="referenceFeatures"
             :model-value="selectedReferenceFeature"

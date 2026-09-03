@@ -20,28 +20,35 @@ export default {
     emits: ["toggle-object-status"],
 
     computed: {
-        ...mapGetters("Modules/ScenarioBuilder", ["activeScenarioCard"])
+        ...mapGetters("Modules/ScenarioBuilder", ["activeScenarioCard"]),
+
+        visibleObjectCards () {
+            return this.activeScenarioCard.objects.filter(card => card.isVisible === true);
+        }
     },
 
     methods: {
         /**
          * Removes an object card from the active scenario card.
-         * @param {Number} index - Index of the object card to remove
+         * @param {String|Number} cardId - Id of the object card to remove.
          * @returns {void}
          */
-        removeObjectCard (index) {
-            const feature = this.activeScenarioCard.objects[index].feature;
-
-            this.removeFeatureFromScenario(feature);
-            this.activeScenarioCard.objects.splice(index, 1);
+        removeObjectCard (cardId) {
+            this.$emit("remove-object-card", cardId);
         },
 
         /**
          * Toggles the status of a card at the specified index.
-         * @param {Number} index - Index of the card to toggle
+         * @param {String|Number} cardId - Id of the card to toggle.
          * @return {void}
          */
-        toggleObjectStatus (index) {
+        toggleObjectStatus (cardId) {
+            const index = this.activeScenarioCard.objects.findIndex(card => card.id === cardId);
+
+            if (index === -1) {
+                return;
+            }
+
             this.$emit("toggle-object-status", index);
         }
     }
@@ -50,11 +57,11 @@ export default {
 
 <template lang="html">
     <div
-        v-if="activeScenarioCard.objects.length"
+        v-if="visibleObjectCards.length"
         class="mb-4 py-2"
     >
         <div
-            v-for="(card, index) in activeScenarioCard.objects"
+            v-for="card in visibleObjectCards"
             :key="card.id"
             class="mb-3"
         >
@@ -65,8 +72,8 @@ export default {
                 :label="card.label"
                 :status="card.status"
                 :text="card.text"
-                @click="toggleObjectStatus(index)"
-                @click:close="removeObjectCard(index)"
+                @click="toggleObjectStatus(card.id)"
+                @click:close="removeObjectCard(card.id)"
             />
         </div>
     </div>

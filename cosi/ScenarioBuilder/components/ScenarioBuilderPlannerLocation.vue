@@ -15,6 +15,7 @@ export default {
     },
 
     inject: [
+        "addFeatureToScenario",
         "featureProperties"
     ],
 
@@ -114,6 +115,7 @@ export default {
             feature.setStyle(style);
 
             this.$emit("add-object-card", feature, label, olLayer.get("id"));
+            this.addFeatureToScenario(feature);
         },
 
         /**

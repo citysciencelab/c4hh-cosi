@@ -8,7 +8,7 @@ const state = {
     icon: "bi-boxes",
     id: "ScenarioBuilder",
     name: "ScenarioBuilder",
-    nameProperties: ["name", "facility", "bezeichnung", "einrichtungsname", "titel"],
+    nameProperties: ["name", "facility", "bezeichnung", "einrichtungsname", "titel", "schulname"],
     useIcons: true,
     width: 0.45,
     scenarioCards: [],
