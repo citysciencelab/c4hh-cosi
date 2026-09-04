@@ -44,15 +44,23 @@
           "discardImage": "Bild verwerfen",
           "discardStory": "Story verwerfen",
           "discardChanges": "Änderungen verwerfen",
-          "discardVideo": "Video verwerfen"
+          "discardVideo": "Video verwerfen",
+          "saveDraw": "Zeichnung hinzufügen",
+          "discardDraw": "Zeichnung verwerfen",
+          "edit": "Bearbeiten"
       },
       "headlines": {
+        "addDrawings": "Neue Zeichnungen hinzufügen",
         "addImages": "Neues Bild hinzufügen",
         "addTexts": "Neuen Text hinzufügen",
         "addVideo": "Neues Video hinzufügen",
         "chapterList": "Übersicht der Kapitel",
         "addImageTitle": "Neues Titelbild hinzufügen",
-        "coverOfStory": "Titelbild der Story"
+        "coverOfStory": "Titelbild der Story",
+        "addDraw": "Auf Karte zeichnen",
+        "drawnObjects": "Gezeichnete Objekte",
+        "mapContent": "Karteninhalte",
+        "drawing": "Zeichnung(en)"
       },
       "chapter": {
         "editChapter": "Kapitel bearbeiten",
@@ -97,7 +105,8 @@
           "feature": "Feature verknüpfen",
           "separator": "Trennlinie",
           "image": "Bild",
-          "video": "Video"
+          "video": "Video",
+          "draw": "Zeichnen"
         },
         "feature": {
           "title": "Überschrift (max. 200 Zeichen)",
@@ -108,6 +117,12 @@
           "cancel": "Feature verwerfen",
           "save": "Feature verknüpfen",
           "info": "Im Abspielmodus erscheint ein Button im Kapitel. Ein Klick darauf zentriert die Karte auf das verknüpfte Objekt und öffnet das Info-Popup."
+        },
+        "draw": {
+          "freeForm": "Fläche",
+          "rectangle": "Rechteck",
+          "circle": "Kreis",
+          "line": "Linie"
         }
       }
     }

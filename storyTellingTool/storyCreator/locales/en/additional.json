@@ -43,15 +43,23 @@
           "discardImage": "Discard image",
           "discardStory": "Discard story",
           "discardChanges": "Discard changes",
-          "discardVideo": "Discard video"
+          "discardVideo": "Discard video",
+          "saveDraw": "Save drawing",
+          "discardDraw": "Remove drawing",
+          "edit": "Edit"
       },
       "headlines": {
+        "addDrawings": "Add new drawings",
         "addImages": "Add new image",
         "addTexts": "Add new text",
         "addVideo": "Add new video",
         "chapterList": "List of Chapters",
         "addImageTitle": "Add new title image",
-        "coverOfStory": "Cover photo for the story"
+        "coverOfStory": "Cover photo for the story",
+        "addDraw": "Draw on map",
+        "drawnObjects": "Drawn Objects",
+        "mapContent": "Map content",
+        "drawing": "Drawing(s)"
       },
       "chapter": {
         "editChapter": "Edit chapter",
@@ -96,7 +104,8 @@
           "feature": "Link feature",
           "separator": "Separator",
           "image": "Image",
-          "video": "Video"
+          "video": "Video",
+          "draw": "Drawing"
         },
         "feature": {
           "title": "Title (max. 200 signs)",
@@ -107,6 +116,12 @@
           "cancel": "Discard feature",
           "save": "Save Feature",
           "info": "In playback mode, a button appears in the chapter. Clicking it centers the map on the linked object and opens the info pop-up."
+        },
+        "draw": {
+          "freeForm": "Free-form",
+          "rectangle": "Rectangle",
+          "circle": "Circle",
+          "line": "Line"
         }
       }
     }

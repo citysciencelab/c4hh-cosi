@@ -3,11 +3,12 @@ import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMe
 import axios from "axios";
 import {boundingExtent} from "ol/extent.js";
 import CookieBanner from "../../shared/cookiebanner/components/CookieBanner.vue";
+import ConvertFeature from "../../../simulationTool/js/convertFeatures.js";
 import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import {getDirectVideo, getEmbedLink} from "../../shared/utils/video.js";
-import {getVisibleLayerList} from "../../shared/utils/layerHelper.js";
+import {getLayerSource, getVisibleLayerList} from "../../shared/utils/layerHelper.js";
 import LayerGroup from "ol/layer/Group.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import isObject from "@shared/js/utils/isObject.js";
@@ -42,6 +43,7 @@ export default {
             showImportWarning3D: [],
             showMode: "",
             showStickyHeader: false,
+            source: null,
             toolBodyScrollTop: 0
         };
     },
@@ -119,6 +121,7 @@ export default {
          * @returns {void}
          */
         currentChapterIndex () {
+            this.source?.clear();
             this.deactivateSubjectLayer();
             this.loadChapter();
             this.removePointMarker();
@@ -238,6 +241,7 @@ export default {
                 this.closePopup();
                 this.changeMapMode("2D");
                 this.setToNorth();
+                this.source?.clear();
                 return;
             }
             if (this._detectActiveStep) {
@@ -502,6 +506,14 @@ export default {
                 }
                 this.setToNorth();
             }
+
+            if (this.currentChapter?.content.length) {
+                this.currentChapter.content.forEach(item => {
+                    if (item.type === "draw") {
+                        this.createDrawObject(item.attrs);
+                    }
+                });
+            }
         },
         /**
          * Determines the center position on the visible part of the map.
@@ -546,6 +558,7 @@ export default {
                 this.scrollToActiveStep();
                 this.removePointMarker();
                 mapCollection.getMap("2D").removeOverlay(this.overlay);
+                this.source?.clear();
             }
         },
         /**
@@ -558,7 +571,17 @@ export default {
                 this.scrollToActiveStep();
                 this.removePointMarker();
                 mapCollection.getMap("2D").removeOverlay(this.overlay);
+                this.source?.clear();
             }
+        },
+        /**
+         * Creates the drawn features.
+         * @param {Object} val the features object.
+         * @returns {void}
+         */
+        createDrawObject (val) {
+            this.source = getLayerSource();
+            this.source.addFeatures(ConvertFeature.geoJsonToOpenlayers(val));
         },
         /**
          * Opens the popup window to show the feature atrributes.
@@ -644,6 +667,7 @@ export default {
                           // also the initial value), the watcher won't fire.
                           // Trigger tools/layers/position manually in that case.
                           if (prevChapterIndex === activeIndex) {
+                              this.source?.clear();
                               this.deactivateSubjectLayer();
                               this.loadChapter();
                               this.removePointMarker();
@@ -1203,6 +1227,10 @@ export default {
         width: 100%;
         height: 100%;
         border: none;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
     }
 }
 </style>

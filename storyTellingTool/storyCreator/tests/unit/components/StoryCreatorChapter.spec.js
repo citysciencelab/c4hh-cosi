@@ -1,10 +1,10 @@
 import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
+import layerCollection from "@core/layers/js/layerCollection.js";
 import sinon from "sinon";
 import StoryCreatorChapter from "../../../components/StoryCreatorChapter.vue";
 import store from "@appstore/index.js";
-
 
 describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
     let localStore, map, originalCesium, wrapper, storyManagerActions;
@@ -93,7 +93,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         mode: () => sinon.stub()
                     },
                     actions: {
-                        changeMapMode: sinon.spy()
+                        changeMapMode: sinon.spy(),
+                        addLayer: sinon.spy()
                     }
                 }
             },
@@ -157,6 +158,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             }
         };
         mapCollection.addMap(map, "2D");
+        sinon.stub(layerCollection, "addLayer");
     });
 
     afterEach(() => {
@@ -544,6 +546,63 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
                 expect(emitted).to.have.lengthOf(1);
                 expect(emitted[0][0].title).to.equal("additional:modules.storyCreator.chapter.title");
+            });
+        });
+
+        describe("handleDraw", () => {
+            it("should add features when editor index points to add position", async () => {
+                const features = [{title: "feature1"}, {title: "feature2"}];
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "draw",
+                        index: 0
+                    },
+                    content: []
+                });
+
+                await wrapper.vm.handleDraw(features);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "draw",
+                        attrs: features
+                    }
+                ]);
+            });
+
+            it("should edit existing features when editor index points to an existing item", async () => {
+                const features = [{title: "feature1"}, {title: "feature2"}];
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "draw",
+                        index: 0
+                    },
+                    content: [
+                        {
+                            type: "draw",
+                            attrs: [{title: "feature1"}, {title: "feature2"}]
+                        }
+                    ]
+                });
+
+                await wrapper.vm.handleDraw(features);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "draw",
+                        attrs: [{title: "feature1"}, {title: "feature2"}]
+                    }
+                ]);
             });
         });
 

@@ -3,16 +3,19 @@ import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vu
 import AddElementDropdown from "../shared/modules/addElementDropdown/components/AddElementDropdown.vue";
 import buildTreeStructure from "@appstore/js/buildTreeStructure.js";
 import CookieBanner from "../../shared/cookiebanner/components/CookieBanner.vue";
+import ConvertFeature from "../../../simulationTool/js/convertFeatures.js";
 import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import {getDirectVideo, getEmbedLink} from "../../shared/utils/video.js";
-import {getVisibleLayerList} from "../../shared/utils/layerHelper.js";
+import {getLayerSource, getVisibleLayerList} from "../../shared/utils/layerHelper.js";
 import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
+import SimpleCard from "../../../cosi/shared/modules/cards/components/SimpleCard.vue";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
+import StoryCreatorAddDrawCard from "./StoryCreatorAddDrawCard.vue";
 import StoryCreatorAddFeatureCard from "./StoryCreatorAddFeatureCard.vue";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
@@ -29,6 +32,8 @@ export default {
         Draggable: draggable,
         FlatButton,
         Multiselect,
+        SimpleCard,
+        StoryCreatorAddDrawCard,
         StoryCreatorAddFeatureCard,
         StoryCreatorAddImageCard,
         StoryCreatorAddTextCard,
@@ -91,6 +96,7 @@ export default {
             selectedLayers: [],
             selectedTool: "",
             showToast: false,
+            source: null,
             title: this.$t("additional:modules.storyCreator.chapter.title")
         };
     },
@@ -104,10 +110,10 @@ export default {
          */
         allowedActions () {
             if (this.enableVideo) {
-                return ["text", "divider", "image", "feature", "video"];
+                return ["text", "divider", "image", "feature", "video", "draw"];
             }
 
-            return ["text", "divider", "image", "feature"];
+            return ["text", "divider", "image", "feature", "draw"];
         },
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
@@ -305,6 +311,8 @@ export default {
             this.changeMapMode("2D");
             this.setToNorth();
         }
+
+        this.source?.clear();
     },
     methods: {
         ...mapActions(["addOrReplaceLayer", "updateLayerConfigs"]),
@@ -374,6 +382,15 @@ export default {
                 type: "",
                 index: null
             };
+        },
+        /**
+         * Opens the popup window to show the feature atrributes.
+         * @param {Object} val the features object.
+         * @returns {void}
+         */
+        createDrawObject (val) {
+            this.source = getLayerSource();
+            this.source.addFeatures(ConvertFeature.geoJsonToOpenlayers(val));
         },
         /**
          * Opens a content editor to edit an existing item.
@@ -447,6 +464,14 @@ export default {
             this.selectedTool = chapter.map.tool
                 ? this.toolList.find(tool => tool.toolId === chapter.map.tool) || ""
                 : "";
+
+            if (chapter?.content.length) {
+                chapter.content.forEach(item => {
+                    if (item.type === "draw") {
+                        this.createDrawObject(item.attrs);
+                    }
+                });
+            }
         },
         /**
          * Returns true if the add editor for the given type is open.
@@ -690,6 +715,30 @@ export default {
                 pitch: pitch,
                 roll: roll
             };
+        },
+        /**
+         * Handles drawing add/edit by writing it to the content array and closing the open editor.
+         * @param {ol/feature[]} features - The array of drawn features.
+         * @returns {void}
+         */
+        handleDraw (features) {
+            if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
+                const editIndex = this.openContentEditor.index;
+
+                this.content.splice(editIndex, 1, {
+                    type: "draw",
+                    attrs: features
+                });
+            }
+            else {
+                this.content.push({
+                    type: "draw",
+                    attrs: features
+                });
+            }
+
+            this.source = getLayerSource();
+            this.closeContentEditor();
         },
         /**
          * Handles image add/edit by writing it to the content array and closing the open editor.
@@ -1250,6 +1299,47 @@ export default {
                                 </div>
                             </div>
                         </div>
+                        <div
+                            v-if="element.type === 'draw'"
+                            class="chapter-content-item__wrapper"
+                        >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
+                            <StoryCreatorAddDrawCard
+                                v-if="isEditingContentItem(index)"
+                                class="mt-2"
+                                :initial-content="element"
+                                @addDrawing="handleDraw"
+                                @click:close="closeContentEditor"
+                            />
+                            <div
+                                v-else
+                                class="card rounded-3 border-0 p-4 position-relative chapter-content-item__preview"
+                                :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
+                                role="button"
+                                tabindex="0"
+                                @click="openContentEditorForEdit(index, 'draw')"
+                                @keydown.enter="openContentEditorForEdit(index, 'draw')"
+                                @keydown.space.prevent="openContentEditorForEdit(index, 'draw')"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-1 chapter-content-item__close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
+                                <div class="mb-3">
+                                    <SimpleCard
+                                        icon="bi bi-bezier"
+                                        :label="$t('additional:modules.storyCreator.headlines.mapContent')"
+                                        :text="element.attrs?.length + ' ' + $t('additional:modules.storyCreator.headlines.drawing')"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </template>
             </Draggable>
@@ -1287,6 +1377,14 @@ export default {
                 v-else-if="isAddingContentType('video')"
                 class="mt-2"
                 @addVideo="handleVideo"
+                @click:close="closeContentEditor"
+            />
+            <StoryCreatorAddDrawCard
+                v-else-if="isAddingContentType('draw')"
+                class="mt-2"
+                :create-image-asset="createImageAsset"
+                :image-assets-by-id="imageAssetsById"
+                @addDrawing="handleDraw"
                 @click:close="closeContentEditor"
             />
         </AccordionItem>
