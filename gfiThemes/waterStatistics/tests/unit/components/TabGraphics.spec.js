@@ -323,7 +323,8 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                         rightAxisTransform: {
                             referenceAttribute: "gok",
                             operator: "subtract",
-                            factor: 1
+                            factor: 1,
+                            reverse: false
                         }
                     }
                 }

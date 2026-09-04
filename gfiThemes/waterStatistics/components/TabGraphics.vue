@@ -234,7 +234,7 @@ export default {
                     },
                     yRight: {
                         type: "linear",
-                        reverse: true,
+                        reverse: this.hasRightAxis ? this.currentChartTheme.chartParams?.rightAxisTransform?.reverse : false,
                         display: this.hasRightAxis,
                         position: "right",
                         title: {
