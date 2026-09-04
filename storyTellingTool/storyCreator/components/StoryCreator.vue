@@ -355,6 +355,21 @@ export default {
         },
 
         /**
+         * Gets the photo credit of the chapter overview image. Images embedded in feature content are ignored.
+         * @param {Object} val - The chapter object.
+         * @return {String} The photo credit.
+        */
+        getChapterOverviewPhotoCredit (val) {
+            if (!isObject(val) || !Array.isArray(val?.content)) {
+                return "";
+            }
+
+            const imageContent = val.content.find(content => content?.type === "image");
+
+            return imageContent?.attrs?.copyright || "";
+        },
+
+        /**
          * Saves the story with current local data.
          * Emits final snapshot to parent for persistence.
          * @returns {void}
@@ -585,8 +600,8 @@ export default {
                         :card-items="getChapterOverviewCardItems(element)"
                         :card-text="getChapterOverviewAttr(element, 'text')"
                         :card-title="element.title"
-                        :copyright="getChapterOverviewAttr(element, 'copyright')"
-                        :photo-credit="getChapterOverviewAttr(element, 'copyright')"
+                        :copyright="getChapterOverviewPhotoCredit(element)"
+                        :photo-credit="getChapterOverviewPhotoCredit(element)"
                         :editable="true"
                         @edit="editChapter(index)"
                         @click="editChapter(index)"

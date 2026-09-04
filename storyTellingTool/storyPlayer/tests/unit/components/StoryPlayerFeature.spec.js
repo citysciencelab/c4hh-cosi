@@ -39,6 +39,30 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayerFeature.spec.js", 
         it("should find shared component FlatButton", () => {
             expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
         });
+
+        it("should not render feature image if no image is provided", () => {
+            expect(wrapper.find(".feature-image").exists()).to.be.false;
+        });
+
+        it("should render feature image if image objectURL is available", async () => {
+            await wrapper.setProps({
+                featureAttributes: {
+                    image: {
+                        id: "image-1",
+                        alt: "Test image",
+                        copyright: "Test Copyright"
+                    }
+                },
+                imageAssetsById: {
+                    "image-1": {
+                        objectURL: "test-image-url"
+                    }
+                }
+            });
+
+            expect(wrapper.find(".feature-image").exists()).to.be.true;
+            expect(wrapper.find(".feature-image img").exists()).to.be.true;
+        });
     });
 
     describe("Interaction", () => {

@@ -34,7 +34,10 @@
         "mapPosition": "Kartenposition",
         "videoLink": "Video-URL (MP4, WebM, Ogg oder YouTube-Link)",
         "videoTitle": "Video-Titel (Optional)",
-        "videoAccessibleText": "Text für Barrierefreiheit"
+        "videoAccessibleText": "Text für Barrierefreiheit",
+        "imageRequiredAlt": "Ein Alternativ-Text zur barrierefreien Bildbeschreibung fehlt.",
+        "imageRequiredCopyright": "Es ist eine Urheberrechtsangabe erforderlich.",
+        "imageRequiredFields": "Erforderliche Felder müssen ausgefüllt sein."
       },
       "buttons": {
           "confirm": "Übernehmen",
@@ -93,9 +96,11 @@
           "title": "Überschrift (max. 200 Zeichen)",
           "description": "Beschreibung (optional, max. 500 Zeichen)",
           "editAttribute": "Attribute bearbeiten",
+          "addImage": "Bild hinzufügen",
           "remove": "Löschen",
           "cancel": "Feature verwerfen",
-          "save": "Feature verknüpfen"
+          "save": "Feature verknüpfen",
+          "info": "Im Abspielmodus erscheint ein Button im Kapitel. Ein Klick darauf zentriert die Karte auf das verknüpfte Objekt und öffnet das Info-Popup."
         }
       }
     }

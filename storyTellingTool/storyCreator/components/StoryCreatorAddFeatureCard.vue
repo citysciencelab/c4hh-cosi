@@ -1,4 +1,5 @@
 <script>
+import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import beautifyKey from "@shared/js/utils/beautifyKey.js";
 import {boundingExtent} from "ol/extent.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
@@ -9,15 +10,28 @@ import {isImage, isWebLink} from "@shared/js/utils/urlHelper.js";
 import isObject from "@shared/js/utils/isObject.js";
 import {isPhoneNumber, getPhoneNumberAsWebLink} from "@shared/js/utils/isPhoneNumber.js";
 import {mapActions, mapGetters} from "vuex";
+import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import {translateKeyWithPlausibilityCheck} from "@shared/js/utils/translateKeyWithPlausibilityCheck.js";
 
 export default {
     name: "StoryCreatorAddFeatureCard",
     components: {
+        AccordionItem,
         FlatButton,
-        InputText
+        InputText,
+        StoryCreatorAddImageCard
     },
     props: {
+        createImageAsset: {
+            type: Function,
+            required: false,
+            default: () => ({})
+        },
+        imageAssetsById: {
+            type: Object,
+            required: false,
+            default: () => ({})
+        },
         /**
          * The initial content
          * @type {Object}
@@ -54,7 +68,10 @@ export default {
             description: "",
             layerName: "",
             title: "",
-            zoomlevel: this.chapterZoomLevel
+            zoomlevel: this.chapterZoomLevel,
+            image: null,
+            isImageValidState: true,
+            isImageAccordionOpen: true
         };
     },
     computed: {
@@ -141,6 +158,7 @@ export default {
                 this.layerName = this.layerConfigById(content?.layerId)?.name;
                 this.title = content?.title;
                 this.zoomlevel = content?.zoomlevel;
+                this.image = content?.image || null;
 
                 this.placingPointMarker(content?.coordinate);
                 this.zoomToExtent({extent: boundingExtent([this.coordinate]), options: {maxZoom: typeof this.zoomlevel === "number" ? content?.zoomlevel : mapCollection.getMapView("2D").getZoom()}});
@@ -230,6 +248,24 @@ export default {
         },
 
         /**
+         * Updates the image validation state.
+         * @param {Boolean} valid - Whether the image is valid.
+         * @returns {void}
+         */
+        handleImageValidity (valid) {
+            this.isImageValidState = valid;
+        },
+
+        /**
+         * Updates the image accordion state.
+         * @param {Boolean} isCollapsed - Whether the accordion is collapsed.
+         * @returns {void}
+         */
+        handleImageAccordionState (isCollapsed) {
+            this.isImageAccordionOpen = !isCollapsed;
+        },
+
+        /**
          * Deletes one element from attribute object.
          * @param {String} key key of the element.
          * @returns {void}
@@ -254,7 +290,8 @@ export default {
                 featureId: this.getDefaultTitle(),
                 coordinate: this.coordinate,
                 attributes: this.attributes,
-                zoomlevel: this.zoomlevel
+                zoomlevel: this.zoomlevel,
+                image: this.image
             };
 
             this.$emit("addFeature", featureObj);
@@ -269,15 +306,24 @@ export default {
         class="card border-0 rounded-3 bg-light p-4"
     >
         <div class="d-flex align-items-center justify-content-between mb-3">
-            <strong class="h4 fw-normal mb-0">
+            <h5 class="mb-3">
                 {{ $t("additional:modules.storyCreator.addElementDropdown.items.feature") }}
-            </strong>
+            </h5>
             <button
                 type="button"
                 class="btn-close ms-2"
                 aria-label="Close"
                 @click="$emit('click:close')"
             />
+        </div>
+        <div
+            v-if="attributes"
+            class="d-flex align-items-center justify-content-center text-secondary small mt-0 mb-3"
+        >
+            <i class="bi bi-info-circle me-2" />
+            <span>
+                {{ $t('additional:modules.storyCreator.addElementDropdown.feature.info') }}
+            </span>
         </div>
         <div v-if="attributes">
             <div class="bg-white rounded-3 p-4">
@@ -305,83 +351,113 @@ export default {
                     html-type="textarea"
                     class="mb-4"
                 />
-                <div class="row no-gutters mb-3">
-                    <h6>
-                        {{ $t("additional:modules.storyCreator.addElementDropdown.feature.editAttribute") }}
-                    </h6>
-                    <div
-                        class="table-wrapper"
-                    >
-                        <table class="table">
-                            <tbody v-if="attributes">
-                                <tr
-                                    v-for="(value, key) in attributes"
-                                    :key="key"
-                                >
-                                    <td
-                                        class="font-bold firstCol"
-                                    >
-                                        <span>
-                                            {{ beautifyKey(translateKeyWithPlausibilityCheck(key, v => $t(v))) }}
-                                        </span>
-                                        <button
-                                            type="button"
-                                            class="btn-close ms-2"
-                                            :aria-label="$t('additional:modules.storyCreator.addElementDropdown.feature.remove')"
-                                            @click="removeAttribute(key)"
-                                        />
-                                    </td>
-                                    <td v-if="isWebLink(value) && !isImage(value)">
-                                        <a
-                                            :href="value"
-                                            target="_blank"
-                                        >Link</a>
-                                    </td>
-                                    <td v-else-if="isWebLink(value) && isImage(value)">
-                                        <a
-                                            :href="value"
-                                            target="_blank"
-                                        >
-                                            <img
-                                                class="gfi-theme-images-image"
-                                                :alt="$t('common:modules.getFeatureInfo.themes.default.imgAlt')"
-                                                :src="value"
-                                            >
-                                        </a>
-                                    </td>
-                                    <td v-else-if="isHTML(value)">
-                                        <div v-html="value" />
-                                    </td>
-                                    <td v-else-if="isPhoneNumber(value)">
-                                        <a :href="getPhoneNumberAsWebLink(value)">{{ value }}</a>
-                                    </td>
-                                    <td v-else-if="isEmailAddress(value)">
-                                        <a :href="`mailto:${value}`">{{ value }}</a>
-                                    </td>
-                                    <td
-                                        v-else-if="Array.isArray(value)"
-                                        v-html="value.join('<br>')"
-                                    />
-                                    <td v-else-if="hasPipe(value)">
-                                        <p
-                                            v-for="(splitValue, splitKey) in value.split('|')"
-                                            :key="splitKey"
-                                        >
-                                            {{ splitValue }}
-                                        </p>
-                                    </td>
-                                    <td
-                                        v-else-if="typeof value === 'string' && value.includes('<br>')"
-                                        v-html="value"
-                                    />
-                                    <td v-else>
-                                        {{ value }}
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <AccordionItem
+                    id="add-image"
+                    icon="bi-image"
+                    :is-open="false"
+                    :title="$t('additional:modules.storyCreator.addElementDropdown.feature.addImage')"
+                    @update-accordion-state="handleImageAccordionState"
+                >
+                    <StoryCreatorAddImageCard
+                        :closeable="false"
+                        :create-image-asset="createImageAsset"
+                        :embedded="true"
+                        :image-assets-by-id="imageAssetsById"
+                        :initial-image="image"
+                        @update:image="image = $event"
+                        @update:image-valid="handleImageValidity"
+                    />
+                </AccordionItem>
+                <div
+                    v-if="!isImageAccordionOpen && image && !isImageValidState"
+                    class="text-danger small mb-2"
+                >
+                    <i class="bi bi-exclamation-circle me-1" />
+                    {{ $t('additional:modules.storyCreator.labels.imageRequiredFields') }}
                 </div>
+                <hr>
+                <AccordionItem
+                    id="edit-attributes"
+                    icon="bi-sliders2"
+                    :is-open="true"
+                    :title="$t('additional:modules.storyCreator.addElementDropdown.feature.editAttribute')"
+                >
+                    <div class="row no-gutters mb-3">
+                        <div
+                            class="table-wrapper"
+                        >
+                            <table class="table">
+                                <tbody v-if="attributes">
+                                    <tr
+                                        v-for="(value, key) in attributes"
+                                        :key="key"
+                                        class="attribute-row"
+                                    >
+                                        <td
+                                            class="font-bold firstCol"
+                                        >
+                                            <span>
+                                                {{ beautifyKey(translateKeyWithPlausibilityCheck(key, v => $t(v))) }}
+                                            </span>
+                                            <button
+                                                type="button"
+                                                class="btn-close ms-2"
+                                                :aria-label="$t('additional:modules.storyCreator.addElementDropdown.feature.remove')"
+                                                @click="removeAttribute(key)"
+                                            />
+                                        </td>
+                                        <td v-if="isWebLink(value) && !isImage(value)">
+                                            <a
+                                                :href="value"
+                                                target="_blank"
+                                            >Link</a>
+                                        </td>
+                                        <td v-else-if="isWebLink(value) && isImage(value)">
+                                            <a
+                                                :href="value"
+                                                target="_blank"
+                                            >
+                                                <img
+                                                    class="gfi-theme-images-image"
+                                                    :alt="$t('common:modules.getFeatureInfo.themes.default.imgAlt')"
+                                                    :src="value"
+                                                >
+                                            </a>
+                                        </td>
+                                        <td v-else-if="isHTML(value)">
+                                            <div v-html="value" />
+                                        </td>
+                                        <td v-else-if="isPhoneNumber(value)">
+                                            <a :href="getPhoneNumberAsWebLink(value)">{{ value }}</a>
+                                        </td>
+                                        <td v-else-if="isEmailAddress(value)">
+                                            <a :href="`mailto:${value}`">{{ value }}</a>
+                                        </td>
+                                        <td
+                                            v-else-if="Array.isArray(value)"
+                                            v-html="value.join('<br>')"
+                                        />
+                                        <td v-else-if="hasPipe(value)">
+                                            <p
+                                                v-for="(splitValue, splitKey) in value.split('|')"
+                                                :key="splitKey"
+                                            >
+                                                {{ splitValue }}
+                                            </p>
+                                        </td>
+                                        <td
+                                            v-else-if="typeof value === 'string' && value.includes('<br>')"
+                                            v-html="value"
+                                        />
+                                        <td v-else>
+                                            {{ value }}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </AccordionItem>
             </div>
             <div class="d-flex justify-content-center gap-2 mt-4">
                 <FlatButton
@@ -390,6 +466,7 @@ export default {
                     :icon="'bi-save'"
                     :text="$t('additional:modules.storyCreator.addElementDropdown.feature.save')"
                     :title="$t('additional:modules.storyCreator.addElementDropdown.feature.save')"
+                    :disabled="!isImageValidState"
                     :interaction="() => saveFeature()"
                 />
                 <FlatButton
@@ -456,6 +533,9 @@ export default {
                 padding-right: 10px;
             }
         }
+    }
+    .attribute-row:hover > td {
+        background-color: $light_blue;
     }
     .dot-flashing {
         position: relative;

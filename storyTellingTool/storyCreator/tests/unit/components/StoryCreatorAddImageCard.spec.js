@@ -159,6 +159,78 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
 
             expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
         });
+
+        it("should use embedded mode when embedded prop is true", async () => {
+            await wrapper.setProps({
+                embedded: true
+            });
+
+            expect(wrapper.find(".card").classes()).to.include("bg-white");
+        });
+
+        it("should use non-embedded mode when embedded prop is false", () => {
+            expect(wrapper.find(".card").classes()).to.include("bg-light");
+        });
+
+        it("should not render the add button when embedded is true", async () => {
+            await wrapper.setProps({
+                embedded: true
+            });
+
+            const buttons = wrapper.findAllComponents({name: "FlatButton"});
+
+            expect(buttons).to.have.lengthOf(1);
+            expect(buttons[0].props("text")).to.equal("additional:modules.storyCreator.buttons.discardImage");
+        });
+
+        it("should render the add button when embedded is false", () => {
+            const buttons = wrapper.findAllComponents({name: "FlatButton"});
+
+            expect(buttons).to.have.lengthOf(2);
+        });
+
+        it("should show alt error in embedded mode when image is loaded and alt is missing", async () => {
+            await wrapper.setProps({
+                embedded: true
+            });
+
+            await wrapper.setData({
+                uploadedAsset: {
+                    id: "test-uuid",
+                    objectURL: "blob:test-created-url"
+                },
+                image: {
+                    id: "test-uuid",
+                    alt: "",
+                    copyright: "copyright info"
+                },
+                showRequiredHint: true
+            });
+
+            expect(wrapper.vm.hasAltError).to.be.true;
+            expect(wrapper.find("#image-name").exists()).to.be.true;
+        });
+
+        it("should show copyright error in embedded mode when image is loaded and copyright is missing", async () => {
+            await wrapper.setProps({
+                embedded: true
+            });
+
+            await wrapper.setData({
+                uploadedAsset: {
+                    id: "test-uuid",
+                    objectURL: "blob:test-created-url"
+                },
+                image: {
+                    id: "test-uuid",
+                    alt: "alt text",
+                    copyright: ""
+                },
+                showRequiredHint: true
+            });
+
+            expect(wrapper.vm.hasCopyrightError).to.be.true;
+        });
     });
 
     describe("Computed Properties", () => {

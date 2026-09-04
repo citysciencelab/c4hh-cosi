@@ -33,7 +33,10 @@
         "mapPosition": "Map position",
         "videoLink": "Video-URL (MP4, WebM, Ogg or YouTube-Link)",
         "videoTitle": "Video-Title (Optional)",
-        "videoAccessibleText": "Text for accessibility"
+        "videoAccessibleText": "Text for accessibility",
+        "imageRequiredAlt": "Alternative text for an accessible image description is missing.",
+        "imageRequiredCopyright": "A copyright notice is required.",
+        "imageRequiredFields": "Required fields must be filled out."
       },
       "buttons": {
           "confirm": "Confirm",
@@ -92,9 +95,11 @@
           "title": "Title (max. 200 signs)",
           "description": "Description (optional, max. 500 signs)",
           "editAttribute": "Edit attribute",
+          "addImage": "Add image",
           "remove": "Remove",
           "cancel": "Discard feature",
-          "save": "Save Feature"
+          "save": "Save Feature",
+          "info": "In playback mode, a button appears in the chapter. Clicking it centers the map on the linked object and opens the info pop-up."
         }
       }
     }

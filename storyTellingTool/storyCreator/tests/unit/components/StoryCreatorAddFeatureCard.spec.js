@@ -134,6 +134,16 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
             expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
             expect(wrapper.findAllComponents({name: "FlatButton"}).length).to.equal(2);
         });
+
+        it("should render StoryCreatorAddImageCard when attributes exist", async () => {
+            await wrapper.setData({
+                attributes: {
+                    id: "1"
+                }
+            });
+
+            expect(wrapper.findComponent({name: "StoryCreatorAddImageCard"}).exists()).to.be.true;
+        });
     });
 
     describe("Methods", () => {
@@ -190,11 +200,58 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
             });
         });
 
+        describe("handleImageValidity", () => {
+            it("should update image validity state when image validity changes", async () => {
+                await wrapper.setData({
+                    attributes: {
+                        id: "1"
+                    }
+                });
+
+                const imageCard = wrapper.findComponent({name: "StoryCreatorAddImageCard"});
+
+                await imageCard.vm.$emit("update:image-valid", false);
+
+                expect(wrapper.vm.isImageValidState).to.be.false;
+
+                await imageCard.vm.$emit("update:image-valid", true);
+
+                expect(wrapper.vm.isImageValidState).to.be.true;
+            });
+        });
+
+        describe("handleImageValidity", () => {
+            it("should update image accordion state", () => {
+                wrapper.vm.handleImageAccordionState(true);
+
+                expect(wrapper.vm.isImageAccordionOpen).to.be.false;
+
+                wrapper.vm.handleImageAccordionState(false);
+
+                expect(wrapper.vm.isImageAccordionOpen).to.be.true;
+            });
+        });
+
+
         describe("saveFeature", () => {
             it("should emit the function addFeature", async () => {
                 wrapper.vm.saveFeature();
                 await wrapper.vm.$nextTick();
                 expect(wrapper.emitted()).to.have.property("addFeature");
+            });
+
+            it("should disable save button when image is invalid", async () => {
+                await wrapper.setData({
+                    attributes: {
+                        id: "1"
+                    },
+                    isImageValidState: false
+                });
+
+                const saveButton = wrapper.findComponent("#save");
+
+                expect(saveButton.exists()).to.be.true;
+                expect(saveButton.props("disabled")).to.be.true;
             });
         });
     });

@@ -1006,6 +1006,7 @@ export default {
             <StoryPlayerFeature
                 v-if="featureAttributes"
                 :key="featureAttributes?.title"
+                :image-assets-by-id="imageAssetsById"
                 :feature-attributes="featureAttributes"
                 @closePopup="closePopup"
             />

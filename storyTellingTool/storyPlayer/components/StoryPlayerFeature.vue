@@ -17,9 +17,27 @@ export default {
         featureAttributes: {
             type: Object,
             required: true
+        },
+        imageAssetsById: {
+            type: Object,
+            required: false,
+            default: () => ({})
         }
     },
     emits: ["closePopup"],
+    computed: {
+        /**
+         * Returns the object URL of the feature image.
+         * @returns {String} The feature image URL or an empty string.
+         */
+        featureImagePath () {
+            const imageId = this.featureAttributes?.imageId;
+
+            return imageId
+                ? this.imageAssetsById?.[imageId]?.objectURL || ""
+                : "";
+        }
+    },
     methods: {
         ...mapActions("Maps", ["removePointMarker"]),
         beautifyKey,
@@ -46,85 +64,100 @@ export default {
 <template lang="html">
     <div
         id="feature-popup"
-        class="bg-white p-3"
+        class="bg-white d-flex flex-column position-relative"
     >
-        <h5>
-            {{ featureAttributes?.title }}
-        </h5>
         <div
-            class="description"
+            v-if="featureAttributes?.image?.id && imageAssetsById[featureAttributes.image.id]?.objectURL"
+            class="feature-image flex-shrink-0"
         >
-            {{ featureAttributes?.description }}
+            <img
+                :src="imageAssetsById[featureAttributes.image.id].objectURL"
+                :alt="featureAttributes.image.alt"
+                class="w-100"
+            >
+            <div class="text-end px-2 pt-1">
+                <small class="photocredit">© {{ featureAttributes.image.copyright }}</small>
+            </div>
         </div>
         <div
-            class="table-wrapper mt-3"
+            class="ps-3 pt-3 pe-3 overflow-auto flex-grow-1 feature-popup-body"
         >
-            <table class="table">
-                <tbody v-if="featureAttributes?.attributes">
-                    <tr
-                        v-for="(value, key) in featureAttributes.attributes"
-                        :key="key"
-                    >
-                        <td
-                            class="font-bold firstCol"
+            <h5 class="mb-2">
+                {{ featureAttributes?.title }}
+            </h5>
+
+            <div class="description">
+                {{ featureAttributes?.description }}
+            </div>
+            <div class="table-wrapper mt-2">
+                <table class="table small">
+                    <tbody v-if="featureAttributes?.attributes">
+                        <tr
+                            v-for="(value, key) in featureAttributes.attributes"
+                            :key="key"
                         >
-                            <span>
-                                {{ beautifyKey(translateKeyWithPlausibilityCheck(key, v => $t(v))) }}
-                            </span>
-                        </td>
-                        <td v-if="isWebLink(value) && !isImage(value)">
-                            <a
-                                :href="value"
-                                target="_blank"
-                            >Link</a>
-                        </td>
-                        <td v-else-if="isWebLink(value) && isImage(value)">
-                            <a
-                                :href="value"
-                                target="_blank"
-                            >
-                                <img
-                                    class="gfi-theme-images-image"
-                                    :alt="$t('common:modules.getFeatureInfo.themes.default.imgAlt')"
-                                    :src="value"
+                            <td class="font-bold firstCol">
+                                <span>
+                                    {{ beautifyKey(translateKeyWithPlausibilityCheck(key, v => $t(v))) }}
+                                </span>
+                            </td>
+
+                            <td v-if="isWebLink(value) && !isImage(value)">
+                                <a
+                                    :href="value"
+                                    target="_blank"
+                                >Link</a>
+                            </td>
+
+                            <td v-else-if="isWebLink(value) && isImage(value)">
+                                <a
+                                    :href="value"
+                                    target="_blank"
                                 >
-                            </a>
-                        </td>
-                        <td v-else-if="isHTML(value)">
-                            <div v-html="value" />
-                        </td>
-                        <td v-else-if="isPhoneNumber(value)">
-                            <a :href="getPhoneNumberAsWebLink(value)">{{ value }}</a>
-                        </td>
-                        <td v-else-if="isEmailAddress(value)">
-                            <a :href="`mailto:${value}`">{{ value }}</a>
-                        </td>
-                        <td
-                            v-else-if="Array.isArray(value)"
-                            v-html="value.join('<br>')"
-                        />
-                        <td v-else-if="hasPipe(value)">
-                            <p
-                                v-for="(splitValue, splitKey) in value.split('|')"
-                                :key="splitKey"
-                            >
-                                {{ splitValue }}
-                            </p>
-                        </td>
-                        <td
-                            v-else-if="typeof value === 'string' && value.includes('<br>')"
-                            v-html="value"
-                        />
-                        <td v-else>
-                            {{ value }}
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                                    <img
+                                        class="gfi-theme-images-image"
+                                        :alt="$t('common:modules.getFeatureInfo.themes.default.imgAlt')"
+                                        :src="value"
+                                    >
+                                </a>
+                            </td>
+                            <td v-else-if="isHTML(value)">
+                                <div v-html="value" />
+                            </td>
+                            <td v-else-if="isPhoneNumber(value)">
+                                <a :href="getPhoneNumberAsWebLink(value)">{{ value }}</a>
+                            </td>
+                            <td v-else-if="isEmailAddress(value)">
+                                <a :href="`mailto:${value}`">{{ value }}</a>
+                            </td>
+                            <td
+                                v-else-if="Array.isArray(value)"
+                                v-html="value.join('<br>')"
+                            />
+                            <td v-else-if="hasPipe(value)">
+                                <p
+                                    v-for="(splitValue, splitKey) in value.split('|')"
+                                    :key="splitKey"
+                                >
+                                    {{ splitValue }}
+                                </p>
+                            </td>
+                            <td
+                                v-else-if="typeof value === 'string' && value.includes('<br>')"
+                                v-html="value"
+                            />
+                            <td v-else>
+                                {{ value }}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <div class="d-flex justify-content-center mt-2">
+        <div class="feature-popup-footer position-absolute bottom-0 start-0 end-0 d-flex justify-content-center align-items-center ps-2 pe-2 pb-1 pt-5">
             <FlatButton
                 id="save"
+                class="mb-2"
                 :icon="'bi-x-lg'"
                 :text="$t('additional:modules.storyPlayer.close')"
                 :title="$t('additional:modules.storyPlayer.close')"
@@ -138,19 +171,70 @@ export default {
 <style lang="scss">
 #feature-popup {
     max-height: 60vh;
+    max-width: 450px;
     border-radius: 5px;
-    box-shadow: 0 8px 11px 2px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 24px 8px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    font-size: $font_size_sm;
 
-    h5, .description {
-        max-width: 500px;
+    .feature-image {
+        img {
+            display: block;
+            width: 100%;
+            max-height: 25vh;
+            object-fit: cover;
+        }
+
+        small {
+            font-size: $font_size_sm;
+        }
+    }
+
+    .feature-title {
+        font-family: $font_family_accent;
+        font-size: 1.25rem;
+        line-height: 1.2;
+        color: $secondary;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+    }
+
+    .description {
+        font-size: $font-size-base;
+        line-height: 1.3;
+        color: $dark_grey;
         white-space: normal;
         overflow-wrap: break-word;
     }
 
-    .table-wrapper {
-        max-width: 500px;
-        max-height: 40vh;
-        overflow: auto;
+    .table {
+        font-size: $font-size-base;
+        line-height: 1.3;
+        color: $dark_grey;
+        margin-bottom: 0;
+
+        td {
+            padding-top: 0.3rem;
+            padding-bottom: 0.3rem;
+            vertical-align: top;
+            overflow-wrap: break-word;
+        }
+
+        .firstCol {
+            font-family: $font_family_accent;
+            color: $dark_grey;
+        }
+
+        p {
+            margin-bottom: 0.2rem;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
     }
+}
+#feature-popup > .feature-popup-body {
+    padding-bottom: 5rem;
 }
 </style>

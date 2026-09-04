@@ -1140,6 +1140,8 @@ export default {
                                 :chapter-zoom-level="element?.attrs?.zoomlevel"
                                 :initial-content="element"
                                 :selected-layers="selectedLayers"
+                                :create-image-asset="createImageAsset"
+                                :image-assets-by-id="imageAssetsById"
                                 @addFeature="handleFeature"
                                 @click:close="closeContentEditor"
                             />
@@ -1275,6 +1277,8 @@ export default {
                 class="mt-2"
                 :chapter-zoom-level="confirmedZoomlevel"
                 :selected-layers="selectedLayers"
+                :create-image-asset="createImageAsset"
+                :image-assets-by-id="imageAssetsById"
                 @addFeature="handleFeature"
                 @click:close="closeContentEditor"
             />
