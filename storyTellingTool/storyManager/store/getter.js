@@ -13,19 +13,13 @@ const getters = {
      */
     menuSide (___, __, _, rootGetters) {
         const mainMenuSections = rootGetters?.["Menu/mainMenu"]?.sections,
-            secondaryMenuSections = rootGetters?.["Menu/secondaryMenu"]?.sections,
             isStoryManagerInMain = Array.isArray(mainMenuSections)
-                && mainMenuSections.flat(Infinity).some(entry => entry?.type === "storyManager"),
-            isStoryManagerInSecondary = Array.isArray(secondaryMenuSections)
-                && secondaryMenuSections.flat(Infinity).some(entry => entry?.type === "storyManager");
+                && mainMenuSections.flat(Infinity).some(entry => entry?.type === "storyManager");
 
         if (isStoryManagerInMain) {
             return "mainMenu";
         }
-        if (isStoryManagerInSecondary) {
-            return "secondaryMenu";
-        }
-        return "";
+        return "secondaryMenu";
     }
 };
 
