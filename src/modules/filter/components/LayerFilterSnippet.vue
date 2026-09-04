@@ -270,6 +270,9 @@ export default {
         },
         triggerAllTagsDeleted () {
             this.resetAllSnippets(this.deleteAllRules());
+            if (!this.hasUnfixedRules(this.filterRules)) {
+                this.amountOfFilteredItems = false;
+            }
         },
         paging (val) {
             if (val?.page >= val?.total) {
