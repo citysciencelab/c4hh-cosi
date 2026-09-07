@@ -45,6 +45,7 @@ export default {
             showDisclaimerModal: false,
             offscreenKey: 0,
             showTable: false,
+            selectedChart: null,
             hoverCrosshairPlugin: {
                 id: "hoverCrosshair",
                 afterDraw (chart, _args, options) {
@@ -119,12 +120,11 @@ export default {
         ]),
         ...mapGetters(["isMobile"]),
         /**
-         * Returns the active chart theme (first theme from params.chartThemes).
+         * Returns the active chart theme.
          * @returns {Object|undefined} chart theme object or undefined when not available.
          */
         currentChartTheme () {
-            // TODO chartTheme muss angepasst werden, wenn mehrere Charts in einem Tab vorhanden sind und es ein Dropdown gibt
-            return this.params?.chartThemes[0];
+            return this.selectedChart ?? this.params?.chartThemes[0];
         },
         /**
          * Indicates whether a right Y axis is configured for the current chart theme.
@@ -826,6 +826,8 @@ export default {
                 });
 
                 this.getPercentilesForThisData();
+
+                this.selectedChart = this.currentChartTheme;
             },
             immediate: true
         },
@@ -848,6 +850,30 @@ export default {
                 }
 
                 this.getPercentilesForThisData();
+            },
+            immediate: true
+        },
+        selectedChart: {
+            deep: true,
+            handler (newSelectedChart, oldSelectedChart) {
+                if (newSelectedChart === oldSelectedChart) {
+                    return;
+                }
+
+                this.runQueryOaf({
+                    queryPurpose: "getAllData"
+                });
+
+                const percentilePath = this.currentChartTheme?.chartParams?.percentiles;
+
+                if (percentilePath) {
+                    this.queryPercentiles({params: {url: percentilePath}});
+                }
+                else {
+                    this.setPercentiles([]);
+                }
+
+                this.filterFromAllData(this.selectedStartYear, this.selectedStartMonth, this.selectedEndYear, this.selectedEndMonth);
             },
             immediate: true
         }
@@ -875,7 +901,8 @@ export default {
         ]),
         ...mapMutations("Modules/WaterStatistics", [
             "setStatisticValues",
-            "setDataLoading"
+            "setDataLoading",
+            "setPercentiles"
         ]),
         /**
          * Find the minimal or maximal numeric value for the provided axisKey inside statisticValues.
@@ -996,7 +1023,7 @@ export default {
          * @returns {string[]} Array of CSV parameter names
          */
         getCsvParams () {
-            const chartParams = this.params?.chartThemes?.[0];
+            const chartParams = this.currentChartTheme;
 
             if (chartParams?.csvParams?.length) {
                 return chartParams?.csvParams;
@@ -1481,6 +1508,32 @@ export default {
         id="TabGraphics"
         class="row chart line"
     >
+        <div
+            v-if="params?.chartThemes?.length > 1"
+            class="chart-select"
+        >
+            <label
+                for="chart-theme-select"
+                class="chart-theme-label"
+            >
+                Datensatz auswählen:
+            </label>
+
+            <select
+                id="chart-theme-select"
+                v-model="selectedChart"
+                class="chart-title-select"
+            >
+                <option
+                    v-for="chart in params?.chartThemes"
+                    :key="chart.chartTitle"
+                    :value="chart"
+                >
+                    {{ chart.chartTitle }}
+                </option>
+            </select>
+        </div>
+
         <div class="filter">
             <div class="manual-date-range">
                 <div class="date-selects">
@@ -1694,6 +1747,27 @@ export default {
 #TabGraphics {
     position: relative; // ensure the spinner-wrapper is positioned correctly within this container
 
+    select {
+        padding: 4px 2px;
+        border-radius: 4px;
+        border: 1px solid #adadad;
+    }
+
+    div.chart-select {
+        margin: 10px 0;
+
+        label.chart-theme-label {
+            font-weight: bold;
+            margin-right: 5px;
+            font-weight: normal;
+        }
+
+        select.chart-title-select {
+            width: auto;
+            margin-left: 5px;
+        }
+    }
+
     div.filter {
         margin-bottom: 10px;
 
@@ -1725,12 +1799,6 @@ export default {
                 display: flex;
                 flex-direction: column;
                 gap: 10px;
-            }
-
-            select {
-                padding: 4px 2px;
-                border-radius: 4px;
-                border: 1px solid #adadad;
             }
 
             .filter-from-select,
