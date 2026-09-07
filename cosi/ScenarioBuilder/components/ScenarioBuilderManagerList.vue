@@ -85,7 +85,7 @@ export default {
                         label: $t('additional:modules.tools.cosi.scenarioManager.planningObject') + ': ' + item.objects.length
                     }
                 ]"
-                :downloadable="item.downloadable"
+                :downloadable="false"
                 :icon="item.icon"
                 :visible="false"
                 :status="item.status"

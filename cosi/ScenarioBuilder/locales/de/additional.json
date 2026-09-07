@@ -4,6 +4,7 @@
             "cosi": {
                 "scenarioBuilder": {
                     "title": "Einrichtungen anlegen",
+                    "description": "Verwalten und bearbeiten Sie Ihre Szenarien übersichtlich an einem Ort. Innerhalb eines Szenarios können Sie mehrere Fachdaten anlegen und bestehende Fachdaten bearbeiten. Wählen Sie dazu vorhandene Fachdaten direkt auf der Karte aus oder erstellen Sie neue Objekte. Anschließend können Sie diese verschieben und ihre Eigenschaften anpassen. Ihre Änderungen bleiben auf das aktuelle Szenario beschränkt",
                     "configureFeature": "Einrichtung konfigurieren",
                     "toolMenu": "Werkzeuge",
                     "help": "Lorem Ipsum dolor sit amet",

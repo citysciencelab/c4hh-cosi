@@ -9,6 +9,7 @@
 ### Added
 
 - lzsResearchClient: Added new addon lzsResearchClient for easy searching and access to geoadata in long-term storage
+- ScenarioBuilder: This allows you to add subject data objects and see, within CoSI, how they affect other subject data and demographic data.
 
 ### Changed
 

@@ -2,7 +2,6 @@
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AddCardButton from "../../shared/modules/cards/components/AddCardButton.vue";
 import {computed} from "vue";
-import {getLayerSource} from "../../utils/layer/getLayerSource.js";
 import {getNameProperty} from "../../utils/features/getNameProperty.js";
 import highlightVectorFeature from "../../utils/highlightVectorFeature";
 import Icon from "ol/style/Icon.js";
@@ -93,7 +92,7 @@ export default {
 
         selectedLayer (newLayer) {
             if (newLayer) {
-                this.loadFeatureDescription(newLayer);
+                this.featureProperties = this.getEditableFeaturePropertiesFromSource(newLayer);
             }
         },
 
@@ -154,19 +153,19 @@ export default {
                   iconSrc = this.getFeatureIconSrc(feature);
 
             this.activeScenarioCard.objects.push({
-                id: feature.getId(),
-                iconSrc,
-                label: properties.facility || name,
-                text: getNameProperty(feature, this.nameProperties)?.value || "Neues Objekt",
                 feature,
+                iconSrc,
+                id: feature.getId(),
                 isVisible: isModified || feature.get("isSimulation"),
+                label: properties.facility || name,
                 layerId: layerId,
-                originProperties: this.getOriginProperties(feature, layerId),
-                status: "",
-                sourceDataMode: !feature.get("isSimulation") ? "existing" : "empty",
-                referenceFeatureId: feature.getId(),
                 manualFeatureProperties: {},
-                referenceFeatureProperties: this.getOriginProperties(feature, layerId)
+                originProperties: feature.clone().getProperties(),
+                text: getNameProperty(feature, this.nameProperties)?.value || "Neues Objekt",
+                referenceFeatureId: feature.getId(),
+                referenceFeatureProperties: feature.clone().getProperties(),
+                sourceDataMode: !feature.get("isSimulation") ? "existing" : "empty",
+                status: ""
             });
 
             this.toggleObjectStatus(this.activeScenarioCard.objects.length - 1);
@@ -186,23 +185,6 @@ export default {
                 return resolvedStyle.getImage().getSrc();
             }
             return undefined;
-        },
-
-        /**
-         * Retrieves the original properties of a feature from its source layer.
-         * If the feature is a simulation, returns an empty object.
-         * @param {ol/Feature} feature - The feature whose original properties are to be retrieved.
-         * @param {String} layerId - The id of the layer.
-         * @returns {Object} The original properties of the feature.
-         */
-        getOriginProperties (feature, layerId) {
-            if (feature.get("isSimulation")) {
-                return {};
-            }
-            const olLayer = layerCollection.getLayerById(layerId).getLayer(),
-                  originFeature = getLayerSource(olLayer).getFeatureById(feature.getId());
-
-            return originFeature.getProperties();
         },
 
         /**
@@ -263,6 +245,7 @@ export default {
             highlightVectorFeature(feature, layer.get("id"));
         },
 
+
         /**
          * Event handler for the end of a feature translation
          * Triggers the updating of guide layer tags and updates clustered features
@@ -270,13 +253,11 @@ export default {
          * @returns {void}
          */
         onTranslateEnd (evt) {
-            const feature = evt.features.item(0),
-                  targetGeometry = feature.getGeometry().clone();
+            const feature = evt.features.item(0);
 
             let originalFeature;
 
             for (originalFeature of unpackCluster(feature)) {
-                originalFeature.setGeometry(targetGeometry);
                 if (!originalFeature.get("isModified") && !originalFeature.get("isSimulation")) {
                     const layer = this.select.getLayer(feature);
 
@@ -284,6 +265,7 @@ export default {
                     setStyleByLayer(originalFeature, layer);
                     this.activeObjectCard.isVisible = true;
                     this.addFeatureToScenario(originalFeature);
+                    layer.getSource().removeFeature(feature);
                 }
                 this.updateSimulationTag(originalFeature);
             }
@@ -329,15 +311,6 @@ export default {
         },
 
         /**
-         * Loads and processes the feature description for a given layer.
-         * @param {Object} layer - The layer object containing attributes and configuration.
-         * @returns {void}
-         */
-        loadFeatureDescription (layer) {
-            this.featureProperties = this.getEditableFeaturePropertiesFromSource(layer);
-        },
-
-        /**
          * Removes an object card from the active scenario card and
          * removes the associated feature from the scenario layer.
          * @param {String|Number} cardId - Id of the object card to remove
@@ -349,10 +322,42 @@ export default {
                 return;
             }
 
-            const feature = this.activeScenarioCard.objects[index].feature;
+            const objectCard = this.activeScenarioCard.objects[index];
 
-            this.removeFeatureFromScenario(feature);
+            if (objectCard.feature.get("isModified")) {
+                this.resetFeatureToOriginal(objectCard);
+            }
+            this.removeFeatureFromScenario(objectCard.feature);
             this.activeScenarioCard.objects.splice(index, 1);
+        },
+
+        /**
+         * Resets a feature to its original properties and geometry, and adds it back to the specified layer.
+         * @param {Object} params - Parameters for resetting the feature.
+         * @param {ol/Feature} params.feature - The feature to reset.
+         * @param {String} params.layerId - The ID of the layer to which the feature belongs.
+         * @param {Object} params.originProperties - The original properties of the feature.
+         * @returns {void}
+         */
+        resetFeatureToOriginal ({feature, layerId, originProperties}) {
+            const olLayer = layerCollection.getLayerById(layerId).getLayer();
+
+            if (!feature || feature.get("isSimulation")) {
+                return;
+            }
+
+            Object.keys(feature.getProperties()).forEach(key => {
+                if (key !== "features") {
+                    feature.unset(key);
+                }
+            });
+
+            Object.entries(originProperties).forEach(([key, value]) => {
+                feature.set(key, value);
+            });
+
+            feature.setGeometry(originProperties.geometry);
+            olLayer.getSource().addFeature(feature);
         },
 
         /**
@@ -371,7 +376,7 @@ export default {
             );
 
             if (this.selectedLayer) {
-                this.loadFeatureDescription(this.selectedLayer);
+                this.featureProperties = this.getEditableFeaturePropertiesFromSource(this.selectedLayer);
             }
         },
 
@@ -453,3 +458,4 @@ export default {
         />
     </template>
 </template>
+

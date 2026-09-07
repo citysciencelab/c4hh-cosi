@@ -35,7 +35,7 @@ export default {
                     {value: this.scenarioTitle},
                     {icon: "bi bi-pencil", label: "Erstellt: " + dayjs().format("DD.MM.YYYY")}
                 ],
-                downloadable: true,
+                downloadable: false,
                 icon: "bi bi-bounding-box",
                 id: hash({
                     title: this.scenarioTitle,

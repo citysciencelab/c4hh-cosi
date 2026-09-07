@@ -1,10 +1,26 @@
 <script>
+import IconButton from "@/shared/modules/buttons/components/IconButton.vue";
+import Badges from "../../badges/components/Badges.vue";
+
 export default {
     name: "SimpleCard",
+    components: {
+        Badges,
+        IconButton
+    },
     props: {
+        badgeList: {
+            type: Array,
+            required: false,
+            default: () => []
+        },
         closeable: {
             type: Boolean,
             default: true
+        },
+        closeIcon: {
+            type: String,
+            default: "bi bi-x-lg"
         },
         disabled: {
             type: Boolean,
@@ -58,7 +74,7 @@ export default {
                     :class="icon"
                 />
             </div>
-            <div class="ps-4 py-1 flex-grow-1">
+            <div class="px-4 py-1">
                 <div class="label">
                     {{ label }}
                 </div>
@@ -66,11 +82,23 @@ export default {
                     {{ text }}
                 </div>
             </div>
-            <button
+            <div
+                v-if="badgeList.length"
+                class="d-flex flex-row flex-grow-1 gap-1"
+            >
+                <Badges
+                    v-for="(badge, idx) in badgeList"
+                    :key="idx"
+                    :background-color="badge.backgroundColor"
+                    :color="badge.color"
+                    :text="badge.text"
+                />
+            </div>
+            <IconButton
                 v-if="closeable"
-                type="button"
-                class="btn-close align-self-start"
-                aria-label="Close"
+                class="p-1"
+                :aria="'Löschen'"
+                :icon="closeIcon"
                 @click.stop="$emit('click:close')"
             />
         </div>

@@ -4,6 +4,7 @@
             "cosi": {
                 "scenarioBuilder": {
                     "title": "Simulate Facilities",
+                    "description": "Manage and edit your scenarios conveniently in one place. Within a scenario, you can create multiple subject data and edit existing subject data. To do this, select existing subject data directly on the map or create new objects. You can then move them and adjust their properties. Your changes remain limited to the current scenario.",
                     "configureFeature": "Configure facility",
                     "toolMenu": "Tools",
                     "help": "Lorem Ipsum dolor sit amet",

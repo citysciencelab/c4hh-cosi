@@ -28,6 +28,38 @@ export default {
     },
 
     methods: {
+
+        /**
+         * Returns the appropriate badge based on the feature's properties.
+         * @param {ol/Feature} feature - The feature object to evaluate.
+         * @returns {Array} - An array containing a single badge object.
+         */
+        getBadge (feature) {
+            if (feature.get("isSimulation")) {
+                return [{
+                    backgroundColor: "#3c5f94",
+                    color: "#ffffff",
+                    icon: null,
+                    text: "Neu"
+                }];
+            }
+            return [{
+                backgroundColor: "#f3b020",
+                color: "#ffffff",
+                icon: null,
+                text: "Geändert"
+            }];
+        },
+
+        /*
+        * Returns the appropriate close icon based on the feature's properties.
+        * @param {ol/Feature} feature - The feature object to evaluate.
+        * @returns {String} - The icon class name for the close button.
+        */
+        getCloseIcon (feature) {
+            return feature.get("isSimulation") ? "bi bi-trash" : "bi bi-arrow-clockwise";
+        },
+
         /**
          * Removes an object card from the active scenario card.
          * @param {String|Number} cardId - Id of the object card to remove.
@@ -67,8 +99,10 @@ export default {
         >
             <SimpleCard
                 hoverable
-                :icon-src="card.iconSrc"
+                :badge-list="getBadge(card.feature)"
+                :close-icon="getCloseIcon(card.feature)"
                 :disabled="isSubjectDataSelected"
+                :icon-src="card.iconSrc"
                 :label="card.label"
                 :status="card.status"
                 :text="card.text"

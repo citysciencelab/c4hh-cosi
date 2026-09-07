@@ -100,7 +100,11 @@ export default {
 
 <template lang="html">
     <div id="scenario-builder">
-        <ToolInfo />
+        <ToolInfo
+            :locale="currentLocale"
+            :summary="$t('additional:modules.tools.cosi.scenarioBuilder.description')"
+            :url="{}"
+        />
         <ScenarioBuilderManager
             v-if="currentView === 'manager'"
         />
