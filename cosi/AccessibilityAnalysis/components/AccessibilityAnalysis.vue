@@ -391,10 +391,6 @@ export default {
         this.visibleVectorLayers = this.getVisibleVectorLayers();
 
         if (this.routingDirections) {
-            const directionsLayer = this.getLayerById("accessibility-directions");
-
-            directionsLayer.getLayer().setStyle(this.directionsRouteLayer.getStyleFunction());
-            directionsLayer.getLayer().setSource(this.directionsRouteSource);
             this.setActiveMode(this.getModeByType("route"));
         }
         else {
@@ -422,6 +418,7 @@ export default {
         document.removeEventListener("shown.bs.dropdown", this.onDropdownShown);
     },
     unmounted () {
+        this.reset();
         this.removeInteraction(this.select);
         this.removeAll();
         this.setDefaults();
