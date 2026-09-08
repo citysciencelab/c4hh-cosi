@@ -706,8 +706,8 @@ describe("addons/gfiThemes/timeSeriesChart/components/TabGraphics.vue", () => {
 
                 expect(wrapper.vm.filterRange).to.equal("last-year");
                 expect(wrapper.vm.filterStartMonth).to.be.undefined;
-                expect(wrapper.vm.rangeStartDate).to.be.undefined;
-                expect(wrapper.vm.rangeEndDate).to.deep.equal(new Date(Date.now()));
+                expect(wrapper.vm.rangeStartDate).to.deep.equal(new Date(2023, 5, 1));
+                expect(wrapper.vm.rangeEndDate).to.deep.equal(new Date(2024, 5, 30, 23, 59, 59, 999));
             });
         });
 
@@ -717,7 +717,7 @@ describe("addons/gfiThemes/timeSeriesChart/components/TabGraphics.vue", () => {
 
                 expect(wrapper.vm.filterRange).to.equal("all-time");
                 expect(wrapper.vm.rangeStartDate).to.deep.equal(new Date(2015, 0, 1));
-                expect(wrapper.vm.rangeEndDate).to.deep.equal(new Date());
+                expect(wrapper.vm.rangeEndDate).to.deep.equal(new Date(2024, 5, 30, 23, 59, 59, 999));
             });
         });
 
@@ -742,7 +742,7 @@ describe("addons/gfiThemes/timeSeriesChart/components/TabGraphics.vue", () => {
                 expect(wrapper.vm.filterEndYear).to.equal(2022);
                 expect(wrapper.vm.filterEndMonth).to.equal(8);
                 expect(wrapper.vm.rangeStartDate).to.deep.equal(new Date(2022, 2, 1));
-                expect(wrapper.vm.rangeEndDate).to.deep.equal(new Date(2022, 8, 0));
+                expect(wrapper.vm.rangeEndDate).to.deep.equal(new Date(2022, 7, 31, 23, 59, 59, 999));
                 expect(addSingleAlert.called).to.be.false;
             });
 
@@ -751,7 +751,9 @@ describe("addons/gfiThemes/timeSeriesChart/components/TabGraphics.vue", () => {
         describe("filterFromAllData", () => {
             it("should call setStatisticValues with only the items inside the given date range", async () => {
                 clock.restore();
-                await wrapper.vm.filterFromAllData(2022, 1, 2022, 12);
+                const {startDate, endDate} = wrapper.vm.setRangeDates(2022, 1, 2022, 12);
+
+                await wrapper.vm.filterFromAllData(startDate, endDate);
 
                 expect(setStatisticValues.called).to.be.true;
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal([allDataMock[1]]);
@@ -759,14 +761,18 @@ describe("addons/gfiThemes/timeSeriesChart/components/TabGraphics.vue", () => {
 
             it("should call setStatisticValues with an empty array when no items match the range", async () => {
                 clock.restore();
-                await wrapper.vm.filterFromAllData(2030, 1, 2030, 12);
+                const {startDate, endDate} = wrapper.vm.setRangeDates(2030, 1, 2030, 12);
+
+                await wrapper.vm.filterFromAllData(startDate, endDate);
 
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal([]);
             });
 
             it("should include items exactly on the start and end boundary dates", async () => {
                 clock.restore();
-                await wrapper.vm.filterFromAllData(2021, 1, 2023, 1);
+                const {startDate, endDate} = wrapper.vm.setRangeDates(2021, 1, 2023, 1);
+
+                await wrapper.vm.filterFromAllData(startDate, endDate);
 
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal(allDataMock);
             });
@@ -774,14 +780,18 @@ describe("addons/gfiThemes/timeSeriesChart/components/TabGraphics.vue", () => {
             it("should return an empty array when allData is empty", async () => {
                 allDataMock.length = 0;
                 clock.restore();
-                await wrapper.vm.filterFromAllData(2021, 1, 2023, 1);
+                const {startDate, endDate} = wrapper.vm.setRangeDates(2021, 1, 2023, 1);
+
+                await wrapper.vm.filterFromAllData(startDate, endDate);
 
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal([]);
             });
 
             it("should return an empty array when the end date is before the start date and both are older than 12 months", async () => {
                 clock.restore();
-                await wrapper.vm.filterFromAllData(2023, 1, 2021, 1);
+                const {startDate, endDate} = wrapper.vm.setRangeDates(2023, 1, 2021, 1);
+
+                await wrapper.vm.filterFromAllData(startDate, endDate);
 
                 expect(setStatisticValues.lastCall.args[1]).to.deep.equal([]);
             });
@@ -1196,6 +1206,50 @@ describe("addons/gfiThemes/timeSeriesChart/components/TabGraphics.vue", () => {
 
                 expect(wrapper.vm.maxScaleLeft).to.equal(26);
             });
+        });
+    });
+
+    describe("sliderSelectedValuesModel", () => {
+        it("should accept only two-item arrays in the setter", () => {
+            wrapper.vm.sliderSelectedValuesModel = ["2025-08-22", "2025-08-23"];
+
+            expect(wrapper.vm.selectedSliderRange).to.deep.equal([
+                "2025-08-22",
+                "2025-08-23"
+            ]);
+
+            const invalidPayloads = [
+                null,
+                "2025-08-22",
+                [],
+                ["2025-08-22"],
+                ["2025-08-22", "2025-08-23", "2025-08-24"]
+            ];
+
+            invalidPayloads.forEach((payload) => {
+                wrapper.vm.sliderSelectedValuesModel = payload;
+
+                expect(wrapper.vm.selectedSliderRange).to.deep.equal([
+                    "2025-08-22",
+                    "2025-08-23"
+                ]);
+            });
+        });
+
+        it("should initialize selectedSliderRange from sliderRange when chart labels change", async () => {
+            wrapper.vm.selectedSliderRange = ["2022-06-15", "2022-06-15"];
+
+            wrapper.vm.setDateAllTime();
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.vm.sliderRange).to.deep.equal([
+                "2021-01-15",
+                "2023-01-01"
+            ]);
+            expect(wrapper.vm.selectedSliderRange).to.deep.equal([
+                "2021-01-15",
+                "2023-01-01"
+            ]);
         });
     });
 });

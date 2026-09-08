@@ -12,6 +12,40 @@ function convertToLocalDateLiteral (date) {
 }
 
 /**
+ * Converts a string of the format "YYYY-MM-DD" or "YYYY-MM" to a date.
+ * @param {string} dateString - Input string in the format "YYYY-MM-DD" or "YYYY-MM".
+ * @param {boolean} [setToEnd=false] - If true, sets the date to the end of the month (for "YYY-MM") or day (for "YYYY-MM-DD").
+ * @returns {Date|null} Parsed date or null when invalid
+ */
+function convertStringToDate (dateString, setToEnd = false) {
+    const match = String(dateString ?? "").match(/^(\d{4})-(\d{2})(?:-(\d{2}))?$/);
+
+    if (!match) {
+        return null;
+    }
+
+    const year = Number(match[1]),
+        month = Number(match[2]),
+        day = match[3] ? Number(match[3]) : null;
+
+    if (month < 1 || month > 12) {
+        return null;
+    }
+
+    // YYYY-MM
+    if (day === null) {
+        return setToEnd
+            ? new Date(year, month, 0, 23, 59, 59, 999)
+            : new Date(year, month - 1, 1);
+    }
+
+    // YYYY-MM-DD
+    return setToEnd
+        ? new Date(year, month - 1, day, 23, 59, 59, 999)
+        : new Date(year, month - 1, day);
+}
+
+/**
  * Guards a CSV field value against Excel's locale-based auto reformatting
  * (date auto-detection, and "." being misread as a thousands separator)
  * by wrapping any numeric-looking value in a text-forcing formula.
@@ -50,6 +84,7 @@ function getFilenameByDate () {
 
 export {
     convertToLocalDateLiteral,
+    convertStringToDate,
     guardAgainstExcelDateAutoFormat,
     pad,
     getFilenameByDate

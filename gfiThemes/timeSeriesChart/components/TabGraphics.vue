@@ -8,6 +8,8 @@ import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
 import TabGraphicsDisclaimerModal from "./TabGraphicsDisclaimerModal.vue";
 import TableComponent from "@shared/modules/table/components/TableComponent.vue";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
+import RangeSlider from "./RangeSlider.vue";
+import {convertToLocalDateLiteral, convertStringToDate} from "../js/helpers.js";
 
 export default {
     name: "TabGraphics",
@@ -17,7 +19,8 @@ export default {
         LinechartItem,
         TabGraphicsDisclaimerModal,
         TableComponent,
-        SwitchInput
+        SwitchInput,
+        RangeSlider
     },
     props: {
         params: {
@@ -34,6 +37,7 @@ export default {
             percentile: null,
             percentileChartBasis: {},
             filterRange: "last-year",
+            isFiltering: false,
             rangeStartDate: undefined,
             rangeEndDate: undefined,
             filterStartMonth: undefined,
@@ -45,6 +49,7 @@ export default {
             showTable: false,
             selectedChart: null,
             showAdditionalLines: false,
+            selectedSliderRange: [],
             hoverCrosshairPlugin: {
                 id: "hoverCrosshair",
                 afterDraw (chart, _args, options) {
@@ -911,6 +916,72 @@ export default {
                 headers,
                 items
             };
+        },
+        /**
+         * Computes the slider range (start and end date) from the chart data labels.
+         * @returns {Array} slider range for RangeSlider
+         */
+        sliderRange () {
+            const labels = this.sliderLabels || [];
+
+            return [
+                labels[0]?.id,
+                labels[labels.length - 1]?.id
+            ];
+        },
+        /**
+         * Computes the selected slider values (start and end date) for RangeSlider.
+         * @returns {Array} selected slider values for RangeSlider
+         */
+        sliderSelectedValuesModel: {
+            get () {
+                return Array.isArray(this.selectedSliderRange)
+                    ? this.selectedSliderRange
+                    : [];
+            },
+            set (value) {
+                if (Array.isArray(value) && value.length === 2) {
+                    this.selectedSliderRange = value;
+                    const startDate = convertStringToDate(value[0]),
+                          endDate = convertStringToDate(value[1], true);
+
+                    this.filterFromAllData(startDate, endDate);
+                }
+            }
+        },
+        /**
+        * Computes the slider labels (dates) for RangeSlider, filtered by the current rangeStartDate and rangeEndDate.
+        * If there are more than 500 labels, only the first label and labels ending with "-01" (first of the month) are returned.
+        * @returns {Array} slider labels for RangeSlider
+        */
+        sliderLabels () {
+            if (!this.rangeStartDate || !this.rangeEndDate) {
+                return [];
+            }
+
+            const axisParameter = this.currentChartTheme.chartParams,
+                  rangeStartDate = convertToLocalDateLiteral(this.rangeStartDate),
+                  rangeEndDate = convertToLocalDateLiteral(this.rangeEndDate),
+                  filteredLabels = (this.allData || [])
+                      .map(data => {
+                          const label = data?.properties?.[axisParameter?.xAxis];
+
+                          return {id: label, name: label};
+                      })
+                      .filter(label => {
+                          return label.id >= rangeStartDate && label.id <= rangeEndDate;
+                      });
+
+            if (filteredLabels.length <= 500) {
+                return filteredLabels;
+            }
+
+            return filteredLabels
+                .filter((label, index) => index === 0 || label.id.endsWith("-01"))
+                .map(label => ({
+                    id: label.id.slice(0, -3),
+                    name: label.name.slice(0, -3)
+                }));
         }
     },
     watch: {
@@ -952,7 +1023,9 @@ export default {
                     return;
                 }
 
-                this.filterFromAllData(this.selectedStartYear, this.selectedStartMonth, this.selectedEndYear, this.selectedEndMonth);
+                const {startDate, endDate} = this.setRangeDates(this.selectedStartYear, this.selectedStartMonth, this.selectedEndYear, this.selectedEndMonth);
+
+                this.filterFromAllData(startDate, endDate);
             },
             immediate: true
         },
@@ -987,7 +1060,19 @@ export default {
                     this.setPercentiles([]);
                 }
 
-                this.filterFromAllData(this.selectedStartYear, this.selectedStartMonth, this.selectedEndYear, this.selectedEndMonth);
+                const {startDate, endDate} = this.setRangeDates(this.selectedStartYear, this.selectedStartMonth, this.selectedEndYear, this.selectedEndMonth);
+
+                this.filterFromAllData(startDate, endDate);
+            }
+        },
+        sliderRange: {
+            deep: true,
+            handler (newRange) {
+                if (!Array.isArray(newRange) || newRange.length !== 2 || !newRange[0] || !newRange[1]) {
+                    return;
+                }
+
+                this.selectedSliderRange = newRange;
             },
             immediate: true
         }
@@ -1018,7 +1103,6 @@ export default {
         ]),
         ...mapMutations("Modules/TimeSeriesChart", [
             "setStatisticValues",
-            "setDataLoading",
             "setPercentiles"
         ]),
         /**
@@ -1117,20 +1201,17 @@ export default {
         csvDownload () {
             const csvProperties = this.getCsvParams();
 
-            if (this.filterRange === "last-year") {
-                const startYear = this.dateRange.twelveMonthsAgoYear,
-                      startMonth = this.dateRange.twelveMonthsAgoMonth,
-                      endYear = this.dateRange.endYear,
-                      endMonth = this.dateRange.endMonth;
+            const selectedStartDate = convertStringToDate(this.selectedSliderRange[0]),
+                  selectedEndDate = convertStringToDate(this.selectedSliderRange[1], true);
 
-                this.rangeStartDate = new Date(Date.UTC(startYear, startMonth - 1, 1));
-                this.rangeEndDate = new Date(Date.UTC(endYear, endMonth, 0));
+            if (!selectedStartDate || !selectedEndDate) {
+                return;
             }
 
             this.runQueryOaf({
                 queryProperties: csvProperties,
-                startDate: this.rangeStartDate,
-                endDate: this.rangeEndDate,
+                startDate: selectedStartDate,
+                endDate: selectedEndDate,
                 queryPurpose: "downloadCsv",
                 epsg: this.projectionCode
             });
@@ -1193,9 +1274,9 @@ export default {
             this.filterStartYear = undefined;
             this.filterEndYear = undefined;
 
-            this.rangeStartDate = undefined;
-            this.rangeEndDate = new Date(Date.now());
-            this.filterFromAllData(this.dateRange.twelveMonthsAgoYear, this.dateRange.twelveMonthsAgoMonth, this.dateRange.endYear, this.dateRange.endMonth);
+            const {startDate, endDate} = this.setRangeDates(this.dateRange.twelveMonthsAgoYear, this.dateRange.twelveMonthsAgoMonth, this.dateRange.endYear, this.dateRange.endMonth);
+
+            this.filterFromAllData(startDate, endDate);
         },
         /**
          * Sets date range to all time and runs OAF query.
@@ -1207,13 +1288,9 @@ export default {
             this.filterStartYear = undefined;
             this.filterEndYear = undefined;
 
-            const endDate = new Date(),
-                  startDate = new Date(this.dateRange.allDataStartYear, this.dateRange.allDataStartMonth - 1, 1);
+            const {startDate, endDate} = this.setRangeDates(this.dateRange.allDataStartYear, this.dateRange.allDataStartMonth, this.dateRange.endYear, this.dateRange.endMonth);
 
-            this.rangeStartDate = startDate;
-            this.rangeEndDate = endDate;
-
-            this.filterFromAllData(this.dateRange.allDataStartYear, this.dateRange.allDataStartMonth, this.dateRange.endYear, this.dateRange.endMonth);
+            this.filterFromAllData(startDate, endDate);
         },
         /**
          * Runs an OAF query with the specified parameters.
@@ -1269,39 +1346,41 @@ export default {
             this.filterEndYear = endYear;
             this.filterEndMonth = endMonth;
 
-            const startDate = new Date(startYear, startMonth - 1, 1),
-                  endDate = new Date(endYear, endMonth, 0);
+            const {startDate, endDate} = this.setRangeDates(startYear, startMonth, endYear, endMonth);
 
-            this.rangeStartDate = startDate;
-            this.rangeEndDate = endDate;
-
-            this.filterFromAllData(startYear, startMonth, endYear, endMonth);
+            this.filterFromAllData(startDate, endDate);
         },
         /**
          * Filters the locally available data by a manual date range and updates statistic values.
-         * @param {number} startYear - The start year.
-         * @param {number} startMonth - The start month (1-12).
-         * @param {number} endYear - The end year.
-         * @param {number} endMonth - The end month (1-12).
+         * @param {Date} startDate - The start date for filtering
+         * @param {Date} endDate - The end date for filtering
          * @returns {Promise<void>} resolves once statisticValues have been updated
          */
-        async filterFromAllData (startYear, startMonth, endYear, endMonth) {
-            this.setDataLoading(true);
+        async filterFromAllData (startDate, endDate) {
+            this.isFiltering = true;
 
-            await this.$nextTick();
-            await new Promise(resolve => setTimeout(resolve, 0));
+            try {
+                await this.$nextTick();
+                await new Promise(resolve => {
+                    requestAnimationFrame(() => {
+                        requestAnimationFrame(resolve);
+                    });
+                });
 
-            const startDate = new Date(Date.UTC(startYear, startMonth - 1, 1)),
-                  endDate = new Date(Date.UTC(endYear, endMonth, 0));
-            const queryData = this.allData.filter((item) => {
-                const itemDate = new Date(item.properties[this.currentChartTheme.chartParams.xAxis]);
+                const xAxis = this.currentChartTheme.chartParams.xAxis,
+                      queryData = this.allData.filter((item) => {
+                          const itemDate = convertStringToDate(item.properties[xAxis]);
 
-                return itemDate >= startDate && itemDate <= endDate;
-            });
+                          return itemDate >= startDate && itemDate <= endDate;
+                      });
 
-            this.setStatisticValues(queryData);
+                this.setStatisticValues(queryData);
 
-            this.setDataLoading(false);
+                await this.$nextTick();
+            }
+            finally {
+                this.isFiltering = false;
+            }
         },
         /**
          * Captures the hidden, fixed-width export chart as a PNG data URL.
@@ -1665,6 +1744,23 @@ export default {
                     yAlign
                 };
             };
+        },
+        /**
+         * Sets the range start and end dates based on the provided year and month values.
+         * @param {number} startYear - The start year
+         * @param {number} startMonth - The start month (1-12)
+         * @param {number} endYear - The end year
+         * @param {number} endMonth - The end month (1-12)
+         * @returns {{startDate: Date, endDate: Date}} The calculated start and end dates
+         */
+        setRangeDates (startYear, startMonth, endYear, endMonth) {
+            const startDate = new Date(startYear, startMonth - 1, 1),
+                  endDate = new Date(endYear, endMonth, 0, 23, 59, 59, 999);
+
+            this.rangeStartDate = startDate;
+            this.rangeEndDate = endDate;
+
+            return {startDate, endDate};
         }
     }
 };
@@ -1838,6 +1934,12 @@ export default {
             :data="tableData"
         />
 
+        <RangeSlider
+            v-if="sliderLabels.length >= 2"
+            v-model="sliderSelectedValuesModel"
+            :data="sliderLabels"
+        />
+
         <div
             v-if="hasDisclaimer"
             class="dataDisclaimerContainer"
@@ -1914,7 +2016,7 @@ export default {
         </div>
 
         <div
-            v-if="dataLoading"
+            v-if="dataLoading || isFiltering"
             class="spinner-wrapper"
         >
             <SpinnerItem custom-class="spinner" />
