@@ -43,7 +43,6 @@ import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
  *
  * @vue-data {Object} paging - The page and the page total.
  * @vue-data {Boolean} disabled - Shows if it is disabled.
- * @vue-data {Boolean} showStop - Shows if terminate button is visible.
  * @vue-data {Boolean} searchInMapExtent - Shows if search in map extend is enabled.
  * @vue-data {Array} snippets - Array of all the snippets.
  * @vue-data {Number} postSnippetKey - The post snippet key.
@@ -134,7 +133,6 @@ export default {
                 total: 0
             },
             disabled: false,
-            showStop: false,
             snippets: [],
             showSpinner: true,
             postSnippetKey: 0,
@@ -911,14 +909,6 @@ export default {
             this.disabled = disable;
         },
         /**
-         * Showing or not Showing terminate button
-         * @param {Boolean} value true/false to en/disable to show terminate button
-         * @returns {void}
-         */
-        showStopButton (value) {
-            this.showStop = value;
-        },
-        /**
          * Returns the layerId based on the given parameters.
          * @param {Number} filterId the unique id of the internal layer filter
          * @param {String} layerId the layer id from configuration (root scope)
@@ -962,7 +952,6 @@ export default {
             this.snippetIdOfLastChange = snippetId;
             this.applyPassiveValuesToTags(this.filterRules);
             this.setFormDisable(true);
-            this.showStopButton(true);
             if (this.closeGfi) {
                 this.setGfiVisible(!this.closeGfi);
             }
@@ -1173,7 +1162,6 @@ export default {
                 return;
             }
             this.api.stop(() => {
-                              this.showStopButton(false);
                               this.setFormDisable(false);
                               this.paging = {
                                   page: 0,
@@ -1703,16 +1691,8 @@ export default {
                         :interaction="filter"
                     />
                     <FlatButton
-                        v-if="hasUnfixedRules(filterRules) && (!(paging.page < paging.total) || !showStop)"
-                        class="btn btn-secondary me-1"
-                        :aria-label="$t('common:modules.filter.filterReset')"
-                        :text="$t('common:modules.filter.filterReset')"
-                        :disabled="filterButtonDisabled || disabled"
-                        :icon="'bi-x-circle'"
-                        :interaction="resetsSnippetsAndRules"
-                    />
-                    <FlatButton
                         v-if="initialRules.length && !isInitialValue(initialRules, filterRules)"
+                        id="resetButton"
                         class="btn btn-secondary me-1"
                         :aria-label="$t('common:modules.filter.filterResetOrigin')"
                         :text="$t('common:modules.filter.filterResetOrigin')"
@@ -1720,17 +1700,11 @@ export default {
                         :icon="'bi-x-circle'"
                         :interaction="resetOriginSnippetsAndRules"
                     />
-                    <FlatButton
-                        v-if="paging.page < paging.total && showStop"
-                        class="btn btn-secondary me-1"
-                        :aria-label="$t('common:modules.filter.button.stop')"
-                        :text="$t('common:modules.filter.button.stop')"
-                        :icon="'bi-x-circle'"
-                        :interaction="stopFilter"
-                    />
                 </div>
                 <ProgressBar
+                    v-if="paging.page < paging.total"
                     :paging="paging"
+                    @stop="stopFilter"
                 />
                 <div v-if="layerConfig.download && Array.isArray(filteredItems) && filteredItems.length">
                     <SnippetDownload
