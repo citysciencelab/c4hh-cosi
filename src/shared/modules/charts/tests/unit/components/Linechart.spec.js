@@ -2,12 +2,19 @@ import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import {nextTick} from "vue";
+import Chart from "chart.js/auto";
 
 import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 
 
 describe("src/shared/modules/charts/components/LinechartItem.vue", () => {
     let wrapper;
+    const customPlugin = {
+        id: "hoverCrosshair",
+        afterDraw () {
+            return "";
+        }
+    };
 
     beforeEach(() => {
         wrapper = shallowMount(LinechartItem, {
@@ -16,7 +23,8 @@ describe("src/shared/modules/charts/components/LinechartItem.vue", () => {
                     labels: [],
                     datasets: []
                 },
-                givenOptions: {}
+                givenOptions: {},
+                givenPlugins: [customPlugin]
             }
         });
     });
@@ -38,13 +46,12 @@ describe("src/shared/modules/charts/components/LinechartItem.vue", () => {
             expect(wrapper.find("canvas").exists()).to.be.true;
         });
     });
-    describe.skip("resetChart", () => {
+    describe("resetChart", () => {
         it("should destroy the former chart", () => {
             const destroySpy = sinon.spy();
 
             nextTick(() => {
-                // eslint-disable-next-line no-undef
-                wrapper.vm.chart = new Chart(document.createElement("CANVAS"));
+                wrapper.vm.chart = new Chart(document.createElement("CANVAS"), {type: "line", data: {}});
                 wrapper.vm.chart.destroy = destroySpy;
                 wrapper.vm.destroyChart();
 
@@ -61,6 +68,7 @@ describe("src/shared/modules/charts/components/LinechartItem.vue", () => {
                 wrapper.vm.resetChart({});
 
                 expect(destroyCalled).to.be.true;
+                expect(wrapper.vm.chart.config.plugins).to.deep.equal([customPlugin]);
             });
         });
     });
