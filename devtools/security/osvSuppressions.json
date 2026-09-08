@@ -300,6 +300,86 @@
       "addedBy": "geodatenanwendungen@gv.hamburg.de",
       "addedOn": "2026-08-13",
       "reviewBy": "2027-08-13"
+    },
+    {
+      "id": "GHSA-73wf-gq98-2v4g",
+      "package": "browserslist",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "Build tooling only; poisoned browserslist-stats.json would require attacker access to commit to project directory tree.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-08",
+      "reviewBy": "2027-09-08"
+    },
+    {
+      "id": "GHSA-c83g-rgw3-j3cx",
+      "package": "browserslist",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "Build tooling only; one-shot build process does not accumulate unbounded cache entries.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-08",
+      "reviewBy": "2027-09-08"
+    },
+    {
+      "id": "GHSA-f65p-4m7j-42xc",
+      "package": "fast-uri",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "ESLint config schema resolution; the URIs are resolved to local schema objects and never dereferenced.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-08",
+      "reviewBy": "2027-09-08"
+    },
+    {
+      "id": "GHSA-fph4-wmhf-6fwf",
+      "package": "fast-uri",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "ESLint config schema resolution; the URIs are resolved to local schema objects and never dereferenced.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-08",
+      "reviewBy": "2027-09-08"
+    },
+    {
+      "id": "GHSA-jqff-g426-hqxp",
+      "package": "fast-uri",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "ESLint config schema resolution; the URIs are resolved to local schema objects and never dereferenced.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-08",
+      "reviewBy": "2027-09-08"
+    },
+    {
+      "id": "GHSA-w9m9-85wc-3x92",
+      "package": "postcss-selector-parser",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "Linting only; CSS selectors are repository-controlled source code, never user-input.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-08",
+      "reviewBy": "2027-09-08"
+    },
+    {
+      "id": "GHSA-4mjr-xmp4-gh2g",
+      "package": "qs",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "Reached only via Node.js url polyfill generator; application uses url-parse for runtime query handling, which does not depend on qs.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-08",
+      "reviewBy": "2027-09-08"
+    },
+    {
+      "id": "GHSA-x5fp-wj9c-mxmx",
+      "package": "qs",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "Reached only via Node.js url polyfill generator; application uses url-parse for runtime query handling, which does not depend on qs.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-08",
+      "reviewBy": "2027-09-08"
     }
   ]
 }
