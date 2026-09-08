@@ -1,8 +1,24 @@
+import {vi} from "vitest";
 import {createStore} from "vuex";
 import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {reactive} from "vue";
 import sinon from "sinon";
+
+vi.mock("chart.js", async () => {
+    const actual = await vi.importActual("chart.js");
+
+    return {
+        ...actual,
+        Tooltip: {
+            ...actual.Tooltip,
+            positioners: {
+                ...actual.Tooltip?.positioners || {}
+            }
+        }
+    };
+});
+
 import TabGraphics from "../../../components/TabGraphics.vue";
 
 describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
@@ -272,7 +288,8 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                             },
                             mutations: {
                                 setStatisticValues,
-                                setDataLoading: sinon.stub()
+                                setDataLoading: sinon.stub(),
+                                setPercentiles: sinon.stub()
                             }
                         }
                     }
@@ -1067,6 +1084,117 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                 await wrapper.vm.$nextTick();
 
                 expect(wrapper.vm.tableData.items).to.deep.equal([]);
+            });
+        });
+
+        describe("additional lines in chart", () => {
+            beforeEach(async () => {
+                await wrapper.setProps({
+                    params: {
+                        ...params,
+                        chartThemes: [
+                            {
+                                ...params.chartThemes[0],
+                                chartParams: {
+                                    ...params.chartThemes[0].chartParams,
+                                    "additionalLines": {
+                                        "buttonTitle": "Lage der Filterstrecke",
+                                        "upper": "filteroberkante",
+                                        "lower": "filterunterkante"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                });
+            });
+
+            it("should return false for additional lines, if config is not complete", async () => {
+                await wrapper.setProps({
+                    params: {
+                        ...params,
+                        chartThemes: [
+                            {
+                                ...params.chartThemes[0],
+                                chartParams: {
+                                    ...params.chartThemes[0].chartParams,
+                                    "additionalLines": { }
+                                }
+                            }
+                        ]
+                    }
+                });
+
+                expect(wrapper.vm.additionalLines).to.be.false;
+
+                await wrapper.setProps({
+                    params: {
+                        ...params,
+                        chartThemes: [
+                            {
+                                ...params.chartThemes[0],
+                                chartParams: {
+                                    ...params.chartThemes[0].chartParams,
+                                    "additionalLines": {
+                                        "buttonTitle": "Lage der Filterstrecke",
+                                        "lower": "filterunterkante"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                });
+
+                expect(wrapper.vm.additionalLines).to.be.false;
+
+                await wrapper.setProps({
+                    params: {
+                        ...params,
+                        chartThemes: [
+                            {
+                                ...params.chartThemes[0],
+                                chartParams: {
+                                    ...params.chartThemes[0].chartParams,
+                                    "additionalLines": {
+                                        "upper": "filteroberkante"
+                                    }
+                                }
+                            }
+                        ]
+                    }
+                });
+
+                expect(wrapper.vm.additionalLines).to.deep.equal({"upper": "filteroberkante"});
+            });
+
+            it("should have correct minScaleLeft, if additionalLines are configured", () => {
+                expect(wrapper.vm.minScaleLeft).to.equal(15.1);
+
+                statisticValuesMock.forEach(dataset => {
+                    dataset.properties.filteroberkante = 12;
+                    dataset.properties.filterunterkante = 10;
+                });
+
+                expect(wrapper.vm.minScaleLeft).to.equal(15.1);
+
+                wrapper.vm.showAdditionalLines = true;
+
+                expect(wrapper.vm.minScaleLeft).to.equal(9);
+            });
+
+            it("should have correct maxScaleLeft, if additionalLines are configured", () => {
+                expect(wrapper.vm.maxScaleLeft).to.equal(15.2);
+
+                statisticValuesMock.forEach(dataset => {
+                    dataset.properties.filteroberkante = 25;
+                    dataset.properties.filterunterkante = 12;
+                });
+
+                expect(wrapper.vm.maxScaleLeft).to.equal(15.2);
+
+                wrapper.vm.showAdditionalLines = true;
+
+                expect(wrapper.vm.maxScaleLeft).to.equal(26);
             });
         });
     });

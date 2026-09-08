@@ -1,4 +1,5 @@
 <script>
+import {Tooltip} from "chart.js";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 // currently using local copy of LinechartItem to allow plugin registration
 // can be switched lateron, when pull request to masterportal core component has been merged
@@ -46,6 +47,7 @@ export default {
             offscreenKey: 0,
             showTable: false,
             selectedChart: null,
+            showAdditionalLines: false,
             hoverCrosshairPlugin: {
                 id: "hoverCrosshair",
                 afterDraw (chart, _args, options) {
@@ -179,6 +181,23 @@ export default {
             return false;
         },
         /**
+         * Determines whether the params for the current chart contain the property additionalLines.
+         *
+         * Returns the object for additionalLines when it has at least the parameter called "upper"
+         *
+         * @returns {Object|false} The object for additionalLines if it contains at least the parameter "upper", otherwise false.
+         */
+        additionalLines () {
+            if (this.currentChartTheme?.chartParams?.additionalLines &&
+                typeof this.currentChartTheme?.chartParams?.additionalLines === "object" &&
+                Object.hasOwn(this.currentChartTheme?.chartParams?.additionalLines, "upper")
+            ) {
+                return this.currentChartTheme.chartParams.additionalLines;
+            }
+
+            return false;
+        },
+        /**
          * Builds the title for the line chart by combining the schema title of the
          * configured query attribute with the corresponding attribute value of the current feature.
          *
@@ -219,7 +238,13 @@ export default {
             const deltaLeft = this.maxScaleLeft - this.minScaleLeft,
                   deltaRight = this.maxScaleRight - this.minScaleRight,
                   hasPercentile = Boolean(this.percentile),
-                  percentileLineTitles = hasPercentile ? Object.values(this.percentileChartBasis).map(value => value.title) : [];
+                  percentileLineTitles = hasPercentile ? Object.values(this.percentileChartBasis).map(value => value.title) : [],
+                  noTooltipLineTitles = this.additionalLines ? [
+                      ...new Set(percentileLineTitles),
+                      this.oafSchema?.properties?.[this.additionalLines.upper]?.title,
+                      this.oafSchema?.properties?.[this.additionalLines.lower]?.title,
+                      this.additionalLines.pdfLegendTitle
+                  ] : percentileLineTitles;
 
             return {
                 plugins: {
@@ -270,10 +295,10 @@ export default {
                     tooltip: {
                         mode: "nearest",
                         intersect: false,
-                        yAlign: "bottom",
+                        position: "smart",
                         caretPadding: 8,
                         filter: function (tooltipItem) {
-                            return !percentileLineTitles.includes(tooltipItem.dataset.label);
+                            return !noTooltipLineTitles.includes(tooltipItem.dataset.label);
                         },
                         callbacks: {
                             title: (items) => {
@@ -485,6 +510,52 @@ export default {
                 });
             }
 
+            // add additional lines when configured in config.json and activated with button click
+            if (this.additionalLines && this.showAdditionalLines) {
+                const upper_data = [],
+                      lower_data = [];
+
+                if (this.statisticValues && this.statisticValues.length) {
+                    this.statisticValues.forEach((dataset) => {
+                        upper_data.push(dataset.properties[this.additionalLines.upper]);
+                        if (this.additionalLines.lower) {
+                            lower_data.push(dataset.properties[this.additionalLines.lower]);
+                        }
+                    });
+                }
+
+                let additionalLinesFill = false;
+
+                if (this.additionalLines.lower) {
+                    datasets.push({
+                        label: this.oafSchema?.properties?.[this.additionalLines.lower]?.title ?? "",
+                        data: lower_data,
+                        hoverOffset: 4,
+                        borderColor: "#75777D",
+                        borderWidth: 2,
+                        pointStyle: false,
+                        fill: false,
+                        yAxisID: "y"
+                    });
+
+                    additionalLinesFill = {above: "#75777D66", below: "#75777D66", target: "-1"};
+                }
+
+                const upperDatasetLabel = this.additionalLines.pdfLegendTitle ?? (this.oafSchema?.properties?.[this.additionalLines.upper]?.title ?? "");
+
+                datasets.push({
+                    label: upperDatasetLabel,
+                    data: upper_data,
+                    hoverOffset: 4,
+                    backgroundColor: "#75777D66",
+                    borderColor: "#75777D",
+                    borderWidth: 2,
+                    pointStyle: false,
+                    fill: additionalLinesFill,
+                    yAxisID: "y"
+                });
+            }
+
             return {
                 labels: labels,
                 datasets: datasets
@@ -512,39 +583,60 @@ export default {
             return this.findStepSizeFromDelta(this.maxDataValueLeft, this.minDataValueLeft);
         },
         /**
-         * Minimal scale boundary for the left axis (rounded down with padding).
-         * If percentile data is available, uses the lowest P10 value found in
-         * this.percentile.perzentile and decreases it by 10%.
-         * Falls back to the data-derived min value (rounded) when percentile data is missing
-         * or minDataValueLeft is below the value calculated from percentiles
-         * @returns {number} minimal scale boundary
+         * Minimal scale boundary for the left Y axis.
+         *
+         * Computes a padded, rounded-down minimum for the left axis scale by collecting
+         * several candidate values and returning the smallest:
+         * - dataset-derived minimum (rounded down, with step-size padding)
+         * - additional-lines minima (upper/lower), when configured and shown
+         * - percentile-derived minimum (P10 minus 10%), when available
+         *
+         * @returns {number} minimal scale boundary for the left axis
          */
         minScaleLeft () {
-            if (this.leftScaleRangeFromPercentiles.min && this.leftScaleRangeFromPercentiles.min < this.minDataValueLeft) {
-                return this.leftScaleRangeFromPercentiles.min;
+            const padding = this.stepSizeLeft > 0.05 ? this.stepSizeLeft : 0,
+                  minValueCheckArray = [Math.floor(this.minDataValueLeft * 10) / 10 - padding];
+
+            if (this.additionalLines && this.showAdditionalLines) {
+                minValueCheckArray.push(this.findMinOrMax(this.additionalLines.upper, false) - 1);
+                if (this.additionalLines.lower) {
+                    minValueCheckArray.push(this.findMinOrMax(this.additionalLines.lower) - 1);
+                }
             }
 
-            const padding = this.stepSizeLeft > 0.05 ? this.stepSizeLeft : 0;
+            if (this.leftScaleRangeFromPercentiles.min) {
+                minValueCheckArray.push(this.leftScaleRangeFromPercentiles.min);
+            }
 
-            return Math.floor(this.minDataValueLeft * 10) / 10 - padding;
+            return Math.min(...minValueCheckArray);
         },
         /**
-         * Maximal scale boundary for the left axis.
-         * If percentile data is available, uses the highest P90 value found in
-         * this.percentile.perzentile and increases it by 10%.
-         * Falls back to the data-derived max value (rounded) when percentile data is missing
-         * or maxDataValueLeft is above the value calculated from percentiles.
+         * Maximal scale boundary for the left Y axis.
          *
-         * @returns {number} maximal scale boundary
+         * Computes a padded, rounded-down maximum for the left axis scale by collecting
+         * several candidate values and returning the biggest:
+         * - dataset-derived maximum (rounded up, with step-size padding)
+         * - additional-lines maxima (upper/lower), when configured and shown
+         * - percentile-derived maximum (P90 plus 10%), when available
+         *
+         * @returns {number} maximal scale boundary for the left axis
          */
         maxScaleLeft () {
-            if (this.leftScaleRangeFromPercentiles.max && this.leftScaleRangeFromPercentiles.max > this.maxDataValueLeft) {
-                return this.leftScaleRangeFromPercentiles.max;
+            const padding = this.stepSizeLeft > 0.05 ? this.stepSizeLeft : 0,
+                  maxValueCheckArray = [Math.ceil(this.maxDataValueLeft * 10) / 10 + padding];
+
+            if (this.additionalLines && this.showAdditionalLines) {
+                maxValueCheckArray.push(this.findMinOrMax(this.additionalLines.upper, false) + 1);
+                if (this.additionalLines.lower) {
+                    maxValueCheckArray.push(this.findMinOrMax(this.additionalLines.lower) + 1);
+                }
             }
 
-            const padding = this.stepSizeLeft > 0.05 ? this.stepSizeLeft : 0;
+            if (this.leftScaleRangeFromPercentiles.max) {
+                maxValueCheckArray.push(this.leftScaleRangeFromPercentiles.max);
+            }
 
-            return Math.ceil(this.maxDataValueLeft * 10) / 10 + padding;
+            return Math.max(...maxValueCheckArray);
         },
         /**
          * Minimal numeric value for the configured right Y axis (derived from statisticValues).
@@ -746,6 +838,14 @@ export default {
          * @returns {Object} chart options for the offscreen export chart
          */
         offscreenChartOptions () {
+            const hasPercentile = Boolean(this.percentile),
+                  percentileLineTitles = hasPercentile ? Object.values(this.percentileChartBasis).map(value => value.title) : [],
+                  allLinesTitles = this.additionalLines ? [
+                      ...new Set(percentileLineTitles),
+                      this.oafSchema?.properties?.[this.additionalLines.upper]?.title,
+                      this.additionalLines.pdfLegendTitle
+                  ] : percentileLineTitles;
+
             return {
                 ...this.lineChartOptions,
                 plugins: {
@@ -753,6 +853,14 @@ export default {
                     title: {
                         ...this.lineChartOptions.plugins.title,
                         display: false
+                    },
+                    legend: {
+                        ...this.lineChartOptions.plugins.legend,
+                        labels: {
+                            filter: function (legendItem) {
+                                return allLinesTitles.includes(legendItem.text);
+                            }
+                        }
                     }
                 },
                 responsive: false,
@@ -828,6 +936,7 @@ export default {
                 this.getPercentilesForThisData();
 
                 this.selectedChart = this.currentChartTheme;
+                this.showAdditionalLines = false;
             },
             immediate: true
         },
@@ -879,6 +988,9 @@ export default {
         }
     },
     mounted () {
+        // Register the smart tooltip positioner
+        this.registerSmartTooltipPositioner();
+
         if (this.percentiles) {
             return;
         }
@@ -1166,7 +1278,7 @@ export default {
          * @param {number} startMonth - The start month (1-12).
          * @param {number} endYear - The end year.
          * @param {number} endMonth - The end month (1-12).
-         * @returns {void}
+         * @returns {Promise<void>} resolves once statisticValues have been updated
          */
         async filterFromAllData (startYear, startMonth, endYear, endMonth) {
             this.setDataLoading(true);
@@ -1259,7 +1371,7 @@ export default {
                 logoPath: pdfParams?.base64LogoPath
             });
         },
-        /*
+        /**
          * Generates a mapping of percentile keys to display metadata used by the chart.
          *
          * Reads the first percentile entry (this.percentile.perzentile[0]) to discover which
@@ -1482,9 +1594,11 @@ export default {
         },
         /**
          * Formats a value as "DD/MM/YYYY" if it represents a valid date (Date instance
-         * or ISO-like date string). Returns the original value unchanged if there is a value, if not returns "-".
+         * or ISO-like date string). Numeric values are rounded to two decimal places.
+         * Non-date, non-numeric values are returned unchanged. Returns "-" if value is
+         * null or undefined.
          * @param {*} value - value to check/format
-         * @returns {*} formatted date string or the original value
+         * @returns {*} formatted date string, rounded number, original value, or "-"
          */
         checkValueAndFormatDate (value) {
             if (value === null || value === undefined) {
@@ -1511,6 +1625,41 @@ export default {
                   year = date.getFullYear();
 
             return `${day}/${month}/${year}`;
+        },
+        /**
+         * Positions the tooltip above the active point whenever possible.
+         * If there is not enough space above the point, the tooltip is placed below it.
+         *
+         * @param {Array} elements active chart elements
+         * @param {Object} eventPosition fallback event position
+         * @returns {{x: number, y: number, yAlign: string}} tooltip position and alignment
+         */
+        registerSmartTooltipPositioner () {
+            Tooltip.positioners.smart = function (elements, eventPosition) {
+                const chart = this.chart,
+                      activeElement = elements?.[0]?.element;
+
+                if (!chart || !activeElement) {
+                    return eventPosition;
+                }
+
+                const chartArea = chart.chartArea,
+                      tooltipHeight = this.height || 0,
+                      caretSize = this.options.caretSize || 0,
+                      caretPadding = this.options.caretPadding || 0,
+                      requiredSpace = tooltipHeight + caretSize + caretPadding,
+                      spaceAbove = activeElement.y - chartArea.top,
+                      spaceBelow = chartArea.bottom - activeElement.y,
+                      yAlign = spaceAbove >= requiredSpace || spaceAbove >= spaceBelow
+                          ? "bottom"
+                          : "top";
+
+                return {
+                    x: activeElement.x,
+                    y: activeElement.y,
+                    yAlign
+                };
+            };
         }
     }
 };
@@ -1732,19 +1881,31 @@ export default {
                 text="Download PDF"
             />
 
-            <div
-                class="offscreen-chart"
-                aria-hidden="true"
-            >
-                <LinechartItem
-                    ref="offscreenLineChart"
-                    :key="offscreenKey"
-                    :data="chartData"
-                    :given-options="offscreenChartOptions"
-                    :width="800"
-                    :height="offscreenChartHeight"
-                />
-            </div>
+            <div class="spacerDiv" />
+
+            <FlatButton
+                v-if="!showTable && additionalLines"
+                :customclass="showAdditionalLines ? 'btn-scnd' : ''"
+                :aria="additionalLines.buttonTitle ?? 'Extra Linien anzeigen'"
+                :icon="showAdditionalLines ? 'bi-filter-square' : 'bi-filter-square-fill'"
+                :title="additionalLines.buttonTitle ?? 'Extra Linien anzeigen'"
+                :interaction="() => {showAdditionalLines = !showAdditionalLines;}"
+                :text="additionalLines.buttonTitle ?? 'Extra Linien anzeigen'"
+            />
+        </div>
+
+        <div
+            class="offscreen-chart"
+            aria-hidden="true"
+        >
+            <LinechartItem
+                ref="offscreenLineChart"
+                :key="offscreenKey"
+                :data="chartData"
+                :given-options="offscreenChartOptions"
+                :width="800"
+                :height="offscreenChartHeight"
+            />
         </div>
 
         <div
@@ -1854,12 +2015,16 @@ export default {
         gap: 5px;
         align-items: center;
 
-        div.offscreen-chart {
-            position: absolute;
-            left: -9999px;
-            top: -9999px;
-            pointer-events: none;
+        div.spacerDiv {
+            flex: 1;
         }
+    }
+
+    div.offscreen-chart {
+        position: absolute;
+        left: -9999px;
+        top: -9999px;
+        pointer-events: none;
     }
 
     div.spinner-wrapper {

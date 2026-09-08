@@ -175,6 +175,10 @@ Each entry defines one chart (and its associated table/CSV/PDF export) shown wit
 | `rightAxisTransform.factor` | number | Multiplier applied as part of the transform calculation. |
 | `rightAxisTransform.reverse` | boolean | Defines if the order of the right axis is ascending (false) or descending (true). |
 | `percentiles` | string | Path to a JSON file providing percentile/classification bands overlaid on the chart (see below). A descripton about the perzentile.json can be found here [perzentile.json](./perzentileJson.md)|
+| `additionalLines.buttonTitle` | string | String to show on the button under the graphic that de-/activates the lines in the graph (optional)
+| `additionalLines.pdfLegendTitle` | string | String to show in the legend of the pdf export if the additional lines are shown; will use upper.title if not given (optional)
+| `additionalLines.upper` | string | Attribute name plotted as additional grey line in the chart (mandatory)
+| `additionalLines.lower` | string | Attribute name plotted as additional grey line in the chart, the space inbetween upper an lower line is filled light grey (optional)
 
 ```json
 "chartParams": {
@@ -187,7 +191,13 @@ Each entry defines one chart (and its associated table/CSV/PDF export) shown wit
     "factor": 1,
     "reverse": true
   },
-  "percentiles": "./resources/perzentile.json"
+  "percentiles": "./resources/perzentile.json",
+  "additionalLines": {
+    "buttonTitle": "Lage der Filterstrecke",
+    "pdfLegendTitle": "Filterstrecke",
+    "upper": "filteroberkante",
+    "lower": "filterunterkante"
+  }
 }
 ```
 

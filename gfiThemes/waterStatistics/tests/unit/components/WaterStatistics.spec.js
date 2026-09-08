@@ -1,7 +1,23 @@
+import {vi} from "vitest";
 import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
+
+vi.mock("chart.js", async () => {
+    const actual = await vi.importActual("chart.js");
+
+    return {
+        ...actual,
+        Tooltip: {
+            ...actual.Tooltip,
+            positioners: {
+                ...actual.Tooltip?.positioners || {}
+            }
+        }
+    };
+});
+
 import WaterStatistics from "../../../components/WaterStatistics.vue";
 
 describe("addons/gfiThemes/waterStatistics/components/WaterStatistics.vue", () => {
