@@ -1633,7 +1633,7 @@ export default {
             </div>
         </v-expand-transition>
         <div
-            v-if="activeMode.type !== 'path'"
+            v-if="activeMode.type !== 'route'"
         >
             <h5 class="mb-3">
                 Verkehrsmittel
@@ -1658,7 +1658,7 @@ export default {
             Berechnungsmethode
         </h5>
         <ButtonGroup
-            v-if="activeMode.type !== 'path'"
+            v-if="activeMode.type !== 'route'"
             class="mb-3"
             :buttons="scaleUnits.map(card => ({name: card.name, value: card.type}))"
             :pre-checked-value="scaleUnit"
