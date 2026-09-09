@@ -442,14 +442,17 @@ const actions = {
                         text: `Erstellt am: ${new Date().toLocaleDateString()}`,
                         fontSize: 12,
                         alignment: "right",
-                        margin: [0, 20, 0, 0]
+                        margin: [0, 20, 0, 0],
+                        color: "#6b6a6a",
+                        bold: true
                     }
                 ],
                 styles: {
                     header: {
-                        fontSize: 16,
+                        fontSize: 12,
                         bold: true,
-                        margin: [10, 20, 0, 10]
+                        margin: [10, 20, 0, 10],
+                        color: "#6b6a6a"
                     }
                 }
             };

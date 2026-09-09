@@ -1225,11 +1225,24 @@ export default {
 
             if (pdfParams) {
                 titleArray = Object.keys(pdfParams?.titleAttributes).map(param => {
-                    if (pdfParams?.titleAttributes?.[param]?.label) {
-                        attributeString = pdfParams?.titleAttributes?.[param]?.label + ": " + this.allAttributes?.[param];
+                    const value = this.allAttributes?.[param];
+                    let formattedValue;
+
+                    if (typeof value === "number") {
+                        formattedValue = String(value).replace(".", ",");
+                    }
+                    else if (typeof value === "string" && (/^\d+\.?\d*$/).test(value)) {
+                        formattedValue = value.replace(".", ",");
                     }
                     else {
-                        attributeString = this.allAttributes?.[param];
+                        formattedValue = value;
+                    }
+
+                    if (pdfParams?.titleAttributes?.[param]?.label) {
+                        attributeString = pdfParams?.titleAttributes?.[param]?.label + ": " + formattedValue;
+                    }
+                    else {
+                        attributeString = formattedValue;
                     }
 
                     if (pdfParams?.titleAttributes?.[param]?.postfix) {

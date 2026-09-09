@@ -989,7 +989,7 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                     imgData: "data:image/png;base64,xxx",
                     width: 800,
                     height: 400,
-                    titleArray: ["Messstelle: 12345", "GOK: 25.48 m", "value"],
+                    titleArray: ["Messstelle: 12345", "GOK: 25,48 m", "value"],
                     useHamburgDesign: true,
                     logoPath: "data:image/png;base64,logo"
                 });
