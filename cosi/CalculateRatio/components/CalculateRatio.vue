@@ -316,7 +316,7 @@ export default {
          * @returns {Array} An array of visible vector layer objects.
          */
         getVisibleVectorLayers () {
-            const supportedLayerTypes = ["WFS", "OAF", "GeoJSON"];
+            const supportedLayerTypes = ["WFS", "OAF", "GeoJSON", "VECTORBASE"];
 
             return layerCollection.getLayers().filter(layer => {
                 return layer.getLayer() instanceof VectorLayer && layer?.attributes.visibility === true && layer?.attributes?.isNeverVisibleInTree !== true && supportedLayerTypes.includes(layer.get("typ"));
@@ -553,7 +553,7 @@ export default {
                     this.featureVals = [];
                     layerFeatures.forEach(feature => {
 
-                        if (this.isFeatureActive(feature, findLayer)) {
+                        if (this.isFeatureActive(feature, findLayer.layer)) {
                             const layerGeometry = getCenter(feature.getGeometry().getExtent());
 
                             if (geometry.intersectsCoordinate(layerGeometry)) {

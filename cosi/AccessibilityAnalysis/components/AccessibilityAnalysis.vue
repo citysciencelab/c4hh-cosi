@@ -598,7 +598,7 @@ export default {
          * @returns {Array} An array of visible vector layer objects.
          */
         getVisibleVectorLayers () {
-            const supportedLayerTypes = ["WFS", "OAF", "GeoJSON"];
+            const supportedLayerTypes = ["WFS", "OAF", "GeoJSON", "VECTORBASE"];
 
             return layerCollection.getLayers().filter(layer => {
                 return layer.getLayer() instanceof VectorLayer && layer?.attributes.visibility === true && layer?.attributes?.isNeverVisibleInTree !== true && supportedLayerTypes.includes(layer.get("typ"));
