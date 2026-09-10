@@ -890,7 +890,6 @@ export default {
                       this.processHandlers.map((handler, index) => handler.execute(this.requestBodies[index], this.accessToken))
                   ),
                   jobIDs = executeResponses.map(response => response.jobID),
-                  initialStatuses = executeResponses.map(response => response.status),
                   newSimulationId = jobIDs.join("_"),
                   newSimulation = {
                       name: this.simulationName || this.simulation.title,
@@ -909,7 +908,7 @@ export default {
 
             Object.values(newSimulation.jobs).forEach((job, index) => {
                 job.requestBody = JSON.parse(JSON.stringify(this.requestBodies[index]));
-                job.jobStatus = {status: initialStatuses[index]};
+                job.jobStatus = executeResponses[index];
                 job.resultStyle = this.simulation.processes[index].resultStyle;
             });
 
@@ -923,12 +922,9 @@ export default {
                 jobs: Object.values(newSimulation.jobs),
                 jobIds: jobIDs,
                 processConfigs: this.simulation.processes,
-                simulationConfig: this.simulation
+                simulationConfig: this.simulation,
+                planningScenario: scenario
             });
-
-            if (this.shouldSaveSimulations) {
-                await upsertPlanningScenarioInIndexedDb(scenario);
-            }
         },
 
         /**

@@ -201,9 +201,10 @@ export default {
      * @param {String[]} payload.jobIds The backend job IDs matching the jobs array.
      * @param {Object[]} payload.processConfigs The process config objects matching jobs.
      * @param {Object} payload.simulationConfig The simulation config used for output normalization.
+     * @param {Object} [payload.planningScenario] The planning scenario to persist after polling.
      * @returns {Promise<void>}
      */
-    async pollAndAssignSimulationJobsResults ({dispatch, rootGetters}, {jobs, jobIds, processConfigs, simulationConfig}) {
+    async pollAndAssignSimulationJobsResults ({dispatch, getters, rootGetters}, {jobs, jobIds, processConfigs, simulationConfig, planningScenario}) {
         const accessToken = rootGetters["Modules/Login/accessToken"];
 
         if (!accessToken || !Array.isArray(jobs) || !Array.isArray(jobIds) || !Array.isArray(processConfigs)) {
@@ -246,6 +247,16 @@ export default {
                     status: "failed"
                 };
                 dispatch("jobStatusChanged");
+            }
+            finally {
+                if (getters.shouldSaveSimulations && isObject(planningScenario) && typeof planningScenario.id === "string") {
+                    try {
+                        await upsertPlanningScenarioInIndexedDb(planningScenario);
+                    }
+                    catch (persistenceError) {
+                        console.warn("Could not persist planning scenario during polling.", persistenceError);
+                    }
+                }
             }
         }));
     },
