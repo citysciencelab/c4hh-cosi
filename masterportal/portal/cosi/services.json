@@ -1786,8 +1786,8 @@
     "datasets": [
       {
         "md_id": "7A77D5EA-C3B4-44D9-8004-36D5D324485D",
-        "csw_url": "https://hmdk.metaver.de/csw",
-        "show_doc_url": "https://hmdk.metaver.de/trefferanzeige?docuuid=",
+        "csw_url": "https://metaver.de/csw",
+        "show_doc_url": "https://metaver.de/trefferanzeige?docuuid=",
         "rs_id": "https://registry.gdi-de.org/id/de.hh/418f6d9e-675c-493c-b56b-ea155db99464",
         "md_name": "HVV Streckennetz für Bahn-, Bus- und Fährlinien Hamburg",
         "bbox": "461468.96892897453,5916367.229806512,587010.9095989474,5980347.755797674",
@@ -1837,8 +1837,8 @@
     "datasets": [
       {
         "md_id": "7A77D5EA-C3B4-44D9-8004-36D5D324485D",
-        "csw_url": "https://hmdk.metaver.de/csw",
-        "show_doc_url": "https://hmdk.metaver.de/trefferanzeige?docuuid=",
+        "csw_url": "https://metaver.de/csw",
+        "show_doc_url": "https://metaver.de/trefferanzeige?docuuid=",
         "rs_id": "https://registry.gdi-de.org/id/de.hh/418f6d9e-675c-493c-b56b-ea155db99464",
         "md_name": "HVV Streckennetz für Bahn-, Bus- und Fährlinien Hamburg",
         "bbox": "461468.96892897453,5916367.229806512,587010.9095989474,5980347.755797674",
@@ -3513,8 +3513,8 @@
     "datasets": [
       {
         "md_id": "7A77D5EA-C3B4-44D9-8004-36D5D324485D",
-        "csw_url": "https://hmdk.metaver.de/csw",
-        "show_doc_url": "https://hmdk.metaver.de/trefferanzeige?docuuid=",
+        "csw_url": "https://metaver.de/csw",
+        "show_doc_url": "https://metaver.de/trefferanzeige?docuuid=",
         "rs_id": "https://registry.gdi-de.org/id/de.hh/418f6d9e-675c-493c-b56b-ea155db99464",
         "md_name": "HVV Streckennetz für Bahn-, Bus- und Fährlinien Hamburg",
         "bbox": "461468.96892897453,5916367.229806512,587010.9095989474,5980347.755797674",
@@ -3546,8 +3546,8 @@
     "datasets": [
       {
         "md_id": "7A77D5EA-C3B4-44D9-8004-36D5D324485D",
-        "csw_url": "https://hmdk.metaver.de/csw",
-        "show_doc_url": "https://hmdk.metaver.de/trefferanzeige?docuuid=",
+        "csw_url": "https://metaver.de/csw",
+        "show_doc_url": "https://metaver.de/trefferanzeige?docuuid=",
         "rs_id": "https://registry.gdi-de.org/id/de.hh/418f6d9e-675c-493c-b56b-ea155db99464",
         "md_name": "HVV Streckennetz für Bahn-, Bus- und Fährlinien Hamburg",
         "bbox": "461468.96892897453,5916367.229806512,587010.9095989474,5980347.755797674",

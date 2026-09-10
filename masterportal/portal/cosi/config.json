@@ -157,8 +157,8 @@
           },
           {
             "type": "about",
-            "cswUrl": "https://hmdk.metaver.de/csw",
-            "metaUrl": "https://hmdk.metaver.de/trefferanzeige?docuuid=EAFBC5F6-BDC4-4D63-8C18-B554D7CBFAAF",
+            "cswUrl": "https://metaver.de/csw",
+            "metaUrl": "https://metaver.de/trefferanzeige?docuuid=EAFBC5F6-BDC4-4D63-8C18-B554D7CBFAAF",
             "metaId": "EAFBC5F6-BDC4-4D63-8C18-B554D7CBFAAF",
             "ustId": "DE118509725",
             "privacyStatementText": "",
@@ -189,7 +189,7 @@
               "stadtteil"],
                   "layerIds": ["31240", "34505", "34896", "34503", "35041", "35046", "35047",
               "cosi_sozialmonitoring_stadtteile"],
-                  "metadataUrls": ["https://www.statistik-nord.de/fileadmin/maps/Stadtteil_Profile_2022/QuellenangabenKarte2023.htm", "https://hmdk.metaver.de/trefferanzeige?docuuid=F4062BD8-43C4-4C4F-AA45-253D84A3685E", "https://hmdk.metaver.de/trefferanzeige?docuuid=28C680E0-F158-4271-9004-515D5557DB0A"]
+                  "metadataUrls": ["https://www.statistik-nord.de/fileadmin/maps/Stadtteil_Profile_2022/QuellenangabenKarte2023.htm", "https://metaver.de/trefferanzeige?docuuid=F4062BD8-43C4-4C4F-AA45-253D84A3685E", "https://metaver.de/trefferanzeige?docuuid=28C680E0-F158-4271-9004-515D5557DB0A"]
                 },
                 "districtNamesMap": {
                   "Steinwerder": "Steinwerder/Kl. Grasbrook",
@@ -236,8 +236,8 @@
                   ],
                   "metadataUrls": [
                     "https://www.statistik-nord.de/fileadmin/maps/Stadtteil_Profile_2022/QuellenangabenKarte2023.htm",
-                    "https://hmdk.metaver.de/trefferanzeige?docuuid=0076F219-A3CA-4898-8501-361565361342",
-                    "https://hmdk.metaver.de/trefferanzeige?docuuid=28C680E0-F158-4271-9004-515D5557DB0A"
+                    "https://metaver.de/trefferanzeige?docuuid=0076F219-A3CA-4898-8501-361565361342",
+                    "https://metaver.de/trefferanzeige?docuuid=28C680E0-F158-4271-9004-515D5557DB0A"
                   ]
                 }
               },
@@ -248,7 +248,7 @@
                 "stats": {
                   "keyOfAttrName": ["verwaltungseinheit", "verwaltungseinheit"],
                   "layerIds": ["31270", "34898"],
-                  "metadataUrls": ["https://www.statistik-nord.de/fileadmin/maps/Stadtteil_Profile_2022/QuellenangabenKarte2023.htm", "https://hmdk.metaver.de/trefferanzeige?docuuid=0076F219-A3CA-4898-8501-361565361342"]
+                  "metadataUrls": ["https://www.statistik-nord.de/fileadmin/maps/Stadtteil_Profile_2022/QuellenangabenKarte2023.htm", "https://metaver.de/trefferanzeige?docuuid=0076F219-A3CA-4898-8501-361565361342"]
                 },
                 "displayAll": true,
                 "districtNamesMap": {
