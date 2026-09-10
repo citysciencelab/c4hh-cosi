@@ -81,7 +81,8 @@ describe("ADDONS: addons/boris/components/DetailComponent.vue", () => {
                     }
                 }}
             });
-            expect(wrapper.find(".detail-component").exists()).to.be.true;
+            expect(wrapper.find("dt").exists()).to.be.true;
+            expect(wrapper.find("dd").exists()).to.be.true;
         });
         it("does not render Detail Component if feature is empty", () => {
             wrapper = shallowMount(DetailComponent, {
@@ -89,7 +90,8 @@ describe("ADDONS: addons/boris/components/DetailComponent.vue", () => {
                 propsData: {...propsData, feature: {}}
             });
 
-            expect(wrapper.find(".detail-component").exists()).to.be.false;
+            expect(wrapper.find("dt").exists()).to.be.false;
+            expect(wrapper.find("dd").exists()).to.be.false;
         });
         it("test method getValue", () => {
             wrapper = shallowMount(DetailComponent, {

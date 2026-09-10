@@ -64,13 +64,20 @@ export class TrafficCountApi {
         /** @private */
         this.subscriptionTopics = {};
         /** @private */
-        // this.layerNameInfix = "";
-        // this.layerNameInfix = "_Zaehlfeld";
         this.layerNameInfix = "_Zaehlstelle";
+
+        /** @private */
+        this.watchdogTimer = null;
+        /** @private */
+        this.watchdogTimeout = 18 * 60 * 1000;
+        /** @private */
+        this.statusCallbacks = [];
 
         // set the mqtt listener
         if (this.mqttClient && typeof this.mqttClient.on === "function") {
             this.mqttClient.on("message", (topic, payload, packet) => {
+                this.resetWatchdog();
+
                 if (Object.prototype.hasOwnProperty.call(this.subscriptionTopics, topic)) {
                     if (!Array.isArray(this.subscriptionTopics[topic])) {
                         return;
@@ -78,14 +85,92 @@ export class TrafficCountApi {
 
                     this.subscriptionTopics[topic].forEach(callback => {
                         if (typeof callback !== "function") {
-                            // continue
                             return;
                         }
                         callback(payload, packet);
                     });
                 }
             });
+
+            // Handle network recovery
+            this.mqttClient.on("connect", () => {
+                this.resetWatchdog();
+            });
+
+            // Handle network loss
+            this.mqttClient.on("offline", () => {
+                this.statusCallbacks.forEach(cb => cb(false));
+            });
+            this.mqttClient.on("error", () => {
+                this.statusCallbacks.forEach(cb => cb(false));
+            });
         }
+    }
+
+    /**
+     * Registers a callback function to listen for MQTT status changes.
+     * Instantly starts the watchdog timer if a callback is provided.
+     * @param {Function} callback The function to be called on status change. Receives a boolean (true = live, false = frozen).
+     * @returns {void}
+     */
+    onMqttStatusChange (callback) {
+        if (!this.statusCallbacks) {
+            this.statusCallbacks = [];
+        }
+
+        if (typeof callback === "function") {
+            this.statusCallbacks.push(callback);
+            this.resetWatchdog();
+        }
+    }
+
+    /**
+     * Removes a previously registered MQTT status change callback.
+     * Stops the watchdog timer if no listeners are left.
+     * @param {Function} callback The callback function to remove.
+     * @returns {void}
+     */
+    offMqttStatusChange (callback) {
+        this.statusCallbacks = this.statusCallbacks.filter(cb => cb !== callback);
+
+        if (this.statusCallbacks.length === 0) {
+            clearTimeout(this.watchdogTimer);
+        }
+    }
+
+    /**
+     * Resets the watchdog timer. Triggered when new data arrives, the connection is re-established,
+     * or a new feature is clicked. Notifies all registered listeners that the stream is active.
+     * @returns {void}
+     */
+    resetWatchdog () {
+        if (this.watchdogTimer) {
+            clearTimeout(this.watchdogTimer);
+        }
+
+        this.statusCallbacks.forEach((listener) => {
+            if (typeof listener === "function") {
+                listener(true);
+            }
+        });
+
+        this.watchdogTimer = setTimeout(() => {
+            this.handleDeadSubscription();
+        }, this.watchdogTimeout);
+    }
+
+    /**
+     * Handles a dead subscription when the watchdog timer expires.
+     * Notifies all registered listeners that the stream is frozen.
+     * @returns {void}
+     */
+    handleDeadSubscription () {
+        console.warn(`TrafficCountAPI: No MQTT messages received for ${this.watchdogTimeout / 60000} minutes. Stream is frozen.`);
+        this.statusCallbacks.forEach((listener) => {
+            if (typeof listener === "function") {
+                listener(false);
+            }
+        });
     }
 
     /**

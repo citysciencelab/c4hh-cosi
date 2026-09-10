@@ -8,6 +8,7 @@ import StoryPlayer from "../../../components/StoryPlayer.vue";
 describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
     let wrapper,
         store,
+        map,
         originalXMLHttpRequest,
         originalIntersectionObserver,
         originalScrollIntoView;
@@ -126,10 +127,11 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                         StoryPlayer: {
                             namespaced: true,
                             state: () => ({
+                                imageAssetsById: {},
                                 showLoadingSpinner: false,
-                                autoplay: true,
                                 fixedStoryPath: "",
                                 fixedStoryName: "",
+                                originalLayerConfig: undefined,
                                 storyConf: {
                                     title: "Geschichten mit Karten erzählen",
                                     chapters: [
@@ -138,29 +140,39 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                                     ],
                                     displayType: "dipas"
                                 },
-                                mode: "2D",
-                                storyConfJson: "mockConfigJsStoryConf.json"
+                                mode: "2D"
                             }),
                             getters: {
+                                imageAssetsById: state => state.imageAssetsById,
                                 showLoadingSpinner: state => state.showLoadingSpinner,
-                                autoplay: state => state.autoplay,
                                 fixedStoryPath: (state) => state.fixedStoryPath,
                                 fixedStoryName: (state) => state.fixedStoryName,
+                                currentStoryName: () => null,
+                                originalLayerConfig: (state) => state.originalLayerConfig,
                                 storyConf: state => state.storyConf,
                                 mode: state => state.mode,
                                 storyConfJson: state => state.storyConfJson,
                                 storyPlayerMenuSide: () => "secondaryMenu"
                             },
                             mutations: {
+                                setOriginalLayerConfig (state, payload) {
+                                    state.originalLayerConfig = payload;
+                                },
                                 setShowLoadingSpinner (state, payload) {
                                     state.showLoadingSpinner = payload;
                                 },
                                 setStoryConf (state, payload) {
-                                    state.setStoryConf = payload;
+                                    state.storyConf = payload;
                                 },
                                 setMode: (state, payload) => {
                                     state.mode = payload;
                                 }
+                            }
+                        },
+                        ShareView: {
+                            namespaced: true,
+                            getters: {
+                                url: () => "https://example.com/portal?test=1"
                             }
                         }
                     }
@@ -168,7 +180,10 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 Maps: {
                     namespaced: true,
                     actions: {
-                        changeMapMode: sinon.stub()
+                        changeMapMode: sinon.stub(),
+                        placingPointMarker: sinon.spy(),
+                        removePointMarker: sinon.spy(),
+                        zoomToExtent: sinon.spy()
                     },
                     getters: {
                         mode: () => "2D"
@@ -190,6 +205,12 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                             state[`${side}Expanded`] = expanded;
                         }
                     }
+                },
+                Alerting: {
+                    namespaced: true,
+                    actions: {
+                        addSingleAlert: sinon.stub()
+                    }
                 }
             },
             state: {
@@ -198,9 +219,23 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 }
             },
             getters: {
-                configJs: state => state.configJs,
+                addLayerButton: () => sinon.stub(),
                 allLayerConfigs: () => [],
-                layerConfigsByAttributes: () => []
+                configJs: state => state.configJs,
+                layerConfig: () => sinon.stub(),
+                layerConfigsByAttributes: () => () => [],
+                layerConfigById: () => (id) => {
+                    if (id === "1") {
+                        return "conf";
+                    }
+                    return false;
+                },
+                visibleBaselayerConfigs: () => []
+            },
+            actions: {
+                addLayerToLayerConfig: () => sinon.stub(),
+                addOrReplaceLayer: () => sinon.stub(),
+                updateLayerConfigs: () => sinon.stub()
             }
         });
 
@@ -221,7 +256,12 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             },
             global: {
                 mocks: {
-                    $t: key => key,
+                    $t: (key, params) => {
+                        if (key === "additional:modules.storyPlayer.numberOfChapters" && params) {
+                            return `Kapitel ${params.current} von ${params.total}`;
+                        }
+                        return key;
+                    },
                     mapCollection: {
                         getMap: sinon.stub().returns({
                             getView: sinon.stub().returns({
@@ -246,6 +286,29 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 plugins: [store]
             }
         });
+
+        mapCollection.clear();
+        map = {
+            id: "ol",
+            mode: "2D",
+            getLayers: () => {
+                return {
+                    getArray: () => {
+                        return [];
+                    }
+                };
+            },
+            getView: () => {
+                return {
+                    animate: sinon.spy(),
+                    getZoom: () => sinon.stub(),
+                    getCenter: () => []
+                };
+            },
+            addOverlay: sinon.spy(),
+            removeOverlay: sinon.spy()
+        };
+        mapCollection.addMap(map, "2D");
     });
 
     afterEach(() => {
@@ -341,6 +404,34 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 }
             });
         });
+
+        it("should render floating-button", async () => {
+            wrapper.vm.showStickyHeader = true;
+            await wrapper.vm.$nextTick();
+            const floatingButton = wrapper.findComponent({name: "IconButton"});
+
+            expect(floatingButton.exists()).to.be.true;
+        });
+
+        it("should not render StoryPlayerFeature component", () => {
+            expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.false;
+        });
+
+        it("should render StoryPlayerFeature component", async () => {
+            await wrapper.setData({featureAttributes: {}});
+
+            expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.true;
+        });
+
+        it("should not render AlertMessage component", () => {
+            expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.false;
+        });
+
+        it("should render AlertMessage component", async () => {
+            await wrapper.setData({showImportWarning3D: [false, true]});
+
+            expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
+        });
     });
 
     describe("Methods", () => {
@@ -395,19 +486,52 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
             resetMenuStub.restore();
         });
 
-        it("should enableLayer and disableLayer call toggleLayer", () => {
-            const toggleLayerStub = sinon.stub(wrapper.vm, "toggleLayer");
+        it("should not in enableLayer to call addLayerToLayerConfig and addOrReplaceLayer", async () => {
+            const addOrReplaceLayerStub = sinon.stub(wrapper.vm, "addOrReplaceLayer"),
+                addLayerToLayerConfigStub = sinon.stub(wrapper.vm, "addLayerToLayerConfig");
 
-            wrapper.vm.enableLayer({id: 1});
-            expect(toggleLayerStub.calledWith({id: 1}, true)).to.be.true;
-            wrapper.vm.disableLayer({id: 2});
-            expect(toggleLayerStub.calledWith({id: 2}, false)).to.be.true;
-            toggleLayerStub.restore();
+            await wrapper.vm.enableLayer(null);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            await wrapper.vm.enableLayer(false);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            await wrapper.vm.enableLayer(0);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            await wrapper.vm.enableLayer({});
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            await wrapper.vm.enableLayer([]);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            await wrapper.vm.enableLayer(undefined);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.false;
+            addOrReplaceLayerStub.restore();
+            addLayerToLayerConfigStub.restore();
         });
 
-        it("should return storyConfPath from store when available", () => {
-            // storyConfJson is set in the store state
-            expect(wrapper.vm.storyConfPath).to.equal("mockConfigJsStoryConf.json");
+        it("should in enableLayer to call addLayerToLayerConfig and addOrReplaceLayer if the id is a string", async () => {
+            const addOrReplaceLayerStub = sinon.stub(wrapper.vm, "addOrReplaceLayer"),
+                addLayerToLayerConfigStub = sinon.stub(wrapper.vm, "addLayerToLayerConfig");
+
+            await wrapper.vm.enableLayer("1");
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.true;
+            addOrReplaceLayerStub.restore();
+            addLayerToLayerConfigStub.restore();
+        });
+
+        it("should in enableLayer to call addLayerToLayerConfig and addOrReplaceLayer if the id is an array", async () => {
+            const addOrReplaceLayerStub = sinon.stub(wrapper.vm, "addOrReplaceLayer"),
+                addLayerToLayerConfigStub = sinon.stub(wrapper.vm, "addLayerToLayerConfig");
+
+            await wrapper.vm.enableLayer(["1", "2"]);
+            expect(addLayerToLayerConfigStub.called).to.be.false;
+            expect(addOrReplaceLayerStub.called).to.be.true;
+            addOrReplaceLayerStub.restore();
+            addLayerToLayerConfigStub.restore();
         });
 
         describe("Chevron Navigation Tests", () => {
@@ -417,6 +541,16 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                     {title: "Step 2", content: []},
                     {title: "Step 3", content: []}
                 ];
+            });
+
+            it("should call function deactivateSubjectLayer", async () => {
+                const deactivateSubjectLayerStub = sinon.stub(wrapper.vm, "deactivateSubjectLayer");
+
+                wrapper.vm.currentChapterIndex = 1;
+                wrapper.vm.goToNextStep();
+                await wrapper.vm.$nextTick();
+                expect(deactivateSubjectLayerStub.called).to.be.true;
+                deactivateSubjectLayerStub.restore();
             });
 
             it("should navigate to next and previous steps", async () => {
@@ -444,11 +578,9 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 wrapper.vm.currentChapterIndex = 1;
                 await wrapper.vm.$nextTick();
 
-                const chevronUp = wrapper.find(".chevron-up .bi-arrow-up");
-                const chevronDown = wrapper.find(".chevron-down .bi-arrow-down");
+                const buttons = wrapper.findAllComponents({name: "IconButton"});
 
-                expect(chevronUp.exists()).to.be.true;
-                expect(chevronDown.exists()).to.be.true;
+                expect(buttons.length).to.equal(2);
             });
 
             it("should hide chevrons at step boundaries", async () => {
@@ -468,14 +600,55 @@ describe("addons/storyPlayer/tests/unit/components/StoryPlayer.spec.js", () => {
                 const goNextSpy = sinon.spy(wrapper.vm, "goToNextStep");
                 const goPrevSpy = sinon.spy(wrapper.vm, "goToPreviousStep");
 
-                await wrapper.find(".chevron-down .btn-chevron").trigger("click");
-                expect(goNextSpy.called).to.be.true;
+                const buttons = wrapper.findAllComponents({name: "IconButton"});
 
-                await wrapper.find(".chevron-up .btn-chevron").trigger("click");
-                expect(goPrevSpy.called).to.be.true;
+                await buttons.at(1).props("interaction")();
+                expect(goNextSpy.calledOnce).to.be.true;
+
+                await buttons.at(0).props("interaction")();
+                expect(goPrevSpy.calledOnce).to.be.true;
 
                 goNextSpy.restore();
                 goPrevSpy.restore();
+            });
+        });
+
+        describe("openFeaturePopup", () => {
+            it("should not call placingPointMarker", () => {
+                const placingPointMarkerSpy = sinon.spy(wrapper.vm, "placingPointMarker");
+
+                wrapper.vm.openFeaturePopup(null);
+                expect(placingPointMarkerSpy.called).to.be.false;
+
+                wrapper.vm.openFeaturePopup(0);
+                expect(placingPointMarkerSpy.called).to.be.false;
+
+                wrapper.vm.openFeaturePopup([]);
+                expect(placingPointMarkerSpy.called).to.be.false;
+
+                wrapper.vm.openFeaturePopup(true);
+                expect(placingPointMarkerSpy.called).to.be.false;
+
+                wrapper.vm.openFeaturePopup("");
+                expect(placingPointMarkerSpy.called).to.be.false;
+
+                wrapper.vm.openFeaturePopup(undefined);
+                expect(placingPointMarkerSpy.called).to.be.false;
+            });
+
+            it("should call placingPointMarker", () => {
+                const placingPointMarkerSpy = sinon.spy(wrapper.vm, "placingPointMarker");
+
+                wrapper.vm.openFeaturePopup({coordinate: [1, 1]});
+                expect(placingPointMarkerSpy.called).to.be.true;
+            });
+
+            it("should render StoryPlayerFeature component", async () => {
+                await wrapper.setData({featureAttributes: undefined});
+                expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.false;
+
+                await wrapper.vm.openFeaturePopup({coordinate: [1, 1], title: "title"});
+                expect(wrapper.findComponent({name: "StoryPlayerFeature"}).exists()).to.be.true;
             });
         });
     });

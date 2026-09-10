@@ -42,6 +42,7 @@
  * @property {string|null} selectedProcessId the selected process id
  * @property {String} simulationIdForResults The Id of the simulation that is currently displayed in simulationResult component.
  * @property {Object[]} simulations - A list of all available simulations.
+ * @property {Boolean} shouldSaveSimulations Flag to enable persistence of planning scenarios and simulations.
  * @property {String|null} simulationApiUrl The URL for the Urban Model Platform API
  * @property {Object} simulationAreaStyle - The default style for the simulation area (BBOX/Extent of planning scenario)
  * @property {Object} userDetailsCache cache for user details
@@ -58,7 +59,7 @@ const state = {
     currentInputName: "",
     dataSources: [],
     description: "additional:modules.tools.simulationTool.toolDescription",
-    hasMouseMapInteractions: true,
+    hasMouseMapInteractions: false,
     hiddenSideMenus: [],
     icon: "bi-sliders2",
     img: {},
@@ -111,6 +112,7 @@ const state = {
     selectedEnsembleId: null,
     selectedJobId: null,
     selectedProcessId: null,
+    shouldSaveSimulations: true,
     simulationApiUrl: null,
     simulationAreaStyle: {
         fillColor: [255, 255, 255, 0],

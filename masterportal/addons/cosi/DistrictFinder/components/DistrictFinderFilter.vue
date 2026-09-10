@@ -184,10 +184,10 @@ export default {
          */
         exportConditions (name, withAreas) {
             const date = dayjs(new Date()).format("YYYY-MM-DD"),
-                data = this.getExportedData(name, date, withAreas, this.cardList),
-                filename = name + "-" + date + ".json",
-                jsonStr = JSON.stringify(data),
-                element = document.createElement("a");
+                  data = this.getExportedData(name, date, withAreas, this.cardList),
+                  filename = name + "-" + date + ".json",
+                  jsonStr = JSON.stringify(data),
+                  element = document.createElement("a");
 
             element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(jsonStr));
             element.setAttribute("download", filename);
@@ -260,7 +260,7 @@ export default {
             }
 
             const remainingArrays = [...arrayOfArrays],
-                remainingOperators = [...operators];
+                  remainingOperators = [...operators];
 
             remainingOperators.splice(0, 1);
 

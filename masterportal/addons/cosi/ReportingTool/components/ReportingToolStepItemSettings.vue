@@ -74,8 +74,8 @@ export default {
          */
         defaultSelectedYear () {
             const yearValues = this.years.map(i => i.value),
-                nonForecastYears = this.getNonForecastYears(yearValues),
-                candidates = nonForecastYears.length ? nonForecastYears : yearValues;
+                  nonForecastYears = this.getNonForecastYears(yearValues),
+                  candidates = nonForecastYears.length ? nonForecastYears : yearValues;
 
             return candidates.length
                 ? Math.max(...candidates)
@@ -89,7 +89,7 @@ export default {
          */
         higherDistrictLevels () {
             const index = this.districtLevels.findIndex(level => level.layerId === this.selectedDistrictLevelId),
-                levelsLength = this.districtLevels.length - 1;
+                  levelsLength = this.districtLevels.length - 1;
 
             return index !== levelsLength ? this.districtLevels.slice(index + 1) : [this.districtLevels[levelsLength]];
         },
@@ -131,9 +131,9 @@ export default {
                 await this.$nextTick();
 
                 const arr = Array.isArray(names) ? names : [],
-                    unique = [...new Set(arr)],
-                    prevLen = this.stableSelectedDistrictNames.length,
-                    newLen = unique.length;
+                      unique = [...new Set(arr)],
+                      prevLen = this.stableSelectedDistrictNames.length,
+                      newLen = unique.length;
 
                 this.stableSelectedDistrictNames = unique;
 

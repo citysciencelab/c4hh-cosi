@@ -138,9 +138,9 @@ export default {
             }
 
             const toolMenuSide = this.dataNarratorMenuSide === "mainMenu" ? "secondaryMenu" : "mainMenu",
-                toolKey = toolId.charAt(0).toUpperCase() + toolId.slice(1),
-                module = this.$store.state.Modules && this.$store.state.Modules[toolKey],
-                name = module && module.name ? module.name : toolKey;
+                  toolKey = toolId.charAt(0).toUpperCase() + toolId.slice(1),
+                  module = this.$store.state.Modules && this.$store.state.Modules[toolKey],
+                  name = module && module.name ? module.name : toolKey;
 
             this.setExpandedBySide({expanded: true, side: toolMenuSide});
             this.changeCurrentComponent({type: toolId, side: toolMenuSide, props: {name}});
@@ -219,8 +219,8 @@ export default {
                 }
                 else {
                     const map = mapCollection.getMap("2D"),
-                        mapView = typeof map?.getView === "function" ? map.getView() : undefined,
-                        zoomLevel = this.isMobilePortrait ? this.currentStep.zoomLevel - 1 : this.currentStep.zoomLevel;
+                          mapView = typeof map?.getView === "function" ? map.getView() : undefined,
+                          zoomLevel = this.isMobilePortrait ? this.currentStep.zoomLevel - 1 : this.currentStep.zoomLevel;
 
                     if (mapView) {
                         setTimeout(() => {
@@ -245,9 +245,9 @@ export default {
                 && Object.prototype.hasOwnProperty.call(this.currentStep.navigation3D, "cameraPosition")
                 && this.currentStep.navigation3D.cameraPosition[0] !== null) {
                 const position = this.currentStep.navigation3D.cameraPosition,
-                    map3d = mapCollection.getMap("3D"),
-                    camera = map3d.getCesiumScene().camera,
-                    destination = Cesium.Cartesian3.fromDegrees(position[0], position[1], position[2]);
+                      map3d = mapCollection.getMap("3D"),
+                      camera = map3d.getCesiumScene().camera,
+                      destination = Cesium.Cartesian3.fromDegrees(position[0], position[1], position[2]);
 
                 camera.flyTo({
                     destination: destination,
@@ -328,28 +328,28 @@ export default {
          */
         getCenterOfVisibleMap () {
             const map = mapCollection.getMap("2D"),
-                mapView = map?.getView(),
-                projection = mapView?.getProjection();
+                  mapView = map?.getView(),
+                  projection = mapView?.getProjection();
 
             if (projection && projection.getUnits() === "degrees") {
                 return this.currentStep.centerCoordinate;
             }
 
             const zoomLevel = this.isMobilePortrait ? this.currentStep.zoomLevel - 1 : this.currentStep.zoomLevel,
-                targetResolution = mapView?.getResolutionForZoom(zoomLevel),
-                rightPadding = this.expanded("secondaryMenu")
-                    ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
-                    : 20,
-                leftPadding = this.expanded("mainMenu")
-                    ? document.getElementById("mp-menu-mainMenu").offsetWidth
-                    : 20,
-                offsetPixels = (rightPadding - leftPadding) / 2,
-                center = this.currentStep.centerCoordinate;
+                  targetResolution = mapView?.getResolutionForZoom(zoomLevel),
+                  rightPadding = this.expanded("secondaryMenu")
+                      ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
+                      : 20,
+                  leftPadding = this.expanded("mainMenu")
+                      ? document.getElementById("mp-menu-mainMenu").offsetWidth
+                      : 20,
+                  offsetPixels = (rightPadding - leftPadding) / 2,
+                  center = this.currentStep.centerCoordinate;
 
             if (this.isMobilePortrait) {
                 const mapHeight = map.getTargetElement().getBoundingClientRect().top,
-                    verticalOffsetPixels = (mapHeight / 2) + 50,
-                    offsetY = verticalOffsetPixels * targetResolution;
+                      verticalOffsetPixels = (mapHeight / 2) + 50,
+                      offsetY = verticalOffsetPixels * targetResolution;
 
                 return [center[0], center[1] - offsetY];
             }
@@ -364,7 +364,7 @@ export default {
          */
         getConfPathfromUrl () {
             const queryString = window.location.search,
-                urlParams = new URLSearchParams(queryString);
+                  urlParams = new URLSearchParams(queryString);
 
             return urlParams.get("story");
         }

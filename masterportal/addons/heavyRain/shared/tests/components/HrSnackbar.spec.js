@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import HrSnackbar from "../../components/HrSnackbar.vue";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/heavyRain/shared/components/HrSnackbar.vue", () => {
     let wrapper;

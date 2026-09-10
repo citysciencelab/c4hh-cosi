@@ -12,6 +12,11 @@ export default {
             type: String,
             required: false,
             default: ","
+        },
+        placeholder: {
+            type: String,
+            required: false,
+            default: "Datum"
         }
     },
     emits: ["clearInput", "toggleCalendar"],
@@ -57,20 +62,32 @@ export default {
 
 <template>
     <div
-        class="input-wrapper"
+        class="input-wrapper d-block w-100"
         role="button"
         tabindex="0"
         @mouseover="setShowCalendarIcon(false)"
         @focus="setShowCalendarIcon(false)"
         @mouseleave="setShowCalendarIcon(true)"
         @blur="setShowCalendarIcon(true)"
+        @keypress.enter="toggleCalendar"
     >
-        <input
-            v-model="dateComputed"
+        <div
             class="date-input form-control"
-            readonly="true"
+            role="button"
+            tabindex="-1"
             @click="toggleCalendar"
+            @keypress.enter="toggleCalendar"
         >
+            <template v-if="dateComputed">
+                {{ dateComputed }}
+            </template>
+            <span
+                v-else
+                class="wrap-input-placeholder"
+            >
+                {{ placeholder }}
+            </span>
+        </div>
         <i :class="['bi bi-calendar4 calendar', showCalendarIcon ? 'show': '']" />
         <i
             :class="['bi bi-x', !showCalendarIcon ? 'show': '']"
@@ -86,16 +103,23 @@ export default {
 
 .input-wrapper {
     position: relative;
-    display: inline-block;
-    width: 210px;
-    input {
+
+    .date-input {
+        height: auto;
+        min-height: calc(1.5em + 0.75rem + 2px);
+        padding-right: 28px;
+        white-space: normal;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+        cursor: pointer;
+        color: $dark_grey;
+
         &:hover {
-            color: $black;
-            background-color: $white;
             border-color: $light_blue;
-            outline: 0;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08), 0 0 0 0.25rem rgba(0, 48, 99, 0.25);
         }
+    }
+    .wrap-input-placeholder {
+        color: $dark_grey;
     }
 }
 

@@ -50,7 +50,6 @@ describe("addons/sessionTool/js/observer/LayerObserver.js", () => {
             expect(getModelByLayerId(null)).to.be.false;
         });
         it("should return undefined if model can't be found even if it is added to the modellist", () => {
-            sinon.restore();
             const request = sinon.spy(() => undefined);
             let model = null;
 

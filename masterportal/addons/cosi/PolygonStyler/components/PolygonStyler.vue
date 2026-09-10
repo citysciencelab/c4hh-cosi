@@ -102,7 +102,7 @@ export default {
          */
         selectedLayerNameList (newNameList, oldNameList) {
             const clickedName = this.differenceOfTwoArrays(newNameList, oldNameList).toString(),
-                tableItem = this.tableItems.find(item => item.name === clickedName);
+                  tableItem = this.tableItems.find(item => item.name === clickedName);
 
             if (tableItem) {
                 tableItem.isVisible = !tableItem.isVisible;
@@ -192,7 +192,7 @@ export default {
          */
         setFeatureValues (tableItem, attributeName) {
             const allValues = tableItem.features.map(feature => feature.get(attributeName)),
-                uniqueValues = [...new Set(allValues)];
+                  uniqueValues = [...new Set(allValues)];
 
             tableItem.styleList = this.getDefaultStyleList(uniqueValues);
             tableItem.selectedAttribute = attributeName;
@@ -260,7 +260,7 @@ export default {
          */
         updateSelectedLayerNameList (newLayerNameList, oldLayerNameList) {
             const removeName = this.differenceOfTwoArrays(newLayerNameList, oldLayerNameList).toString(),
-                isNameSelected = this.selectedLayerNameList.includes(removeName);
+                  isNameSelected = this.selectedLayerNameList.includes(removeName);
 
             if (isNameSelected) {
                 this.selectedLayerNameList = this.selectedLayerNameList.filter(name => name !== removeName);
@@ -284,7 +284,7 @@ export default {
             :items="layerNameList"
             multiple
             outlined
-            dense
+            density="compact"
         />
         <v-data-table
             v-if="visibleTableItems.length > 0"

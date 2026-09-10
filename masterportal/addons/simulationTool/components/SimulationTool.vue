@@ -20,6 +20,8 @@ import SimulationList from "./Simulation/SimulationList.vue";
 import SimulationParameter from "./Simulation/SimulationParameter.vue";
 import simulationResults from "./Simulation/SimulationResults.vue";
 import {infrastructureLayerId} from "../layerIds.js";
+import {readAllPlanningScenariosFromIndexedDb} from "../js/planningScenariosIndexedDb.js";
+import isObject from "@shared/js/utils/isObject.js";
 
 import TutorialPanel from "./HelpSection/TutorialPanel.vue";
 
@@ -50,6 +52,9 @@ export default {
     },
     mounted: async function () {
         await this.checkLoggedIn();
+        if (this.shouldSaveSimulations) {
+            await this.restorePlanningScenariosFromIndexedDb();
+        }
         this.maximizeDrawer();
         this.fetchProcesses();
         this.fetchJobs();
@@ -77,6 +82,104 @@ export default {
         ]),
         ...mapMutations("Modules/SimulationTool", Object.keys(mutations)),
         ...mapActions("Modules/SimulationTool", Object.keys(actions)),
+
+        /**
+         * Loads all planning scenarios from indexedDB and merges missing entries into the store.
+         * @returns {Promise<void>}
+         */
+        async restorePlanningScenariosFromIndexedDb () {
+            try {
+                const persistedScenarios = await readAllPlanningScenariosFromIndexedDb();
+
+                if (!Array.isArray(persistedScenarios) || !persistedScenarios.length) {
+                    return;
+                }
+
+                const scenariosById = new Map(
+                    (Array.isArray(this.planningScenarios) ? this.planningScenarios : [])
+                        .filter(scenario => scenario && typeof scenario.id === "string")
+                        .map(scenario => [scenario.id, scenario])
+                );
+
+                persistedScenarios.forEach(scenario => {
+                    if (scenario && typeof scenario.id === "string") {
+                        scenariosById.set(scenario.id, scenario);
+                    }
+                });
+
+                const mergedScenarios = Array.from(scenariosById.values());
+
+                this.setPlanningScenarios(mergedScenarios);
+                await this.resumePendingJobsFromScenarios(mergedScenarios);
+            }
+            catch (error) {
+                console.warn("Could not restore planning scenarios from indexedDB.", error);
+            }
+        },
+
+        /**
+         * Resumes pending jobs from restored planning scenarios.
+         * Jobs with status "accepted" or "running" are polled concurrently.
+         * @param {Object[]} scenarios Restored planning scenarios.
+         * @returns {Promise<void>}
+         */
+        async resumePendingJobsFromScenarios (scenarios) {
+            if (!Array.isArray(scenarios) || !scenarios.length) {
+                return;
+            }
+
+            const pendingStatuses = new Set(["accepted", "running"]);
+            const pollingPromises = [];
+
+            scenarios.forEach(scenario => {
+                if (!isObject(scenario?.simulations)) {
+                    return;
+                }
+
+                Object.values(scenario.simulations).forEach(simulation => {
+                    if (!isObject(simulation?.jobs)) {
+                        return;
+                    }
+
+                    const simulationConfig = this.simulations.find(config => config.id === simulation.configId);
+
+                    if (!simulationConfig?.processes?.length) {
+                        return;
+                    }
+
+                    const pendingEntries = Object.entries(simulation.jobs)
+                        .map(([jobId, job], index) => ({
+                            job,
+                            jobId,
+                            processConfig: simulationConfig.processes[index]
+                        }))
+                        .filter(({job, processConfig}) => {
+                            return pendingStatuses.has(job?.jobStatus?.status)
+                                && isObject(processConfig)
+                                && processConfig.url
+                                && processConfig.id;
+                        });
+
+                    if (!pendingEntries.length) {
+                        return;
+                    }
+
+                    pollingPromises.push(this.pollAndAssignSimulationJobsResults({
+                        jobs: pendingEntries.map(({job}) => job),
+                        jobIds: pendingEntries.map(({jobId}) => jobId),
+                        processConfigs: pendingEntries.map(({processConfig}) => processConfig),
+                        simulationConfig
+                    }));
+                });
+            });
+
+            if (!pollingPromises.length) {
+                return;
+            }
+
+            await Promise.all(pollingPromises);
+        },
+
         maximizeDrawer () {
             this.setCurrentMenuWidth({
                 side: "secondaryMenu",

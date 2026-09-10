@@ -138,19 +138,19 @@ export default {
                 </v-card-text>
                 <v-card-actions class="py-4 justify-space-between">
                     <v-btn
-                        color="grey lighten-1"
+                        color="grey-lighten-1"
                         @click.native="$emit('updateStyle')"
                     >
                         {{ $t("additional:modules.tools.cosi.polygonStyler.settings.applyButton") }}
                     </v-btn>
                     <v-btn
-                        color="grey lighten-1"
+                        color="grey-lighten-1"
                         @click.native="$emit('resetStyle')"
                     >
                         {{ $t("additional:modules.tools.cosi.polygonStyler.removeButton") }}
                     </v-btn>
                     <v-btn
-                        color="grey lighten-1"
+                        color="grey-lighten-1"
                         @click.native="$emit('hideDialog')"
                     >
                         {{ $t("additional:modules.tools.cosi.polygonStyler.settings.abortButton") }}
@@ -175,13 +175,13 @@ export default {
                 </v-card-text>
                 <v-card-actions class="py-3 justify-space-between">
                     <v-btn
-                        color="grey lighten-1"
+                        color="grey-lighten-1"
                         @click.native="setColorToStyle(selectedStyle, colorPickerValue)"
                     >
                         {{ $t("additional:modules.tools.cosi.polygonStyler.settings.applyButton") }}
                     </v-btn>
                     <v-btn
-                        color="grey lighten-1"
+                        color="grey-lighten-1"
                         @click.native="toggleColorPickerDialog"
                     >
                         {{ $t("additional:modules.tools.cosi.polygonStyler.settings.abortButton") }}

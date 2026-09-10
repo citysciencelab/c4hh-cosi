@@ -136,7 +136,7 @@ export default {
          */
         addInputFeature (evt) {
             const olFeature = this.setFeatureProperties(evt.feature, this.getPropertiesToShow),
-                geojsonFeature = ConvertFeature.openlayersToGeoJson([olFeature])[0];
+                  geojsonFeature = ConvertFeature.openlayersToGeoJson([olFeature])[0];
 
             this.createdFeatures = this.getLayerSource().getFeatures().filter(feature => feature.get("created") === true).concat(evt.feature);
             this.getInputFeatures(this.currentEditableInput).push(geojsonFeature);
@@ -301,8 +301,8 @@ export default {
         updateGeometry (evt) {
             evt.features.forEach((feature) => {
                 const geometry = feature.getGeometry().getCoordinates(),
-                    geojsonFeatures = this.getInputFeatures(this.currentEditableInput),
-                    featureIndex = geojsonFeatures.findIndex(f => f.id === feature.getId());
+                      geojsonFeatures = this.getInputFeatures(this.currentEditableInput),
+                      featureIndex = geojsonFeatures.findIndex(f => f.id === feature.getId());
 
                 if (featureIndex !== -1) {
                     geojsonFeatures[featureIndex].geometry.coordinates = geometry;

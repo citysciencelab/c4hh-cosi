@@ -18,14 +18,14 @@ export default {
     },
     mounted () {
         this.registerListener({type: "click", listener: this.onMapClickOktagon,
-            keyForBoundFunctions: "onMapClickOktagon"});
+                               keyForBoundFunctions: "onMapClickOktagon"});
         this.$nextTick(() => {
             this.initURLParameter();
         });
     },
     unmounted () {
         this.unregisterListener({type: "click", listener: this.onMapClickOktagon,
-            keyForBoundFunctions: "onMapClickOktagon"});
+                                 keyForBoundFunctions: "onMapClickOktagon"});
         this.removePointMarker();
     },
     methods: {
@@ -50,14 +50,14 @@ export default {
             this.addCoordinatesToSubmitObject(coord);
             for (const layerId of this.layerIds) {
                 const mapView2D = mapCollection.getMapView("2D"),
-                    constrainedResolution = mapView2D.getConstrainedResolution(mapView2D.getResolution()),
-                    resolution = findWhereJs(mapView2D.get("options"), {resolution: constrainedResolution}).resolution,
-                    projection = mapView2D.getProjection(),
-                    layer = layerCollection.getLayerById(layerId),
-                    url = layer.getLayerSource().getFeatureInfoUrl(coord, resolution, projection, {
-                        INFO_FORMAT: "text/xml",
-                        STYLES: ""
-                    });
+                      constrainedResolution = mapView2D.getConstrainedResolution(mapView2D.getResolution()),
+                      resolution = findWhereJs(mapView2D.get("options"), {resolution: constrainedResolution}).resolution,
+                      projection = mapView2D.getProjection(),
+                      layer = layerCollection.getLayerById(layerId),
+                      url = layer.getLayerSource().getFeatureInfoUrl(coord, resolution, projection, {
+                          INFO_FORMAT: "text/xml",
+                          STYLES: ""
+                      });
 
                 await this.requestALKISWMS(url);
             }

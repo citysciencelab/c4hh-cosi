@@ -1,4 +1,4 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import MietenspiegelFormular from "../../components/MietenspiegelFormular.vue";
@@ -7,7 +7,6 @@ import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import sinon from "sinon";
 import wfsRequest from "../../../../src/shared/js/api/wfs/getFeature.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/mietenspiegelFormular/components/MietenspiegelFormular.vue", () => {
     let store;

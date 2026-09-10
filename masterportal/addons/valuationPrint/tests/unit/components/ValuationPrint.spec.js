@@ -1,4 +1,4 @@
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 import Polygon from "ol/geom/Polygon.js";
@@ -10,7 +10,6 @@ import ModalItem from "../../../../../src/shared/modules/modals/components/Modal
 import IconButton from "../../../../../src/shared/modules/buttons/components/IconButton.vue";
 import WfsSearch from "../../../../../src/modules/wfsSearch/components/WfsSearch.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
     const features = [
@@ -101,6 +100,8 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
                             messageList: [],
                             specificAddress: "",
                             printedFeature: [],
+                            multiSelectParcels: false,
+                            parcelLayerZoomLevel: 0,
                             ...values
                         };
                     },
@@ -131,6 +132,8 @@ describe("addons/valuationPrint/components/ValuationPrint.vue", () => {
                             selectedFeatures: [],
                             messageList: [],
                             specificAddress: "",
+                            multiSelectParcels: false,
+                            parcelLayerZoomLevel: 0,
                             printedFeature: []
                         };
                     },

@@ -1,9 +1,8 @@
 import {createStore} from "vuex";
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import DataTableTheme from "../../../components/DataTable.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/gfiThemes/components/dataTable/components/DataTable.vue", () => {
     let wrapper;

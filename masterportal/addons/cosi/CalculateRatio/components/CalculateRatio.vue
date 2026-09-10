@@ -104,11 +104,11 @@ export default {
         ...mapGetters("Modules/CalculateRatio", Object.keys(getters)),
         ...mapGetters("Modules/DistrictSelector", ["mapping", "selectedDistrictLevel", "selectedFeatures", "label", "keyOfAttrName", "keyOfAttrNameStats", "loadend"]),
         ...mapGetters("Modules/FeaturesList",
-            {
-            // facilitiesMapping: "mapping",
-            // groupActiveLayer: "groupActiveLayer",
-                isFeatureActive: "isFeatureActive"
-            }),
+                      {
+                          // facilitiesMapping: "mapping",
+                          // groupActiveLayer: "groupActiveLayer",
+                          isFeatureActive: "isFeatureActive"
+                      }),
         ...mapGetters("Modules/ColorCodeMap", ["visualizationState"]),
         ...mapGetters(["layerConfig", "visibleSubjectDataLayerConfigs"]),
 
@@ -120,13 +120,13 @@ export default {
 
             if (this.fActive_A || this.fActive_B) {
                 const capacity = {
-                        name: "Kapazität",
-                        key: "capacity"
-                    },
-                    need = {
-                        name: "Bedarf",
-                        key: "need"
-                    };
+                          name: "Kapazität",
+                          key: "capacity"
+                      },
+                      need = {
+                          name: "Bedarf",
+                          key: "need"
+                      };
 
                 options.push(capacity, need);
             }
@@ -343,8 +343,6 @@ export default {
     methods: {
         ...mapMutations("Modules/CalculateRatio", Object.keys(mutations)),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
-        ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
-        ...mapMutations("Modules/ChartGenerator", ["setNewDataset"]),
 
         getVisibleLayerList () {
             this.layerIdList = this.getVisibleVectorLayers().map(layer => layer.getLayer().get("name"));
@@ -366,7 +364,7 @@ export default {
          * @returns {Array} An array of visible vector layer objects.
          */
         getVisibleVectorLayers () {
-            const supportedLayerTypes = ["WFS", "OAF", "GeoJSON"];
+            const supportedLayerTypes = ["WFS", "OAF", "GeoJSON", "VECTORBASE"];
 
             return layerCollection.getLayers().filter(layer => {
                 return layer.getLayer() instanceof VectorLayer && layer?.attributes.visibility === true && layer?.attributes?.isNeverVisibleInTree !== true && supportedLayerTypes.includes(layer.get("typ"));
@@ -548,7 +546,7 @@ export default {
 
             dataArray_A.forEach((obj_A) => {
                 const obj_B = dataArray_B.find(obj => obj.name === obj_A.name),
-                    combined = {...obj_A, ...obj_B};
+                      combined = {...obj_A, ...obj_B};
 
                 allData.push(combined);
             });
@@ -595,7 +593,7 @@ export default {
 
             this.selectedFeatures.forEach(district => {
                 const name = district.getProperties()[this.keyOfAttrName],
-                    geometry = district.getGeometry();
+                      geometry = district.getGeometry();
 
                 this.calcHelper = {};
                 this.calcHelper.name = name;
@@ -604,17 +602,16 @@ export default {
 
                 if (isFacility) {
                     const findLayer = this.getVisibleVectorLayers().find(layer => layer.getLayer().get("name") === this["selectedField" + letter]),
-                        layerFeatures = getLayerSource(findLayer.getLayer()).getFeatures(),
-                        paramField = this["paramField" + letter],
-                        // the selection only carries the display name, the feature property is the id from the layer config
-                        paramKey = findLayer?.attributes?.numericalValues?.find(value => value.name === paramField?.name)?.id
-                            || paramField?.name?.toLowerCase();
+                          layerFeatures = getLayerSource(findLayer.getLayer()).getFeatures(),
+                          paramField = this["paramField" + letter],
+                          // the selection only carries the display name, the feature property is the id from the layer config
+                          paramKey = findLayer?.attributes?.numericalValues?.find(value => value.name === paramField?.name)?.id || paramField?.name?.toLowerCase();
 
                     this.calcHelper["type_" + letter] = "facility";
                     this.featureVals = [];
                     layerFeatures.forEach(feature => {
 
-                        if (this.isFeatureActive(feature)) {
+                        if (this.isFeatureActive(feature, findLayer.layer)) {
                             const layerGeometry = getCenter(feature.getGeometry().getExtent());
 
                             if (geometry.intersectsCoordinate(layerGeometry)) {
@@ -667,7 +664,7 @@ export default {
                     this.calcHelper["type_" + letter] = "feature";
 
                     const featureData = this.getFeatureData(name, this["selectedField" + letter]),
-                        yearValues = {};
+                          yearValues = {};
 
                     featureData.forEach(year => {
                         yearValues[year.jahr] = year.wert;
@@ -692,7 +689,7 @@ export default {
          */
         getFeatureData (districtName, featureName) {
             const featureDataList = [],
-                selectedDistricts = this.selectedDistrictLevel.districts.filter(district => district.isSelected === true);
+                  selectedDistricts = this.selectedDistrictLevel.districts.filter(district => district.isSelected === true);
 
             this.selectedStatFeatures = selectedDistricts.map(district => district.statFeatures).flat();
 
@@ -819,63 +816,6 @@ export default {
         },
 
         /**
-         * @description Passes data to the Chart Generator Tool.
-         * @returns {Void} Function returns nothing.
-         */
-        loadToChartGenerator () {
-            const graphObj = {
-                    id: "calcratio-" + this.selectedFeatures.map(district => {
-                        return district.id_;
-                    }).join("-") + "-" + this.selectedFieldA.id + "-" + this.paramFieldA.name + "-" + this.selectedFieldB.id + "-" + this.paramFieldB.name,
-                    name: "Versorgungsanalyse - Visualisierung " + this.columnSelector.name + " (" + this.$t("additional:modules.tools.cosi.calculateRatio.title") + ")",
-                    type: ["LineChart", "BarChart"],
-                    color: "rainbow",
-                    source: this.$t("additional:modules.tools.cosi.calculateRatio.title"),
-                    scaleLabels: [this.columnSelector.name, "Jahre"],
-                    data: {
-                        labels: [...this.availableYears],
-                        datasets: []
-                    }
-                },
-
-                dataArray = [];
-
-            this.dataSets[this.activeSet].results.forEach(result => {
-                if (result) {
-                    dataArray.push(result.data);
-                }
-            });
-
-            this.availableYears.forEach(year => {
-                const dataPerYear = utils.calculateRatio(dataArray, year)
-                    .filter(dataset => dataset.scope);
-
-                dataPerYear.forEach(dataset => {
-                    const checkExisting = graphObj.data.datasets.find(set => set.label === dataset.scope);
-
-                    if (checkExisting) {
-                        checkExisting.data.push(dataset[this.columnSelector.key]);
-                    }
-                    else {
-                        const obj = {
-                            label: dataset.scope,
-                            data: [dataset[this.columnSelector.key]]
-                        };
-
-                        graphObj.data.datasets.push(obj);
-                    }
-                });
-            });
-
-            graphObj.data.labels.reverse();
-            graphObj.data.datasets.forEach(dataset => {
-                dataset.data.reverse();
-            });
-
-            this.channelGraphData(graphObj);
-        },
-
-        /**
          * @description Deletes a set from the Tool Window.
          * @param {Integer} index Index of the set to be deleted in the dataSets Array.
          * @returns {Void} Function returns nothing.
@@ -907,10 +847,10 @@ export default {
          */
         preparesChartData () {
             const chartData = [],
-                inputA = this.dataSets[this.activeSet].inputs.selectedFieldA,
-                inputB = this.dataSets[this.activeSet].inputs.selectedFieldB,
-                parameterA = this.dataSets[this.activeSet].inputs.facilityPropertyList_A.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_A[0] + ")" : "",
-                parameterB = this.dataSets[this.activeSet].inputs.facilityPropertyList_B.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_B[0] + ")" : "";
+                  inputA = this.dataSets[this.activeSet].inputs.selectedFieldA,
+                  inputB = this.dataSets[this.activeSet].inputs.selectedFieldB,
+                  parameterA = this.dataSets[this.activeSet].inputs.facilityPropertyList_A.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_A[0] + ")" : "",
+                  parameterB = this.dataSets[this.activeSet].inputs.facilityPropertyList_B.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_B[0] + ")" : "";
 
 
             this.availableColumns.forEach((type, idx) => {

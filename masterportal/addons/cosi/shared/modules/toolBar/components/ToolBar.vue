@@ -37,22 +37,26 @@ export default {
             type: Array,
             required: true
         },
+        groupButtons: {
+            type: Array,
+            required: false,
+            default: () => [
+                {"value": "table", "icon": "bi-table", "name": "Tabelle"},
+                {"value": "chart", "icon": "bi-bar-chart", "name": "Diagramm"}
+            ]
+        },
         showDetail: {
             type: [Boolean, Object],
             required: false,
             default: false
         }
     },
-    emits: ["exportTable", "update:setting-items", "showView"],
+    emits: ["exportTable", "update:setting-items", "showView", "showDetails"],
     data () {
         return {
             optionalDropdownInstance: null,
             filterMenuDropdownInstance: null,
-            filterButtonId: "add-filter-button",
-            groupButtons: [
-                {"value": "table", "icon": "bi-table", "name": "Tabelle"},
-                {"value": "chart", "icon": "bi-bar-chart", "name": "Diagramm"}
-            ]
+            filterButtonId: "add-filter-button"
         };
     },
     computed: {
@@ -66,7 +70,7 @@ export default {
     },
     mounted () {
         const toggleElement = document.getElementById(this.optionalButton?.id),
-            filterElement = document.getElementById(this.filterButtonId);
+              filterElement = document.getElementById(this.filterButtonId);
 
         if (filterElement) {
             this.filterMenuDropdownInstance = Dropdown.getOrCreateInstance(filterElement);
@@ -93,8 +97,8 @@ export default {
          */
         onGlobalPointerDown (event) {
             const roots = [this.$refs.optionalDropdownRoot, this.$refs.filterDropdownRoot],
-                clickedInVuetifyOverlay = event.target.closest(".v-overlay"),
-                clickedInside = roots.some(root => root?.contains(event.target));
+                  clickedInVuetifyOverlay = event.target.closest(".v-overlay"),
+                  clickedInside = roots.some(root => root?.contains(event.target));
 
             if (clickedInside || clickedInVuetifyOverlay) {
                 return;
@@ -249,7 +253,7 @@ export default {
                 id="show-detail"
                 :aria="$t('additional:modules.tools.cosi.dashboard.dietailView')"
                 :checked="showDetail.visibility"
-                :interaction="() => {}"
+                :interaction="() => $emit('showDetails', !showDetail.visibility)"
                 :label="$t('additional:modules.tools.cosi.dashboard.dietailView')"
                 class="mb-3 pt-1"
             />

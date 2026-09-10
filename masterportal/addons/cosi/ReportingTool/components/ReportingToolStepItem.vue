@@ -64,8 +64,8 @@ export default {
          */
         dropdownItems () {
             const usedNames = this.cards.map(card => card.name),
-                filteredCardTypes = this.cardMapping.filter(cardType => cardType.multiple || !usedNames.includes(cardType.name)),
-                dropdownItems = [];
+                  filteredCardTypes = this.cardMapping.filter(cardType => cardType.multiple || !usedNames.includes(cardType.name)),
+                  dropdownItems = [];
 
             filteredCardTypes.forEach(cardType => {
                 if (Array.isArray(cardType.items)) {
@@ -268,7 +268,7 @@ export default {
          */
         updateCardOrder (id, upOrDown) {
             const indexFrom = this.cards.findIndex(x => x.id === id),
-                indexTo = upOrDown === "down" ? indexFrom + 1 : indexFrom - 1;
+                  indexTo = upOrDown === "down" ? indexFrom + 1 : indexFrom - 1;
 
             [this.cards[indexFrom], this.cards[indexTo]] = [this.cards[indexTo], this.cards[indexFrom]];
         },

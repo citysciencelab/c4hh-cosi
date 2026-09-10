@@ -136,9 +136,9 @@ export default {
         });
 
         const breakpoint = "(max-width: 768px)",
-            mediaQuery = window.matchMedia(breakpoint),
-            isMobile = mediaQuery.matches,
-            orientationCheck = this.screenOrientationType.startsWith("landscape");
+              mediaQuery = window.matchMedia(breakpoint),
+              isMobile = mediaQuery.matches,
+              orientationCheck = this.screenOrientationType.startsWith("landscape");
 
         if (isMobile && orientationCheck) {
             this.applyMobileLandscapeLayout();
@@ -161,28 +161,28 @@ export default {
         }
 
         const heading = document.getElementById("mp-menu-navigation-secondaryMenu"),
-            toolBody = document.getElementById("mp-body-secondaryMenu"),
-            positionFix = this.storyConf.showHomeButton ? 250 : 190,
-            resizeObserver = new ResizeObserver((entries) => {
-                const entry = entries[0];
+              toolBody = document.getElementById("mp-body-secondaryMenu"),
+              positionFix = this.storyConf.showHomeButton ? 250 : 190,
+              resizeObserver = new ResizeObserver((entries) => {
+                  const entry = entries[0];
 
-                this.rightButtonsPositionLeft = entry.contentRect.width - positionFix + "px";
-                this.toolWidth = toolBody.clientWidth + "px";
+                  this.rightButtonsPositionLeft = entry.contentRect.width - positionFix + "px";
+                  this.toolWidth = toolBody.clientWidth + "px";
 
-                if (window.matchMedia("(max-width: 768px)").matches && !this.isMobilePortrait) {
-                    document.getElementById("secondaryMenu-toggle-button").style.right = document.getElementById("mp-menu-secondaryMenu").clientWidth - 15 + "px";
-                    document.getElementById("mp-menu-secondaryMenu").style.removeProperty("left");
-                    document.getElementsByClassName("btn-group-controls")[0].style.right = document.getElementById("mp-menu-secondaryMenu").clientWidth + 10 + "px";
-                }
-                else if (window.matchMedia("(max-width: 768px)").matches && this.isMobilePortrait) {
-                    document.getElementsByClassName("btn-group-controls")[0].style.removeProperty("right");
-                    this.addSingleAlert({
-                        content: this.$t("additional:modules.dataNarrator.dipasPlayer.mobilePortraitMessage"),
-                        category: "info",
-                        once: true
-                    });
-                }
-            });
+                  if (window.matchMedia("(max-width: 768px)").matches && !this.isMobilePortrait) {
+                      document.getElementById("secondaryMenu-toggle-button").style.right = document.getElementById("mp-menu-secondaryMenu").clientWidth - 15 + "px";
+                      document.getElementById("mp-menu-secondaryMenu").style.removeProperty("left");
+                      document.getElementsByClassName("btn-group-controls")[0].style.right = document.getElementById("mp-menu-secondaryMenu").clientWidth + 10 + "px";
+                  }
+                  else if (window.matchMedia("(max-width: 768px)").matches && this.isMobilePortrait) {
+                      document.getElementsByClassName("btn-group-controls")[0].style.removeProperty("right");
+                      this.addSingleAlert({
+                          content: this.$t("additional:modules.dataNarrator.dipasPlayer.mobilePortraitMessage"),
+                          category: "info",
+                          once: true
+                      });
+                  }
+              });
 
         if (this.isMobilePortrait) {
             this.applyMobilePortraitLayout();
@@ -211,7 +211,7 @@ export default {
     activated () {
         // Handle KeepAlive visibility. Triggered if component is activated
         const heading = document.getElementById("mp-menu-navigation-secondaryMenu"),
-            toolBody = document.getElementById("mp-body-secondaryMenu");
+              toolBody = document.getElementById("mp-body-secondaryMenu");
 
         heading.setAttribute("style", this.dipasPlayerHeadingStyle);
         this.originalToolBodyStyle = toolBody.getAttribute("style");
@@ -233,7 +233,7 @@ export default {
     deactivated () {
         // Handle KeepAlive visibility. Triggered if component is deactivated
         const heading = document.getElementById("mp-menu-navigation-secondaryMenu"),
-            toolBody = document.getElementById("mp-body-secondaryMenu");
+              toolBody = document.getElementById("mp-body-secondaryMenu");
 
         heading?.style?.removeProperty("display");
         toolBody.setAttribute("style", this.originalToolBodyStyle || "");
@@ -265,8 +265,8 @@ export default {
         async loadStoryContents (htmlFile) {
             if (this.storyConf.htmlFolder && htmlFile) {
                 const storybasepath = this.storyConfPath.endsWith("/") ? this.storyConfPath : this.storyConfPath + "/",
-                    response = await axios.get(storybasepath + this.storyConf.htmlFolder + "/" + htmlFile),
-                    data = await response.data;
+                      response = await axios.get(storybasepath + this.storyConf.htmlFolder + "/" + htmlFile),
+                      data = await response.data;
 
                 return data;
             }
@@ -352,9 +352,9 @@ export default {
          */
         getIframeAspectRatio (iframe) {
             const width = !isNaN(parseInt(iframe.width, 10)) ? parseInt(iframe.width, 10) : 16,
-                height = !isNaN(parseInt(iframe.height, 10)) ? parseInt(iframe.height, 10) : 9,
-                ratio = width / height,
-                ratioDiffs = {};
+                  height = !isNaN(parseInt(iframe.height, 10)) ? parseInt(iframe.height, 10) : 9,
+                  ratio = width / height,
+                  ratioDiffs = {};
 
             let ratioDiffsArray = [];
 
@@ -430,8 +430,8 @@ export default {
 
                             // Handle iframe aspect ratio and progress
                             const iframeElement = step.querySelector("iframe"),
-                                iframeDiv = step.getElementsByClassName("field_video")[0],
-                                storyProgress = 100 / this.steps.length * (activeIndex + 1);
+                                  iframeDiv = step.getElementsByClassName("field_video")[0],
+                                  storyProgress = 100 / this.steps.length * (activeIndex + 1);
 
                             if (iframeElement && iframeDiv) {
                                 const ratioClass = this.getIframeAspectRatio(iframeElement);

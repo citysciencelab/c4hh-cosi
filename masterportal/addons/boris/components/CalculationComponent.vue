@@ -56,7 +56,7 @@ export default {
 
 <template>
     <div id="calculation-component">
-        <div
+        <dl
             v-if="type === 'select'"
             class="select-part"
         >
@@ -72,6 +72,8 @@ export default {
             </dt>
             <dd>
                 <select
+                    :id="`${subject}-${textId}`"
+                    :name="`calc-select-${subject}`"
                     :value="selectedOption"
                     class="form-select"
                     :aria-label="$t('additional:modules.boris.landCalculation.ariaLabelBuildingDesigns')"
@@ -93,8 +95,8 @@ export default {
                     <span v-html="text" />
                 </div>
             </dd>
-        </div>
-        <div
+        </dl>
+        <dl
             v-else
             class="input-part"
         >
@@ -111,6 +113,8 @@ export default {
             <dd>
                 <label>
                     <input
+                        :id="`${subject}-${textId}`"
+                        :name="`calc-input-${subject}`"
                         type="text"
                         class="form-control"
                         :value="selectedBrwFeature.get(subject).toString().replace('.', ',')"
@@ -124,6 +128,6 @@ export default {
                     <span v-html="text" />
                 </div>
             </dd>
-        </div>
+        </dl>
     </div>
 </template>

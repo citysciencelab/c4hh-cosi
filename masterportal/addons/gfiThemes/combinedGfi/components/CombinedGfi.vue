@@ -85,10 +85,10 @@ export default {
                 this.bufferDistance = null;
 
                 const newGeometry = newFeature.getOlFeature()?.getGeometry(),
-                    newCoordinates = newGeometry ? JSON.stringify(newGeometry.getCoordinates()) : null,
-                    geometryProviderLayer = this.layersToRequest.find(layer => {
-                        return layer.geometryProvider;
-                    });
+                      newCoordinates = newGeometry ? JSON.stringify(newGeometry.getCoordinates()) : null,
+                      geometryProviderLayer = this.layersToRequest.find(layer => {
+                          return layer.geometryProvider;
+                      });
 
                 if (this.previousGeometry === newCoordinates) {
                     return;
@@ -159,7 +159,7 @@ export default {
          */
         paginatedFeatures (rows, page) {
             const start = (page - 1) * this.itemsPerPage,
-                end = start + this.itemsPerPage;
+                  end = start + this.itemsPerPage;
 
             return rows.slice(start, end);
         },
@@ -180,7 +180,7 @@ export default {
          */
         changePage (layerIndex, newPage) {
             const maxPage = this.totalPages(this.layerResults[layerIndex].rows),
-                updatedLayerResults = [...this.layerResults];
+                  updatedLayerResults = [...this.layerResults];
 
             let page = newPage;
 
@@ -205,8 +205,8 @@ export default {
          */
         validateAndChangePage (layerIndex) {
             const maxPage = this.totalPages(this.layerResults[layerIndex].rows),
-                tempPage = this.layerResults[layerIndex].tempPage,
-                updatedLayerResults = [...this.layerResults];
+                  tempPage = this.layerResults[layerIndex].tempPage,
+                  updatedLayerResults = [...this.layerResults];
 
             let validatedPage = tempPage;
 
@@ -524,7 +524,6 @@ export default {
 </template>
 
 <style scoped lang="scss">
-@import 'variables';
 
 .button-group {
     display: flex;

@@ -85,9 +85,9 @@ export default {
          */
         earliestStartTime () {
             const timeValues = this.startTimes
-                    .map(time => new Date(time).getTime())
-                    .filter(value => Number.isFinite(value)),
-                earliestTimeValue = Math.min(...timeValues);
+                      .map(time => new Date(time).getTime())
+                      .filter(value => Number.isFinite(value)),
+                  earliestTimeValue = Math.min(...timeValues);
 
             if (!Number.isFinite(earliestTimeValue)) {
                 return "";
@@ -144,9 +144,9 @@ export default {
          */
         latestFinishedTime () {
             const timeValues = this.finishedTimes
-                    .map(time => new Date(time).getTime())
-                    .filter(value => Number.isFinite(value)),
-                latestTimeValue = Math.max(...timeValues);
+                      .map(time => new Date(time).getTime())
+                      .filter(value => Number.isFinite(value)),
+                  latestTimeValue = Math.max(...timeValues);
 
             if (!Number.isFinite(latestTimeValue)) {
                 return "";
@@ -212,7 +212,10 @@ export default {
                 this.startTimes = jobsArr.map(job => job.jobStatus?.started).filter(time => time);
                 this.finishedTimes = jobsArr.map(job => job.jobStatus?.finished).filter(time => time);
                 this.progressValues = jobsArr.map(job => job.jobStatus?.progress).filter(progress => Number.isFinite(progress));
-                this.outputs = Object.keys(jobsArr[0]?.jobResults || {});
+
+                const allOutputs = Object.keys(jobsArr[0]?.jobResults || {});
+
+                this.outputs = this.getVisibleOutputs(allOutputs);
                 this.showFeatures(this.simulationIdForResults, this.jobs, this.outputs);
             },
             immediate: true
@@ -246,23 +249,69 @@ export default {
         }
     },
     unmounted () {
-        if (this.layers.length) {
-            this.layers.forEach(layer => {
-                layer.getLayerSource().clear();
-            });
-        }
         Object.values(this.outputSelectInteraction).forEach(interactionsOnLayer => Object.values(interactionsOnLayer).forEach(interaction => this.removeInteraction(interaction)));
         if (layerCollection.getLayerById(infrastructureLayerId)) {
             layerCollection.getLayerById(infrastructureLayerId).getLayerSource().clear();
         }
+        this.layers.forEach(layer => {
+            const layerId = layer.layer?.get("id");
+
+            if (layerId) {
+                this.changeVisibility({
+                    layerId,
+                    value: false
+                });
+            }
+        });
     },
     methods: {
-        ...mapActions("Modules/SimulationTool", ["updateFeatures", "zoomToFeature"]),
+        ...mapActions("Modules/SimulationTool", [
+            "deleteSimulationFromPlanningScenario",
+            "updateFeatures",
+            "zoomToFeature"
+        ]),
         ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
         ...mapActions("Menu", ["changeCurrentComponent", "toggleMenu"]),
+        ...mapActions(["addLayerToLayerConfig"]),
+        ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
         ...mapMutations("Modules/SimulationTool", [
-            "setMode"
+            "setMode",
+            "setSimulationIdForResults"
         ]),
+
+        /**
+         * Deletes the current simulation and returns to simulation list.
+         * @returns {Promise<void>}
+         */
+        async deleteCurrentSimulation () {
+            const scenarioId = this.currentPlanningScenario?.id;
+            const simulationId = this.simulationIdForResults;
+
+            if (typeof scenarioId !== "string" || typeof simulationId !== "string") {
+                return;
+            }
+
+            await this.deleteSimulationFromPlanningScenario({
+                scenarioId,
+                simulationId
+            });
+
+            this.setSimulationIdForResults("");
+            this.setMode("simulationList");
+        },
+
+        /**
+         * Filters outputs to exclude those marked with hide: true in the simulation config.
+         * @param {String[]} allOutputs - Array of all output keys from job results.
+         * @returns {String[]} Filtered array of visible output keys.
+         */
+        getVisibleOutputs (allOutputs) {
+            return allOutputs.filter(outputKey => {
+                const outputConfig = this.simulationConfig?.outputs?.[outputKey];
+
+                return outputConfig?.hide !== true;
+            });
+        },
 
         /**
          * Adds a select for given layer.
@@ -288,22 +337,67 @@ export default {
         /**
          * Creates or updates a layer with the given layerId.
          * @param {String} layerId - The ID of the layer to create or update.
+         * @param {string} output - The output key.
          * @returns {Object} The created or updated layer.
          */
-        createOrUpdateLayer (layerId) {
-            if (typeof layerCollection.getLayerById(layerId) !== "undefined") {
-                const layer = layerCollection.getLayerById(layerId);
+        createOrUpdateLayer (layerId, output) {
+            const existingLayer = layerCollection.getLayerById(layerId);
 
-                layer.getLayerSource().clear();
-                return layer;
+            if (existingLayer) {
+                this.changeVisibility({
+                    layerId,
+                    value: true
+                });
+                return existingLayer;
             }
-            const layer = layerFactory.createLayer({
-                typ: "VECTORBASE",
-                id: layerId,
-                name: layerId
-            });
 
+            const transmissionMode = this.simulationConfig?.outputs?.[output]?.value?.transmissionMode || "value",
+                  minZoom = this.simulationConfig?.outputs?.[output]?.minZoom,
+                  legendURL = this.simulationConfig?.outputs?.[output]?.legendUrl || "",
+                  gfiAttributes = this.simulationConfig?.outputs?.[output]?.gfiAttributes,
+                  outputResult = Object.values(this.jobs || {}).find(job => job?.jobResults?.[output]),
+                  url = outputResult?.jobResults?.[output]?.href || outputResult?.jobResults?.[output]?.value?.links?.[0]?.href || "",
+                  layerType = transmissionMode === "reference" ? "OAF" : "VECTORBASE",
+                  layerAttributes = transmissionMode === "reference"
+                      ? {
+                          id: layerId,
+                          name: this.currentSimulation?.name || layerId,
+                          typ: layerType,
+                          url,
+                          loadingStrategy: "bbox",
+                          dontInitStyle: true
+                      }
+                      : {
+                          typ: layerType,
+                          id: layerId,
+                          name: this.currentSimulation?.name || layerId
+                      };
+
+            if (isObject(gfiAttributes)) {
+                layerAttributes.gfiAttributes = gfiAttributes;
+            }
+
+            if (transmissionMode === "reference" && url === "") {
+                console.warn(`No reference URL found for result layer ${layerId}.`);
+            }
+
+            const layer = layerFactory.createLayer(layerAttributes);
+
+            this.addLayerToLayerConfig({
+                layerConfig: {
+                    id: layerId,
+                    name: this.currentSimulation?.name || layerId,
+                    type: "layer",
+                    typ: layerType,
+                    visibility: true,
+                    showInLayerTree: true,
+                    transparency: 0,
+                    legendURL
+                },
+                parentKey: "subjectlayer"
+            });
             layer.layer.setZIndex(9999998);
+            layer.layer.setMinZoom(typeof minZoom === "number" ? minZoom : 0);
             return layer;
         },
 
@@ -314,12 +408,12 @@ export default {
          */
         getAllZValuesFromTableFeature (feature) {
             const featureProps = feature.getProperties(),
-                allZValues = Object.entries(featureProps).filter(([key]) => key.startsWith("custom-z-")).sort((a, b) => {
-                    const zA = parseFloat(a[0].replace("custom-z-", "")),
-                        zB = parseFloat(b[0].replace("custom-z-", ""));
+                  allZValues = Object.entries(featureProps).filter(([key]) => key.startsWith("custom-z-")).sort((a, b) => {
+                      const zA = parseFloat(a[0].replace("custom-z-", "")),
+                            zB = parseFloat(b[0].replace("custom-z-", ""));
 
-                    return zB - zA;
-                });
+                      return zB - zA;
+                  });
 
             return allZValues;
         },
@@ -401,13 +495,13 @@ export default {
             if (val?.type === "polygon") {
                 val.styles?.forEach((data, index) => {
                     const legendObj = {
-                            "name": data.value
-                        },
-                        style = {
-                            "polygonFillColor": data.style?.fillColor,
-                            "polygonStrokeColor": data.style?.strokeColor,
-                            "polygonStrokeWidth": data.style?.strokeWidth
-                        };
+                              "name": data.value
+                          },
+                          style = {
+                              "polygonFillColor": data.style?.fillColor,
+                              "polygonStrokeColor": data.style?.strokeColor,
+                              "polygonStrokeWidth": data.style?.strokeWidth
+                          };
 
                     extractedValue[index] = FeaturesHandler.prepareLegendForPolygon(legendObj, style);
                 });
@@ -470,6 +564,110 @@ export default {
         getMappedProperty,
 
         /**
+         * Gets a dynamic-binary style function for the display options.
+         * @param {Object} displayOptions The display options configuration for the output.
+         * @param {Object} jobResults The job results containing classification break values.
+         * @returns {Function|null} The OpenLayers style function or null.
+         */
+        getStyleFunctionFromDisplayOptions (displayOptions, jobResults) {
+            if (displayOptions?.hide) {
+                return () => null;
+            }
+
+            if (displayOptions?.type !== "dynamic-binary") {
+                console.warn(`Unsupported display option type "${displayOptions?.type}". Expected "dynamic-binary".`);
+                return null;
+            }
+
+            const properties = Array.isArray(displayOptions?.properties) ? displayOptions.properties : [],
+                  colors = displayOptions?.colors;
+
+            if (properties.length < 2) {
+                console.warn("displayOptions.properties must contain at least two entries for dynamic-binary styling.");
+                return null;
+            }
+
+            if (!Array.isArray(colors) || !colors.length || !colors.some(row => Array.isArray(row) && row.length)) {
+                console.warn("displayOptions.colors must be a non-empty 2D array for dynamic-binary styling.");
+                return null;
+            }
+
+            const [firstProperty, secondProperty] = properties,
+                  classificationBreakOutputs = displayOptions?.classificationBreakOutputs || {},
+                  firstClassificationBreakOutput = classificationBreakOutputs[firstProperty],
+                  secondClassificationBreakOutput = classificationBreakOutputs[secondProperty];
+
+            if (!firstClassificationBreakOutput || !secondClassificationBreakOutput) {
+                console.warn(`Missing classificationBreakOutputs mapping for properties "${firstProperty}" and/or "${secondProperty}".`);
+            }
+
+            const strokeColor = displayOptions?.strokeColor,
+                  strokeWidth = Number.isFinite(Number(displayOptions?.strokeWidth))
+                      ? Number(displayOptions?.strokeWidth)
+                      : 0,
+                  rowClassCount = colors.length,
+                  columnClassCount = Math.max(...colors.map(row => Array.isArray(row) ? row.length : 0), 0),
+                  maxRowIndex = Math.max(rowClassCount - 1, 0),
+                  maxColumnIndex = Math.max(columnClassCount - 1, 0);
+
+            const styleCache = colors.map(row => Array.isArray(row)
+                ? row.map(color => {
+                    if (!color) {
+                        return null;
+                    }
+                    const styleDefinition = {
+                        fill: new Fill({color})
+                    };
+
+                    if (strokeColor && strokeWidth > 0) {
+                        styleDefinition.stroke = new Stroke({
+                            color: strokeColor,
+                            width: strokeWidth
+                        });
+                    }
+
+                    return new Style(styleDefinition);
+                })
+                : []);
+
+            /**
+             * Gets the classification index for a property value.
+             * @param {String|Number} propertyValue The feature property value.
+             * @param {Number[]} classificationBreaks The classification break values.
+             * @param {Number} maxClassIndex The maximum allowed classification index.
+             * @returns {Number} The classification index between 0 and maxClassIndex.
+             */
+            function getClassificationIndex (propertyValue, classificationBreaks, maxClassIndex) {
+                const numericValue = Number(propertyValue),
+                      numericBreaks = Array.isArray(classificationBreaks) ? classificationBreaks.map(value => Number(value)).filter(value => Number.isFinite(value)) : [];
+
+                if (!Number.isFinite(numericValue) || !numericBreaks.length) {
+                    return 0;
+                }
+
+                let classificationIndex = 0;
+
+                numericBreaks.forEach((classificationBreak, index) => {
+                    if (numericValue >= classificationBreak) {
+                        classificationIndex = Math.min(index + 1, maxClassIndex);
+                    }
+                });
+
+                return classificationIndex;
+            }
+
+            return feature => {
+                const propertyValues = properties.map(property => feature.get(property)),
+                      firstClassificationBreaks = jobResults?.[firstClassificationBreakOutput]?.value || jobResults?.[firstClassificationBreakOutput],
+                      secondClassificationBreaks = jobResults?.[secondClassificationBreakOutput]?.value || jobResults?.[secondClassificationBreakOutput],
+                      firstClassificationIndex = getClassificationIndex(propertyValues[0], firstClassificationBreaks, maxRowIndex),
+                      secondClassificationIndex = getClassificationIndex(propertyValues[1], secondClassificationBreaks, maxColumnIndex);
+
+                return styleCache?.[firstClassificationIndex]?.[secondClassificationIndex] || null;
+            };
+        },
+
+        /**
          * Sets the Feature style according to the value of property.
          * @param {ol/Feature} feature - The feature.
          * @param {Object} currentStyles - The current style objects.
@@ -513,22 +711,46 @@ export default {
             }
 
             outputs.forEach(output => {
+                if (this.simulationConfig?.outputs?.[output]?.hide === true) {
+                    return;
+                }
+
                 const layerId = `${simulationId}-${output}`,
-                    layer = this.createOrUpdateLayer(layerId),
-                    layerSource = layer.getLayerSource();
+                      transmissionMode = this.simulationConfig?.outputs?.[output]?.value?.transmissionMode || "value",
+                      layer = this.createOrUpdateLayer(layerId, output),
+                      layerSource = layer.getLayerSource();
 
                 Object.values(jobs).forEach(job => {
-                    const featuresToAdd = ConvertFeature.geoJsonToOpenlayers(job.jobResults?.[output]?.features || []),
-                        foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
-                        isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table";
+                    const foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
+                          styleFunction = foundProcess?.displaySettings
+                              ? this.getStyleFunctionFromDisplayOptions(foundProcess.displaySettings[output], job.jobResults)
+                              : null;
 
+                    if (transmissionMode === "reference") {
+                        layer.layer.setStyle(styleFunction);
+                        return;
+                    }
+
+                    const featuresFromJob = job.jobResults?.[output]?.value?.features || job.jobResults?.[output]?.features || [],
+                          featuresToAdd = ConvertFeature.geoJsonToOpenlayers(featuresFromJob),
+                          isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table";
+
+                    layerSource.clear();
                     if (isTableMode) {
                         this.processAndStylePointFeaturesForTable(layerId, layer, layerSource, featuresToAdd, simulationId, foundProcess?.renderingOptions?.attributeToShow);
                         return;
                     }
                     featuresToAdd?.forEach(feature => {
                         feature.set("simulationId", simulationId);
-                        this.setFeatureStyle(feature, job.resultStyle);
+
+                        if (typeof styleFunction === "function") {
+                            const style = styleFunction(feature);
+
+                            feature.setStyle(style);
+                        }
+                        else {
+                            this.setFeatureStyle(feature, job.resultStyle);
+                        }
                     });
                     layerSource.addFeatures(featuresToAdd);
                 });
@@ -555,8 +777,8 @@ export default {
          */
         storeTranslatedPointAndCreateLine (feature, layerId, toShowAttrKey, originalXYKey, customZKey) {
             const featureGeometry = feature.getGeometry(),
-                [x, y, z] = featureGeometry.getCoordinates().toString().split(","),
-                coordinate2d = `${x},${y}`;
+                  [x, y, z] = featureGeometry.getCoordinates().toString().split(","),
+                  coordinate2d = `${x},${y}`;
             let zValue;
 
             if (!isObject(this.tableFeaturesCollection[layerId][coordinate2d])) {
@@ -590,7 +812,7 @@ export default {
          */
         processAndStylePointFeaturesForTable (layerId, layer, layerSource, geojsonFeature, simulationId, toShowAttrKey) {
             const originalXYKey = "og-xy",
-                customZKey = "custom-z-";
+                  customZKey = "custom-z-";
 
             this.tableFeaturesCollection[layerId] = this.tableFeaturesCollection[layerId] || {};
             this.lineFeaturesCollection[layerId] = this.lineFeaturesCollection[layerId] || {};
@@ -634,8 +856,8 @@ export default {
                 return;
             }
             const tableFeature = event.features.getArray()[0],
-                tableFeatureProps = tableFeature?.getProperties?.(),
-                z = [];
+                  tableFeatureProps = tableFeature?.getProperties?.(),
+                  z = [];
             let xy;
 
             if (!isObject(tableFeature.getGeometry())) {
@@ -669,15 +891,15 @@ export default {
          */
         onFeatureSelect (event, layerId, layerSource, customZKey) {
             const currentFeature = event.selected[0] || event.deselected[0],
-                featureCoordinateAsString = currentFeature.getGeometry().getCoordinates().toString(),
-                keyOfTableFeature = featureCoordinateAsString.split(",").slice(0, -1).join(","),
-                tableFeature = this.tableFeaturesCollection[layerId][keyOfTableFeature],
-                hideFeatures = Array.isArray(event.selected) && event.selected.length > 0;
+                  featureCoordinateAsString = currentFeature.getGeometry().getCoordinates().toString(),
+                  keyOfTableFeature = featureCoordinateAsString.split(",").slice(0, -1).join(","),
+                  tableFeature = this.tableFeaturesCollection[layerId][keyOfTableFeature],
+                  hideFeatures = Array.isArray(event.selected) && event.selected.length > 0;
 
             if (tableFeature) {
                 tableFeature.setStyle(hideFeatures ? new Style(null) : this.getFeatureStyleTable(this.formatKeyValuePairs(this.getAllZValuesFromTableFeature(tableFeature), customZKey)));
                 const multipleLines = Object.keys(this.lineFeaturesCollection[layerId]).filter(key => key.startsWith(keyOfTableFeature)),
-                    bulkUpdate = [];
+                      bulkUpdate = [];
 
                 multipleLines.forEach(featureXYZ => {
                     bulkUpdate.push(this.lineFeaturesCollection[layerId][featureXYZ]);
@@ -690,10 +912,10 @@ export default {
 
             this.layers.forEach(layer => {
                 const layerId = layer.layer?.get("id"),
-                    tableFeatures = this.tableFeaturesCollection[layerId] || {},
-                    lineFeatures = this.lineFeaturesCollection[layerId] || {},
-                    bulkUpdate = Object.values(lineFeatures),
-                    layerSource = layer.getLayerSource();
+                      tableFeatures = this.tableFeaturesCollection[layerId] || {},
+                      lineFeatures = this.lineFeaturesCollection[layerId] || {},
+                      bulkUpdate = Object.values(lineFeatures),
+                      layerSource = layer.getLayerSource();
 
                 Object.values(tableFeatures).forEach(feature => {
                     if (show) {
@@ -912,6 +1134,14 @@ export default {
                         :aria-label="$t('additional:modules.tools.simulationTool.showProperties')"
                         :text="$t('additional:modules.tools.simulationTool.showProperties')"
                         @click="() => setMode('simulationParameter')"
+                    />
+                    <FlatButton
+                        id="delete-simulation"
+                        secondary
+                        :icon="'bi bi-trash'"
+                        :aria-label="'löschen'"
+                        :text="'löschen'"
+                        @click="deleteCurrentSimulation"
                     />
                     <!-- If print module is available, show print button -->
                     <!--<FlatButton

@@ -7,7 +7,6 @@ import utils from "../../utils";
 import ColorCodeLegend from "./ColorCodeLegend.vue";
 import {generateColorScale} from "../../utils/colorScale.js";
 import groupMapping from "../../utils/groupMapping";
-import ChartDataset from "../../ChartGenerator/classes/ChartDataset";
 import {mapDistrictNames} from "../../DistrictSelector/utils/prepareDistrictLevels";
 
 export default {
@@ -131,7 +130,6 @@ export default {
     methods: {
         ...mapActions("Modules/ColorCodeMap", Object.keys(actions)),
         ...mapMutations("Modules/ColorCodeMap", Object.keys(mutations)),
-        ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
 
         /**
@@ -268,36 +266,6 @@ export default {
 
             this.graphData.push(newDataset);
         },
-        /**
-         * @description Passes data to the Chart Generator Tool.
-         * @returns {Void} Function returns nothing.
-         */
-        loadToChartGenerator () {
-            const graphObj = new ChartDataset({
-                    id: "ccm" + this.selectedFeatures.map(district => {
-                        return district.id_;
-                    }).join("-"),
-                    name: [this.label] + " - " + this.dataCategory + " (" + this.$t("additional:modules.tools.colorCodeMap.title") + ")",
-                    type: ["LineChart", "BarChart", "PieChart"],
-                    color: ["#55eb34", "rgb(14, 150, 240)", "yellow"],
-                    beginAtZero: true,
-                    source: this.$t("additional:modules.tools.colorCodeMap.title"),
-                    scaleLabels: [this.selectedFeature, this.$t("additional:modules.tools.colorCodeMap.yearsLabel")],
-                    data: {
-                        labels: [],
-                        datasets: []
-                    }
-                }),
-                years = this.graphData[0].data.reduce((availableYears, val, i) => val ? [...availableYears, this.availableYears[i]] : availableYears, []);
-
-            graphObj.data.labels = years.reverse();
-            graphObj.data.datasets = this.graphData.map(dataset => ({
-                label: dataset.label,
-                data: [...dataset.data].filter(x => Boolean(x)).reverse()
-            }));
-
-            this.channelGraphData(graphObj);
-        },
 
         openMetadata () {
             this.metadataUrls.forEach(url => {
@@ -368,7 +336,7 @@ export default {
                         v-if="selectedStatFeatures.length"
                         v-model="_selectedYear"
                         outlined
-                        dense
+                        density="compact"
                         :items="availableYears"
                         :title="$t('additional:modules.tools.colorCodeMap.yearsLabel')"
                         class="year_selection selection"
@@ -377,7 +345,7 @@ export default {
                         v-if="selectedStatFeatures.length"
                         v-model="lastYear"
                         outlined
-                        dense
+                        density="comfortable"
                         :items="availableYears"
                         clearable
                         class="year_selection selection"
@@ -390,7 +358,7 @@ export default {
                     :items="statsMapping"
                     item-text="value"
                     outlined
-                    dense
+                    density="comfortable"
                     hide-details
                 />
             </div>
@@ -446,7 +414,6 @@ export default {
                 <button
                     class="graph_button"
                     :title="$t('additional:modules.tools.colorCodeMap.generateChart')"
-                    @click="loadToChartGenerator()"
                 >
                     <i class="bi bi-bar-chart" />
                 </button>

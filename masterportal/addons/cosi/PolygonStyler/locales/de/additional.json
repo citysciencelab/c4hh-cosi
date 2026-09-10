@@ -18,7 +18,7 @@
             "columnFill": "Füllfarbe",
             "columnStroke": "Umrissfarbe"
           },
-          "description": "Mit Hilfe dieser Funktion können Sie Flächen, z.B. Gebäudegrundrisse, auf der Karte datenabhängig einfärben. Aktuell geht dies mit den Datensätzen Flurstücke, Nutzung, Gebäude und Wärmebedarf. Sie finden sich unter Fachdaten-Analyse/Simulation, Umwelt."
+          "description": "Mit dieser Funktion können Sie Flächen, zum Beispiel Gebäudegrundrisse oder Flurstücke, auf der Karte datenbasiert einfärben. Derzeit ist das für die Datensätze Flurstücke, Nutzungen, Gebäude und Wärmebedarf möglich. Diese finden Sie unter Fachdaten > Analyse/Simulation > Umwelt."
         }
       }
     }

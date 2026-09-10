@@ -87,7 +87,7 @@ export default {
 
         if (this.uniqueGeoIdsWithNames.length > 0 && this.selectedLocationId === "") {
             const initialSelectedGeoId = this.initialSelectedGeoId || this.uniqueGeoIdsWithNames[0].geoId,
-                olLayer = layerCollection.getLayerById(this.gridLayerId).getLayerSource().getFeatures().find(feature => feature.get("geoid") === initialSelectedGeoId);
+                  olLayer = layerCollection.getLayerById(this.gridLayerId).getLayerSource().getFeatures().find(feature => feature.get("geoid") === initialSelectedGeoId);
 
             this.setSelectedFeatures([olLayer]);
             olLayer.setStyle(this.selectStyle);

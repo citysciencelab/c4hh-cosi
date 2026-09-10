@@ -43,7 +43,7 @@ export default {
                     },
                     tooltips: {
                         callbacks: {
-                        // use label callback to return the desired label
+                            // use label callback to return the desired label
                             label: (tooltipItem, data) => {
                                 return data.datasets[tooltipItem.datasetIndex].label + ": " + thousandsSeparator(tooltipItem.value);
                             }
@@ -95,11 +95,11 @@ export default {
             }
 
             const ctx = this.$el.getContext("2d"),
-                config = {
-                    type: "bar",
-                    data: data,
-                    options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
-                };
+                  config = {
+                      type: "bar",
+                      data: data,
+                      options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
+                  };
 
             if (this.chart instanceof ChartJs) {
                 this.destroyChart();

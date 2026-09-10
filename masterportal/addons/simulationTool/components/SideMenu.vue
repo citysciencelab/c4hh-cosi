@@ -38,14 +38,14 @@ export default {
         },
         applyCustomLayout () {
             const defaultNavigation = document.getElementById("mp-menu-navigation-secondaryMenu"),
-                menuBody = document.getElementById("mp-body-secondaryMenu");
+                  menuBody = document.getElementById("mp-body-secondaryMenu");
 
             menuBody.style.padding = "0";
             defaultNavigation.style.display = "none";
         },
         restoreDefaultLayout () {
             const defaultNavigation = document.getElementById("mp-menu-navigation-secondaryMenu"),
-                menuBody = document.getElementById("mp-body-secondaryMenu");
+                  menuBody = document.getElementById("mp-body-secondaryMenu");
 
             menuBody.style.padding = "0 1.5rem 1.5rem 1.5rem";
             defaultNavigation.style.display = "block";

@@ -51,13 +51,13 @@ export default {
             try {
                 this.requestState.loading = true;
                 const response = await fetch(`${this.simulationApiUrl}/processes/${processId}`, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            ...additionalHeaders
-                        }
-                    }),
+                          headers: {
+                              "Content-Type": "application/json",
+                              ...additionalHeaders
+                          }
+                      }),
 
-                    result = await response.json();
+                      result = await response.json();
 
                 if (!response.ok) {
                     this.requestState.error = result.error_message || response.status + ": unknown errror";

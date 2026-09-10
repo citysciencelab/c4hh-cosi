@@ -61,9 +61,9 @@ export default {
             }
 
             const visibleLayers = layerCollection.getLayers().filter(layer => {
-                    return layer?.attributes.visibility && !layer?.attributes?.isNeverVisibleInTree;
-                }),
-                categoryList = [];
+                      return layer?.attributes.visibility && !layer?.attributes?.isNeverVisibleInTree;
+                  }),
+                  categoryList = [];
 
             this.setSelectedGeoDataList([]);
             this.setSelectedStatDataList([]);
@@ -96,10 +96,10 @@ export default {
     },
     async created () {
         const filteredPropertyNames = this.getFilteredPropertyNames(this.selectedDistrictLevel?.propertyNameList, this.ignorePropertyNames),
-            toIgnoreTools = ["templateAdmin", "templateManager"],
-            configuredModules = this.configuredModules.map(value => {
-                return value.type;
-            }).filter(toolNames => !toIgnoreTools.includes(toolNames));
+              toIgnoreTools = ["templateAdmin", "templateManager"],
+              configuredModules = this.configuredModules.map(value => {
+                  return value.type;
+              }).filter(toolNames => !toIgnoreTools.includes(toolNames));
 
         this.setToolOptions(this.getToolList(configuredModules));
         this.setStatOptions(this.getMappedLabelByValue(filteredPropertyNames, this.initMapping));
@@ -208,8 +208,8 @@ export default {
          */
         getLayerConfigs () {
             const layerConfigs = [],
-                backgroundLayerConfigs = this.allLayerConfigsStructured(treeBaselayersKey),
-                subjectLayerConfigs = this.allLayerConfigsStructured(treeSubjectsKey);
+                  backgroundLayerConfigs = this.allLayerConfigsStructured(treeBaselayersKey),
+                  subjectLayerConfigs = this.allLayerConfigsStructured(treeSubjectsKey);
 
             // Adds background layers
             layerConfigs.push({group: i18next.t("common:modules.layerSelection.backgrounds"), level: 1});
@@ -329,8 +329,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "/src/assets/css/mixins.scss";
-@import "/src/assets/css/variables";
 
 .nav-tabs .nav-link.active {
     color: $light_blue;

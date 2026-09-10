@@ -1,14 +1,12 @@
 <script>
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import {VSpacer} from "vuetify/components";
-import {VDivider} from "vuetify/components/VDivider";
 
 export default {
     name: "DistrictFinderFilterOperator",
     components: {
         DropdownAutocomplete,
-        VSpacer,
-        VDivider
+        VSpacer
     },
     props: {
         id: {
@@ -35,10 +33,7 @@ export default {
 <template lang="html">
     <div class="container">
         <div class="row justify-content-center">
-            <v-divider
-                class="conditionline"
-                vertical
-            />
+            <div class="conditionline" />
         </div>
         <div class="row justify-content-center">
             <v-spacer />
@@ -52,10 +47,7 @@ export default {
             <v-spacer />
         </div>
         <div class="row justify-content-center">
-            <v-divider
-                class="conditionline m-0"
-                vertical
-            />
+            <div class="conditionline m-0" />
         </div>
     </div>
 </template>
@@ -63,11 +55,11 @@ export default {
 <style lang="scss" scoped>
 
 .conditionline {
+    width: 1px;
     height: 26px;
     padding: 0;
-    border-color: $secondary;
+    background-color: $secondary;
     opacity: 1;
-    border-width: 1px;
 }
 
 </style>

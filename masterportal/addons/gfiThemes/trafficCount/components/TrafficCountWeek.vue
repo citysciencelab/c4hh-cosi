@@ -1,7 +1,7 @@
 <script>
 import TrafficCountCompDiagram from "./TrafficCountCompDiagram.vue";
 import TrafficCountCompTable from "./TrafficCountCompTable.vue";
-import TrafficCountCheckbox from "./TrafficCountCheckbox.vue";
+import TrafficCountSwitch from "./TrafficCountSwitch.vue";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import dayjs from "dayjs";
 import weekOfYear from "dayjs/plugin/weekOfYear";
@@ -11,7 +11,6 @@ import {addMissingDataWeek} from "../utils/addMissingData.js";
 import {getPublicHoliday} from "../../../../src/shared/js/utils/calendar.js";
 import TrafficCountDatePicker from "./TrafficCountDatePicker.vue";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
-import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(weekOfYear);
 dayjs.extend(advancedFormat);
@@ -22,7 +21,7 @@ export default {
     components: {
         TrafficCountCompDiagram,
         TrafficCountCompTable,
-        TrafficCountCheckbox,
+        TrafficCountSwitch,
         TrafficCountDatePicker
     },
     props: {
@@ -44,10 +43,6 @@ export default {
         },
         holidays: {
             type: Array,
-            required: true
-        },
-        activeTab: {
-            type: Boolean,
             required: true
         }
     },
@@ -82,7 +77,7 @@ export default {
             descriptionYAxis: i18next.t("additional:modules.tools.gfi.themes.trafficCount.yAxisTextWeek"),
             renderLabelLegend: (datetime) => {
                 const weeknumber = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").isoWeek(),
-                    year = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").isoWeekYear();
+                      year = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").isoWeekYear();
 
                 return this.calendarweek + " " + weeknumber + " / " + year;
             },
@@ -91,17 +86,14 @@ export default {
                     return meansOfTransports === "Anzahl_Schwerverkehr" ? "triangle" : "circle";
                 }
                 const pointStyle = [],
-                    format = "YYYY-MM-DD";
+                      format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (getPublicHoliday(datetime[i], this.holidays, format)) {
                         pointStyle.push("star");
                     }
-                    else if (meansOfTransports === "Anzahl_Schwerverkehr") {
-                        pointStyle.push("triangle");
-                    }
                     else {
-                        pointStyle.push("circle");
+                        pointStyle.push(false);
                     }
                 }
 
@@ -109,7 +101,7 @@ export default {
             },
             renderPointSize: (datetime) => {
                 const pointSize = [],
-                    format = "YYYY-MM-DD";
+                      format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (getPublicHoliday(datetime[i], this.holidays, format)) {
@@ -155,9 +147,6 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/TrafficCount", [
-            "activeTabId"
-        ]),
         calendarweek: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.calendarweek");
         }
@@ -174,11 +163,6 @@ export default {
                 }
             },
             deep: true
-        },
-        activeTab () {
-            if (this.activeTab && this.activeTabId !== "week") {
-                this.setActiveTabId("week");
-            }
         }
     },
     created () {
@@ -188,9 +172,6 @@ export default {
         this.minDate = dayjs().subtract(1, "year").startOf("year").format("YYYY-MM-DD");
     },
     methods: {
-        ...mapMutations("Modules/TrafficCount", [
-            "setActiveTabId"
-        ]),
         /**
          * Initializes the calendar / resets the date.
          * @returns {void}
@@ -211,9 +192,9 @@ export default {
          */
         weekDatepickerValueChanged: function (dates) {
             const api = this.api,
-                thingId = this.thingId,
-                meansOfTransport = this.meansOfTransport,
-                timeSettings = [];
+                  thingId = this.thingId,
+                  meansOfTransport = this.meansOfTransport,
+                  timeSettings = [];
 
             if (!Array.isArray(dates) || dates.length === 0) {
                 this.apiData = [];
@@ -333,7 +314,7 @@ export default {
 </script>
 
 <template>
-    <div v-if="activeTab">
+    <div>
         <div
             id="weekDateSelector"
             class="dateSelector"
@@ -365,7 +346,7 @@ export default {
                 </template>
             </TrafficCountDatePicker>
         </div>
-        <TrafficCountCheckbox
+        <TrafficCountSwitch
             :current-means-of-transport="meansOfTransport"
             :last-means-of-transport-key="meansOfTransportKey"
             :table-diagram-id="diagramWeek"
@@ -382,12 +363,11 @@ export default {
                 :render-label-legend="renderLabelLegend"
                 :render-point-style="renderPointStyle"
                 :render-point-size="renderPointSize"
-                :active-tab="activeTab"
                 :current-means-of-transport="meansOfTransport"
                 :means-of-transport-key="meansOfTransportKey"
             />
         </div>
-        <TrafficCountCheckbox
+        <TrafficCountSwitch
             :table-diagram-id="tableWeek"
         />
         <div id="tableWeek">
@@ -404,11 +384,3 @@ export default {
         </div>
     </div>
 </template>
-
-<style lang="scss">
-#weekDateSelector {
-    .mx-input {
-        border-radius: 0px;
-    }
-}
-</style>

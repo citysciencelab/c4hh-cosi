@@ -182,6 +182,101 @@ export default {
          */
         isHeavyTrafficAvailableDesc: function () {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.isHeavyTrafficAvailableDesc");
+        },
+
+        indicator: function () {
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.indicator");
+        },
+
+        totalNumbers: function () {
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.totalNumbers");
+        },
+
+        shortTermDevelopment: function () {
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.shortTermDevelopment");
+        },
+
+        peakValues: function () {
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.peakValues");
+        },
+
+        previousDay: function () {
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.previousDay");
+        },
+
+        workingDayAverageShort: function () {
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.workingDayAverageShort");
+        },
+
+        shortTermKfzHeader: function () {
+            if (this.meansOfTransport === "Anzahl_Kfz" || this.meansOfTransport === "Anzahl_Schwerverkehr") {
+                return this.$t("additional:modules.tools.gfi.themes.trafficCount.carLabel");
+            }
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.number");
+        },
+
+        lastDayKfzDetailed: function () {
+            const isSchwerverkehr = this.meansOfTransport === "Anzahl_Schwerverkehr";
+            let value;
+
+            if (isSchwerverkehr) {
+                value = typeof this.lastDayValueSecond !== "undefined" ? this.lastDayValueSecond : "";
+            }
+            else {
+                value = this.lastDayValue;
+            }
+            const desc = this.lastDayDesc ? "am " + this.lastDayDesc : "";
+
+            return desc ? value + "<br><small>" + desc + "</small>" : value;
+        },
+
+        lastDayHeavyDetailed: function () {
+            const isKfz = this.meansOfTransport === "Anzahl_Kfz";
+            let value;
+
+            if (isKfz) {
+                value = typeof this.lastDayValueSecond !== "undefined" ? this.lastDayValueSecond : "";
+            }
+            else {
+                value = this.lastDayValue;
+            }
+            const desc = this.lastDayDesc ? "am " + this.lastDayDesc : "";
+
+            return desc ? value + "<br><small>" + desc + "</small>" : value;
+        },
+
+        workingDayAverageKfzDetailed: function () {
+            const isSchwerverkehr = this.meansOfTransport === "Anzahl_Schwerverkehr";
+            let value;
+
+            if (isSchwerverkehr) {
+                value = typeof this.workingDayAverageValueSecond !== "undefined" ? this.workingDayAverageValueSecond : "";
+            }
+            else {
+                value = this.workingDayAverageValue;
+            }
+            const desc = isSchwerverkehr ? this.workingDayAverageDescSecond : this.workingDayAverageDesc;
+
+            return desc ? value + "<br><small>seit " + desc + "</small>" : value;
+        },
+
+        workingDayAverageHeavyDetailed: function () {
+            const isKfz = this.meansOfTransport === "Anzahl_Kfz";
+            let value;
+
+            if (isKfz) {
+                value = typeof this.workingDayAverageValueSecond !== "undefined" ? this.workingDayAverageValueSecond : "";
+            }
+            else {
+                value = this.workingDayAverageValue;
+            }
+            const desc = isKfz ? this.workingDayAverageDescSecond : this.workingDayAverageDesc;
+
+            return desc ? value + "<br><small>seit " + desc + "</small>" : value;
+        },
+
+        showHeavyTrafficColumns: function () {
+            return this.isHeavyTrafficAvailable && typeof this.lastDayValueSecond !== "undefined";
         }
     },
     watch: {
@@ -201,8 +296,7 @@ export default {
                 if (oldVal) {
                     this.setupTabInfo(this.api, this.thingId, newVal);
                 }
-
-                this.isHeavyTrafficAvailable = newVal === "Anzahl_Kfz";
+                this.isHeavyTrafficAvailable = newVal === "Anzahl_Kfz" || newVal === "Anzahl_Schwerverkehr";
             },
             immediate: true
         },
@@ -490,116 +584,134 @@ export default {
             id="trafficcount-info-table"
             class="padded"
         >
+            <!-- Gesamtzahlen -->
+            <h6 class="section-title">
+                {{ totalNumbers }}
+            </h6>
             <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>{{ indicator }}</th>
+                        <th>{{ period }}</th>
+                        <th>{{ number }}</th>
+                    </tr>
+                </thead>
                 <tbody>
-                    <tr colspan="3">
-                        <td class="bold">
-                        &nbsp;
-                        </td>
-                        <td class="bold text-end">
-                            {{ period }}
-                        </td>
-                        <td class="bold text-end">
-                            {{ number }}
-                        </td>
+                    <tr>
+                        <td>{{ totalSince }}</td>
+                        <td>{{ totalDesc }}</td>
+                        <td>{{ totalValue }}</td>
                     </tr>
-                    <tr colspan="3">
-                        <td class="bold">
-                            {{ totalSince }}
-                        </td>
-                        <td>
-                            {{ totalDesc }}
-                        </td>
-                        <td>
-                            {{ totalValue }}
-                        </td>
+                    <tr>
+                        <td>{{ sinceBeginningOfTheYear }}</td>
+                        <td>{{ thisYearDesc }}</td>
+                        <td>{{ thisYearValue }}</td>
                     </tr>
-                    <tr colspan="3">
-                        <td class="bold">
-                            {{ sinceBeginningOfTheYear }}
-                        </td>
-                        <td>
-                            {{ thisYearDesc }}
-                        </td>
-                        <td>
-                            {{ thisYearValue }}
-                        </td>
+                    <tr>
+                        <td>{{ overThePastYear }}</td>
+                        <td>{{ lastYearDesc }}</td>
+                        <td>{{ lastYearValue }}</td>
                     </tr>
-                    <tr colspan="3">
-                        <td class="bold">
-                            {{ overThePastYear }}
-                        </td>
-                        <td>
-                            {{ lastYearDesc }}
-                        </td>
-                        <td>
-                            {{ lastYearValue }}
-                        </td>
+                </tbody>
+            </table>
+
+            <!-- Kurzfristige Entwicklung -->
+            <h6 class="section-title">
+                {{ shortTermDevelopment }}
+            </h6>
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>{{ indicator }}</th>
+                        <th v-if="showHeavyTrafficColumns">
+                            {{ $t("additional:modules.tools.gfi.themes.trafficCount.carLabel") }}
+                        </th>
+                        <th v-if="showHeavyTrafficColumns">
+                            {{ $t("additional:modules.tools.gfi.themes.trafficCount.heavyTrafficLabel") }}
+                        </th>
+                        <template v-if="!showHeavyTrafficColumns">
+                            <th>{{ period }}</th>
+                            <th>{{ number }}</th>
+                        </template>
                     </tr>
-                    <tr colspan="3">
-                        <td
-                            class="bold"
-                            v-html="onThePreviousDay"
-                        />
-                        <td
-                            class="align-middle"
-                        >
-                            {{ lastDayDesc }}
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="align-middle">
+                            {{ previousDay }}
                         </td>
-                        <td v-html="lastDayValueDetailed" />
+                        <template v-if="showHeavyTrafficColumns">
+                            <td
+                                class="align-middle"
+                                v-html="lastDayKfzDetailed"
+                            />
+                            <td
+                                class="align-middle"
+                                v-html="lastDayHeavyDetailed"
+                            />
+                        </template>
+                        <template v-else>
+                            <td class="align-middle">
+                                {{ lastDayDesc }}
+                            </td>
+                            <td class="align-middle">
+                                {{ lastDayValue }}
+                            </td>
+                        </template>
                     </tr>
-                    <tr colspan="3">
-                        <td
-                            class="bold"
-                            v-html="workingDayAverage"
-                        />
-                        <td v-html="workingDayAverageDescDetailed" />
-                        <td v-html="workingDayAverageValueDetailed" />
+                    <tr>
+                        <td class="align-middle">
+                            {{ workingDayAverageShort }}
+                        </td>
+                        <template v-if="showHeavyTrafficColumns">
+                            <td
+                                class="align-middle"
+                                v-html="workingDayAverageKfzDetailed"
+                            />
+                            <td
+                                class="align-middle"
+                                v-html="workingDayAverageHeavyDetailed"
+                            />
+                        </template>
+                        <template v-else>
+                            <td class="align-middle">
+                                {{ workingDayAverageDesc }}
+                            </td>
+                            <td class="align-middle">
+                                {{ workingDayAverageValue }}
+                            </td>
+                        </template>
                     </tr>
-                    <tr colspan="3">
-                        <td class="bold">
-                            {{ highestDay }}
-                        </td>
-                        <td>
-                            {{ highestWorkloadDayDesc }}
-                        </td>
-                        <td>
-                            {{ highestWorkloadDayValue }}
-                        </td>
+                </tbody>
+            </table>
+
+            <!-- Höchstwerte nach Zeitraum -->
+            <h6 class="section-title">
+                {{ peakValues }}
+            </h6>
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>{{ indicator }}</th>
+                        <th>{{ period }}</th>
+                        <th>{{ number }}</th>
                     </tr>
-                    <tr colspan="3">
-                        <td class="bold">
-                            {{ highestWeek }}
-                        </td>
-                        <td>
-                            {{ highestWorkloadWeekDesc }}
-                        </td>
-                        <td>
-                            {{ highestWorkloadWeekValue }}
-                        </td>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>{{ highestDay }}</td>
+                        <td>{{ highestWorkloadDayDesc }}</td>
+                        <td>{{ highestWorkloadDayValue }}</td>
                     </tr>
-                    <tr colspan="3">
-                        <td class="bold">
-                            {{ highestMonth }}
-                        </td>
-                        <td>
-                            {{ highestWorkloadMonthDesc }}
-                        </td>
-                        <td>
-                            {{ highestWorkloadMonthValue }}
-                        </td>
+                    <tr>
+                        <td>{{ highestWeek }}</td>
+                        <td>{{ highestWorkloadWeekDesc }}</td>
+                        <td>{{ highestWorkloadWeekValue }}</td>
                     </tr>
-                    <tr
-                        v-if="isHeavyTrafficAvailable"
-                        colspan="3"
-                    >
-                        <td class="bold">
-                            {{ isHeavyTrafficAvailableDesc }}
-                        </td>
-                        <td />
-                        <td>
-                            {{ isHeavyTrafficAvailableValue }}
-                        </td>
+                    <tr>
+                        <td>{{ highestMonth }}</td>
+                        <td>{{ highestWorkloadMonthDesc }}</td>
+                        <td>{{ highestWorkloadMonthValue }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -610,22 +722,43 @@ export default {
 <style lang="scss" scoped>
     #trafficcount-info-table {
         margin: 6px 0 0 0;
+
+        .section-title {
+            color: #003063;
+            font-weight: bold;
+            margin-top: 1.25rem;
+            margin-bottom: 0.25rem;
+
+            &:first-child {
+                margin-top: 0.5rem;
+            }
+        }
+
         table {
             margin: 0;
-            tbody {
-                tr:first-child {
-                    td {
-                        text-align: left;
-                    }
+
+            th {
+                font-weight: bold;
+                text-align: right;
+
+                &:first-child {
+                    text-align: left;
                 }
             }
-            td,
-            th {
+
+            td {
                 text-align: right;
+
+                &:first-child {
+                    text-align: left;
+                }
+
+                small {
+                    display: block;
+                    font-size: 0.8em;
+                    color: #555;
+                }
             }
-             td:first-child{
-                 text-align: left;
-             }
         }
     }
 </style>

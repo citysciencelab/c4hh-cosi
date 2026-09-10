@@ -1,13 +1,12 @@
 import {createStore} from "vuex";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import InformationComponent from "../../../components/InformationComponent.vue";
+import DetailComponent from "../../../components/DetailComponent.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
 
-
-config.global.mocks.$t = key => key;
 
 describe("ADDONS: addons/boris/components/InformationComponent.vue", () => {
     const mockConfigJson = {
@@ -98,7 +97,7 @@ describe("ADDONS: addons/boris/components/InformationComponent.vue", () => {
                 }
             });
             expect(wrapper.find(".information-position").exists()).to.be.true;
-            expect(wrapper.find(".detail-component").exists()).to.be.true;
+            expect(wrapper.findComponent(DetailComponent).exists()).to.be.true;
         });
     });
 });

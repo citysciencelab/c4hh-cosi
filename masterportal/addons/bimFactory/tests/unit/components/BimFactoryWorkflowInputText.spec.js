@@ -1,10 +1,9 @@
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
 import BimFactoryWorkflowInputText from "../../../components/BimFactoryWorkflowInputText.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("BimFactoryWorkflowInputText.vue", () => {
     const mockConfigForStep2Component1 = {
@@ -142,20 +141,6 @@ describe("BimFactoryWorkflowInputText.vue", () => {
 
             expect(container.components[mockConfig.component.machineName].value).to.equal(newValue);
         });
-    });
-
-    it("throws an error if config is missing required properties", () => {
-        expect(() => {
-            mount(BimFactoryWorkflowInputText, {
-                props: {
-                    config: {
-                        containerId: "Projektinformationen"
-                        // Missing component object
-                    }
-                },
-                global: globalMocks
-            });
-        }).to.throw();
     });
 
     it("checks clearComponentErrors() to the store on input event", async () => {

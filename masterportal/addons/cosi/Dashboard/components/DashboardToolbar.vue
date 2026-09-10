@@ -124,12 +124,12 @@ export default {
              */
             set (newSelectedGroups) {
                 const oldSelectedGroups = this.selectedGroups,
-                    addedGroups = newSelectedGroups.filter(group => !oldSelectedGroups.includes(group)),
-                    removedGroups = oldSelectedGroups.filter(group => !newSelectedGroups.includes(group)),
-                    categoriesToAdd = this.mapping.filter(mappingEntry => addedGroups.includes(mappingEntry.group))
-                        .map(mappingEntry => mappingEntry.value),
-                    categoriesToRemove = this.mapping.filter(mappingEntry => removedGroups.includes(mappingEntry.group))
-                        .map(mappingEntry => mappingEntry.value);
+                      addedGroups = newSelectedGroups.filter(group => !oldSelectedGroups.includes(group)),
+                      removedGroups = oldSelectedGroups.filter(group => !newSelectedGroups.includes(group)),
+                      categoriesToAdd = this.mapping.filter(mappingEntry => addedGroups.includes(mappingEntry.group))
+                          .map(mappingEntry => mappingEntry.value),
+                      categoriesToRemove = this.mapping.filter(mappingEntry => removedGroups.includes(mappingEntry.group))
+                          .map(mappingEntry => mappingEntry.value);
 
                 this._statsFeatureFilter = [
                     ...this._statsFeatureFilter.filter(category => !categoriesToRemove.includes(category)),

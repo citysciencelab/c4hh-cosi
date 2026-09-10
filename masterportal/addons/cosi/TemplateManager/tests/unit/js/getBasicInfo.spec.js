@@ -36,7 +36,6 @@ describe("addons/cosi/TemplateManager/js/getBasicInfo", () => {
 
             sinon.stub(getBasicInfo, "getLevelInfos").returns(levelInfo);
             expect(getBasicInfo.getOverviewBasicInfo(selectedDistrictLevel)).to.deep.equal(expected);
-            sinon.restore();
         });
     });
     describe("getLevelInfos", () => {

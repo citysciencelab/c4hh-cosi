@@ -28,9 +28,6 @@ describe.skip("addons/DistrictSelector/utils/prepareDistrictLevels.js", () => {
         );
     });
 
-    afterAll(() => {
-        sinon.restore();
-    });
 
     beforeEach(() => {
         sinon.spy(console, "error");

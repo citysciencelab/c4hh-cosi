@@ -3,6 +3,7 @@
         "tools": {
             "cosi": {
                 "dashboard": {
+                    "description": "Mit dieser Funktion werden statistische Daten wie z.B. Demographie, Haushaltsgrößen oder die Einwohnerzahl für ausgewählte Gebiete sowie Vergleichsdaten auf Ebene von Stadtteil, Bezirk und Gesamt-Hamburg angezeigt. Zudem können Diagramme und Zeitreihen erstellt, Verhältnisse, Korrelationen analysiert und Daten exportiert werden.",
                     "alertMessageNoData": "Bisher wurden keine Gebiete ausgewählt. Um statistische Daten anzuzeigen, wählen Sie bitte mindestens ein Gebiet aus. Verwenden Sie dazu die Funktion 'Gebiet auswählen'",
                     "title": "Statistische Datenübersicht",
                     "avgCol": "Durchschnitt",

@@ -44,7 +44,7 @@ export default {
          */
         async uploadFile (event) {
             const file = event.target.files.item(0),
-                fileReader = new FileReader();
+                  fileReader = new FileReader();
 
             fileReader.onload = (evt) => this.onFileLoad(evt.target.result);
 
@@ -74,7 +74,7 @@ export default {
             }
             if (json.state.Maps?.mode === "3D" && Object.prototype.hasOwnProperty.call(json.state, "Modeler3D")) {
                 const mapObserver = this.observer.find(observer => observer.key === "Maps"),
-                    observersWithoutMap = this.observer.filter(observer => observer.key !== "Maps");
+                      observersWithoutMap = this.observer.filter(observer => observer.key !== "Maps");
 
                 if (typeof mapObserver?.setter === "function") {
                     await mapObserver.setter(json.state.Maps);

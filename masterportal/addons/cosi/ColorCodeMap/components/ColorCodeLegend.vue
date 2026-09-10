@@ -91,7 +91,7 @@ export default {
         },
         markerPosition (index) {
             const value = this.matchResults[index].getProperties()[this.yearSelector + this.selectedYear],
-                relativeValue = ((value - this.colorScale.legend.values[0]) * 100) / (this.colorScale.legend.values[this.colorScale.legend.values.length - 1] - this.colorScale.legend.values[0]);
+                  relativeValue = ((value - this.colorScale.legend.values[0]) * 100) / (this.colorScale.legend.values[this.colorScale.legend.values.length - 1] - this.colorScale.legend.values[0]);
 
             if (index > this.matchResults.length) {
                 return "display:none";

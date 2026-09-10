@@ -30,8 +30,8 @@ export default {
          */
         featureProperties () {
             const _propBlacklist = this.propBlacklist,
-                props = this.item.feature.getProperties(),
-                filteredProps = Object.entries(props).filter(prop => !_propBlacklist.includes(prop[0]));
+                  props = this.item.feature.getProperties(),
+                  filteredProps = Object.entries(props).filter(prop => !_propBlacklist.includes(prop[0]));
 
             return Object.fromEntries(filteredProps);
         }
@@ -58,7 +58,7 @@ export default {
 <template>
     <v-sheet>
         <v-card>
-            <v-table dense>
+            <v-table density="compact">
                 <template #default>
                     <tbody class="detail-view-row">
                         <tr

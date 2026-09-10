@@ -3,6 +3,7 @@
     "storyCreator": {
       "storyNav": "Story",
       "chapterNav": "Kapitel",
+      "autosaveHint": "Die Änderung wurde automatisch gespeichert.",
       "title": "Story Creator",
       "addChapter": "Kapitel hinzufügen",
       "saveStory": "Story speichern",
@@ -14,6 +15,7 @@
       "previewNav": "Story-Vorschau",
       "introText": "Dieses Werkzeug dient der Erstellung interaktiver, kartenbasierter Geschichten. Nach der Eingabe der allgemeinen Informationen, wie Name, Beschreibung, Autor und Titelbild, können darunter die einzelnen Kapitel flexibel hinzugefügt werden. Über die Schaltflächen am Seitenende lässt sich die Story in der Vorschau prüfen, speichern oder verwerfen.",
       "labels": {
+        "storyname": "Story-Name",
         "storyTitle": "Story-Namen eingeben",
         "storyDescription": "Beschreibung der Story (optional)",
         "storyAuthor": "Autor der Story (optional)",
@@ -26,18 +28,28 @@
         "editStory": "Story bearbeiten",
         "downloadStory": "Story herunterladen",
         "wrongFormat": "Es sind nur Bilddateien (z. B. JPG, PNG) zulässig.",
+        "wrongVideoFormat": "Es sind nur Video (z. B. mp4, webm, ogg, mov, avi, mkv, wmv, flv, m4v, 3gp) zulässig.",
         "wrongFormatTitle": "Ungültiges Dateiformat",
         "emptyChapter": "Es wurden noch keine Kapitel angelegt.",
-        "mapPosition": "Kartenposition"
+        "mapPosition": "Kartenposition",
+        "videoLink": "Video-URL (MP4, WebM, Ogg oder YouTube-Link)",
+        "videoTitle": "Video-Titel (Optional)",
+        "videoAccessibleText": "Text für Barrierefreiheit",
+        "imageRequiredAlt": "Ein Alternativ-Text zur barrierefreien Bildbeschreibung fehlt.",
+        "imageRequiredCopyright": "Es ist eine Urheberrechtsangabe erforderlich.",
+        "imageRequiredFields": "Erforderliche Felder müssen ausgefüllt sein."
       },
       "buttons": {
           "confirm": "Übernehmen",
           "discardImage": "Bild verwerfen",
-          "abort": "Abbrechen"
+          "discardStory": "Story verwerfen",
+          "discardChanges": "Änderungen verwerfen",
+          "discardVideo": "Video verwerfen"
       },
       "headlines": {
         "addImages": "Neues Bild hinzufügen",
         "addTexts": "Neuen Text hinzufügen",
+        "addVideo": "Neues Video hinzufügen",
         "chapterList": "Übersicht der Kapitel",
         "addImageTitle": "Neues Titelbild hinzufügen",
         "coverOfStory": "Titelbild der Story"
@@ -49,17 +61,24 @@
         "mapPosition": "Kartenposition übernehmen",
         "currentPosition": "Aktuelle Position auf der Karte",
         "layerList": "Fachdaten einbinden (optional)",
+        "baseLayerList": "Hintergrundkarte auswählen",
         "toolList": "Werkzeug öffnen (optional)",
         "zoomLevel": "Zoomstufe",
         "save": "Kapitel speichern",
         "cancel": "abbrechen",
+        "cancelNew": "Kapitel verwerfen",
+        "cancelEdit": "Änderungen verwerfen",
         "successAlert": "Die Kartenposition wurde erfolgreich übernommen!",
         "positionChangedHint": "Die Position entspricht nicht der aktuellen Ansicht der Karte.",
         "addContent": "Inhalte hinzufügen",
         "title": "Kapitelüberschrift eingeben",
         "initialText": "Hier klicken, um eine Kapitelbeschreibung hinzuzufügen...",
         "toolListPlaceholder": "Werkzeug auswählen...",
-        "layerListPlaceholder": "Layer auswählen..."
+        "baseLayerListPlaceholder": "Hintergrundkarte auswählen...",
+        "layerListPlaceholder": "Layer auswählen...",
+        "noFeatureLinked": "Kein Feature verknüpft",
+        "noSubjectLayerHint": "Bitte Fachdaten auswählen um ein Feature verknüpfen zu können.",
+        "addFeatureDescription": "Durch Klicken auf ein Feature in der Karte wird dieses mit dem aktuellen Kapitel verbunden. Es lassen sich zusätzliche Informationen hinzufügen und festlegen, welche Attribute später im Info-Popup sichtbar sind."
       },
       "addElementDropdown": {
         "categories": {
@@ -68,9 +87,20 @@
         },
         "items": {
           "text": "Text",
+          "feature": "Feature verknüpfen",
           "separator": "Trennlinie",
           "image": "Bild",
           "video": "Video"
+        },
+        "feature": {
+          "title": "Überschrift (max. 200 Zeichen)",
+          "description": "Beschreibung (optional, max. 500 Zeichen)",
+          "editAttribute": "Attribute bearbeiten",
+          "addImage": "Bild hinzufügen",
+          "remove": "Löschen",
+          "cancel": "Feature verwerfen",
+          "save": "Feature verknüpfen",
+          "info": "Im Abspielmodus erscheint ein Button im Kapitel. Ein Klick darauf zentriert die Karte auf das verknüpfte Objekt und öffnet das Info-Popup."
         }
       }
     }

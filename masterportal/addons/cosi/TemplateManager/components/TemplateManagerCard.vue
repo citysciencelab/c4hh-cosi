@@ -37,7 +37,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters("Modules/TemplateManager", ["currentActiveTemplate", "multiTemplate"]),
+        ...mapGetters("Modules/TemplateManager", ["currentActiveTemplate"]),
 
         checked: {
             get () {
@@ -61,18 +61,6 @@ export default {
          * @returns {void}
          */
         checkActive (evt) {
-            const checkbox = document.getElementsByName("template-card");
-
-            if (!this.multiTemplate) {
-                Array.prototype.forEach.call(checkbox, el => {
-                    if (evt.target.id !== el.id && el.checked === true) {
-                        el.checked = false;
-                        this.$emit("showTemplate", el.title);
-                        this.$emit("activateTemplate", el.title, false);
-                    }
-                });
-            }
-
             this.$emit("showTemplate", this.title);
             this.$emit("activateTemplate", this.title, evt?.target?.checked);
         }

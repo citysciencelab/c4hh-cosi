@@ -92,7 +92,6 @@ export default {
 </template>
 
 <style scoped lang="scss">
-@import 'variables';
 
 .additional-requests {
     margin-top: 1rem;

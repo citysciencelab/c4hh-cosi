@@ -1,9 +1,8 @@
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import DynamicInputByType from "../../../../../components/shared/components/DynamicInputByType.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/SimulationTool/components/shared/components/DynamicInputByType.vue", () => {
     let store;

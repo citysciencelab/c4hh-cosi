@@ -419,8 +419,8 @@ const actions = {
     async loadPropertyOfFeatureById ({dispatch, getters, rootGetters}, payload) {
         const featureRequest = new WFS({version: "2.0.0"}).writeGetFeature({
                 srsName: rootGetters["Maps/projectionCode"],
-                featureTypes: ["geomarker"],
-                filter: resourceId(payload.geomarkerId)
+                featureTypes: [getters.geoMarkerEditLayerFeatureType],
+                filter: resourceId(getters.geoMarkerEditFeatureId(payload.geomarkerId))
             }),
             {geomarkerEditLayerUrl} = getters;
 
@@ -460,8 +460,8 @@ const actions = {
     async loadFeatureWithLockById ({rootGetters, getters, dispatch}, payload) {
         const featureRequest = new WFS({version: "2.0.0"}).writeGetFeature({
                 srsName: rootGetters["Maps/projectionCode"],
-                featureTypes: ["geomarker"],
-                filter: resourceId(payload.geomarkerId)
+                featureTypes: [getters.geoMarkerEditLayerFeatureType],
+                filter: resourceId(getters.geoMarkerEditFeatureId(payload.geomarkerId))
             }),
             {geomarkerEditLayerUrl} = getters;
 
@@ -601,7 +601,7 @@ const actions = {
 
             commit("setCurrentlyLockedFeature", {
                 featureId: currentlyLockedFeature.featureId,
-                lockId: currentlyLockedFeature.lockId,
+                lockId: getters.geoMarkerEditFeatureId(currentlyLockedFeature.lockId),
                 lockRefreshTimeStamp: null,
                 lockRefreshTimeoutId: null
             });

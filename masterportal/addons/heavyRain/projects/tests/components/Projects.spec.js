@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import Projects from "../../components/Projects.vue";
-
-config.global.mocks.$t = key => key;
+import sinon from "sinon";
 
 describe("addons/heavyRain/projects/components/Projects.vue", () => {
     let store;
@@ -27,7 +26,11 @@ describe("addons/heavyRain/projects/components/Projects.vue", () => {
                                 {
                                     "name": "Bekannte Bereiche (z.B. Presse)",
                                     "color": "#D55E00"
-                                }]
+                                }],
+                                currentView: () => "main"
+                            },
+                            mutations: {
+                                setCurrentView: sinon.stub()
                             }
                         }
                     }

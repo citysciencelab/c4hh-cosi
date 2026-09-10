@@ -4,7 +4,7 @@
             "cosi": {
                 "dipasProjects": {
                     "title": "DIPAS Projekte",
-                    "summary": "Mit dem DIPAS Werkzeug können alle Beiträge aus laufenden DIPAS Verfahren in der Karte visualisiert und eingesehen werden.",
+                    "summary": "Mit der DIPAS Funktion können Sie Beiträge aus allen Beteiligungsverfahren auf der Karte anzeigen lassen. Beiträge können nach Kategorien oder nach Bewertungen gestylt werden.",
                     "projectsHeadline": "Alle Projekte",
                     "contributionsHeadline": "Alle Beiträge",
                     "showAllContributions": "Alle Beiträge anzeigen",
@@ -13,6 +13,7 @@
                     "categories": "Kategorien",
                     "created": "Erstellt am: ",
                     "contributionType": "Beitragstyp",
+                    "contributionAnalysis": "Beitrags-Analyse",
                     "owner": "Verantwortlich",
                     "projectDescription": "Projektbeschreibung",
                     "numberOfComments": "Anzahl der Kommentare:",
@@ -21,6 +22,7 @@
                     "viewOriginalPost": "Originalbeitrag öffnen",
                     "backToProjects": "Zurück zu Projekten",
                     "noContributions": "Es sind keine Beiträge vorhanden.",
+                    "noContributionsRatings": "Für dieses Projekt liegen keine Bewertungen vor. Die Heatmap kann nicht angezeigt werden.",
                     "numberOfContribution": "Es sind {{ count }} Beiträge vorhanden",
                     "frozen": "abgeschlossen",
                     "dormant": "ruhend",
@@ -28,7 +30,9 @@
                     "ascending": "Datum aufsteigend",
                     "descending": "Datum absteigend",
                     "loading": "Projekte werden geladen...",
-                    "showHeatmap": "Heatmap auf der Karte anzeigen",
+                    "showHeatmap": "Heatmap nach Anzahl der Bewertungen anzeigen",
+                    "legend": "Legende",
+                    "transparency": "Transparenz",
                     "styling": {
                         "label": "Styling der Beiträge:",
                         "byProject": "nach Projekt",
@@ -44,6 +48,17 @@
                     "polling": {
                         "label": "Automatisches Update",
                         "help": "Neue Beiträge automatisch nachladen."
+                    },
+                    "contributionsAnalyse": {
+                        "label": "Beitrags-Analyse",
+                        "labelPointAnalyse": "Punktestyling nach Stimmung pro Beitrag",
+                        "legend": "Legende"
+                    },
+                    "voting": {
+                      "balancedVotes": "ausgeglichen",
+                      "negativeVotes": "negativ",
+                      "noVotes": "Keine Bewertung",
+                      "positiveVotes": "positiv"
                     }
                 }
             }

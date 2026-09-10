@@ -135,26 +135,26 @@ export default {
                         return;
                     }
                     startPrintProcess(this.printUrl, "pdf", this.pdfAppId, mapfishDialog, (url, payload) => {
-                        this.addMessage(this.$t("additional:modules.valuationPrint.pdfInTheMaking"));
-                        return axios.post(url, payload);
-                    },
-                    () => {
-                        this.addMessage(this.$t("additional:modules.valuationPrint.pleaseWait"));
-                    },
-                    error => {
-                        this.addMessage(this.$t("additional:modules.valuationPrint.pdfError"), true);
-                        console.error(error);
-                        this.startSpecificationProcess();
-                    },
-                    url => {
-                        this.addMessage(this.$t("additional:modules.valuationPrint.pdfSuccess"));
-                        this.addUrl(url, this.fileprefix);
-                        this.progressCounter++;
-                        if (this.numberOfImagesConfigured === 0) {
-                            this.scrollToDownloadSection();
-                        }
-                        this.startSpecificationProcess();
-                    });
+                                          this.addMessage(this.$t("additional:modules.valuationPrint.pdfInTheMaking"));
+                                          return axios.post(url, payload);
+                                      },
+                                      () => {
+                                          this.addMessage(this.$t("additional:modules.valuationPrint.pleaseWait"));
+                                      },
+                                      error => {
+                                          this.addMessage(this.$t("additional:modules.valuationPrint.pdfError"), true);
+                                          console.error(error);
+                                          this.startSpecificationProcess();
+                                      },
+                                      url => {
+                                          this.addMessage(this.$t("additional:modules.valuationPrint.pdfSuccess"));
+                                          this.addUrl(url, this.fileprefix);
+                                          this.progressCounter++;
+                                          if (this.numberOfImagesConfigured === 0) {
+                                              this.scrollToDownloadSection();
+                                          }
+                                          this.startSpecificationProcess();
+                                      });
                 });
             }, errorMsg => {
                 this.addMessage(errorMsg, true);
@@ -316,8 +316,8 @@ export default {
          */
         handleParcelSearch (feature) {
             const landmark = feature.get("gemarkungsname"),
-                parcelNumber = feature.get("flurstuecksnummer"),
-                layerSource = layerCollection.getLayerById(this.parcelLayerId).getLayerSource();
+                  parcelNumber = feature.get("flurstuecksnummer"),
+                  layerSource = layerCollection.getLayerById(this.parcelLayerId).getLayerSource();
 
             layerSource.refresh();
             layerSource.once("featuresloadend", () => {
@@ -491,7 +491,7 @@ export default {
                 return;
             }
             const feature = featureList.length > 1 ? unionFeatures(featureList) : featureList[0],
-                extent = feature.getGeometry().getExtent();
+                  extent = feature.getGeometry().getExtent();
 
             this.setMessageList([]);
             this.setUrlList([]);
@@ -513,7 +513,7 @@ export default {
          */
         async getAddress (val, featureList) {
             const feature = featureList.length > 1 ? unionFeatures(featureList) : featureList[0],
-                config = this.config?.services?.hh_wfs_dog;
+                  config = this.config?.services?.hh_wfs_dog;
 
             if (!this.isModalRequired) {
                 this.setPrintedFeature(featureList);
@@ -579,48 +579,48 @@ export default {
                 return;
             }
             const imageName = Object.keys(this.config.images[idx])[0],
-                mapfishDialogInstance = new MapfishDialog(
-                    {},
-                    this.config.images[idx],
-                    this.defaultValue,
-                    this.projection.getCode(),
-                    this.templateName,
-                    this.getFilenameOfPDF(imageName, dayjs().format("YYYY-MM-DD"))
-                );
+                  mapfishDialogInstance = new MapfishDialog(
+                      {},
+                      this.config.images[idx],
+                      this.defaultValue,
+                      this.projection.getCode(),
+                      this.templateName,
+                      this.getFilenameOfPDF(imageName, dayjs().format("YYYY-MM-DD"))
+                  );
 
             mapfishDialogInstance.create(this.parcelData).then(mapfishDialog => {
                 mapfishDialog.attributes.map = mapfishDialog.attributes[imageName + ".map"];
                 delete mapfishDialog.attributes[imageName + ".map"];
 
                 startPrintProcess(this.printUrl, "png", this.imageAppId, mapfishDialog, (url, payload) => {
-                    this.addMessage(this.$t("additional:modules.valuationPrint.imageInTheMaking", {imageName: upperFirst(imageName)}), false);
-                    return axios.post(url, payload);
-                },
-                () => {
-                    this.addMessage(this.$t("additional:modules.valuationPrint.pleaseWait"), false);
-                },
-                (error) => {
-                    this.addMessage(this.$t("additional:modules.valuationPrint.imageError", {imageName: upperFirst(imageName)}), true);
-                    console.error(error);
-                    if (this.config.images[idx + 1]) {
-                        this.startImageProcess(idx + 1);
-                    }
-                },
-                (url) => {
-                    this.progressCounter++;
-                    this.addMessage(this.$t("additional:modules.valuationPrint.imageSuccess", {imageName: upperFirst(imageName)}), false);
-                    this.addUrl(url, upperFirst(imageName));
-                    if (this.config.images[idx + 1]) {
-                        this.startImageProcess(idx + 1);
-                        return;
-                    }
-                    this.progressCounter = this.numberOfProgressSteps;
-                    setTimeout(() => {
-                        this.isInProcessOfCreatingReport = false;
-                    }, 2000);
-                    this.setShowDownloadAll(true);
-                    this.scrollToDownloadSection();
-                });
+                                      this.addMessage(this.$t("additional:modules.valuationPrint.imageInTheMaking", {imageName: upperFirst(imageName)}), false);
+                                      return axios.post(url, payload);
+                                  },
+                                  () => {
+                                      this.addMessage(this.$t("additional:modules.valuationPrint.pleaseWait"), false);
+                                  },
+                                  (error) => {
+                                      this.addMessage(this.$t("additional:modules.valuationPrint.imageError", {imageName: upperFirst(imageName)}), true);
+                                      console.error(error);
+                                      if (this.config.images[idx + 1]) {
+                                          this.startImageProcess(idx + 1);
+                                      }
+                                  },
+                                  (url) => {
+                                      this.progressCounter++;
+                                      this.addMessage(this.$t("additional:modules.valuationPrint.imageSuccess", {imageName: upperFirst(imageName)}), false);
+                                      this.addUrl(url, upperFirst(imageName));
+                                      if (this.config.images[idx + 1]) {
+                                          this.startImageProcess(idx + 1);
+                                          return;
+                                      }
+                                      this.progressCounter = this.numberOfProgressSteps;
+                                      setTimeout(() => {
+                                          this.isInProcessOfCreatingReport = false;
+                                      }, 2000);
+                                      this.setShowDownloadAll(true);
+                                      this.scrollToDownloadSection();
+                                  });
             });
         },
 
@@ -657,23 +657,23 @@ export default {
                 });
 
                 startPrintProcess(this.printUrl, "pdf", this.pdfSpecificationAppId, mapfishDialog, (url, payload) => {
-                    this.addMessage(this.$t("additional:modules.valuationPrint.pdfInTheMaking"));
-                    return axios.post(url, payload);
-                },
-                () => {
-                    this.addMessage(this.$t("additional:modules.valuationPrint.pleaseWait"));
-                },
-                error => {
-                    this.addMessage(this.$t("additional:modules.valuationPrint.pdfError"), true);
-                    console.error(error);
-                    this.startImageProcess();
-                },
-                (url) => {
-                    this.addMessage(this.$t("additional:modules.valuationPrint.pdfSuccess"));
-                    this.addUrl(url, this.$t("additional:modules.valuationPrint.modalTitle"));
-                    this.progressCounter++;
-                    this.startImageProcess();
-                });
+                                      this.addMessage(this.$t("additional:modules.valuationPrint.pdfInTheMaking"));
+                                      return axios.post(url, payload);
+                                  },
+                                  () => {
+                                      this.addMessage(this.$t("additional:modules.valuationPrint.pleaseWait"));
+                                  },
+                                  error => {
+                                      this.addMessage(this.$t("additional:modules.valuationPrint.pdfError"), true);
+                                      console.error(error);
+                                      this.startImageProcess();
+                                  },
+                                  (url) => {
+                                      this.addMessage(this.$t("additional:modules.valuationPrint.pdfSuccess"));
+                                      this.addUrl(url, this.$t("additional:modules.valuationPrint.modalTitle"));
+                                      this.progressCounter++;
+                                      this.startImageProcess();
+                                  });
             });
         },
 

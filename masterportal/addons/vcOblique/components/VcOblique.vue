@@ -1,26 +1,13 @@
 <script>
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import mutationsObliqueViewer from "../store/mutationsVcOblique.js";
-import iframeResizer from "iframe-resizer/js/iframeResizer";
 
 export default {
     name: "VcOblique",
-    directives: {
-        resize: {
-            beforeMount (el, {value = {}}) {
-                el.addEventListener("load", () => {
-                    if (!el.iFrameResizer) {
-                        iframeResizer({...value, warningTimeout: 0}, el);
-                    }
-                });
-            },
-            beforeUnmount (el) {
-                el?.iFrameResizer?.removeListeners();
-            }
-        }},
     computed: {
         ...mapGetters("Modules/VcOblique", [
             "active",
+            "currentImageName",
             "defaultMapMarkerStyleId",
             "icon",
             "name",
@@ -60,10 +47,10 @@ export default {
             "initObliqueView",
             "resetObliqueViewer",
             "obliqueView",
-            "createObliqueViewerURL"])
+            "createObliqueViewerURL"
+        ])
     }
 };
-
 </script>
 
 <template lang="html">
@@ -73,20 +60,47 @@ export default {
     >
         <iframe
             id="obliqueIframe"
-            ref="iframeContent"
-            v-resize="{}"
             title="ObliqueIframe"
-            width="100%"
-            height="100%"
-            frameboarder="0"
             :src="obliqueViewerURL"
         />
+        <div
+            v-if="currentImageName"
+            id="oblique-footer"
+        >
+            {{ currentImageName }}
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-#obliqueViewer{
+#obliqueViewer {
     height: 84vh;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    container-type: inline-size;
+}
+
+#obliqueIframe {
+    width: 100%;
+    flex: 1 1 auto;
+    min-height: 0;
+    border: 0;
+    display: block;
+}
+
+#oblique-footer {
+    display: none;
+    padding: 4px 8px;
+    font-size: 0.8rem;
+    color: #333;
+    background: rgba(255, 255, 255, 0.85);
+    text-align: left;
+}
+
+@container (min-width: 605px) {
+    #oblique-footer {
+        display: block;
+    }
 }
 </style>
-

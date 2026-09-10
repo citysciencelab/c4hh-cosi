@@ -2,29 +2,38 @@
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AddElementDropdown from "../shared/modules/addElementDropdown/components/AddElementDropdown.vue";
 import buildTreeStructure from "@appstore/js/buildTreeStructure.js";
+import CookieBanner from "../../shared/cookiebanner/components/CookieBanner.vue";
 import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
+import {getDirectVideo, getEmbedLink} from "../../shared/utils/video.js";
+import {getVisibleLayerList} from "../../shared/utils/layerHelper.js";
 import isObject from "@shared/js/utils/isObject.js";
-import {mapGetters} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
-import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
+import StoryCreatorAddFeatureCard from "./StoryCreatorAddFeatureCard.vue";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
+import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
+import StoryCreatorAddVideoCard from "./StoryCreatorAddVideoCard.vue";
 import tipTapJsonToHtml from "../shared/modules/tipTapEditor/js/tipTapJsonToHtml.js";
-import {Toast} from "bootstrap";
+import Toast from "../../shared/toasts/components/ToastsElement.vue";
 
 export default {
     name: "StoryCreatorChapter",
     components: {
         AccordionItem,
         AddElementDropdown,
+        CookieBanner,
         Draggable: draggable,
         FlatButton,
         Multiselect,
+        StoryCreatorAddFeatureCard,
         StoryCreatorAddImageCard,
-        StoryCreatorAddTextCard
+        StoryCreatorAddTextCard,
+        StoryCreatorAddVideoCard,
+        Toast
     },
     props: {
         /**
@@ -60,7 +69,8 @@ export default {
     },
     emits: [
         "save-chapter",
-        "cancel-chapter"
+        "cancel-chapter",
+        "update:chapter-title"
     ],
     data () {
         return {
@@ -73,17 +83,32 @@ export default {
             zoomlevel: "",
             confirmedCoordinate: [],
             confirmedZoomlevel: "",
+            is3DLayerExisted: false,
+            isCookieAllowed: document.cookie.split("; ").some(cookie => cookie.startsWith("username=storyvideo")),
             layerList: [],
+            navigation3D: undefined,
             toolList: [],
-            selectedLayer: [],
+            selectedLayers: [],
             selectedTool: "",
-            showAlert: false,
+            showToast: false,
             title: this.$t("additional:modules.storyCreator.chapter.title")
         };
     },
     computed: {
-        ...mapGetters(["configuredModules", "layerConfig"]),
-        ...mapGetters("Modules/StoryManager", ["subjectLayerCategory"]),
+        ...mapGetters(["addLayerButton", "allBaselayerConfigs", "allLayerConfigs", "configuredModules", "controlsConfig", "layerConfig", "layerConfigById", "visibleBaselayerConfigs"]),
+        ...mapGetters("Maps", ["mode"]),
+        ...mapGetters("Modules/StoryManager", ["enableVideo", "originalLayerConfig", "subjectLayerCategory", "toolStoryWhitelist"]),
+        /**
+         * Returns the allowed actions, if video is allowed, it will be added.
+         * @returns {String[]} the allowed actions.
+         */
+        allowedActions () {
+            if (this.enableVideo) {
+                return ["text", "divider", "image", "feature", "video"];
+            }
+
+            return ["text", "divider", "image", "feature"];
+        },
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
          * @returns {Boolean} True if position or zoom has changed, otherwise false.
@@ -112,37 +137,130 @@ export default {
          */
         isContentEditorOpen () {
             return this.openContentEditor.type !== "";
+        },
+        /**
+         * Returns the currently visible baselayer with the highest zIndex.
+         * @returns {Object|null} The active baselayer configuration or null.
+         */
+        activeVisibleBaselayer () {
+            if (!Array.isArray(this.visibleBaselayerConfigs) || this.visibleBaselayerConfigs.length === 0) {
+                return null;
+            }
+
+            let activeLayer = this.visibleBaselayerConfigs[0];
+
+            for (const layer of this.visibleBaselayerConfigs) {
+                if (layer.zIndex > activeLayer.zIndex) {
+                    activeLayer = layer;
+                }
+            }
+
+            return activeLayer;
+        },
+        /**
+         * Reflects the currently active baselayer and activates a newly selected one.
+         * @returns {Object|String} The active baselayer or an empty value.
+         */
+        selectedBaseLayer: {
+            get () {
+                return this.activeVisibleBaselayer || "";
+            },
+            set (layer) {
+                if (!layer) {
+                    return;
+                }
+
+                this.applyLayerVisibility(layer);
+            }
         }
     },
     watch: {
         /**
-         * Initializes and displays the Bootstrap Toast. The toast will automatically hide after 4 seconds.
-         * @param {Boolean} newVal - The new value of showAlert.
+         * Watches for the selected layers.
+         * @param {Object[]} layers - The selected layer objects object in array.
+         * @returns {void}
          */
-        showAlert (newVal) {
-            if (newVal) {
-                this.$nextTick(() => {
-                    const toastEl = this.$refs.toast;
+        selectedLayers: {
+            handler (val, oldVal) {
+                if (this.mode === "3D" && Array.isArray(oldVal)) {
+                    oldVal.forEach(layer => {
+                        const layerConf = this.layerConfigById(layer.layerId);
 
-                    if (toastEl) {
-                        const toast = new Toast(toastEl);
+                        if (layerConf?.is3DLayer) {
+                            this.removeLayer(layerConf);
+                        }
+                    });
+                }
 
-                        toast.show();
-                        setTimeout(() => {
-                            this.showAlert = false;
-                        }, 4000);
+                const layers = mapCollection.getMap("2D")?.getLayers();
+
+                this.deactivateSubjectLayer(getVisibleLayerList(layers));
+
+                if (!Array.isArray(val)) {
+                    return;
+                }
+
+                val.forEach(layer => {
+                    if (!layer?.layerId) {
+                        return;
                     }
+
+                    this.addOrReplaceLayer({
+                        layerId: layer.layerId,
+                        visibility: true
+                    });
                 });
+
+                this.is3DLayerExisted = val.some(layer => this.layerConfigById(layer.layerId)?.is3DLayer);
+
+                this.changeMapMode(this.is3DLayerExisted ? "3D" : "2D");
+            },
+            deep: true
+        },
+        /**
+         * Emits the current chapter title whenever it changes so parents can update breadcrumb navigation.
+         * @param {String} newVal - The new title value.
+         * @returns {void}
+         */
+        title (newVal) {
+            this.$emit("update:chapter-title", newVal);
+        },
+        /**
+         * Automatically hides the info toast after 4 seconds.
+         * @param {Boolean} newVal - The new value of showToast.
+         * @returns {void}
+         */
+        showToast (newVal) {
+            if (newVal) {
+                setTimeout(() => {
+                    this.showToast = false;
+                }, 4000);
             }
         }
     },
+    created () {
+        if (typeof this.originalLayerConfig === "undefined") {
+            this.setOriginalLayerConfig(JSON.parse(JSON.stringify(this.allLayerConfigs)));
+        }
+    },
     mounted () {
+        const layers = mapCollection.getMap("2D")?.getLayers(),
+              map = mapCollection.getMap("2D"),
+              additionalLayers = this.allLayerConfigs.filter(
+                  obj => !this.originalLayerConfig.some(item => item.id === obj.id)
+              );
+
+        if (this.mode === "3D") {
+            this.changeMapMode("2D");
+            this.setToNorth();
+        }
+
+        this.deactivateSubjectLayer(getVisibleLayerList(layers));
+
         this.layerList = this.getLayerList();
         this.toolList = this.getToolList(this.configuredModules);
 
         this.loadChapterData();
-
-        const map = mapCollection.getMap("2D");
 
         if (map) {
             map.on("moveend", this.updatePositionFromMap);
@@ -167,6 +285,12 @@ export default {
                 }
             ];
         }
+
+        additionalLayers.forEach(layer => {
+            const layerConf = this.layerConfigById(layer.id);
+
+            this.removeLayer(layerConf);
+        });
     },
     beforeUnmount () {
         const map = mapCollection.getMap("2D");
@@ -174,8 +298,25 @@ export default {
         if (map) {
             map.un("moveend", this.updatePositionFromMap);
         }
+
+        this.resetLayerConfig(this.selectedLayers);
+
+        if (this.mode === "3D") {
+            this.changeMapMode("2D");
+            this.setToNorth();
+        }
     },
     methods: {
+        ...mapActions(["addOrReplaceLayer", "updateLayerConfigs"]),
+        ...mapActions("Maps", ["changeMapMode"]),
+        ...mapActions("Modules/LayerSelection", ["changeVisibility"]),
+        ...mapActions("Modules/LayerTree", ["removeLayer"]),
+        ...mapActions("Modules/StoryManager", ["removeLayerFromLayerConfig"]),
+        ...mapMutations("Modules/StoryManager", ["setOriginalLayerConfig"]),
+        ...mapMutations(["setLayerConfigByParentKey"]),
+
+        getDirectVideo,
+        getEmbedLink,
         tipTapJsonToHtml,
         /**
          * Resets the current chapter and goes back to overview page.
@@ -186,11 +327,39 @@ export default {
             this.$emit("cancel-chapter");
         },
         /**
+         * Deactivates current subject layers from tree and map.
+         * @param {ol/layer[]} layers - The current visible layers.
+         * @returns {void}
+         */
+        deactivateSubjectLayer (layers) {
+            if (!Array.isArray(layers) || !layers.length) {
+                return;
+            }
+
+            layers.forEach(layer => {
+                const layerConf = this.layerConfigById(layer.get("id"));
+
+                if (layerConf && !layerConf?.baselayer && !this.selectedLayers.some(sl => sl.layerId === layer.get("id"))) {
+                    this.addOrReplaceLayer({
+                        layerId: layer.get("id"),
+                        visibility: false
+                    });
+                }
+            });
+        },
+        /**
          * Opens a content add/edit component and stores context of the open editor.
          * @param {String} type - The editor type (e.g. "text" or "image").
          * @returns {void}
          */
         openContentEditorForAdd (type) {
+            if (type === "divider") {
+                this.content.push({
+                    type: "divider"
+                });
+                return;
+            }
+
             this.openContentEditor = {
                 type,
                 index: this.content.length
@@ -215,6 +384,13 @@ export default {
         openContentEditorForEdit (index, type) {
             if (this.isContentEditorOpen) {
                 return;
+            }
+            if (type === "feature") {
+                const layerId = this.content[index].attrs?.layerId;
+
+                if (!this.selectedLayers.some(layer => layer.layerId === layerId)) {
+                    this.selectedLayers.push(...this.layerList.filter(layer => layer.layerId === layerId));
+                }
             }
             this.openContentEditor = {
                 type,
@@ -256,9 +432,18 @@ export default {
             this.confirmedZoomlevel = chapter.map.zoomLevel || "";
             this.zoomlevel = chapter.map.zoomLevel || "";
 
-            this.selectedLayer = Array.isArray(chapter.map.layers)
+            this.selectedLayers = Array.isArray(chapter.map.layers)
                 ? this.layerList.filter(layer => chapter.map.layers.includes(layer.layerId))
                 : [];
+
+            if (Array.isArray(chapter.map.layers)) {
+                chapter.map.layers.forEach(layerId => {
+                    if (this.allBaselayerConfigs.some(layer => layer.id === layerId)) {
+                        this.applyLayerVisibility({id: layerId});
+                    }
+                });
+            }
+
             this.selectedTool = chapter.map.tool
                 ? this.toolList.find(tool => tool.toolId === chapter.map.tool) || ""
                 : "";
@@ -286,12 +471,12 @@ export default {
          * @returns {Object[]} A list of objects with following format: {layerId: x, label: y}
          */
         getLayerList () {
-            const rawLayers = getAndMergeAllRawLayers(),
-                layerConfig = {
-                    baselayer: {},
-                    subjectlayer: {}
-                },
-                layersStructured = buildTreeStructure.build(rawLayers, layerConfig, this.subjectLayerCategory, []);
+            const rawLayers = this.controlsConfig?.button3d !== true ? getAndMergeAllRawLayers().filter(layer => !layer.is3DLayer) : getAndMergeAllRawLayers(),
+                  layerConfig = {
+                      baselayer: {},
+                      subjectlayer: {}
+                  },
+                  layersStructured = buildTreeStructure.build(rawLayers, layerConfig, this.subjectLayerCategory, []);
 
             return this.getParsedLayerList(layersStructured?.elements);
         },
@@ -305,7 +490,25 @@ export default {
 
             this.confirmedCoordinate = [...this.coordinate];
             this.confirmedZoomlevel = this.zoomlevel;
-            this.showAlert = true;
+            this.showToast = true;
+            this.navigation3D = this.get3DParameter();
+        },
+        /**
+         * Activates the selected layer by updating layer config visibility.
+         * @param {Object} layer - The selected layer option.
+         * @returns {void}
+         */
+        applyLayerVisibility (layer) {
+            const layerId = layer?.id || layer?.layerId;
+
+            if (!layerId) {
+                return;
+            }
+
+            this.changeVisibility({
+                layerId,
+                value: true
+            });
         },
 
         /**
@@ -334,7 +537,9 @@ export default {
             const layerNames = [];
 
             this.findAllObjectsByKeyValueDeep(list).forEach(layer => {
-                if (typeof layer?.name !== "undefined") {
+                const layerConf = this.layerConfigById(layer?.id);
+
+                if (typeof layer?.name !== "undefined" && !layerConf?.baselayer) {
                     layerNames.push({layerId: layer.id, label: layer.name, level: layer.level, $isDisabled: layer.$isDisabled});
                 }
             });
@@ -372,7 +577,6 @@ export default {
 
             return results;
         },
-
         /**
          * Gets all the tools from Masterportal filtered by the configured list of tools.
          * @param {Object[]} modules - list of strings where each string represent tool key
@@ -383,10 +587,14 @@ export default {
                 return [];
             }
             let toolList = [];
+            const whitelist = Array.isArray(this.toolStoryWhitelist) ? this.toolStoryWhitelist : [];
 
             modules.forEach(val => {
+                if (whitelist.length > 0 && !whitelist.includes(val?.type)) {
+                    return;
+                }
                 const capModuleName = val?.type.charAt(0).toUpperCase() + val?.type.slice(1),
-                    key = typeof store.getters["Modules/" + capModuleName + "/name"] !== "undefined" ? store.getters["Modules/" + capModuleName + "/name"] : capModuleName;
+                      key = typeof store.getters["Modules/" + capModuleName + "/name"] !== "undefined" ? store.getters["Modules/" + capModuleName + "/name"] : capModuleName;
 
                 toolList.push({toolId: val?.type, label: i18next.t(key)});
             });
@@ -402,7 +610,7 @@ export default {
         handleContent (content) {
             if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
                 const editIndex = this.openContentEditor.index,
-                    currentItem = this.content[editIndex];
+                      currentItem = this.content[editIndex];
 
                 if (currentItem) {
                     this.content.splice(editIndex, 1, content);
@@ -424,27 +632,87 @@ export default {
             this.zoomlevel = "";
             this.confirmedCoordinate = [];
             this.confirmedZoomlevel = "";
-            this.selectedLayer = [];
             this.selectedTool = "";
             this.closeContentEditor();
+        },
+        /**
+         * Collects and returns the current chapter data without emitting.
+         * Used by the parent via $refs for breadcrumb-based auto-save.
+         * @returns {Object} The chapter data object.
+         */
+        collectChapterData () {
+            const baseLayerId = this.selectedBaseLayer?.id,
+                  subjectLayerIds = this.selectedLayers.map(layer => layer.layerId),
+                  layers = baseLayerId ? [baseLayerId, ...subjectLayerIds] : subjectLayerIds;
+
+            return {
+                title: this.title.trim() !== "" ? this.title : this.$t("additional:modules.storyCreator.chapter.title"),
+                map: {
+                    center: [...this.confirmedCoordinate],
+                    zoomLevel: this.confirmedZoomlevel,
+                    layers,
+                    tool: this.selectedTool.toolId
+                },
+                navigation3D: this.is3DLayerExisted ? this.navigation3D : undefined,
+                content: this.content,
+                is3D: this.is3DLayerExisted
+            };
         },
         /**
          * Saves the chapter and returns to the overview page.
          * @returns {void}
          */
         saveChapter () {
-            const chapter = {
-                title: this.title.trim() !== "" ? this.title : this.$t("additional:modules.storyCreator.chapter.title"),
-                map: {
-                    center: [...this.confirmedCoordinate],
-                    zoomLevel: this.confirmedZoomlevel,
-                    layers: this.selectedLayer.map(layer => layer.layerId),
-                    tool: this.selectedTool.toolId
-                },
-                content: this.content
-            };
+            this.$emit("save-chapter", this.collectChapterData());
+        },
+        /**
+         * Gets the 3d parameter for coordination and position.
+         * @returns {Object} the parameter object.
+         */
+        get3DParameter () {
+            if (!this.is3DLayerExisted) {
+                return undefined;
+            }
 
-            this.$emit("save-chapter", chapter);
+            const olCesium = mapCollection.getMap("3D"),
+                  camera = olCesium?.scene_?.camera,
+                  cartographic = Cesium?.Cartographic?.fromCartesian(camera?.position),
+                  longitude = Cesium?.Math?.toDegrees(cartographic?.longitude),
+                  latitude = Cesium?.Math?.toDegrees(cartographic?.latitude),
+                  height = cartographic?.height,
+                  heading = camera?.heading,
+                  pitch = camera?.pitch,
+                  roll = camera?.roll;
+
+            return {
+                cameraPosition: [longitude, latitude, height],
+                heading: heading,
+                pitch: pitch,
+                roll: roll
+            };
+        },
+        /**
+         * Handles image add/edit by writing it to the content array and closing the open editor.
+         * @param {Object} image - The image object containing id, alt, copyright, and objectURL.
+         * @returns {void}
+         */
+        handleFeature (feature) {
+            if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
+                const editIndex = this.openContentEditor.index;
+
+                this.content.splice(editIndex, 1, {
+                    type: "feature",
+                    attrs: feature
+                });
+            }
+            else {
+                this.content.push({
+                    type: "feature",
+                    attrs: feature
+                });
+            }
+
+            this.closeContentEditor();
         },
         /**
          * Handles image add/edit by writing it to the content array and closing the open editor.
@@ -477,6 +745,29 @@ export default {
             this.closeContentEditor();
         },
         /**
+         * Handles video add/edit by writing it to the content array and closing the open editor.
+         * @param {Object} videoObj - The video object containing link, title and freetext.
+         * @returns {void}
+         */
+        handleVideo (videoObj) {
+            if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
+                const editIndex = this.openContentEditor.index;
+
+                this.content.splice(editIndex, 1, {
+                    type: "video",
+                    attrs: videoObj
+                });
+            }
+            else {
+                this.content.push({
+                    type: "video",
+                    attrs: videoObj
+                });
+            }
+
+            this.closeContentEditor();
+        },
+        /**
          * Removes a content item and cleans up related resources.
          * @param {Number} index - The index of the content item to remove.
          * @returns {void}
@@ -490,7 +781,45 @@ export default {
 
             this.content.splice(index, 1);
         },
+        /**
+         * Resets the layer config.
+         * @returns {void}
+         */
+        resetLayerConfig () {
+            this.selectedLayers.forEach(layer => {
+                const layerConf = this.layerConfigById(layer.layerId);
 
+                this.removeLayer(layerConf);
+
+                this.$nextTick(() => {
+                    if (!this.originalLayerConfig.some(orilayer => orilayer.id === layer.layerId)) {
+                        this.removeLayerFromLayerConfig(layer.layerId);
+                    }
+                });
+            });
+            this.selectedLayers = [];
+
+            if (!this.addLayerButton?.active) {
+                this.updateLayerConfigs(this.originalLayerConfig);
+            }
+        },
+        /**
+         * Set the cookie if external video is enabled.
+         * @returns {void}
+         */
+        setCookie () {
+            const maxAge = 7 * 24 * 60 * 60;
+
+            document.cookie = "username=storyvideo; max-age=" + maxAge + "; path=/";
+            this.isCookieAllowed = true;
+        },
+        /**
+         * Set the mapView to north.
+         * @returns {void}
+         */
+        setToNorth () {
+            mapCollection.getMapView("2D").animate({rotation: 0});
+        },
         /**
          * Updates the current zoom level and coordinate from the map view.
          * @returns {void}
@@ -502,14 +831,13 @@ export default {
                 return;
             }
 
-            if (this.showAlert) {
-                this.showAlert = false;
+            if (this.showToast) {
+                this.showToast = false;
             }
 
             this.zoomlevel = mapView.getZoom();
             this.coordinate = [...mapView.getCenter()];
         }
-
     }
 };
 </script>
@@ -530,17 +858,17 @@ export default {
         >
             <div class="map-position">
                 <FlatButton
-                    class="float-left"
+                    class="mb-4"
                     icon="bi bi-play-circle"
                     :text="$t('additional:modules.storyCreator.chapter.mapPosition')"
                     :disabled="isButtonDisabled"
                     @click.native="getMapPosition()"
                 />
-                <div v-if="confirmedCoordinate.length && confirmedZoomlevel !== ''">
+                <div v-if="mode !== '3D' && confirmedCoordinate.length && confirmedZoomlevel !== ''">
                     {{ $t("additional:modules.storyCreator.chapter.currentPosition") }}
                 </div>
                 <div
-                    v-if="confirmedCoordinate.length && confirmedZoomlevel !== ''"
+                    v-if="mode !== '3D' && confirmedCoordinate.length && confirmedZoomlevel !== ''"
                     class="p-2 d-flex flex-row align-center"
                 >
                     <div class="p-1 fs-3">
@@ -555,6 +883,11 @@ export default {
                         </div>
                     </div>
                 </div>
+                <Toast
+                    v-if="showToast"
+                    type="info"
+                    :text="$t('additional:modules.storyCreator.chapter.successAlert')"
+                />
             </div>
             <div
                 v-if="positionChanged"
@@ -563,23 +896,25 @@ export default {
                 <i class="fs-4 bi bi-exclamation-circle pe-2" />
                 {{ $t("additional:modules.storyCreator.chapter.positionChangedHint") }}
             </div>
-            <div
-                v-if="showAlert"
-                ref="toast"
-                class="toast align-items-center border-0"
-                role="alert"
-                aria-live="assertive"
-                aria-atomic="true"
-            >
-                <div class="d-flex">
-                    <div class="toast-body">
-                        <i
-                            class="bi bi-check-lg me-2 toast-icon"
-                            aria-hidden="true"
-                        />
-                        {{ $t('additional:modules.storyCreator.chapter.successAlert') }}
-                    </div>
-                </div>
+            <div class="row no-gutters mb-4 mt-3">
+                <label
+                    for="base-layer-list"
+                    class="form-label small text-muted"
+                >
+                    {{ $t('additional:modules.storyCreator.chapter.baseLayerList') }}
+                </label>
+                <Multiselect
+                    id="base-layer-list"
+                    v-model="selectedBaseLayer"
+                    :aria-label="$t('additional:modules.storyCreator.chapter.baseLayerList')"
+                    :multiple="false"
+                    :options="allBaselayerConfigs"
+                    :show-labels="false"
+                    :placeholder="$t('additional:modules.storyCreator.chapter.baseLayerListPlaceholder')"
+                    label="name"
+                    track-by="id"
+                    @select="applyLayerVisibility"
+                />
             </div>
             <div class="row no-gutters mb-4 mt-4">
                 <label
@@ -590,7 +925,7 @@ export default {
                 </label>
                 <Multiselect
                     id="layer-list"
-                    v-model="selectedLayer"
+                    v-model="selectedLayers"
                     :placeholder="$t('additional:modules.storyCreator.chapter.layerListPlaceholder')"
                     :aria-label="$t('additional:modules.storyCreator.chapter.layerList')"
                     label="label"
@@ -668,13 +1003,13 @@ export default {
             :is-open="true"
             :title="$t('additional:modules.storyCreator.chapter.addContent')"
         >
-            <div class="chapter-title mt-4 mb-3 p-2 h5">
+            <div class="chapter-title mt-4 mb-3 px-2 py-0 rounded-3">
                 <input
-                    v-model="title"
-                    class="w-100 bg-transparent border-0"
-                    style="outline: none;"
+                    v-model.trim="title"
+                    class="form-control-plaintext w-100 fs-5 outline-none-fallback"
                     :placeholder="$t('additional:modules.storyCreator.chapter.title')"
                     :aria-label="$t('additional:modules.storyCreator.chapter.title')"
+                    @blur="title = title || $t('additional:modules.storyCreator.chapter.title')"
                 >
             </div>
             <Draggable
@@ -729,8 +1064,8 @@ export default {
                                     :alt="element.attrs.alt"
                                     class="rounded w-100 d-block"
                                 >
-                                <div class="text-end mt-1 small">
-                                    © {{ element?.attrs?.copyright }}
+                                <div class="text-end mt-1">
+                                    <small>© {{ element?.attrs?.copyright }}</small>
                                 </div>
                             </div>
                         </div>
@@ -769,13 +1104,158 @@ export default {
                                 <div v-html="tipTapJsonToHtml(element)" />
                             </div>
                         </div>
+                        <div
+                            v-else-if="element.type === 'divider'"
+                            class="chapter-content-item__wrapper"
+                        >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
+                            <div
+                                class="p-4 rounded-3 chapter-content-item__preview chapter-content-item--hoverable"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-2 chapter-content-item__close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
+                                <hr class="my-0 me-4">
+                            </div>
+                        </div>
+                        <div
+                            v-else-if="element.type === 'feature'"
+                            class="chapter-content-item__wrapper"
+                        >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
+                            <StoryCreatorAddFeatureCard
+                                v-if="isEditingContentItem(index)"
+                                class="mt-2"
+                                :chapter-zoom-level="element?.attrs?.zoomlevel"
+                                :initial-content="element"
+                                :selected-layers="selectedLayers"
+                                :create-image-asset="createImageAsset"
+                                :image-assets-by-id="imageAssetsById"
+                                @addFeature="handleFeature"
+                                @click:close="closeContentEditor"
+                            />
+                            <div
+                                v-else
+                                class="p-4 rounded-3 chapter-content-item__preview"
+                                :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
+                                role="button"
+                                tabindex="0"
+                                @click="openContentEditorForEdit(index, 'feature')"
+                                @keydown.enter="openContentEditorForEdit(index, 'feature')"
+                                @keydown.space.prevent="openContentEditorForEdit(index, 'feature')"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-2 chapter-content-item__close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
+                                <FlatButton
+                                    :id="'feature' + index"
+                                    class="mb-3"
+                                    :icon="'bi-geo-alt-fill'"
+                                    :text="element.attrs.title"
+                                    :title="element.attrs.title"
+                                    :interaction="() => {}"
+                                />
+                            </div>
+                        </div>
+                        <div
+                            v-if="element.type === 'video'"
+                            class="chapter-content-item__wrapper"
+                        >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
+                            <StoryCreatorAddVideoCard
+                                v-if="isEditingContentItem(index)"
+                                class="mt-2"
+                                :initial-content="element"
+                                @addVideo="handleVideo"
+                                @click:close="closeContentEditor"
+                            />
+                            <div
+                                v-else
+                                class="card rounded-3 border-0 p-4 position-relative chapter-content-item__preview"
+                                :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
+                                role="button"
+                                tabindex="0"
+                                @click="openContentEditorForEdit(index, 'video')"
+                                @keydown.enter="openContentEditorForEdit(index, 'video')"
+                                @keydown.space.prevent="openContentEditorForEdit(index, 'video')"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-1 chapter-content-item__close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
+                                <div v-if="getDirectVideo(element?.attrs?.link).length">
+                                    <video
+                                        width="100%"
+                                        height="auto"
+                                        controls
+                                        :aria-label="element?.attrs?.accessibleText"
+                                    >
+                                        <source
+                                            :src="element?.attrs?.link"
+                                            :type="getDirectVideo(element?.attrs?.link)[0]?.content"
+                                        >
+                                        <track
+                                            kind="captions"
+                                            src=""
+                                            srclang="de"
+                                            label="German"
+                                            default
+                                        >
+                                    </video>
+                                </div>
+                                <div
+                                    v-else
+                                    class="video-container"
+                                >
+                                    <iframe
+                                        v-if="isCookieAllowed"
+                                        width="100%"
+                                        height="100%"
+                                        allow="autoplay"
+                                        :src="getEmbedLink(element?.attrs?.link)"
+                                        :title="element?.attrs?.title"
+                                    />
+                                    <CookieBanner
+                                        v-if="!isCookieAllowed"
+                                        :source="getEmbedLink(element?.attrs?.link)"
+                                        @setCookie="setCookie"
+                                    />
+                                </div>
+                                <div
+                                    v-if="isCookieAllowed"
+                                    class="mt-1 small"
+                                >
+                                    {{ element?.attrs?.title }}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </template>
             </Draggable>
             <AddElementDropdown
                 v-if="!isContentEditorOpen"
                 class="mt-5"
-                :allowed-actions="['text', 'image']"
+                :allowed-actions="allowedActions"
                 @action-triggered="openContentEditorForAdd"
             />
             <StoryCreatorAddTextCard
@@ -792,6 +1272,22 @@ export default {
                 @addImage="handleImage"
                 @click:close="closeContentEditor"
             />
+            <StoryCreatorAddFeatureCard
+                v-else-if="isAddingContentType('feature')"
+                class="mt-2"
+                :chapter-zoom-level="confirmedZoomlevel"
+                :selected-layers="selectedLayers"
+                :create-image-asset="createImageAsset"
+                :image-assets-by-id="imageAssetsById"
+                @addFeature="handleFeature"
+                @click:close="closeContentEditor"
+            />
+            <StoryCreatorAddVideoCard
+                v-else-if="isAddingContentType('video')"
+                class="mt-2"
+                @addVideo="handleVideo"
+                @click:close="closeContentEditor"
+            />
         </AccordionItem>
         <div
             v-if="!isContentEditorOpen"
@@ -800,7 +1296,7 @@ export default {
             <hr class="w-100">
             <FlatButton
                 id="save"
-                class="mb-4"
+                class="my-4"
                 :icon="'bi-save'"
                 :text="$t('additional:modules.storyCreator.chapter.save')"
                 :title="$t('additional:modules.storyCreator.chapter.save')"
@@ -810,7 +1306,7 @@ export default {
                 id="cancel"
                 class="mb-4"
                 :icon="'bi-x-lg'"
-                :text="$t('additional:modules.storyCreator.chapter.cancel')"
+                :text="editIndex === false ? $t('additional:modules.storyCreator.chapter.cancelNew') : $t('additional:modules.storyCreator.chapter.cancelEdit')"
                 :secondary="true"
                 :interaction="() => cancelChapter()"
             />
@@ -820,15 +1316,33 @@ export default {
 <style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style lang="scss" scoped>
-.toast {
+.chapter-hint-area {
+    min-height: 2.5rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.chapter-success-alert {
     background-color: $secondary;
     color: $white;
-    .toast-icon {
-        font-size: 1.15rem;
-        color: $white;
-        line-height: 1;
-    }
+    border-radius: 0.25rem;
+    width: 100%;
 }
+
+.hint-fade-enter-active {
+    transition: opacity 0.4s ease;
+}
+
+.hint-fade-leave-active {
+    transition: opacity 1s ease;
+}
+
+.hint-fade-enter-from,
+.hint-fade-leave-to {
+    opacity: 0;
+}
+
 .position-hint {
     color: $secondary;
 }
@@ -909,6 +1423,15 @@ export default {
     }
 }
 
+.chapter-content-item--hoverable:hover {
+    outline: 1px solid $light_grey;
+}
+.chapter-content-item__wrapper:has(.chapter-content-item--hoverable) {
+    .drag-handle {
+        top: 50%;
+        transform: translateY(-50%);
+    }
+}
 .chapter-content-item__preview:hover .chapter-content-item__close,
 .chapter-content-item__preview:focus-within .chapter-content-item__close {
     opacity: 0.5;
@@ -977,7 +1500,7 @@ export default {
     border-radius: 10px;
 }
 .chapter .multiselect__tag:hover {
-    background: $dark_blue;
+    background: $secondary;
     color: $white;
 }
 .chapter .multiselect .multiselect__tag i::before {
@@ -993,8 +1516,6 @@ export default {
     left: 9px;
 }
 
-.chapter .multiselect__option--selected.multiselect__option--highlight,
-.chapter .multiselect__option--selected.multiselect__option--highlight:after,
 .chapter .multiselect__option:after,
 .chapter .multiselect__option--selected,
 .chapter .multiselect__option--selected:after,
@@ -1006,6 +1527,7 @@ export default {
 .chapter .multiselect__option--highlight,
 .chapter .multiselect__option--highlight:after {
     background: $secondary;
+    color: $white;
 }
 
 .map-position {
@@ -1015,7 +1537,6 @@ export default {
 }
 
 .chapter-title {
-    font-family: $font_family_accent;
     color: $dark_grey;
     &:hover {
         outline-color: $light_grey;
@@ -1025,5 +1546,18 @@ export default {
     &:focus {
         outline: 1px solid $light_grey;
     }
+}
+
+.video-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 16 / 9;
+}
+
+.video-container iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
 }
 </style>

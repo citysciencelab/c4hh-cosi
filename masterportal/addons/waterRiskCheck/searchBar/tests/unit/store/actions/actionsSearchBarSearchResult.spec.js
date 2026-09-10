@@ -1,5 +1,7 @@
 import sinon from "sinon";
 import {expect} from "chai";
+import {createPinia, setActivePinia} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import WKTUtil from "@shared/js/utils/getWKTGeom.js";
 import wmsGFIUtil from "@shared/js/utils/getWmsFeaturesByMimeType.js";
@@ -16,6 +18,8 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
         map;
 
     beforeEach(() => {
+        setActivePinia(createPinia());
+
         zoomLevel = 5;
 
         dispatch = sinon.spy();
@@ -305,16 +309,18 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
                 },
                 source = {
                     id: "sourceId"
-                };
+                },
+                layerInformationStore = useLayerInformationStore(),
+                startLayerInformationSpy = sinon.stub(layerInformationStore, "startLayerInformation");
 
             dispatch = sinon.stub().resolves(config);
             await actions.showLayerInfo({dispatch, commit}, {layerId, source});
 
-            expect(dispatch.calledTwice).to.be.true;
+            expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.firstCall.args[0]).to.equals("retrieveLayerConfig");
             expect(dispatch.firstCall.args[1]).to.be.deep.equals({layerId, source});
-            expect(dispatch.secondCall.args[0]).to.equals("Modules/LayerInformation/startLayerInformation");
-            expect(dispatch.secondCall.args[1]).to.be.deep.equals(config);
+            expect(startLayerInformationSpy.calledOnce).to.be.true;
+            expect(startLayerInformationSpy.firstCall.args[0]).to.be.deep.equals(config);
             expect(commit.calledOnce).to.be.true;
             expect(commit.firstCall.args[0]).to.equals("Modules/LayerSelection/setLayerInfoVisible");
             expect(commit.firstCall.args[1]).to.be.true;

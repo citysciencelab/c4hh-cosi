@@ -238,9 +238,11 @@ export default {
     unmounted () {
         if (this.currentPlanningComponent !== "newLanduse") {
             this.clearFeatures();
-            layerCollection.getLayerById("planning-scenario").getLayerSource().clear();
-            layerCollection.getLayerById(infrastructureLayerId)?.getLayerSource().clear();
-            this.removeInteraction(this.planningScenarioSelectInteraction);
+            layerCollection.getLayerById("planning-scenario")?.getLayerSource?.().clear();
+            layerCollection.getLayerById(infrastructureLayerId)?.getLayerSource?.().clear();
+            if (this.planningScenarioSelectInteraction) {
+                this.removeInteraction(this.planningScenarioSelectInteraction);
+            }
         }
     },
     methods: {
@@ -265,7 +267,7 @@ export default {
             }
 
             const layerSource = layerCollection.getLayerById("planning-scenario").getLayerSource(),
-                olFeatures = ConvertFeature.geoJsonToOpenlayers(features);
+                  olFeatures = ConvertFeature.geoJsonToOpenlayers(features);
 
             layerSource.addFeatures(olFeatures);
         },
@@ -290,8 +292,10 @@ export default {
          * @returns {void}
          */
         clearFeatures () {
-            if (this.getLayerSource().getFeatures().length) {
-                this.getLayerSource().clear(true);
+            const currentLayerSource = layerCollection.getLayerById(this.featureLayerId)?.getLayerSource?.();
+
+            if (currentLayerSource?.getFeatures().length) {
+                currentLayerSource.clear(true);
             }
         },
 

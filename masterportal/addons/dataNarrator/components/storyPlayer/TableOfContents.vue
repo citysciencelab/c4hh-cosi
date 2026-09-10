@@ -98,8 +98,8 @@ export default {
 
                 if (container) {
                     const containerRect = container.getBoundingClientRect(),
-                        stepElRect = stepDiv.getBoundingClientRect(),
-                        scrollTop = container.scrollTop + stepElRect.top - containerRect.top - 40;
+                          stepElRect = stepDiv.getBoundingClientRect(),
+                          scrollTop = container.scrollTop + stepElRect.top - containerRect.top - 40;
 
                     container.scrollTo({top: scrollTop, behavior: "smooth"});
                 }
@@ -123,7 +123,7 @@ export default {
 
                 if (tocEl) {
                     const rect = tocEl.getBoundingClientRect(),
-                        availableHeight = window.innerHeight - rect.top - 20;
+                          availableHeight = window.innerHeight - rect.top - 20;
 
                     this.tocMaxHeight = `${Math.max(availableHeight, 150)}px`;
                 }

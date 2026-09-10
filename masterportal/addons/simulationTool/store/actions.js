@@ -3,8 +3,40 @@ import isObject from "../../../src/shared/js/utils/isObject.js";
 import {extractEventCoordinates} from "../../../src/shared/js/utils/extractEventCoordinates.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection.js";
 import ConvertStyle from "../js/convertStyle.js";
+import deserializeFlatGeobufToGeoJsonFeatureCollection from "../js/deserializeFlatGeobufToGeoJsonFeatureCollection.js";
 import layerFactory from "../../../src/core/layers/js/layerFactory.js";
+import OgcApiProcess from "../js/ogcApiProcess.js";
 import {infrastructureLayerId} from "../layerIds.js";
+import {upsertPlanningScenarioInIndexedDb} from "../js/planningScenariosIndexedDb.js";
+
+/**
+ * Converts FlatGeobuf outputs in job results into GeoJSON feature collections.
+ * @param {Object} simulationConfig The simulation configuration for output metadata.
+ * @param {Object} jobResults The raw job results from backend.
+ * @returns {Promise<Object>} The normalized job results.
+ */
+async function convertFlatGeobufOutputsIfNeeded (simulationConfig, jobResults) {
+    if (!isObject(jobResults)) {
+        return jobResults;
+    }
+
+    const convertedResults = {...jobResults};
+
+    await Promise.all(Object.entries(convertedResults).map(async ([outputKey, outputValue]) => {
+        const outputMediaType = simulationConfig?.outputs?.[outputKey]?.value?.format?.mediaType;
+
+        if (outputMediaType === "application/flatgeobuf") {
+            const deserializedResult = await deserializeFlatGeobufToGeoJsonFeatureCollection(outputValue);
+
+            convertedResults[outputKey] = deserializedResult ?? outputValue;
+            return;
+        }
+
+        convertedResults[outputKey] = outputValue;
+    }));
+
+    return convertedResults;
+}
 
 export default {
     /**
@@ -55,7 +87,7 @@ export default {
         commit("setProcessesLoading", true);
 
         try {
-            const response = await fetch(`${getters.simulationApiUrl}/processes/`, {
+            const response = await fetch(`${getters.simulationApiUrl}/processes`, {
                 headers: {
                     "content-type": "application/json",
                     ...additionalHeaders
@@ -86,7 +118,7 @@ export default {
 
         try {
             const response = await fetch(
-                `${getters.simulationApiUrl}/jobs/?include_ensembles`,
+                `${getters.simulationApiUrl}/jobs?include_ensembles`,
                 {
                     headers: {
                         "content-type": "application/json",
@@ -159,6 +191,111 @@ export default {
      */
     jobStatusChanged ({commit, getters}) {
         commit("setOnJobStatusChange", getters.onJobStatusChange + 1);
+    },
+
+    /**
+     * Polls simulation jobs concurrently and assigns normalized results.
+     * @param {Object} context The vuex action context.
+     * @param {Object} payload The action payload.
+     * @param {Object[]} payload.jobs The simulation job objects to update in place.
+     * @param {String[]} payload.jobIds The backend job IDs matching the jobs array.
+     * @param {Object[]} payload.processConfigs The process config objects matching jobs.
+     * @param {Object} payload.simulationConfig The simulation config used for output normalization.
+     * @returns {Promise<void>}
+     */
+    async pollAndAssignSimulationJobsResults ({dispatch, rootGetters}, {jobs, jobIds, processConfigs, simulationConfig}) {
+        const accessToken = rootGetters["Modules/Login/accessToken"];
+
+        if (!accessToken || !Array.isArray(jobs) || !Array.isArray(jobIds) || !Array.isArray(processConfigs)) {
+            return;
+        }
+
+        await Promise.all(jobs.map(async (_, index) => {
+            const processConfig = processConfigs[index],
+                jobId = jobIds[index],
+                currentJob = jobs[index];
+
+            if (!isObject(currentJob) || typeof jobId !== "string" || !isObject(processConfig) || !processConfig.url || !processConfig.id) {
+                return;
+            }
+
+            const processHandler = new OgcApiProcess(processConfig.url, processConfig.id);
+
+            try {
+                const jobResults = await processHandler.pollJobStatusAndGetResults(
+                    accessToken,
+                    jobId,
+                    processConfig.pollingInterval,
+                    jobStatus => {
+                        currentJob.jobStatus = jobStatus;
+                        dispatch("jobStatusChanged");
+                    }
+                );
+
+                const normalizedJobResults = await convertFlatGeobufOutputsIfNeeded(simulationConfig, jobResults);
+
+                if (jobs[index] !== currentJob) {
+                    return;
+                }
+                currentJob.jobResults = normalizedJobResults;
+                dispatch("jobStatusChanged");
+            }
+            catch (error) {
+                currentJob.jobStatus = {
+                    ...currentJob.jobStatus,
+                    status: "failed"
+                };
+                dispatch("jobStatusChanged");
+            }
+        }));
+    },
+
+    /**
+     * Deletes a simulation from a planning scenario and persists the updated scenario.
+     * @param {Object} context The vuex action context.
+     * @param {Object} payload The action payload.
+     * @param {String} payload.scenarioId The id of the planning scenario.
+     * @param {String} payload.simulationId The id of the simulation to delete.
+     * @returns {Promise<void>}
+     */
+    async deleteSimulationFromPlanningScenario ({commit, getters}, {scenarioId, simulationId}) {
+        if (typeof scenarioId !== "string" || typeof simulationId !== "string") {
+            return;
+        }
+
+        const currentScenarios = Array.isArray(getters.planningScenarios) ? getters.planningScenarios : [],
+            updatedScenarios = currentScenarios.map(scenario => {
+                if (scenario?.id !== scenarioId || !isObject(scenario?.simulations)) {
+                    return scenario;
+                }
+
+                const updatedScenario = {
+                    ...scenario,
+                    simulations: {...scenario.simulations}
+                };
+
+                delete updatedScenario.simulations[simulationId];
+                return updatedScenario;
+            });
+
+        commit("setPlanningScenarios", updatedScenarios);
+
+        if (!getters.shouldSaveSimulations) {
+            return;
+        }
+
+        const scenarioToPersist = updatedScenarios.find(scenario => scenario?.id === scenarioId);
+
+        if (!scenarioToPersist) {
+            return;
+        }
+
+        try {
+            await upsertPlanningScenarioInIndexedDb(scenarioToPersist);
+        }
+        catch (error) {
+            console.warn("Could not persist simulation deletion in indexedDB.", error);
+        }
     },
 
     // async fetchEnsembles ({commit, getters, rootGetters}) {
@@ -327,7 +464,7 @@ export default {
         }
         layerSourceForObjects.clear(true);
 
-        if (!currentPlanningScenario || !currentPlanningScenario.scenarioFeature || !currentPlanningScenario.scenarioFeature.features) {
+        if (!layerSource || !currentPlanningScenario || !currentPlanningScenario.scenarioFeature || !currentPlanningScenario.scenarioFeature.features) {
             return;
         }
 
@@ -337,16 +474,15 @@ export default {
             olFeature.setStyle(ConvertStyle.geoJsonToOpenlayers(feat.style));
             layerSource.addFeature(olFeature);
         });
-        currentPlanningScenario.inputs.buildings.features.forEach(building => {
-            const olFeature = geoJsonParser.readFeature(building);
+        Object.values(currentPlanningScenario.inputs)
+            .filter(input => input?.isEditable === true && Array.isArray(input.features))
+            .forEach(input => {
+                input.features.forEach(feature => {
+                    const olFeature = geoJsonParser.readFeature(feature);
 
-            layerSourceForObjects.addFeature(olFeature);
-        });
-        currentPlanningScenario.inputs.roads.features.forEach(road => {
-            const olFeature = geoJsonParser.readFeature(road);
-
-            layerSourceForObjects.addFeature(olFeature);
-        });
+                    layerSourceForObjects.addFeature(olFeature);
+                });
+            });
     },
 
     /**

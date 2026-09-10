@@ -7,8 +7,6 @@
 ### __Breaking Changes__
 
 ### Added
-- PlanParken: Added a new addon `planParken` to analyze parking spaces in an area.
-- GFI - `parking`: Added a new gfi to match the visual style of the `planParken` addon.
 
 ### Changed
 
@@ -17,6 +15,61 @@
 ### Removed
 
 ### Fixed
+- gfiThemes: The printServerUrl from combinedGfiPrintConfig.json in the combinedGFI theme now takes precedence over the printServerUrl from the layer config, if available.
+
+---
+
+## 2026-09-02 v3.26.0
+
+### Added
+- userTracking: Added new feature for tracking user behavior with matomo (see userTracking/README.md for details).
+
+## 2026-08-05 v3.25.0
+
+### Added
+- package.json: new command `npm run deleteAllNodeModules` added.
+
+### Changed
+ - The following packages have been updated:
+   - dependencies:
+      - Cosi, gfiThemes, sdpDownload, mapFishUtils, simulationTool, valuationPrint, WaterRiskCheck:
+        - @turf/buffer: ^7.2.0 to ^7.3.5
+        - @turf/center-of-mass: ^7.2.0 to ^7.3.5
+        - @turf/helpers: ^7.2.0 to ^7.3.5
+        - @turf/intersect: ^7.2.0 to ^7.3.5
+        - @turf/points-within-polygon: ^7.2.0 to ^7.3.5
+        - @turf/simplify: ^7.2.0 to ^7.3.5
+        - @turf/truncate: ^7.2.0 to ^7.3.5
+        - @turf/union: ^7.2.0 to ^7.3.5
+        - d3-array: ^3.1.1 to ^3.2.4
+        - d3-color: ^3.0.1 to ^3.1.0
+        - d3-scale-chromatic: ^3.0.0 to ^3.1.0
+        - lodash: ^4.17.21 to ^4.18.1
+- vcOblique: Replaced iframe-resizer package with CSS-based iframe sizing.
+- package.json: postinstall script detects package.json files automatically and does not fail, if one of the installs fails.
+
+### Removed
+- ChartGenerator Modul: Code that is no longer needed 
+- The following packages have been removed in CoSI:
+    - jszip ^3.7.1
+    - vue-chartjs ^5.3.1
+
+---
+
+## 2026-07-01 v3.24.0
+
+### Added
+- PlanParken: Added a new addon `planParken` to analyze parking spaces in an area.
+- GFI - `parking`: Added a new gfi to match the visual style of the `planParken` addon.
+- vcOblique: Added footer with image name, because footer of VCMap 6 does not react to image changes.
+
+### Changed
+- Boris: Changed list structures to reflect accessibility rules
+
+### Removed
+
+### Fixed
+- vcOblique: Fixed a bug where rotating oblique images caused the geomarker to sometimes jump to another position.
 
 ---
 

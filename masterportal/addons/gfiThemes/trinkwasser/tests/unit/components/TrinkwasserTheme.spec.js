@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import TrinkwasserTheme from "../../../components/TrinkwasserTheme.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/trinkwasser/components/TrinkwasserTheme.vue", () => {
     let wrapper;

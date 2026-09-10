@@ -99,10 +99,10 @@ export default {
             }
 
             const geojsonFeature = JSON.parse(content),
-                geoJsonParser = new GeoJSON({
-                    dataProjection: "EPSG:4326",
-                    featureProjection: "EPSG:25832"
-                });
+                  geoJsonParser = new GeoJSON({
+                      dataProjection: "EPSG:4326",
+                      featureProjection: "EPSG:25832"
+                  });
 
             try {
                 const olFeatures = geoJsonParser.readFeatures(geojsonFeature);
@@ -126,6 +126,9 @@ export default {
         :icon="'bi bi-arrow-bar-up'"
         :title="$t('additional:modules.cosi.districtSelector.importHeader')"
     >
+        <p>
+            <small>{{ $t('additional:modules.cosi.districtSelector.importHelp') }}</small>
+        </p>
         <FileUpload
             :id="'District-Selector-Upload'"
             :keydown="(e) => triggerClickOnFileInput(e)"

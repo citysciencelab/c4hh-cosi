@@ -307,9 +307,9 @@ export default {
         */
         createChartData (responseData) {
             const labels = [],
-                presentation_data = [],
-                aggregatedData = {},
-                datasets = [];
+                  presentation_data = [],
+                  aggregatedData = {},
+                  datasets = [];
             let labelKey;
 
             switch (this.selectedChartData) {
@@ -343,9 +343,9 @@ export default {
             });
 
             const sortedData = Object.entries(aggregatedData)
-                    .sort((a, b) => b[1] - a[1])
-                    .slice(0, 10),
-                [largestLabel, largestValue] = sortedData.shift();
+                      .sort((a, b) => b[1] - a[1])
+                      .slice(0, 10),
+                  [largestLabel, largestValue] = sortedData.shift();
 
             labels.push(largestLabel);
 

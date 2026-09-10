@@ -1,23 +1,30 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
 import StoryCreatorChapter from "../../../components/StoryCreatorChapter.vue";
 import store from "@appstore/index.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
-    let localStore, map, wrapper;
+    let localStore, map, originalCesium, wrapper, storyManagerActions;
 
     beforeAll(() => {
         i18next.init({
             lng: "cimode",
             debug: false
         });
+        originalCesium = global.Cesium;
     });
 
     beforeEach(() => {
+        storyManagerActions = {
+            removeLayerFromLayerConfig: sinon.spy()
+        };
+        global.Cesium = {};
+        global.Cesium.Cartographic = {
+            fromCartesian: sinon.spy()
+        };
         localStore = createStore({
             namespaced: true,
             modules: {
@@ -26,11 +33,15 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     modules: {
                         StoryManager: {
                             namespaced: true,
+                            actions: storyManagerActions,
                             getters: {
                                 currentChapter: (state) => state.currentChapter,
+                                enableVideo: (state) => state.enableVideo,
+                                imageAssetsById: (state) => state.imageAssetsById,
+                                originalLayerConfig: (state) => state.originalLayerConfig,
                                 story: (state) => state.story,
                                 subjectLayerCategory: (state) => state.subjectLayerCategory,
-                                imageAssetsById: (state) => state.imageAssetsById
+                                toolStoryWhitelist: (state) => state.toolStoryWhitelist
                             },
                             mutations: {
                                 removeImageAsset (state, id) {
@@ -41,6 +52,9 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                 },
                                 setCurrentView (state, value) {
                                     state.currentView = value;
+                                },
+                                setOriginalLayerConfig (state, value) {
+                                    state.originalLayerConfig = value;
                                 }
                             },
                             state: {
@@ -55,19 +69,47 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                                     }
                                 },
                                 currentView: "chapter",
+                                enableVideo: true,
                                 imageAssetsById: {},
+                                originalLayerConfig: undefined,
                                 story: {
                                     chapters: []
                                 },
-                                subjectLayerCategory: {}
+                                subjectLayerCategory: {},
+                                toolStoryWhitelist: []
+                            }
+                        },
+                        LayerTree: {
+                            namespaced: true,
+                            actions: {
+                                removeLayer: () => sinon.stub()
                             }
                         }
+                    }
+                },
+                Maps: {
+                    namespaced: true,
+                    getters: {
+                        mode: () => sinon.stub()
+                    },
+                    actions: {
+                        changeMapMode: sinon.spy()
                     }
                 }
             },
             getters: {
+                addLayerButton: () => sinon.stub(),
+                allBaselayerConfigs: () => [],
+                allLayerConfigs: () => [],
                 configuredModules: () => sinon.stub(),
-                layerConfig: () => ({})
+                controlsConfig: () => sinon.stub(),
+                layerConfig: () => sinon.stub(),
+                layerConfigById: () => sinon.stub(),
+                visibleBaselayerConfigs: () => []
+            },
+            actions: {
+                addOrReplaceLayer: () => sinon.stub(),
+                updateLayerConfigs: () => sinon.stub()
             }
         });
         wrapper = shallowMount(StoryCreatorChapter, {
@@ -99,14 +141,26 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             mode: "2D",
             on: sinon.stub(),
             un: sinon.stub(),
+            getLayers: () => {
+                return {
+                    getArray: () => {
+                        return [];
+                    }
+                };
+            },
             getView: () => {
                 return {
-                    getZoom: () => sinon.stub(),
+                    animate: sinon.spy(),
+                    getZoom: () => 1,
                     getCenter: () => []
                 };
             }
         };
         mapCollection.addMap(map, "2D");
+    });
+
+    afterEach(() => {
+        global.Cesium = originalCesium;
     });
 
     describe("Component DOM", () => {
@@ -126,7 +180,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
         it("should find vue multiselect component", () => {
             expect(wrapper.findComponent({name: "Multiselect"}).exists()).to.be.true;
-            expect(wrapper.findAllComponents({name: "Multiselect"})).to.be.lengthOf(2);
+            expect(wrapper.findAllComponents({name: "Multiselect"})).to.be.lengthOf(3);
         });
 
         it("should configure Draggable to use drag handle only", async () => {
@@ -143,7 +197,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             const draggableWrapper = wrapper.findComponent({name: "Draggable"});
 
             expect(draggableWrapper.exists()).to.be.true;
-            expect(draggableWrapper.props("itemKey")).to.equal("id");
+            expect(draggableWrapper.attributes("item-key")).to.equal("id");
             expect(draggableWrapper.props("modelValue")).to.deep.equal(content);
         });
 
@@ -173,6 +227,15 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             const btn = wrapper.findComponent({name: "FlatButton"});
 
             expect(btn.attributes("disabled")).to.not.be.undefined;
+        });
+
+        it("should not find Toast component", () => {
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.false;
+        });
+
+        it("should find Toast component", async () => {
+            await wrapper.setData({"showToast": true});
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.true;
         });
     });
 
@@ -258,6 +321,31 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         },
                         {type: "layer", level: 1, $isDisabled: false}
                     ]
+                );
+            });
+        });
+
+        describe("get3DParameter", () => {
+            it("should return undefined", () => {
+                expect(wrapper.vm.get3DParameter()).to.be.undefined;
+            });
+
+            it("should return an object", async () => {
+                await wrapper.setData({
+                    is3DLayerExisted: true
+                });
+
+                expect(wrapper.vm.get3DParameter()).to.deep.equal(
+                    {
+                        cameraPosition: [
+                            undefined,
+                            undefined,
+                            undefined
+                        ],
+                        heading: undefined,
+                        pitch: undefined,
+                        roll: undefined
+                    }
                 );
             });
         });
@@ -384,9 +472,10 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     title: "Neues Testkapitel",
                     confirmedCoordinate: [123, 456],
                     confirmedZoomlevel: 2,
-                    selectedLayer: [{layerId: 1}, {layerId: 2}],
+                    selectedLayers: [{layerId: 1}, {layerId: 2}],
                     selectedTool: {toolId: "testTool"},
-                    content: []
+                    content: [],
+                    is3DLayerExisted: false
                 });
 
                 wrapper.vm.saveChapter();
@@ -396,7 +485,9 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 expect(emitted).to.have.lengthOf(1);
                 expect(emitted[0][0]).to.deep.equal({
                     content: [],
+                    is3D: false,
                     title: "Neues Testkapitel",
+                    navigation3D: undefined,
                     map: {
                         center: [123, 456],
                         zoomLevel: 2,
@@ -413,7 +504,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     title: "Geändertes Kapitel 2",
                     confirmedCoordinate: [999, 888],
                     confirmedZoomlevel: 10,
-                    selectedLayer: [],
+                    selectedLayers: [],
                     selectedTool: "",
                     content: [{type: "text", text: "Neuer Inhalt"}]
                 });
@@ -425,6 +516,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 expect(emitted).to.have.lengthOf(1);
                 expect(emitted[0][0]).to.deep.equal({
                     title: "Geändertes Kapitel 2",
+                    is3D: false,
+                    navigation3D: undefined,
                     map: {
                         center: [999, 888],
                         zoomLevel: 10,
@@ -441,7 +534,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     content: [],
                     confirmedCoordinate: [123, 456],
                     confirmedZoomlevel: 2,
-                    selectedLayer: [],
+                    selectedLayers: [],
                     selectedTool: ""
                 });
 
@@ -451,6 +544,100 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
                 expect(emitted).to.have.lengthOf(1);
                 expect(emitted[0][0].title).to.equal("additional:modules.storyCreator.chapter.title");
+            });
+        });
+
+        describe("handleFeature", () => {
+            it("should add a feature when editor index points to add position", async () => {
+                const feature = {
+                    title: "title",
+                    description: "description",
+                    layerId: "1",
+                    featureId: "1",
+                    coordinate: [0, 0],
+                    zoomlevel: 1,
+                    attributes: {}
+                };
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "feature",
+                        index: 0
+                    },
+                    content: []
+                });
+
+                await wrapper.vm.handleFeature(feature);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "feature",
+                        attrs: {
+                            title: "title",
+                            description: "description",
+                            layerId: "1",
+                            featureId: "1",
+                            coordinate: [0, 0],
+                            zoomlevel: 1,
+                            attributes: {}
+                        }
+                    }
+                ]);
+            });
+
+            it("should edit an existing feature when editor index points to an existing item", async () => {
+                const feature = {
+                    title: "",
+                    content: [],
+                    confirmedCoordinate: [123, 456],
+                    confirmedZoomlevel: 2,
+                    selectedLayers: [],
+                    selectedTool: ""
+                };
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "feature",
+                        index: 0
+                    },
+                    content: [
+                        {
+                            type: "feature",
+                            attrs: {
+                                title: "",
+                                content: [],
+                                confirmedCoordinate: [123, 456],
+                                confirmedZoomlevel: 2,
+                                selectedLayers: [],
+                                selectedTool: ""
+                            }
+                        }
+                    ]
+                });
+
+                await wrapper.vm.handleFeature(feature);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "feature",
+                        attrs: {
+                            title: "",
+                            content: [],
+                            confirmedCoordinate: [123, 456],
+                            confirmedZoomlevel: 2,
+                            selectedLayers: [],
+                            selectedTool: ""
+                        }
+                    }
+                ]);
             });
         });
 
@@ -558,6 +745,41 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         content: [{type: "paragraph", content: [{type: "text", text: "Keep me"}]}]
                     }
                 ]);
+            });
+        });
+
+        describe("resetLayerConfig ", () => {
+            it("should set the selectedLayers to be empty array", async () => {
+                await wrapper.setData({
+                    selectedLayers: [{layerId: 1}]
+                });
+
+                await wrapper.vm.resetLayerConfig([{layerId: 1}]);
+                expect(wrapper.vm.selectedLayers.length).to.be.equal(0);
+            });
+        });
+
+        describe("openContentEditorForAdd", () => {
+            it("should add a divider without opening the content editor", async () => {
+                await wrapper.setData({
+                    content: [],
+                    openContentEditor: {
+                        type: "",
+                        index: null
+                    }
+                });
+
+                wrapper.vm.openContentEditorForAdd("divider");
+
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "divider"
+                    }
+                ]);
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
             });
         });
     });

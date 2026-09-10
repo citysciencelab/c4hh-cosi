@@ -93,7 +93,6 @@ export default {
 </template>
 
 <style scoped lang="scss">
-@import 'variables';
 
 .loading-container {
     display: flex;

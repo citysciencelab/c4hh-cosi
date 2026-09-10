@@ -13,9 +13,14 @@ const {
 } = actions;
 
 describe("addons/oktagon/store/actionsOktagon", () => {
+    const originalWindow = global.window;
 
     beforeEach(() => {
         sinon.stub(i18next, "t").callsFake(key => key);
+    });
+
+    afterEach(() => {
+        global.window = originalWindow;
     });
 
 
@@ -111,7 +116,7 @@ describe("addons/oktagon/store/actionsOktagon", () => {
     describe("initURLParameter reads the parameters and zooms the map accordingly", () => {
         it("called with wrong parameter bezirk=Harburg1", async () => {
             global.window = Object.create(window);
-            Object.defineProperty(window, "location", {
+            Object.defineProperty(global.window, "location", {
                 value: {search: "?bezirk=Harburg1&rueckurl=https://example.com"}
             });
 
@@ -130,7 +135,7 @@ describe("addons/oktagon/store/actionsOktagon", () => {
 
         it("called with parameter bezirk=Harburg", async () => {
             global.window = Object.create(window);
-            Object.defineProperty(window, "location", {
+            Object.defineProperty(global.window, "location", {
                 value: {search: "?bezirk=Harburg&rueckurl=https://example.com"}
             });
 

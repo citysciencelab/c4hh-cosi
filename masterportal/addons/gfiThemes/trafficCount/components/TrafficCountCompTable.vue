@@ -78,7 +78,7 @@ export default {
     },
     computed: {
         tableIndication: function () {
-            return this.$t("additional:modules.tools.gfi.themes.trafficCount.tableIndication");
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.holidaySign");
         }
     },
     watch: {
@@ -198,73 +198,141 @@ export default {
 </script>
 
 <template>
-    <div class="table-container">
-        <table class="table table-striped table-bordered text-nowrap">
-            <thead>
-                <tr>
-                    <th>
-                        {{ tableTitle }}
-                    </th>
-                    <th
-                        v-for="(value, datetime) in getFirstDataset(apiData)"
+    <div class="table-wrapper">
+        <div
+            v-if="currentTabId !== 'info'"
+            class="holiday-indication"
+        >
+            * {{ tableIndication }}
+        </div>
+        <div class="table-container">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            {{ tableTitle }}
+                        </th>
+                        <th
+                            v-for="(dataObjFlat, idx) in tableData"
+                            :key="idx"
+                        >
+                            {{ setRowTitle(dataObjFlat?.key, getFirstKeyOfObject(dataObjFlat?.dataset)) }}
+                            {{ setStarAtDay(Object.keys(dataObjFlat?.dataset ? dataObjFlat?.dataset : {})) }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody v-if="tableData.length">
+                    <tr
+                        v-for="(value, datetime, rowIdx) in getFirstDataset(apiData)"
                         :key="datetime"
                     >
-                        {{ setColTitle(datetime) }}
-                    </th>
-                </tr>
-            </thead>
-            <tbody v-if="tableData.length">
-                <tr
-                    v-for="(dataObjFlat, idx) in tableData"
-                    :key="idx"
-                >
-                    <td>
-                        {{ setRowTitle(dataObjFlat?.key, getFirstKeyOfObject(dataObjFlat?.dataset)) }} {{ setStarAtDay(Object.keys(dataObjFlat?.dataset ? dataObjFlat?.dataset : {})) }}
-                    </td>
-                    <td
-                        v-for="(value, datetime) of dataObjFlat.dataset"
-                        :key="datetime"
-                    >
-                        {{ setFieldValue(value) }} {{ setStar(datetime) }}
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+                        <td>
+                            {{ setColTitle(datetime) }}
+                        </td>
+                        <td
+                            v-for="(dataObjFlat, idx) in tableData"
+                            :key="idx"
+                        >
+                            {{ setFieldValue(dataObjFlat?.dataset ? Object.values(dataObjFlat.dataset)[rowIdx] : '') }}
+                            {{ setStar(datetime) }}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-.table-container {
+
+.table-wrapper {
     margin-top: 5px;
     margin-bottom: 10px;
+
+    .holiday-indication {
+        font-size: 10px;
+    }
+}
+
+.table-container {
     overflow: auto;
+    max-height: 500px;
+    position: relative;
     text-align: center;
+
+    &::-webkit-scrollbar {
+        height: 10px;
+        width: 10px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background: rgba(0, 0, 0, 0.2);
+        border-radius: 10px;
+    }
 
     table {
         margin-bottom: 0;
+        border-collapse: separate;
+        border-spacing: 0;
 
-        th,td {
-            padding: 0.3125rem;
-        }
-
+        th,
         td {
-            min-width: 50px;
+            padding: 0.6rem 0.3125rem;
+            border: none;
+            vertical-align: middle;
+        }
 
-            &:first-of-type {
-                text-align: left;
-            }
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: $white;
+            z-index: 15;
+            border-bottom: 2px solid $light_grey;
+            white-space: normal;
+            word-break: break-word;
+            line-height: 1.3;
+            min-width: 120px;
+            font-weight: 600;
+        }
 
-            &:first-child {
-                font-weight: bold;
+        th:first-child,
+        td:first-child {
+            position: sticky;
+            left: 0;
+            z-index: 10;
+            font-family: $font_family_accent;
+            font-size: $font-size-base;
+            text-align: center;
+
+            &::after {
+                content: "";
+                position: absolute;
+                top: 0;
+                right: -10px;
+                bottom: 0;
+                width: 10px;
+                background: linear-gradient(to right, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0));
+                pointer-events: none;
             }
         }
 
-        th {
-            vertical-align: middle;
-            font-size: 13px;
+        th:first-child {
+            z-index: 30;
+            background-color: $white;
+        }
 
-            &:first-of-type {
-                font-size: 16px;
+        tbody tr {
+            &:nth-child(odd) td {
+                background-color: $light_blue;
+            }
+
+            &:nth-child(even) td {
+                background-color: $white;
+            }
+
+            &:hover td {
+                background-color: $table-hover-bg;
+                transition: background-color 0.12s ease;
             }
         }
     }

@@ -64,7 +64,7 @@ export default {
          */
         cardOneNumericalValueList () {
             const layerr = this.layerList.find(layer => this.cardOneSelectedItemList.includes(layer.getLayer().get("name"))),
-                values = layerr?.attributes?.numericalValues?.map(value => value.name) || [];
+                  values = layerr?.attributes?.numericalValues?.map(value => value.name) || [];
 
             return [...values, "Anzahl"];
         },
@@ -82,7 +82,7 @@ export default {
          */
         cardTwoNumericalValueList () {
             const layerr = this.layerList.find(layer => this.cardTwoSelectedItemList.includes(layer.getLayer().get("name"))),
-                values = layerr?.attributes?.numericalValues?.map(value => value.name) || [];
+                  values = layerr?.attributes?.numericalValues?.map(value => value.name) || [];
 
             return [...values, "Anzahl"];
         },
@@ -124,10 +124,10 @@ export default {
         */
         changeCards () {
             const tempType = this.cardOneType,
-                tempFactor = this.cardOneFactor,
-                tempDivisor = this.cardOneDivisor,
-                tempItemListSelected = this.cardOneSelectedItemList,
-                tempNumericalValuesSelected = this.cardOneSelectedNumericalValueList;
+                  tempFactor = this.cardOneFactor,
+                  tempDivisor = this.cardOneDivisor,
+                  tempItemListSelected = this.cardOneSelectedItemList,
+                  tempNumericalValuesSelected = this.cardOneSelectedNumericalValueList;
 
             this.cardOneType = this.cardTwoType;
             this.cardTwoType = tempType;

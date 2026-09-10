@@ -245,9 +245,6 @@
   "tacticalMark": {
     "type": "tool"
   },
-  "fileImportAddon": {
-    "type": "tool"
-  },
   "dataNarrator": {
     "path": "dataNarrator",
     "type": "tool"
@@ -266,5 +263,8 @@
   "mpaddonGfi": {
     "type": "gfiTheme",
     "path": "mpaddon/gfiTheme"
+  },
+  "userTracking": {
+    "type": "javascript"
   }
 }

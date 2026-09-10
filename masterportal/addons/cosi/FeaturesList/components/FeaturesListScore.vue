@@ -5,7 +5,7 @@ import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
 import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 import Weights from "./FeaturesListScoreWeights.vue";
 import {mapGetters, mapActions} from "vuex";
-import deepEqual from "deep-equal";
+import deepEqual from "fast-deep-equal";
 import {VBtn} from "vuetify/components/VBtn";
 import {VCard, VCardTitle, VCardText, VCardActions} from "vuetify/components/VCard";
 // import {VIcon} from "vuetify/components/VIcon";
@@ -55,7 +55,7 @@ export default {
          */
         layerList () {
             const list = [],
-                subjectLayerConfigs = this.allLayerConfigsStructured(treeSubjectsKey);
+                  subjectLayerConfigs = this.allLayerConfigsStructured(treeSubjectsKey);
 
             subjectLayerConfigs.forEach(config => {
                 if (config.type !== "folder") {
@@ -190,10 +190,10 @@ export default {
         </v-card-title>
         <v-card-text>
             <ToolInfo
-                :summary="'Die Entfernung (Fußweg) zur nächstgelegenen ausgewählten Einrichtung wird berechnet. Werden mehrere Einrichtungen ausgewählt, wird die Entfernung gemittelt.'"
+                :summary="'Mit diesem Werkzeug können Sie die Entfernung (Fußweg) zur nächstgelegenen ausgewählten Einrichtung berechnen. Bei der Auswahl mehrerer Einrichtungen wird die durchschnittliche Entfernung berechnet.'"
             />
             <v-row
-                dense
+                density="comfortable"
             >
                 <DropdownAutocomplete
                     id="selectedDistanceScoreLayers"
@@ -203,7 +203,7 @@ export default {
                     :label="$t('additional:modules.tools.cosi.featuresList.distanceScoreLayerLabel')"
                     outlined
                     :disabled="scoringIsOngoing"
-                    dense
+                    density="compact"
                     item-title="name"
                     return-object
                     hide-details

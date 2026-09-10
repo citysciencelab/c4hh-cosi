@@ -81,7 +81,7 @@ export default {
 
         zoomToFeature () {
             const extent = this.item.feature.getGeometry().getExtent(),
-                buffered = buffer(extent, 500);
+                  buffered = buffer(extent, 500);
 
             this.zoomToExtent({extent: buffered, options: {padding: this.zoomToExtentPadding}});
 
@@ -96,8 +96,8 @@ export default {
         getTitle (item) {
             let title = "";
             const originalGeometryType = item.feature.get("originalGeometryType"),
-                wrongGeometryType = ![undefined, "Point"].includes(originalGeometryType),
-                noGeometryGiven = !(item.feature.get("dipasLocated") || item.feature.get("dipasLocated") === undefined);
+                  wrongGeometryType = ![undefined, "Point"].includes(originalGeometryType),
+                  noGeometryGiven = !(item.feature.get("dipasLocated") || item.feature.get("dipasLocated") === undefined);
 
             if (item.isSimulation || wrongGeometryType || noGeometryGiven) {
                 title += this.$t("additional:modules.tools.cosi.featuresList.warning");

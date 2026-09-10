@@ -252,15 +252,15 @@ export default {
          */
         getExportedData (templateName, templateDes, geoData, statData, toolData, referenceValueList) {
             const createdDate = dayjs(new Date()).format("DD.MM.YYYY, HH:mm:ss"),
-                formatedDate = dayjs(new Date()).format("YYYY-MM-DD, HH:mm:ss").replace(", ", "T") + ".174Z",
-                layerIds = geoData.map(data => data.layerId),
-                toolId = toolData?.toolId,
-                statsFeatureLable = statData.reduce((result, data) => {
-                    if (data.label !== "") {
-                        result.push(data.label);
-                    }
-                    return result;
-                }, []);
+                  formatedDate = dayjs(new Date()).format("YYYY-MM-DD, HH:mm:ss").replace(", ", "T") + ".174Z",
+                  layerIds = geoData.map(data => data.layerId),
+                  toolId = toolData?.toolId,
+                  statsFeatureLable = statData.reduce((result, data) => {
+                      if (data.label !== "") {
+                          result.push(data.label);
+                      }
+                      return result;
+                  }, []);
 
             return {
                 "meta": {
@@ -293,8 +293,8 @@ export default {
          */
         exportFile (name, data) {
             const filename = name + ".json",
-                jsonStr = JSON.stringify(data),
-                element = document.createElement("a");
+                  jsonStr = JSON.stringify(data),
+                  element = document.createElement("a");
 
             element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(jsonStr));
             element.setAttribute("download", filename);
@@ -386,8 +386,8 @@ export default {
             }
 
             const fileName = file?.name ? file.name : "",
-                fileType = fileName !== "" ? fileName.substring(fileName.length - 4, fileName.length) : "undefined",
-                reader = new FileReader();
+                  fileType = fileName !== "" ? fileName.substring(fileName.length - 4, fileName.length) : "undefined",
+                  reader = new FileReader();
 
             if (fileName === "") {
                 console.warn("The file is corrupt.");
@@ -815,7 +815,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "/src/assets/css/variables";
 
 .add-statistic button {
     color: $secondary;
@@ -887,7 +886,4 @@ export default {
 </style>
 
 <style lang="scss">
-@import "/src/assets/css/mixins.scss";
-@import "/src/assets/css/variables";
-
 </style>

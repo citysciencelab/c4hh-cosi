@@ -13,6 +13,7 @@ export default {
             default: () => []
         }
     },
+    emits: ["action-triggered"],
     data () {
         return {
             /**
@@ -20,6 +21,7 @@ export default {
              */
             defaultItems: [
                 {category: "elements", name: "text", icon: "bi-type", action: "text"},
+                {category: "elements", name: "feature", icon: "bi-geo-alt-fill", action: "feature"},
                 {category: "elements", name: "separator", icon: "bi-dash-lg", action: "divider"},
                 {category: "media", name: "image", icon: "bi-image", action: "image"},
                 {category: "media", name: "video", icon: "bi-play-btn", action: "video"}
@@ -33,9 +35,9 @@ export default {
          */
         filteredAndGroupedItems () {
             const groups = {},
-                visibleItems = this.allowedActions && this.allowedActions.length > 0
-                    ? this.defaultItems.filter(item => this.allowedActions.includes(item.action))
-                    : this.defaultItems;
+                  visibleItems = this.allowedActions && this.allowedActions.length > 0
+                      ? this.defaultItems.filter(item => this.allowedActions.includes(item.action))
+                      : this.defaultItems;
 
             visibleItems.forEach(item => {
                 if (!groups[item.category]) {
@@ -161,22 +163,22 @@ export default {
         display: flex;
         align-items: center;
         padding: 0.5rem 1rem;
-        color: $dark_grey;
+        color: $dark_blue;
         transition: background-color 0.2s ease;
 
         i {
-            color: $placeholder-color;
+            color: $dark_blue;
             font-size: 1.1rem;
             width: 24px;
             text-align: center;
         }
 
         &:hover, &:focus, &.active {
-            background-color: $light_blue;
-            color: $black;
+            background-color: $secondary;
+            color: $white;
 
             i {
-                color: $black;
+                color: $white;
             }
         }
     }

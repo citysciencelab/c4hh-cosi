@@ -163,7 +163,7 @@ export default {
                 return false;
             }
             const dateStr = momentDate.format("YYYY-MM-DD"),
-                idx = this.selectedDates.indexOf(dateStr);
+                  idx = this.selectedDates.indexOf(dateStr);
 
             if (idx === -1) {
                 this.selectedDates.push(dateStr);

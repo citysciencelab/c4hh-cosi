@@ -38,6 +38,18 @@ const getters = {
         }
 
         return "";
+    },
+    /**
+     * Returns the URL params for the storyPlayer so that the currently loaded story
+     * can be restored when the shared link is opened in a browser.
+     * @param {Object} storyPlayerState - The local state of the storyPlayer module
+     * @returns {Object|undefined} URL params object with currentStoryName, or undefined if no story is loaded.
+     */
+    urlParams (storyPlayerState) {
+        if (storyPlayerState.currentStoryName) {
+            return {currentStoryName: storyPlayerState.currentStoryName};
+        }
+        return undefined;
     }
 };
 

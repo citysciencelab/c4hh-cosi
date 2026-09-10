@@ -221,9 +221,9 @@ export default {
 
                 reader.onload = f => {
                     const layerName = this.getLayerName(file.name),
-                        checkSameLayer = this.importedFileNames.filter(importedFileName => {
-                            return this.getLayerName(file.name) === this.getLayerName(importedFileName);
-                        });
+                          checkSameLayer = this.importedFileNames.filter(importedFileName => {
+                              return this.getLayerName(file.name) === this.getLayerName(importedFileName);
+                          });
 
                     this.$store.dispatch("Modules/CosiFileImport/importKML", {
                         raw: f.target.result,
@@ -429,7 +429,7 @@ export default {
                 </p>
                 <v-select
                     v-model="currentCrs"
-                    dense
+                    density="compact"
                     :items="availableCrs"
                     item-title="name"
                     item-value="crs"
@@ -571,10 +571,9 @@ export default {
                                                     <span>{{ data.item.key }}</span>
                                                 </template>
                                                 <template
-                                                    slot="item"
-                                                    slot-scope="data"
+                                                    #item="{ item }"
                                                 >
-                                                    <span><strong>{{ data.item.key }}</strong>: {{ data.item.value }}</span>
+                                                    <span><strong>{{ item.key }}</strong>: {{ item.value }}</span>
                                                 </template>
                                             </v-select>
                                         </div>
@@ -895,7 +894,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    @import "../../../../src/assets/css/variables.scss";
 
     .h-seperator {
         margin:12px 0 12px 0;

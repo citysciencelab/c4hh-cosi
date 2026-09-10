@@ -5,9 +5,10 @@ import StoryManager from "../../../components/StoryManager.vue";
 import sinon from "sinon";
 
 describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () => {
-    let store, wrapper;
+    let store, wrapper, changeCurrentComponentSpy;
 
     beforeEach(() => {
+        changeCurrentComponentSpy = sinon.spy();
         store = createStore({
             modules: {
                 Modules: {
@@ -20,8 +21,11 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                                 fixedStoryPath: (state) => state.fixedStoryPath,
                                 fixedStoryFiles: (state) => state.fixedStoryFiles,
                                 fixedStoryLoaded: (state) => state.fixedStoryLoaded,
+                                menuSide: () => "secondaryMenu",
                                 storyList: (state) => state.storyList,
-                                subjectLayerCategory: (state) => state.subjectLayerCategory
+                                subjectLayerCategory: (state) => state.subjectLayerCategory,
+                                enableCreator: (state) => state.enableCreator,
+                                enableImport: (state) => state.enableImport
                             },
                             mutations: {
                                 setCurrentStoryIndex (state, value) {
@@ -42,6 +46,8 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                             },
                             state: {
                                 currentStoryIndex: undefined,
+                                enableCreator: true,
+                                enableImport: true,
                                 storyList: [
                                     {
                                         story: {
@@ -77,8 +83,32 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                                 fixedStoryFiles: [],
                                 fixedStoryLoaded: false
                             }
+                        },
+                        StoryPlayer: {
+                            namespaced: true,
+                            state: () => ({
+                                currentStoryName: null,
+                                imageAssetsById: {},
+                                storyConf: {}
+                            }),
+                            mutations: {
+                                setCurrentStoryName (state, value) {
+                                    state.currentStoryName = value;
+                                },
+                                setImageAssetsById (state, value) {
+                                    state.imageAssetsById = value;
+                                },
+                                setStoryConf (state, value) {
+                                    state.storyConf = value;
+                                }
+                            }
                         }
-
+                    }
+                },
+                Menu: {
+                    namespaced: true,
+                    actions: {
+                        changeCurrentComponent: changeCurrentComponentSpy
                     }
                 }
             }
@@ -89,10 +119,6 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                 plugins: [store]
             }
         });
-    });
-
-    afterEach(() => {
-        sinon.restore();
     });
 
     describe("Component DOM", () => {
@@ -116,6 +142,26 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
         it("should not find InfoText component", () => {
             expect(wrapper.findComponent({name: "InfoText"}).exists()).to.be.false;
         });
+
+        it("should not find AlertMessage component", () => {
+            expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.false;
+        });
+
+        it("should find AlertMessage component", async () => {
+            await wrapper.setData({showImportError: true, showImportWarning3D: true});
+
+            expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
+            expect(wrapper.findAllComponents({name: "AlertMessage"}).length).to.equal(2);
+        });
+
+        it("should not find Toast component", () => {
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.false;
+        });
+
+        it("should find Toast component", async () => {
+            await wrapper.setData({"savedStoryIndex": 1});
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.true;
+        });
     });
 
     describe("Methods", () => {
@@ -130,6 +176,8 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
 
         describe("editStory", () => {
             it("should set currentStoryIndex and switch to creator view", () => {
+                store.state.Modules.StoryManager.enableCreator = true;
+
                 wrapper.vm.editStory(0);
 
                 expect(wrapper.vm.currentView).to.equal("creator");
@@ -155,7 +203,7 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                 wrapper.vm.onSaveStory(storySnapshot, imageAssetsSnapshot);
 
                 expect(store.state.Modules.StoryManager.storyList.length).to.equal(3);
-                expect(store.state.Modules.StoryManager.storyList[2]).to.deep.equal({
+                expect(store.state.Modules.StoryManager.storyList[0]).to.deep.equal({
                     story: storySnapshot,
                     imageAssetsById: imageAssetsSnapshot
                 });
@@ -305,11 +353,108 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
         });
 
         describe("playStory", () => {
-            it("should set playingStoryIndex to the given index", async () => {
+            it("should call changeCurrentComponent with storyPlayer config", async () => {
                 await wrapper.vm.playStory(1);
 
-                expect(wrapper.vm.playingStoryIndex).to.equal(1);
+                expect(changeCurrentComponentSpy.calledOnce).to.be.true;
+                expect(changeCurrentComponentSpy.firstCall.args[1]).to.deep.equal({
+                    type: "storyPlayer",
+                    side: "secondaryMenu",
+                    props: {name: "additional:modules.storyPlayer.name"}
+                });
             });
+        });
+
+        describe("deactivated", () => {
+            it("negative: currentView stays 'manager' when already in manager view on deactivation", () => {
+                wrapper.vm.currentView = "manager";
+                wrapper.vm.$options.deactivated.call(wrapper.vm);
+                expect(wrapper.vm.currentView).to.equal("manager");
+            });
+        });
+
+        describe("confirmLeaveTool", () => {
+            it("positive: closes the modal, resets currentView to 'manager', clears pendingNavigation, and dispatches the intercepted navigation", () => {
+                const pendingNav = {type: "layerSelection", side: "secondaryMenu", props: {name: "Layer Selection"}};
+
+                wrapper.vm.currentView = "creator";
+                wrapper.vm.showLeaveToolModal = true;
+                wrapper.vm.pendingNavigation = pendingNav;
+
+                wrapper.vm.confirmLeaveTool();
+
+                expect(wrapper.vm.showLeaveToolModal).to.be.false;
+                expect(wrapper.vm.currentView).to.equal("manager");
+                expect(wrapper.vm.pendingNavigation).to.be.null;
+                expect(changeCurrentComponentSpy.calledOnce).to.be.true;
+                expect(changeCurrentComponentSpy.firstCall.args[1]).to.deep.equal(pendingNav);
+            });
+
+            it("negative: does not dispatch navigation when pendingNavigation is null", () => {
+                wrapper.vm.pendingNavigation = null;
+                wrapper.vm.confirmLeaveTool();
+                expect(changeCurrentComponentSpy.called).to.be.false;
+            });
+        });
+
+        describe("cancelLeaveTool", () => {
+            it("positive: closes the leave-tool modal and clears pendingNavigation without dispatching any navigation", () => {
+                wrapper.vm.showLeaveToolModal = true;
+                wrapper.vm.pendingNavigation = {type: "layerSelection", side: "secondaryMenu", props: {}};
+
+                wrapper.vm.cancelLeaveTool();
+
+                expect(wrapper.vm.showLeaveToolModal).to.be.false;
+                expect(wrapper.vm.pendingNavigation).to.be.null;
+                expect(changeCurrentComponentSpy.called).to.be.false;
+            });
+        });
+    });
+
+    describe("Save hint behavior", () => {
+        it("positive: onSaveStory sets savedStoryIndex when existing story data changed", () => {
+            const changedStory = {
+                title: "Changed Title",
+                description: "",
+                author: "",
+                imageSrc: "",
+                imageAlt: "",
+                imageCopyright: "",
+                chapters: []
+            };
+
+            store.state.Modules.StoryManager.currentStoryIndex = 1;
+            wrapper.vm.onSaveStory(changedStory, {});
+
+            expect(wrapper.vm.savedStoryIndex).to.equal(1);
+            expect(wrapper.vm.currentView).to.equal("manager");
+        });
+
+        it("negative: onSaveStory does not set savedStoryIndex when story data is unchanged", () => {
+            const originalStory = store.state.Modules.StoryManager.storyList[1].story,
+                unchangedSnapshot = Object.assign({}, originalStory, {created: "24.07.2026"});
+
+            store.state.Modules.StoryManager.currentStoryIndex = 1;
+            wrapper.vm.onSaveStory(unchangedSnapshot, {});
+
+            expect(wrapper.vm.savedStoryIndex).to.be.null;
+        });
+
+        it("positive: onSaveStory always sets savedStoryIndex for a new story", () => {
+            const newStory = {
+                title: "Brand New Story",
+                description: "",
+                author: "",
+                imageSrc: "",
+                imageAlt: "",
+                imageCopyright: "",
+                chapters: []
+            };
+
+            store.state.Modules.StoryManager.currentStoryIndex = undefined;
+            wrapper.vm.onSaveStory(newStory, {});
+
+            expect(wrapper.vm.savedStoryIndex).to.equal(0);
         });
     });
 
@@ -386,21 +531,21 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
                 expect(storyCreatorComponent.props("imageAssetsById")).to.be.an("object");
             }
         });
+    });
+    describe("Configuration Limits (enableCreator & enableImport)", () => {
+        it("should not render AddCardButton and block editStory if enableCreator is false", async () => {
+            store.state.Modules.StoryManager.enableCreator = false;
+            await wrapper.vm.$nextTick();
 
-        it("should set playingStoryIndex when play event is emitted from story card", async () => {
-            const storyCards = wrapper.findAllComponents({name: "InfoCard"});
-
-            await storyCards[0].vm.$emit("play");
-
-            expect(wrapper.vm.playingStoryIndex).to.equal(0);
+            expect(wrapper.findComponent({name: "AddCardButton"}).exists()).to.be.false;
         });
 
-        it("should set playingStoryIndex when story card is clicked", async () => {
-            const storyCards = wrapper.findAllComponents({name: "InfoCard"});
+        it("should not render import buttons and block onStoryImportFileChange if enableImport is false", async () => {
+            store.state.Modules.StoryManager.enableImport = false;
+            await wrapper.vm.$nextTick();
 
-            await storyCards[0].trigger("click");
-
-            expect(wrapper.vm.playingStoryIndex).to.equal(0);
+            expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.false;
+            expect(wrapper.find("input[type='file']").exists()).to.be.false;
         });
     });
 });

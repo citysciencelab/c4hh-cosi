@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import BimFactoryWorkflowStep from "../../../components/BimFactoryWorkflowStep.vue";
 import BimFactoryWorkflowInputErrors from "../../../components/BimFactoryWorkflowInputErrors.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("BimFactoryWorkflowStep.vue", () => {
     const mockStep2 = {
