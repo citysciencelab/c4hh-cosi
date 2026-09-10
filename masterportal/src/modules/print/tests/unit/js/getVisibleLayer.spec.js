@@ -8,6 +8,7 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
     let layers,
         layer1,
         layer2,
+        origGetters,
         origCommit,
         origDispatch;
 
@@ -28,6 +29,7 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
         mapCollection.addMap(map, "2D");
         origDispatch = store.dispatch;
         origCommit = store.commit;
+        origGetters = store.getters;
     });
 
     beforeEach(() => {
@@ -38,7 +40,10 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
             getMaxResolution: () => 1000,
             getMinResolution: () => 0,
             getZIndex: () => 1,
-            get: () => "maybeInvisible"
+            get: () => "maybeInvisible",
+            addEventListener: sinon.stub(),
+            setZIndex: () => sinon.stub(),
+            setOpacity: () => sinon.stub()
         };
         layer2 = {
             id: "2",
@@ -63,6 +68,7 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
     afterEach(() => {
         store.dispatch = origDispatch;
         store.commit = origCommit;
+        store.getters = origGetters;
     });
 
     describe("getVisibleLayer.js", function () {
@@ -143,6 +149,21 @@ describe("src/modules/print/utils/getVisibleLayer.js", function () {
             expect(store.commit.firstCall.args[1]).to.deep.equals([]);
             expect(store.commit.secondCall.args[0]).to.equals("Modules/Print/setInvisibleLayerNames");
             expect(store.commit.secondCall.args[1]).to.equals("");
+        });
+
+        it("sets zIndex for child layers of a group", function () {
+            const setZIndexSpy = sinon.spy(),
+                groupLayer = new LayerGroup({
+                    visible: true,
+                    zIndex: 5,
+                    layers: [layer1, layer2]
+                });
+
+            layer2.setZIndex = setZIndexSpy;
+            layers.push(groupLayer);
+            layerProvider.getVisibleLayer();
+
+            expect(setZIndexSpy.calledWith(5)).to.be.true;
         });
 
     });

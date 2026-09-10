@@ -272,8 +272,8 @@ export default {
          */
         handleDirectionsEvent (event, localCoords, geoSearchResult) {
             const action = event.target.id,
-                point = this.selectedFeature && this.waypointsDirections.find((element) => element.feature.ol_uid === this.selectedFeature.feature.ol_uid),
-                emptyWaypoint = this.waypointsDirections.slice(1, this.waypointsDirections.length - 1).find((waypoint) => waypoint.coordinates.length === 0);
+                  point = this.selectedFeature && this.waypointsDirections.find((element) => element.feature.ol_uid === this.selectedFeature.feature.ol_uid),
+                  emptyWaypoint = this.waypointsDirections.slice(1, this.waypointsDirections.length - 1).find((waypoint) => waypoint.coordinates.length === 0);
 
             switch (action) {
                 case "add-startpoint":
@@ -290,8 +290,8 @@ export default {
                     }
                     else {
                         this.addWaypointDirections({index: this.waypointsDirections.length - 1,
-                            coordinates: localCoords,
-                            displayName: geoSearchResult ? geoSearchResult.getDisplayName() : ""
+                                                    coordinates: localCoords,
+                                                    displayName: geoSearchResult ? geoSearchResult.getDisplayName() : ""
                         });
                     }
                     this.findDirections();
@@ -331,8 +331,8 @@ export default {
          */
         handleTSREvent (event, localCoords, geoSearchResult) {
             const action = event.target.id,
-                point = this.selectedFeature && this.waypointsTSR.find((element) => element.feature.ol_uid === this.selectedFeature.feature.ol_uid),
-                emptyWaypoint = this.waypointsTSR.slice(1, this.waypointsTSR.length - 1).find((waypoint) => waypoint.displayName === undefined);
+                  point = this.selectedFeature && this.waypointsTSR.find((element) => element.feature.ol_uid === this.selectedFeature.feature.ol_uid),
+                  emptyWaypoint = this.waypointsTSR.slice(1, this.waypointsTSR.length - 1).find((waypoint) => waypoint.displayName === undefined);
 
             switch (action) {
                 case "add-startpoint":
@@ -352,8 +352,8 @@ export default {
                     }
                     else {
                         this.addWaypointTSR({index: this.waypointsTSR.length - 1,
-                            coordinates: localCoords,
-                            displayName: geoSearchResult ? geoSearchResult.getDisplayName() : ""
+                                             coordinates: localCoords,
+                                             displayName: geoSearchResult ? geoSearchResult.getDisplayName() : ""
                         });
                     }
                     break;
@@ -374,9 +374,9 @@ export default {
 
             try {
                 const geoSearchResult = await this.fetchTextByCoordinates({
-                        coordinates: await this.transformCoordinatesLocalToWgs84Projection(toRaw(this.coordinates))
-                    }),
-                    localCoords = toRaw(this.coordinates);
+                          coordinates: await this.transformCoordinatesLocalToWgs84Projection(toRaw(this.coordinates))
+                      }),
+                      localCoords = toRaw(this.coordinates);
 
                 if (this.activeRoutingToolOption === "DIRECTIONS") {
                     this.handleDirectionsEvent(event, localCoords, geoSearchResult);
@@ -411,9 +411,9 @@ export default {
          */
         addAvoidPoint () {
             const avoidPoint = new Feature({
-                    geometry: new Circle(this.coordinates)
-                }),
-                modal = Modal.getInstance(this.$refs["ref-avoidPointModal"]);
+                      geometry: new Circle(this.coordinates)
+                  }),
+                  modal = Modal.getInstance(this.$refs["ref-avoidPointModal"]);
 
             avoidPoint.getGeometry().setRadius(this.avoidRadius > 0 ? this.avoidRadius * 1000 : 5);
 

@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import BorisComponent from "../../../components/BorisComponent.vue";
 import Boris from "../../../store/indexBoris.js";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("ADDONS: addons/boris/components/BorisComponent.vue", () => {
     const mockConfigJson = {
@@ -77,6 +76,13 @@ describe("ADDONS: addons/boris/components/BorisComponent.vue", () => {
                                 filename: () => sinon.stub(),
                                 printStarted: () => sinon.stub(),
                                 progressWidth: () => sinon.stub()}
+                        }
+                    },
+                    ResizeHandle: {
+                        namespaced: true,
+                        getters: {
+                            mainMenuWidth: () => 0,
+                            secondaryMenuWidth: () => 0
                         }
                     }
                 },

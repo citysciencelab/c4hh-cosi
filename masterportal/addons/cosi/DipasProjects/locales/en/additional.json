@@ -12,12 +12,14 @@
                     "categories": "Categories",
                     "created": "Created on: ",
                     "contributionType": "Contribution type",
+                    "contributionAnalysis": "Contribution analysis",
                     "numberOfComments": "Number of comments",
                     "positiveVotes": "Positive votes",
                     "negativeVotes": "Negative votes",
                     "viewOriginalPost": "Open the original post",
                     "backToProjects": "Back to projects",
                     "noContributions": "There are no contributions.",
+                    "noContributionsRatings": "There are no ratings for this project. The heat map cannot be displayed.",
                     "numberOfContribution": "There are {{ count }} contributions.",
                     "owner": "Owner",
                     "projectDescription": "Project description",
@@ -28,7 +30,9 @@
                     "descending": "Date: Descending",
                     "loading": "Loading projects...",
                     "showContributions": "Show contributions on the map",
-                    "showHeatmap": "Show heatmap on the map",
+                    "showHeatmap": "Display a heat map based on the number of ratings",
+                    "legend": "Legend",
+                    "transparency": "Transparency",
                     "styling": {
                         "label": "Styling of the contributions:",
                         "byProject": "by project",
@@ -44,6 +48,17 @@
                     "polling": {
                         "label": "Automatic Update",
                         "help": "Load new contributions automatically."
+                    },
+                    "contributionsAnalyse": {
+                        "label": "Contributions analysis",
+                        "labelPointAnalyse": "Point styling by mood per contribution",
+                        "legend": "Legend"
+                    },
+                    "voting": {
+                      "balancedVotes": "balanced",
+                      "negativeVotes": "negative",
+                      "noVotes": "No votes",
+                      "positiveVotes": "positive"
                     }
                 }
             }

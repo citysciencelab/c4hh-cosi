@@ -159,28 +159,28 @@ export default {
             }
 
             const focusableSelectors = [
-                    "a[href]",
-                    "area[href]",
-                    "input:not([disabled])",
-                    "select:not([disabled])",
-                    "textarea:not([disabled])",
-                    "button:not([disabled])",
-                    "iframe",
-                    "object",
-                    "embed",
-                    "[tabindex]:not([tabindex=\"-1\"])",
-                    "[contenteditable]"
-                ],
-                focusableEls = modal.querySelectorAll(focusableSelectors.join(",")),
-                focusable = Array.prototype.slice.call(focusableEls).filter(el => el.offsetParent !== null);
+                      "a[href]",
+                      "area[href]",
+                      "input:not([disabled])",
+                      "select:not([disabled])",
+                      "textarea:not([disabled])",
+                      "button:not([disabled])",
+                      "iframe",
+                      "object",
+                      "embed",
+                      "[tabindex]:not([tabindex=\"-1\"])",
+                      "[contenteditable]"
+                  ],
+                  focusableEls = modal.querySelectorAll(focusableSelectors.join(",")),
+                  focusable = Array.prototype.slice.call(focusableEls).filter(el => el.offsetParent !== null);
 
             if (focusable.length === 0) {
                 return;
             }
 
             const first = focusable[0],
-                last = focusable[focusable.length - 1],
-                active = document.activeElement;
+                  last = focusable[focusable.length - 1],
+                  active = document.activeElement;
 
             if (!event.shiftKey && active === last) {
                 event.preventDefault();

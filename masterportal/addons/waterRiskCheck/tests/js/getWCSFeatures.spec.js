@@ -21,14 +21,12 @@ describe("src/js/api/getWCSFeatures.js", () => {
             await getWCSFeatures.getWCSPoints(undefined, "", ["foo", "bar", "fow", "fow"]).catch(error => {
                 expect(error).to.be.equal(expected);
             });
-            sinon.restore();
         });
         it("should resolve empty array if everything went ok but the result is empty", async () => {
             const requestStub = sinon.stub(axios, "get").returns(Promise.resolve({status: 200, data: ""}));
 
             expect(await getWCSFeatures.getWCSPoints(undefined, "", ["foo", "bar", "fow", "fow"])).to.be.an("array").that.is.empty;
             expect(requestStub.calledOnce).to.be.true;
-            sinon.restore();
         });
         it("should resolve array with geoJSON points", async () => {
             const requestStub = sinon.stub(axios, "get").returns(Promise.resolve({status: 200, data:
@@ -41,7 +39,6 @@ describe("src/js/api/getWCSFeatures.js", () => {
 
             expect(await getWCSFeatures.getWCSPoints(undefined, "", ["foo", "bar", "fow", "fow"])).to.deep.equal(expected);
             expect(requestStub.calledOnce).to.be.true;
-            sinon.restore();
         });
         it("should reject with rejected error from axios", async () => {
             sinon.stub(axios, "get").returns(Promise.reject({status: 500, statusText: "whoever reads this is cool"}));
@@ -50,7 +47,6 @@ describe("src/js/api/getWCSFeatures.js", () => {
             await getWCSFeatures.getWCSPoints(undefined, "", ["foo", "bar", "fow", "fow"]).catch(error => {
                 expect(error).to.deep.equal(expected);
             });
-            sinon.restore();
         });
     });
 });

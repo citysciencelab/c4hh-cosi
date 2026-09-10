@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import FloodRiskManagementCard from "../../../components/FloodRiskManagementCard.vue";
 import SpinnerItem from "../../../../../src/shared/modules/spinner/components/SpinnerItem.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/floodRiskManagement/components/FloodRiskManagementCard.vue", () => {
     describe("Component DOM", () => {

@@ -1,4 +1,4 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
@@ -8,7 +8,6 @@ import layerCollection from "@core/layers/js/layerCollection.js";
 import layerFactory from "@core/layers/js/layerFactory.js";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/heavyRain/shared/components/HrDraw.vue", () => {
     let store,

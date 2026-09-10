@@ -33,6 +33,7 @@ describe("src/modules/print/store/actionsPrintInitialization.js", () => {
         dispatch,
         getters,
         rootGetters;
+    const originStoreGetter = store.getters;
 
     beforeAll(() => {
         map = {
@@ -60,6 +61,9 @@ describe("src/modules/print/store/actionsPrintInitialization.js", () => {
         };
     });
 
+    afterEach(() => {
+        store.getters = originStoreGetter;
+    });
     describe("chooseCurrentLayout", () => {
         it("should choose the current Layout", async () => {
             const payload = [

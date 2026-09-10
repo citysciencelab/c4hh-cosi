@@ -79,9 +79,9 @@ export default {
          */
         getYearData (year, rowName) {
             const yearData = this.tableData.find(function (data) {
-                    return data.year === year;
-                }),
-                contained = yearData[rowName] !== undefined;
+                      return data.year === year;
+                  }),
+                  contained = yearData[rowName] !== undefined;
 
             if (contained) {
                 if (this.isAllNumbers(yearData[rowName])) {

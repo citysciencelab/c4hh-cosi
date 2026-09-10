@@ -60,10 +60,10 @@ export default {
          */
         dragHandle: function (event) {
             const index = parseInt(event.target.value, 10),
-                prevLayerId = this.getLayerIdFromIndex(index),
-                nextLayerId = this.getLayerIdFromIndex(index, "next"),
-                prevLayerTransparency = (index % 10) * 10,
-                nextLayerTransparency = 100 - prevLayerTransparency;
+                  prevLayerId = this.getLayerIdFromIndex(index),
+                  nextLayerId = this.getLayerIdFromIndex(index, "next"),
+                  prevLayerTransparency = (index % 10) * 10,
+                  nextLayerTransparency = 100 - prevLayerTransparency;
 
             this.layerIds.forEach(layer => {
                 if (layer.layerId !== prevLayerId && layer.layerId !== nextLayerId) {
@@ -87,8 +87,8 @@ export default {
          */
         getLayerIdFromIndex: function (index, mode) {
             const position = this.getPositionFromValue(index, mode),
-                layerIds = this.layerIds[position],
-                layerId = layerIds ? layerIds.layerId : {};
+                  layerIds = this.layerIds[position],
+                  layerId = layerIds ? layerIds.layerId : {};
 
             return layerId;
         },
@@ -127,7 +127,7 @@ export default {
 
             if (transparency === 0) {
                 const filteredObj = layerIds.filter(obj => obj.layerId === layerId),
-                    index = layerIds.indexOf(filteredObj[0]);
+                      index = layerIds.indexOf(filteredObj[0]);
 
                 this.setActiveIndex(index);
             }

@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction.js";
@@ -12,7 +12,6 @@ import VectorSource from "ol/source/Vector.js";
 
 import DrawEditComponent from "@shared/modules/draw/components/DrawEdit.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/draw/components/DrawEdit.vue", () => {
     let addInteractionSpy,

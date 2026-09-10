@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import CompareMaps from "@modules/compareMaps/components/CompareMaps.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 import mapCollection from "@core/maps/js/mapCollection.js";
 import mutations from "@modules/compareMaps/store/mutationsCompareMaps.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/compareMaps/components/CompareMaps.vue", () => {
     let store, rootCommitSpy, rootDispatchSpy, wrapper, map;

@@ -1,6 +1,5 @@
 import {getCenter} from "ol/extent.js";
 import createLayerAddToTreeModule from "@shared/js/utils/createLayerAddToTree.js";
-import tabStatus from "../constantsTabStatus.js";
 import spatialSelection from "../js/getSpatialSelection.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 
@@ -160,9 +159,7 @@ export default {
      */
     switchBackToList ({state, commit}) {
         if (state.layer) {
-            commit("setLayerListView", tabStatus.ENABLED);
-            commit("setFeatureDetailView", tabStatus.ENABLED);
-            commit("setFeatureListView", tabStatus.ACTIVE);
+            commit("setActiveTab", "list");
         }
     },
     /**
@@ -189,9 +186,8 @@ export default {
         }
         commit("setFeatureCount", state.gfiFeaturesOfLayer.length);
         commit("setShownFeatures", state.gfiFeaturesOfLayer.length < state.maxFeatures ? state.gfiFeaturesOfLayer.length : state.maxFeatures);
-        commit("setLayerListView", tabStatus.ENABLED);
-        commit("setFeatureListView", tabStatus.ACTIVE);
-        commit("setFeatureDetailView", tabStatus.DISABLED);
+        commit("setSelectedRow", null);
+        commit("setActiveTab", "list");
     },
     /**
      * Processes the GFI features of the selected layer depending on whether the user selected an area or not.
@@ -219,11 +215,11 @@ export default {
      * @returns {void}
      */
     switchToDetails ({state, commit}) {
-        if (state.selectedRow !== null) {
-            commit("setLayerListView", tabStatus.ENABLED);
-            commit("setFeatureListView", tabStatus.ENABLED);
-            commit("setFeatureDetailView", tabStatus.ACTIVE);
+        if (!state.layer) {
+            return;
         }
+
+        commit("setActiveTab", "details");
     },
     /**
      * Switches to the themes list of all visible layers and resets the featureList and the selectedFeature.

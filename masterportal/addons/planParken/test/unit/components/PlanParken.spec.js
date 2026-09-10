@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import Component from "../../../components/PlanParken.vue";
 import PlanParken from "../../../store/indexPlanParken.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/PlanParken/components/PlanParken.vue", () => {
     const geographicValues = ["Box", "Circle", "Polygon"],

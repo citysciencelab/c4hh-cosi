@@ -8,12 +8,128 @@
 ### __Breaking Changes__
 
 ### Added
+- WFS-T: Added configurable per-field input validation on single insert and update, configurable in the layer's `gfiAttributes`.
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+- Issue \#1655: Menu modules now keep their own configuration when multiple modules of the same type are defined in config.json. LayerSlider and Filter no longer reuse the last configured instance.
+- Accessibility: Fixed accessibility issues across layer tree and controls (label associations, icon-button naming, ARIA semantics, and preview alt text).
+
+---
+
+## 2026-09-02 v3.26.0
+
+### Added
+- NavTab: Added styleVariant prop for more styling options.
+- i18next: added french language.
+- The following packages have been added:
+    - dependencies:
+        - "pinia": "^4.0.2"
+- Readme: Information and link to issues in opencode added.
+- Security: Updated SECURITY.md to direct vulnerability reports to a private email address instead of the public issue tracker, and added a corresponding note in the README.
+- Alerting: Added first-open alerts for modules via `config.js` (`alerting.moduleOpenAlerts`).
+- WFS-T: Added a loading spinner while fetching features (disabling interactions). The selected layer can automatically activate in the layer tree and restore on exit. Configurable via `showLayerLoader` and `activateLayerInTree`.
+
+### Changed
+- GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.
+- Filter: Snippet - DateRange. Replaced the native date inputs with vue-datepicker-next. Improved synchronization between datepicker and slider values so manually selected dates are preserved even when no exact value exists in initialDateRef. Added support for date, month, and year picker modes based on the configured format.
+- State management: Introduced Pinia alongside Vuex to support the gradual migration of module stores.
+- The following packages have been updated:
+    - dependencies:
+        - Axios: 1.16.0 to 1.19.0.
+
+### Removed
+- The following packages have been removed:
+  - dependencies:
+    - vue-matomo: ^4.2.0
+- Matomo: Removed implementation from MasterPortal (has been rewritten as an addon).
+
+### Fixed
+- Issue \#1624: Fixed misleading parameter in config.js.md
+- Issue \#1625: Fixed using configured styleId when mousehover on vectorlayers.
+- Issue \#1631: Property preparation in wfst tool can now handle objects in gfiAttributes and saves geometry without having to configure it in gfiAttributes.
+- Issue \#1643: Alerting: Fixed a stale `onceInSession` alert (e.g. a layer attribution hint) reappearing together with a new alert once the modal had already been closed.
+- Issue \#1649: Print no longer crashes when style conditions are missing properties and logs a warning and falls back to default styling.
+- FileImport: importDrawLayer reappears in the layer tree when importing a file, even after being removed.
+- SearchBar: Fixed misaligned action icons in "Show all" results for street searches.
+- CopyrightConstraints: Fixed license metadata display where JSON was being shown as raw text instead of formatted license information and removed empty constraint entries from the list.
+- WMS-Time: Re-activating an already-used WMS-Time layer no longer auto-enables time series comparison or adds a second layer unexpectedly.
+
+---
+## 2026-08-19 v3.25.1
+
+### Changed
+- Build: Changed chunking of modules and packages during build time to prevent an unhealthy amount of <script>-tags in the resulting index.html and decrease load time of built portals.
+
+## 2026-08-05 v3.25.0
+
+### Added
+- Issue\#1604 Modules/Controls/Orientation: new parameter `showDirection` and `showAccuracy` configuration enable to display user orientation when they are moving and accuracy of location.
+- package.json: Added `npm run buildJsDoc` to script `prePushHook`.
+- JSDoc: Added a theme for jsdoc to make it more usable. Features include: better design, a searchbar, dark mode, a logo, links to bitbucket.
+- The following packages have been added:
+    - devDependencies:
+        - "docdash": "^2.0.2"
+- Login: Added new config.js parameter `includeCredentials`. If set to false, intercepted requests still get the Authorization header but do not send credentials (cookies), which can help prevent CORS errors.
+- NavTab: Added slot to display optional content (e.g. badges, counts) after the label.
+- SearchBar: Added new `searchInterfaceCsw` to search records of a CSW catalog.
+
+### Changed
+- Issue \#1641 : PortalFooter: The scaleline is displayed on mobile devices with a screen width of 320px or more.
+- FeatureLister: Replaced the module-specific navigation tabs with the shared NavTab component.
+- Repository: Added repository rules to enforce consistent contribution and review standards.
+- services.json-md: Corrected and extended dodumentation of OAF layer.
+- PoiOrientation: Replaced navigation pills with the shared NavTab component and updated badge display using the new slot.
+- The following packages have been updated:
+    - dependencies:
+        - @masterportal/masterportalapi: 2.62.0 to 2.63.0
+    - devDependencies:
+        - vite: 8.0.14 to 8.1.4
+- Tests: 
+    - Tests now fail on vue warnings.
+    - Excluded barchart and piechart tests due to issues with the prePushHook.
+- ResizeHandle: Simplified component by removing multi-directional resize infrastructure to support menu width resizing only (left/right positions).
+
+### Fixed
+- Issue \#1522: Show publish date and creation date of metadata separately.
+- Issue \#1626: Added fallback to OpenLayers default style for vector layers when styleId is missing or not found.
+- Issue \#1627: Module openConfig updates menu.
+- Issue \#1630: Fixed parseMissingKeyHandler misinterpreting decimal numbers as time values (e.g. "0.58 m" became "0:58 m"). The time format replacement now requires two-digit hours only.
+- Issue \#1632: Filter: Fix setting filter rules from URL Parameters.
+- Issue \#1634: url parameter `highlightFeaturesByAttributes` can now handle MultiPoint, MultiPolygon and MultiLineString features.
+- Issue \#1635: AddWMS: Fixed visibility and showInLayerTree to correctly control imported layer visibility and tree placement. Newly imported external layers now receive proper zIndex assignment when visibility or showInLayerTree is enabled.
+- Issue \#1638: FolderCheckBox: Folder checkbox selection (isFolderSelectable) now adds layers in the same order as "add all".
+- Issue \#1641 : PortalFooter: if `alias_mobile` is not set at `urls` entry, link is not shown on mobile devices.
+- Control: Fixed a layout issue with the control module.
+- FeatureLister/NavTab: Disabled tabs are now non-interactive, and native nav-link tab markup is prevented by lint rules in favor of the shared NavTab component.
+- Filter: A bug has been fixed that prevented the geometry filter from working with multipolygons.
+- Menu: Fixed a bug on mobile, where the close button disappeared behind input fields.
+- WMSTime: Fixed deleting WMS-Time layers in compare mode, which kept the remaining layer, LayerSwiper und TimeSlider in a broken state.
+- LayerPills:
+    - Fixed a bug that showed "show more" button on certain zoom sizes and refactored how LayerPills width is calculated.
+    - Layers with showInLayerTree set to false are now consistently hidden from LayerPills.
+- OAF-Layer: Fixed legend entries being incomplete or changing on zoom. The legend now shows all style-rule-defined entries regardless of the currently loaded features in the map view.
+- Print: Grouped baselayers are no longer printed on top of other layers.
+
+---
+
+## 2026-07-01 v3.24.0
+
+### Added
 - Vue-directive: Added a vue-directive "bs-tooltip.js" to handle Bootstrap-Tooltips.
 - TabContainer: Added new shared component `TabContainer` for reusable, state-independent tab navigation.
 - WMS-Time: Added Parameters `displayFormat` and `displayTimezone` to format the timestamp label in the TimeSlider.
 - The following packages have been added:
     - dependencies:
-        -     @stylistic/eslint-plugin: ^5.10.0
+        - @stylistic/eslint-plugin: ^5.10.0
+- WFS-T: possibility to set default values for WFS feature properties
+- Security: Added automated Jira ticket creation for OSV vulnerabilities above a configurable CVSS threshold.
+- SensorLayer: Make socket connection (mqtt/wss) token aware
 
 ### Changed
 - The following packages have been updated:
@@ -26,8 +142,10 @@
         - eslint-plugin-vue": 9.32.0 to 10.9.1
 - Replaced native text input elements with the custom `InputText` component in selected modules without changing the user-facing behavior.
 - GraphicalSelect: Implemented debounce of the slider input to increase reliability of presented data and decrease the amount of requests.
-
-### Deprecated
+- Accessibility: Changed lists of CoordToolkit and BaselayerSwitcher to make it more readable for screen readers and added an eslint rule to enforce the right list implementations.
+- ESLint: The linter now also checks `.mjs` files. Existing lint issues in `.mjs` files have been fixed.
+- configuredModules: The modules under folder of sections should also be parsed into configuredModules.
+- Tests: Improve performance by enabling file parallelism and multi-threading.
 
 ### Removed
 - The following packages have been removed:
@@ -35,6 +153,7 @@
     - @stylistic/eslint-plugin-js ^2.13.0
 
 ### Fixed
+- Issue \#1343: Fixed width-calculation for left and right menu.
 - Issue \#1585: Fixed case where dragging for resizing menus continued after releasing mouse or touch outside browser window.
 - Issue \#1594: Sort legend in order of style config for Geojson Layer.
 - Issue \#1600: AddWMS: Fixed detection of crs, if using EPSG-Code 4326.
@@ -45,6 +164,7 @@
 - Issue \#1614: MenuContainerBodyRoot: Horizontal separators in menu sections now only render when sections contain items.
 - Issue \#1619: GetFeatureInfo: Fixed case where GFI with iframe content did not reopen after being closed.
 - Issue \#1620: Adapted vite build to respect new created heads (clone with --branch).
+- Issue \#1621: Measure: Fixed recalculation of measurement values after geometry modification, regardless of the currently selected geometry type.
 - Migrator: Fixed creation of index.html.
 - Gazetteer: Restored correct display of geographicalIdentifier as search result, if available.
 - SearchBar: Fixed unstable highlighting of 3D tiles at address coordinates.
@@ -52,6 +172,49 @@
 - ButtonGroup: Fixed `precheckedIndex` not reflecting the initial `selectedValue` on component creation.
 - SearchBar: Fixed duplicated results with URL Parameter `QUERY`.
 - LayerInformation: Fixed CSS scope.
+- GetFeatureInfo: Fixed the display of the table view.
+- Draw_old: Marked `importDrawLayer` as dynamic to prevent it from being included in generated share links and causing errors in parametrized URLs.
+
+---
+
+## 2026-06-24 v3.15.3 (LTS)
+
+### Added
+ - Security: Added SECURITY.md file.
+ - Added CONTRIBUTING.md file.
+ - Architectural Decision Record **[ADR](./docs/Dev/Architecture_Decision_Record.md)**: Added documentation file for architectural decisions in the project.
+ - UrlParams:
+    - ZOOMTOGEOMETRY: Added GeoJSON layer support for ZOOMTOGEOMETRY.
+    - ZOOMTOFEATUREID:
+        - An attribute `centerOfExtent` has been added to control whether a point geometry is set to the extent of the respective feature or whether the feature itself is displayed in its geometry.
+        - WFS versions 1.0.0, 1.1.0, and 2.0.0 are now compatible.
+
+### Changed
+- The following packages have been updated:
+    - dependencies:
+        - @masterportal/masterportalapi: 2.51.0 to 2.51.1
+
+### Fixed
+- Issue \#1472: Improve error handling and robustness of `addInterceptor`.
+- Issue \#1489: Print - fix rotated print masks and add missing rotation for MapFish. Add information regarding missing support of *High Resolution PlotService* to docs.
+- Issue \#1515: Filter: saveTo: `url` was fixed. Now reads URL params properly and sets them.
+- Issue \#1573: LayerPills: On-click shows layerinfomation for groups, too.
+- Issue \#1577: PortalFooter: Fixed About-Module detection to search in all menu sections instead of only the first one.
+- Issue \#1578: layer2dVector: Fixed legend creation for WFS layers.
+- VectorStyle: Fixed styling of polygons: `"zig-line-horizontal"` and `"diagonal-right"` are rotated by 90Â°.
+- sortObjects: Ensure stable sortByLayerSequence order in Chrome/Firefox.
+- BufferAnalysis: Fixed applying values from URL. New and legacy format are now correctly parsed and applied.
+- UrlParams:
+  - Fixed an issue where old links with non-existent layers would fail to load by adding a fail-safe mechanism.
+  - Fixed WMS-Time layers not working with legacy URL parameters.
+  - ZOOMTOFEATUREID: Features that are always at the top of the map are now displayed again.
+  - Links to other config files have been corrected in the `urlParameter` documentation.
+- GFI: In the gfiTheme `Default`, line breaks have been optimised and the size of the content changes when the sidebar is resized.  
+- Print: Fixed print layer sorting for grouped layers without zIndex.
+- SearchBar: 
+    - Added a checkbox to select all subcategories when opening a folder.
+    - Fixed duplicated results with URL Parameter `QUERY`.
+- WMS-Time: Activating time comparison placed the second WMS-Time layer at the top of the layerTree, causing it to cover other layers. The fix places the comparison layer directly above the original layer.
 
 ---
 

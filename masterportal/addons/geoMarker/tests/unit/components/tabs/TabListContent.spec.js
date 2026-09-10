@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import TabListContent from "../../../../components/tabs/TabListContent.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/geoMarker/components/tabs/TabListContent.vue", () => {
     let wrapper,

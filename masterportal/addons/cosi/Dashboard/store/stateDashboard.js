@@ -42,6 +42,7 @@ const state = {
     calculations: [],
     columnHeader: {},
     deactivateGFI: false,
+    description: "",
     districtColumns: [],
     excludedPropsForExport: ["visualized", "expanded", "years", "groupIndex"],
     exportGrouped: false,

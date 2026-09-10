@@ -19,7 +19,6 @@ import DashboardChartView from "./DashboardChartView.vue";
 import DashboardTimeline from "./DashboardTimeline.vue";
 import DashboardToolbar from "./DashboardToolbar.vue";
 import exportXlsx from "../../utils/exportXlsx";
-import {generateChartForDistricts, generateChartForCorrelation, generateChartsForItems} from "../utils/chart";
 import getters from "../store/gettersDashboard.js";
 import IconButton from "../../../../src/shared/modules/buttons/components/IconButton.vue";
 import isObject from "@shared/js/utils/isObject.js";
@@ -297,57 +296,6 @@ export default {
             }
         },
 
-        renderCharts (item) {
-            const
-                total = this.getTotalForAllTimestamps(item),
-                average = this.getAverageForAllTimestamps(item),
-                data = {
-                    ...item,
-                    total,
-                    average
-                },
-                chart = generateChartForDistricts(
-                    data,
-                    this.selectedColumns,
-                    this.selectedDistrictLevel.label,
-                    this.timestampPrefix
-                );
-
-            this.channelGraphData(chart);
-        },
-
-        renderGroupedCharts () {
-            if (this.selectedItems.length === 0) {
-                return;
-            }
-
-            const
-                datasets = this.selectedItems.map(item => ({
-                    ...item,
-                    total: this.getTotalForAllTimestamps(item),
-                    average: this.getAverageForAllTimestamps(item)
-                })),
-                charts = generateChartsForItems(
-                    datasets,
-                    this.selectedColumns,
-                    this.selectedDistrictLevel.label,
-                    this.timestampPrefix
-                );
-
-            this.channelGraphData(charts);
-        },
-
-        renderScatterplot () {
-            if (!(this.fields.B && this.fields.A)) {
-                return;
-            }
-
-            const correlation = this.calculateCorrelation(),
-                chart = generateChartForCorrelation(correlation, this.fields.B.category, this.fields.A.category);
-
-            this.channelGraphData(chart);
-        },
-
         onVisualizationChanged () {
             let item;
 
@@ -391,12 +339,12 @@ export default {
                 fixedHeaderEnd = null,
                 header = null;
             const items = this.selectedItems.length > 0 ? this.selectedItems : this.items,
-                preparedItems = this.getPreparedItems(items),
-                selectedDistrictLabels = this.getSelectedDistrictsLabels(this.selectedDistrictLevel.districts),
-                prefix = this.prefixExportFilename,
-                rawData = this.prepareTableExportWithTimeline(preparedItems, selectedDistrictLabels, this.items[0].years, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns),
-                filename = composeFilename(this.$t("additional:modules.tools.cosi.dashboard.exportFilename", {prefix})),
-                modifiedKey = [{"oldKey": "isTemp", "newKey": "eigene Berechnungen"}];
+                  preparedItems = this.getPreparedItems(items),
+                  selectedDistrictLabels = this.getSelectedDistrictsLabels(this.selectedDistrictLevel.districts),
+                  prefix = this.prefixExportFilename,
+                  rawData = this.prepareTableExportWithTimeline(preparedItems, selectedDistrictLabels, this.items[0].years, this.keyMap, this.selectedDistrictLevel.districts, this.timestampPrefix, this.exportGrouped, this.districtColumns),
+                  filename = composeFilename(this.$t("additional:modules.tools.cosi.dashboard.exportFilename", {prefix})),
+                  modifiedKey = [{"oldKey": "isTemp", "newKey": "eigene Berechnungen"}];
 
             try {
                 exportedData = this.sanitizeData(JSON.parse(JSON.stringify(rawData)), [...this.excludedPropsForExport, ...this.unselectedColumnLabels]);
@@ -571,14 +519,14 @@ export default {
          */
         onStartCalculation (calculationName, operation, category_A, category_B) {
             const isSelectionOperation = operation === "sumUpSelected" || operation === "divideSelected",
-                field_A = this.items.find(item => item.category === category_A),
-                field_B = this.items.find(item => item.category === category_B),
-                // Selection based operations must only ever touch the categories the user
-                // filtered into the table - falling back to "all items" would silently sum
-                // every statistic in the dashboard.
-                fallbackItems = this.selectedItems.length > 0 ? this.selectedItems : this.items,
-                selectedItems = isSelectionOperation ? this.selectedItems : fallbackItems,
-                calcName = calculationName || getCalculationId({operation, category_A, category_B, selectedCategories: selectedItems.map(item => item.category)});
+                  field_A = this.items.find(item => item.category === category_A),
+                  field_B = this.items.find(item => item.category === category_B),
+                  // Selection based operations must only ever touch the categories the user
+                  // filtered into the table - falling back to "all items" would silently sum
+                  // every statistic in the dashboard.
+                  fallbackItems = this.selectedItems.length > 0 ? this.selectedItems : this.items,
+                  selectedItems = isSelectionOperation ? this.selectedItems : fallbackItems,
+                  calcName = calculationName || getCalculationId({operation, category_A, category_B, selectedCategories: selectedItems.map(item => item.category)});
 
             if (isSelectionOperation && selectedItems.length < 2) {
                 return;
@@ -698,17 +646,17 @@ export default {
             // This will return one object containing all keys the items
             const obj = arr.reduce((res, item) => ({...res, ...item})),
 
-                // Get those keys as an array
-                keys = Object.keys(obj),
+                  // Get those keys as an array
+                  keys = Object.keys(obj),
 
-                // Create an object with all keys set to the default value (0)
-                def = keys.reduce((result, key) => {
-                    result[key] = missingValues;
-                    return result;
-                }, {}),
+                  // Create an object with all keys set to the default value (0)
+                  def = keys.reduce((result, key) => {
+                      result[key] = missingValues;
+                      return result;
+                  }, {}),
 
-                // Use object destrucuring to replace all default values with the ones we have
-                result = arr.map((item) => ({...def, ...item}));
+                  // Use object destrucuring to replace all default values with the ones we have
+                  result = arr.map((item) => ({...def, ...item}));
 
             return result;
         },
@@ -796,8 +744,7 @@ export default {
             <v-main>
                 <ToolInfo
                     :url="readmeUrl"
-                    :locale="currentLocale"
-                    :is-open="false"
+                    :summary="$t('additional:modules.tools.cosi.dashboard.description')"
                 />
                 <AlertMessage
                     v-if="selectedDistrictNames.length === 0"

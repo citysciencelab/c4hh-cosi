@@ -116,7 +116,7 @@ export default {
             handler (val) {
                 if (!this.isActive && typeof this.activeCard !== "undefined") {
                     const bboxGeomWKT = this.activeCard.subjectFeatureWKT,
-                        decodedFeature = wktParser.decodeFeature(bboxGeomWKT);
+                          decodedFeature = wktParser.decodeFeature(bboxGeomWKT);
 
                     this.addSubjectAreaToLayer(decodedFeature);
                     this.setBoundingGeometry(decodedFeature.getGeometry());
@@ -444,8 +444,8 @@ export default {
         registerDragBoxListener (dragBox, featureCollection) {
             dragBox.on("boxend", (evt) => {
                 const extent = evt.target.getGeometry().getExtent(),
-                    source = this.getDistrictLevelById(this.selectedDistrictLevelId).layer.getSource(),
-                    keyOfAttrName = this.selectedDistrictLevel.keyOfAttrName;
+                      source = this.getDistrictLevelById(this.selectedDistrictLevelId).layer.getSource(),
+                      keyOfAttrName = this.selectedDistrictLevel.keyOfAttrName;
 
                 source.forEachFeatureIntersectingExtent(extent, (feature) => {
                     if (this.selectedDistrictLevel.filterableValues.includes(feature.get(keyOfAttrName))) {
@@ -615,7 +615,7 @@ export default {
          */
         updateExtent () {
             const extent = calculateExtent(this.selectedFeatures, parseInt(0, 10)),
-                bboxGeom = getBoundingGeometry(this.selectedFeatures, 0);
+                  bboxGeom = getBoundingGeometry(this.selectedFeatures, 0);
 
             if (this.cards.some(card => JSON.stringify(card.selectedDistricts.sort()) === JSON.stringify(this.selectedDistrictNames.sort()))) {
                 const index = this.cards.findIndex(card => JSON.stringify(card.selectedDistricts.sort()) === JSON.stringify(this.selectedDistrictNames.sort()));
@@ -627,17 +627,17 @@ export default {
             this.isDragBoxActive = false;
             this.cards.unshift({
                 badgeList: [{
-                    backgroundColor: "rgba(0, 141, 203, 1)",
-                    color: "rgba(255, 255, 255, 1)",
-                    icon: "bi bi-bar-chart",
-                    text: this.$t("additional:modules.cosi.districtSelector.statisticalData")
-                },
-                {
-                    backgroundColor: "#EB8A3E",
-                    color: "rgba(255, 255, 255, 1)",
-                    icon: "bi bi-layers",
-                    text: this.$t("additional:modules.cosi.districtSelector.subjectData")
-                }],
+                                backgroundColor: "rgba(0, 141, 203, 1)",
+                                color: "rgba(255, 255, 255, 1)",
+                                icon: "bi bi-bar-chart",
+                                text: this.$t("additional:modules.cosi.districtSelector.statisticalData")
+                            },
+                            {
+                                backgroundColor: "#EB8A3E",
+                                color: "rgba(255, 255, 255, 1)",
+                                icon: "bi bi-layers",
+                                text: this.$t("additional:modules.cosi.districtSelector.subjectData")
+                            }],
                 data: [
                     {value: this.$t("additional:modules.cosi.districtSelector.districtLevel") + ": " + this.selectedDistrictLevel.label},
                     {icon: "bi-map", label: this.$t("additional:modules.cosi.districtSelector.selectedAreas") + ": " + getLimitedDistictName(this.selectedDistrictNames)},
@@ -692,7 +692,7 @@ export default {
 
             if (namesOfDistricts.length > 0) {
                 const districtFeatures = this.layer.getSource().getFeatures(),
-                    namesAssoc = {};
+                      namesAssoc = {};
 
                 namesOfDistricts.forEach(name => {
                     namesAssoc[name] = true;
@@ -738,8 +738,8 @@ export default {
             }).then(() => {
                 this.generateTable().then((dashboardItems) => {
                     const foundItem = dashboardItems.find((item) => item.category === this.mapping[0].value),
-                        districtLabels = selectedDistricts.map(district => district.getLabel()),
-                        population = getTotal(foundItem, districtLabels, foundItem.years[0]);
+                          districtLabels = selectedDistricts.map(district => district.getLabel()),
+                          population = getTotal(foundItem, districtLabels, foundItem.years[0]);
 
                     card.population = thousandsSeparator(population);
                     card.data[2].label = this.$t("additional:modules.cosi.districtSelector.population") + ": " + thousandsSeparator(population);
@@ -755,8 +755,8 @@ export default {
          */
         toggleCardStatus (index) {
             const activeIndex = this.cards.findIndex(card => card.status === "active"),
-                subjectFeatureWKT = this.cards[index]?.subjectFeatureWKT,
-                subjectFeature = wktParser.decodeFeature(subjectFeatureWKT);
+                  subjectFeatureWKT = this.cards[index]?.subjectFeatureWKT,
+                  subjectFeature = wktParser.decodeFeature(subjectFeatureWKT);
 
             this.clearSubjectAreaFromLayer();
             this.addSubjectAreaToLayer(subjectFeature);
@@ -809,6 +809,9 @@ export default {
                 :title="$t('additional:modules.cosi.districtSelector.drawLabel')"
                 icon="bi bi-plus-square-dotted"
             >
+                <p>
+                    <small>{{ $t('additional:modules.cosi.districtSelector.areaSelection') }}</small>
+                </p>
                 <div class="d-flex align-items-center">
                     <IconButton
                         :id="'districtSelectorDragBox'"

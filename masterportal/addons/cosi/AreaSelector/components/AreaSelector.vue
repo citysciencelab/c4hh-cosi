@@ -124,7 +124,7 @@ export default {
 
         handleResponsee (resp) {
             const parsedData = resp.ExecuteResponse.ProcessOutputs.Output.Data.ComplexData.einwohner,
-                responseResult = JSON.parse(parsedData.ergebnis);
+                  responseResult = JSON.parse(parsedData.ergebnis);
 
             this.einwohner = responseResult.einwohner_fhh;
         },

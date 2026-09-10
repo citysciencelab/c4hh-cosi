@@ -1,9 +1,8 @@
-import {mount, shallowMount, config} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import SnippetFeatureInfo from "../../../components/SnippetFeatureInfo.vue";
 import Feature from "ol/Feature.js";
 import {expect} from "chai";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/SnippetFeatureInfo.vue", () => {
     it("should have correct default values", () => {

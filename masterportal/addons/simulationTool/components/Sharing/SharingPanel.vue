@@ -50,12 +50,12 @@ export default {
             try {
                 this.requestState.loading = true;
                 const response = await fetch(`/api/${this.endPoint}/${this.entityId}/users`, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            ...additionalHeaders
-                        }
-                    }),
-                    result = await response.json();
+                          headers: {
+                              "Content-Type": "application/json",
+                              ...additionalHeaders
+                          }
+                      }),
+                      result = await response.json();
 
                 if (!response.ok) {
                     this.requestState.error = result.error_message || response.status + ": unknown errror";

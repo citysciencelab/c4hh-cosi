@@ -253,9 +253,6 @@ describe("addons/floodRiskManagement/store/actionsPrintInitialization.js", () =>
             expect(dispatch.calledWith("chooseCurrentLayout", state.layoutList)).to.be.true;
             expect(commit.calledWith("setEventListener", "postrender")).to.be.true;
         });
-        afterAll(function () {
-            sinon.restore();
-        });
     });
 
     describe("createPrintMask", function () {

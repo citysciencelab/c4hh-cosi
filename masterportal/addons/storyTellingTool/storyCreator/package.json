@@ -4,6 +4,7 @@
     "private": true,
     "type": "module",
     "dependencies": {
+        "@tiptap/extension-link": "^2.27.2",
         "@tiptap/starter-kit": "^2.27.1",
         "@tiptap/vue-3": "^2.27.1"
     }

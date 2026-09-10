@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
 import VectorLayer from "ol/layer/Vector.js";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import SelectFeaturesComponent from "@modules/selectFeatures/components/SelectFeatures.vue";
 import SelectFeaturesModule from "@modules/selectFeatures/store/indexSelectFeatures.js";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/selectFeatures/components/SelectFeatures.vue", () => {
     const mockMapActions = {

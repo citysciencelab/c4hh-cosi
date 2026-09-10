@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import StartModuleComponent from "@modules/controls/startModule/components/StartModule.vue";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/controls/startModule/components/StartModule.vue", () => {
     let setActiveSpy = sinon.spy(),

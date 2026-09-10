@@ -107,6 +107,13 @@ In the `"restrictedAlerts"` object alerts only for specific portals may be speci
 Within `"alerts"`, alerts may be defined as previously defined. Each alert holds an ID for reference, which is its respective key in the `"alerts"` object.
 
 
+### Display order of alerts
+
+Alerts are displayed in the order in which they are listed in the `"alerts"` section. This way the person creating the hints can decide which hint is more important and arrange the order accordingly.
+
+For example: For the Boris portal there is a very important alert that is only relevant for Boris. In addition, a global alert is added for all portals, which is, however, less important in the context of the Boris portal. By controlling the order of the entries in the `"alerts"` section, the responsible person can decide for each individual case and arrange the hints appropriately.
+
+
 Besides the central loading of alerts with an own alerting json. Alerts can defined within the `config.json` with the parameter `Portalconfig.alerts`. If such a parameter is set, the module will create the alerts. Multiple alerts are allowed by default. This allows to customize the initial alerts of a single portal.
 
 Configuration of alerts within config.json example:
@@ -125,6 +132,46 @@ Configuration of alerts within config.json example:
     },
     "mapView": {
 ```
+
+
+## Universal "first open" alerts from config.js
+
+You can configure alerts that are shown when a module is opened.
+
+Configure them in `config.js` under `alerting.moduleOpenAlerts`:
+
+```js
+{
+    alerting: {
+    moduleOpenAlerts: {
+      "compare-features-release": {
+        moduleType: "compareFeatures",
+        title: "common:modules.compareFeatures.title",
+        content: "common:modules.compareFeatures.feedback.newToolInfo",
+        once: true,
+        mustBeConfirmed: true
+      }
+    }
+    }
+}
+```
+
+Each entry supports:
+
+|Name|Required|Type|Description|
+|----|--------|----|-----------|
+|moduleType|yes|String|Module type that triggers the alert, e.g. `"compareFeatures"`.|
+|content|yes|String|Alert text or i18n key.|
+|title|no|String|Title text or i18n key.|
+|category|no|String|Alert category, default `"info"`.|
+|mustBeConfirmed|no|Boolean|Whether user can disable it with "do not show again" behavior.|
+|once|no|Boolean|Show only once across visits (default `true`).|
+|onceInSession|no|Boolean|Show only once per session (default `true`).|
+
+Internally this uses `displayOnEvent` with `Menu/changeCurrentComponent`.
+The alias `modul` is also supported for backward compatibility.
+If `moduleOpenAlerts` is configured as an object map, each object key is treated as `alertId` and included in the hash for once/localStorage behavior.
+Using an object map is recommended when you want an explicit id that can be changed later to force a new once-alert.
 
 
 ## Alerts on events

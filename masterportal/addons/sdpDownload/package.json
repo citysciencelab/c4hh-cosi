@@ -10,7 +10,7 @@
   },
   "scripts": {},
   "dependencies": {
-    "@turf/helpers": "^7.2.0",
-    "@turf/intersect": "^7.2.0"
+    "@turf/helpers": "^7.3.5",
+    "@turf/intersect": "^7.3.5"
   }
 }

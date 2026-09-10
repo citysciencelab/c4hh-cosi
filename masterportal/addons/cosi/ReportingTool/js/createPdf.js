@@ -266,7 +266,7 @@ export default class PDFMaker {
      * @returns {void}
      */
     download (fileName) {
-        pdfMake.createPdf(this.getDocDefinition(), "", "").download(fileName);
+        pdfMake.createPdf(this.getDocDefinition()).download(fileName);
     }
 
     /**

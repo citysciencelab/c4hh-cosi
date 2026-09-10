@@ -135,12 +135,6 @@ describe.skip("addons/cosi/Dashboard/components/Dashboard.vue", () => {
                             actions: {
                                 updateDistricts: sinon.stub()
                             }
-                        },
-                        ChartGenerator: {
-                            namespaced: true,
-                            actions: {
-                                channelGraphData: sinon.stub()
-                            }
                         }
                     }
                 }
@@ -696,12 +690,6 @@ describe.skip("addons/cosi/Dashboard/components/Dashboard.vue", () => {
                                     },
                                     actions: {
                                         updateDistricts: sinon.stub()
-                                    }
-                                },
-                                ChartGenerator: {
-                                    namespaced: true,
-                                    actions: {
-                                        channelGraphData: sinon.stub()
                                     }
                                 }
                             }

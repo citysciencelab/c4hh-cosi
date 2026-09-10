@@ -7,6 +7,12 @@ import globals from "globals";
 import stylistic from "@stylistic/eslint-plugin";
 import nodePlugin from "eslint-plugin-n";
 
+const navTabLegacyExcludedFiles = [
+    "src/shared/modules/tabs/components/NavTab.vue",
+    "src/modules/featureLister/components/LayerListView.vue",
+    "src/modules/layerPills/components/LayerPills.vue"
+];
+
 export default [
     js.configs.recommended,
     ...pluginVue.configs["flat/recommended"],
@@ -118,6 +124,7 @@ export default [
             "prefer-numeric-literals": "error",
             "prefer-rest-params": "error",
             "radix": "error",
+            "@stylistic/indent": ["error", 4, {"SwitchCase": 1}],
             "spaced-comment": "error",
             "yoda": "error",
             // changes for eslint v9
@@ -263,6 +270,7 @@ export default [
             "vue/no-v-for-template-key-on-child": ["off"],
             "vue/no-deprecated-v-bind-sync": ["off"],
             "vue/html-indent": ["error", 4],
+            "vue/script-indent": ["error", 4, {"baseIndent": 0, "switchCase": 1}],
             "vue/html-closing-bracket-newline": [
                 "error",
                 {
@@ -326,7 +334,7 @@ export default [
 
                 // 1) Relative imports ("./" or "../") must end with .js or .vue
                 {
-                    selector: "ImportDeclaration[source.value=/^\\./]:not([source.value=/\\.(?:js|vue|json|css|scss|sass)$/])",
+                    selector: "ImportDeclaration[source.value=/^\\./]:not([source.value=/\\.(?:js|mjs|vue|json|css|scss|sass)$/])",
                     message: "Relative imports must include a valid extension (.js, .vue, .json, .css, .scss, or .sass)."
                 },
 
@@ -344,7 +352,7 @@ export default [
 
                 // 4) (optional) Dynamic relative imports must include .js or .vue
                 {
-                    selector: "CallExpression[callee.type='Import'] > Literal[value=/^\\./]:not([value=/\\.(?:js|vue|json|css|scss|sass)$/])",
+                    selector: "CallExpression[callee.type='Import'] > Literal[value=/^\\./]:not([value=/\\.(?:js|mjs|vue|json|css|scss|sass)$/])",
                     message: "Dynamic relative imports must include .js, .vue, .json, .css, .scss, or .sass."
                 },
 
@@ -369,16 +377,34 @@ export default [
                     message: "Native <input type=\"text\"> is not allowed. Use <InputText> instead."
                 },
 
-                // 3) Disallow native accordion buttons with static class="accordion-button".
+                // 3) Disallow native nav links and enforce NavTab usage.
+                {
+                    selector: "VElement[name='a']:has(VAttribute[directive=false][key.name='class'][value.value=/\\bnav-link\\b/]), VElement[name='button']:has(VAttribute[directive=false][key.name='class'][value.value=/\\bnav-link\\b/])",
+                    message: "Native nav tabs with class \"nav-link\" are not allowed. Use <NavTab> instead."
+                },
+
+                // 4) Disallow nav-link literals inside dynamic :class expressions.
+                {
+                    selector: "VElement[name='a']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='nav-link']), VElement[name='a']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='nav-link']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='nav-link']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='nav-link'])",
+                    message: "Native nav tabs with class \"nav-link\" are not allowed. Use <NavTab> instead."
+                },
+
+                // 5) Disallow native accordion buttons with static class="accordion-button".
                 {
                     selector: "VElement[name='button']:has(VAttribute[directive=false][key.name='class'][value.value=/\\baccordion-button\\b/])",
                     message: "Native <button class=\"accordion-button\"> is not allowed. Use <AccordionItem> instead."
                 },
 
-                // 4) Disallow accordion-button literals inside dynamic :class expressions.
+                // 6) Disallow accordion-button literals inside dynamic :class expressions.
                 {
                     selector: "VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] VLiteral[value='accordion-button']), VElement[name='button']:has(VAttribute[directive=true][key.name.name='bind'][key.argument.name='class'] Literal[value='accordion-button'])",
                     message: "Native <button> with class \"accordion-button\" is not allowed. Use <AccordionItem> instead."
+                },
+
+                // 7) Disallow <li> without proper parent (ol, ul, menu, or template)
+                {
+                    selector: "VElement[name='li']:not([parent.name='ol']):not([parent.name='ul']):not([parent.name='menu']):not([parent.name='template']):not([parent.name='transitiongroup'])",
+                    message: "<li> must be a direct child of <ol>, <ul>, <menu>, or <template>. Using other parents violates accessibility standards. Vue's <TransitionGroup> is allowed when it renders as a list container (<ul> or <ol>)."
                 }
             ]
 
@@ -386,13 +412,25 @@ export default [
         }
     },
     {
-        files: ["addons/**/*.{js,vue}"],
+        files: ["**/*.vue"],
+        rules: {
+            "@stylistic/indent": "off"
+        }
+    },
+    {
+        files: ["addons/**/*.{js,mjs,vue}"],
         rules: {
             "no-restricted-syntax": "off",
             "vue/no-restricted-syntax": "off",
             "vue/no-deprecated-delete-set": "off",
             "vue/no-deprecated-model-definition": "off",
             "jsdoc/ts-no-empty-object-type": "off"
+        }
+    },
+    {
+        files: navTabLegacyExcludedFiles,
+        rules: {
+            "vue/no-restricted-syntax": "off"
         }
     },
     {
@@ -417,11 +455,26 @@ export default [
         }
     },
     {
+        files: ["devtools/**/*.mjs"],
+        rules: {
+            "func-style": "off",
+            "no-console": "off",
+            "n/no-process-env": "off",
+            "n/no-process-exit": "off"
+        }
+    },
+    {
+        files: ["devtools/jsdoc/js/*.js"],
+        rules: {
+            "jsdoc/require-jsdoc": "off"
+        }
+    },
+    {
         ignores: [
             "**/node_modules/",
             "**/dist/",
             "**/portalconfigs/",
-            "**/jsdoc/",
+            "jsdoc/**",
             "**/docHtml/",
             "**/.git/",
             "**/html/",

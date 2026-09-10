@@ -175,4 +175,15 @@ describe("src/modules/wfst/store/gettersWfst.js", () => {
             expect(gettersWfst.savingErrorMessage(state)(feature)).to.equal("");
         });
     });
+    describe("interactionsDisabled", () => {
+        it("should be true if buttons are disabled", () => {
+            expect(gettersWfst.interactionsDisabled({buttonsDisabled: true, layerLoading: false})).to.be.true;
+        });
+        it("should be true if the layer is loading", () => {
+            expect(gettersWfst.interactionsDisabled({buttonsDisabled: false, layerLoading: true})).to.be.true;
+        });
+        it("should be false if neither buttons are disabled nor the layer is loading", () => {
+            expect(gettersWfst.interactionsDisabled({buttonsDisabled: false, layerLoading: false})).to.be.false;
+        });
+    });
 });

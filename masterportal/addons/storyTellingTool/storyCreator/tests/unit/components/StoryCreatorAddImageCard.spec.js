@@ -1,11 +1,10 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import StoryCreatorAddImageCard from "../../../components/StoryCreatorAddImageCard.vue";
 import sinon from "sinon";
-import {afterEach, beforeEach, describe} from "vitest";
+import {beforeEach, describe} from "vitest";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
     let wrapper,
@@ -70,10 +69,6 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
         });
     });
 
-    afterEach(() => {
-        sinon.restore();
-    });
-
     describe("Component DOM", () => {
         it("should exist", () => {
             expect(wrapper.exists()).to.be.true;
@@ -133,8 +128,11 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
             expect(wrapper.findAllComponents({name: "InputText"}).length).to.equal(2);
         });
 
-        it("should render the FlatButton component only if isImageLoaded is true", async () => {
-            expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.false;
+        it("should render the save FlatButton disabled initially, and enable it when alt, copyright are set and image is loaded", async () => {
+            const saveButton = wrapper.findComponent({name: "FlatButton"});
+
+            expect(saveButton.exists()).to.be.true;
+            expect(saveButton.props("disabled")).to.be.true;
 
             await wrapper.setData({
                 uploadedAsset: {
@@ -145,10 +143,11 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
                     id: "test-uuid",
                     alt: "alt",
                     copyright: "copyright"
-                }
+                },
+                isImageLoaded: true
             });
 
-            expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
+            expect(saveButton.props("disabled")).to.be.false;
         });
 
         it("should not render AlertMessage components", () => {
@@ -160,19 +159,92 @@ describe("addons/storyCreator/components/StoryCreatorAddImageCard.vue", () => {
 
             expect(wrapper.findComponent({name: "AlertMessage"}).exists()).to.be.true;
         });
+
+        it("should use embedded mode when embedded prop is true", async () => {
+            await wrapper.setProps({
+                embedded: true
+            });
+
+            expect(wrapper.find(".card").classes()).to.include("bg-white");
+        });
+
+        it("should use non-embedded mode when embedded prop is false", () => {
+            expect(wrapper.find(".card").classes()).to.include("bg-light");
+        });
+
+        it("should not render the add button when embedded is true", async () => {
+            await wrapper.setProps({
+                embedded: true
+            });
+
+            const buttons = wrapper.findAllComponents({name: "FlatButton"});
+
+            expect(buttons).to.have.lengthOf(1);
+            expect(buttons[0].props("text")).to.equal("additional:modules.storyCreator.buttons.discardImage");
+        });
+
+        it("should render the add button when embedded is false", () => {
+            const buttons = wrapper.findAllComponents({name: "FlatButton"});
+
+            expect(buttons).to.have.lengthOf(2);
+        });
+
+        it("should show alt error in embedded mode when image is loaded and alt is missing", async () => {
+            await wrapper.setProps({
+                embedded: true
+            });
+
+            await wrapper.setData({
+                uploadedAsset: {
+                    id: "test-uuid",
+                    objectURL: "blob:test-created-url"
+                },
+                image: {
+                    id: "test-uuid",
+                    alt: "",
+                    copyright: "copyright info"
+                },
+                showRequiredHint: true
+            });
+
+            expect(wrapper.vm.hasAltError).to.be.true;
+            expect(wrapper.find("#image-name").exists()).to.be.true;
+        });
+
+        it("should show copyright error in embedded mode when image is loaded and copyright is missing", async () => {
+            await wrapper.setProps({
+                embedded: true
+            });
+
+            await wrapper.setData({
+                uploadedAsset: {
+                    id: "test-uuid",
+                    objectURL: "blob:test-created-url"
+                },
+                image: {
+                    id: "test-uuid",
+                    alt: "alt text",
+                    copyright: ""
+                },
+                showRequiredHint: true
+            });
+
+            expect(wrapper.vm.hasCopyrightError).to.be.true;
+        });
     });
 
     describe("Computed Properties", () => {
-        it("should set computed 'enableAdd' to false", () => {
+        it("should set computed 'enableAdd' to false initially", () => {
             expect(wrapper.vm.enableAdd).to.be.false;
         });
 
-        it("should set computed 'enableAdd' to true", async () => {
+        it("should set computed 'enableAdd' to true when alt, copyright are set and image is loaded", async () => {
             await wrapper.setData({
                 image: {
                     alt: "alt",
                     copyright: "copyright"
-                }
+                },
+                isImageLoaded: true
             });
 
             expect(wrapper.vm.enableAdd).to.be.true;

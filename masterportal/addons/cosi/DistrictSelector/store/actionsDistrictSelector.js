@@ -8,6 +8,53 @@ import {mapDistrictNames} from "../utils/prepareDistrictLevels.js";
 import {equalTo} from "ol/format/filter";
 import {nextTick} from "vue";
 import Collection from "ol/Collection";
+import i18next from "i18next";
+
+/**
+ * Loads the statistical features of a single stats layer for a single district.
+ * @param {Object} params - the parameters.
+ * @param {Object} params.districtLevel - The district level the layer belongs to.
+ * @param {Number} params.index - The index of the layer within districtLevel.stats.
+ * @param {String} params.districtName - The district to load the features for.
+ * @param {Function} params.getStatFeatures - Function for WFS GetFeature-Request via Post.
+ * @param {String} params.srsName - The projection code of the map.
+ * @param {module:ol/format/WFS} params.wfsFormat - The format to read WFS responses with.
+ * @returns {Promise<module:ol/Feature[]>} The features, empty for an unsupported layer type.
+ */
+async function loadStatLayerFeatures ({districtLevel, index, districtName, getStatFeatures, srsName, wfsFormat}) {
+    const layer = districtLevel.stats.layers[index],
+        keyOfAttrName = districtLevel.stats.keyOfAttrName[index];
+
+    if (layer.typ === "WFS") {
+        const statFeatures = await getStatFeatures(layer.url, {
+            featureTypes: [layer.featureType],
+            srsName: srsName,
+            propertyNames: districtLevel.propertyNameList[index],
+            filter: equalTo(keyOfAttrName, districtName)
+        });
+
+        return wfsFormat.readFeatures(statFeatures);
+    }
+    if (layer.typ === "OAF") {
+        const response = await oafRequest.getOAFFeatureGet(layer.url, layer.collection, {
+            skipGeometry: true,
+            filter: keyOfAttrName + "='" + districtName + "'",
+            crs: "http://www.opengis.net/def/crs/EPSG/0/25832",
+            filterCrs: "http://www.opengis.net/def/crs/EPSG/0/25832"
+        });
+
+        return oafRequest.readAllOAFToGeoJSON(response);
+    }
+    if (layer.typ === "GeoJSON") {
+        // Self-hosted derived statistics (portal/cosi/tools/), e.g. the Sozialmonitoring
+        // index aggregated to Stadtteil level. Fetched once and filtered in memory -
+        // see loadLocalStatFeatures.
+        return loadLocalStatFeatures(layer.url, keyOfAttrName, districtName);
+    }
+
+    // Unsupported layer type - an empty result, never the previous layer's features.
+    return [];
+}
 
 const actions = {
     /**
@@ -25,7 +72,10 @@ const actions = {
      */
     async loadStatFeatures ({dispatch, rootGetters}, {districtLevel, districts, getStatFeatures = getFeature.getFeaturePOST, recursive = true}) {
         const wfsFormat = new WFS(),
-            layers = districtLevel.stats.layers;
+            layers = districtLevel.stats.layers,
+            // Names of the stats layers that could not be loaded at all, reported once
+            // at the end instead of per district x layer.
+            failedLayers = new Set();
 
         let olFeatures;
 
@@ -35,57 +85,44 @@ const actions = {
                 const districtName = mapDistrictNames(districts[i].getName(), districtLevel);
 
                 for (let j = 0; j < layers.length; j++) {
-                    if (districtLevel.stats.layers[j].typ === "WFS") {
-                        const statFeatures = await getStatFeatures(districtLevel.stats.layers[j].url, {
-                            featureTypes: [districtLevel.stats.layers[j].featureType],
+                    try {
+                        olFeatures = await loadStatLayerFeatures({
+                            districtLevel,
+                            index: j,
+                            districtName,
+                            getStatFeatures,
                             srsName: rootGetters["Maps/projectionCode"],
-                            propertyNames: districtLevel.propertyNameList[j],
-                            filter: equalTo(districtLevel.stats.keyOfAttrName[j], districtName)
+                            wfsFormat
                         });
-
-                        olFeatures = wfsFormat.readFeatures(statFeatures);
                     }
-                    else if (districtLevel.stats.layers[j].typ === "OAF") {
-                        const response = await oafRequest.getOAFFeatureGet(
-                            districtLevel.stats.layers[j].url,
-                            districtLevel.stats.layers[j].collection,
-                            {
-                                skipGeometry: true,
-                                filter: districtLevel.stats.keyOfAttrName[j] + "='" + districtName + "'",
-                                crs: "http://www.opengis.net/def/crs/EPSG/0/25832",
-                                filterCrs: "http://www.opengis.net/def/crs/EPSG/0/25832"
-                            }
-                        );
-
-                        olFeatures = oafRequest.readAllOAFToGeoJSON(response);
-                    }
-                    else if (districtLevel.stats.layers[j].typ === "GeoJSON") {
-                        // Self-hosted derived statistics (portal/cosi/tools/), e.g. the
-                        // Sozialmonitoring index aggregated to Stadtteil level. Fetched
-                        // once and filtered in memory - see loadLocalStatFeatures.
-                        olFeatures = await loadLocalStatFeatures(
-                            districtLevel.stats.layers[j].url,
-                            districtLevel.stats.keyOfAttrName[j],
-                            districtName
-                        );
-                    }
-                    else {
-                        // Unsupported layer type - do not silently reuse the previous
-                        // iteration's features for this district.
+                    catch (error) {
+                        // A single unreachable collection must not abort the run. The
+                        // requests are sequential and the whole chain was unguarded, so one
+                        // timing-out Hamburg dataset skipped every remaining layer, every
+                        // remaining district AND the closing updateDistricts() that tells
+                        // the Dashboard its data is ready - the Dashboard then stayed empty
+                        // even for the datasets that had loaded fine.
                         olFeatures = [];
+                        failedLayers.add(layers[j].name || layers[j].id);
+                        console.error(`loadStatFeatures: ${layers[j].id} failed for ${districtName}`, error);
                     }
                     if (olFeatures.length > 0) {
                         await parseFeatures(olFeatures, districts[i], districtLevel);
                     }
-                    else {
-                        // dispatch("Alerting/addSingleAlert", {
-                        //     content: "Es konnten nicht alle Datensätze vollständig geladen werden! Bitte versuchen Sie es später erneut. Sollte der Fehler weiterhin bestehen nutzen Sie bitte das Kontaktformular.",
-                        //     category: "Warning",
-                        //     cssClass: "warning"
-                        // }, {root: true});
-                    }
                 }
             }
+        }
+
+        if (failedLayers.size > 0) {
+            // Partially loaded statistics look exactly like real ones ("this district has
+            // no data") - say so rather than let an outage pass for a finding.
+            dispatch("Alerting/addSingleAlert", {
+                category: i18next.t("common:modules.alerting.categories.warning"),
+                content: i18next.t("additional:modules.cosi.districtSelector.statsLoadingFailed", {
+                    level: districtLevel.label,
+                    datasets: [...failedLayers].join(", ")
+                })
+            }, {root: true});
         }
 
         // loading reference Districts recursively

@@ -33,16 +33,16 @@ export default {
             // get configured graph properties from providers
             handler (newValue) {
                 const jobIds = Object.keys(newValue),
-                    jobs = this.jobs,
-                    providers = this.providers;
+                      jobs = this.jobs,
+                      providers = this.providers;
 
                 for (const jobId of jobIds) {
                     if (!this.chartConfigs[jobId]) {
                         this.chartConfigs[jobId] = {xProp: "", yProp: "", rootProp: ""};
                     }
                     const job = jobs.find(aJob => aJob.jobID === jobId),
-                        [serverName, processName] = job ? job.processID.split(":") : [],
-                        config = providers?.[serverName]?.processes?.[processName]?.["graph-properties"];
+                          [serverName, processName] = job ? job.processID.split(":") : [],
+                          config = providers?.[serverName]?.processes?.[processName]?.["graph-properties"];
 
                     if (!job || !config) {
                         continue;

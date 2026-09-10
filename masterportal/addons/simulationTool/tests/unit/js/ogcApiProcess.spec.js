@@ -14,6 +14,10 @@ describe("addons/simulationTool/js/ogcApiProcess.js", () => {
             expect(ogcApiProcess.baseUrl).to.equal(baseUrl);
             expect(ogcApiProcess.processId).to.equal(processId);
         });
+
+        it("should throw for invalid baseUrl", () => {
+            expect(() => new OgcApiProcess("ftp://example.com", "process123")).to.throw();
+        });
     });
 
     describe("getDescription", () => {

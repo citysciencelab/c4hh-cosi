@@ -208,7 +208,7 @@ export default {
 
             if (values instanceof Date && this.activeChartDatasetConfig.datePickerType === "month") {
                 const startDay = dayjs(values).format("YYYY-MM-DD"),
-                    endDay = dayjs(values).endOf("month").format("YYYY-MM-DD");
+                      endDay = dayjs(values).endOf("month").format("YYYY-MM-DD");
 
                 switch (this.selectedChartData) {
                     case "ageGroup":
@@ -232,7 +232,7 @@ export default {
             }
             else if (values[0] && values[1] && this.activeChartDatasetConfig.datePickerType === "date") {
                 const startDay = dayjs(values[0]).format("YYYY-MM-DD"),
-                    endDay = dayjs(values[1]).format("YYYY-MM-DD");
+                      endDay = dayjs(values[1]).format("YYYY-MM-DD");
 
                 switch (this.selectedChartData) {
                     case "daily":
@@ -324,13 +324,13 @@ export default {
 
             responses.forEach((response, index) => {
                 const color = index === 0 ? "#df0000" : "#002680",
-                    aggregatedData = aggregateData(
-                        response.features,
-                        date => date.getFullYear(),
-                        date => date.getMonth(),
-                        () => ({sum: 0, count: 0}),
-                        groupByKey
-                    );
+                      aggregatedData = aggregateData(
+                          response.features,
+                          date => date.getFullYear(),
+                          date => date.getMonth(),
+                          () => ({sum: 0, count: 0}),
+                          groupByKey
+                      );
 
                 datasets.push({
                     data: [],
@@ -364,8 +364,8 @@ export default {
          */
         createChartData (responses, chartType) {
             const labels = new Set(),
-                locations = new Set(),
-                datasets = [];
+                  locations = new Set(),
+                  datasets = [];
             let presentation_data,
                 color;
 
@@ -373,9 +373,9 @@ export default {
                 presentation_data = [];
                 response.features.forEach((feature) => {
                     const date = dayjs(feature.properties.datum).utc(true).locale(this.currentLocale),
-                        labelXAxis = this.selectedChartData === "hourly"
-                            ? date.format("dd, DD.MM.YYYY") + ` ${feature.properties.startuhrzeit}:00`
-                            : date.format("dd, DD.MM.YYYY");
+                          labelXAxis = this.selectedChartData === "hourly"
+                              ? date.format("dd, DD.MM.YYYY") + ` ${feature.properties.startuhrzeit}:00`
+                              : date.format("dd, DD.MM.YYYY");
 
                     labels.add(labelXAxis);
                     locations.add(this.uniqueGeoIdsWithNames.find(f => f.geoId === feature.properties.geoid).name);

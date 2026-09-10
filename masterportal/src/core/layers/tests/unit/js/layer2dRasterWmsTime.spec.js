@@ -2,6 +2,7 @@ import {expect} from "chai";
 import sinon from "sinon";
 import store from "@appstore/index.js";
 import Layer2dRasterWmsTime from "@core/layers/js/layer2dRasterWmsTime.js";
+import layerCollection from "@core/layers/js/layerCollection.js";
 import axios from "axios";
 
 describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
@@ -1139,6 +1140,190 @@ describe("src/core/js/layers/layer2dRasterWmsTime.js", () => {
             );
             expect(setVisibleSpy.calledOnce).to.be.true;
             expect(setVisibleSpy.firstCall.args[0]).to.be.true;
+        });
+    });
+
+    describe("visibilityChanged", () => {
+        let removeLayerStub, dispatchStub;
+
+        beforeEach(() => {
+            removeLayerStub = sinon.stub(Layer2dRasterWmsTime.prototype, "removeLayer");
+            dispatchStub = sinon.stub(store, "dispatch");
+            store.getters["Modules/LayerSwiper/active"] = false;
+            store.getters.layerConfigById = sinon.stub().returns({showInLayerTree: true});
+        });
+
+        afterEach(() => {
+            sinon.restore();
+        });
+
+        [
+            {swiper: true, showInTree: false, input: false, expectRemove: true, desc: "calls removeLayer if hidden from tree"},
+            {swiper: false, showInTree: false, input: false, expectRemove: false, desc: "does NOT call removeLayer if swiper inactive"},
+            {swiper: false, showInTree: true, input: true, expectRemove: false, expectToggle: false, desc: "does not auto-reactivate swiper on visible"}
+        ].forEach(({swiper, showInTree, input, expectRemove, expectToggle, desc}) => {
+            it(`should match behavior: ${desc}`, () => {
+                store.getters["Modules/LayerSwiper/active"] = swiper;
+                store.getters.layerConfigById.returns({showInLayerTree: showInTree});
+                const layer = new Layer2dRasterWmsTime(attributes);
+
+                if (expectToggle) {
+                    store.getters.layerConfigById.returns({visibility: true, showInLayerTree: true});
+                }
+
+                layer.visibilityChanged(input);
+
+                if (expectRemove) {
+                    expect(removeLayerStub.calledOnce).to.be.true;
+                }
+                if (typeof expectToggle === "boolean") {
+                    expect(dispatchStub.calledWith("Modules/WmsTime/toggleSwiper")).to.equal(expectToggle);
+                }
+            });
+        });
+
+        it("should reactivate swiper if second layer is explicitly set visible", () => {
+            store.getters["Modules/LayerSwiper/active"] = false;
+            store.getters.layerConfigById.callsFake(id => {
+                if (id === attributes.id || id === attributes.id + "_secondLayer") {
+                    return {visibility: true, showInLayerTree: true, time: {playbackDelay: 1}};
+                }
+                return undefined;
+            });
+            const layer = new Layer2dRasterWmsTime({...attributes, id: attributes.id + "_secondLayer"});
+
+            layer.visibilityChanged(true);
+
+            expect(dispatchStub.calledWith("Modules/WmsTime/toggleSwiper", attributes.id + "_secondLayer")).to.be.true;
+        });
+
+        it("should reactivate swiper if base layer is explicitly set visible after second layer", () => {
+            store.getters["Modules/LayerSwiper/active"] = false;
+            store.getters["Modules/WmsTime/defaultDimensionName"] = "TIME";
+            store.getters.layerConfigById.callsFake(id => {
+                if (id === attributes.id || id === attributes.id + "_secondLayer") {
+                    return {visibility: true, showInLayerTree: true, time: {playbackDelay: 1}};
+                }
+                return undefined;
+            });
+            sinon.stub(layerCollection, "getLayerById").returns({
+                getLayerSource: () => ({
+                    getParams: () => ({TIME: "2020"})
+                })
+            });
+            const layer = new Layer2dRasterWmsTime(attributes);
+
+            layer.visibilityChanged(true);
+
+            expect(dispatchStub.calledWith("Modules/WmsTime/toggleSwiper", attributes.id)).to.be.true;
+        });
+    });
+
+
+    describe("removeLayer", () => {
+        let dispatchStub;
+
+        beforeEach(() => {
+            dispatchStub = sinon.stub(store, "dispatch");
+            commitStub.resetHistory();
+            store.getters["Modules/LayerSwiper/active"] = true;
+            store.getters["Modules/WmsTime/layerAppendix"] = "_secondLayer";
+            store.getters["Modules/WmsTime/defaultDimensionName"] = "TIME";
+            store.getters.layerConfigById = sinon.stub().returns({});
+            sinon.stub(layerCollection, "getLayerById").returns({
+                getLayerSource: () => ({
+                    getParams: () => ({TIME: "2020"})
+                })
+            });
+        });
+
+        afterEach(() => {
+            dispatchStub.restore();
+            store.getters = origGetters;
+        });
+
+        it("should re-promote second layer to base id when first layer is removed", () => {
+            const wmsTimeLayer = new Layer2dRasterWmsTime({...attributes, zIndex: 5}),
+                secondLayerId = attributes.id + "_secondLayer";
+
+            store.getters.layerConfigById.withArgs(secondLayerId).returns({id: secondLayerId, visibility: true, showInLayerTree: true, zIndex: 10});
+
+            wmsTimeLayer.removeLayer(attributes.id);
+
+            const combinedCall = dispatchStub.getCalls().find(call => call.args[0] === "replaceByIdInLayerConfig" && call.args[1]?.layerConfigs?.length === 2
+            );
+
+            expect(combinedCall).to.exist;
+            expect(combinedCall.args[1].layerConfigs[0].id).to.equal(attributes.id);
+            expect(combinedCall.args[1].layerConfigs[0].layer.visibility).to.be.true;
+            expect(combinedCall.args[1].layerConfigs[0].layer.showInLayerTree).to.be.true;
+            expect(combinedCall.args[1].layerConfigs[1].id).to.equal(secondLayerId);
+            expect(combinedCall.args[1].layerConfigs[1].layer.visibility).to.be.false;
+            expect(combinedCall.args[1].layerConfigs[1].layer.showInLayerTree).to.be.false;
+        });
+
+        it("should keep TimeSlider active on remaining layer when one compare layer is removed", () => {
+            const wmsTimeLayer = new Layer2dRasterWmsTime(attributes),
+                secondLayerId = attributes.id + "_secondLayer";
+
+            store.getters.layerConfigById.withArgs(secondLayerId).returns({id: secondLayerId, visibility: true, showInLayerTree: true, time: {playbackDelay: 2}});
+
+            wmsTimeLayer.removeLayer(attributes.id);
+
+            const setTimeSliderActiveCall = commitStub.getCalls().find(call => call.args[0] === "Modules/WmsTime/setTimeSliderActive");
+
+            expect(setTimeSliderActiveCall).to.exist;
+            expect(setTimeSliderActiveCall.args[1]).to.deep.equal({
+                active: true,
+                currentLayerId: attributes.id,
+                playbackDelay: 2
+            });
+            expect(commitStub.calledWith("Modules/WmsTime/setVisibility", true)).to.be.true;
+            expect(commitStub.calledWith("Modules/WmsTime/setTimeSliderDefaultValue", "2020")).to.be.true;
+        });
+
+        it("should take remaining layer time when params use lowercase key", () => {
+            const wmsTimeLayer = new Layer2dRasterWmsTime(attributes),
+                secondLayerId = attributes.id + "_secondLayer";
+
+            layerCollection.getLayerById.restore();
+            sinon.stub(layerCollection, "getLayerById").callsFake(id => {
+                if (id === secondLayerId) {
+                    return {getLayerSource: () => ({getParams: () => ({time: "2018"})})};
+                }
+                return {updateTime: sinon.spy(), getLayerSource: () => ({getParams: () => ({})})};
+            });
+            store.getters.layerConfigById.withArgs(secondLayerId).returns({id: secondLayerId, visibility: true, showInLayerTree: true, time: {playbackDelay: 2}});
+
+            wmsTimeLayer.removeLayer(attributes.id);
+
+            expect(commitStub.calledWith("Modules/WmsTime/setTimeSliderDefaultValue", "2018")).to.be.true;
+        });
+
+        it("should deactivate swiper without using toggleSwiper", () => {
+            const wmsTimeLayer = new Layer2dRasterWmsTime(attributes);
+
+            store.getters.layerConfigById.withArgs(attributes.id + "_secondLayer").returns({});
+
+            wmsTimeLayer.removeLayer(attributes.id);
+
+            const deactivateCall = dispatchStub.getCalls().find(call => call.args[0] === "Modules/WmsTime/deactivateLayerSwiper"),
+                toggleCall = dispatchStub.getCalls().find(call => call.args[0] === "Modules/WmsTime/toggleSwiper");
+
+            expect(deactivateCall).to.exist;
+            expect(toggleCall).to.not.exist;
+        });
+
+        it("should deactivate timeSlider if LayerSwiper is not active", () => {
+            store.getters["Modules/LayerSwiper/active"] = false;
+            const wmsTimeLayer = new Layer2dRasterWmsTime(attributes);
+
+            wmsTimeLayer.removeLayer(attributes.id);
+
+            const commitCall = commitStub.getCalls().find(call => call.args[0] === "Modules/WmsTime/setTimeSliderActive");
+
+            expect(commitCall).to.exist;
+            expect(commitCall.args[1]).to.deep.equal({active: false, currentLayerId: ""});
         });
     });
 });

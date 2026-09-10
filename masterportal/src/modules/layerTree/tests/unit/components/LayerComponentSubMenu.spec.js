@@ -1,14 +1,15 @@
 import {createStore} from "vuex";
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
+import {createPinia, setActivePinia} from "pinia";
 
 import LayerComponentSubMenu from "@modules/layerTree/components/LayerComponentSubMenu.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
-    let changeCurrentComponentStub,
+    let pinia,
+        changeCurrentComponentStub,
         layer,
         layerConfigStub,
         propsData,
@@ -29,6 +30,8 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         };
 
     beforeEach(() => {
+        pinia = createPinia();
+        setActivePinia(pinia);
         layer = {
             id: "1",
             name: "layer",
@@ -144,7 +147,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         showFolderPath = false;
         wrapper = shallowMount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -163,7 +166,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         });
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -177,7 +180,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         layer.parentId = "folder-1";
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -190,7 +193,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         showFolderPath = true;
         wrapper = shallowMount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -203,7 +206,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         layer.parentId = "folder-1";
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -215,6 +218,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
                 type: "layerSelection",
                 side: "mainMenu",
                 props: {
+                    "layerId": "1",
                     "name": layer.name
                 }
             }
@@ -229,7 +233,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
     it("renders the remove-layer", () => {
         wrapper = shallowMount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -240,7 +244,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
     it("should remove layer if remove layer button is clicked", async () => {
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -253,15 +257,16 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
     it("renders the transparency", () => {
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
 
         expect(wrapper.find("#layer-component-icon-sub-menu-transparency-container-" + propsData.layerConf.id).exists()).to.be.true;
         expect(wrapper.find(".transparency-container > i").classes()).to.includes("bi-droplet-half");
-        expect(wrapper.find(".transparency-container > label").exists()).to.be.true;
+        expect(wrapper.find(".transparency-container .transparency-text").exists()).to.be.true;
         expect(wrapper.find(".transparency-container input").exists()).to.be.true;
+        expect(wrapper.find(".transparency-container input").attributes("aria-label")).to.not.be.undefined;
     });
 
     it("set value to input field", () => {
@@ -269,7 +274,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
 
         wrapper = mount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -311,7 +316,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
 
         wrapper = shallowMount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: {
                 layerConf: layer1
@@ -337,7 +342,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
 
         wrapper = shallowMount(LayerComponentSubMenu, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: {
                 layerConf: layer1
@@ -352,7 +357,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         it("getPath - no folders --> no path", () => {
             wrapper = shallowMount(LayerComponentSubMenu, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 propsData
             });
@@ -365,7 +370,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
 
             wrapper = shallowMount(LayerComponentSubMenu, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 propsData
             });
@@ -375,7 +380,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         it("getNamesOfParentFolder returns array with folder names", () => {
             wrapper = shallowMount(LayerComponentSubMenu, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 propsData
             });
@@ -385,7 +390,7 @@ describe("src/modules/layerTree/components/LayerComponentSubMenu.vue", () => {
         it("getNamesOfParentFolder returns empty array if parentId is undefined of folder is unknown", () => {
             wrapper = shallowMount(LayerComponentSubMenu, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 propsData
             });

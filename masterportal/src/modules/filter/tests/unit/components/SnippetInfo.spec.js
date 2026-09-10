@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import SnippetInfo from "@modules/filter/components/SnippetInfo.vue";
 import {expect} from "chai";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/SnippetInfo.vue", () => {
     it("should render correctly", () => {

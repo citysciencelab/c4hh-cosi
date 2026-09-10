@@ -1,9 +1,8 @@
-import {mount, shallowMount, config} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import SnippetChart from "../../../components/SnippetChart.vue";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/SnippetChart.vue", () => {
     const chartConfig = {

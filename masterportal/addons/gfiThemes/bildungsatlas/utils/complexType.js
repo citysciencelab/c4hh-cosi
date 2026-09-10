@@ -1,5 +1,8 @@
 import {convertColor} from "../../../../src/shared/js/utils/convertColor.js";
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat.js";
+
+dayjs.extend(customParseFormat);
 
 /**
  * ComplexTypes are invented by the LGV to represent wfs array structures.

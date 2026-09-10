@@ -285,7 +285,8 @@
       "contactName": "Nome",
       "contactPhone": "Tel.",
       "contactEmail": "E-mail",
-      "wait": "Um momento, por favor"
+      "wait": "Um momento, por favor",
+      "license": "Licença"
     },
     "draw": {
       "description": "Crie marcações importantes ou assinale áreas",
@@ -633,6 +634,7 @@
       "addressSuffix": "Endereço",
       "addressSuffixes": "Endereços da camada",
       "attachFileMessage": "se necessário, anexar o tipo de ficheiro no download",
+      "creationDate": "Criação",
       "downloadDataset": "Descarregar conjunto de dados",
       "lastModified": "Última alteração",
       "legend": "Legenda",
@@ -640,7 +642,7 @@
       "noMetadataLoaded": "Não foi possível carregar metadados!",
       "noMetadataLoadedConsole": "Não foi possível obter os metadados para esta camada. Isto indica um problema com o services.json integrado.",
       "periodicityTitle": "Atualização de dados",
-      "publicationCreation": "Publicação / criação",
+      "publicationDate": "Publicação",
       "pointOfContact": "Pessoa de contacto",
       "contactInfoMessage": "Escreva à pessoa de contacto do tema ",
       "contactPublisher": "Escreva à pessoa de contacto ",

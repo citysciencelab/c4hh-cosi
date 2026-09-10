@@ -3,11 +3,13 @@ import sinon from "sinon";
 import actions from "@modules/layerInformation/store/actionsLayerInformation.js";
 import getCswRecordById from "@shared/js/api/getCswRecordById.js";
 import axios from "axios";
-
-const {startLayerInformation, setMetadataURL} = actions;
+import store from "@appstore/index.js";
+import {createPinia, setActivePinia} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => {
-    let getters = {},
+    let layerInformationStore,
+        pinia,
         rootGetters,
         commit,
         dispatch;
@@ -21,10 +23,32 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
     });
 
     beforeEach(() => {
-        dispatch = sinon.spy();
-        commit = sinon.spy();
+        pinia = createPinia();
+        setActivePinia(pinia);
+
+        layerInformationStore = useLayerInformationStore();
+
+        rootGetters = {
+            configJs: {},
+            "Modules/Legend/layerInfoLegend": {
+                id: "123"
+            },
+            isMobile: false,
+            "Menu/expanded": () => true,
+            restServiceById: () => undefined,
+            layerConfigById: () => undefined,
+            styleListLoaded: true
+        };
+
+        sinon.stub(store, "getters").value(rootGetters);
+
+        commit = sinon.stub(store, "commit");
+        dispatch = sinon.stub(store, "dispatch");
     });
 
+    afterEach(() => {
+        sinon.restore();
+    });
 
     describe("initialize the store", () => {
         let layerConf,
@@ -49,71 +73,74 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
                 ]
             };
 
-            rootGetters = {
-                "Modules/Legend/layerInfoLegend": {
-                    id: "123"
-                },
-                isMobile: () => isMobile,
-                "Menu/expanded": () => menuExpanded
+            rootGetters["Modules/Legend/layerInfoLegend"] = {
+                id: "123"
             };
-
+            rootGetters.isMobile = isMobile;
+            rootGetters["Menu/expanded"] = () => menuExpanded;
         });
+
         it("should initialize the LayerInformation", () => {
-            startLayerInformation({commit, dispatch, rootGetters}, layerConf);
-            expect(commit.calledTwice).to.be.true;
-            expect(commit.firstCall.args[0]).to.equal("setLegendAvailable");
-            expect(commit.firstCall.args[1]).to.be.equals(true);
-            expect(commit.secondCall.args[0]).to.equal("setLayerInfo");
-            expect(commit.secondCall.args[1]).to.be.deep.equals(layerConf);
+            const setLayerInfo = sinon.stub(layerInformationStore, "setLayerInfo"),
+                setMetadataURL = sinon.stub(layerInformationStore, "setMetadataURL"),
+                additionalSingleLayerInfo = sinon.stub(layerInformationStore, "additionalSingleLayerInfo");
 
+            actions.startLayerInformation.call(layerInformationStore, layerConf);
 
-            expect(dispatch.calledThrice).to.be.true;
+            expect(layerInformationStore.legendAvailable).to.be.true;
+            expect(setLayerInfo.calledWith(layerConf)).to.be.true;
+
+            expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.firstCall.args[0]).to.equal("Menu/changeCurrentComponent");
             expect(dispatch.firstCall.args[1]).to.be.deep.equals({
                 type: "layerInformation",
                 side: "mainMenu",
                 props: {name: layerConf.datasets[0].md_name}
             });
-            expect(dispatch.secondCall.args[0]).to.equal("setMetadataURL");
-            expect(dispatch.secondCall.args[1]).to.be.equals(layerConf.datasets[0].md_id);
-            expect(dispatch.thirdCall.args[0]).to.equal("additionalSingleLayerInfo");
+
+            expect(setMetadataURL.calledWith(layerConf.datasets[0].md_id)).to.be.true;
+            expect(additionalSingleLayerInfo.calledOnce).to.be.true;
         });
+
         it("should initialize the LayerInformation with name of layer", () => {
+            const setLayerInfo = sinon.stub(layerInformationStore, "setLayerInfo"),
+                setMetadataURL = sinon.stub(layerInformationStore, "setMetadataURL"),
+                additionalSingleLayerInfo = sinon.stub(layerInformationStore, "additionalSingleLayerInfo");
+
             delete layerConf.datasets[0].md_name;
-            startLayerInformation({commit, dispatch, rootGetters}, layerConf);
-            expect(commit.calledTwice).to.be.true;
-            expect(commit.firstCall.args[0]).to.equal("setLegendAvailable");
-            expect(commit.firstCall.args[1]).to.be.equals(true);
-            expect(commit.secondCall.args[0]).to.equal("setLayerInfo");
-            expect(commit.secondCall.args[1]).to.be.deep.equals(layerConf);
 
+            actions.startLayerInformation.call(layerInformationStore, layerConf);
 
-            expect(dispatch.calledThrice).to.be.true;
+            expect(layerInformationStore.legendAvailable).to.be.true;
+            expect(setLayerInfo.calledWith(layerConf)).to.be.true;
+
+            expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.firstCall.args[0]).to.equal("Menu/changeCurrentComponent");
             expect(dispatch.firstCall.args[1]).to.be.deep.equals({
                 type: "layerInformation",
                 side: "mainMenu",
                 props: {name: "name of the layer"}
             });
-            expect(dispatch.secondCall.args[0]).to.equal("setMetadataURL");
-            expect(dispatch.secondCall.args[1]).to.be.equals(layerConf.datasets[0].md_id);
-            expect(dispatch.thirdCall.args[0]).to.equal("additionalSingleLayerInfo");
+            expect(setMetadataURL.calledWith(layerConf.datasets[0].md_id)).to.be.true;
+            expect(additionalSingleLayerInfo.calledOnce).to.be.true;
         });
+
         it("should initialize the LayerInformation and create legend", () => {
+            const setLayerInfo = sinon.stub(layerInformationStore, "setLayerInfo"),
+                setMetadataURL = sinon.stub(layerInformationStore, "setMetadataURL"),
+                additionalSingleLayerInfo = sinon.stub(layerInformationStore, "additionalSingleLayerInfo");
+
             layerConf.legendURL = "https://legend.de";
             layerConf.id = "another";
 
-            startLayerInformation({commit, dispatch, rootGetters}, layerConf);
-            expect(commit.calledThrice).to.be.true;
-            expect(commit.firstCall.args[0]).to.equal("setLegendAvailable");
-            expect(commit.firstCall.args[1]).to.be.equals(true);
-            expect(commit.secondCall.args[0]).to.equal("Modules/Legend/setLayerInfoLegend");
-            expect(commit.secondCall.args[1]).to.be.deep.equals({});
-            expect(commit.thirdCall.args[0]).to.equal("setLayerInfo");
-            expect(commit.thirdCall.args[1]).to.be.deep.equals(layerConf);
+            actions.startLayerInformation.call(layerInformationStore, layerConf);
 
+            expect(layerInformationStore.legendAvailable).to.be.true;
+            expect(commit.calledOnce).to.be.true;
+            expect(commit.firstCall.args[0]).to.equal("Modules/Legend/setLayerInfoLegend");
+            expect(commit.firstCall.args[1]).to.be.deep.equals({});
 
-            expect(dispatch.callCount).to.be.equals(4);
+            expect(dispatch.callCount).to.be.equals(2);
             expect(dispatch.firstCall.args[0]).to.equal("Modules/Legend/createLegendForLayerInfo");
             expect(dispatch.firstCall.args[1]).to.equal(layerConf.id);
 
@@ -123,22 +150,26 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
                 side: "mainMenu",
                 props: {name: layerConf.datasets[0].md_name}
             });
-            expect(dispatch.thirdCall.args[0]).to.equal("setMetadataURL");
-            expect(dispatch.thirdCall.args[1]).to.be.equals(layerConf.datasets[0].md_id);
-            expect(dispatch.getCall(3).args[0]).to.equal("additionalSingleLayerInfo");
+            expect(setLayerInfo.calledWith(layerConf)).to.be.true;
+            expect(setMetadataURL.calledWith(layerConf.datasets[0].md_id)).to.be.true;
+            expect(additionalSingleLayerInfo.calledOnce).to.be.true;
         });
 
         it("should toggle the LayerInformation in menu if mobile", () => {
+            const setLayerInfo = sinon.stub(layerInformationStore, "setLayerInfo"),
+                setMetadataURL = sinon.stub(layerInformationStore, "setMetadataURL"),
+                additionalSingleLayerInfo = sinon.stub(layerInformationStore, "additionalSingleLayerInfo");
+
             isMobile = true;
             menuExpanded = false;
-            startLayerInformation({commit, dispatch, rootGetters}, layerConf);
-            expect(commit.calledTwice).to.be.true;
-            expect(commit.firstCall.args[0]).to.equal("setLegendAvailable");
-            expect(commit.firstCall.args[1]).to.be.equals(true);
-            expect(commit.secondCall.args[0]).to.equal("setLayerInfo");
-            expect(commit.secondCall.args[1]).to.be.deep.equals(layerConf);
 
-            expect(dispatch.callCount).to.be.equals(4);
+            rootGetters.isMobile = isMobile;
+            rootGetters["Menu/expanded"] = () => menuExpanded;
+            actions.startLayerInformation.call(layerInformationStore, layerConf);
+            expect(layerInformationStore.legendAvailable).to.be.true;
+            expect(setLayerInfo.calledWith(layerConf)).to.be.true;
+
+            expect(dispatch.callCount).to.be.equals(2);
             expect(dispatch.firstCall.args[0]).to.equal("Menu/toggleMenu");
             expect(dispatch.firstCall.args[1]).to.equal("mainMenu");
 
@@ -148,87 +179,105 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
                 side: "mainMenu",
                 props: {name: layerConf.datasets[0].md_name}
             });
-            expect(dispatch.thirdCall.args[0]).to.equal("setMetadataURL");
-            expect(dispatch.thirdCall.args[1]).to.be.equals(layerConf.datasets[0].md_id);
-            expect(dispatch.getCall(3).args[0]).to.equal("additionalSingleLayerInfo");
+            expect(setMetadataURL.calledWith(layerConf.datasets[0].md_id)).to.be.true;
+            expect(additionalSingleLayerInfo.calledOnce).to.be.true;
         });
 
         it("should set metaDataCatalogueId from configJs before initialization", () => {
-            getters = {
-                metaDataCatalogueId: "old-id"
-            };
+            sinon.stub(layerInformationStore, "setLayerInfo");
+            sinon.stub(layerInformationStore, "setMetadataURL");
+            sinon.stub(layerInformationStore, "additionalSingleLayerInfo");
+            layerInformationStore.metaDataCatalogueId = "old-id";
             rootGetters.configJs = {
                 metaDataCatalogueId: "new-id"
             };
 
-            startLayerInformation({commit, dispatch, getters, rootGetters}, layerConf);
+            actions.startLayerInformation.call(layerInformationStore, layerConf);
 
-            expect(commit.callCount).to.be.gte(3);
-            expect(commit.firstCall.args[0]).to.equal("setMetaDataCatalogueId");
-            expect(commit.firstCall.args[1]).to.equal("new-id");
+            expect(layerInformationStore.metaDataCatalogueId).to.equal("new-id");
         });
 
         it("should set the Meta Data URLs", async () => {
             const metaId = "73A344E9-CDB5-4A17-89C1-05E202989755",
-                state = {
-                    layerInfo: {
-                        "id": "123",
-                        "metaID": "layerMetaId",
-                        "layername": "name",
-                        "url": "google.de",
-                        "urlIsVisible": true
-                    },
-                    metaDataCatalogueId: "2"
-                },
-                metaURLs = ["https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid=73A344E9-CDB5-4A17-89C1-05E202989755"];
+                metaURLs = [
+                    "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid=73A344E9-CDB5-4A17-89C1-05E202989755"
+                ];
 
-            setMetadataURL({commit, dispatch, state, rootGetters: {
-                restServiceById: id => id === "2" ? {url: "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid="} : {}
-            }}, metaId);
+            layerInformationStore.layerInfo = {
+                "id": "123",
+                "metaID": "layerMetaId",
+                "layername": "name",
+                "url": "google.de",
+                "urlIsVisible": true
+            };
 
-            expect(commit.calledWith("setMetaURLs", metaURLs)).to.be.true;
+            layerInformationStore.metaDataCatalogueId = "2";
+
+            rootGetters.restServiceById = id => id === "2"
+                ? {
+                    url: "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid="
+                }
+                : {};
+
+            actions.setMetadataURL.call(layerInformationStore, metaId);
+
+            expect(layerInformationStore.metaURLs).to.deep.equal(metaURLs);
         });
 
         it("should use showDocUrl if set", async () => {
-            const state = {
-                layerInfo: {
-                    "id": "123",
-                    "metaID": "73A344E9-CDB5-4A17-89C1-05E202989755",
-                    "layername": "name",
-                    "url": "google.de",
-                    "urlIsVisible": true,
-                    "cswUrl": "https://metaver.de/csw",
-                    "showDocUrl": "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid="
-                },
-                metaDataCatalogueId: "2"
+            layerInformationStore.layerInfo = {
+                "id": "123",
+                "metaID": "73A344E9-CDB5-4A17-89C1-05E202989755",
+                "layername": "name",
+                "url": "google.de",
+                "urlIsVisible": true,
+                "cswUrl": "https://metaver.de/csw",
+                "showDocUrl": "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid="
             };
+            layerInformationStore.metaDataCatalogueId = "2";
 
-            setMetadataURL({commit, dispatch, state, rootGetters: {
-                restServiceById: id => id === "2" ? {url: "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid="} : {}
-            }}, "73A344E9-CDB5-4A17-89C1-05E202989755");
+            rootGetters.restServiceById = id => id === "2"
+                ? {
+                    url: "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid="
+                }
+                : {};
+            actions.setMetadataURL.call(
+                layerInformationStore,
+                "73A344E9-CDB5-4A17-89C1-05E202989755"
+            );
 
-            expect(commit.calledWith("setMetaURLs", ["https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid=73A344E9-CDB5-4A17-89C1-05E202989755"])).to.be.true;
+            expect(layerInformationStore.metaURLs).to.deep.equal([
+                "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid=73A344E9-CDB5-4A17-89C1-05E202989755"
+            ]);
         });
 
         it("should use the url from metaDataCatalogueId if showDocUrl is not set", async () => {
-            const state = {
-                    layerInfo: {
-                        "id": "123",
-                        "metaID": "73A344E9-CDB5-4A17-89C1-05E202989755",
-                        "layername": "name",
-                        "url": "google.de",
-                        "urlIsVisible": true,
-                        "cswUrl": "https://metaver.de/csw"
-                    },
-                    metaDataCatalogueId: "2"
-                },
-                metaURLs = ["https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid=73A344E9-CDB5-4A17-89C1-05E202989755"];
+            const metaURLs = [
+                "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid=73A344E9-CDB5-4A17-89C1-05E202989755"
+            ];
 
-            setMetadataURL({commit, dispatch, state, rootGetters: {
-                restServiceById: id => id === "2" ? {url: "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid="} : {}
-            }}, "73A344E9-CDB5-4A17-89C1-05E202989755");
+            layerInformationStore.layerInfo = {
+                "id": "123",
+                "metaID": "73A344E9-CDB5-4A17-89C1-05E202989755",
+                "layername": "name",
+                "url": "google.de",
+                "urlIsVisible": true,
+                "cswUrl": "https://metaver.de/csw"
+            };
+            layerInformationStore.metaDataCatalogueId = "2";
 
-            expect(commit.calledWith("setMetaURLs", metaURLs)).to.be.true;
+            rootGetters.restServiceById = id => id === "2"
+                ? {
+                    url: "https://metaver.de/trefferanzeige?cmd=doShowDocument&docuuid="
+                }
+                : {};
+
+            actions.setMetadataURL.call(
+                layerInformationStore,
+                "73A344E9-CDB5-4A17-89C1-05E202989755"
+            );
+
+            expect(layerInformationStore.metaURLs).to.deep.equal(metaURLs);
         });
     });
 
@@ -246,34 +295,42 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
                 id: "layerId",
                 name: "name"
             };
-            getters = {
-                type: "layerInformation"
-            };
-            rootGetters = {
-                layerConfigById: () => layerConfig,
-                styleListLoaded: true
-            };
+            rootGetters.layerConfigById = () => layerConfig;
+            rootGetters.styleListLoaded = true;
         });
 
         it("styleListLoaded = true, start layer info", () => {
-            actions.restoreFromUrlParams({getters, dispatch, rootGetters}, attributes);
-            expect(dispatch.calledTwice).to.be.true;
+            const startLayerInformation = sinon.stub(layerInformationStore, "startLayerInformation");
+
+            actions.restoreFromUrlParams.call(layerInformationStore, attributes);
+
+            expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.firstCall.args[0]).to.equal("Menu/updateComponentState");
-            expect(dispatch.firstCall.args[1]).to.be.deep.equals({type: "LayerInformation", attributes});
-            expect(dispatch.secondCall.args[0]).to.equal("Modules/LayerInformation/startLayerInformation");
-            expect(dispatch.secondCall.args[1]).to.be.deep.equals(layerConfig);
+            expect(dispatch.firstCall.args[1]).to.be.deep.equals({
+                type: "LayerInformation",
+                attributes
+            });
+
+            expect(startLayerInformation.calledWith(layerConfig)).to.be.true;
         });
         it("styleListLoaded = false, wait and start layer info", () => {
+            const waitAndRestoreLayerInformation = sinon.stub(
+                layerInformationStore,
+                "waitAndRestoreLayerInformation"
+            );
+
             rootGetters.styleListLoaded = false;
-            actions.restoreFromUrlParams({getters, dispatch, rootGetters}, attributes);
-            expect(dispatch.calledTwice).to.be.true;
+
+            actions.restoreFromUrlParams.call(layerInformationStore, attributes);
+
+            expect(dispatch.calledOnce).to.be.true;
             expect(dispatch.firstCall.args[0]).to.equal("Menu/updateComponentState");
-            expect(dispatch.firstCall.args[1]).to.be.deep.equals({type: "LayerInformation", attributes});
-            expect(dispatch.secondCall.args[0]).to.equal("waitAndRestoreLayerInformation");
-            expect(dispatch.secondCall.args[1]).to.be.deep.equals(layerConfig);
+            expect(dispatch.firstCall.args[1]).to.be.deep.equals({
+                type: "LayerInformation",
+                attributes
+            });
+            expect(waitAndRestoreLayerInformation.calledWith(layerConfig)).to.be.true;
         });
-
-
     });
     describe("getAbstractInfo", () => {
         it("should show the about module in menu", async () => {
@@ -281,58 +338,40 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
                     metaId: "73A344E9-CDB5-4A17-89C1-05E202989755",
                     cswUrl: "https://metaver.de/csw"
                 },
-                state = {
-                    metaId: "portalId",
-                    cswUrl: "test.de",
-                    downloadLinks: []
-                },
                 cswReturn = {
                     getTitle: () => "name",
                     getAbstract: () => "abstract",
                     getFrequenzy: () => "123",
                     getDownloadLinks: () => [],
+                    getCreationDate: () => "thisIsADate",
                     getPublicationDate: () => "thisIsADate",
                     getContact: () => "contact",
                     getPublisher: () => "publisher",
                     getRevisionDate: () => "thisIsADate"
                 };
 
+            layerInformationStore.downloadLinks = [];
             sinon.stub(getCswRecordById, "getRecordById").returns(cswReturn);
 
-            await actions.getAbstractInfo({commit, dispatch, state, rootGetters}, metaInfo);
+            await actions.getAbstractInfo.call(layerInformationStore, metaInfo);
 
-            expect(commit.callCount).to.be.equal(10);
-            expect(commit.firstCall.args[0]).to.equal("setDownloadLinks");
-            expect(commit.firstCall.args[1]).to.be.deep.equals(null);
-            expect(commit.secondCall.args[0]).to.equal("setTitle");
-            expect(commit.secondCall.args[1]).to.be.deep.equals("name");
-            expect(commit.thirdCall.args[0]).to.equal("setAbstractText");
-            expect(commit.thirdCall.args[1]).to.be.deep.equals("abstract");
-            expect(commit.getCall(3).args[0]).to.equal("setPeriodicityKey");
-            expect(commit.getCall(3).args[1]).to.be.deep.equals("123");
-            expect(commit.getCall(4).args[0]).to.equal("setDownloadLinks");
-            expect(commit.getCall(4).args[1]).to.be.deep.equals([]);
-            expect(commit.getCall(5).args[0]).to.equal("setDatePublication");
-            expect(commit.getCall(5).args[1]).to.be.deep.equals("thisIsADate");
-            expect(commit.getCall(6).args[0]).to.equal("setPointOfContact");
-            expect(commit.getCall(6).args[1]).to.be.deep.equals("contact");
-            expect(commit.getCall(7).args[0]).to.equal("setPublisher");
-            expect(commit.getCall(7).args[1]).to.be.deep.equals("publisher");
-            expect(commit.getCall(8).args[0]).to.equal("setDateRevision");
-            expect(commit.getCall(8).args[1]).to.be.deep.equals("thisIsADate");
-            expect(commit.getCall(9).args[0]).to.equal("setDownloadLinks");
-            expect(commit.getCall(9).args[1]).to.be.deep.equals([]);
+            expect(layerInformationStore.downloadLinks).to.deep.equal([]);
+            expect(layerInformationStore.title).to.equal("name");
+            expect(layerInformationStore.abstractText).to.equal("abstract");
+            expect(layerInformationStore.periodicityKey).to.equal("123");
+            expect(layerInformationStore.datePublication).to.equal("thisIsADate");
+            expect(layerInformationStore.dateCreation).to.equal("thisIsADate");
+            expect(layerInformationStore.pointOfContact).to.equal("contact");
+            expect(layerInformationStore.publisher).to.equal("publisher");
+            expect(layerInformationStore.dateRevision).to.equal("thisIsADate");
         });
 
-        it("ensures that downloadLinks is set to null", () => {
-            const metaInfo = {},
-                state = {};
+        it("ensures that downloadLinks is set to null", async () => {
+            const metaInfo = {};
 
-            actions.getAbstractInfo({commit, dispatch, state, rootGetters}, metaInfo);
+            await actions.getAbstractInfo.call(layerInformationStore, metaInfo);
 
-            expect(commit.callCount).to.be.equal(9);
-            expect(commit.firstCall.args[0]).to.equal("setDownloadLinks");
-            expect(commit.firstCall.args[1]).to.be.deep.equals(null);
+            expect(layerInformationStore.downloadLinks).to.equal(null);
         });
 
         it("retrieves data from unmodified cswUrl when metaId is nullish", async () => {
@@ -346,70 +385,70 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
                     metaId: undefined,
                     cswUrl: "https://metaver.de/csw"
                 },
-                state = {};
+                getCustomMetaData = sinon.stub(layerInformationStore, "getCustomMetaData");
 
             sinon.stub(axios, "get").resolves({
                 request: {
-                    responseXML: new DOMParser().parseFromString("<Metadata></Metadata>", "application/xml")
+                    responseXML: new DOMParser().parseFromString(
+                        "<Metadata></Metadata>",
+                        "application/xml"
+                    )
                 }
             });
 
             sinon.stub(getCswRecordById, "getMetadata").returns(undefined);
 
-            await actions.getAbstractInfo({commit, dispatch, state, rootGetters}, metaInfoNull);
+            await actions.getAbstractInfo.call(layerInformationStore, metaInfoNull);
 
             expect(axios.get.calledWith(metaInfoNull.cswUrl)).to.be.true;
-            expect(dispatch.calledWith("getCustomMetaData")).to.be.true;
+            expect(getCustomMetaData.calledOnce).to.be.true;
 
             axios.get.resetHistory();
-            dispatch.resetHistory();
+            getCustomMetaData.resetHistory();
 
-            await actions.getAbstractInfo({commit, dispatch, state, rootGetters}, metaInfoUndefined);
+            await actions.getAbstractInfo.call(layerInformationStore, metaInfoUndefined);
 
             expect(axios.get.calledWith(metaInfoUndefined.cswUrl)).to.be.true;
-            expect(dispatch.calledWith("getCustomMetaData")).to.be.true;
+            expect(getCustomMetaData.calledOnce).to.be.true;
         });
     });
     describe("additionalSingleLayerInfo", () => {
-        it("should initialize the other abstract layer infos", () => {
-            const state = {
-                layerInfo: {
-                    cswUrl: "https://metaver.de/csw",
-                    metaID: "73A344E9-CDB5-4A17-89C1-05E202989755",
-                    attributes: {attr1: "value1"},
-                    customMetadata: {key: "value"}
-                }
+        it("should initialize the other abstract layer infos", async () => {
+            layerInformationStore.layerInfo = {
+                cswUrl: "https://metaver.de/csw",
+                metaID: "73A344E9-CDB5-4A17-89C1-05E202989755",
+                attributes: {attr1: "value1"},
+                customMetadata: {key: "value"}
             };
+            const getAbstractInfo = sinon.stub(layerInformationStore, "getAbstractInfo");
 
-            actions.additionalSingleLayerInfo({dispatch, state});
+            await actions.additionalSingleLayerInfo.call(layerInformationStore);
 
-            expect(dispatch.callCount).to.be.equals(1);
+            expect(getAbstractInfo.calledOnce).to.be.true;
 
-            expect(dispatch.firstCall.args[0]).to.equal("getAbstractInfo");
-            expect(dispatch.firstCall.args[1]).to.deep.equal({
-                metaId: state.layerInfo.metaID,
-                cswUrl: state.layerInfo.cswUrl,
-                attributes: state.layerInfo.attributes,
-                customMetadata: state.layerInfo.customMetadata
+            expect(getAbstractInfo.firstCall.args[0]).to.deep.equal({
+                metaId: layerInformationStore.layerInfo.metaID,
+                cswUrl: layerInformationStore.layerInfo.cswUrl,
+                attributes: layerInformationStore.layerInfo.attributes,
+                customMetadata: layerInformationStore.layerInfo.customMetadata
             });
         });
 
-        it("should dispatches 'getAbstractInfo' with correct payload for metaID array", () => {
-            const state = {
-                layerInfo: {
-                    metaID: ["id1", "id2", "id3"],
-                    cswUrl: "https://metaver.de/csw",
-                    customMetadata: {key: "value"},
-                    attributes: {attr1: "value1"}
-                },
-                selectedLayerIndex: 1
+        it("should dispatches 'getAbstractInfo' with correct payload for metaID array", async () => {
+            layerInformationStore.layerInfo = {
+                metaID: ["id1", "id2", "id3"],
+                cswUrl: "https://metaver.de/csw",
+                customMetadata: {key: "value"},
+                attributes: {attr1: "value1"}
             };
+            layerInformationStore.selectedLayerIndex = 1;
 
-            actions.additionalSingleLayerInfo({dispatch, state});
+            const getAbstractInfo = sinon.stub(layerInformationStore, "getAbstractInfo");
 
-            expect(dispatch.calledOnce).to.be.true;
-            expect(dispatch.firstCall.args[0]).to.equal("getAbstractInfo");
-            expect(dispatch.firstCall.args[1]).to.deep.equal({
+            await actions.additionalSingleLayerInfo.call(layerInformationStore);
+
+            expect(getAbstractInfo.calledOnce).to.be.true;
+            expect(getAbstractInfo.firstCall.args[0]).to.deep.equal({
                 metaId: "id2",
                 cswUrl: "https://metaver.de/csw",
                 customMetadata: {key: "value"},
@@ -417,22 +456,20 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
             });
         });
 
-        it("should default to the first metaID when selectedLayerIndex is out of bounds", () => {
-            const state = {
-                layerInfo: {
-                    metaID: ["id1", "id2", "id3"],
-                    cswUrl: "https://metaver.de/csw",
-                    customMetadata: {key: "value"},
-                    attributes: {attr1: "value1"}
-                },
-                selectedLayerIndex: 10
+        it("should default to the first metaID when selectedLayerIndex is out of bounds", async () => {
+            layerInformationStore.layerInfo = {
+                metaID: ["id1", "id2", "id3"],
+                cswUrl: "https://metaver.de/csw",
+                customMetadata: {key: "value"},
+                attributes: {attr1: "value1"}
             };
+            layerInformationStore.selectedLayerIndex = 10;
+            const getAbstractInfo = sinon.stub(layerInformationStore, "getAbstractInfo");
 
-            actions.additionalSingleLayerInfo({dispatch, state});
+            await actions.additionalSingleLayerInfo.call(layerInformationStore);
 
-            expect(dispatch.calledOnce).to.be.true;
-            expect(dispatch.firstCall.args[0]).to.equal("getAbstractInfo");
-            expect(dispatch.firstCall.args[1]).to.deep.equal({
+            expect(getAbstractInfo.calledOnce).to.be.true;
+            expect(getAbstractInfo.firstCall.args[0]).to.deep.equal({
                 metaId: "id1",
                 cswUrl: "https://metaver.de/csw",
                 customMetadata: {key: "value"},
@@ -440,12 +477,7 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
             });
         });
         it("should throw an error but still fill abstract info on bad metaInformation", async () => {
-            const state = {
-                    layerInfo: {
-                        cswUrl: ""
-                    }
-                },
-                metaInfo = {
+            const metaInfo = {
                     attributes: "",
                     cswUrl: "e",
                     customMetadata: "",
@@ -456,28 +488,24 @@ describe("src/modules/layerInformation/store/actionsLayerInformation.js", () => 
             console.error = sinon.spy();
             sinon.stub(getCswRecordById, "getRecordById").throws();
 
-            await actions.getAbstractInfo({commit, dispatch, state, rootGetters}, metaInfo);
+            await actions.getAbstractInfo.call(layerInformationStore, metaInfo);
 
-            expect(console.error.getCall(0).args[0]).to.equal("modules.layerInformation.noMetadataLoadedConsole");
-            expect(commit.callCount).to.be.equal(9);
-            expect(commit.firstCall.args[0]).to.equal("setDownloadLinks");
-            expect(commit.firstCall.args[1]).to.be.deep.equals(null);
-            expect(commit.secondCall.args[0]).to.equal("setTitle");
-            expect(commit.secondCall.args[1]).to.be.deep.equals("");
-            expect(commit.getCall(2).args[0]).to.equal("setPeriodicityKey");
-            expect(commit.getCall(2).args[1]).to.be.deep.equals("");
-            expect(commit.getCall(3).args[0]).to.equal("setDatePublication");
-            expect(commit.getCall(3).args[1]).to.be.deep.equals("");
-            expect(commit.getCall(4).args[0]).to.equal("setAbstractText");
-            expect(commit.getCall(4).args[1]).to.be.deep.equals("modules.layerInformation.noMetadataLoaded");
-            expect(commit.getCall(5).args[0]).to.equal("setNoMetadataLoaded");
-            expect(commit.getCall(5).args[1]).to.be.deep.equals("modules.layerInformation.noMetadataLoaded");
-            expect(commit.getCall(6).args[0]).to.equal("setPointOfContact");
-            expect(commit.getCall(6).args[1]).to.be.deep.equals("");
-            expect(commit.getCall(7).args[0]).to.equal("setPublisher");
-            expect(commit.getCall(7).args[1]).to.be.deep.equals("");
-            expect(commit.getCall(8).args[0]).to.equal("setDateRevision");
-            expect(commit.getCall(8).args[1]).to.be.deep.equals("");
+            expect(console.error.getCall(0).args[0]).to.equal(
+                "modules.layerInformation.noMetadataLoadedConsole"
+            );
+            expect(layerInformationStore.downloadLinks).to.equal(null);
+            expect(layerInformationStore.title).to.equal("");
+            expect(layerInformationStore.periodicityKey).to.equal("");
+            expect(layerInformationStore.datePublication).to.equal("");
+            expect(layerInformationStore.abstractText).to.equal(
+                "modules.layerInformation.noMetadataLoaded"
+            );
+            expect(layerInformationStore.noMetadataLoaded).to.equal(
+                "modules.layerInformation.noMetadataLoaded"
+            );
+            expect(layerInformationStore.pointOfContact).to.equal("");
+            expect(layerInformationStore.publisher).to.equal("");
+            expect(layerInformationStore.dateRevision).to.equal("");
 
             console.error = consoleError;
         });

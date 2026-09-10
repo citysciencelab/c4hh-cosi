@@ -187,10 +187,9 @@ describe("src/modules/filter/interfaces/utils/interface.oaf.extern.js", () => {
             const onsuccess = sinon.spy(),
                 onerror = sinon.spy(),
                 filterId = 123,
-                abortSpy = sinon.spy(),
-                fakeController = {abort: abortSpy};
+                fakeController = new AbortController(),
+                abortSpy = sinon.spy(fakeController, "abort");
 
-            Object.setPrototypeOf(fakeController, AbortController.prototype);
             interfaceOafExtern.axiosControllers[filterId] = fakeController;
 
             interfaceOafExtern.stop(filterId, onsuccess, onerror);

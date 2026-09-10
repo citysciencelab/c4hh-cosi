@@ -17,9 +17,11 @@ describe("src/core/maps/store/gettersMap.js", () => {
     let layer1,
         layer2,
         layer3,
-        olMap;
+        olMap,
+        originalCesium;
 
     beforeAll(() => {
+        originalCesium = global.Cesium;
         layer1 = new VectorLayer({
             id: "1",
             name: "layer1",
@@ -51,6 +53,10 @@ describe("src/core/maps/store/gettersMap.js", () => {
         addLayer({}, layer1);
         addLayer({}, layer2);
         addLayer({}, layer3);
+    });
+
+    afterEach(() => {
+        global.Cesium = originalCesium;
     });
 
     describe("getLayerById", () => {

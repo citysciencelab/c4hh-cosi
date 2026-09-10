@@ -1,7 +1,7 @@
 import searchBarUrlParams from "@modules/searchBar/js/searchBarUrlParams.js";
 
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import store from "@appstore/index.js";
@@ -11,8 +11,6 @@ import actionsSearchBarSearchInterfaces from "@modules/searchBar/store/actions/a
 import stateSearchBar from "@modules/searchBar/store/stateSearchBar.js";
 import mutationsSearchBar from "@modules/searchBar/store/mutationsSearchBar.js";
 import gettersSearchBar from "@modules/searchBar/store/gettersSearchBar.js";
-
-config.global.mocks.$t = key => key;
 
 
 describe("src/modules/searchBar/js/searchBarUrlParams.js", () => {

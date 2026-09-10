@@ -17,10 +17,14 @@
 FROM node:24.15.0-bookworm AS build
 
 # The Vite build derives the mastercode/<version> folder name from git; with no
-# .git in the build context it would fall back to a timestamp. Pin it instead so
-# the build is deterministic and index.html ↔ asset folder always agree.
-ARG MASTERCODE_VERSION_FOLDER=3_23_0
-ENV MASTERCODE_VERSION_FOLDER=${MASTERCODE_VERSION_FOLDER}
+# .git in the build context it falls back to a long timestamped name. We set a
+# short one below — but it MUST stay unique per build: /mastercode/ is served
+# immutable for 30 days (deploy/nginx.conf) and the folder name is the only cache
+# key there is. Pinning it to a constant let browsers mix an old masterportal.js
+# with newly fetched lazy chunks, whose minified import names are regenerated
+# every build — half of them then resolve to undefined and the app dies at
+# startup. Pass this ARG to reproduce a specific build's asset paths.
+ARG MASTERCODE_VERSION_FOLDER=
 
 WORKDIR /app
 # Source tree only — node_modules/dist/.git are excluded via .dockerignore.
@@ -38,22 +42,35 @@ RUN npm install --ignore-scripts --no-audit --no-fund
 
 # The production build bundles EVERY addon registered in addonsConf.json, so each
 # addon that has its own node_modules imports must have its deps installed — not
-# just cosi (e.g. vpiDashboard imports vue-slider-component). This list mirrors
-# the addons `postinstall` script exactly; none of these sub-packages have a
-# prepare/husky script, so they install cleanly without git.
+# just cosi (e.g. vpiDashboard imports vue-slider-component).
+#
+# Upstream's own postinstall walks the tree for package.json files rather than
+# using a fixed list, because that list goes stale: vcOblique dropped its
+# package.json when iframe-resizer was replaced by a native ResizeObserver, and
+# a hardcoded `cd vcOblique && npm install` aborts the whole build under
+# `set -eu`. So discover the manifests instead of naming them. (We can't call
+# upstream's script directly — it imports masterportal/devtools/tasks/utils.js,
+# which needs a newer core than the addons tree it ships with.)
 RUN set -eu; \
-    for d in sdpDownload vcOblique valuationPrint waterRiskCheck simulationTool \
-             shared/js/mapfishUtils vpiDashboard gfiThemes/combinedGfi cosi \
-             storyTellingTool/storyCreator storyTellingTool/storyManager; do \
-        echo "==> npm install addons/$d"; \
+    find . -mindepth 2 -name package.json -not -path './node_modules/*' \
+         -not -path '*/node_modules/*' -print \
+    | sort \
+    | while read -r manifest; do \
+        d=$(dirname "$manifest"); \
+        echo "==> npm install addons/${d#./}"; \
         (cd "$d" && npm install --no-audit --no-fund); \
     done
 
 # Production build of the portals in portal/ (incl. portal/cosi). The official
 # build (`npm run build`) removes the intermediate dist/portal afterwards — do
 # the same. Result: dist/cosi/ (portal + registries) + dist/mastercode/ (assets).
+# The timestamp is taken inside this step, so the folder name only changes when
+# the step actually reruns — i.e. when the source changed, which is exactly when
+# the caches must be busted. index.html is emitted by the same run and therefore
+# always agrees with it.
 WORKDIR /app/masterportal
-RUN node node_modules/.bin/vite build --config devtools/vite.config.js --mode production \
+RUN MASTERCODE_VERSION_FOLDER="${MASTERCODE_VERSION_FOLDER:-3_26_0_$(date -u +%Y%m%d%H%M%S)}" \
+    node node_modules/.bin/vite build --config devtools/vite.config.js --mode production \
     && rm -rf dist/portal
 
 # ---------------------------------------------------------------------------

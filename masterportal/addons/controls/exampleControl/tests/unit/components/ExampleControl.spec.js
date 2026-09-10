@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import ExampleControl from "../../../components/ExampleControl.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/controls/exampleControl/components/ExampleControl.vue", () => {
     const showAlertSpy = sinon.spy();

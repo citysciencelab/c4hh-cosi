@@ -32,7 +32,7 @@ export default {
 
         currentTitle () {
             const component = this.currentMenuComponent,
-                key = component?.props?.name || `common:modules.${component?.type}.name`;
+                  key = component?.props?.name || `common:modules.${component?.type}.name`;
 
             return this.$t(key);
         },
@@ -61,7 +61,7 @@ export default {
             }
 
             const pointsToMenuRoot = this.previousNavigation === this.$t("common:modules.menu.name"),
-                hideSecondaryGfiBack = this.isSecondaryGfiWithoutMenu && pointsToMenuRoot;
+                  hideSecondaryGfiBack = this.isSecondaryGfiWithoutMenu && pointsToMenuRoot;
 
             return !hideSecondaryGfiBack;
         },
@@ -94,8 +94,8 @@ export default {
                 :id="'mp-navigation-' + side"
                 class="pt-2 mp-menu-navigation-link"
                 href="#"
-                @click.prevent="navigateBack(side)"
-                @keypress="navigateBack(side)"
+                @click.prevent="navigateBack({side})"
+                @keypress="navigateBack({side})"
             >
                 <h6 class="mp-menu-navigation-link-text mb-1"><p class="bi-chevron-left me-2" />{{ previousNavigation }}</h6>
             </a>

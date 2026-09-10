@@ -1,10 +1,8 @@
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import SchulinfoTheme from "../../../components/SchulinfoTheme.vue";
 import ThemeConfig from "../../../themeConfig.json";
-
-config.global.mocks.$t = key => key;
 
 
 describe("addons/schulinfo/components/SchulinfoTheme.vue", () => {

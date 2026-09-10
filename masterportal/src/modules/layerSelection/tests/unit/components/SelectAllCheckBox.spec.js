@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
@@ -7,7 +7,6 @@ import layerTypes from "@core/layers/js/layerTypes.js";
 import SelectAllCheckBox from "@modules/layerSelection/components/SelectAllCheckBox.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerTree/components/SelectAllCheckBox.vue", () => {
     let store,

@@ -83,7 +83,6 @@ describe.skip("addons/cosi/TemplateManager/components/TemplateManagerImport.vue"
 
             await buttonWrapper.trigger("click");
             expect(spyTriggerFileInput.calledOnce).to.be.true;
-            sinon.restore();
             wrapper.destroy();
         });
 
@@ -94,7 +93,6 @@ describe.skip("addons/cosi/TemplateManager/components/TemplateManagerImport.vue"
 
             await inputWrapper.trigger("change");
             expect(spyLoadFiles.calledOnce).to.be.true;
-            sinon.restore();
             wrapper.destroy();
         });
     });

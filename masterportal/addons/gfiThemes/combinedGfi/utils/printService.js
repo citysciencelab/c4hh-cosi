@@ -12,7 +12,7 @@ import {loadModule} from "./loadModule.js";
  * @param {string} printConfigPath - The path to the print configuration
  * @param {Array} layerResults - The layer results
  * @param {Object} alternativePolygonFeature - Alternative polygon feature
- * @param {string} printServerUrl - The print server URL
+ * @param {string} printServerUrl - The print server URL from the layer config
  * @param {Array} additionalRequestResults - Additional request results
  * @returns {Promise<Response>} The print response
  */
@@ -22,15 +22,22 @@ export async function sendPrintRequestToServer (preparePrintRequest, olFeature, 
             layerResults,
             alternativePolygonFeature,
             printConfigPath,
-            additionalRequestResults
+            additionalRequestResults,
+            printServerUrl
         ),
-        response = await fetch(printServerUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(printRequest)
-        });
+        resolvedPrintServerUrl = printRequest.printServerUrl || printServerUrl;
+
+    if (!resolvedPrintServerUrl) {
+        throw new Error("No print server URL available. Please set printServerUrl in the combinedGFIPrintConfig.json or in the layer config.");
+    }
+
+    const response = await fetch(resolvedPrintServerUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(printRequest)
+    });
 
     if (!response.ok) {
         const errorText = await response.text();

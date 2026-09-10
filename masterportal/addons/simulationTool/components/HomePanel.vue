@@ -1,5 +1,6 @@
 <script>
 // import ProcessList from "./Process/ProcessList.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SectionHeader from "./SectionHeader.vue";
 
 import {mapGetters, mapMutations} from "vuex";
@@ -7,6 +8,7 @@ import {mapGetters, mapMutations} from "vuex";
 export default {
     name: "HomePanel",
     components: {
+        FlatButton,
         SectionHeader
         // ProcessList
     },
@@ -67,14 +69,25 @@ export default {
                 <p>{{ $t("additional:modules.tools.simulationTool.tutorialInfo") }} <i class="bi bi-arrow-right-circle-fill" /></p>
             </div>
         </div>
-        <div class="element-wrapper">
-            <div class="segment-header">
-                {{ $t("additional:modules.tools.simulationTool.continue") }}
-            </div>
-            <!-- <ProcessList
+        <!-- <div class="element-wrapper">
+            <ProcessList
                 :header-is-visible="false"
                 @selected="(payload) => $emit('selected', payload)"
-            /> -->
+            />
+        </div> -->
+        <div class="m-4">
+            <FlatButton
+                :text="$t('additional:modules.tools.simulationTool.createPlanningArea')"
+                :interaction="() => setMode('planningScenario')"
+            />
+            <FlatButton
+                :text="$t('additional:modules.tools.simulationTool.freeSimulation')"
+                :interaction="() => setMode('simulationParameter')"
+            />
+            <FlatButton
+                :text="$t('additional:modules.tools.simulationTool.selectSimulationArea')"
+                disabled
+            />
         </div>
     </div>
 </template>
@@ -89,49 +102,6 @@ export default {
     font-weight: 600;
     font-size: 24px;
 
-}
-
-.segment-header {
-    font-size: 18px;
-    font-weight: 500;
-    line-height: 23px;
-    padding-bottom: 5px;
-    margin-bottom: 0;
-}
-
-.segment-wrapper {
-    display: flex;
-    justify-content: space-between;
-    flex-direction: column;
-    border: 0px;
-    border-radius: 8px;
-    box-shadow: var(--bs-box-shadow);
-    width: 100%;
-    background-color: transparent;
-
-    button.segment-wrapper {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-direction: row;
-        gap: 10px;
-        transition: background-color 0.3s ease;
-        padding: 10px;
-
-        &:hover {
-            background-color: var(--bs-btn-hover-bg);
-            ;
-        }
-
-        p {
-            margin: 0;
-        }
-
-        i {
-            font-size: 1.5rem;
-            margin: 0 15px 0 auto;
-        }
-    }
 }
 
 .element-wrapper {

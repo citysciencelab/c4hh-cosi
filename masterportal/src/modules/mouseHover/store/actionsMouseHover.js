@@ -109,6 +109,16 @@ export default {
             return layer?.mouseHoverField && layer.mouseHoverField !== "";
         }));
     },
+    /**
+     * Highlights the given feature depending on the geometry type by dispatching "Maps/highlightFeature".
+     * @param {Object} context the context
+     * @param {Object} context.dispatch the dispatch
+     * @param {Object} context.state the state
+     * @param {Object} payload the state
+     * @param {Object} payload.feature openlayers feature to highlight
+     * @param {Object} payload.layer openlayers layer og the feature
+     * @returns {void}
+     */
     highlightFeature ({dispatch, state}, {feature, layer}) {
         const {highlightVectorRulesPointLine, highlightVectorRulesPolygon} = state,
             layerId = layer.get("id"),
@@ -134,8 +144,8 @@ export default {
         if (rawLayer && rawLayer.styleId) {
             highlightObject.styleId = rawLayer.styleId;
         }
-        else if (layer && layer.styleId) {
-            highlightObject.styleId = layer.styleId;
+        else if (layer.get("styleId")) {
+            highlightObject.styleId = layer.get("styleId");
         }
 
         highlightObject.highlightStyle = {

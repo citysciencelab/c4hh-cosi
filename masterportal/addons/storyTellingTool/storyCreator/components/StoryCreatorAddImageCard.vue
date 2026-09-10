@@ -13,6 +13,11 @@ export default {
         InputText
     },
     props: {
+        embedded: {
+            type: Boolean,
+            required: false,
+            default: false
+        },
         closeable: {
             type: Boolean,
             required: false,
@@ -32,7 +37,7 @@ export default {
             default: null
         }
     },
-    emits: ["addImage", "click:close"],
+    emits: ["addImage", "update:image", "update:image-valid", "click:close"],
     data () {
         return {
             image: {
@@ -40,7 +45,8 @@ export default {
                 copyright: ""
             },
             uploadedAsset: null,
-            isValidated: true
+            isValidated: true,
+            showRequiredHint: false
         };
     },
     computed: {
@@ -59,15 +65,46 @@ export default {
             return Boolean(this.currentAsset?.id && this.currentAsset?.objectURL);
         },
         /**
-         * Returns true if the alt and copyright are not empty.
+         * Returns true if the alt and copyright are not empty and image is loaded.
          * @returns {Boolean} True if the alt and copyright are not empty.
          */
         enableAdd () {
-            if (this.image?.alt.trim() !== "" && this.image?.copyright.trim() !== "") {
+            if (this.image?.alt.trim() !== "" && this.image?.copyright.trim() !== "" && this.isImageLoaded) {
                 return true;
             }
 
             return false;
+        },
+        /**
+         * Returns true if the alt text is required and missing.
+         * @returns {Boolean} True if the alt text is missing and the required hint should be shown.
+         */
+        hasAltError () {
+            return this.embedded
+                && this.showRequiredHint
+                && !this.image?.alt?.trim();
+        },
+        /**
+         * Returns true if the copyright is required and missing.
+         * @returns {Boolean} True if the copyright is missing and the required hint should be shown.
+         */
+        hasCopyrightError () {
+            return this.embedded
+                && this.showRequiredHint
+                && !this.image?.copyright?.trim();
+        }
+    },
+    watch: {
+        image: {
+            handler () {
+                if (this.embedded) {
+                    this.updateEmbeddedImage();
+                }
+                else {
+                    this.$emit("update:image", this.image);
+                }
+            },
+            deep: true
         }
     },
     created () {
@@ -98,6 +135,7 @@ export default {
                 objectURL: null
             };
             this.isValidated = true;
+            this.showRequiredHint = false;
         },
 
         /**
@@ -116,12 +154,56 @@ export default {
             this.uploadedAsset = await this.createImageAsset(file);
 
             this.image.id = this.uploadedAsset.id;
+        },
+
+        /**
+         * Returns true if the image metadata is valid.
+         * @returns {Boolean} True if alt text and copyright are present and an image is loaded.
+         */
+        isImageValid () {
+            return Boolean(
+                this.image?.alt?.trim()
+                    && this.image?.copyright?.trim()
+                    && this.isImageLoaded
+            );
+        },
+
+        /**
+         * Updates the embedded image and its validation state. Emits the image only when it is valid.
+         * @returns {void}
+         */
+        updateEmbeddedImage () {
+            if (!this.isImageLoaded) {
+                this.showRequiredHint = false;
+                this.$emit("update:image-valid", true);
+                this.$emit("update:image", null);
+
+                return;
+            }
+            const valid = this.isImageValid();
+
+            this.$emit("update:image-valid", valid);
+            this.showRequiredHint = !valid && this.isImageLoaded;
+
+            if (!valid) {
+                return;
+            }
+
+            this.$emit("update:image", {
+                ...this.image,
+                id: this.currentAsset?.id || this.initialImage?.id
+            });
         }
+
+
     }
 };
 </script>
 <template lang="html">
-    <div class="card border-0 rounded-3 bg-light">
+    <div
+        class="card border-0 rounded-3"
+        :class="embedded ? 'bg-white' : 'bg-light'"
+    >
         <div class="card-body p-4 position-relative">
             <button
                 v-if="closeable"
@@ -132,9 +214,9 @@ export default {
             />
 
             <h5 class="card-title mb-3">
-                {{ closeable
-                    ? $t('additional:modules.storyCreator.headlines.addImages')
-                    : $t('additional:modules.storyCreator.headlines.addImageTitle') }}
+                {{ !embedded && !closeable
+                    ? $t('additional:modules.storyCreator.headlines.addImageTitle')
+                    : $t('additional:modules.storyCreator.headlines.addImages') }}
             </h5>
             <div v-if="!isImageLoaded">
                 <FileUpload
@@ -156,15 +238,19 @@ export default {
                 id="image-name"
                 v-model="image.alt"
                 class="mt-2"
+                :class-obj="{'is-invalid': hasAltError}"
                 :label="$t('additional:modules.storyCreator.labels.alt')"
                 :placeholder="$t('additional:modules.storyCreator.labels.alt')"
+                :error-message="hasAltError ? $t('additional:modules.storyCreator.labels.imageRequiredAlt'): null"
             />
             <InputText
                 id="image-name"
                 v-model="image.copyright"
                 class="mt-2"
+                :class-obj="{'is-invalid': hasCopyrightError}"
                 :label="$t('additional:modules.storyCreator.labels.copyright')"
                 :placeholder="$t('additional:modules.storyCreator.labels.copyright')"
+                :error-message="hasCopyrightError ? $t('additional:modules.storyCreator.labels.imageRequiredCopyright'): null"
             />
             <AlertMessage
                 v-if="!isValidated"
@@ -175,10 +261,10 @@ export default {
                 @closed="isValidated = true"
             />
             <div
-                v-if="isImageLoaded"
                 class="d-flex justify-content-center gap-2"
             >
                 <FlatButton
+                    v-if="!embedded"
                     class="mt-2"
                     icon="bi bi-save"
                     :text="$t('additional:modules.storyCreator.buttons.confirm')"

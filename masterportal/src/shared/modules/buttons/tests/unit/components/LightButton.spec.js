@@ -1,9 +1,8 @@
 import sinon from "sinon";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import LightButton from "@shared/modules/buttons/components/LightButton.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/components/LightButton.vue", () => {
     let interactionSpy;

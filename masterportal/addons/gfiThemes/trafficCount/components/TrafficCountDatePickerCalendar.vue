@@ -50,7 +50,7 @@ export default {
     computed: {
         namesOfWeekdaysComputed () {
             const result = [],
-                weekdays = this.$t("additional:modules.tools.gfi.themes.trafficCount.datepicker.weekdaysShort", {returnObjects: true});
+                  weekdays = this.$t("additional:modules.tools.gfi.themes.trafficCount.datepicker.weekdaysShort", {returnObjects: true});
 
             for (let i = 1; i <= 7; i++) {
                 result.push(weekdays[i % 7]);
@@ -81,9 +81,9 @@ export default {
          */
         getCurrentDates (currentSwitch, selectedDates) {
             const result = [],
-                currentMoment = dayjs(currentSwitch, "YYYY-MM", true),
-                minMoment = dayjs(this.minDate, "YYYY-MM-DD"),
-                maxMoment = dayjs(this.maxDate, "YYYY-MM-DD");
+                  currentMoment = dayjs(currentSwitch, "YYYY-MM", true),
+                  minMoment = dayjs(this.minDate, "YYYY-MM-DD"),
+                  maxMoment = dayjs(this.maxDate, "YYYY-MM-DD");
 
             let datePointer = currentMoment.isValid() ? dayjs(currentMoment) : dayjs(),
                 endDate = null;

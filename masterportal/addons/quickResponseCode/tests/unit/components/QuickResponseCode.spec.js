@@ -1,4 +1,4 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import sinon from "sinon";
@@ -7,7 +7,6 @@ import QuickResponseCodeComponent from "../../../components/QuickResponseCode.vu
 import QuickResponseCodeOverlayComponent from "../../../components/QuickResponseCodeOverlay.vue";
 import QuickResponseCode from "../../../store/indexQuickResponseCode";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/quickResponseCode/components/QuickResponseCode.vue", () => {
     const mockConfigJson = {

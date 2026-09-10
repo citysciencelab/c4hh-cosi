@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import MenuContainerBodyRootItems from "@modules/menu/components/MenuContainerBodyRootItems.vue";
 import {expect} from "chai";
 import MenuContainerBodyRootItemElement from "@modules/menu/components/MenuContainerBodyRootItemElement.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
     let store,
@@ -27,11 +26,19 @@ describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
                     namespaced: true,
                     getters: {
                         section: () => () => sections,
-                        customMenuElementIcon: () => "bi-customMenuElementIcon"
+                        customMenuElementIcon: () => "bi-customMenuElementIcon",
+                        sectionsBySide: () => () => []
                     }
                 },
                 Modules: {
-                    namespaced: true
+                    namespaced: true,
+                    state: () => ({
+                        TestModule: {
+                            icon: "bi-state",
+                            description: "stateDescription",
+                            someFlag: true
+                        }
+                    })
                 }
             }
         });
@@ -129,12 +136,31 @@ describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
             propsData: {idAppendix: "secondaryMenu", path: pathSecondaryMenu}
         });
 
-        expect(sections[0].icon).to.be.equals("bi-customMenuElementIcon");
         expect(wrapper.findAllComponents(MenuContainerBodyRootItemElement).length).to.be.equal(sections.length);
         expect(wrapper.findAll("#mp-menu-body-items-element-0-secondaryMenu")[0].attributes("name")).to.be.equal(sections[0].name);
-        expect(wrapper.findAll("#mp-menu-body-items-element-0-secondaryMenu")[0].attributes("icon")).to.be.equal(sections[0].icon);
+        expect(wrapper.findAll("#mp-menu-body-items-element-0-secondaryMenu")[0].attributes("icon")).to.be.equal("bi-customMenuElementIcon");
         expect(wrapper.findAll("#mp-menu-body-items-element-0-secondaryMenu")[0].attributes("description")).to.be.equal("");
         expect(wrapper.findAll("#mp-menu-body-items-element-0-secondaryMenu")[0].attributes("path")).to.be.equal(pathSecondaryMenu.join(",") + ",0");
+    });
+
+    it("chooseProperties keeps item values when state has defaults for the same module type", () => {
+        wrapper = shallowMount(MenuContainerBodyRootItems, {
+            global: {
+                plugins: [store]
+            },
+            propsData: {idAppendix: "mainMenu", path: pathMainMenu}
+        });
+
+        const properties = wrapper.vm.chooseProperties({
+            type: "testModule",
+            name: "itemName",
+            icon: "bi-item",
+            description: "itemDescription"
+        });
+
+        expect(properties.icon).to.equal("bi-item");
+        expect(properties.description).to.equal("itemDescription");
+        expect(properties.someFlag).to.equal(true);
     });
 
     it("section contains 'customMenuElement' with icon", () => {

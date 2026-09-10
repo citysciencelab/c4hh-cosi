@@ -16,12 +16,12 @@ describe("src/modules/layerTree/store/actionsLayerTree", function () {
     describe("removeLayer", function () {
         it("removeLayer", function () {
             const layerConfig =
-            {
-                id: "1",
-                visibility: true,
-                showInLayerTree: true,
-                attribute: "test"
-            },
+                    {
+                        id: "1",
+                        visibility: true,
+                        showInLayerTree: true,
+                        attribute: "test"
+                    },
                 expectedArg =
                     {
                         id: "1",
@@ -43,21 +43,21 @@ describe("src/modules/layerTree/store/actionsLayerTree", function () {
     describe("updateTransparency", function () {
         it("updateTransparency", function () {
             const layerConf =
-                {
-                    id: "1",
-                    visibility: true,
-                    showInLayerTree: true,
-                    attribute: "test"
-                },
+                    {
+                        id: "1",
+                        visibility: true,
+                        showInLayerTree: true,
+                        attribute: "test"
+                    },
                 transparency = 50,
                 expectedArg =
-                {
-                    id: "1",
-                    visibility: true,
-                    showInLayerTree: true,
-                    attribute: "test",
-                    transparency: transparency
-                };
+                    {
+                        id: "1",
+                        visibility: true,
+                        showInLayerTree: true,
+                        attribute: "test",
+                        transparency: transparency
+                    };
 
             updateTransparency({dispatch}, {layerConf, transparency});
 
@@ -70,12 +70,12 @@ describe("src/modules/layerTree/store/actionsLayerTree", function () {
     describe("replaceByIdInLayerConfig", function () {
         it("replaceByIdInLayerConfig", function () {
             const layerConf =
-                {
-                    id: "1",
-                    visibility: true,
-                    showInLayerTree: true,
-                    attribute: "test"
-                },
+                    {
+                        id: "1",
+                        visibility: true,
+                        showInLayerTree: true,
+                        attribute: "test"
+                    },
                 expectedArg = {
                     layerConfigs: [
                         {

@@ -3,10 +3,6 @@ import DropdownAutocomplete from "../../shared/modules/dropdown/components/Dropd
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import ToolBar from "../../shared/modules/toolBar/components/ToolBar.vue";
-import {VBtn} from "vuetify/components/VBtn";
-import {VCheckbox} from "vuetify/components/VCheckbox";
-import {VCol, VRow} from "vuetify/components/VGrid";
-import {VIcon} from "vuetify/components/VIcon";
 
 export default {
     name: "FeaturesListToolbar",
@@ -14,12 +10,7 @@ export default {
         DropdownAutocomplete,
         IconButton,
         InputText,
-        ToolBar,
-        VBtn,
-        VCheckbox,
-        VCol,
-        VIcon,
-        VRow
+        ToolBar
     },
     props: {
         districtItems: {
@@ -91,6 +82,7 @@ export default {
 <template lang="html">
     <ToolBar
         :optional-button="locationScoreButton"
+        :show-detail="{visibility: true}"
         v-bind="$attrs"
     >
         <template #filterMenu>
@@ -131,45 +123,4 @@ export default {
             Standortbewertung
         </template>
     </ToolBar>
-    <div id="features-list-toolbar">
-        <v-row>
-            <v-col class="border-style">
-                <v-btn
-                    tile
-                    depressed
-                    small
-                    color="grey lighten-1"
-                    :title="$t('additional:modules.tools.cosi.featuresList.createCharts')"
-                    @click="$emit('createCharts')"
-                >
-                    <v-icon
-                        small
-                        left
-                    >
-                        mdi-poll
-                    </v-icon>
-                    {{ $t('additional:modules.tools.cosi.featuresList.createCharts') }}
-                </v-btn>
-                <v-btn
-                    v-if="showDipasButton"
-                    small
-                    depressed
-                    tile
-                    color="grey lighten-1"
-                    :title="$t('additional:modules.tools.cosi.featuresList.dipas.createCharts')"
-                    @click="$emit('createDipasCharts')"
-                >
-                    <v-icon>mdi-thumbs-up-down</v-icon>
-                </v-btn>
-                <br>
-                <v-checkbox
-                    v-model="sumUpLayers"
-                    dense
-                    hide-details
-                    :label="$t('additional:modules.tools.cosi.featuresList.sumUpLayers')"
-                    :title="$t('additional:modules.tools.cosi.featuresList.sumUpLayersTooltip')"
-                />
-            </v-col>
-        </v-row>
-    </div>
 </template>

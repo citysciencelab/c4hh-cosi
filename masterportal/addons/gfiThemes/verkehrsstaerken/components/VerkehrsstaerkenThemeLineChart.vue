@@ -63,9 +63,9 @@ export default {
          */
         changeCategory (evt) {
             const buttonGroupElements = document.getElementById(
-                    "verkehrsstaerken-btn-group"
-                ),
-                buttons = buttonGroupElements ? buttonGroupElements.children : [];
+                      "verkehrsstaerken-btn-group"
+                  ),
+                  buttons = buttonGroupElements ? buttonGroupElements.children : [];
 
             this.category = evt.currentTarget.id;
 
@@ -124,21 +124,21 @@ export default {
          */
         createChartData: function (dataset, category) {
             const preparedDataset = this.prepareDataset(dataset, category),
-                hasConstructionSiteInfluence = dataset.some(data => data.Anmerkung),
-                chartData = {
-                    labels: preparedDataset.labels,
-                    datasets: [{
-                        borderColor: this.chartColorCircle,
-                        fill: false,
-                        lineTension: 0,
-                        label: this.createDatasetLabel(category),
-                        data: preparedDataset.data,
-                        pointBorderColor: preparedDataset.color,
-                        pointBackgroundColor: preparedDataset.color,
-                        pointRadius: preparedDataset.radius,
-                        pointStyle: preparedDataset.pointStyle
-                    }]
-                };
+                  hasConstructionSiteInfluence = dataset.some(data => data.Anmerkung),
+                  chartData = {
+                      labels: preparedDataset.labels,
+                      datasets: [{
+                          borderColor: this.chartColorCircle,
+                          fill: false,
+                          lineTension: 0,
+                          label: this.createDatasetLabel(category),
+                          data: preparedDataset.data,
+                          pointBorderColor: preparedDataset.color,
+                          pointBackgroundColor: preparedDataset.color,
+                          pointRadius: preparedDataset.radius,
+                          pointStyle: preparedDataset.pointStyle
+                      }]
+                  };
 
             if (hasConstructionSiteInfluence) {
                 chartData.datasets.push(
@@ -229,21 +229,21 @@ export default {
                     usePointStyle: true,
                     generateLabels: chart => {
                         const data = chart.data,
-                            legends = Array.isArray(data.datasets) ? data.datasets.map((dataset, i) => {
-                                return {
-                                    text: dataset.label,
-                                    fillStyle: !Array.isArray(dataset.pointBackgroundColor) ? dataset.pointBackgroundColor : this.chartColorCircle,
-                                    hidden: !chart.isDatasetVisible(i),
-                                    lineCap: dataset.borderCapStyle,
-                                    lineDash: dataset.borderDash,
-                                    lineDashOffset: dataset.borderDashOffset,
-                                    lineJoin: dataset.borderJoinStyle,
-                                    lineWidth: dataset.borderWidth,
-                                    strokeStyle: dataset.borderColor,
-                                    pointStyle: dataset.pointStyle,
-                                    datasetIndex: i
-                                };
-                            }, this) : [];
+                              legends = Array.isArray(data.datasets) ? data.datasets.map((dataset, i) => {
+                                  return {
+                                      text: dataset.label,
+                                      fillStyle: !Array.isArray(dataset.pointBackgroundColor) ? dataset.pointBackgroundColor : this.chartColorCircle,
+                                      hidden: !chart.isDatasetVisible(i),
+                                      lineCap: dataset.borderCapStyle,
+                                      lineDash: dataset.borderDash,
+                                      lineDashOffset: dataset.borderDashOffset,
+                                      lineJoin: dataset.borderJoinStyle,
+                                      lineWidth: dataset.borderWidth,
+                                      strokeStyle: dataset.borderColor,
+                                      pointStyle: dataset.pointStyle,
+                                      datasetIndex: i
+                                  };
+                              }, this) : [];
 
                         return legends;
                     }

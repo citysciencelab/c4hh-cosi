@@ -1,8 +1,7 @@
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import SolaratlasTheme from "../../../components/SolaratlasTheme.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/solaratlas/components/SolaratlasTheme.vue", () => {
     let wrapper;

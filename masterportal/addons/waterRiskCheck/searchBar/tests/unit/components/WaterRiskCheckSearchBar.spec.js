@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import SearchBarComponent from "../../../components/WaterRiskCheckSearchBar.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/waterRiskCheck/searchBar/components/WaterRiskCheckSearchBar.vue", () => {
     const searchInterfaceInstances = [

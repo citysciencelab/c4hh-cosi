@@ -13,6 +13,7 @@ const state = {
     deactivateGFI: false,
     icon: "bi-save",
     id: "saveSession",
+    description: "",
     isVisibleInMenu: true,
     name: "additional:modules.cosi.saveSession.title",
     sessionToLoad: null,

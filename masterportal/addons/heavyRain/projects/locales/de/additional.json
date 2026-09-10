@@ -19,7 +19,8 @@
         "drawFirst": "Bitte zeichnen Sie erst ein Objekt auf der Karte!",
         "nameRequired": "Bitte geben Sie einen Projektnamen ein!",
         "saveSuccess": "Das neue Projekt wurde erfolgreich gespeichert!",
-        "updateSuccess": "Das Projekt wurde erfolgreich aktualisiert!"
+        "updateSuccess": "Das Projekt wurde erfolgreich aktualisiert!",
+        "invalid": "Die Eingabefelder für Projektname, Eingetragen von und Ansprechpartner dürfen nicht leer sein."
       },
       "labels": {
         "projectName": "Projektname",

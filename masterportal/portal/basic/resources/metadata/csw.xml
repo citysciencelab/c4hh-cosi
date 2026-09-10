@@ -1,0 +1,805 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<csw:GetRecordByIdResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2">
+	<gmd:MD_Metadata xmlns:gco="http://www.isotc211.org/2005/gco" xmlns:gmd="http://www.isotc211.org/2005/gmd" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:gmx="http://www.isotc211.org/2005/gmx" xmlns:gts="http://www.isotc211.org/2005/gts" xmlns:igctx="https://www.ingrid-oss.eu/schemas/igctx" xmlns:srv="http://www.isotc211.org/2005/srv" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.isotc211.org/2005/gmd http://repository.gdi-de.org/schemas/geonetwork/2020-12-11/csw/2.0.2/profiles/apiso/1.0.1/apiso.xsd https://www.ingrid-oss.eu/schemas/igctx https://www.ingrid-oss.eu/schemas/igctx/igctx.xsd">
+		<gmd:fileIdentifier>
+			<gco:CharacterString>6520CC0A-D2A6-11D5-88C8-000102DCCF41</gco:CharacterString>
+		</gmd:fileIdentifier>
+		<gmd:language>
+			<gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="ger"/>
+		</gmd:language>
+		<gmd:characterSet>
+			<gmd:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8"/>
+		</gmd:characterSet>
+		<gmd:parentIdentifier>
+			<gco:CharacterString>02FA9B2A-A76F-11D5-88B7-000102B6A10E</gco:CharacterString>
+		</gmd:parentIdentifier>
+		<gmd:hierarchyLevel>
+			<gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset">dataset</gmd:MD_ScopeCode>
+		</gmd:hierarchyLevel>
+		<gmd:contact>
+			<gmd:CI_ResponsibleParty uuid="dc98347a-de62-4473-8048-7883e20fe314">
+				<gmd:organisationName>
+					<gco:CharacterString>hmdk-bvm@bvm.hamburg.de</gco:CharacterString>
+				</gmd:organisationName>
+				<gmd:contactInfo>
+					<gmd:CI_Contact>
+						<gmd:address>
+							<gmd:CI_Address>
+								<gmd:electronicMailAddress>
+									<gco:CharacterString>hmdk-bvm@bvm.hamburg.de</gco:CharacterString>
+								</gmd:electronicMailAddress>
+							</gmd:CI_Address>
+						</gmd:address>
+					</gmd:CI_Contact>
+				</gmd:contactInfo>
+				<gmd:role>
+					<gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact"/>
+				</gmd:role>
+			</gmd:CI_ResponsibleParty>
+		</gmd:contact>
+		<gmd:dateStamp>
+			<gco:Date>2026-01-28</gco:Date>
+		</gmd:dateStamp>
+		<gmd:metadataStandardName>
+			<gco:CharacterString>ISO19115</gco:CharacterString>
+		</gmd:metadataStandardName>
+		<gmd:metadataStandardVersion>
+			<gco:CharacterString>2003/Cor.1:2006</gco:CharacterString>
+		</gmd:metadataStandardVersion>
+		<gmd:referenceSystemInfo>
+			<gmd:MD_ReferenceSystem>
+				<gmd:referenceSystemIdentifier>
+					<gmd:RS_Identifier>
+						<gmd:code>
+							<gmx:Anchor xlink:href="http://www.opengis.net/def/crs/EPSG/0/25832">EPSG 25832: ETRS89 / UTM Zone 32N</gmx:Anchor>
+						</gmd:code>
+					</gmd:RS_Identifier>
+				</gmd:referenceSystemIdentifier>
+			</gmd:MD_ReferenceSystem>
+		</gmd:referenceSystemInfo>
+		<gmd:identificationInfo>
+			<gmd:MD_DataIdentification uuid="https://registry.gdi-de.org/id/de.hh/c8898da0-c19e-453e-9e48-0de68994a3cb">
+				<gmd:citation>
+					<gmd:CI_Citation>
+						<gmd:title>
+							<gco:CharacterString>Bike + Ride Anlagen Hamburg</gco:CharacterString>
+						</gmd:title>
+						<gmd:alternateTitle>
+							<gco:CharacterString>B+R-Anlagen</gco:CharacterString>
+						</gmd:alternateTitle>
+						<gmd:date>
+							<gmd:CI_Date>
+								<gmd:date>
+									<gco:DateTime>2013-06-07T00:00:00.000+02:00</gco:DateTime>
+								</gmd:date>
+								<gmd:dateType>
+									<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="creation"/>
+								</gmd:dateType>
+							</gmd:CI_Date>
+						</gmd:date>
+						<gmd:date>
+							<gmd:CI_Date>
+								<gmd:date>
+									<gco:DateTime>2024-06-05T00:00:00.000+02:00</gco:DateTime>
+								</gmd:date>
+								<gmd:dateType>
+									<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication"/>
+								</gmd:dateType>
+							</gmd:CI_Date>
+						</gmd:date>
+						<gmd:date>
+							<gmd:CI_Date>
+								<gmd:date>
+									<gco:DateTime>2017-12-31T00:00:00.000+01:00</gco:DateTime>
+								</gmd:date>
+								<gmd:dateType>
+									<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="revision"/>
+								</gmd:dateType>
+							</gmd:CI_Date>
+						</gmd:date>
+						<gmd:identifier>
+							<gmd:MD_Identifier>
+								<gmd:code>
+									<gco:CharacterString>https://registry.gdi-de.org/id/de.hh/c8898da0-c19e-453e-9e48-0de68994a3cb</gco:CharacterString>
+								</gmd:code>
+							</gmd:MD_Identifier>
+						</gmd:identifier>
+					</gmd:CI_Citation>
+				</gmd:citation>
+				<gmd:abstract>
+					<gco:CharacterString>Der Datensatz enthält die Lage der Fahrradabstellanlagen an Schnellbahnhaltestellen im Hamburger Stadtgebiet.
+
+Für jede Abstellanlage wird die Anzahl der öffentlichen Stellplätze (überdacht und nicht überdacht) und, wenn vorhanden, die Anzahl der abschließbaren Mietplätze angegeben.</gco:CharacterString>
+				</gmd:abstract>
+				<gmd:pointOfContact>
+					<gmd:CI_ResponsibleParty uuid="B7A0369F-FAD0-4B6E-9666-DB99D975ABC7">
+						<gmd:organisationName>
+							<gco:CharacterString>Behörde für Verkehr und Mobilitätswende (BVM)</gco:CharacterString>
+						</gmd:organisationName>
+						<gmd:positionName>
+							<gco:CharacterString>Amt Verkehr</gco:CharacterString>
+						</gmd:positionName>
+						<gmd:contactInfo>
+							<gmd:CI_Contact>
+								<gmd:address>
+									<gmd:CI_Address>
+										<gmd:deliveryPoint>
+											<gco:CharacterString>Postbox 112109, D-20421 Hamburg</gco:CharacterString>
+										</gmd:deliveryPoint>
+										<gmd:deliveryPoint>
+											<gco:CharacterString>Alter Steinweg 4</gco:CharacterString>
+										</gmd:deliveryPoint>
+										<gmd:city>
+											<gco:CharacterString>Hamburg</gco:CharacterString>
+										</gmd:city>
+										<gmd:administrativeArea>
+											<gco:CharacterString>Hamburg</gco:CharacterString>
+										</gmd:administrativeArea>
+										<gmd:postalCode>
+											<gco:CharacterString>D-20459</gco:CharacterString>
+										</gmd:postalCode>
+										<gmd:country>
+											<gco:CharacterString>DEU</gco:CharacterString>
+										</gmd:country>
+										<gmd:electronicMailAddress>
+											<gco:CharacterString>hmdk-bvm@bvm.hamburg.de</gco:CharacterString>
+										</gmd:electronicMailAddress>
+									</gmd:CI_Address>
+								</gmd:address>
+								<gmd:onlineResource>
+									<gmd:CI_OnlineResource>
+										<gmd:linkage>
+											<gmd:URL>https://www.hamburg.de/bvm</gmd:URL>
+										</gmd:linkage>
+									</gmd:CI_OnlineResource>
+								</gmd:onlineResource>
+							</gmd:CI_Contact>
+						</gmd:contactInfo>
+						<gmd:role>
+							<gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="publisher"/>
+						</gmd:role>
+					</gmd:CI_ResponsibleParty>
+				</gmd:pointOfContact>
+				<gmd:pointOfContact>
+					<gmd:CI_ResponsibleParty uuid="B7A0369F-FAD0-4B6E-9666-DB99D975ABC7">
+						<gmd:organisationName>
+							<gco:CharacterString>Behörde für Verkehr und Mobilitätswende (BVM)</gco:CharacterString>
+						</gmd:organisationName>
+						<gmd:positionName>
+							<gco:CharacterString>Amt Verkehr</gco:CharacterString>
+						</gmd:positionName>
+						<gmd:contactInfo>
+							<gmd:CI_Contact>
+								<gmd:address>
+									<gmd:CI_Address>
+										<gmd:deliveryPoint>
+											<gco:CharacterString>Postbox 112109, D-20421 Hamburg</gco:CharacterString>
+										</gmd:deliveryPoint>
+										<gmd:deliveryPoint>
+											<gco:CharacterString>Alter Steinweg 4</gco:CharacterString>
+										</gmd:deliveryPoint>
+										<gmd:city>
+											<gco:CharacterString>Hamburg</gco:CharacterString>
+										</gmd:city>
+										<gmd:administrativeArea>
+											<gco:CharacterString>Hamburg</gco:CharacterString>
+										</gmd:administrativeArea>
+										<gmd:postalCode>
+											<gco:CharacterString>D-20459</gco:CharacterString>
+										</gmd:postalCode>
+										<gmd:country>
+											<gco:CharacterString>DEU</gco:CharacterString>
+										</gmd:country>
+										<gmd:electronicMailAddress>
+											<gco:CharacterString>hmdk-bvm@bvm.hamburg.de</gco:CharacterString>
+										</gmd:electronicMailAddress>
+									</gmd:CI_Address>
+								</gmd:address>
+								<gmd:onlineResource>
+									<gmd:CI_OnlineResource>
+										<gmd:linkage>
+											<gmd:URL>https://www.hamburg.de/bvm</gmd:URL>
+										</gmd:linkage>
+									</gmd:CI_OnlineResource>
+								</gmd:onlineResource>
+							</gmd:CI_Contact>
+						</gmd:contactInfo>
+						<gmd:role>
+							<gmd:CI_RoleCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_RoleCode" codeListValue="pointOfContact"/>
+						</gmd:role>
+					</gmd:CI_ResponsibleParty>
+				</gmd:pointOfContact>
+				<gmd:resourceMaintenance>
+					<gmd:MD_MaintenanceInformation>
+						<gmd:maintenanceAndUpdateFrequency>
+							<gmd:MD_MaintenanceFrequencyCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_MaintenanceFrequencyCode" codeListValue="continual"/>
+						</gmd:maintenanceAndUpdateFrequency>
+						<gmd:updateScope>
+							<gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset"/>
+						</gmd:updateScope>
+					</gmd:MD_MaintenanceInformation>
+				</gmd:resourceMaintenance>
+				<gmd:graphicOverview>
+					<gmd:MD_BrowseGraphic>
+						<gmd:fileName>
+							<gco:CharacterString>https://geodienste.hamburg.de/HH_WMS_Bike_und_Ride?SERVICE=WMS&amp;VERSION=1.3.0&amp;REQUEST=GetMap&amp;FORMAT=image/png&amp;BBOX=563313,5932000,569213,5937900&amp;WIDTH=256&amp;HEIGHT=256&amp;STYLES=&amp;CRS=EPSG:25832&amp;LAYERS=bike_und_ride</gco:CharacterString>
+						</gmd:fileName>
+					</gmd:MD_BrowseGraphic>
+				</gmd:graphicOverview>
+				<gmd:descriptiveKeywords>
+					<gmd:MD_Keywords>
+						<gmd:keyword>
+							<gco:CharacterString>Bike + Ride</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Bike</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Ride</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Fahrradparken</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Fahrradabstellplätze an S-und U-Bahn-Haltestellen</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Fahrradbügel</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Fahrradhäuschen</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Fahrradständer</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Haltestelle</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Bahn</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Fahrradgarage</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Fahrradbox</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>Fahrradkäfig</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>B+R</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>HVD</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>mobilithek_category_PARKING_AND_REST_AREA_INFORMATION</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>mobilithek_subcategory_BIKE_PARKING_LOCATIONS</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gco:CharacterString>opendata</gco:CharacterString>
+						</gmd:keyword>
+					</gmd:MD_Keywords>
+				</gmd:descriptiveKeywords>
+				<gmd:descriptiveKeywords>
+					<gmd:MD_Keywords>
+						<gmd:keyword>
+							<gco:CharacterString>TRAN</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:type>
+							<gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+						</gmd:type>
+					</gmd:MD_Keywords>
+				</gmd:descriptiveKeywords>
+				<gmd:descriptiveKeywords>
+					<gmd:MD_Keywords>
+						<gmd:keyword>
+							<gco:CharacterString>Hamburgisches Transparenzgesetz (HmbTG)</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:thesaurusName>
+							<gmd:CI_Citation>
+								<gmd:title>
+									<gco:CharacterString>Further legal basis</gco:CharacterString>
+								</gmd:title>
+								<gmd:date>
+									<gmd:CI_Date>
+										<gmd:date>
+											<gco:Date>2020-05-05</gco:Date>
+										</gmd:date>
+										<gmd:dateType>
+											<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication">publication</gmd:CI_DateTypeCode>
+										</gmd:dateType>
+									</gmd:CI_Date>
+								</gmd:date>
+							</gmd:CI_Citation>
+						</gmd:thesaurusName>
+					</gmd:MD_Keywords>
+				</gmd:descriptiveKeywords>
+				<gmd:descriptiveKeywords>
+					<gmd:MD_Keywords>
+						<gmd:keyword>
+							<gmx:Anchor xlink:href="https://sns.uba.de/umthes/TH_00009162">Fahrrad</gmx:Anchor>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gmx:Anchor xlink:href="https://sns.uba.de/umthes/TH_00028834">Verkehr</gmx:Anchor>
+						</gmd:keyword>
+						<gmd:keyword>
+							<gmx:Anchor xlink:href="https://sns.uba.de/umthes/TH_00020140">Radfahren</gmx:Anchor>
+						</gmd:keyword>
+						<gmd:type>
+							<gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+						</gmd:type>
+						<gmd:thesaurusName>
+							<gmd:CI_Citation>
+								<gmd:title>
+									<gco:CharacterString>UMTHES Thesaurus</gco:CharacterString>
+								</gmd:title>
+								<gmd:date>
+									<gmd:CI_Date>
+										<gmd:date>
+											<gco:Date>2009-01-15</gco:Date>
+										</gmd:date>
+										<gmd:dateType>
+											<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication">publication</gmd:CI_DateTypeCode>
+										</gmd:dateType>
+									</gmd:CI_Date>
+								</gmd:date>
+							</gmd:CI_Citation>
+						</gmd:thesaurusName>
+					</gmd:MD_Keywords>
+				</gmd:descriptiveKeywords>
+				<gmd:descriptiveKeywords>
+					<gmd:MD_Keywords>
+						<gmd:keyword>
+							<gmx:Anchor xlink:href="http://data.europa.eu/bna/c_b79e35eb">Mobilität</gmx:Anchor>
+						</gmd:keyword>
+						<gmd:type>
+							<gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+						</gmd:type>
+						<gmd:thesaurusName>
+							<gmd:CI_Citation>
+								<gmd:title>
+									<gmx:Anchor xlink:href="http://data.europa.eu/bna/asd487ae75">High-value dataset categories</gmx:Anchor>
+								</gmd:title>
+								<gmd:date>
+									<gmd:CI_Date>
+										<gmd:date>
+											<gco:Date>2023-09-27</gco:Date>
+										</gmd:date>
+										<gmd:dateType>
+											<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication">publication</gmd:CI_DateTypeCode>
+										</gmd:dateType>
+									</gmd:CI_Date>
+								</gmd:date>
+							</gmd:CI_Citation>
+						</gmd:thesaurusName>
+					</gmd:MD_Keywords>
+				</gmd:descriptiveKeywords>
+				<gmd:descriptiveKeywords>
+					<gmd:MD_Keywords>
+						<gmd:keyword>
+							<gco:CharacterString>hmbtg_09_geodaten</gco:CharacterString>
+						</gmd:keyword>
+						<gmd:type>
+							<gmd:MD_KeywordTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_KeywordTypeCode" codeListValue="theme"/>
+						</gmd:type>
+						<gmd:thesaurusName>
+							<gmd:CI_Citation>
+								<gmd:title>
+									<gco:CharacterString>HmbTG-Informationsgegenstand</gco:CharacterString>
+								</gmd:title>
+								<gmd:date>
+									<gmd:CI_Date>
+										<gmd:date>
+											<gco:Date>2013-08-02</gco:Date>
+										</gmd:date>
+										<gmd:dateType>
+											<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication">publication</gmd:CI_DateTypeCode>
+										</gmd:dateType>
+									</gmd:CI_Date>
+								</gmd:date>
+							</gmd:CI_Citation>
+						</gmd:thesaurusName>
+					</gmd:MD_Keywords>
+				</gmd:descriptiveKeywords>
+				<gmd:descriptiveKeywords>
+					<gmd:MD_Keywords>
+						<gmd:keyword>
+							<gco:CharacterString>Geodaten</gco:CharacterString>
+						</gmd:keyword>
+					</gmd:MD_Keywords>
+				</gmd:descriptiveKeywords>
+				<gmd:descriptiveKeywords>
+					<gmd:MD_Keywords>
+						<gmd:keyword>
+							<gco:CharacterString>hmbtg</gco:CharacterString>
+						</gmd:keyword>
+					</gmd:MD_Keywords>
+				</gmd:descriptiveKeywords>
+				<gmd:resourceConstraints>
+					<gmd:MD_LegalConstraints>
+						<gmd:useConstraints>
+							<gmd:MD_RestrictionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions"/>
+						</gmd:useConstraints>
+						<gmd:otherConstraints>
+							<gco:CharacterString>Datenlizenz Deutschland Namensnennung 2.0</gco:CharacterString>
+						</gmd:otherConstraints>
+						<gmd:otherConstraints>
+							<gco:CharacterString>Quellenvermerk: Freie und Hansestadt Hamburg, Behörde für Verkehr und Mobilitätswende</gco:CharacterString>
+						</gmd:otherConstraints>
+						<gmd:otherConstraints>
+							<gco:CharacterString>{"id":"dl-by-de/2.0","name":"Datenlizenz Deutschland Namensnennung 2.0","url":"https://www.govdata.de/dl-de/by-2-0","quelle":"Freie und Hansestadt Hamburg, Behörde für Verkehr und Mobilitätswende"}</gco:CharacterString>
+						</gmd:otherConstraints>
+					</gmd:MD_LegalConstraints>
+				</gmd:resourceConstraints>
+				<gmd:resourceConstraints>
+					<gmd:MD_LegalConstraints>
+						<gmd:accessConstraints>
+							<gmd:MD_RestrictionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_RestrictionCode" codeListValue="otherRestrictions">otherRestrictions</gmd:MD_RestrictionCode>
+						</gmd:accessConstraints>
+						<gmd:otherConstraints>
+							<gmx:Anchor xlink:href="http://inspire.ec.europa.eu/metadata-codelist/LimitationsOnPublicAccess/noLimitations">Es gelten keine Zugriffsbeschränkungen</gmx:Anchor>
+						</gmd:otherConstraints>
+					</gmd:MD_LegalConstraints>
+				</gmd:resourceConstraints>
+				<gmd:language>
+					<gmd:LanguageCode codeList="http://www.loc.gov/standards/iso639-2/" codeListValue="ger"/>
+				</gmd:language>
+				<gmd:characterSet>
+					<gmd:MD_CharacterSetCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_CharacterSetCode" codeListValue="utf8"/>
+				</gmd:characterSet>
+				<gmd:topicCategory>
+					<gmd:MD_TopicCategoryCode>transportation</gmd:MD_TopicCategoryCode>
+				</gmd:topicCategory>
+				<gmd:extent>
+					<gmd:EX_Extent>
+						<gmd:geographicElement>
+							<gmd:EX_GeographicDescription>
+								<gmd:extentTypeCode>
+									<gco:Boolean>true</gco:Boolean>
+								</gmd:extentTypeCode>
+								<gmd:geographicIdentifier>
+									<gmd:MD_Identifier>
+										<gmd:code>
+											<gco:CharacterString>Hamburg (02)</gco:CharacterString>
+										</gmd:code>
+									</gmd:MD_Identifier>
+								</gmd:geographicIdentifier>
+							</gmd:EX_GeographicDescription>
+						</gmd:geographicElement>
+						<gmd:geographicElement>
+							<gmd:EX_GeographicBoundingBox>
+								<gmd:extentTypeCode>
+									<gco:Boolean>true</gco:Boolean>
+								</gmd:extentTypeCode>
+								<gmd:westBoundLongitude>
+									<gco:Decimal>8.420551</gco:Decimal>
+								</gmd:westBoundLongitude>
+								<gmd:eastBoundLongitude>
+									<gco:Decimal>10.326304</gco:Decimal>
+								</gmd:eastBoundLongitude>
+								<gmd:southBoundLatitude>
+									<gco:Decimal>53.394985</gco:Decimal>
+								</gmd:southBoundLatitude>
+								<gmd:northBoundLatitude>
+									<gco:Decimal>53.964153</gco:Decimal>
+								</gmd:northBoundLatitude>
+							</gmd:EX_GeographicBoundingBox>
+						</gmd:geographicElement>
+						<gmd:geographicElement>
+							<gmd:EX_GeographicDescription>
+								<gmd:geographicIdentifier>
+									<gmd:MD_Identifier>
+										<gmd:code>
+											<gmx:Anchor xlink:href="https://registry.gdi-de.org/id/de.bund.bkg.regschluessel/02">020000000000</gmx:Anchor>
+										</gmd:code>
+									</gmd:MD_Identifier>
+								</gmd:geographicIdentifier>
+							</gmd:EX_GeographicDescription>
+						</gmd:geographicElement>
+						<gmd:temporalElement>
+							<gmd:EX_TemporalExtent>
+								<gmd:extent>
+									<gml:TimePeriod gml:id="timePeriod_ID_9b2722c0-01a0-42be-a133-59163b2e5747">
+										<gml:beginPosition>1995-01-01T00:00:00.000+01:00</gml:beginPosition>
+										<gml:endPosition indeterminatePosition="unknown"/>
+									</gml:TimePeriod>
+								</gmd:extent>
+							</gmd:EX_TemporalExtent>
+						</gmd:temporalElement>
+					</gmd:EX_Extent>
+				</gmd:extent>
+			</gmd:MD_DataIdentification>
+		</gmd:identificationInfo>
+		<gmd:distributionInfo>
+			<gmd:MD_Distribution>
+				<gmd:distributionFormat>
+					<gmd:MD_Format>
+						<gmd:name>
+							<gco:CharacterString>Excel</gco:CharacterString>
+						</gmd:name>
+						<gmd:version>
+							<gco:CharacterString>keine Angaben</gco:CharacterString>
+						</gmd:version>
+					</gmd:MD_Format>
+				</gmd:distributionFormat>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>http://geoportal-hamburg.de/verkehrsportal/</gmd:URL>
+								</gmd:linkage>
+								<gmd:name>
+									<gco:CharacterString>Link zum Verkehrsportal Hamburg</gco:CharacterString>
+								</gmd:name>
+								<gmd:function>
+									<gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="unspecificurl">unspecificurl</gmd:CI_OnLineFunctionCode>
+								</gmd:function>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>https://daten-hamburg.de/transport_verkehr/bike_und_ride/BikeRideAnlagen_HH_2014-09-11.zip</gmd:URL>
+								</gmd:linkage>
+								<gmd:applicationProfile>
+									<gco:CharacterString>GML</gco:CharacterString>
+								</gmd:applicationProfile>
+								<gmd:name>
+									<gco:CharacterString>Download Bike + Ride Anlagen Hamburg (GML), 2015</gco:CharacterString>
+								</gmd:name>
+								<gmd:function>
+									<gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+								</gmd:function>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>https://geodienste.hamburg.de/HH_WFS_Bike_und_Ride?SERVICE=WFS&amp;VERSION=1.1.0&amp;REQUEST=GetFeature&amp;typename=de.hh.up:bike_und_ride</gmd:URL>
+								</gmd:linkage>
+								<gmd:applicationProfile>
+									<gco:CharacterString>GML</gco:CharacterString>
+								</gmd:applicationProfile>
+								<gmd:name>
+									<gco:CharacterString>Download WFS Bike + Ride Anlagen Hamburg (GML)</gco:CharacterString>
+								</gmd:name>
+								<gmd:description>
+									<gco:CharacterString>Bitte ergänzen Sie ggf. den Dateityp .GML an der heruntergeladenen Datei.</gco:CharacterString>
+								</gmd:description>
+								<gmd:function>
+									<gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+								</gmd:function>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>https://geodienste.hamburg.de/HH_WFS_Bike_und_Ride?service=WFS&amp;request=DescribeFeatureType&amp;version=1.1.0&amp;typename=de.hh.up:bike_und_ride</gmd:URL>
+								</gmd:linkage>
+								<gmd:name>
+									<gco:CharacterString>Download WFS-Schemadatei Bike + Ride Anlagen Hamburg (XSD)</gco:CharacterString>
+								</gmd:name>
+								<gmd:description>
+									<gco:CharacterString>Die XSD-Datei ist die Schema-Beschreibung für lokal gespeicherte GML-Dateien, die über den Download-WFS herunter geladen werden können.
+
+Bitte ergänzen Sie ggf. den Dateityp, .XSD an der heruntergeladenen Datei.</gco:CharacterString>
+								</gmd:description>
+								<gmd:function>
+									<gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+								</gmd:function>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>https://www.pr.hamburg/b-r-anlagen/</gmd:URL>
+								</gmd:linkage>
+								<gmd:name>
+									<gco:CharacterString>B+R Anlagen Mietplätze</gco:CharacterString>
+								</gmd:name>
+								<gmd:function>
+									<gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</gmd:CI_OnLineFunctionCode>
+								</gmd:function>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>https://www.hamburg.de/fahrradfahren-in-hamburg/4128764/bike-and-ride-in-hamburg/</gmd:URL>
+								</gmd:linkage>
+								<gmd:name>
+									<gco:CharacterString>B+R Hamburg Inf0rmationen</gco:CharacterString>
+								</gmd:name>
+								<gmd:function>
+									<gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="information">information</gmd:CI_OnLineFunctionCode>
+								</gmd:function>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>https://api.hamburg.de/datasets/v1/bike_und_ride</gmd:URL>
+								</gmd:linkage>
+								<gmd:name>
+									<gco:CharacterString>OGC API - Features (OAF) Landing Page</gco:CharacterString>
+								</gmd:name>
+								<gmd:function>
+									<gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="unspecificurl">unspecificurl</gmd:CI_OnLineFunctionCode>
+								</gmd:function>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>https://geodienste.hamburg.de/download?url=https://geodienste.hamburg.de/HH_WFS_Bike_und_Ride&amp;f=csv</gmd:URL>
+								</gmd:linkage>
+								<gmd:applicationProfile>
+									<gco:CharacterString>CSV</gco:CharacterString>
+								</gmd:applicationProfile>
+								<gmd:name>
+									<gco:CharacterString>Download Bike + Ride Anlagen Hamburg (CSV)</gco:CharacterString>
+								</gmd:name>
+								<gmd:function>
+									<gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+								</gmd:function>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>https://geodienste.hamburg.de/download?url=https://geodienste.hamburg.de/HH_WFS_Bike_und_Ride&amp;f=json</gmd:URL>
+								</gmd:linkage>
+								<gmd:applicationProfile>
+									<gco:CharacterString>GeoJSON</gco:CharacterString>
+								</gmd:applicationProfile>
+								<gmd:name>
+									<gco:CharacterString>Download Bike + Ride Anlagen Hamburg (GeoJSON)</gco:CharacterString>
+								</gmd:name>
+								<gmd:function>
+									<gmd:CI_OnLineFunctionCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_OnLineFunctionCode" codeListValue="download">download</gmd:CI_OnLineFunctionCode>
+								</gmd:function>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>https://geodienste.hamburg.de/HH_WFS_Bike_und_Ride?SERVICE=WFS&amp;REQUEST=GetCapabilities</gmd:URL>
+								</gmd:linkage>
+								<gmd:protocol>
+									<gmx:Anchor xlink:href="http://www.opengis.net/def/serviceType/ogc/wfs">OGC Web Feature Service</gmx:Anchor>
+								</gmd:protocol>
+								<gmd:name>
+									<gco:CharacterString>Dienst "WFS Bike + Ride Anlagen Hamburg" (GetCapabilities)</gco:CharacterString>
+								</gmd:name>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:onLine>
+							<gmd:CI_OnlineResource>
+								<gmd:linkage>
+									<gmd:URL>https://geodienste.hamburg.de/HH_WMS_Bike_und_Ride?SERVICE=WMS&amp;REQUEST=GetCapabilities</gmd:URL>
+								</gmd:linkage>
+								<gmd:protocol>
+									<gmx:Anchor xlink:href="http://www.opengis.net/def/serviceType/ogc/wms">OGC Web Map Service</gmx:Anchor>
+								</gmd:protocol>
+								<gmd:name>
+									<gco:CharacterString>Dienst "WMS Bike + Ride Anlagen Hamburg" (GetCapabilities)</gco:CharacterString>
+								</gmd:name>
+							</gmd:CI_OnlineResource>
+						</gmd:onLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+				<gmd:transferOptions>
+					<gmd:MD_DigitalTransferOptions>
+						<gmd:unitsOfDistribution>
+							<gco:CharacterString>MB</gco:CharacterString>
+						</gmd:unitsOfDistribution>
+						<gmd:offLine>
+							<gmd:MD_Medium>
+								<gmd:name>
+									<gmd:MD_MediumNameCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_MediumNameCode" codeListValue="cdRom"/>
+								</gmd:name>
+								<gmd:mediumNote>
+									<gco:CharacterString/>
+								</gmd:mediumNote>
+							</gmd:MD_Medium>
+						</gmd:offLine>
+					</gmd:MD_DigitalTransferOptions>
+				</gmd:transferOptions>
+			</gmd:MD_Distribution>
+		</gmd:distributionInfo>
+		<gmd:dataQualityInfo>
+			<gmd:DQ_DataQuality>
+				<gmd:scope>
+					<gmd:DQ_Scope>
+						<gmd:level>
+							<gmd:MD_ScopeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#MD_ScopeCode" codeListValue="dataset"/>
+						</gmd:level>
+					</gmd:DQ_Scope>
+				</gmd:scope>
+				<gmd:report>
+					<gmd:DQ_DomainConsistency>
+						<gmd:result>
+							<gmd:DQ_ConformanceResult>
+								<gmd:specification>
+									<gmd:CI_Citation>
+										<gmd:title>
+											<gco:CharacterString>VERORDNUNG (EG) Nr. 1089/2010 DER KOMMISSION vom 23. November 2010 zur Durchführung der Richtlinie 2007/2/EG des Europäischen Parlaments und des Rates hinsichtlich der Interoperabilität von Geodatensätzen und -diensten</gco:CharacterString>
+										</gmd:title>
+										<gmd:date>
+											<gmd:CI_Date>
+												<gmd:date>
+													<gco:Date>2010-12-08</gco:Date>
+												</gmd:date>
+												<gmd:dateType>
+													<gmd:CI_DateTypeCode codeList="http://standards.iso.org/iso/19139/resources/gmxCodelists.xml#CI_DateTypeCode" codeListValue="publication">publication</gmd:CI_DateTypeCode>
+												</gmd:dateType>
+											</gmd:CI_Date>
+										</gmd:date>
+									</gmd:CI_Citation>
+								</gmd:specification>
+								<gmd:explanation>
+									<gco:CharacterString>see the referenced specification</gco:CharacterString>
+								</gmd:explanation>
+								<gmd:pass>
+									<gco:Boolean>false</gco:Boolean>
+								</gmd:pass>
+							</gmd:DQ_ConformanceResult>
+						</gmd:result>
+					</gmd:DQ_DomainConsistency>
+				</gmd:report>
+				<gmd:lineage>
+					<gmd:LI_Lineage>
+						<gmd:statement>
+							<gco:CharacterString>Keine</gco:CharacterString>
+						</gmd:statement>
+					</gmd:LI_Lineage>
+				</gmd:lineage>
+			</gmd:DQ_DataQuality>
+		</gmd:dataQualityInfo>
+	</gmd:MD_Metadata>
+</csw:GetRecordByIdResponse>

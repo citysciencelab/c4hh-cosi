@@ -17,7 +17,12 @@ export default {
          * @returns {Object[]} Sorted list of planning scenarios.
          */
         sortedPlanningScenarios () {
-            return this.planningScenarios ? [...this.planningScenarios].sort((a, b) => a.name.localeCompare(b.name)) : [];
+            if (!this.planningScenarios) {
+                return [];
+            }
+            return this.planningScenarios
+                .filter(scenario => scenario.id !== "noScenario")
+                .sort((a, b) => a.name.localeCompare(b.name));
         },
 
         /**

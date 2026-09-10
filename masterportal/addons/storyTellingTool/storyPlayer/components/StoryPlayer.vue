@@ -1,67 +1,78 @@
 <script>
+import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMessage.vue";
 import axios from "axios";
+import {boundingExtent} from "ol/extent.js";
+import CookieBanner from "../../shared/cookiebanner/components/CookieBanner.vue";
 import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
+import {getDirectVideo, getEmbedLink} from "../../shared/utils/video.js";
+import {getVisibleLayerList} from "../../shared/utils/layerHelper.js";
+import LayerGroup from "ol/layer/Group.js";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import Overlay from "ol/Overlay.js";
+import StoryPlayerFeature from "./StoryPlayerFeature.vue";
+import StoryPlayerToolbar from "./StoryPlayerToolbar.vue";
 import tipTapJsonToHtml from "../../storyCreator/shared/modules/tipTapEditor/js/tipTapJsonToHtml";
 
 export default {
     name: "StoryPlayer",
-    props: {
-        imageAssetsById: {
-            type: Object,
-            default: null
-        },
-        isMobileDevice: {
-            type: Boolean,
-            default: false
-        },
-        screenOrientationType: {
-            type: String,
-            default: screen.orientation?.type
-        },
-        storyConfProp: {
-            type: Object,
-            default: null
-        }
+    components: {
+        AlertMessage,
+        CookieBanner,
+        FlatButton,
+        IconButton,
+        StoryPlayerFeature,
+        StoryPlayerToolbar
     },
     data () {
         return {
             currentIndex: -1,
             currentChapterIndex: 0,
-            fixedImageAssetsById: null,
-            loadedContent: null,
+            featureAttributes: null,
+            interval: null,
             isHovering: null,
             isChangeFrom3D: false,
-            showMode: "",
-            interval: null,
-            toolBodyScrollTop: 0,
+            isCookieAllowed: document.cookie.split("; ").some(cookie => cookie.startsWith("username=storyvideo")),
+            loadedContent: null,
+            overlay: null,
             scroller: null,
-            showStickyHeader: false
+            showImportWarning3D: [],
+            showMode: "",
+            showStickyHeader: false,
+            toolBodyScrollTop: 0
         };
     },
     computed: {
+        ...mapGetters("Modules/ShareView", ["url"]),
         ...mapGetters("Modules/StoryPlayer", [
-            "autoplay",
+            "currentStoryName",
             "description",
+            "duration",
             "fixedStoryName",
             "fixedStoryPath",
             "icon",
             "id",
+            "imageAssetsById",
             "mode",
             "name",
-            "storyConfJson",
+            "originalLayerConfig",
             "type",
             "storyPlayerMenuSide",
+            "storyConf",
             "supportedDevices",
             "supportedMapModes"
         ]),
-        ...mapGetters("Modules/StoryPlayer", {
-            storyConfStore: "storyConf"
-        }),
         ...mapGetters([
-            "layerConfigsByAttributes",
+            "addLayerButton",
             "allLayerConfigs",
-            "layerConfigById"
+            "controlsConfig",
+            "layerConfig",
+            "layerConfigById",
+            "layerConfigsByAttributes",
+            "visibleBaselayerConfigs"
         ]),
         ...mapGetters("Maps", ["mode"]),
         ...mapGetters("Menu", [
@@ -69,13 +80,6 @@ export default {
             "secondaryMenu",
             "expanded"
         ]),
-        /**
-         * The path to the story configuration json.
-         * @returns {String} the path to the story configuration json
-         */
-        storyConfPath () {
-            return this.storyConfJson ? this.storyConfJson : this.getConfPathfromUrl();
-        },
         /**
          * The current selected chapter of the story.
          * @returns {Object} current chapter
@@ -87,58 +91,58 @@ export default {
             return this.storyConf.chapters[this.currentChapterIndex];
         },
         /**
-         * The story configuration object, either from the prop or the store.
-         * @returns {Object} the story configuration
-         */
-        storyConf () {
-            return this.storyConfProp || this.storyConfStore || {};
-        },
-        /**
-         * The image assets object.
-         * @returns {Object} the image assets object
-         */
-        finalImageAssetsById () {
-            return this.imageAssetsById || this.fixedImageAssetsById;
-        },
-        /**
          * The URL of the cover image.
          * @returns {String} the URL of the cover image
          */
         coverImagePath () {
-            return this.finalImageAssetsById?.[this.storyConf.imageSrc]?.objectURL || "";
-        },
-        isMobilePortrait () {
-            return this.isMobileDevice && this.screenOrientationType.startsWith("portrait");
+            return this.imageAssetsById?.[this.storyConf.imageSrc]?.objectURL || "";
         }
     },
     watch: {
+        /**
+         * Reloads the story when the currentStoryName changes.
+         * This happens when the portal is opened via a shared URL that encodes a specific story.
+         * @param {String} newName the new story name
+         * @returns {void}
+         */
+        async currentStoryName (newName) {
+            if (newName && newName !== this.fixedStoryName) {
+                await this.getFixedStoryList(this.fixedStoryPath, newName);
+                this.currentIndex = -1;
+                this.currentChapterIndex = 0;
+                await this.$nextTick();
+                this.scrollerSetup();
+            }
+        },
         /**
          * Handles step changes.
          * @returns {void}
          */
         currentChapterIndex () {
+            this.deactivateSubjectLayer();
             this.loadChapter();
+            this.removePointMarker();
+            mapCollection.getMap("2D").removeOverlay(this.overlay);
         }
     },
     created () {
-        const breakpoint = "(max-width: 768px)",
-            mediaQuery = window.matchMedia(breakpoint),
-            isMobile = mediaQuery.matches,
-            orientationCheck = this.screenOrientationType?.startsWith("landscape");
-
-        if (isMobile && orientationCheck) {
-            this.applyMobileLandscapeLayout();
+        if (typeof this.originalLayerConfig === "undefined") {
+            this.setOriginalLayerConfig(JSON.parse(JSON.stringify(this.allLayerConfigs)));
         }
     },
     async mounted () {
         if (!Object.keys(this.storyConf).length) {
-            await this.getFixedStoryList(this.fixedStoryPath, this.fixedStoryName);
-        }
+            const storyName = this.currentStoryName || this.fixedStoryName;
 
+            await this.getFixedStoryList(this.fixedStoryPath, storyName);
+        }
+        this.toolBodyScrollTop = 0;
+
+        await this.$nextTick();
         this.scrollerSetup();
 
         const toolBody = document.getElementById("mp-body-secondaryMenu"),
-            coverCard = this.$refs.coverCard;
+              coverCard = this.$refs.coverCard;
 
         if (toolBody) {
             toolBody.addEventListener("scroll", this.handleToolBodyScroll);
@@ -152,26 +156,25 @@ export default {
             );
             this.coverCardObserver.observe(coverCard);
         }
+        this.deactivateSubjectLayer();
     },
-    activated () {
+    beforeUnmount () {
+        if (this.coverCardObserver) {
+            this.coverCardObserver.disconnect();
+        }
+        // Disconnect previous observer if exists
+        if (this._stepObserver) {
+            this._stepObserver.disconnect();
+        }
+        this._detectActiveStep = null;
+        // Remove scroll event listener
         const toolBody = document.getElementById("mp-body-secondaryMenu");
 
         this.$nextTick(() => {
-            if (toolBody && this.toolBodyScrollTop > 0) {
-                toolBody.scrollTop = this.toolBodyScrollTop;
-            }
-            if (toolBody) {
-                toolBody.addEventListener("scroll", this.handleToolBodyScroll);
-            }
+            this.currentIndex = -1;
+            this.currentChapterIndex = 0;
+            this.toolBodyScrollTop = 0;
         });
-    },
-    deactivated () {
-        // Handle KeepAlive visibility. Triggered if component is deactivated
-        const heading = document.getElementById("mp-menu-navigation-secondaryMenu"),
-            toolBody = document.getElementById("mp-body-secondaryMenu");
-
-        heading?.style?.removeProperty("display");
-        toolBody.setAttribute("style", this.originalToolBodyStyle || "");
 
         // Remove scroll event listener
         if (toolBody) {
@@ -180,38 +183,27 @@ export default {
             toolBody.scrollTop = 0;
         }
 
-        // remove the close button if GFI is opened
-        document.getElementById("mp-menu-header-close-button-secondaryMenu")?.setAttribute("style", "display: none;");
-        document.getElementById("mp-menu-navigation-reset-button-secondaryMenu")?.setAttribute("style", "display: none;");
-    },
-    beforeUnmount () {
-        // Hides all story layers
-        const layerList = typeof this.layerConfigsByAttributes === "function"
-            ? this.layerConfigsByAttributes({showInLayerTree: true})
-            : [];
+        this.deactivateSubjectLayer();
 
-        for (const layer of layerList) {
-            if (!layer || !layer.id || !layer.attributes) {
-                continue;
-            }
-
-            const isStepLayer = (
-                (this.currentStep && this.currentStep.layers) ||
-                []
-            ).includes(layer.id) || (this.currentStep && this.currentStep.layers && this.currentStep.layers.some(l => {
-                return Array.isArray(l) ? l.includes(layer.id) : false;
-            }));
-
-            if (isStepLayer && layer.attributes.isVisibleInMap) {
-                this.disableLayer(layer);
-            }
+        if (!this.addLayerButton?.active) {
+            this.updateLayerConfigs(this.originalLayerConfig);
         }
-        if (this.coverCardObserver) {
-            this.coverCardObserver.disconnect();
+        else {
+            this.allLayerConfigs.forEach(each => {
+                if (!this.originalLayerConfig.some(oriLayer => oriLayer.id === each.id)) {
+                    this.removeLayerFromLayerConfig(each.id);
+                }
+            });
         }
+
+        this.deactivateTool();
+        this.closePopup();
+        this.setToNorth();
     },
     methods: {
         ...mapMutations("Modules/StoryPlayer", [
+            "setCurrentStoryName",
+            "setImageAssetsById",
             "setSupportedDevices",
             "setSupportedMapModes",
             "setType",
@@ -219,19 +211,38 @@ export default {
             "setName",
             "setDescription",
             "setIcon",
+            "setOriginalLayerConfig",
             "setStoryConf",
-            "setStoryConfJson",
-            "setAutoplay",
             "setMode"
         ]),
         ...mapMutations("Menu", ["setExpandedBySide"]),
-        ...mapActions("Maps", ["changeMapMode"]),
-        ...mapActions(["replaceByIdInLayerConfig"]),
+        ...mapMutations(["setLayerConfigByParentKey"]),
+        ...mapActions("Alerting", ["addSingleAlert"]),
+        ...mapActions("Modules/LayerTree", ["removeLayer"]),
+        ...mapActions("Maps", ["changeMapMode", "placingPointMarker", "removePointMarker", "zoomToExtent"]),
+        ...mapActions(["addLayerToLayerConfig", "addOrReplaceLayer", "replaceByIdInLayerConfig", "updateLayerConfigs"]),
+        ...mapActions("Modules/StoryManager", ["removeLayerFromLayerConfig"]),
         ...mapActions("Menu", ["changeCurrentComponent", "resetMenu"]),
 
+        getDirectVideo,
+        getEmbedLink,
         tipTapJsonToHtml,
         handleToolBodyScroll (event) {
             this.toolBodyScrollTop = event.target.scrollTop;
+            // When scrolled all the way to the top, deactivate all chapters.
+            if (event.target.scrollTop === 0 && this.currentIndex >= 0) {
+                document.querySelectorAll("#story-player .stepper").forEach(s => s.classList.remove("active"));
+                this.currentIndex = -1;
+                this.deactivateTool();
+                this.deactivateSubjectLayer();
+                this.closePopup();
+                this.changeMapMode("2D");
+                this.setToNorth();
+                return;
+            }
+            if (this._detectActiveStep) {
+                this._detectActiveStep();
+            }
         },
         /**
          * Activates a tool
@@ -239,17 +250,70 @@ export default {
          * @returns {void}
          */
         activateTool (toolId) {
-            if (this.isMobilePortrait) {
-                return;
-            }
-
             const toolMenuSide = this.storyPlayerMenuSide === "mainMenu" ? "secondaryMenu" : "mainMenu",
-                toolKey = toolId.charAt(0).toUpperCase() + toolId.slice(1),
-                module = this.$store.state.Modules && this.$store.state.Modules[toolKey],
-                name = module && module.name ? module.name : toolKey;
+                  toolKey = toolId.charAt(0).toUpperCase() + toolId.slice(1),
+                  module = this.$store.state.Modules && this.$store.state.Modules[toolKey],
+                  name = module && module.name ? module.name : toolKey;
 
             this.setExpandedBySide({expanded: true, side: toolMenuSide});
             this.changeCurrentComponent({type: toolId, side: toolMenuSide, props: {name}});
+        },
+        /**
+         * Closes the popup overlay and remove the point marker.
+         * @returns {void}
+         */
+        closePopup () {
+            this.removePointMarker();
+            mapCollection.getMap("2D").removeOverlay(this.overlay);
+        },
+        /**
+         * Deactivates current subject layers from tree and map.
+         * @returns {void}
+         */
+        deactivateSubjectLayer () {
+            const layers = mapCollection.getMap("2D")?.getLayers(),
+                  baselayerId = this.visibleBaselayerConfigs[0]?.id,
+                  visibleLayerList = getVisibleLayerList(layers, baselayerId),
+                  groupLayers = this.layerConfigsByAttributes({typ: "GROUP"});
+
+            visibleLayerList.forEach(layer => {
+                if (!this.addLayerButton.active) {
+                    if (layer instanceof LayerGroup) {
+                        const childrenId = layer.getSource().map(childLayer => childLayer.get("id"));
+
+                        groupLayers.forEach(groupLayer => {
+                            if (groupLayer?.children.some(childlayer => childrenId.includes(childlayer.id))) {
+                                this.addOrReplaceLayer({
+                                    layerId: groupLayer.id,
+                                    visibility: false
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        this.addOrReplaceLayer({
+                            layerId: layer.get("id"),
+                            visibility: false
+                        });
+                    }
+                }
+                else {
+                    const layerConf = this.layerConfigById(layer.get("id"));
+
+                    this.removeLayer(layerConf);
+                }
+            });
+
+            this.allLayerConfigs.forEach(each => {
+                if (!this.originalLayerConfig.some(oriLayer => oriLayer.id === each.id)) {
+                    this.replaceByIdInLayerConfig({
+                        layerId: each.id,
+                        visibility: false,
+                        showInLayerTree: false
+                    });
+                    this.removeLayer(each);
+                }
+            });
         },
         /**
          * Deactivates a tool on the opposite menu side of where the storyPlayer is located
@@ -282,7 +346,8 @@ export default {
                     const {storyJson, imageAssetsById} = await extractStoryZip(response.data);
 
                     this.setStoryConf(storyJson);
-                    this.fixedImageAssetsById = imageAssetsById;
+                    this.setImageAssetsById(imageAssetsById);
+                    this.setCurrentStoryName(name);
                 }
                 catch (error) {
                     console.warn(
@@ -297,37 +362,53 @@ export default {
             }
         },
         /**
-         * Toggles a layer on the map
-         * @param {Object} layer the layer to enable
-         * @param {Boolean} enabled enables the layer if `true`, disables the layer if `false`
+         * Enables a layer or group layer on the map
+         * @param {StringString[]} id the layer id(s) to enable
          * @returns {void}
          */
-        toggleLayer (layer, enabled) {
-            this.replaceByIdInLayerConfig({
-                layerConfigs: [{
-                    id: layer.id,
-                    layer: {
-                        visibility: enabled,
-                        showInLayerTree: true
+        async enableLayer (id) {
+            if (typeof id !== "string" && (!Array.isArray(id) || !id.length)) {
+                return;
+            }
+
+            const layerIds = typeof id === "string" ? [id] : id;
+
+            await Promise.all(
+                layerIds.map(async (layerId) => {
+                    let layerConf = this.layerConfigById(layerId);
+
+                    if (!layerConf) {
+                        const groupLayers = this.layerConfigsByAttributes({typ: "GROUP"});
+
+                        if (groupLayers.length) {
+                            groupLayers.forEach(groupLayer => {
+                                if (groupLayer?.children.some(layer => layer.id === layerId)) {
+                                    this.addOrReplaceLayer({
+                                        layerId: groupLayer.id,
+                                        visibility: true,
+                                        showInLayerTree: true
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            layerConf = getAndMergeAllRawLayers().find(layer => layer.id === layerId);
+
+                            if (layerConf) {
+                                this.addLayerToLayerConfig({layerConfig: layerConf});
+                            }
+                        }
                     }
-                }]
-            });
-        },
-        /**
-         * Enables a layer on the map
-         * @param {Object} layer the layer to enable
-         * @returns {void}
-         */
-        enableLayer (layer) {
-            this.toggleLayer(layer, true);
-        },
-        /**
-         * Disables a layer on the map
-         * @param {Object} layer the layer to disable
-         * @returns {void}
-         */
-        disableLayer (layer) {
-            this.toggleLayer(layer, false);
+
+                    if (layerConf) {
+                        this.addOrReplaceLayer({
+                            layerId: layerId,
+                            visibility: true,
+                            showInLayerTree: true
+                        });
+                    }
+                })
+            );
         },
         /**
          * Sets up the tool window and content for the selected chapter.
@@ -343,6 +424,15 @@ export default {
                 this.setInitialWidth(this.currentChapter.stepWidth);
             }
 
+            if (this.currentChapter.is3D && this.controlsConfig?.button3d !== true) {
+                this.showImportWarning3D[this.currentChapterIndex] = true;
+                return;
+            }
+
+            if (this.currentChapter.is3D && this.mode === "2D") {
+                this.changeMapMode("3D");
+            }
+
             // Toggles 3D map mode
             if (this.currentChapter.is3D && this.mode === "2D") {
                 this.changeMapMode("3D");
@@ -350,6 +440,7 @@ export default {
             else if (!this.currentChapter.is3D && this.mode === "3D") {
                 this.isChangeFrom3D = true;
                 this.changeMapMode("2D");
+                this.setToNorth();
             }
 
             // Updates the map center and zoom level for 2D
@@ -359,8 +450,8 @@ export default {
                 }
                 else {
                     const map = mapCollection.getMap("2D"),
-                        mapView = typeof map?.getView === "function" ? map.getView() : undefined,
-                        zoomLevel = this.isMobilePortrait ? this.currentChapter.map.zoomLevel - 1 : this.currentChapter.map.zoomLevel;
+                          mapView = typeof map?.getView === "function" ? map.getView() : undefined,
+                          zoomLevel = this.currentChapter.map.zoomLevel;
 
                     if (mapView) {
                         setTimeout(() => {
@@ -369,7 +460,7 @@ export default {
                             mapView.animate({
                                 center: adjustedCenter,
                                 zoom: zoomLevel,
-                                duration: 1000,
+                                duration: this.duration,
                                 rotation: 0
                             });
 
@@ -384,44 +475,30 @@ export default {
             if (this.currentChapter.navigation3D
                 && Object.prototype.hasOwnProperty.call(this.currentChapter.navigation3D, "cameraPosition")
                 && this.currentChapter.navigation3D.cameraPosition[0] !== null) {
-                const position = this.currentChapter.navigation3D.cameraPosition,
-                    map3d = mapCollection.getMap("3D"),
-                    camera = map3d.getCesiumScene().camera,
-                    destination = Cesium.Cartesian3.fromDegrees(position[0], position[1], position[2]);
+                const camera = mapCollection.getMap("3D").getCesiumScene().camera,
+                      postion = this.currentChapter.navigation3D.cameraPosition;
 
                 camera.flyTo({
-                    destination: destination,
+                    destination: Cesium.Cartesian3.fromDegrees(postion[0], postion[1], postion[2]),
                     orientation: {
                         heading: this.currentChapter.navigation3D.heading,
-                        pitch: this.currentChapter.navigation3D.pitch
+                        pitch: this.currentChapter.navigation3D.pitch,
+                        roll: this.currentChapter.navigation3D.roll
                     },
-                    easingFunction: Cesium.EasingFunction.QUADRATIC_OUT
+                    easingFunction: Cesium.EasingFunction.QUADRATIC_OUT,
+                    duration: this.duration / 1000
                 });
             }
-
-            const layerList = Array.isArray(this.allLayerConfigs) ? this.allLayerConfigs : [];
 
             // Updates the map layers
-            for (const layer of layerList) {
-                const isStepLayer = (this.currentChapter.map.layers || []).includes(
-                    layer.id
-                ) || this.currentChapter.map.layers.some(l => {
-                    return Array.isArray(l) ? l.includes(layer.id) : false;
-                });
-
-                if (isStepLayer) {
-                    this.enableLayer(layer);
-                }
-                else if (!isStepLayer) {
-                    this.disableLayer(layer);
-                }
-            }
+            this.currentChapter?.map?.layers.forEach(layer => this.enableLayer(layer));
 
             if (!this.currentChapter.is3D) {
                 this.deactivateTool();
                 if (this.currentChapter.map?.tool) {
                     this.activateTool(this.currentChapter.map.tool);
                 }
+                this.setToNorth();
             }
         },
         /**
@@ -433,46 +510,30 @@ export default {
          */
         getCenterOfVisibleMap () {
             const map = mapCollection.getMap("2D"),
-                mapView = map?.getView(),
-                projection = mapView?.getProjection();
+                  mapView = map?.getView(),
+                  projection = mapView?.getProjection();
 
             if (projection && projection.getUnits() === "degrees") {
                 return this.currentChapter.map.center;
             }
 
-            const zoomLevel = this.isMobilePortrait ? this.currentChapter.map.zoomLevel - 1 : this.currentChapter.map.zoomLevel,
-                targetResolution = mapView?.getResolutionForZoom(zoomLevel),
-                rightPadding = this.expanded("secondaryMenu")
-                    ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
-                    : 20,
-                leftPadding = this.expanded("mainMenu")
-                    ? document.getElementById("mp-menu-mainMenu").offsetWidth
-                    : 20,
-                offsetPixels = (rightPadding - leftPadding) / 2,
-                center = this.currentChapter.map.center;
+            const zoomLevel = this.currentChapter.map.zoomLevel,
+                  targetResolution = mapView?.getResolutionForZoom(zoomLevel),
+                  rightPadding = this.expanded("secondaryMenu")
+                      ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
+                      : 20,
+                  leftPadding = this.expanded("mainMenu")
+                      ? document.getElementById("mp-menu-mainMenu").offsetWidth
+                      : 20,
+                  offsetPixels = (rightPadding - leftPadding) / 2,
+                  center = this.currentChapter.map.center;
 
-            if (this.isMobilePortrait) {
-                const mapHeight = map.getTargetElement().getBoundingClientRect().top,
-                    verticalOffsetPixels = (mapHeight / 2) + 50,
-                    offsetY = verticalOffsetPixels * targetResolution;
-
-                return [center[0], center[1] - offsetY];
-            }
 
             const offsetX = offsetPixels * targetResolution;
 
             return [center[0] + offsetX, center[1]];
         },
-        /**
-         * Gets the URL of a story.json from the URL parameter 'story'
-         * @returns {String} the URL of the story.json
-         */
-        getConfPathfromUrl () {
-            const queryString = window.location.search,
-                urlParams = new URLSearchParams(queryString);
 
-            return urlParams.get("story");
-        },
         /**
          * Navigates to the previous step
          * @returns {void}
@@ -481,6 +542,8 @@ export default {
             if (this.currentChapterIndex > 0) {
                 this.currentChapterIndex -= 1;
                 this.scrollToActiveStep();
+                this.removePointMarker();
+                mapCollection.getMap("2D").removeOverlay(this.overlay);
             }
         },
         /**
@@ -491,7 +554,31 @@ export default {
             if (this.currentChapterIndex < this.storyConf.chapters.length - 1) {
                 this.currentChapterIndex += 1;
                 this.scrollToActiveStep();
+                this.removePointMarker();
+                mapCollection.getMap("2D").removeOverlay(this.overlay);
             }
+        },
+        /**
+         * Opens the popup window to show the feature atrributes.
+         * @param {Object} val the attributes of the feature.
+         * @returns {void}
+         */
+        openFeaturePopup (val) {
+            if (!isObject(val)) {
+                return;
+            }
+
+            this.placingPointMarker(val?.coordinate);
+            this.zoomToExtent({extent: boundingExtent([val?.coordinate]), options: {maxZoom: typeof val?.zoomlevel === "number" ? val?.zoomlevel : mapCollection.getMapView("2D").getZoom()}});
+            this.featureAttributes = val;
+            this.overlay = new Overlay({
+                element: this.$refs.storyPlayerFeature,
+                positioning: "center-right",
+                offset: [-30, -20]
+            });
+
+            mapCollection.getMap("2D").addOverlay(this.overlay);
+            this.overlay.setPosition(val?.coordinate);
         },
         /**
          * Scrolls the step into view
@@ -507,8 +594,7 @@ export default {
             });
         },
         scrollerSetup () {
-            const stepRefs = Array.isArray(this.$refs.stepper) ? this.$refs.stepper : [this.$refs.stepper],
-                stepElements = stepRefs.filter(step => step && step.classList);
+            const stepElements = Array.from(document.querySelectorAll("#story-player .stepper"));
 
             if (stepElements.length === 0) {
                 return;
@@ -536,41 +622,82 @@ export default {
             // intersectionRatios tell you how much of each observed element is currently visible,
             // so it can be decided which one is “active”.
             const intersectionRatios = new Array(stepElements.length).fill(0),
-                minVisibleRatio = 0.15,
-                switchDelta = 0.12,
-                applyActiveStep = (activeIndex) => {
-                    const step = stepElements[activeIndex];
+                  applyActiveStep = (activeIndex) => {
+                      const step = stepElements[activeIndex];
 
-                    if (!step || !step.classList) {
+                      if (!step || !step.classList) {
+                          return;
+                      }
+
+                      stepElements.forEach(s => s.classList.remove("active"));
+                      step.classList.add("active");
+
+                      if (this.currentIndex !== activeIndex) {
+                          const prevChapterIndex = this.currentChapterIndex;
+
+                          this.currentIndex = activeIndex;
+                          this.currentChapterIndex = activeIndex;
+
+                          // If currentChapterIndex didn't change (e.g. chapter 0 which is
+                          // also the initial value), the watcher won't fire.
+                          // Trigger tools/layers/position manually in that case.
+                          if (prevChapterIndex === activeIndex) {
+                              this.deactivateSubjectLayer();
+                              this.loadChapter();
+                              this.removePointMarker();
+                              mapCollection.getMap("2D").removeOverlay(this.overlay);
+                          }
+                          // else: watcher on currentChapterIndex handles it.
+
+                          // Handle iframe aspect ratio and progress
+                          const iframeElement = step.querySelector("iframe"),
+                                iframeDiv = step.getElementsByClassName("field_video")[0];
+
+                          if (iframeElement && iframeDiv) {
+                              const ratioClass = this.getIframeAspectRatio(iframeElement);
+
+                              iframeDiv.classList.add("ratio", ratioClass);
+                          }
+                      }
+                  };
+
+            const scroller = document.getElementById("mp-body-secondaryMenu");
+
+            // Shared detection logic — stored on the instance so handleToolBodyScroll
+            // can also call it when the IntersectionObserver doesn't fire (e.g. when
+            // all short chapters are fully visible at the same time).
+            this._detectActiveStep = () => {
+                const scrollerRect = scroller.getBoundingClientRect(),
+                      viewportCenter = scrollerRect.top + scrollerRect.height / 2;
+
+                let activeIndex = -1,
+                    minDistance = Infinity;
+
+                stepElements.forEach((step, idx) => {
+                    const rect = step.getBoundingClientRect();
+
+                    if (rect.bottom < scrollerRect.top || rect.top > scrollerRect.bottom) {
                         return;
                     }
 
-                    stepElements.forEach(s => s.classList.remove("active"));
-                    step.classList.add("active");
+                    const center = rect.top + rect.height / 2;
+                    const distance = Math.abs(center - viewportCenter);
 
-                    if (this.currentIndex !== activeIndex) {
-                        this.currentIndex = activeIndex;
-                        this.currentChapterIndex = activeIndex;
-
-                        // Handle iframe aspect ratio and progress
-                        const iframeElement = step.querySelector("iframe"),
-                            iframeDiv = step.getElementsByClassName("field_video")[0];
-
-                        if (iframeElement && iframeDiv) {
-                            const ratioClass = this.getIframeAspectRatio(iframeElement);
-
-                            iframeDiv.classList.add("ratio", ratioClass);
-                        }
+                    if (distance < minDistance) {
+                        minDistance = distance;
+                        activeIndex = idx;
                     }
-                };
+                });
 
-            if (this.currentChapterIndex >= 0 && this.currentChapterIndex < stepElements.length) {
-                applyActiveStep(this.currentChapterIndex);
-            }
+                const isNearCenter = minDistance <= scrollerRect.height / 2;
+
+                if (activeIndex !== -1 && isNearCenter && activeIndex !== this.currentIndex) {
+                    applyActiveStep(activeIndex);
+                }
+            };
 
             this._stepObserver = new IntersectionObserver(
                 (entries) => {
-                    // Update intersection ratios for all steps
                     entries.forEach(entry => {
                         const idx = stepElements.indexOf(entry.target);
 
@@ -579,41 +706,47 @@ export default {
                         }
                     });
 
-                    // Find the step with the highest intersection ratio
-                    let maxRatio = 0,
-                        activeIndex = -1;
-
-                    // find which step is most visible in the viewport and mark it as the "active" step.
-                    intersectionRatios.forEach((ratio, idx) => {
-                        if (ratio > maxRatio) {
-                            maxRatio = ratio;
-                            activeIndex = idx;
-                        }
-                    });
-
-                    if (activeIndex === -1 || maxRatio < minVisibleRatio) {
-                        return;
-                    }
-
-                    const currentRatio = this.currentIndex >= 0
-                            ? intersectionRatios[this.currentIndex]
-                            : 0,
-                        shouldSwitch = this.currentIndex === -1
-                            || activeIndex === this.currentIndex
-                            || maxRatio >= currentRatio + switchDelta;
-
-                    if (shouldSwitch) {
-                        applyActiveStep(activeIndex);
-                    }
+                    this._detectActiveStep();
                 },
                 {
-                    root: null,
+                    root: scroller,
                     threshold: thresholds
                 }
             );
 
             // Observe each step element
             stepElements.forEach(step => this._stepObserver.observe(step));
+        },
+
+        /**
+         * Scrolls the secondary menu to the top.
+         * @returns {void}
+         */
+        scrollToTop () {
+            const secondaryMenu = document.getElementById("mp-body-secondaryMenu");
+
+            if (secondaryMenu) {
+                secondaryMenu.scrollTo({top: 0, behavior: "smooth"});
+            }
+        },
+
+        /**
+         * Set the mapView to north.
+         * @returns {void}
+         */
+        setToNorth () {
+            mapCollection.getMapView("2D").animate({rotation: 0});
+        },
+
+        /**
+         * Set the cookie if external video is enabled.
+         * @returns {void}
+         */
+        setCookie () {
+            const maxAge = 7 * 24 * 60 * 60;
+
+            document.cookie = "username=storyvideo; max-age=" + maxAge + "; path=/";
+            this.isCookieAllowed = true;
         }
     }
 };
@@ -626,58 +759,77 @@ export default {
     >
         <div
             v-if="showStickyHeader"
-            class="sticky-top bg-white border-bottom shadow-sm py-3 px-3 d-flex flex-column gap-1"
+            class="sticky-top bg-white border-bottom shadow-sm py-3 px-3 d-flex flex-row align-items-center gap-2"
         >
-            <h4 class="sticky-title mb-0 flex-grow-1">
-                {{ storyConf.title }}
-            </h4>
-            <span class="number-of-chapters">
-                Kapitel {{ currentChapterIndex + 1 }} von {{ storyConf.chapters.length }}
-            </span>
+            <div class="d-flex flex-column gap-1 flex-grow-1">
+                <h4 class="sticky-title mb-0">
+                    {{ storyConf.title }}
+                </h4>
+                <span class="number-of-chapters">
+                    {{ $t('additional:modules.storyPlayer.numberOfChapters', { current: currentChapterIndex + 1, total: storyConf.chapters.length }) }}
+                </span>
+            </div>
+            <div class="d-flex flex-column justify-content-end align-items-center gap-2">
+                <StoryPlayerToolbar />
+            </div>
         </div>
         <div
-            class="d-flex w-100 player"
+            class="d-flex w-100 flex-column player"
         >
             <div
                 ref="coverCard"
-                class="card cover-card"
+                class="card cover-card mb-5 border-0 shadow-sm rounded-3 d-flex flex-column"
+                :class="{
+                    'has-image justify-content-start': coverImagePath && coverImagePath.length,
+                    'justify-content-center': !coverImagePath || !coverImagePath.length
+                }"
             >
+                <div class="d-flex justify-content-end align-items-center gap-2 mb-2">
+                    <StoryPlayerToolbar />
+                </div>
                 <img
                     v-if="coverImagePath && coverImagePath.length"
                     :src="coverImagePath"
-                    class="card-img-top"
+                    class="cover-image rounded-3"
                     :alt="storyConf.coverImageAlt"
                 >
                 <div class="text-end">
                     <small
-                        v-if="storyConf.coverImageCopyright"
-                        class="text-muted copyright me-2 mt-1"
+                        v-if="storyConf.imageCopyright"
+                        class="text-muted me-2 mt-1"
                     >
-                        &copy; {{ storyConf.coverImageCopyright }}
+                        &copy; {{ storyConf.imageCopyright }}
                     </small>
                 </div>
-                <div class="card-body p-4">
+                <div class="card-body p-4 p-md-5 d-flex flex-column justify-content-center align-items-start text-start">
                     <h4
                         v-if="storyConf.title"
-                        class="story-title"
+                        class="story-title fw-black mb-4"
                     >
                         {{ storyConf.title }}
                     </h4>
                     <div
-                        class="d-flex align-items-center gap-2 mb-2 author-block"
+                        class="d-flex align-items-center justify-content-between w-100 mb-2"
                     >
-                        <i class="bi bi-person-circle fs-4 me-1" />
-                        <div class="d-flex flex-column justify-content-center">
-                            <small
-                                class="author-name"
-                            >
-                                {{ storyConf.author }}
-                            </small>
-                            <small
-                                class="created text-muted small"
-                            >
-                                {{ storyConf.created }}
-                            </small>
+                        <div
+                            class="d-flex align-items-center gap-2 author-block"
+                        >
+                            <i
+                                v-if="storyConf.author"
+                                class="bi bi-person-circle fs-4 me-1"
+                            />
+                            <div class="d-flex flex-column justify-content-center">
+                                <small
+                                    class="author-name"
+                                >
+                                    {{ storyConf.author }}
+                                </small>
+                                <small
+                                    class="created text-muted"
+                                >
+                                    {{ storyConf.created }}
+                                </small>
+                            </div>
                         </div>
                     </div>
                     <p
@@ -688,70 +840,176 @@ export default {
                     </p>
                 </div>
             </div>
+
             <div
                 class="storyTitle"
                 tabindex="0"
             >
                 <div
                     v-for="(chapter, index) in storyConf.chapters"
-                    ref="stepper"
-                    :key="chapter.title"
-                    class="stepper"
-                    :class="{firstStep: index === 0, lastStep: index === storyConf.chapters.length - 1}"
+                    :key="chapter.title + index"
                 >
                     <div
-                        v-if="index === currentChapterIndex && currentChapterIndex > 0"
-                        class="chevron-navigation chevron-up"
+                        v-if="index === currentChapterIndex && index > 0"
+                        class="d-flex justify-content-center mb-3 py-2"
                     >
-                        <button
-                            class="btn btn-chevron"
-                            :aria-label="`Zum vorherigen Schritt (${currentChapterIndex})`"
-                            @click="goToPreviousStep"
-                        >
-                            <i class="bi bi-arrow-up" />
-                        </button>
+                        <IconButton
+                            class="btn-light"
+                            :class-array="['chevron']"
+                            :aria="$t('additional:modules.storyPlayer.goToPrevStep')"
+                            icon="bi bi-chevron-up"
+                            :title="$t('additional:modules.storyPlayer.goToPrevStep')"
+                            :interaction="() => goToPreviousStep()"
+                        />
                     </div>
-                    <h2 v-if="chapter.title">
-                        {{ chapter.title }}
-                    </h2>
-
                     <div
-                        class="story-player-content"
+                        class="card mb-4 stepper mx-4 rounded"
+                        :class="{
+                            firstStep: index === 0,
+                            lastStep: index === storyConf.chapters.length - 1,
+                            active: index === currentChapterIndex && currentIndex >= 0
+                        }"
                     >
                         <div
-                            v-for="(item, itemIndex) in chapter.content"
-                            :key="'content-' + itemIndex"
+                            ref="stepper"
+                            class="card-body"
                         >
-                            <div v-if="item.type === 'image'">
-                                <img
-                                    :src="finalImageAssetsById?.[item.id]?.objectURL"
-                                    :alt="item.attrs?.alt"
-                                    class="rounded w-100 d-block mb-2"
+                            <h5
+                                v-if="chapter.title"
+                                class="card-title px-3 pb-3"
+                            >
+                                {{ chapter.title }}
+                            </h5>
+                            <div class="story-player-content card-text px-3">
+                                <div
+                                    v-for="(item, itemIndex) in chapter.content"
+                                    :key="'content-' + itemIndex"
                                 >
-                                <div class="text-end small text-muted">
-                                    <span v-if="item.attrs?.copyright">© {{ item.attrs.copyright }}</span>
+                                    <div v-if="item.type === 'image'">
+                                        <img
+                                            :src="imageAssetsById?.[item.id]?.objectURL"
+                                            :alt="item.attrs?.alt"
+                                            class="rounded w-100 d-block mb-2"
+                                        >
+                                        <div class="text-end text-muted">
+                                            <small v-if="item.attrs?.copyright">© {{ item.attrs.copyright }}</small>
+                                        </div>
+                                    </div>
+                                    <div
+                                        v-else-if="item.type === 'doc'"
+                                        class="mb-3"
+                                        v-html="tipTapJsonToHtml(item)"
+                                    />
+                                    <hr
+                                        v-else-if="item.type === 'divider'"
+                                    >
+                                    <div
+                                        v-else-if="item.type === 'feature'"
+                                    >
+                                        <FlatButton
+                                            :id="'feature' + itemIndex"
+                                            class="mb-3"
+                                            :icon="'bi-geo-alt-fill'"
+                                            :text="item.attrs.title"
+                                            :title="item.attrs.title"
+                                            :interaction="() => openFeaturePopup(item.attrs)"
+                                        />
+                                    </div>
+                                    <div
+                                        v-else-if="item.type === 'video'"
+                                    >
+                                        <div v-if="getDirectVideo(item?.attrs?.link).length">
+                                            <video
+                                                width="100%"
+                                                height="auto"
+                                                controls
+                                                :aria-label="item?.attrs?.accessibleText"
+                                            >
+                                                <source
+                                                    :src="item?.attrs?.link"
+                                                    :type="getDirectVideo(item?.attrs?.link)[0]?.content"
+                                                >
+                                                <track
+                                                    kind="captions"
+                                                    src=""
+                                                    srclang="de"
+                                                    label="German"
+                                                    default
+                                                >
+                                            </video>
+                                        </div>
+                                        <div
+                                            v-else
+                                            class="video-container"
+                                        >
+                                            <iframe
+                                                v-if="isCookieAllowed"
+                                                width="100%"
+                                                height="100%"
+                                                allow="autoplay"
+                                                :src="getEmbedLink(item?.attrs?.link)"
+                                                :title="item?.attrs?.title"
+                                            />
+                                            <CookieBanner
+                                                v-if="!isCookieAllowed"
+                                                :source="getEmbedLink(item?.attrs?.link)"
+                                                @setCookie="setCookie"
+                                            />
+                                        </div>
+                                        <div
+                                            v-if="isCookieAllowed"
+                                            class="mt-1 small"
+                                        >
+                                            {{ item?.attrs?.title }}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                            <div
-                                v-else-if="item.type === 'doc'"
-                                v-html="tipTapJsonToHtml(item)"
-                            />
                         </div>
                     </div>
+                    <AlertMessage
+                        v-if="showImportWarning3D[index]"
+                        class="mt-2"
+                        :closeable="true"
+                        :text="$t('additional:modules.storyManager.importWarning3D')"
+                        type="warning"
+                        @closed="showImportWarning3D[index] = false"
+                    />
                     <div
-                        v-if="index === currentChapterIndex && currentChapterIndex < storyConf.chapters.length - 1"
-                        class="chevron-navigation chevron-down"
+                        v-if="index === currentChapterIndex && index < storyConf.chapters.length - 1"
+                        class="d-flex justify-content-center py-2"
                     >
-                        <button
-                            class="btn btn-chevron"
-                            :aria-label="`Zum nächsten Schritt (${currentChapterIndex + 2})`"
-                            @click="goToNextStep"
-                        >
-                            <i class="bi bi-arrow-down" />
-                        </button>
+                        <IconButton
+                            class="btn-light"
+                            :class-array="['chevron']"
+                            :aria="$t('additional:modules.storyPlayer.goToPrevStep')"
+                            icon="bi bi-chevron-down"
+                            :title="$t('additional:modules.storyPlayer.goToPrevStep')"
+                            :interaction="() => goToNextStep()"
+                        />
                     </div>
+                    <div
+                        class="scroll-space"
+                    />
                 </div>
             </div>
+        </div>
+        <IconButton
+            v-if="showStickyHeader"
+            class="position-fixed bottom-0 end-0 mb-5 me-5"
+            :aria="$t('additional:modules.storyPlayer.floatingButton.scrollToTop')"
+            :class-array="['btn-secondary']"
+            :icon-array="['bi-arrow-up fs-3']"
+            @click="scrollToTop"
+        />
+        <div ref="storyPlayerFeature">
+            <StoryPlayerFeature
+                v-if="featureAttributes"
+                :key="featureAttributes?.title"
+                :image-assets-by-id="imageAssetsById"
+                :feature-attributes="featureAttributes"
+                @closePopup="closePopup"
+            />
         </div>
     </div>
 </template>
@@ -760,13 +1018,33 @@ export default {
 #story-player {
     background-color: #F5F5F5;
 
+    .btn-wrapper {
+        width: 50px;
+    }
+
+    .chevron {
+        background-color: $white;
+        border: 1px solid $dark_grey;
+
+        &:hover {
+            background-color: $light_blue;
+        }
+
+        &:active {
+            background-color: $dark_blue;
+            color: $white;
+        }
+    }
+
     .sticky-top {
         z-index: 1050;
     }
+
     .sticky-title {
         color: $secondary;
         font-family: $font_family_accent;
     }
+
     .number-of-chapters {
         color: $dark_grey;
     }
@@ -779,52 +1057,57 @@ export default {
                 max-width: 100%;
             }
         }
+    }
 
-        img {
-            max-width: 100%;
-        }
+    .storyTitle::after {
+        content: "";
+        display: block;
+        height: 30vh;
     }
 
     .cover-card {
-        min-height: 82vh;
-        height: 82vh;
-        max-height: 82vh;
+        min-height: 85vh;
         width: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: flex-start;
-        box-sizing: border-box;
-        overflow: hidden;
+        background-color: $white;
+        transition: all 0.3s ease-in-out;
 
-        .card-img-top {
-            flex: 1 1 0;
-            min-height: 150px;
-            max-height: 60vh;
-            width: 100%;
-            object-fit: cover;
-            transition: max-height 0.3s;
+        .story-title {
+            font-size: 2.5rem;
+            font-family: $font_family_accent;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            color: $secondary;
         }
-        .card-body {
-            flex: 0 0 auto;
-            overflow-y: auto;
-            min-height: 0;
+
+        .card-text {
+            font-size: 1.15rem;
+            line-height: 1.6;
+            color: $dark_grey;
+            max-width: 650px;
+        }
+
+        &.has-image {
+            .story-title {
+                font-size: $font_size_huge;
+            }
+
+            .cover-image {
+                height: 60vh;
+                max-height: 60vh;
+                width: 100%;
+                object-fit: cover;
+            }
         }
     }
 }
 
 .player {
-    --h1Size: 1.875rem;
-    --h2Size: 1.5rem;
-    --pSize: 1rem;
-
     width: var(--initialToolWidth);
+
     @media (max-width: 767px) {
         width: var(--initialToolWidthMobile);
     }
 
-    display: flex;
-    flex-direction: column;
-    flex: 1;
     overflow-x: hidden;
     overflow-y: auto;
 
@@ -833,172 +1116,22 @@ export default {
     }
 
     .stepper {
-        min-height: 500px;
-        margin: 20px 10px;
-        background-color: rgb(240, 240, 240);
+        min-height: auto;
+        padding: 2rem;
         opacity: 0.4;
         border: 1px solid #e0e0e0;
-        border-radius: 12px;
         box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
         overflow: hidden;
         position: relative;
         scroll-margin-top: 50px;
         transition: all 0.3s ease-in-out;
 
-        .chevron-navigation {
-            display: flex;
-            justify-content: center;
-            padding: 8px 0;
-
-            .btn-chevron {
-                background-color: #fff;
-                border: 1px solid #000;
-                border-radius: 50%;
-                color: #000;
-                cursor: pointer;
-                padding: 0;
-                width: 35px;
-                height: 35px;
-                display: inline-flex;
-                align-items: center;
-                justify-content: center;
-                transition: all 0.3s ease;
-
-                .bi {
-                    font-size: 20px;
-                    line-height: 1;
-                }
-
-                &:hover {
-                    background-color: #f5f5f5;
-                    transform: scale(1.08);
-                }
-
-                &:active {
-                    transform: scale(0.95);
-                }
-            }
-        }
-
-        .chevron-up {
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-        }
-
-        .chevron-down {
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
-        }
-        >figure {
-            >img {
-                width: 100%;
-                object-fit: cover;
-            }
-
-            figcaption {
-                text-align: right;
-                padding: 0 10px 0 0;
-                font-size: 0.75rem;
-            }
-        }
-
-        h2 {
-            padding: 16px 20px 10px;
-            color: var(--DipasColorsFont, #212529);
-            font-size: var(--h2Size);
-            text-transform: none;
-            font-weight: bold;
-            hyphens: auto;
-        }
-
-        &.lastStep{
-            margin-bottom: 60vh;
-        }
-
         .story-player-content {
             overflow: auto;
-            padding: 0.625rem 1.25rem;
 
             :deep() {
                 .paragraph {
                     padding-bottom: 10px;
-                }
-
-                h3 {
-                    font-size: 1.25rem;
-                    line-height: 1.5rem;
-                    color: var(--DipasColorsFont, #212529);
-                    border-bottom: none;
-                    margin: 0;
-                }
-
-                p {
-                    font-size: var(--pSize);
-                    margin-right: 0;
-                    line-height: 1.5rem;
-                }
-
-                figure {
-                    img {
-                        object-fit: contain;
-                        object-position: top;
-                        width: 100%;
-                        height: auto;
-                        max-height: 50vh;
-                    }
-
-                    figcaption {
-                        text-align: right;
-                        font-size: 0.75rem;
-                    }
-                }
-
-                .paragraph_image_position_image_left {
-                    display: flow-root;
-                    .field_image {
-                        figure {
-                            float: left;
-                            padding: 0.313rem 0.625rem 0 0;
-                            width: 45%;
-                            height: 100%;
-
-                            img {
-                                max-width: 100%;
-                                max-height: 100%;
-                                height: auto;
-                                width: auto;
-                            }
-
-                            figcaption {
-                                font-size: 0.75rem;
-                                text-align: right;
-                                line-height: 1rem;
-                            }
-                        }
-                    }
-                }
-
-                .paragraph_image_position_image_right {
-                    display: flow-root;
-                    .field_image {
-                        figure {
-                            float: right;
-                            padding: 0.313rem 0 0 0.625rem;
-                            width: 45%;
-                            height: 100%;
-
-                            img {
-                                max-width: 100%;
-                                max-height: 100%;
-                                height: auto;
-                                width: auto;
-                            }
-
-                            figcaption {
-                                font-size: 0.75rem;
-                                text-align: right;
-                                line-height: 1rem;
-                            }
-                        }
-                    }
                 }
 
                 iframe {
@@ -1006,13 +1139,68 @@ export default {
                     height: 100%;
                 }
             }
+
+            strong, b {
+                font-family: $font_family_accent;
+            }
+
+            p {
+                font-size: $font-size-base;
+            }
+
+            p:empty {
+                min-height: 1em;
+            }
+
+            p:empty::before {
+                content: "\00a0";
+            }
+
+            h1, h2, h3, h4, h5, h6 {
+                font-family: $font_family_accent;
+                text-transform: unset;
+                border: 0;
+                color: $dark_grey;
+                line-height: 1.1;
+                word-wrap: break-word;
+                overflow-wrap: break-word;
+            }
+
+            h1 {
+                font-size: 1.4rem;
+            }
+
+            h2 {
+                font-size: 1.2rem;
+            }
+
+            h3 {
+                font-size: 1.1rem;
+            }
         }
 
         &.active {
-            background-color: #ffffff;
+            background-color: $white;
             opacity: 1;
             box-shadow: 0 8px 11px 2px rgba(0, 0, 0, 0.15);
         }
+    }
+
+    .scroll-space {
+        height: 5vh;
+    }
+
+    .video-container {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        aspect-ratio: 16 / 9;
+    }
+
+    .video-container iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
     }
 }
 </style>

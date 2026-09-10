@@ -33,6 +33,9 @@ export default function Layer2dVector (attributes) {
     if (attributes.renderer === "webgl") {
         webgl.setLayerProperties(this);
     }
+    if (attributes.dontInitStyle === true) {
+        return;
+    }
     this.initStyle(attributes);
 }
 
@@ -223,7 +226,7 @@ Layer2dVector.prototype.createStyle = async function (attrs) {
                 const feat = feature !== undefined ? feature : this,
                     isClusterFeature = typeof feat.get("features") === "function" || typeof feat.get("features") === "object" && Boolean(feat.get("features").length > 1);
 
-                styleResult = createStyle.createStyle(styleObject, feat, isClusterFeature, Config.wfsImgPath);
+                styleResult = createStyle.createStyle(styleObject, feat, isClusterFeature, Config.wfsImgPath, {layerId: attrs.id});
             }
             finally {
                 this.isStyling = false;
@@ -234,6 +237,7 @@ Layer2dVector.prototype.createStyle = async function (attrs) {
         this.setStyle(style);
     }
     else {
+        this.setStyle(null);
         console.warn(i18next.t("common:core.layers.errorHandling.wrongStyleId", {styleId}));
     }
 };

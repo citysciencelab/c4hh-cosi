@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import SnippetSliderRange from "@modules/filter/components/SnippetSliderRange.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/SnippetSliderRange.vue", () => {
     let wrapper = null;

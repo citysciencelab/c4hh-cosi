@@ -4,7 +4,8 @@
             "gfi": {
                 "themes": {
                     "trafficCount": {
-                        "infoLabel": "Info",
+                        "infoLabel": "Overview",
+                        "timeViewLabel": "Choose time view",
                         "dayLabel": "Day",
                         "weekLabel": "Week",
                         "yearLabel": "Year",
@@ -21,9 +22,9 @@
                         "dateLabel": "Date",
                         "clockLabel": "",
                         "tableLabel": "Table",
-                        "tableTitleDay": "Date",
-                        "tableTitleWeek": "Week",
-                        "tableTitleYear": "Year",
+                        "tableTitleDay": "Time",
+                        "tableTitleWeek": "Day of the Week",
+                        "tableTitleYear": "Calendar Week",
                         "notice": "Due to unavailable data, gaps in the chart and empty table cells may occur.",
                         "lastupdateLabel": "Last update:",
                         "autoUpdateNote": "Data is not automatically updated.",
@@ -47,12 +48,19 @@
                         "reset": "Reset",
                         "holidaySign": "Holiday Influence",
                         "trucksStatus": "** The count of trucks (Beta-Status)",
-                        "downloads": "Downloads",
-                        "downloadsAll": "Download all data",
-                        "downloadsMin": "Interval: 15 Minutes",
-                        "downloadsHour": "Interval: 1 Hour",
-                        "downloadsDay": "Interval: 1 Day",
-                        "downloadsWeek": "Interval: 1 Week",
+                        "download": "Download",
+                        "downloadChoose": "Choose data export",
+                        "downloadIntervalMin": "15 minutes",
+                        "downloadIntervalHour": "1 hour",
+                        "downloadIntervalDay": "1 day",
+                        "downloadIntervalWeek": "1 week",
+                        "downloadPeriod": "Period: {{from}} – {{until}}",
+                        "downloadPeriodSince": "Period: since {{year}}",
+                        "downloadPeriodAll": "Period: entire period",
+                        "downloadAll": "Download all",
+                        "downloadAllDescription": "All intervals in one CSV",
+                        "downloadAllFilename": "total",
+                        "downloadIntervalColumn": "Interval",
                         "error": {
                             "dataNotAvailableA": "(not",
                             "dataNotAvailableB": "received)",
@@ -67,10 +75,21 @@
                             "weekdaysShort": ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
                         },
                         "heavyTraffic": "(heavy traffic)",
+                        "showHeavyTraffic": "Show heavy traffic",
+                        "showCarTraffic": "Show cars",
+                        "showTable": "Show table",
                         "totalTraffic": "(total motor vehicles)",
                         "isHeavyTrafficAvailableDesc": "Heavy traffic available",
                         "available": "Yes",
-                        "inavailable": "No"
+                        "inavailable": "No",
+                        "indicator": "Indicator",
+                        "totalNumbers": "Total numbers",
+                        "shortTermDevelopment": "Development",
+                        "peakValues": "Peak values",
+                        "previousDay": "Previous day",
+                        "workingDayAverageShort": "Average working day",
+                        "isHeavyTrafficAvailable": "Heavy traffic is available",
+                        "isHeavyTrafficNotAvailable": "Heavy traffic is not available"
                     }
                 }
             }

@@ -1,9 +1,8 @@
 import sinon from "sinon";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/components/IconButton.vue", () => {
     let interactionSpy;
@@ -57,5 +56,29 @@ describe("src/shared/components/IconButton.vue", () => {
             });
 
         expect(wrapper.find(".btn-label").text()).to.equal("der button label");
+    });
+    it("should emit click event when button is clicked", () => {
+        const iconString = "bi-list",
+            wrapper = mount(IconButton, {
+                propsData: {interaction: interactionSpy, icon: iconString, aria: "Bla bla"}
+            }),
+            button = wrapper.find("button");
+
+        button.trigger("click");
+
+        expect(wrapper.emitted("click")).to.exist;
+        expect(wrapper.emitted("click")).to.have.lengthOf(1);
+    });
+    it("should call both interaction prop and emit click event", () => {
+        const iconString = "bi-list",
+            wrapper = mount(IconButton, {
+                propsData: {interaction: interactionSpy, icon: iconString, aria: "Bla bla"}
+            }),
+            button = wrapper.find("button");
+
+        button.trigger("click");
+
+        expect(interactionSpy.calledOnce).to.be.true;
+        expect(wrapper.emitted("click")).to.have.lengthOf(1);
     });
 });

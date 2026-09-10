@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import SearchBarResultListTopicTreeItemComponent from "@modules/searchBar/components/SearchBarResultListTopicTreeItem.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/searchBar/components/SearchBarResultListTopicTreeItem.vue", () => {
     let addLayerToTopicTreeSpy,
@@ -16,67 +15,67 @@ describe("src/modules/searchBar/components/SearchBarResultListTopicTreeItem.vue"
         searchResults;
 
     const resultOne =
-    {
-        category: "Straße",
-        id: "BeidemNeuenKrahnStraße",
-        index: 0,
-        name: "Bei dem Neuen Krahn",
-        searchInterfaceId: "gazetteer",
-        displayedInfo: "",
-        icon: "bi-signpost",
-        imagePath: "",
-        toolTip: "toolTipAvailable",
-        events: {
-            onClick: {
-                activateLayerInTopicTree: {
-                    layerId: "123"
+            {
+                category: "Straße",
+                id: "BeidemNeuenKrahnStraße",
+                index: 0,
+                name: "Bei dem Neuen Krahn",
+                searchInterfaceId: "gazetteer",
+                displayedInfo: "",
+                icon: "bi-signpost",
+                imagePath: "",
+                toolTip: "toolTipAvailable",
+                events: {
+                    onClick: {
+                        activateLayerInTopicTree: {
+                            layerId: "123"
+                        }
+                    },
+                    buttons: {
+                        activateLayerInTopicTree: {
+                            layerId: "123"
+                        }
+                    }
                 }
             },
-            buttons: {
-                activateLayerInTopicTree: {
-                    layerId: "123"
-                }
-            }
-        }
-    },
         resultTwo =
-        {
-            category: "Adresse",
-            id: "BeidemNeuenKrahn2Adresse",
-            index: 1,
-            name: "Bei dem Neuen Krahn 2",
-            searchInterfaceId: "gazetteer",
-            displayedInfo: "",
-            icon: "bi-signpost",
-            imagePath: "",
-            toolTip: undefined,
-            events: {
-            }
-        },
-        resultThree =
-    {
-        category: "Straße",
-        id: "BeidemNeuenKrahnStraße",
-        index: 2,
-        name: "Bei dem Neuen Krahn",
-        searchInterfaceId: "topicTree",
-        displayedInfo: "",
-        icon: "bi-signpost",
-        imagePath: "",
-        toolTip: "toolTipAvailable",
-        events: {
-            onClick: {
-                addLayerToTopicTree: {
-                    layerId: "123"
+            {
+                category: "Adresse",
+                id: "BeidemNeuenKrahn2Adresse",
+                index: 1,
+                name: "Bei dem Neuen Krahn 2",
+                searchInterfaceId: "gazetteer",
+                displayedInfo: "",
+                icon: "bi-signpost",
+                imagePath: "",
+                toolTip: undefined,
+                events: {
                 }
             },
-            buttons: {
-                addLayerToTopicTree: {
-                    layerId: "123"
+        resultThree =
+            {
+                category: "Straße",
+                id: "BeidemNeuenKrahnStraße",
+                index: 2,
+                name: "Bei dem Neuen Krahn",
+                searchInterfaceId: "topicTree",
+                displayedInfo: "",
+                icon: "bi-signpost",
+                imagePath: "",
+                toolTip: "toolTipAvailable",
+                events: {
+                    onClick: {
+                        addLayerToTopicTree: {
+                            layerId: "123"
+                        }
+                    },
+                    buttons: {
+                        addLayerToTopicTree: {
+                            layerId: "123"
+                        }
+                    }
                 }
-            }
-        }
-    };
+            };
 
     beforeEach(() => {
         searchResults = [resultOne, resultTwo, resultThree];

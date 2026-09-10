@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import BimFactoryWorkflowDetailSelector from "../../../components/BimFactoryWorkflowDetailSelector.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("BimFactoryWorkflowDetailSelector.vue", () => {
     let wrapper;

@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {Point, Polygon} from "ol/geom";
 import TabFilterContent from "../../../../components/tabs/TabFilterContent.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/geoMarker/components/tabs/TabFilterContent.vue", () => {
     let wrapper = null,

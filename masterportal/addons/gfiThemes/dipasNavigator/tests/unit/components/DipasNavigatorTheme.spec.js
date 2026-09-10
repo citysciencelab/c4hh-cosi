@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import DipasNavigatorTheme from "../../../components/DipasNavigatorTheme.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/dipasNavigator/components/DipaNavigatorTheme.vue", () => {
     let wrapper,

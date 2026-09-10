@@ -230,68 +230,68 @@ export default {
             }
 
             const columnSettings = this.tableData.headers.find(item => item.itemProperty === columnToSort),
-                sorted = [...items].sort((a, b) => {
-                    const valueA = a[columnToSort],
-                        valueB = b[columnToSort];
+                  sorted = [...items].sort((a, b) => {
+                      const valueA = a[columnToSort],
+                            valueB = b[columnToSort];
 
-                    if ((valueA === undefined || valueA === null) && (valueB === undefined || valueB === null)) {
-                        return 0;
-                    }
+                      if ((valueA === undefined || valueA === null) && (valueB === undefined || valueB === null)) {
+                          return 0;
+                      }
 
-                    if (valueA === undefined || valueA === null) {
-                        return 1;
-                    }
+                      if (valueA === undefined || valueA === null) {
+                          return 1;
+                      }
 
-                    if (valueB === undefined || valueB === null) {
-                        return -1;
-                    }
+                      if (valueB === undefined || valueB === null) {
+                          return -1;
+                      }
 
-                    if (columnSettings?.sortable) {
-                        if (columnSettings.sortable === "numeric") {
-                            const numA = parseFloat(valueA),
-                                numB = parseFloat(valueB);
+                      if (columnSettings?.sortable) {
+                          if (columnSettings.sortable === "numeric") {
+                              const numA = parseFloat(valueA),
+                                    numB = parseFloat(valueB);
 
-                            if (isNaN(numA) && isNaN(numB)) {
-                                return 0;
-                            }
+                              if (isNaN(numA) && isNaN(numB)) {
+                                  return 0;
+                              }
 
-                            if (isNaN(numA)) {
-                                return 1;
-                            }
+                              if (isNaN(numA)) {
+                                  return 1;
+                              }
 
-                            if (isNaN(numB)) {
-                                return -1;
-                            }
+                              if (isNaN(numB)) {
+                                  return -1;
+                              }
 
-                            return numA - numB;
-                        }
-                        else if (columnSettings.sortable === "string") {
-                            // Set locales parameter to undefined in order to use the current browser locale.
-                            return valueA.localeCompare(valueB, undefined, {ignorePunctuation: true});
-                        }
-                        else if (columnSettings.sortable === "date") {
-                            const format = columnSettings.sortableDateFormat || "YYYY-MM-DD HH:mm",
-                                dateA = dayjs(valueA, format),
-                                dateB = dayjs(valueB, format);
+                              return numA - numB;
+                          }
+                          else if (columnSettings.sortable === "string") {
+                              // Set locales parameter to undefined in order to use the current browser locale.
+                              return valueA.localeCompare(valueB, undefined, {ignorePunctuation: true});
+                          }
+                          else if (columnSettings.sortable === "date") {
+                              const format = columnSettings.sortableDateFormat || "YYYY-MM-DD HH:mm",
+                                    dateA = dayjs(valueA, format),
+                                    dateB = dayjs(valueB, format);
 
-                            if (!dateA.isValid() && !dateB.isValid()) {
-                                return 0;
-                            }
+                              if (!dateA.isValid() && !dateB.isValid()) {
+                                  return 0;
+                              }
 
-                            if (!dateA.isValid()) {
-                                return 1;
-                            }
+                              if (!dateA.isValid()) {
+                                  return 1;
+                              }
 
-                            if (!dateB.isValid()) {
-                                return -1;
-                            }
+                              if (!dateB.isValid()) {
+                                  return -1;
+                              }
 
-                            return dateA.diff(dateB);
-                        }
-                    }
+                              return dateA.diff(dateB);
+                          }
+                      }
 
-                    return 0;
-                });
+                      return 0;
+                  });
 
             return order === "desc" ? sorted.reverse() : sorted;
         },

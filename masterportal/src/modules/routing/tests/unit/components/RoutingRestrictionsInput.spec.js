@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import RoutingRestrictionsInputComponent from "@modules/routing/components/RoutingRestrictionsInput.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/RoutingRestrictionsInput.vue", () => {
     let store,

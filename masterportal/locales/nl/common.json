@@ -256,7 +256,8 @@
       "contactName": "naam",
       "contactPhone": "Tel.",
       "contactEmail": "e-mail",
-      "wait": "Een ogenblik alstublieft"
+      "wait": "Een ogenblik alstublieft",
+      "license": "Licentie"
     },
     "draw": {
       "description": "Maak belangrijke markeringen of markeer gebieden",
@@ -576,13 +577,14 @@
       "addressSuffix": "adres",
       "addressSuffixes": "Laag-adressen",
       "attachFileMessage": "Voeg indien nodig het bestandstype toe tijdens het downloaden",
+      "creationDate": "Creatie",
       "downloadDataset": "Gegevensset downloaden",
       "lastModified": "Laatst bijgewerkt",
       "legend": "Legenda",
       "name": "Informatie en legenda",
       "noMetadataLoaded": "Er konden geen metadata worden geladen!",
       "periodicityTitle": "Gegevensupdate",
-      "publicationCreation": "Publicatie/creatie",
+      "publicationDate": "Publicatie",
       "pointOfContact": "contactpersoon",
       "contactInfoMessage": "Schrijf naar de contactpersoon voor het onderwerp ",
       "mailSubject": "Verzoek om dataset ",

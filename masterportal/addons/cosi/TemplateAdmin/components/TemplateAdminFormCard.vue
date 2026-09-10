@@ -177,8 +177,6 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import "/src/assets/css/mixins.scss";
-@import "/src/assets/css/variables";
 
 .card {
     max-width: 100%;

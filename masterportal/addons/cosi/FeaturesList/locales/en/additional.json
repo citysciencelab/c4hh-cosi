@@ -3,6 +3,7 @@
         "tools": {
             "cosi": {
                 "featuresList": {
+                    "description": "With this function, you can view topic-specific, technical information such as green spaces, trees or day care centers for individual issues or locations. The information is georeferenced. You can use it for detailed analysis, planning and management of urban and spatial structures.",
                     "title": "Facilities Overview",
                     "titleLocationScore": "Location Score",
                     "help": "Lists all active facilities for the selected districts",

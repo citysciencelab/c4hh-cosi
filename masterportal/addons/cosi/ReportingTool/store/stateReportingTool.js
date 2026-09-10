@@ -15,6 +15,7 @@ const state = {
     id: "reportingTool",
     type: "reportingTool",
     name: "additional:modules.cosi.reportingTool.title",
+    description: "",
     icon: "bi-printer",
     infrastructureTableLimitEnabledConfig: false,
     infrastructureTableLimitConfig: 10,

@@ -1,10 +1,10 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
+
 import {createStore} from "vuex";
 import {expect} from "chai";
 import PlanningScenario from "../../../../components/PlanningScenario/PlanningScenario.vue";
 import SimulationToolModule from "../../../../store/index.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/SimulationTool/components/PlanningScenario/PlanningScenario.vue", () => {
     let wrapper, store;

@@ -76,22 +76,26 @@ export default {
                     :keys="['bemerkung']"
                     :label="$t('additional:modules.boris.detailInformation.moreFeatures')"
                 />
-                <br>
-                <div
+
+                <template
                     v-if="parseInt(selectedBrwFeature.get('jahrgang'), 10) >= 2002"
                 >
-                    <dt>{{ $t("additional:modules.boris.landValue") }}:</dt>
+                    <dt class="brw-label">
+                        {{ $t("additional:modules.boris.landValue") }}:
+                    </dt>
                     <dd>{{ selectedBrwFeature.get('richtwert_euro') }} €/m²</dd>
-                </div>
-                <div
+                </template>
+                <template
                     v-else
                 >
-                    <dt>{{ $t("additional:modules.boris.landValue") }}:</dt>
+                    <dt class="brw-label">
+                        {{ $t("additional:modules.boris.landValue") }}:
+                    </dt>
                     <dd>
                         <span>{{ selectedBrwFeature.get('richtwert_euro') }} €/m²</span>
                         <span class="d-flex justify-content-end">{{ selectedBrwFeature.get('richtwert_dm') }} DM/m²</span>
                     </dd>
-                </div>
+                </template>
             </dl>
         </div>
         <div
@@ -144,3 +148,9 @@ export default {
         </div>
     </div>
 </template>
+
+<style  lang="scss" scoped>
+    .brw-label {
+        padding-top: 1rem;
+    }
+</style>

@@ -158,7 +158,7 @@ Layer3dTileset.prototype.createStyle = async function (attrs) {
         styleObject = styleList.returnStyleObject(styleId);
 
     if (styleObject !== undefined) {
-        const createdStyle = createStyle.createStyle(styleObject, undefined, false, Config.wfsImgPath),
+        const createdStyle = createStyle.createStyle(styleObject, undefined, false, Config.wfsImgPath, {layerId: attrs.id}),
             options = {
                 color: {
                     conditions: createdStyle

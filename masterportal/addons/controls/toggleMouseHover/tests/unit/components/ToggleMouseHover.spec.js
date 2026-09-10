@@ -1,10 +1,9 @@
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
 import ToggleMouseHover from "../../../components/ToggleMouseHover.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/controls/toggleMouseHover/components/ToggleMouseHover.vue", () => {
     const spySetMouseHover = sinon.spy();

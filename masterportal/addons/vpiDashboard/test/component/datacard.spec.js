@@ -1,10 +1,9 @@
 import DataCardComponent from "../../components/DataCard.vue";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Vuex from "vuex";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 /**
  * Run only these tests via command:

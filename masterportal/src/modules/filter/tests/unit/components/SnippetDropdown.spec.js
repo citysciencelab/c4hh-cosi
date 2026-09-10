@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createStyle.js";
 import {expect} from "chai";
 import FilterStore from "@modules/filter/store/indexFilter.js";
@@ -11,7 +11,6 @@ import SnippetDropdown from "@modules/filter/components/SnippetDropdown.vue";
 import sinon from "sinon";
 import mapCollection from "@core/maps/js/mapCollection.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/SnippetDropdown.vue", () => {
     let wrapper, store;

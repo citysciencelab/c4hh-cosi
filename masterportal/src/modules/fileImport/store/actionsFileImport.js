@@ -858,7 +858,7 @@ export default {
      * @param {string|null} fileName - The name of the file being imported (used when useDifferentLayers is true).
      * @returns {Promise<{layer: module:ol/layer, layerId: string}>} The created/existing layer and its ID.
      */
-    async addLayerConfig ({dispatch, state}, fileName) {
+    async addLayerConfig ({dispatch, state, rootGetters}, fileName) {
         let layerId = state.layerId,
             layerName = "importDrawLayer";
 
@@ -881,6 +881,18 @@ export default {
                     visibility: true
                 },
                 parentKey: treeSubjectsKey
+            }, {root: true});
+        }
+        else {
+            await dispatch("replaceByIdInLayerConfig", {
+                layerConfigs: [{
+                    id: layerId,
+                    layer: {
+                        visibility: true,
+                        showInLayerTree: true,
+                        zIndex: rootGetters.determineZIndex(layerId)
+                    }
+                }]
             }, {root: true});
         }
 

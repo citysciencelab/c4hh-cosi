@@ -8,9 +8,11 @@ describe("src/core/js/layers/layer3dTerrain.js", () => {
         cesiumTerrainProviderSpy,
         fromUrlSpy,
         map3d,
+        originalCesium,
         warn;
 
     beforeAll(() => {
+        originalCesium = global.Cesium;
         warn = sinon.spy();
         sinon.stub(console, "warn").callsFake(warn);
 
@@ -49,7 +51,7 @@ describe("src/core/js/layers/layer3dTerrain.js", () => {
     });
 
     afterEach(() => {
-        global.Cesium = null;
+        global.Cesium = originalCesium;
     });
 
     describe("createLayer", () => {

@@ -102,7 +102,7 @@ export default {
          */
         additionalColumns () {
             const columns = [],
-                extent = this.feature?.getBBox?.();
+                  extent = this.feature?.getBBox?.();
 
             if (extent) {
                 columns.push({key: "EPSG", value: this.projection.getCode()});
@@ -258,7 +258,7 @@ export default {
             }
 
             const value = selectedOption.toLowerCase(),
-                filterObject = JSON.parse(JSON.stringify(this.filterObject));
+                  filterObject = JSON.parse(JSON.stringify(this.filterObject));
 
             if (!Object.prototype.hasOwnProperty.call(filterObject, columnName)) {
                 filterObject[columnName] = {};
@@ -278,7 +278,7 @@ export default {
                 return;
             }
             const value = removedOption.toLowerCase(),
-                filterObject = JSON.parse(JSON.stringify(this.filterObject));
+                  filterObject = JSON.parse(JSON.stringify(this.filterObject));
 
             if (Object.keys(filterObject[columnName]).length === 1) {
                 delete filterObject[columnName];

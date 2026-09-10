@@ -12,7 +12,6 @@ In the following, all configuration options are described. For all configuration
 |cswId|no|String|`"3"`|Reference to a CSW interface used to retrieve layer information. The ID will be resolved to a service defined in the **[rest-services.json](../Global-Config/rest-services.json.md)** file.|`"my CSW-ID"`|
 |ignoredKeys|no|String[]|`["BOUNDEDBY", "SHAPE", "SHAPE_LENGTH", "SHAPE_AREA", "OBJECTID", "GLOBALID", "GEOMETRY", "SHP", "SHP_AREA", "SHP_LENGTH","GEOM"]`|List of attribute names to be ignored for attribute information lists of all layer types. Only used with "gfiAttributes": "showAll".|`["BOUNDEDBY", "SHAPE", "SHAPE_LENGTH", "SHAPE_AREA", "OBJECTID", "GLOBALID", "GEOMETRY", "SHP", "SHP_AREA", "SHP_LENGTH","GEOM"]`|
 |layerConf|yes|String||Path to the **[services.json](../Global-Config/services.json.md)** file containing all available WMS layers and WFS feature types. The path is relative to *js/masterportal.js*.|`https://geodienste.hamburg.de/lgv-config/services-internet.json"`||
-|matomo|no|**[matomo](#matomo)**||Options to integrate tracking via matomo.||
 |vuetifyFolder|no|String||Folder name used as `../../addons/${Config.vuetifyFolder}/plugins/vuetify/index.js` to load an optional vuetify instance.|`"cosi"`|
 |metaDataCatalogueId|no|String|`"2"`|URL to the metadata catalog linked to in the layer information window. The ID is resolved to a service of the **[rest-services.json](../Global-Config/rest-services.json.md)** file. Note: This attribute is only necessary, when no "show_doc_url" is configured in the metadata dataset in the **[services.json](../Global-Config/services.json.md)**. The url can either be set globally (**[config.js](config.js.md)**) or layer-specific(**[services.json](../Global-Config/services.json.md)**).|`"MetaDataCatalogueUrl"`|
 |namedProjections|yes|String[]||Definition of the usable coordinate systems. See **[syntax definition](http://proj4js.org/#named-projections)** for details..|`[["EPSG:25832", "+title=ETRS89/UTM 32N +proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"]]`|
@@ -36,12 +35,22 @@ Overrides the alert module's default values.
 |----|--------|----|-------|-----------|
 |fetchBroadcastUrl|no|String|`false`|The alerting module will initially use a linked configuration file from this URL, if set. For more information see **[Alerting](../../Dev/vueComponents/Alerting.md)**|
 |initialAlerts|no|**[initialAlerts](#alertinginitialalerts)**||Alerts that are displayed when the portal is started|
+|moduleOpenAlerts|no|**[moduleOpenAlerts](#alertingmoduleopenalerts)**||Alerts that are displayed when a module is opened for the first time.|
 |localStorageDisplayedAlertsKey|no|String|`"displayedAlerts"`|Arbitrary key used to store information regarding the alerting module in the browser's local storage.|
 
 ```js title="Example"
 {
     alerting: {
         fetchBroadcastUrl: "./resources/newsFeedPortalAlerts.json",
+        moduleOpenAlerts: {
+            "compare-features-release": {
+                moduleType: "compareFeatures",
+                title: "common:modules.compareFeatures.title",
+                content: "common:modules.compareFeatures.feedback.newToolInfo",
+                once: true,
+                mustBeConfirmed: true
+            }
+        },
         initialAlerts: {
             qs-release: {
                 category: "Portal zur Abnahme!",
@@ -54,6 +63,21 @@ Overrides the alert module's default values.
     }
 }
 ```
+
+***
+
+### alerting.moduleOpenAlerts
+Alerts that are displayed when a specific menu module is opened.
+
+|Name|Required|Type|Default|Description|
+|----|--------|----|-------|-----------|
+|moduleType|yes|String||Type of the module that triggers the alert on open, e.g. `"compareFeatures"` or `"print"`.|
+|content|yes|String||Alert text or i18n key.|
+|title|no|String|`""`|Optional title text or i18n key.|
+|category|no|String|`"info"`|Alert category.|
+|mustBeConfirmed|no|Boolean|`false`|If `true`, users can hide the message via "do not show again" toggle.|
+|once|no|Boolean|`true`|If `true`, the alert is shown only once (persisted in local storage).|
+|onceInSession|no|Boolean|`true`|If `true`, the alert is shown only once per browser session.|
 
 ***
 
@@ -76,17 +100,6 @@ Alerts that are displayed when the portal is started.
 
 ***
 
-## matomo
-Options to integrate tracking via matomo. Besides following options further options may be set, see https://www.npmjs.com/package/vue-matomo .
-
-|Name|Required|Type|Default|Description|
-|----|--------|----|-------|-----------|
-|host|yes|String|""|If set, tracking-information will be sent to given matomo host.|
-|siteId|yes|String|""|siteId of matomo to be used.|
-
-
-***
-
 ## portalLanguage
 Settings for multilingualism of the portal interface.
 
@@ -94,7 +107,7 @@ Settings for multilingualism of the portal interface.
 |----|--------|----|-------|-----------|
 |changeLanguageOnStartWhen|no|String[]|`["querystring", "localStorage", "navigator", "htmlTag"]`|Order of user language detection. See [i18next browser language detection documentation](https://github.com/i18next/i18next-browser-languageDetector) for details.|
 |debug|no|Boolean|`false`|Controls whether debug information regarding translations is logged to the console.|
-|enabled|yes|Boolean|`true`|Controls whether a button to switch the portal's language is provided.|
+|enabled|yes|Boolean|`true`|Determines whether a language switch button is displayed in the portal. Note: This option requires the Language module to be configured in config.json.|
 |fallbackLanguage|no|String|`"de"`|Fallback language used if contents are not available in the currently selected language.|
 |languages|yes|Object|`{ de: "deutsch", en: "englisch" }`|Language abbreviations. Please mind that matching locale files must exist.|
 |loadPath|no|String|`"/locales/{{lng}}/{{ns}}.json"`|Path to load language files from, or a function returning such a path: `function(lngs, namespaces) { return path; }`. `lng` and `ns` are read from the path, if given, as if from a static path. You may also provide a URL like `"https://localhost:9001/locales/{{lng}}/{{ns}}.json"`. See [i18next http backend documentation](https://github.com/i18next/i18next-http-backend) for details.|
@@ -186,6 +199,7 @@ This module allows the user to login with an OIDC server. The retrieved access t
 |oidcScope|yes|String||The scope used for oidc, defaults to "profile email openid".|
 |oidcRedirectUri|yes|String||The url to redirect the oidc process to - after login.|
 |interceptorUrlRegex|yes|String||An regexp pattern that allows to specify urls the oidc token will be attached to.|
+|includeCredentials|no|Boolean|true|If set to false, intercepted requests still get the Authorization header but do not send credentials (cookies), which can help prevent CORS errors.|
 
 Make sure in keycloak the client is configured as follows:
 ```

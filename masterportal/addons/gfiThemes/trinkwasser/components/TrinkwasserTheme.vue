@@ -56,7 +56,7 @@ export default {
          */
         mapPropertiesToBlueprint (blueprint, gfiContent, addSecludedValuesInto) {
             const assoc = {},
-                result = {};
+                  result = {};
 
             Object.keys(blueprint).forEach(title => {
                 // adapt the title to keep the given order (of titles)

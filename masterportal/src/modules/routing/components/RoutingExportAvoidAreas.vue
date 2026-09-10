@@ -55,7 +55,7 @@ export default {
          */
         async submitDownload () {
             const modalElement = this.$refs.exportAvoidAreasModal,
-                modal = Modal.getInstance(modalElement);
+                  modal = Modal.getInstance(modalElement);
 
             this.avoidPolygons = await this.getAvoidPolygonsWgs84();
 
@@ -123,10 +123,10 @@ export default {
          */
         downloadGeoJSON () {
             const format = new GeoJSON(),
-                features = format.readFeatures(this.avoidPolygons),
-                geojsonStr = format.writeFeatures(features),
-                validation = this.validateFileName(this.filename),
-                polygonAvailable = this.hasAvoidPolygons(this.avoidPolygons);
+                  features = format.readFeatures(this.avoidPolygons),
+                  geojsonStr = format.writeFeatures(features),
+                  validation = this.validateFileName(this.filename),
+                  polygonAvailable = this.hasAvoidPolygons(this.avoidPolygons);
 
             if (validation.isValid) {
                 if (polygonAvailable.isAvailable) {
@@ -155,9 +155,9 @@ export default {
          */
         async downloadKML () {
             const format = new GeoJSON(),
-                features = format.readFeatures(this.avoidPolygons),
-                validation = this.validateFileName(this.filename),
-                polygonAvailable = this.hasAvoidPolygons(this.avoidPolygons);
+                  features = format.readFeatures(this.avoidPolygons),
+                  validation = this.validateFileName(this.filename),
+                  polygonAvailable = this.hasAvoidPolygons(this.avoidPolygons);
 
             if (validation.isValid) {
                 if (polygonAvailable.isAvailable) {
@@ -207,7 +207,7 @@ export default {
             }
             else {
                 const url = URL.createObjectURL(blob),
-                    a = document.createElement("a");
+                      a = document.createElement("a");
 
                 a.href = url;
                 a.download = filename;

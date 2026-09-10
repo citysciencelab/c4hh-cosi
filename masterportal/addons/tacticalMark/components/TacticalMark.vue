@@ -367,11 +367,11 @@ export default {
          */
         async setDownloadFeatures () {
             const downloadFeatures = [],
-                drawnFeatures = this.layer.layerSource.getFeatures();
+                  drawnFeatures = this.layer.layerSource.getFeatures();
 
             drawnFeatures.forEach(drawnFeature => {
                 const feature = drawnFeature.clone(),
-                    geometry = feature.getGeometry();
+                      geometry = feature.getGeometry();
 
                 // If the feature is invisible from filter, the style will be reset by printing.
                 if (!feature.get("isVisible") && feature.get("invisibleStyle")) {
@@ -396,7 +396,7 @@ export default {
             if (downloadFeatures.length > 0) {
 
                 const dataString = await convertFeaturesToKml(downloadFeatures),
-                    link = document.createElement("a");
+                      link = document.createElement("a");
 
                 this.file = this.prepareFileName(this.filename);
 

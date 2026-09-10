@@ -55,9 +55,9 @@ export default {
          */
         replaceDataInURLSchema (coordinates) {
             const transformedCoords = this.transformCoords(coordinates),
-                lat = transformedCoords[1],
-                lon = transformedCoords[0],
-                url = this.urlSchema.replace("{{LAT}}", lat).replace("{{LON}}", lon);
+                  lat = transformedCoords[1],
+                  lon = transformedCoords[0],
+                  url = this.urlSchema.replace("{{LAT}}", lat).replace("{{LON}}", lon);
 
             return url;
         },

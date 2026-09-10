@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import Map from "ol/Map.js";
 import SDPComponent from "../../../components/SdpDownload.vue";
 import GraphicalSelect from "../../../../../src/shared/modules/graphicalSelect/components/GraphicalSelect.vue";
@@ -7,7 +7,6 @@ import SdpDownload from "../../../store/index.js";
 import sinon from "sinon";
 import {expect} from "chai";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/sdpDownload/components/SdpDownload.vue", () => {
 

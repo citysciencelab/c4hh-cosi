@@ -1,5 +1,8 @@
 import {sortObjects} from "@shared/js/utils/sortObjects.js";
 import {treeBaselayersKey, treeSubjectsKey, treeOrder} from "@shared/js/utils/constants.js";
+import getNestedValues from "@shared/js/utils/getNestedValues.js";
+
+const alwaysOnTop = 9999999;
 
 /**
  * Returns true if the given config has a numeric zIndex property.
@@ -193,7 +196,42 @@ function sortVisibleLayerListByZindexBeforePrint (visibleLayerList) {
         .map(item => item.layer);
 }
 
+/**
+ * Returns nested layer configs that are external, visible or shown in tree, and lack a numeric zIndex.
+ * @param {Object} layerConfig the layer config to inspect
+ * @returns {Object[]} nested layer configs with missing zIndex
+ */
+function getExternalLayerConfigsWithMissingZIndex (layerConfig) {
+    if (layerConfig?.isExternal !== true) {
+        return [];
+    }
+
+    return getNestedValues(layerConfig, "elements", true)
+        .flat(Infinity)
+        .filter(config => config?.type === "layer"
+            && config?.isExternal === true
+            && (config?.showInLayerTree === true || config?.visibility === true)
+            && !hasNumericZIndex(config));
+}
+
+/**
+ * Assigns zIndex to nested layer configs that are external, visible or shown in tree, and lack a numeric zIndex.
+ * @param {Object} layerConfig the layer config to process
+ * @param {Number} maxZIndex the maximum zIndex to start from
+ * @returns {Number} the count of configs that were assigned a zIndex
+ */
+function assignZIndexToNestedExternalConfigs (layerConfig, maxZIndex) {
+    const nestedConfigs = getExternalLayerConfigsWithMissingZIndex(layerConfig);
+
+    nestedConfigs.forEach((config, index) => {
+        config.zIndex = maxZIndex + index + 1;
+    });
+
+    return nestedConfigs.length;
+}
+
 export default {
+    alwaysOnTop,
     hasNumericZIndex,
     maxZIndexOfLayerConfigsByParentKey,
     determineZIndex,
@@ -204,6 +242,8 @@ export default {
     sortVisibleLayerListByZindexBeforePrint,
     getLayerWithMaxZIndex,
     getMaxZIndexFromConfigs,
-    getMaxZIndexForParentKey
+    getMaxZIndexForParentKey,
+    getExternalLayerConfigsWithMissingZIndex,
+    assignZIndexToNestedExternalConfigs
 };
 

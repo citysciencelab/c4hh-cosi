@@ -66,6 +66,9 @@ export default {
             this.resetChart(this.data);
         });
     },
+    beforeUnmount () {
+        this.destroyChart();
+    },
     methods: {
         /**
          * destroys the old charts and creates a new chart+
@@ -75,15 +78,35 @@ export default {
          * @returns {void}  -
          */
         resetChart (data) {
-            const ctx = this.$el.getContext("2d"),
-                config = {
-                    type: "line",
-                    data: data,
-                    options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
-                };
+            const canvas = this.$el;
 
-            if (this.chart instanceof Chart) {
+            if (!canvas || typeof canvas.getContext !== "function") {
+                return;
+            }
+
+            const existingChart = typeof Chart.getChart === "function" ? Chart.getChart(canvas) : null,
+                  ctx = canvas.getContext("2d"),
+                  config = {
+                      type: "line",
+                      data: data,
+                      options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
+                  };
+
+            if (existingChart) {
+                existingChart.stop();
+                existingChart.destroy();
+
+                if (this.chart === existingChart) {
+                    this.chart = null;
+                }
+            }
+
+            if (this.chart) {
                 this.destroyChart();
+            }
+
+            if (!ctx) {
+                return;
             }
 
             this.chart = new Chart(ctx, config);
@@ -107,7 +130,20 @@ export default {
          * @returns {void}
          */
         destroyChart () {
-            if (this.chart instanceof Chart) {
+            const canvas = this.$el,
+                  existingChart = canvas && typeof Chart.getChart === "function" ? Chart.getChart(canvas) : null;
+
+            if (existingChart) {
+                existingChart.stop();
+                existingChart.destroy();
+
+                if (this.chart === existingChart) {
+                    this.chart = null;
+                }
+            }
+
+            if (this.chart) {
+                this.chart.stop();
                 this.chart.destroy();
                 this.chart = null;
             }

@@ -1,25 +1,32 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import LayerInformationComponent from "@modules/layerInformation/components/LayerInformation.vue";
 import sinon from "sinon";
-
-config.global.mocks.$t = key => key;
-
+import {createPinia, setActivePinia} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     let store,
-        legendAvailable,
-        downloadLinks,
-        pointOfContact,
-        publisher,
+        pinia,
+        layerInformationStore,
         mainMenu,
         layerConfig;
 
     beforeEach(() => {
+        pinia = createPinia();
+        setActivePinia(pinia);
+
+        layerInformationStore = useLayerInformationStore();
+
+        layerInformationStore.layerInfo = {
+            typ: "WMS",
+            metaIdArray: [],
+            url: "https://wfs.example.org/?evil=1"
+        };
         layerConfig = {};
-        downloadLinks = null;
-        legendAvailable = true;
+        layerInformationStore.downloadLinks = null;
+        layerInformationStore.legendAvailable = true;
         mainMenu = {
             currentComponent: "layerInformation",
             navigation: {
@@ -38,41 +45,6 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
                 Modules: {
                     namespaced: true,
                     modules: {
-                        namespaced: true,
-                        LayerInformation: {
-                            namespaced: true,
-                            state: {
-                                layerInfo: {
-                                    typ: "WMS",
-                                    metaIdArray: [],
-                                    url: "https://wfs.example.org/?evil=1"
-                                }
-                            },
-                            mutations: {
-                                setMetaDataCatalogueId: () => sinon.stub()
-                            },
-                            getters: {
-                                customText: () => sinon.stub(),
-                                title: () => "",
-                                layerInfo: (state) => state.layerInfo,
-                                datePublication: () => null,
-                                downloadLinks: () => downloadLinks,
-                                periodicityKey: () => null,
-                                abstractText: () => "Test",
-                                noMetadataLoaded: () => "",
-                                metaURLs: () => [],
-                                currentLayerName: () => "",
-                                legendAvailable: () => legendAvailable,
-                                showUrlGlobal: () => true,
-                                pointOfContact: () => pointOfContact,
-                                publisher: () => publisher,
-                                dateRevision: sinon.stub()
-                            },
-                            actions: {
-                                setConfigParams: () => sinon.stub(),
-                                getAbstractInfo: () => sinon.stub()
-                            }
-                        },
                         Legend: {
                             namespaced: true,
                             getters: {
@@ -87,6 +59,13 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
                             getters: {
                                 name: () => "Contactname",
                                 type: () => "contact"
+                            }
+                        },
+                        ResizeHandle: {
+                            namespaced: true,
+                            getters: {
+                                mainMenuWidth: () => 0,
+                                secondaryMenuWidth: () => 0
                             }
                         }
                     }
@@ -127,7 +106,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     it("should have an existing title", () => {
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -135,10 +114,10 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     });
 
     it("should have a close button, active tab is 'layerinfo-legend'", () => {
-        downloadLinks = ["https://download.com"];
+        layerInformationStore.downloadLinks = ["https://download.com"];
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -149,11 +128,11 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     });
 
     it("if legendAvailable is false: 'LayerInfoDataDownload' is active tab", () => {
-        legendAvailable = false;
-        downloadLinks = ["https://download.com"];
+        layerInformationStore.legendAvailable = false;
+        layerInformationStore.downloadLinks = ["https://download.com"];
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -165,7 +144,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     it("should check if dropdown for group layer to not exists", () => {
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -175,7 +154,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     it("should generate correct url", () => {
         const wrapper = mount(LayerInformationComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }
             }),
             link = wrapper.find("#url div.pt-5 a");
@@ -184,7 +163,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     });
 
     it("should show point of contact accordion  using content from pointOfContact", () => {
-        pointOfContact = {
+        layerInformationStore.pointOfContact = {
             "name": "Behörde ABC",
             "positionName": ["Metadaten-Verantwortlicher"],
             "street": "XYZ Straße 99",
@@ -194,11 +173,11 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             "email": "test@gv.hamburg.de",
             "country": "DEU"
         };
-        publisher = null;
+        layerInformationStore.publisher = null;
 
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -206,12 +185,12 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     });
 
     it("should not show point of contact accordion", () => {
-        pointOfContact = null;
-        publisher = null;
+        layerInformationStore.pointOfContact = null;
+        layerInformationStore.publisher = null;
 
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -219,8 +198,8 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     });
 
     it("should show point of contact accordion  using content from publisher", () => {
-        pointOfContact = null;
-        publisher = {
+        layerInformationStore.pointOfContact = null;
+        layerInformationStore.publisher = {
             "name": "Behörde ABC",
             "positionName": ["Metadaten-Verantwortlicher"],
             "street": "XYZ Straße 99",
@@ -233,7 +212,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
 
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -241,8 +220,8 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     });
 
     it("should show zip code in one line with city", async () => {
-        pointOfContact = null;
-        publisher = {
+        layerInformationStore.pointOfContact = null;
+        layerInformationStore.publisher = {
             "name": "Behörde ABC",
             "positionName": ["Metadaten-Verantwortlicher"],
             "street": "XYZ Straße 99",
@@ -255,7 +234,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
 
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -264,15 +243,15 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
 
 
     it("should not show undefined for missing address information", () => {
-        pointOfContact = null;
-        publisher = {
+        layerInformationStore.pointOfContact = null;
+        layerInformationStore.publisher = {
             "name": "Behörde ABC",
             "email": "test@gv.hamburg.de"
         };
 
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -280,8 +259,8 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     });
 
     it("should show zip code in one line with city", async () => {
-        pointOfContact = null;
-        publisher = {
+        layerInformationStore.pointOfContact = null;
+        layerInformationStore.publisher = {
             "name": "Behörde ABC",
             "positionName": ["Metadaten-Verantwortlicher"],
             "street": "XYZ Straße 99",
@@ -294,7 +273,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
 
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -303,15 +282,15 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
 
 
     it("should not show undefined for missing address information", async () => {
-        pointOfContact = null;
-        publisher = {
+        layerInformationStore.pointOfContact = null;
+        layerInformationStore.publisher = {
             "name": "Behörde ABC",
             "email": "test@gv.hamburg.de"
         };
 
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -319,7 +298,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     });
 
     it("should show the dropdown when layerInfo.typ is 'GROUP'", () => {
-        store.state.Modules.LayerInformation.layerInfo = {
+        layerInformationStore.layerInfo = {
             typ: "GROUP",
             metaIdArray: ["sample-meta-id"],
             layers: [
@@ -331,7 +310,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
 
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -339,11 +318,11 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     });
 
     it("should not show the dropdown when layerInfo.typ is not 'GROUP'", () => {
-        store.state.Modules.LayerInformation.layerInfo.typ = "WMS";
+        layerInformationStore.layerInfo.typ = "WMS";
 
         const wrapper = mount(LayerInformationComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -351,7 +330,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
     });
 
     it("should populate the dropdown with layer names from layerInfo", () => {
-        store.state.Modules.LayerInformation.layerInfo = {
+        layerInformationStore.layerInfo = {
             typ: "GROUP",
             metaIdArray: ["sample-meta-id"],
             layers: [
@@ -363,7 +342,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
 
         const wrapper = mount(LayerInformationComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }
             }),
             options = wrapper.findAll("#layer-selection-dropdown option");
@@ -380,7 +359,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             layerConfig.url = "/orig_url";
             const wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 layerInfo = {
@@ -403,7 +382,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             layerConfig.url = "/url";
             const wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 layerInfo = {
@@ -426,7 +405,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             layerConfig.url = "/url";
             const wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 layerInfo = {
@@ -444,7 +423,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             layerConfig.url = "https://daten.de/gdi3d/objects/";
             const wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 layerInfo = {
@@ -462,7 +441,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             layerConfig.url = "https://daten.de/gdi3d/objects/tileset.json";
             const wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 layerInfo = {
@@ -480,7 +459,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             layerConfig.url = "https://daten.de/gdi3d/objects";
             const wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 layerInfo = {
@@ -498,7 +477,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             layerConfig.url = "https://daten.de/gdi3d/objects?";
             const wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 layerInfo = {
@@ -516,7 +495,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             layerConfig.url = "https://daten.de/gdi3d/terrain/";
             const wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 layerInfo = {
@@ -534,7 +513,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             layerConfig.url = "https://daten.de/gdi3d/terrain";
             const wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 layerInfo = {
@@ -552,7 +531,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             layerConfig.url = "https://daten.de/gdi3d/terrain?";
             const wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 layerInfo = {
@@ -570,7 +549,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             const url = "https://daten.de/gdi3d/terrain?",
                 wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 cleanedUrl = wrapper.vm.cleanUrl(url);
@@ -582,7 +561,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             const url = "https://daten.de/gdi3d/terrain/",
                 wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 cleanedUrl = wrapper.vm.cleanUrl(url);
@@ -594,7 +573,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             const url = "https://daten.de/gdi3d/terrain/?",
                 wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 cleanedUrl = wrapper.vm.cleanUrl(url);
@@ -607,7 +586,7 @@ describe("src/modules/layerInformation/components/LayerInformation.vue", () => {
             const url = "https://daten.de/gdi3d/terrain",
                 wrapper = mount(LayerInformationComponent, {
                     global: {
-                        plugins: [store]
+                        plugins: [store, pinia]
                     }
                 }),
                 cleanedUrl = wrapper.vm.cleanUrl(url);

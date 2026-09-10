@@ -1,4 +1,4 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
@@ -10,7 +10,6 @@ vi.mock("../../../shared/js/storyZipCreator.js", () => ({
     extractStoryZip: vi.fn()
 }));
 
-config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/storyCreator.vue", () => {
     let store, wrapper;
@@ -35,6 +34,12 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                                 })
                             },
                             state: {}
+                        },
+                        Menu: {
+                            namespaced: true,
+                            actions: {
+                                changeCurrentComponent: sinon.spy()
+                            }
                         }
                     }
                 }
@@ -66,10 +71,6 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                 plugins: [store]
             }
         });
-    });
-
-    afterEach(() => {
-        sinon.restore();
     });
 
     describe("Component DOM", () => {
@@ -118,6 +119,15 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
             const titleImage = wrapper.find(".chapter-title-image-preview");
 
             expect(titleImage.exists()).to.be.true;
+        });
+
+        it("should not find Toast component", () => {
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.false;
+        });
+
+        it("should find Toast component", async () => {
+            await wrapper.setData({"showAutosaveHint": true});
+            expect(wrapper.findComponent({name: "Toast"}).exists()).to.be.true;
         });
     });
 
@@ -257,7 +267,7 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                     }
                 };
 
-                expect(wrapper.vm.getChapterOverviewCardItems(val).subject).to.equal("2 modules.layerSelection.datalayer");
+                expect(wrapper.vm.getChapterOverviewCardItems(val).subject).to.equal("1 modules.layerSelection.datalayer");
                 expect(wrapper.vm.getChapterOverviewCardItems(val).map).to.equal("modules.storyCreator.labels.mapPosition");
                 expect(wrapper.vm.getChapterOverviewCardItems(val).tool).to.equal("Tool");
             });
@@ -416,10 +426,52 @@ describe("addons/storyCreator/components/storyCreator.vue", () => {
                 }
             });
 
-            expect(newWrapper.vm.title).to.equal("");
+            expect(newWrapper.vm.title).to.equal("additional:modules.storyCreator.labels.storyname");
             expect(newWrapper.vm.description).to.equal("");
             expect(newWrapper.vm.author).to.equal("");
             expect(newWrapper.vm.chapterContent).to.deep.equal([]);
+        });
+    });
+
+    describe("Breadcrumb, save and hint behavior", () => {
+        it("positive: autosaveChapterAndGoToStory switches currentView back to 'story'", () => {
+            // No ref needed: even without a rendered chapter component,
+            // the method must always switch currentView to 'story'.
+            wrapper.vm.currentView = "chapter";
+
+            wrapper.vm.autosaveChapterAndGoToStory();
+
+            expect(wrapper.vm.currentView).to.equal("story");
+        });
+
+        it("positive: autosaveChapterAndGoToStory sets showAutosaveHint to true when chapter data changed", async () => {
+            // Capture wrapper in a const before awaits to satisfy require-atomic-updates.
+            // Switch to chapter view first so Vue creates the $refs.chapterComp stub,
+            // then override collectChapterData on the existing stub instance.
+            const localWrapper = wrapper;
+
+            await localWrapper.setData({currentView: "chapter"});
+            await localWrapper.vm.$nextTick();
+            localWrapper.vm._initialChapterSnapshot = JSON.stringify({title: "Old Title", content: []});
+            localWrapper.vm.$refs.chapterComp.collectChapterData = sinon.stub().returns({title: "New Title", content: []});
+
+            localWrapper.vm.autosaveChapterAndGoToStory();
+
+            expect(localWrapper.vm.showAutosaveHint).to.be.true;
+        });
+
+        it("negative: autosaveChapterAndGoToStory keeps showAutosaveHint false when editing an existing chapter with unchanged data", async () => {
+            const chapterData = {title: "Same Title", content: []},
+                localWrapper = wrapper;
+
+            await localWrapper.setData({currentView: "chapter", editingChapterIndex: 0, chapterContent: [chapterData]});
+            await localWrapper.vm.$nextTick();
+            localWrapper.vm._initialChapterSnapshot = JSON.stringify(chapterData);
+            localWrapper.vm.$refs.chapterComp.collectChapterData = sinon.stub().returns(chapterData);
+
+            localWrapper.vm.autosaveChapterAndGoToStory();
+
+            expect(localWrapper.vm.showAutosaveHint).to.be.false;
         });
     });
 });

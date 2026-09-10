@@ -1,4 +1,4 @@
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import AccordionItem from "../../../../../src/shared/modules/accordion/components/AccordionItem.vue";
@@ -9,7 +9,6 @@ import FloodRiskManagementSwitcher from "../../../components/FloodRiskManagement
 import sinon from "sinon";
 import SwitchInput from "../../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/floodRiskManagement/components/FloodRiskManagement.vue", () => {
     const mockMapGetters = {

@@ -1,11 +1,10 @@
 import TabOriginsComponent from "../../../components/Tabs/TabOrigins.vue";
 import axios from "axios";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Vuex from "vuex";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/vpiDashboard/components/Tabs/TabOrigins.vue", () => {
     let wrapper = null,
@@ -62,10 +61,6 @@ describe("addons/vpiDashboard/components/Tabs/TabOrigins.vue", () => {
     afterEach(() => {
         wrapper.unmount();
         wrapper = null;
-    });
-
-    afterAll(() => {
-        sinon.restore();
     });
 
     it("renders the origins component", () => {

@@ -1,78 +1,77 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {mount, config} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import Modeler3DImportComponent from "@modules/modeler3D/components/Modeler3DImport.vue";
 import Modeler3D from "@modules/modeler3D/store/indexModeler3D.js";
 import actions from "@modules/modeler3D/store/actionsModeler3D.js";
-import {JSDOM} from "jsdom";
 import {ColladaLoader} from "three/examples/jsm/loaders/ColladaLoader.js";
 import {OBJLoader} from "three/examples/jsm/loaders/OBJLoader.js";
 import {GLTFExporter} from "three/examples/jsm/exporters/GLTFExporter.js";
 
-const globalDocument = global.document,
-    globalWindow = global.window,
-    {window} = new JSDOM(),
-    featureCollection = {
-        type: "FeatureCollection",
-        features: [
-            {
-                type: "Feature",
-                properties: {
-                    name: "Zeichnung",
-                    clampToGround: true,
-                    color: {
-                        red: 0.9411764705882353,
-                        green: 0.9725490196078431,
-                        blue: 1,
-                        alpha: 1
-                    },
-                    outlineColor: {
-                        red: 0.9411764705882353,
-                        green: 0.9725490196078431,
-                        blue: 1,
-                        alpha: 1
-                    },
-                    extrudedHeight: 51.399072774877325
+const featureCollection = {
+    type: "FeatureCollection",
+    features: [
+        {
+            type: "Feature",
+            properties: {
+                name: "Zeichnung",
+                clampToGround: true,
+                color: {
+                    red: 0.9411764705882353,
+                    green: 0.9725490196078431,
+                    blue: 1,
+                    alpha: 1
                 },
-                geometry: {
-                    type: "Polygon",
-                    coordinates: [[
-                        [9.994428832757109, 53.55216143433489, 31.39907277487732],
-                        [9.99525788981755, 53.552197024075085, 31.39907277487732],
-                        [9.994765846774351, 53.55178310383997, 31.39907277487732]
-                    ]]
-                }
+                outlineColor: {
+                    red: 0.9411764705882353,
+                    green: 0.9725490196078431,
+                    blue: 1,
+                    alpha: 1
+                },
+                extrudedHeight: 51.399072774877325
             },
-            {
-                type: "Feature",
-                properties: {
-                    name: "Zeichnung",
-                    clampToGround: true,
-                    color: {
-                        red: 0.9411764705882353,
-                        green: 0.9725490196078431,
-                        blue: 1,
-                        alpha: 1
-                    },
-                    width: 2
-                },
-                geometry: {
-                    type: "Polyline",
-                    coordinates: [[
-                        [9.994428832757109, 53.55216143433489, 31.39907277487732],
-                        [9.99525788981755, 53.552197024075085, 31.39907277487732],
-                        [9.994765846774351, 53.55178310383997, 31.39907277487732]
-                    ]]
-                }
+            geometry: {
+                type: "Polygon",
+                coordinates: [[
+                    [9.994428832757109, 53.55216143433489, 31.39907277487732],
+                    [9.99525788981755, 53.552197024075085, 31.39907277487732],
+                    [9.994765846774351, 53.55178310383997, 31.39907277487732]
+                ]]
             }
-        ]
-    };
+        },
+        {
+            type: "Feature",
+            properties: {
+                name: "Zeichnung",
+                clampToGround: true,
+                color: {
+                    red: 0.9411764705882353,
+                    green: 0.9725490196078431,
+                    blue: 1,
+                    alpha: 1
+                },
+                width: 2
+            },
+            geometry: {
+                type: "Polyline",
+                coordinates: [[
+                    [9.994428832757109, 53.55216143433489, 31.39907277487732],
+                    [9.99525788981755, 53.552197024075085, 31.39907277487732],
+                    [9.994765846774351, 53.55178310383997, 31.39907277487732]
+                ]]
+            }
+        }
+    ]
+};
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/modeler3D/components/Modeler3DImport.vue", () => {
-    let store, wrapper, scene;
+    let store,
+        wrapper,
+        scene,
+        originalFileReader,
+        originalCesium;
     const entities = {
             getById: () => ({position: {}}),
             values: []
@@ -92,8 +91,12 @@ describe("src/modules/modeler3D/components/Modeler3DImport.vue", () => {
             }
         };
 
+    beforeAll(() => {
+        originalFileReader = global.FileReader;
+        originalCesium = global.Cesium;
+    });
+
     beforeEach(() => {
-        global.window = window;
         global.FileReader = window.FileReader;
         mapCollection.clear();
         mapCollection.addMap(map3D, "3D");
@@ -133,8 +136,8 @@ describe("src/modules/modeler3D/components/Modeler3DImport.vue", () => {
             wrapper.unmount();
         }
 
-        global.document = globalDocument;
-        global.window = globalWindow;
+        global.FileReader = originalFileReader;
+        global.Cesium = originalCesium;
     });
 
     it("should find Tool component", () => {

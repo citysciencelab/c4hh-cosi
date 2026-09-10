@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import ZoomInAndOut from "@modules/controls/zoom/components/ZoomInAndOut.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/controls/zoom/components/ZoomInAndOut.vue", () => {
     const decreaseZoomSpy = sinon.spy(),

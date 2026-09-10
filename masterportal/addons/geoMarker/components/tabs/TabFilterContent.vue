@@ -70,8 +70,8 @@ export default {
          */
         urlFilterPermalink () {
             const departmentIds = [],
-                layerParams = this.layerUrlParams,
-                layerSearchParams = JSON.stringify(layerParams);
+                  layerParams = this.layerUrlParams,
+                  layerSearchParams = JSON.stringify(layerParams);
 
             this.filterSelections.departmentsSelected.forEach(departmentSelected => {
                 const matchedDepartmentId = Object.keys(this.departments).find(
@@ -117,7 +117,7 @@ export default {
          */
         statusAllOrOpen () {
             return this.filterSelections.statusSelected.length === 0 ||
-                   this.filterSelections.statusSelected.includes("offen");
+                this.filterSelections.statusSelected.includes("offen");
         },
         /**
          * Checks if status is empty or 'inaktiv'.
@@ -125,7 +125,7 @@ export default {
          */
         statusAllOrInactive () {
             return this.filterSelections.statusSelected.length === 0 ||
-                   this.filterSelections.statusSelected.includes("inaktiv");
+                this.filterSelections.statusSelected.includes("inaktiv");
         },
         /**
          * Checks if status is empty, 'geschlossen'.
@@ -133,7 +133,7 @@ export default {
          */
         statusAllOrClosed () {
             return this.filterSelections.statusSelected.length === 0 ||
-                   this.filterSelections.statusSelected.includes("geschlossen");
+                this.filterSelections.statusSelected.includes("geschlossen");
         },
         /**
          * Returns all relevant layer IDs, corresponding to selected department and status in the filter settings
@@ -237,7 +237,7 @@ export default {
          */
         async handleUrlFilter () {
             const parameterDepartments = new URLSearchParams(document.location.search).get("filterGeoMarkerAbteilung")?.split(",") ?? [],
-                parameterStatus = new URLSearchParams(document.location.search).get("filterGeoMarkerStatus")?.split(",") ?? [];
+                  parameterStatus = new URLSearchParams(document.location.search).get("filterGeoMarkerStatus")?.split(",") ?? [];
 
             this.urlFilter = {
                 departments: parameterDepartments.map(departmentId => this.departments[departmentId] ?? null).filter(value => value !== null),
@@ -246,11 +246,11 @@ export default {
 
             if (this.urlFilter?.departments?.length || this.urlFilter?.status?.length) {
                 const htmlTitleDepartments = this.urlFilter?.departments
-                        ? this.urlFilter.departments.map(department => department.name).join(", ")
-                        : "",
-                    htmlTitleCategories = this.urlFilter?.status?.length
-                        ? `[${this.urlFilter.status.join("|")}]`
-                        : "";
+                          ? this.urlFilter.departments.map(department => department.name).join(", ")
+                          : "",
+                      htmlTitleCategories = this.urlFilter?.status?.length
+                          ? `[${this.urlFilter.status.join("|")}]`
+                          : "";
 
                 if (htmlTitleDepartments || htmlTitleCategories) {
                     document.title = `${document.title} - ${this.$t("additional:modules.geoMarker.filter.urlFilterPrefix")}: ${htmlTitleDepartments} ${htmlTitleCategories}`.trim();
@@ -307,9 +307,9 @@ export default {
                         // Opening a GFI for one feature and calling the above mentioned function afterwards
                         // will make the feature vanish from the layer.
                         const layerSource = layer.getLayerSource(),
-                            style = layer.getStyleAsFunction(layer.get("style")),
-                            allFeaturesOnLayer = layerSource.getFeatures(),
-                            filteredFeaturesIdList = this.allFilteredFeatures.map(feat => feat.getId());
+                              style = layer.getStyleAsFunction(layer.get("style")),
+                              allFeaturesOnLayer = layerSource.getFeatures(),
+                              filteredFeaturesIdList = this.allFilteredFeatures.map(feat => feat.getId());
 
                         allFeaturesOnLayer.forEach(feature => {
                             if (filteredFeaturesIdList.includes(feature.getId())) {
@@ -367,8 +367,17 @@ export default {
                     const source = layer.getSource();
 
                     // Info: This workaround does not work, if a layer has no features at all.
+                    // Therefore a timeout is set as fallback
                     if (!source.getFeatures().length) {
-                        source.once("featuresloadend", resolve);
+                        // wait for featuresloadend or fallback to timeout
+                        const timeout = setTimeout(() => {
+                            resolve();
+                        }, 3000);
+
+                        source.once("featuresloadend", () => {
+                            clearTimeout(timeout);
+                            resolve();
+                        });
                     }
                     else {
                         resolve();
@@ -387,8 +396,17 @@ export default {
                         const source = this.map.getLayers().getArray().find(l => l.get("id") === layerId).getSource();
 
                         // Info: This workaround does not work, if a layer has no features at all.
+                        // Therefore a timeout is set as fallback
                         if (!source.getFeatures().length) {
-                            source.once("featuresloadend", resolve);
+                            // wait for featuresloadend or fallback to timeout
+                            const timeout = setTimeout(() => {
+                                resolve();
+                            }, 3000);
+
+                            source.once("featuresloadend", () => {
+                                clearTimeout(timeout);
+                                resolve();
+                            });
                         }
                         else {
                             resolve();
@@ -417,7 +435,7 @@ export default {
 
                 // make the allFilteredFeatures array unique so that each GeoMarker is included only once
                 const uniqueFeatures = [],
-                    seenIds = new Set();
+                      seenIds = new Set();
 
                 this.allFilteredFeatures.forEach(feat => {
                     const id = feat.getId();
@@ -498,8 +516,8 @@ export default {
 
                     // Description, Source, GeoMarkerID
                     const filterValueSourceTrimLC = this.filterSelections.filterValueSource?.trim().toLowerCase(),
-                        filterValueDescrTrimLC = this.filterSelections.filterValueDescr?.trim().toLowerCase(),
-                        filterValueIDTrimLC = this.filterSelections.filterValueId?.trim().toLowerCase();
+                          filterValueDescrTrimLC = this.filterSelections.filterValueDescr?.trim().toLowerCase(),
+                          filterValueIDTrimLC = this.filterSelections.filterValueId?.trim().toLowerCase();
 
                     if (filterValueSourceTrimLC && filterValueSourceTrimLC !== "") {
                         // Source filter does not apply to this feature = check next feature
@@ -592,8 +610,8 @@ export default {
             }
 
             const {from, to} = filterValue,
-                fromTimeStamp = from === "" ? null : dayjs(from),
-                toTimeStamp = to === "" ? null : dayjs(to);
+                  fromTimeStamp = from === "" ? null : dayjs(from),
+                  toTimeStamp = to === "" ? null : dayjs(to);
 
             if (!fromTimeStamp && !toTimeStamp) {
                 return false;
@@ -633,8 +651,8 @@ export default {
 
                     if (layer && layer.layer && layer.layer.isVisible()) {
                         const layerSource = layer.getLayerSource(),
-                            style = layer.getStyleAsFunction(layer.get("style")),
-                            allFeaturesOnLayer = layerSource.getFeatures();
+                              style = layer.getStyleAsFunction(layer.get("style")),
+                              allFeaturesOnLayer = layerSource.getFeatures();
 
                         allFeaturesOnLayer.forEach(feature => {
                             feature.setStyle(style(feature));
@@ -984,6 +1002,8 @@ export default {
         </div>
     </div>
 </template>
+
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style lang="scss">
 div#geoMarkerFilterContent {

@@ -6,6 +6,7 @@ import MenuContainerBodyRootLogo from "./MenuContainerBodyRootLogo.vue";
 import SearchBar from "../../searchBar/components/SearchBar.vue";
 
 /**
+ * The MenuContainer component is responsible for rendering the menu and its content. It handles the menu's state, including its width, expansion, and the currently displayed component. The component also manages the resizing of the menu and adjusts the visibility of certain elements based on the menu's width.
  * @module modules/MenuContainer
  * @vue-prop {String} side - The side in which the menu component is being rendered.
  * @vue-computed {String} handlePosition - Defines whether the ResizeHandle should be displayed on the right or left side.
@@ -152,7 +153,7 @@ export default {
          */
         hideElementsForBiggerMenu (menuPercentWidth) {
             const hideElementBreakPoint = document.documentElement.clientWidth > 1000 ? 0.7 : 0.5,
-                footer = document.getElementById("module-portal-footer");
+                  footer = document.getElementById("module-portal-footer");
 
             this.setLayerPillsHidden(menuPercentWidth >= hideElementBreakPoint);
             if (footer) {
@@ -240,7 +241,6 @@ export default {
             :mutation="setCurrentMenuWidth"
             :min-width="0"
             :max-width="0.95"
-            :min-height="1"
             :side="side"
             @resizing="eventData => onResize(eventData)"
         >
@@ -307,6 +307,7 @@ export default {
     position: absolute;
     right: 10px;
     top: 10px;
+    z-index: 1;
 }
 
 

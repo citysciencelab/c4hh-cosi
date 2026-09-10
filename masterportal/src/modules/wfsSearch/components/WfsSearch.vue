@@ -91,8 +91,8 @@ export default {
             }
             if (resultList === "showAll") {
                 const tableHeaders = [],
-                    lengths = this.results.map(feature => Object.keys(feature.values_).length),
-                    indexOfFeatureWithMostAttr = lengths.indexOf(Math.max(...lengths));
+                      lengths = this.results.map(feature => Object.keys(feature.values_).length),
+                      indexOfFeatureWithMostAttr = lengths.indexOf(Math.max(...lengths));
 
                 Object.keys(this.results[indexOfFeatureWithMostAttr].values_)
                     .reduce((acc, curr) => {
@@ -203,8 +203,8 @@ export default {
          */
         getCompareKeys (row) {
             const {resultList} = this.currentInstance,
-                geometryKeys = ["geometry", "geom", "the_geom", "wkb_geometry"],
-                technicalKeys = ["boundedBy", "code", "fuuid", "identificatie", "ligtInProvincieCode"];
+                  geometryKeys = ["geometry", "geom", "the_geom", "wkb_geometry"],
+                  technicalKeys = ["boundedBy", "code", "fuuid", "identificatie", "ligtInProvincieCode"];
 
             if (isObject(resultList)) {
                 return Object.keys(resultList).filter(key => !geometryKeys.includes(key) && key in row
@@ -221,7 +221,7 @@ export default {
          */
         getRowId (row) {
             const compareKeys = this.getCompareKeys(row),
-                signature = compareKeys.map(key => String(row[key] || "")).join("-");
+                  signature = compareKeys.map(key => String(row[key] || "")).join("-");
             let hash = 0;
 
             for (let i = 0; i < signature.length; i++) {
@@ -243,7 +243,7 @@ export default {
             }
 
             const compareKeys = this.getCompareKeys(row),
-                rowSignature = compareKeys.map(key => `${key}:${row[key]}`).sort().join("|");
+                  rowSignature = compareKeys.map(key => `${key}:${row[key]}`).sort().join("|");
 
             return this.selectedRows.some(selectedRow => {
                 const selectedSignature = compareKeys
@@ -332,17 +332,17 @@ export default {
         handleRowSelected (row) {
             if (this.multiSelect) {
                 const rowClone = JSON.parse(JSON.stringify(row)),
-                    compareKeys = this.getCompareKeys(rowClone),
-                    rowSignature = compareKeys.map(key => `${key}:${rowClone[key]}`).sort().join("|"),
-                    existingIndex = this.selectedRows.findIndex(selectedRow => {
-                        const selectedSignature = compareKeys
-                            .filter(key => key in selectedRow)
-                            .map(key => `${key}:${selectedRow[key]}`)
-                            .sort()
-                            .join("|");
+                      compareKeys = this.getCompareKeys(rowClone),
+                      rowSignature = compareKeys.map(key => `${key}:${rowClone[key]}`).sort().join("|"),
+                      existingIndex = this.selectedRows.findIndex(selectedRow => {
+                          const selectedSignature = compareKeys
+                              .filter(key => key in selectedRow)
+                              .map(key => `${key}:${selectedRow[key]}`)
+                              .sort()
+                              .join("|");
 
-                        return rowSignature === selectedSignature;
-                    });
+                          return rowSignature === selectedSignature;
+                      });
 
                 if (compareKeys.length === 0) {
                     return;
@@ -408,9 +408,9 @@ export default {
          */
         updateMultiSelectMarkers () {
             const polygonLayer = mapMarker.getMapmarkerLayerById("marker_polygon_layer"),
-                geometries = this.selectedRows
-                    .map(row => this.returnGeometryFromRow(row))
-                    .filter(geometry => geometry !== null && typeof geometry.getExtent === "function");
+                  geometries = this.selectedRows
+                      .map(row => this.returnGeometryFromRow(row))
+                      .filter(geometry => geometry !== null && typeof geometry.getExtent === "function");
 
             if (polygonLayer) {
                 polygonLayer.getSource().clear();

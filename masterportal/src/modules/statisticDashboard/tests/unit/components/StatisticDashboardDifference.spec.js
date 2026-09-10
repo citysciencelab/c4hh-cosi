@@ -1,4 +1,4 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import StatisticDashboardDifference from "@modules/statisticDashboard/components/StatisticDashboardDifference.vue";
@@ -8,7 +8,6 @@ import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature.js";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/statiscticDashboard/components/StatisticDashboardDifference.vue", () => {
     const propsData = {

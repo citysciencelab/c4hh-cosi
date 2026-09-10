@@ -132,17 +132,17 @@ describe("src/app-store/actionsLayerConfig.js", () => {
         ];
         layerConfig = {};
         layerConfig[treeBaselayersKey] =
-        {
-            elements: [
-                {
-                    id: "453",
-                    visibility: true
-                },
-                {
-                    id: "452"
-                }
-            ]
-        };
+            {
+                elements: [
+                    {
+                        id: "453",
+                        visibility: true
+                    },
+                    {
+                        id: "452"
+                    }
+                ]
+            };
         layerConfig[treeSubjectsKey] = {
             elements: [
                 {
@@ -419,6 +419,154 @@ describe("src/app-store/actionsLayerConfig.js", () => {
             expect(dispatch.secondCall.args[1]).to.be.undefined;
             expect(state.layerConfig[treeSubjectsKey].elements[0].elements[0].elements[0].elements.length).to.equal(1);
             expect(state.layerConfig[treeSubjectsKey].elements[0].elements[0].elements[0].elements[0].id).to.deep.equal(layerToAdd.id);
+        });
+
+        it("addLayerToLayerConfig assigns zIndex to newly added showInLayerTree layers in folders", () => {
+            const folderToAdd = {
+                type: "folder",
+                id: "new_folder",
+                isExternal: true,
+                elements: [
+                    {
+                        type: "layer",
+                        id: "new_layer_1",
+                        isExternal: true,
+                        showInLayerTree: true
+                    },
+                    {
+                        type: "folder",
+                        id: "new_sub_folder",
+                        elements: [
+                            {
+                                type: "layer",
+                                id: "new_layer_2",
+                                isExternal: true,
+                                showInLayerTree: true
+                            }
+                        ]
+                    }
+                ]
+            };
+
+            layerConfig[treeSubjectsKey] = {
+                elements: [
+                    {
+                        id: "1132",
+                        type: "layer",
+                        showInLayerTree: true,
+                        zIndex: 4
+                    }
+                ]
+            };
+            state.layerConfig = layerConfig;
+
+            getters = {
+                allLayerConfigs: [
+                    {
+                        id: "1132",
+                        zIndex: 4,
+                        type: "layer"
+                    }
+                ],
+                allLayerConfigsByParentKey: () => [
+                    {
+                        id: "1132",
+                        zIndex: 4,
+                        type: "layer"
+                    }
+                ],
+                visibleSubjectDataLayerConfigs: []
+            };
+
+            getActionsLayerConfig().addLayerToLayerConfig({dispatch, getters, state}, {layerConfig: folderToAdd, parentKey: treeSubjectsKey});
+
+            expect(folderToAdd.elements[0].zIndex).to.equal(5);
+            expect(folderToAdd.elements[1].elements[0].zIndex).to.equal(6);
+            expect(folderToAdd.zIndex).to.equal(7);
+        });
+
+        it("addLayerToLayerConfig assigns zIndex to visible imported folder layers", () => {
+            const folderToAdd = {
+                type: "folder",
+                id: "new_folder",
+                isExternal: true,
+                elements: [
+                    {
+                        type: "layer",
+                        id: "new_layer_1",
+                        isExternal: true,
+                        showInLayerTree: false,
+                        visibility: true
+                    }
+                ]
+            };
+
+            layerConfig[treeSubjectsKey] = {
+                elements: [
+                    {
+                        id: "1132",
+                        type: "layer",
+                        showInLayerTree: true,
+                        zIndex: 4
+                    }
+                ]
+            };
+            state.layerConfig = layerConfig;
+
+            getters = {
+                allLayerConfigs: [
+                    {
+                        id: "1132",
+                        zIndex: 4,
+                        type: "layer"
+                    }
+                ],
+                allLayerConfigsByParentKey: () => [
+                    {
+                        id: "1132",
+                        zIndex: 4,
+                        type: "layer"
+                    }
+                ],
+                visibleSubjectDataLayerConfigs: []
+            };
+
+            getActionsLayerConfig().addLayerToLayerConfig({dispatch, getters, state}, {layerConfig: folderToAdd, parentKey: treeSubjectsKey});
+
+            expect(folderToAdd.elements[0].zIndex).to.equal(5);
+            expect(folderToAdd.zIndex).to.equal(6);
+        });
+
+        it("addLayerToLayerConfig does not assign zIndex to folder layers hidden from tree and map", () => {
+            const folderToAdd = {
+                type: "folder",
+                id: "new_folder",
+                isExternal: true,
+                elements: [
+                    {
+                        type: "layer",
+                        id: "new_layer_1",
+                        isExternal: true,
+                        showInLayerTree: false,
+                        visibility: false
+                    }
+                ]
+            };
+
+            layerConfig[treeSubjectsKey] = {
+                elements: []
+            };
+            state.layerConfig = layerConfig;
+
+            getters = {
+                allLayerConfigs: [],
+                allLayerConfigsByParentKey: () => [],
+                visibleSubjectDataLayerConfigs: []
+            };
+
+            getActionsLayerConfig().addLayerToLayerConfig({dispatch, getters, state}, {layerConfig: folderToAdd, parentKey: treeSubjectsKey});
+
+            expect(folderToAdd.elements[0].zIndex).to.be.undefined;
         });
     });
 

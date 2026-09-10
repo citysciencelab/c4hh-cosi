@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import AddElementDropdown from "../../../components/AddElementDropdown.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/storyTellingTool/storyCreator/shared/modules/AddElementDropdown/components/AddElementDropdown.vue", () => {
     let wrapper;
@@ -24,10 +23,10 @@ describe("addons/storyTellingTool/storyCreator/shared/modules/AddElementDropdown
             expect(button.exists()).to.be.true;
         });
 
-        it("should render all 4 default items when no 'allowedActions' are provided", () => {
+        it("should render all 5 default items when no 'allowedActions' are provided", () => {
             const items = wrapper.findAll(".dropdown-item");
 
-            expect(items.length).to.equal(4);
+            expect(items.length).to.equal(5);
         });
 
         it("should render 2 category headers and exactly 1 divider", () => {
@@ -71,7 +70,7 @@ describe("addons/storyTellingTool/storyCreator/shared/modules/AddElementDropdown
             await wrapper.setProps({allowedActions: []});
             const items = wrapper.findAll(".dropdown-item");
 
-            expect(items.length).to.equal(4);
+            expect(items.length).to.equal(5);
         });
 
         it("should ignore unknown action names in 'allowedActions' and only render valid ones", async () => {

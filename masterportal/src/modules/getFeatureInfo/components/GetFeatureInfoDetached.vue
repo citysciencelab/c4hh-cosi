@@ -168,12 +168,12 @@ export default {
         highlightVectorFeature () {
             if (this.highlightVectorRules) {
                 const layer = layerCollection.getLayerById(this.feature.getLayerId()),
-                    styleId = layer?.get("styleId"),
-                    highlightObject = {
-                        feature: this.feature.getOlFeature(),
-                        layer: {id: this.feature.getLayerId()},
-                        styleId
-                    };
+                      styleId = layer?.get("styleId"),
+                      highlightObject = {
+                          feature: this.feature.getOlFeature(),
+                          layer: {id: this.feature.getLayerId()},
+                          styleId
+                      };
 
                 if (this.hideMapMarkerOnVectorHighlight) {
                     this.hideMarker();
@@ -240,10 +240,10 @@ export default {
         highlightWMSFeature () {
             if (this.showPolygonMarkerForWMS) {
                 const layer = layerCollection.getLayerById(this.feature.getLayerId()),
-                    highlightObject = {
-                        feature: this.feature.getOlFeature(),
-                        layer: {id: this.feature.getLayerId()}
-                    };
+                      highlightObject = {
+                          feature: this.feature.getOlFeature(),
+                          layer: {id: this.feature.getLayerId()}
+                      };
 
                 if (layer?.attributes?.typ?.toLowerCase() === "wms") {
                     this.removePolygonMarker();

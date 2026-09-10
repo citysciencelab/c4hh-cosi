@@ -1,14 +1,13 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import RoutingCoordinateInputComponent from "@modules/routing/components/RoutingCoordinateInput.vue";
 import mutations from "@modules/routing/store/mutationsRouting.js";
 import actions from "@modules/routing/store/actionsRouting.js";
 import {RoutingWaypoint} from "@modules/routing/js/classes/routing-waypoint.js";
 import {RoutingGeosearchResult} from "@modules/routing/js/classes/routing-geosearch-result.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/RoutingCoordinateInput.vue", () => {
     let store,

@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import StoryCreatorAddTextCard from "../../../components/StoryCreatorAddTextCard.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/storyCreator/components/StoryCreatorAddTextCard.vue", () => {
     describe("Component DOM", () => {

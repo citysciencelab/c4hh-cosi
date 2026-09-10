@@ -65,7 +65,7 @@ export default {
             this.mouseY = e.clientY;
 
             const prevEl = this.dragEl.previousElementSibling,
-                nextEl = this.placeholder.nextElementSibling;
+                  nextEl = this.placeholder.nextElementSibling;
 
             // console.log("try", prevEl, nextEl);
 
@@ -89,7 +89,7 @@ export default {
             this.layerList.removeProperty("visibility");
 
             const endRowIndex = [].slice.call(this.clone.children).indexOf(this.dragEl),
-                rows = [].slice.call(this.layerList.querySelectorAll("li"));
+                  rows = [].slice.call(this.layerList.querySelectorAll("li"));
 
             if (this.dragIndex > endRowIndex) {
                 rows[endRowIndex].parentNode.insertBefore(rows[this.dragIndex], rows[endRowIndex]);
@@ -104,7 +104,7 @@ export default {
         },
         cloneRow () {
             const rect = this.layerList.getBoundingClientRect(),
-                width = parseInt(window.getComputedStyle(this.layerList).width, 10);
+                  width = parseInt(window.getComputedStyle(this.layerList).width, 10);
 
             this.clone = document.createElement("div");
             this.clone.style.position = "absolute";
@@ -113,9 +113,9 @@ export default {
             this.layerList.parentNode.insertBefore(this.clone, this.layerList);
             this.layerList.querySelectorAll("li").forEach(row => {
                 const item = document.createElement("div"),
-                    newList = document.createElement("ul"),
-                    newRow = document.createElement("li"),
-                    contents = [].slice.call(row.children);
+                      newList = document.createElement("ul"),
+                      newRow = document.createElement("li"),
+                      contents = [].slice.call(row.children);
 
                 item.classList.add("draggable");
                 newList.setAttribute("class", "clone-table");
@@ -136,7 +136,7 @@ export default {
         },
         swapRows (nodeA, nodeB) {
             const parentA = nodeA.parentNode,
-                siblingA = nodeA.nextSibling === nodeB ? nodeA : nodeA.nextSibling;
+                  siblingA = nodeA.nextSibling === nodeB ? nodeA : nodeA.nextSibling;
 
             // Move `nodeA` to before the `nodeB`
             nodeB.parentNode.insertBefore(nodeA, nodeB);
@@ -147,7 +147,7 @@ export default {
         checkPosition (nodeA, nodeB) {
             // Get the bounding rectangle of nodes
             const rectA = nodeA.getBoundingClientRect(),
-                rectB = nodeB.getBoundingClientRect();
+                  rectB = nodeB.getBoundingClientRect();
 
             return rectA.top + rectA.height / 2 < rectB.top + rectB.height / 2;
         },
@@ -211,9 +211,6 @@ export default {
 
 
 <style lang="scss" scoped>
-    @import "~variables";
-    @import "../../utils/variables.scss";
-
     .list {
         ul {
             display:flex;

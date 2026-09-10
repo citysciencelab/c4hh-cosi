@@ -3,6 +3,13 @@ import getters from "../../../store/gettersStreetSmart.js";
 
 describe("addons/StreetSmart/store/gettersStreetSmart", function () {
     describe("currentLocale", function () {
+        beforeEach(function () {
+            localStorage.removeItem("i18nextLng");
+        });
+
+        afterEach(function () {
+            localStorage.removeItem("i18nextLng");
+        });
 
         it("returns 'de' if currentLocale is 'de'", function () {
             const rootGetters = {
@@ -61,9 +68,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
             expect(locale).to.be.eql("de");
         });
         it("gets the locale from localstorage", async function () {
-            global.localStorage = {
-                "i18nextLng": "en"
-            };
+            localStorage.setItem("i18nextLng", "en");
             const rootGetters = {
                     "Modules/Language/currentLocale": ""
                 },
@@ -72,9 +77,7 @@ describe("addons/StreetSmart/store/gettersStreetSmart", function () {
             expect(locale).to.be.eql("en-US");
         });
         it("defaults to de if the localStorage language is not available", async function () {
-            global.localStorage = {
-                "i18nextLng": "it"
-            };
+            localStorage.setItem("i18nextLng", "it");
             const rootGetters = {
                     "Modules/Language/currentLocale": ""
                 },

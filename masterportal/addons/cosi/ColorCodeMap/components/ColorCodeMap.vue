@@ -5,12 +5,9 @@ import mutations from "../store/mutationsColorCodeMap";
 import actions from "../store/actionsColorCodeMap";
 import utils from "../../utils";
 import ColorCodeLegend from "./ColorCodeLegend.vue";
-import {Fill, Stroke, Style, Text} from "ol/style.js";
 import {generateColorScale} from "../../utils/colorScale.js";
 import groupMapping from "../../utils/groupMapping";
-import ChartDataset from "../../ChartGenerator/classes/ChartDataset";
 import {mapDistrictNames} from "../../DistrictSelector/utils/prepareDistrictLevels";
-import {convertColor} from "@shared/js/utils/convertColor";
 
 export default {
     name: "ColorCodeMap",
@@ -27,8 +24,6 @@ export default {
             colorScale: [],
             // Saves the last year when user changes year manually.
             // lastYear: null,
-            // Saves riginal Map Styling before ColorCodeMap changes stylingmodule namespace not found in mapGetters()
-            originalStyling: null,
             // Highest Value of selected feature among all selected districts
             hiVal: null,
             // Lowest Value of selected feature among all selected districts
@@ -116,19 +111,8 @@ export default {
                 this.animationOverYears(this.playSpeed);
             }
         },
-        dataToColorCodeMap (newState) {
-            if (newState) {
-                this.renderDataFromCalculateRatio();
-            }
-            else {
-                this.setVisualizationState(false);
-            }
-        },
-        colorCodeMapDataset () {
-            if (this.dataToColorCodeMap) {
-                this.renderDataFromCalculateRatio();
-            }
-        },
+        // no watchers on dataToColorCodeMap / colorCodeMapDataset: the Versorgungsanalyse
+        // dispatches the rendering itself, so it no longer depends on this component existing
         selectedFeature () {
             this.generateGraphData();
             this.renderVisualization();
@@ -146,7 +130,6 @@ export default {
     methods: {
         ...mapActions("Modules/ColorCodeMap", Object.keys(actions)),
         ...mapMutations("Modules/ColorCodeMap", Object.keys(mutations)),
-        ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
 
         /**
@@ -216,53 +199,6 @@ export default {
         },
 
         /**
-         * @todo Generate Dynamic Legend for incoming data from CalculateRatio Component.
-         * @description Renders data on map from CalculateRatio Component.
-         * @returns {void}
-         */
-        renderDataFromCalculateRatio () {
-            if (!this.visualizationState) {
-                this.setVisualizationState(true);
-            }
-
-            const resultValues = this.colorCodeMapDataset.map(x => {
-                return x.data;
-            });
-
-            this.colorScale = this.getColorsByValues(resultValues);
-
-            // todo generate Legend for CC Data
-            this.selectedFeatures.forEach(district => {
-                const getStyling = district.getStyle(),
-                    matchResults = this.colorCodeMapDataset.find(x => utils.unifyString(x.name) === utils.unifyString(district.get(this.keyOfAttrName)));
-
-                if (matchResults) {
-                    if (this.originalStyling === null) {
-                        this.originalStyling = getStyling;
-                    }
-                    const convertedColor = convertColor(this.colorScale.scale(matchResults.data), "rgb");
-
-                    getStyling.fill = new Fill({color: [...convertedColor, 0.75]});
-                    getStyling.zIndex = 1;
-                    getStyling.text = new Text({
-                        font: "16px Calibri,sans-serif",
-                        fill: new Fill({
-                            color: [255, 255, 255]
-                        }),
-                        stroke: new Stroke({
-                            color: [0, 0, 0],
-                            width: 3
-                        }),
-                        text: matchResults.data !== undefined ? parseFloat(matchResults.data).toLocaleString(this.currentLocale) : this.$t("additional:modules.tools.colorCodeMap.noData"),
-                        overflow: true
-                    });
-
-                    district.setStyle(new Style(getStyling));
-                }
-
-            });
-        },
-        /**
          * @description Calculate dynamic colors for Array based on its values.
          * @param {*} values Array of ints.
          * @returns {Object} the colorScale function(value) and the n-step legend color/value pairs.
@@ -330,36 +266,6 @@ export default {
 
             this.graphData.push(newDataset);
         },
-        /**
-         * @description Passes data to the Chart Generator Tool.
-         * @returns {Void} Function returns nothing.
-         */
-        loadToChartGenerator () {
-            const graphObj = new ChartDataset({
-                    id: "ccm" + this.selectedFeatures.map(district => {
-                        return district.id_;
-                    }).join("-"),
-                    name: [this.label] + " - " + this.dataCategory + " (" + this.$t("additional:modules.tools.colorCodeMap.title") + ")",
-                    type: ["LineChart", "BarChart", "PieChart"],
-                    color: ["#55eb34", "rgb(14, 150, 240)", "yellow"],
-                    beginAtZero: true,
-                    source: this.$t("additional:modules.tools.colorCodeMap.title"),
-                    scaleLabels: [this.selectedFeature, this.$t("additional:modules.tools.colorCodeMap.yearsLabel")],
-                    data: {
-                        labels: [],
-                        datasets: []
-                    }
-                }),
-                years = this.graphData[0].data.reduce((availableYears, val, i) => val ? [...availableYears, this.availableYears[i]] : availableYears, []);
-
-            graphObj.data.labels = years.reverse();
-            graphObj.data.datasets = this.graphData.map(dataset => ({
-                label: dataset.label,
-                data: [...dataset.data].filter(x => Boolean(x)).reverse()
-            }));
-
-            this.channelGraphData(graphObj);
-        },
 
         openMetadata () {
             this.metadataUrls.forEach(url => {
@@ -390,14 +296,10 @@ export default {
                         @click="minimize = !minimize"
                     >
                         <template v-if="minimize">
-                            <v-icon>
-                                mdi-plus
-                            </v-icon>
+                            <i class="bi bi-plus-lg" />
                         </template>
                         <template v-else>
-                            <v-icon>
-                                mdi-minus
-                            </v-icon>
+                            <i class="bi bi-dash-lg" />
                         </template>
                     </button>
                     <button
@@ -407,40 +309,34 @@ export default {
                         :title="$t('additional:modules.tools.colorCodeMap.toggleVisualization')"
                         @click="toggleVisualizationState"
                     >
-                        <v-icon
+                        <i
                             v-if="visualizationState"
-                        >
-                            mdi-eye-off
-                        </v-icon>
-                        <v-icon
+                            class="bi bi-eye-slash"
+                        />
+                        <i
                             v-else
-                        >
-                            mdi-eye
-                        </v-icon>
+                            class="bi bi-eye"
+                        />
                     </button>
                     <button
                         class="prev btn btn-default btn-sm"
                         :title="$t('additional:modules.tools.colorCodeMap.prev')"
                         @click="changeSelector(-1)"
                     >
-                        <v-icon>
-                            mdi-chevron-left
-                        </v-icon>
+                        <i class="bi bi-chevron-left" />
                     </button>
                     <button
                         class="next btn btn-default btn-sm"
                         :title="$t('additional:modules.tools.colorCodeMap.next')"
                         @click="changeSelector(1)"
                     >
-                        <v-icon>
-                            mdi-chevron-right
-                        </v-icon>
+                        <i class="bi bi-chevron-right" />
                     </button>
                     <v-select
                         v-if="selectedStatFeatures.length"
                         v-model="_selectedYear"
                         outlined
-                        dense
+                        density="compact"
                         :items="availableYears"
                         :title="$t('additional:modules.tools.colorCodeMap.yearsLabel')"
                         class="year_selection selection"
@@ -449,7 +345,7 @@ export default {
                         v-if="selectedStatFeatures.length"
                         v-model="lastYear"
                         outlined
-                        dense
+                        density="comfortable"
                         :items="availableYears"
                         clearable
                         class="year_selection selection"
@@ -462,7 +358,7 @@ export default {
                     :items="statsMapping"
                     item-text="value"
                     outlined
-                    dense
+                    density="comfortable"
                     hide-details
                 />
             </div>
@@ -489,9 +385,7 @@ export default {
                     :title="$t('additional:modules.tools.colorCodeMap.infoTooltip')"
                     @click="showInfo"
                 >
-                    <v-icon>
-                        mdi-help-circle
-                    </v-icon>
+                    <i class="bi bi-question-circle" />
                 </button>
                 <div
                     v-if="visualizationState && !minimize"
@@ -503,16 +397,14 @@ export default {
                         :title="$t('additional:modules.tools.colorCodeMap.animate')"
                         @click="setPlayState(!playState)"
                     >
-                        <v-icon
+                        <i
                             v-if="!playState"
-                        >
-                            mdi-play-circle
-                        </v-icon>
-                        <v-icon
+                            class="bi bi-play-circle"
+                        />
+                        <i
                             v-else
-                        >
-                            mdi-pause-circle-outline
-                        </v-icon>
+                            class="bi bi-pause-circle"
+                        />
                     </button>
                     <input
                         v-model="playSpeed"
@@ -522,19 +414,14 @@ export default {
                 <button
                     class="graph_button"
                     :title="$t('additional:modules.tools.colorCodeMap.generateChart')"
-                    @click="loadToChartGenerator()"
                 >
-                    <v-icon>
-                        mdi-poll
-                    </v-icon>
+                    <i class="bi bi-bar-chart" />
                 </button>
                 <button
                     :title="$t('additional:modules.tools.colorCodeMap.metadata')"
                     @click="openMetadata()"
                 >
-                    <v-icon>
-                        mdi-information
-                    </v-icon>
+                    <i class="bi bi-info-circle" />
                 </button>
             </div>
         </div>

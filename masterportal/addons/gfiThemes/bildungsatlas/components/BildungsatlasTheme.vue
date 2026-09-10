@@ -62,8 +62,8 @@ export default {
          */
         refreshGfi () {
             const gfiTheme = this.feature?.getTheme(),
-                gfiParams = gfiTheme?.params,
-                properties = this.feature?.getProperties();
+                  gfiParams = gfiTheme?.params,
+                  properties = this.feature?.getProperties();
 
             if (typeof gfiParams === "object" && gfiParams?.subTheme) {
                 this.subTheme = gfiParams.subTheme;
@@ -129,7 +129,7 @@ export default {
          */
         parseTranslationInHtml (str) {
             const parser = new DOMParser(),
-                doc = parser.parseFromString(str, "text/html");
+                  doc = parser.parseFromString(str, "text/html");
 
             return doc.body.innerHTML;
         }

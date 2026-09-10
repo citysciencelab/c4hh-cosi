@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import BufferAnalysisComponent from "@modules/bufferAnalysis/components/BufferAnalysis.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 import {createLayerConfigsArray} from "../utils/functions.js";
 import {nextTick} from "vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
     let store,
@@ -48,7 +47,9 @@ describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
                             state: {
                                 selectedSourceLayer: null,
                                 selectedTargetLayer: null,
-                                selectOptions: []
+                                selectOptions: [],
+                                bufferRadius: 0,
+                                savedUrl: null
                             },
                             actions: {
                                 checkIntersection: checkIntersectionSpy,
@@ -70,7 +71,9 @@ describe("src/modules/bufferAnalysis/components/BufferAnalysis.vue", () => {
                                 }
                             },
                             getters: {
-                                selectOptions: (state) => state.selectOptions
+                                bufferRadius: (state) => state.bufferRadius ?? 0,
+                                selectOptions: (state) => state.selectOptions,
+                                savedUrl: (state) => state.savedUrl ?? null
                             }
                         }
                     }

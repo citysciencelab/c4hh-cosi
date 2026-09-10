@@ -33,9 +33,9 @@ export default {
         ...mapGetters("Modules/GeoMarker", [
             "geoMarkerFeatureList",
             "geoMarkerShortFeatureId",
+            "geoMarkerNonEditFeatureId",
             "geoMarkerState",
             "geoMarkerFeatureSelected",
-            "geoMarkerWfsFeatureType",
             "categories",
             "departments",
             "geoMarkerUpdateFeature",
@@ -84,7 +84,7 @@ export default {
                 ],
                 items: this.geoMarkerFeatureList?.map(item => {
                     const featureProperties = item.getProperties(),
-                        geoMarkerState = this.geoMarkerState(featureProperties);
+                          geoMarkerState = this.geoMarkerState(featureProperties);
 
                     return {
                         zeitstempel: featureProperties.zeitstempel
@@ -157,11 +157,13 @@ export default {
             "requestGFI"
         ]),
         setSelectedFeature (item) {
-            const selectedFeature = this.geoMarkerFeatureList.find(feature => feature.getId() === item.featureId);
+            if (item && item.featureId) {
+                const selectedFeature = this.geoMarkerFeatureList.find(feature => feature.getId() === item.featureId);
 
-            this.selectedFeatureIsGemisEditNotAllowed = this.isGemisFeature(selectedFeature);
-            this.setGeoMarkerFeatureSelected(selectedFeature);
-            this.selectedListItemId = item.id;
+                this.selectedFeatureIsGemisEditNotAllowed = this.isGemisFeature(selectedFeature);
+                this.setGeoMarkerFeatureSelected(selectedFeature);
+                this.selectedListItemId = item.id;
+            }
         },
         resetSelectedFeature () {
             this.setGeoMarkerFeatureSelected(null);
@@ -170,14 +172,14 @@ export default {
         },
         openVcOblique () {
             const vcObliqueLink = this.restServiceById("oblique").url,
-                geometry = this.geoMarkerFeatureSelected
-                    ? this.geoMarkerFeatureSelected.getGeometry().clone()
-                    : null,
-                referenceSystem = mapCollection.getMapView("2D").getProjection().getCode(),
-                transformedCoordinates = geometry?.transform(referenceSystem, "EPSG:4326").getCoordinates(),
-                useUrl = geometry
-                    ? `${vcObliqueLink}?lang=de&groundPosition=${transformedCoordinates[0]},${transformedCoordinates[1]}&distance=250#`
-                    : vcObliqueLink;
+                  geometry = this.geoMarkerFeatureSelected
+                      ? this.geoMarkerFeatureSelected.getGeometry().clone()
+                      : null,
+                  referenceSystem = mapCollection.getMapView("2D").getProjection().getCode(),
+                  transformedCoordinates = geometry?.transform(referenceSystem, "EPSG:4326").getCoordinates(),
+                  useUrl = geometry
+                      ? `${vcObliqueLink}?lang=de&groundPosition=${transformedCoordinates[0]},${transformedCoordinates[1]}&distance=250#`
+                      : vcObliqueLink;
 
             window.open(useUrl, "_blank");
         },
@@ -189,24 +191,24 @@ export default {
             }
 
             const map = mapCollection.getMap("2D"),
-                pixelAtCoordinates = map?.getPixelFromCoordinate(coordinates),
-                rightPadding = this.expanded("secondaryMenu")
-                    ? document.getElementById("mp-menu-secondaryMenu").offsetWidth + 20
-                    : 20,
-                leftPadding = this.expanded("mainMenu")
-                    ? document.getElementById("mp-menu-mainMenu").offsetWidth + 20
-                    : 20,
-                offset = (rightPadding - leftPadding) / 2,
-                shiftedPixelX = [pixelAtCoordinates[0] + offset, pixelAtCoordinates[1]],
-                shiftedCoordinate = map.getCoordinateFromPixel(shiftedPixelX);
+                  pixelAtCoordinates = map?.getPixelFromCoordinate(coordinates),
+                  rightPadding = this.expanded("secondaryMenu")
+                      ? document.getElementById("mp-menu-secondaryMenu").offsetWidth + 20
+                      : 20,
+                  leftPadding = this.expanded("mainMenu")
+                      ? document.getElementById("mp-menu-mainMenu").offsetWidth + 20
+                      : 20,
+                  offset = (rightPadding - leftPadding) / 2,
+                  shiftedPixelX = [pixelAtCoordinates[0] + offset, pixelAtCoordinates[1]],
+                  shiftedCoordinate = map.getCoordinateFromPixel(shiftedPixelX);
 
             this.setCenter(shiftedCoordinate);
         },
         zoomToGeoMarker () {
             if (this.geoMarkerFeatureSelected) {
                 const map = mapCollection.getMap("2D"),
-                    view = map.getView(),
-                    setZoom = 8;
+                      view = map.getView(),
+                      setZoom = 8;
 
                 if (view.getZoom() === setZoom) {
                     this.centerVisibleMap();
@@ -230,19 +232,19 @@ export default {
             if (this.geoMarkerFeatureSelected) {
                 if (this.geoMarkerUpdateMode) {
                     const updateProperties = this.geoMarkerFeatureSelected.getProperties(),
-                        departmentKeys = Object.keys(this.departments),
-                        statusProperties = Object.entries(updateProperties)
-                            // eslint-disable-next-line no-unused-vars
-                            .filter(([key, value]) => ["offen", "inaktiv", "geschlossen"].includes(value)),
-                        allUpdateLayers = statusProperties.map(layer => {
-                            // The features in the gebaeude layer are stored with the status of the gemis department (sta_gemis).
-                            // Since the features in the gemis layer are not editable they should not reach this point and do not need to be treated here.
-                            const department = layer[0] === "sta_gemis" ? "gebaeude" : departmentKeys.find(key => {
-                                return layer[0].includes(key) ? this.departments[key].layerIds[layer[1]] : null;
-                            });
+                          departmentKeys = Object.keys(this.departments),
+                          statusProperties = Object.entries(updateProperties)
+                              // eslint-disable-next-line no-unused-vars
+                              .filter(([key, value]) => ["offen", "inaktiv", "geschlossen"].includes(value)),
+                          allUpdateLayers = statusProperties.map(layer => {
+                              // The features in the gebaeude layer are stored with the status of the gemis department (sta_gemis).
+                              // Since the features in the gemis layer are not editable they should not reach this point and do not need to be treated here.
+                              const department = layer[0] === "sta_gemis" ? "gebaeude" : departmentKeys.find(key => {
+                                  return layer[0].includes(key) ? this.departments[key].layerIds[layer[1]] : null;
+                              });
 
-                            return this.departments[department].layerIds[layer[1]];
-                        });
+                              return this.departments[department].layerIds[layer[1]];
+                          });
 
                     this.setGeoMarkerUpdateLayerIds(allUpdateLayers);
                     this.setMapInteraction("update");
@@ -261,7 +263,7 @@ export default {
 
                     if (!this.originalCoordinates) {
                         this.originalCoordinates = this.geoMarkerFeatureList
-                            .find(feature => feature.getId() === this.geoMarkerFeatureSelected.getId())
+                            .find(feature => feature.getId() === this.geoMarkerNonEditFeatureId(this.geoMarkerFeatureSelected.getId()))
                             .getGeometry()
                             .getCoordinates();
                     }

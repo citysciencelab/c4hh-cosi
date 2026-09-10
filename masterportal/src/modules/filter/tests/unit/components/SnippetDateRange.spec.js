@@ -1,10 +1,9 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import SnippetDateRange from "@modules/filter/components/SnippetDateRange.vue";
 import dayjs from "dayjs";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/SnippetDateRange.vue", () => {
     let wrapper = null;
@@ -20,6 +19,9 @@ describe("src/modules/filter/components/SnippetDateRange.vue", () => {
             expect(wrapper.vm.adjustMinMax).to.be.an("array").that.is.empty;
             expect(wrapper.vm.internalFormat).to.equal("YYYY-MM-DD");
             expect(wrapper.vm.initialDateRef).to.be.an("array").that.is.empty;
+            expect(wrapper.vm.dateFrom).to.be.null;
+            expect(wrapper.vm.dateUntil).to.be.null;
+            expect(wrapper.vm.updateSource).to.equal("slider");
             expect(wrapper.vm.intvEmitCurrentRule).to.equal(-1);
             expect(wrapper.vm.sliderMouseDown).to.be.false;
             expect(wrapper.vm.operatorWhitelist).to.deep.equal([
@@ -49,6 +51,259 @@ describe("src/modules/filter/components/SnippetDateRange.vue", () => {
             expect(wrapper.vm.title).to.be.true;
             expect(wrapper.vm.value).to.be.undefined;
             expect(wrapper.vm.visible).to.be.true;
+        });
+    });
+    describe("watcher", () => {
+        describe("adjustment", () => {
+            it("should update dateFrom to new minimum if datepicker value is below min even if slider index does not change", async () => {
+                const api = {
+                    getUniqueValues: (attrName, onsuccess) => onsuccess([
+                        "10.08.2022",
+                        "16.08.2022",
+                        "20.08.2022",
+                        "26.08.2022",
+                        "30.08.2022"
+                    ])
+                };
+
+                wrapper = shallowMount(SnippetDateRange, {propsData: {
+                    api,
+                    attrName: "attrName",
+                    format: "DD.MM.YYYY"
+                }});
+
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+
+                await wrapper.setData({
+                    hasRuleSet: true,
+                    sliderFrom: 1,
+                    dateFrom: dayjs("12.08.2022", "DD.MM.YYYY").toDate()
+                });
+
+                expect(wrapper.vm.sliderFrom).to.equal(1);
+                expect(dayjs(wrapper.vm.dateFrom).format("DD.MM.YYYY")).to.equal("12.08.2022");
+
+                await wrapper.setProps({
+                    adjustment: {
+                        start: true,
+                        finish: false,
+                        snippetId: 2,
+                        adjust: {
+                            min: "16.08.2022",
+                            max: "30.08.2022"
+                        }
+                    }
+                });
+                await wrapper.vm.$nextTick();
+
+                await wrapper.setProps({
+                    adjustment: {
+                        start: false,
+                        finish: true,
+                        snippetId: 2,
+                        adjust: {
+                            min: "16.08.2022",
+                            max: "30.08.2022"
+                        }
+                    }
+                });
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+
+                expect(wrapper.vm.currentSliderMin).to.equal(1);
+                expect(wrapper.vm.sliderFrom).to.equal(1);
+                expect(dayjs(wrapper.vm.dateFrom).format("DD.MM.YYYY")).to.equal("16.08.2022");
+            });
+
+            it("should update dateUntil to new maximum if datepicker value is above max even if slider index does not change", async () => {
+                const api = {
+                    getUniqueValues: (attrName, onsuccess) => onsuccess([
+                        "10.08.2022",
+                        "16.08.2022",
+                        "20.08.2022",
+                        "26.08.2022",
+                        "30.08.2022"
+                    ])
+                };
+
+                wrapper = shallowMount(SnippetDateRange, {propsData: {
+                    api,
+                    attrName: "attrName",
+                    format: "DD.MM.YYYY"
+                }});
+
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+
+                await wrapper.setData({
+                    hasRuleSet: true,
+                    sliderUntil: 3,
+                    dateUntil: dayjs("28.08.2022", "DD.MM.YYYY").toDate()
+                });
+
+                expect(wrapper.vm.sliderUntil).to.equal(3);
+                expect(dayjs(wrapper.vm.dateUntil).format("DD.MM.YYYY")).to.equal("28.08.2022");
+
+                await wrapper.setProps({
+                    adjustment: {
+                        start: true,
+                        finish: false,
+                        snippetId: 2,
+                        adjust: {
+                            min: "10.08.2022",
+                            max: "26.08.2022"
+                        }
+                    }
+                });
+                await wrapper.vm.$nextTick();
+
+                await wrapper.setProps({
+                    adjustment: {
+                        start: false,
+                        finish: true,
+                        snippetId: 2,
+                        adjust: {
+                            min: "10.08.2022",
+                            max: "26.08.2022"
+                        }
+                    }
+                });
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+
+                expect(wrapper.vm.currentSliderMax).to.equal(3);
+                expect(wrapper.vm.sliderUntil).to.equal(3);
+                expect(dayjs(wrapper.vm.dateUntil).format("DD.MM.YYYY")).to.equal("26.08.2022");
+            });
+
+            it("should keep exact datepicker values if they are still inside adjusted min and max", async () => {
+                const api = {
+                    getUniqueValues: (attrName, onsuccess) => onsuccess([
+                        "10.08.2022",
+                        "16.08.2022",
+                        "20.08.2022",
+                        "26.08.2022",
+                        "30.08.2022"
+                    ])
+                };
+
+                wrapper = shallowMount(SnippetDateRange, {propsData: {
+                    api,
+                    attrName: "attrName",
+                    format: "DD.MM.YYYY"
+                }});
+
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+
+                await wrapper.setData({
+                    hasRuleSet: true,
+                    sliderFrom: 1,
+                    sliderUntil: 3,
+                    dateFrom: dayjs("18.08.2022", "DD.MM.YYYY").toDate(),
+                    dateUntil: dayjs("24.08.2022", "DD.MM.YYYY").toDate()
+                });
+
+                await wrapper.setProps({
+                    adjustment: {
+                        start: true,
+                        finish: false,
+                        snippetId: 2,
+                        adjust: {
+                            min: "16.08.2022",
+                            max: "26.08.2022"
+                        }
+                    }
+                });
+                await wrapper.vm.$nextTick();
+
+                await wrapper.setProps({
+                    adjustment: {
+                        start: false,
+                        finish: true,
+                        snippetId: 2,
+                        adjust: {
+                            min: "16.08.2022",
+                            max: "26.08.2022"
+                        }
+                    }
+                });
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+
+                expect(wrapper.vm.sliderFrom).to.equal(1);
+                expect(wrapper.vm.sliderUntil).to.equal(3);
+                expect(dayjs(wrapper.vm.dateFrom).format("DD.MM.YYYY")).to.equal("18.08.2022");
+                expect(dayjs(wrapper.vm.dateUntil).format("DD.MM.YYYY")).to.equal("24.08.2022");
+            });
+
+            it("should update both datepicker values if adjusted range excludes both selected dates", async () => {
+                const api = {
+                    getUniqueValues: (attrName, onsuccess) => onsuccess([
+                        "10.08.2022",
+                        "16.08.2022",
+                        "20.08.2022",
+                        "26.08.2022",
+                        "30.08.2022"
+                    ])
+                };
+
+                wrapper = shallowMount(SnippetDateRange, {propsData: {
+                    api,
+                    attrName: "attrName",
+                    format: "DD.MM.YYYY"
+                }});
+
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+
+                await wrapper.setData({
+                    hasRuleSet: true,
+                    sliderFrom: 1,
+                    sliderUntil: 3,
+                    dateFrom: dayjs("12.08.2022", "DD.MM.YYYY").toDate(),
+                    dateUntil: dayjs("28.08.2022", "DD.MM.YYYY").toDate()
+                });
+
+                await wrapper.setProps({
+                    adjustment: {
+                        start: true,
+                        finish: false,
+                        snippetId: 2,
+                        adjust: {
+                            min: "16.08.2022",
+                            max: "26.08.2022"
+                        }
+                    }
+                });
+                await wrapper.vm.$nextTick();
+
+                await wrapper.setProps({
+                    adjustment: {
+                        start: false,
+                        finish: true,
+                        snippetId: 2,
+                        adjust: {
+                            min: "16.08.2022",
+                            max: "26.08.2022"
+                        }
+                    }
+                });
+                await wrapper.vm.$nextTick();
+                await wrapper.vm.$nextTick();
+
+                expect(wrapper.vm.currentSliderMin).to.equal(1);
+                expect(wrapper.vm.currentSliderMax).to.equal(3);
+                expect(wrapper.vm.sliderFrom).to.equal(1);
+                expect(wrapper.vm.sliderUntil).to.equal(3);
+                expect(dayjs(wrapper.vm.dateFrom).format("DD.MM.YYYY")).to.equal("16.08.2022");
+                expect(dayjs(wrapper.vm.dateUntil).format("DD.MM.YYYY")).to.equal("26.08.2022");
+            });
         });
     });
     describe("mounted", () => {
@@ -247,11 +502,16 @@ describe("src/modules/filter/components/SnippetDateRange.vue", () => {
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
-                        expect(wrapper.find(".datepickerWrapper").find(".from").find("input").attributes("min")).to.equal("2022-08-10");
-                        expect(wrapper.find(".datepickerWrapper").find(".from").find("input").attributes("max")).to.equal("2022-08-30");
-                        expect(wrapper.find(".datepickerWrapper").find(".until").find("input").attributes("min")).to.equal("2022-08-10");
-                        expect(wrapper.find(".datepickerWrapper").find(".until").find("input").attributes("max")).to.equal("2022-08-30");
+
+                        expect(wrapper.vm.dateMinComputed).to.equal("2022-08-10");
+                        expect(wrapper.vm.dateMaxComputed).to.equal("2022-08-30");
+
+                        expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 9))).to.be.true;
+                        expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 10))).to.be.false;
+                        expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 30))).to.be.false;
+                        expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 31))).to.be.true;
                     });
+
                     it("should set min and max with dates before unix epoch based on api response", async () => {
                         const api = {
                             getUniqueValues: (attrName, onsuccess) => onsuccess([
@@ -271,11 +531,11 @@ describe("src/modules/filter/components/SnippetDateRange.vue", () => {
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
-                        expect(wrapper.find(".datepickerWrapper").find(".from").find("input").attributes("min")).to.equal("1950-08-10");
-                        expect(wrapper.find(".datepickerWrapper").find(".from").find("input").attributes("max")).to.equal("2022-08-30");
-                        expect(wrapper.find(".datepickerWrapper").find(".until").find("input").attributes("min")).to.equal("1950-08-10");
-                        expect(wrapper.find(".datepickerWrapper").find(".until").find("input").attributes("max")).to.equal("2022-08-30");
+
+                        expect(wrapper.vm.dateMinComputed).to.equal("1950-08-10");
+                        expect(wrapper.vm.dateMaxComputed).to.equal("2022-08-30");
                     });
+
                     it("should cap min and max date for datepicker if props value is given", async () => {
                         const api = {
                             getUniqueValues: (attrName, onsuccess) => onsuccess([
@@ -296,11 +556,16 @@ describe("src/modules/filter/components/SnippetDateRange.vue", () => {
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
-                        expect(wrapper.find(".datepickerWrapper").find(".from").find("input").attributes("min")).to.equal("2022-08-16");
-                        expect(wrapper.find(".datepickerWrapper").find(".from").find("input").attributes("max")).to.equal("2022-08-26");
-                        expect(wrapper.find(".datepickerWrapper").find(".until").find("input").attributes("min")).to.equal("2022-08-16");
-                        expect(wrapper.find(".datepickerWrapper").find(".until").find("input").attributes("max")).to.equal("2022-08-26");
+
+                        expect(wrapper.vm.dateMinComputed).to.equal("2022-08-16");
+                        expect(wrapper.vm.dateMaxComputed).to.equal("2022-08-26");
+
+                        expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 15))).to.be.true;
+                        expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 16))).to.be.false;
+                        expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 26))).to.be.false;
+                        expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 27))).to.be.true;
                     });
+
                     it("should cap min and max with dates before unix epoch if props value is given", async () => {
                         const api = {
                             getUniqueValues: (attrName, onsuccess) => onsuccess([
@@ -321,10 +586,9 @@ describe("src/modules/filter/components/SnippetDateRange.vue", () => {
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
-                        expect(wrapper.find(".datepickerWrapper").find(".from").find("input").attributes("min")).to.equal("1950-08-16");
-                        expect(wrapper.find(".datepickerWrapper").find(".from").find("input").attributes("max")).to.equal("2022-08-26");
-                        expect(wrapper.find(".datepickerWrapper").find(".until").find("input").attributes("min")).to.equal("1950-08-16");
-                        expect(wrapper.find(".datepickerWrapper").find(".until").find("input").attributes("max")).to.equal("2022-08-26");
+
+                        expect(wrapper.vm.dateMinComputed).to.equal("1950-08-16");
+                        expect(wrapper.vm.dateMaxComputed).to.equal("2022-08-26");
                     });
                 });
                 describe("prechecked", () => {
@@ -348,8 +612,8 @@ describe("src/modules/filter/components/SnippetDateRange.vue", () => {
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
-                        expect(wrapper.find(".datepickerWrapper").find(".from").find("input").element.value).to.equal("2022-08-10");
-                        expect(wrapper.find(".datepickerWrapper").find(".until").find("input").element.value).to.equal("2022-08-30");
+                        expect(dayjs(wrapper.vm.dateFrom).format("YYYY-MM-DD")).to.equal("2022-08-10");
+                        expect(dayjs(wrapper.vm.dateUntil).format("YYYY-MM-DD")).to.equal("2022-08-30");
                     });
                     it("should set value to borders for datepickers given by prechecked", async () => {
                         const api = {
@@ -373,8 +637,8 @@ describe("src/modules/filter/components/SnippetDateRange.vue", () => {
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
                         await wrapper.vm.$nextTick();
-                        expect(wrapper.find(".datepickerWrapper").find(".from").find("input").element.value).to.equal("2022-08-16");
-                        expect(wrapper.find(".datepickerWrapper").find(".until").find("input").element.value).to.equal("2022-08-26");
+                        expect(dayjs(wrapper.vm.dateFrom).format("YYYY-MM-DD")).to.equal("2022-08-16");
+                        expect(dayjs(wrapper.vm.dateUntil).format("YYYY-MM-DD")).to.equal("2022-08-26");
                     });
                 });
             });
@@ -1124,6 +1388,227 @@ describe("src/modules/filter/components/SnippetDateRange.vue", () => {
                     attrName: ["attrNameA", "attrNameB"]
                 }});
                 expect(wrapper.vm.getTitle()).to.equal("attrNameA");
+            });
+        });
+        describe("getFormatTypeByFormat", () => {
+            it("should return year for year format", () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                expect(wrapper.vm.getFormatTypeByFormat("YYYY")).to.equal("year");
+            });
+
+            it("should return month for month formats", () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                expect(wrapper.vm.getFormatTypeByFormat("YYYY.MM")).to.equal("month");
+                expect(wrapper.vm.getFormatTypeByFormat("MM.YYYY")).to.equal("month");
+            });
+
+            it("should return date for any other format", () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                expect(wrapper.vm.getFormatTypeByFormat("DD.MM.YYYY")).to.equal("date");
+                expect(wrapper.vm.getFormatTypeByFormat(undefined)).to.equal("date");
+            });
+        });
+
+        describe("isDateDisabled", () => {
+            it("should return true if initialDateRef is empty", () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 20))).to.be.true;
+            });
+
+            it("should return true if date is outside min and max", async () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                await wrapper.setData({
+                    initialDateRef: [
+                        "2022-08-10",
+                        "2022-08-20",
+                        "2022-08-30"
+                    ],
+                    currentSliderMin: 0,
+                    currentSliderMax: 2
+                });
+
+                expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 9))).to.be.true;
+                expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 20))).to.be.false;
+                expect(wrapper.vm.isDateDisabled(new Date(2022, 7, 31))).to.be.true;
+            });
+        });
+
+        describe("getDateBySliderIndex", () => {
+            it("should return the date represented by the slider index", async () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                await wrapper.setData({
+                    initialDateRef: [
+                        "2022-08-10",
+                        "2022-08-20",
+                        "2022-08-30"
+                    ]
+                });
+
+                expect(dayjs(wrapper.vm.getDateBySliderIndex(1)).format("YYYY-MM-DD")).to.equal("2022-08-20");
+            });
+
+            it("should return null if slider index has no valid date", async () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                await wrapper.setData({
+                    initialDateRef: []
+                });
+
+                expect(wrapper.vm.getDateBySliderIndex(0)).to.be.null;
+            });
+        });
+
+        describe("emitSelectedDateRule", () => {
+            it("should emit the exact selected datepicker dates", async () => {
+                wrapper = shallowMount(SnippetDateRange, {propsData: {
+                    format: "DD.MM.YYYY"
+                }});
+
+                const spy = sinon.spy(wrapper.vm, "emitCurrentRule");
+
+                await wrapper.setData({
+                    dateFrom: new Date(2022, 7, 12),
+                    dateUntil: new Date(2022, 7, 28)
+                });
+
+                wrapper.vm.emitSelectedDateRule();
+
+                expect(spy.calledOnce).to.be.true;
+                expect(spy.firstCall.args[0]).to.deep.equal([
+                    "12.08.2022",
+                    "28.08.2022"
+                ]);
+            });
+
+            it("should not emit if a selected date is invalid", async () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                const spy = sinon.spy(wrapper.vm, "emitCurrentRule");
+
+                await wrapper.setData({
+                    dateFrom: null,
+                    dateUntil: new Date(2022, 7, 28)
+                });
+
+                wrapper.vm.emitSelectedDateRule();
+
+                expect(spy.notCalled).to.be.true;
+            });
+        });
+
+        describe("updateDateFrom", () => {
+            it("should keep the exact selected date even if slider snaps to initialDateRef", async () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                await wrapper.setData({
+                    initialDateRef: [
+                        "2022-08-10",
+                        "2022-08-16",
+                        "2022-08-20",
+                        "2022-08-26",
+                        "2022-08-30"
+                    ],
+                    sliderFrom: 0,
+                    sliderUntil: 4,
+                    dateFrom: new Date(2022, 7, 10),
+                    dateUntil: new Date(2022, 7, 30)
+                });
+
+                sinon.stub(wrapper.vm, "emitSelectedDateRule");
+
+                wrapper.vm.updateDateFrom(new Date(2022, 7, 12));
+
+                expect(dayjs(wrapper.vm.dateFrom).format("YYYY-MM-DD")).to.equal("2022-08-12");
+                expect(wrapper.vm.sliderFrom).to.equal(1);
+                expect(wrapper.vm.emitSelectedDateRule.calledOnce).to.be.true;
+            });
+
+            it("should move dateUntil if selected from date is after dateUntil", async () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                await wrapper.setData({
+                    initialDateRef: [
+                        "2022-08-10",
+                        "2022-08-16",
+                        "2022-08-20",
+                        "2022-08-26",
+                        "2022-08-30"
+                    ],
+                    sliderFrom: 0,
+                    sliderUntil: 2,
+                    dateFrom: new Date(2022, 7, 10),
+                    dateUntil: new Date(2022, 7, 20)
+                });
+
+                sinon.stub(wrapper.vm, "emitSelectedDateRule");
+
+                wrapper.vm.updateDateFrom(new Date(2022, 7, 26));
+
+                expect(dayjs(wrapper.vm.dateFrom).format("YYYY-MM-DD")).to.equal("2022-08-26");
+                expect(dayjs(wrapper.vm.dateUntil).format("YYYY-MM-DD")).to.equal("2022-08-26");
+                expect(wrapper.vm.sliderFrom).to.equal(3);
+                expect(wrapper.vm.sliderUntil).to.equal(3);
+            });
+        });
+
+        describe("updateDateUntil", () => {
+            it("should keep the exact selected date even if slider snaps to initialDateRef", async () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                await wrapper.setData({
+                    initialDateRef: [
+                        "2022-08-10",
+                        "2022-08-16",
+                        "2022-08-20",
+                        "2022-08-26",
+                        "2022-08-30"
+                    ],
+                    sliderFrom: 0,
+                    sliderUntil: 4,
+                    dateFrom: new Date(2022, 7, 10),
+                    dateUntil: new Date(2022, 7, 30)
+                });
+
+                sinon.stub(wrapper.vm, "emitSelectedDateRule");
+
+                wrapper.vm.updateDateUntil(new Date(2022, 7, 28));
+
+                expect(dayjs(wrapper.vm.dateUntil).format("YYYY-MM-DD")).to.equal("2022-08-28");
+                expect(wrapper.vm.sliderUntil).to.equal(3);
+                expect(wrapper.vm.emitSelectedDateRule.calledOnce).to.be.true;
+            });
+
+            it("should move dateFrom if selected until date is before dateFrom", async () => {
+                wrapper = shallowMount(SnippetDateRange, {});
+
+                await wrapper.setData({
+                    initialDateRef: [
+                        "2022-08-10",
+                        "2022-08-16",
+                        "2022-08-20",
+                        "2022-08-26",
+                        "2022-08-30"
+                    ],
+                    sliderFrom: 2,
+                    sliderUntil: 4,
+                    dateFrom: new Date(2022, 7, 20),
+                    dateUntil: new Date(2022, 7, 30)
+                });
+
+                sinon.stub(wrapper.vm, "emitSelectedDateRule");
+
+                wrapper.vm.updateDateUntil(new Date(2022, 7, 16));
+
+                expect(dayjs(wrapper.vm.dateFrom).format("YYYY-MM-DD")).to.equal("2022-08-16");
+                expect(dayjs(wrapper.vm.dateUntil).format("YYYY-MM-DD")).to.equal("2022-08-16");
+                expect(wrapper.vm.sliderFrom).to.equal(1);
+                expect(wrapper.vm.sliderUntil).to.equal(1);
             });
         });
     });

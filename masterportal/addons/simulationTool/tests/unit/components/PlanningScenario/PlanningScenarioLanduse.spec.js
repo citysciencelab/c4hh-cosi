@@ -1,4 +1,4 @@
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
@@ -8,7 +8,6 @@ import PlanningScenarioLanduse from "../../../../components/PlanningScenario/Pla
 import sinon from "sinon";
 import VectorSource from "ol/source/Vector.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLanduse.vue", () => {
     let store;

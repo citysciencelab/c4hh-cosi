@@ -77,7 +77,7 @@ export default {
          */
         assignFeatureProperties: function (feature) {
             const topics = JSON.parse(JSON.stringify(ThemeConfig)).themen,
-                assignedFeatureProperties = [];
+                  assignedFeatureProperties = [];
 
             topics.forEach(topic => {
                 const filteredAttributes = [];

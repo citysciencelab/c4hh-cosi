@@ -571,6 +571,67 @@ describe("src/app-store/js/buildTreeStructure.js", () => {
             expect(layersInFourthFolders[1].parentId).to.be.equals(result.elements[3].elements[0].id);
             expect(layersInFourthFolders[1].name).not.to.be.equals(layersInFourthFolders[1].datasets[0].md_name);
         });
+
+        it("should keep inspire folders stable when category is changed from opendata", () => {
+            let rawLayers = null,
+                openDataResult = null,
+                layerContainer = null,
+                inspireResultAfterSwitch = null,
+                inspireResultDirect = null,
+                inspireNamesAfterSwitch = null,
+                inspireNamesDirect = null;
+
+            sinon.stub(rawLayerList, "getLayerList").returns(layerList);
+            rawLayers = getAndMergeAllRawLayers();
+            openDataResult = buildTreeStructure.build(rawLayers, layerConfig, categories[0], layerConfig[treeSubjectsKey].elements);
+            layerContainer = getNestedValues(openDataResult, "elements", true).flat(Infinity);
+            inspireResultAfterSwitch = buildTreeStructure.build(getAndMergeAllRawLayers(), layerConfig, categories[1], layerContainer, true);
+            inspireResultDirect = buildTreeStructure.build(getAndMergeAllRawLayers(), layerConfig, categories[1]);
+            inspireNamesAfterSwitch = inspireResultAfterSwitch.elements.map(({name}) => name).sort();
+            inspireNamesDirect = inspireResultDirect.elements.map(({name}) => name).sort();
+
+            expect(inspireResultAfterSwitch).to.be.an("object");
+            expect(inspireNamesAfterSwitch).to.deep.equals(inspireNamesDirect);
+            expect(inspireNamesAfterSwitch).to.be.an("array").that.is.not.empty;
+            expect(inspireResultAfterSwitch.elements).to.have.lengthOf(inspireResultDirect.elements.length);
+            expect(inspireNamesAfterSwitch).to.include("kein INSPIRE-Thema");
+        });
+
+        it("should keep organisation folders stable after repeated category changes", () => {
+            let rawLayers = null,
+                openDataResult = null,
+                inspireResultAfterSwitch = null,
+                organisationResultAfterSwitch = null,
+                organisationResultDirect = null,
+                organisationNamesAfterSwitch = null,
+                organisationNamesDirect = null;
+
+            sinon.stub(rawLayerList, "getLayerList").returns(layerList);
+            rawLayers = getAndMergeAllRawLayers();
+            openDataResult = buildTreeStructure.build(rawLayers, layerConfig, categories[0], layerConfig[treeSubjectsKey].elements);
+            inspireResultAfterSwitch = buildTreeStructure.build(
+                getAndMergeAllRawLayers(),
+                layerConfig,
+                categories[1],
+                getNestedValues(openDataResult, "elements", true).flat(Infinity),
+                true
+            );
+            organisationResultAfterSwitch = buildTreeStructure.build(
+                getAndMergeAllRawLayers(),
+                layerConfig,
+                categories[2],
+                getNestedValues(inspireResultAfterSwitch, "elements", true).flat(Infinity),
+                true
+            );
+            organisationResultDirect = buildTreeStructure.build(getAndMergeAllRawLayers(), layerConfig, categories[2]);
+            organisationNamesAfterSwitch = organisationResultAfterSwitch.elements.map(({name}) => name).sort();
+            organisationNamesDirect = organisationResultDirect.elements.map(({name}) => name).sort();
+
+            expect(organisationResultAfterSwitch).to.be.an("object");
+            expect(organisationNamesAfterSwitch).to.deep.equals(organisationNamesDirect);
+            expect(organisationNamesAfterSwitch).to.be.an("array").that.is.not.empty;
+            expect(organisationResultAfterSwitch.elements).to.have.lengthOf(organisationResultDirect.elements.length);
+        });
     });
     describe("setIdsAtFolders", () => {
         it("should set ids and parentIds", () => {

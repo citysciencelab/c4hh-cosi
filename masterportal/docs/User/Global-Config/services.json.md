@@ -353,7 +353,7 @@ A layer based on the OGC's [Web Feature Service](https://www.ogc.org/standard/wf
 |gfiTheme|yes|String/Object||Display style of GFI information for this layer. Unless `"default"` is chosen, custom templates may be used to show GFI information in another format than the default table style.|`"default"`|
 |useProxy|no|Boolean|`false`|_Deprecated in the next major release. *[GDI-DE](https://www.gdi-de.org/en)* recommends setting CORS headers on the required services instead._ Only used for GFI requests. The request will contain the requested URL as path, with dots replaced by underscores.|`false`|
 |wfsFilter|no|String||Set to use xml ressource as wfs filter, the content of the filter file will be sent to the wfs server as POST request (**[see below](#filtering-of-wfs-layers)**).|`"ressources/xmlFilter/filterSchulenStadtteilschulen"`|
-|doNotLoadInitially|no|String|false|if set to true the layer will be initialized without network call, an empty array of features is promoted - this is useful to add features later on (e.g. by filtering) to a full functional but initially empty layer|false|
+|doNotLoadInitially|no|Boolean|`false`|if set to true the layer will be initialized without network call, an empty array of features is promoted - this is useful to add features later on (e.g. by filtering) to a full functional but initially empty layer|`false`|
 |isSecured|no|Boolean|false|Displays whether the layer belongs to a secured service. (**[see below](#secured-wms-services)**)|false|
 |layerSequence|no|Number||Number to determine the sequence of layers in the layerTree and layerSelection. The layers are rendered in sequence based on the assigned value, e.g. layers with `layerSequence=1` will initially be on top, etc. Does not work for Baselayers.|
 |propertyNames|no|Array||The attributes as PROPERTYNAME parameter to receive response from wfs layer |`["properties"]`|
@@ -473,8 +473,8 @@ If the configured layer id is a JSON object, the object should be in the followi
 
 | Name    | Required | Type   | Default | Description              | Example     |
 |---------|----------|--------|---------|--------------------------|-------------|
-| layerId | yes      | String |         | Attribute value layerId. | `"1234567"` |
-| suffix  | yes      | String |         | Attribute value suffix.  | `"text"`    |
+| layerId | yes | String |         | Attribute value layerId. | `"1234567"` |
+| suffix  | yes | String |         | Attribute value suffix.  | `"text"`    |
 
 The layerId and suffix must be unique as a pair!
 
@@ -487,7 +487,7 @@ The layerId and suffix must be unique as a pair!
 }
 ```
 
-### Secured WFS Services
+### Secured WFS OAF Services
 
 **CAUTION: If the layer belongs to a secured service, the following changes must be made to the service!**
 
@@ -778,7 +778,7 @@ Settings related to layer metadata.
 
 All metadata of the layer data is referenced here. By clicking the "i" button in the layer tree, the information is retrieved by the CSW interface and shown to the user.
 For this, the **[rest-services.json](rest-services.json.md)** has to provide the URL of the metadata catalog resp. its CSW interface.
-The values *kategorie_opendata*, *kategorie_inspire*, and *kategorie_organisation* are used for layer categorization if the **[config.json](../Portal-Config/config.json.md)** has `tree.type` set to `"default"`.
+The values *kategorie_opendata*, *kategorie_inspire*, and *kategorie_organisation* are used for layer categorization if the **[config.json](../Portal-Config/config.json.md)** has `tree.type` set to `"auto"`.
  It is also possible to retrieve metadata with a getMetaData request. In this case, additional information can be displayedn/activate. To remove the "i" button altogether, explicitly set `"datasets": false`.
 
 | Name | Required | Type | Default | Description |
@@ -1175,6 +1175,8 @@ If the gfiAttributes are given as an object, a key's value may also be an object
 | format | no | String/Object | `"YYYY-MM-DDTHH:mm:ss.SSSZ"/{"key": "value"}` | Data format. | `"DD.MM.YYY"` |
 | prefix | no | String |  | Attribute value prefix. | Add string to value without whitespace `"https://"` |
 | suffix | no | String |  | Attribute value suffix. | `"°C"` |
+| regex | no | String |  | Only evaluated by the WFS-T module. Regular expression the input of this attribute is validated against on single insert and update. **Important:** The expression is an *additional* restriction on top of the built-in validation of the attribute type, it does not replace it. A digits-only expression on a `string` attribute therefore never validates, see **[regex and the built-in validation](#regex-and-the-built-in-validation)**. Empty optional fields stay valid. Since this is defined in a JSON string, backslashes must be escaped. | `"^\\d{5}$"` |
+| regexError | no | String | `"common:modules.wfst.error.regexInputError"` | Only evaluated by the WFS-T module. Locale key or plain text shown when the input does not match `regex`. | `"common:modules.wfst.error.regexInputError"` |
 
 **gfiAttributes example object using `suffix` and `prefix` :**
 
@@ -1302,6 +1304,42 @@ If the gfiAttributes are given as an object, a key's value may also be an object
 }
 ```
 
+**gfiAttributes example object using `regex` for WFS-T input validation:**
+
+```json
+{
+   "gfiAttributes": {
+      "name": "Name",
+      "plz": {
+         "name": "Postleitzahl",
+         "regex": "^\\d{5}$",
+         "regexError": "common:modules.wfst.error.regexInputError"
+      }
+   }
+}
+```
+
+In this example the service must describe `plz` as a numeric type (`integer`, `int`, `short`, `decimal` or `float`). If `plz` were described as `string`, the digits-only expression could never be fulfilled - see the following note.
+
+### regex and the built-in validation
+
+> **Important:** A `regex` only further restricts the input, it never relaxes the built-in validation. An input is accepted only if it passes **both** the built-in validation of the attribute type **and** the configured `regex`. An expression that contradicts the built-in rules can never be fulfilled and the field stays invalid permanently.
+
+This mainly affects attributes the service describes as `string`, which are rendered as a text input. Their built-in validation
+
+* rejects any input consisting of digits only, and
+* only allows the characters `A-Z`, `a-z`, `0-9`, space, `ä`, `ö`, `ü`, `Ä`, `Ö`, `Ü`, `ß`, `[`, `]`, `,`, `.`, `-`, `/` and `\`.
+
+Consequences for a `string` attribute:
+
+| Expression | Result | Reason |
+|---|---|---|
+| `"^\\d{5}$"` | never validates | Digits-only input is always rejected by the text validation. |
+| `"^[^@]+@[^@]+$"` | never validates | `@` is not among the characters allowed by the text validation. |
+| `"^[A-Z]{2}-\\d{4}$"` | works | Letters, `-` and digits are allowed, and the input is not digits only. |
+
+Configure digits-only expressions on attributes the service describes as a numeric type, or extend the expression so it also satisfies the text rule (for example `"^PLZ \\d{5}$"`).
+
 ***
 
 ## gfiAttributes html
@@ -1423,26 +1461,28 @@ With these confurations a url in the feature properties can be displayed either 
 
 ## OAF layer
 
-| Name              | Required | Type                                                            | Default                                     | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Example                                                                               |
-|-------------------|----------|-----------------------------------------------------------------|---------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------|
-| datasets          | yes      | **[datasets](#wms_wfs_oaf_datasets)**[]/Boolean |                                             | Metadata specification. All metadata of the layer data is referenced here. By clicking the "i" button in the layer tree, the information is retrieved by the CSW interface and shown to the user. For this, the **[rest-services.json](rest-services.json.md)** has to provide the URL of the metadata catalog resp. its CSW interface. The values *kategorie_opendata*, *kategorie_inspire*, and *kategorie_organisation* are used for layer categorization if the **[config.json](../Portal-Config/config.json.md)** has `tree.type` set to `"default"`. To remove the "i" button altogether, explicitly set `"datasets": false`. |                                                                                       |
-| doNotLoadInitially| no       | Boolean                                                         |                                             | If set to true, the layer will be loaded without any features. Can be used for external filtering.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |                                                                                       |
-| collection        | yes      | String                                                          |                                             | Collection to load.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `"bab_vkl"`                                                                           |
-| gfiAttributes     | yes      | String/**[gfiAttributes](#gfi-attributes)**     |                                             | GFI attributes to be shown.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `"ignore"`                                                                            |
-| id                | yes      | String/**[wfs_id](#wfs_id)**                    |                                             | Arbitrary id or an object with id and suffix                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `"44"`                                                                                |
-| layerAttribution  | no       | String                                                          | `"nicht vorhanden"`                         | Additional layer information to be shown in the portal's control element *LayerAttribution*, if configured to appear. If `"nicht vorhanden"` (technical key meaning "not available") is chosen, no layer attribution is shown.                                                                                                                                                                                                                                                                                                                                                                                     | `"nicht vorhanden"`                                                                   |
-| legend            | no       | Boolean/String/String[]                                         |                                             | Value of the **[services.json](services.json.md)** file. URL to be used to request a static legend image. Use a boolean value to dynamically generate the legend from a OAF request or the OAF styling respectively. Use a string to link an image or a PDF file. Use `"ignore"` or `false` for no legend.                                                                                                                                                                                                                                                                                                                                                  | `false`                                                                               |
-| name              | yes      | String                                                          |                                             | Arbitrary display name used in the layer tree.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `"Traffic situation on freeways"`                                                     |
-| typ               | yes      | String                                                          |                                             | Service type; in this case, "OAF".                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | `"OAF"`                                                                               |
-| url               | yes      | String                                                          |                                             | Service URL                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | `"https://api.hamburg.de/datasets/v1/schulen"`                                        |
-| altitudeMode      | no       | enum["clampToGround","absolute","relativeToGround"]             | `"clampToGround"`                           | Height mode in 3D mode.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `"absolute"`                                                                          |
-| altitude          | no       | Number                                                          |                                             | Display height in 3D mode in meters. If an altitude is given, any existing z coordinate is overwritten. If no z coordinate exists, altitude is used as its value.                                                                                                                                                                                                                                                                                                                                                                                                                                                  | `527`                                                                                 |
-| altitudeOffset    | no       | Number                                                          |                                             | Height offset for display in 3D mode in meters. If given, any existing z coordinates will be increased by this value. If no z coordinate exists, this value is used as z coordinate.                                                                                                                                                                                                                                                                                                                                                                                                                               | `10`                                                                                  |
-| gfiTheme          | yes      | String/Object                                                   |                                             | Display style of GFI information for this layer. Unless `"default"` is chosen, custom templates may be used to show GFI information in another format than the default table style.                                                                                                                                                                                                                                                                                                                                                                                                                                | `"default"`                                                                           |
-| isSecured         | no       | Boolean                                                         | false                                       | Displays whether the layer belongs to a secured service. (**[see below](#secured-wfs-services)**)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | false                                                                                 |
-| limit             | false    | Number                                                          |                                             | Limits the number of items presented in the response document. Ignored if bulk is `true`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          | `10`                                                                                  |
-| crs               | false    | String                                                          | http://www.opengis.net/def/crs/EPSG/0/25832 | The coordinate reference system of the response geometries. If not supported, server will respond with error 400. See collections index of your oaf service for supported crs. e.g. https://api.hamburg.de/datasets/v1/schulen/collections. Can also be set to false to disable the crs parameter                                                                                                                                                                                                                                                                                                                  | `"EPSG:25832"`                                                                        |
-|layerSequence|no|Number||Number to determine the sequence of layers in the layerTree and layerSelection. The layers are rendered in sequence based on the assigned value, e.g. layers with `layerSequence=1` will initially be on top, etc. Does not work for Baselayers.|
+| Name | Required | Type | Default | Description | Example |
+|---|---|---|---|---|---|
+| altitude | no | Number |  | Display height in 3D mode in meters. If an altitude is given, any existing z coordinate is overwritten. If no z coordinate exists, altitude is set as z coordinate. | `527` |
+| altitudeMode | no | enum["clampToGround","absolute","relativeToGround"] | `"clampToGround"` | Height mode in 3D mode. | `"absolute"` |
+| altitudeOffset | no | Number |  | Height offset for display in 3D mode in meters. If given, any existing z coordinates will be increased by this value. If no z coordinate exists, this value is used as z coordinate. | `10` |
+| collection | yes | String |  | Collection to load. | `"bab_vkl"` |
+| crs | false | String | http://www.opengis.net/def/crs/EPSG/0/25832 | The coordinate reference system of the response geometries. If not supported, server will respond with error 400. See collections index of your oaf service for supported crs. e.g. https://api.hamburg.de/datasets/v1/schulen/collections. Can also be set to false to disable the crs parameter | `"EPSG:25832"` |
+| datasets | yes | **[datasets](#wms_wfs_oaf_datasets)**[]/Boolean |  | Metadata specification. All metadata of the layer data is referenced here. By clicking the "i" button in the layer tree, the information is retrieved by the CSW interface and shown to the user. For this, the **[rest-services.json](rest-services.json.md)** has to provide the URL of the metadata catalog resp. its CSW interface. The values *kategorie_opendata*, *kategorie_inspire*, and *kategorie_organisation* are used for layer categorization if the **[config.json](../Portal-Config/config.json.md)** has `tree.type` set to `"auto"`. To remove the "i" button altogether, explicitly set `"datasets": false`. |  |
+| datetime | no | String |  | If set, the key ‘datetime’ is added to requests to the layer, using this value. |  |
+| doNotLoadInitially | no | Boolean |  | If set to true, the layer will be loaded without any features. Can be used for external filtering. |  |
+| gfiAttributes | yes | String/**[gfiAttributes](#gfi-attributes)** |  | GFI attributes to be shown.  | `"ignore"` |
+| gfiTheme | yes | String/Object |  | Display style of GFI information for this layer. Unless `"default"` is chosen, custom templates may be used to show GFI information in another format than the default table style. | `"default"` |
+| id | yes | String/**[wfs_id](#wfs_id)** |  | Arbitrary id or an object with id and suffix | `"44"` |
+| isSecured | no | Boolean | false | Displays whether the layer belongs to a secured service. (**[see above](#secured-wfs-oaf-services)**) | false |
+| layerAttribution | no | String | `"nicht vorhanden"` | Additional layer information to be shown in the portal's control element *LayerAttribution*, if configured to appear.If "nicht vorhanden" (technical key meaning "not available") or omitted, no layer attribution is shown. | `"nicht vorhanden"` |
+| layerSequence | no | Number |  | Number to determine the sequence of layers in the layerTree and layerSelection. The layers are rendered in sequence based on the assigned value, e.g. layers with `layerSequence=1` will initially be on top, etc. Does not work for Baselayers. |  |
+| legend | no | Boolean/String/String[] |  | Value of the **[services.json](services.json.md)** file. URL to be used to request a static legend image. Use a boolean value to dynamically generate the legend from a OAF request or the OAF styling respectively. Use a string to link an image or a PDF file. Use `"ignore"` or `false` for no legend. | `false` |
+| limit | false | Number | `400` | Limits the number of items presented in the response document. Ignored if bulk is `true`. | `10` |
+| name | yes | String |  | Arbitrary display name used in the layer tree. | `"Traffic situation on freeways"` |
+| params | no | String{} |  | Key value pairs to add to the request. |  |
+| typ | yes | String |  | Service type; in this case, "OAF". | `"OAF"` |
+| url | yes | String |  | Service URL | `"https://api.hamburg.de/datasets/v1/schulen"` |
 
 **OAF example:**
 

@@ -20,7 +20,7 @@ export default {
         await nextTick();
         commit("Modules/WaterRiskCheckSearchBar/setSearchInput", "", {root: true});
         if (rootGetters.isMobile) {
-            dispatch("Menu/navigateBack", rootState.Modules.WaterRiskCheckSearchBar.currentSide, {root: true});
+            dispatch("Menu/navigateBack", {side: rootState.Modules.WaterRiskCheckSearchBar.currentSide}, {root: true});
         }
 
     }

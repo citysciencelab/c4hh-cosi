@@ -174,17 +174,17 @@ export default {
          */
         getBufferedFeature (wktFeature, buffer) {
             const feature = wktParser.decodeFeature(wktFeature),
-                geometryCollection = getBoundingGeometry([feature], buffer).getGeometries(),
-                geojsonPolygons = geometryCollection.flatMap(geometry => {
-                    if (geometry.getType() === "Polygon") {
-                        return [turfPolygon(geometry.getCoordinates())];
-                    }
-                    if (geometry.getType() === "MultiPolygon") {
-                        return geometry.getPolygons().map(polygon => turfPolygon(polygon.getCoordinates())
-                        );
-                    }
-                    return [];
-                });
+                  geometryCollection = getBoundingGeometry([feature], buffer).getGeometries(),
+                  geojsonPolygons = geometryCollection.flatMap(geometry => {
+                      if (geometry.getType() === "Polygon") {
+                          return [turfPolygon(geometry.getCoordinates())];
+                      }
+                      if (geometry.getType() === "MultiPolygon") {
+                          return geometry.getPolygons().map(polygon => turfPolygon(polygon.getCoordinates())
+                          );
+                      }
+                      return [];
+                  });
 
             this.setBoundingGeometry(geometryCollection);
 
@@ -217,7 +217,7 @@ export default {
         onDrawEnd (evt) {
             if (evt.feature.getGeometry().getType() === "Circle") {
                 const circleGeom = evt.feature.getGeometry(),
-                    polygonGeom = polygonFromCircle(circleGeom, 128);
+                      polygonGeom = polygonFromCircle(circleGeom, 128);
 
                 evt.feature.setGeometry(polygonGeom);
                 mapCollection.getMap("2D").removeOverlay(this.circleOverlay);
@@ -300,7 +300,7 @@ export default {
          */
         setBuffer (value) {
             const nextVal = this.normalizeBufferValue(value),
-                sourceWkt = this.activeCard.drawnFeatureWKT || this.activeCard.statisticalFeatureWKT;
+                  sourceWkt = this.activeCard.drawnFeatureWKT || this.activeCard.statisticalFeatureWKT;
 
             this.buffer = nextVal;
             this.activeCard.buffer = nextVal;
@@ -347,7 +347,7 @@ export default {
          */
         setSubjectFeatureFromImport (features) {
             const extent = wktParser.decodeFeature(this.activeCard.subjectFeatureWKT).getGeometry().getExtent(),
-                importedWkt = Array.isArray(features) && features[0] ? wktParser.encodeFeature(features[0]) : null;
+                  importedWkt = Array.isArray(features) && features[0] ? wktParser.encodeFeature(features[0]) : null;
 
             this.activeCard.drawnFeatureWKT = importedWkt;
             this.setSubjectFeature(importedWkt, this.activeCard.buffer);
@@ -417,7 +417,7 @@ export default {
 
             if (namesOfDistricts.length > 0) {
                 const districtFeatures = this.selectedDistrictLayer.getSource().getFeatures(),
-                    namesAssoc = {};
+                      namesAssoc = {};
 
                 namesOfDistricts.forEach(name => {
                     namesAssoc[name] = true;
@@ -439,10 +439,10 @@ export default {
          */
         setPopulationSize (card) {
             const subjectFeature = wktParser.decodeFeature(card.subjectFeatureWKT),
-                service = this.restServiceById(this.wpsServiceId),
-                geometry = subjectFeature.getGeometry(),
-                populationLabel = this.$t("additional:modules.cosi.districtSelector.population"),
-                notAvailable = this.$t("additional:modules.cosi.districtSelector.populationNotAvailable");
+                  service = this.restServiceById(this.wpsServiceId),
+                  geometry = subjectFeature.getGeometry(),
+                  populationLabel = this.$t("additional:modules.cosi.districtSelector.population"),
+                  notAvailable = this.$t("additional:modules.cosi.districtSelector.populationNotAvailable");
 
             if (service === undefined) {
                 console.warn("Rest Service with the ID 1001 is not configured in rest-services.json!");
@@ -456,9 +456,9 @@ export default {
                 const outerPolygon = geometryToGeoJson(geometry, false, "EPSG:25832", "EPSG:25832");
 
                 WPS.wpsRequest(service.id, service.url, this.wpsProcess, {
-                    "such_flaeche": JSON.stringify(outerPolygon)
-                },
-                (resp) => this.handlePopulationResponse(resp, card)
+                                   "such_flaeche": JSON.stringify(outerPolygon)
+                               },
+                               (resp) => this.handlePopulationResponse(resp, card)
                 );
             }
         },
@@ -531,11 +531,11 @@ export default {
          */
         handlePopulationResponse (resp, card) {
             const result = resp?.ExecuteResponse?.ProcessOutputs?.Output?.Data?.ComplexData?.einwohner?.ergebnis,
-                trimmed = typeof result === "string" ? result.trim() : "",
-                populationLabel = this.$t("additional:modules.cosi.districtSelector.population"),
-                notAvailable = this.$t("additional:modules.cosi.districtSelector.populationNotAvailable"),
-                processingFailed = this.$t("additional:modules.cosi.districtSelector.populationProcessingFailed"),
-                mapped = trimmed ? this.getPopulationAlertFromServerMessage(trimmed) : undefined;
+                  trimmed = typeof result === "string" ? result.trim() : "",
+                  populationLabel = this.$t("additional:modules.cosi.districtSelector.population"),
+                  notAvailable = this.$t("additional:modules.cosi.districtSelector.populationNotAvailable"),
+                  processingFailed = this.$t("additional:modules.cosi.districtSelector.populationProcessingFailed"),
+                  mapped = trimmed ? this.getPopulationAlertFromServerMessage(trimmed) : undefined;
 
             card.populationAlert = null;
 
@@ -551,7 +551,7 @@ export default {
             if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
                 try {
                     const parsed = JSON.parse(trimmed),
-                        numericValue = Number(parsed?.einwohner_fhh);
+                          numericValue = Number(parsed?.einwohner_fhh);
 
                     if (Number.isFinite(numericValue)) {
                         card.data[2].label = `${populationLabel}: ${thousandsSeparator(numericValue)}`;
@@ -601,6 +601,9 @@ export default {
             :icon="'bi bi-pencil'"
             :title="$t('additional:modules.cosi.districtSelector.drawHeader')"
         >
+            <p>
+                <small>{{ $t('additional:modules.cosi.districtSelector.drawHelp') }}</small>
+            </p>
             <div class="d-flex gap-4 mb-4 ms-3">
                 <DrawTypes
                     :current-layout="drawStyle"
@@ -624,6 +627,9 @@ export default {
             :icon="'bi bi-record-circle'"
             :title="$t('additional:modules.cosi.districtSelector.bufferHeader')"
         >
+            <p>
+                <small>{{ $t('additional:modules.cosi.districtSelector.bufferHelp') }}</small>
+            </p>
             <InputText
                 id="district-selector-buffer"
                 class="mb-4 ms-3"

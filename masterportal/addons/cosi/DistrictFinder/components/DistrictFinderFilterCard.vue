@@ -1,4 +1,5 @@
 <script>
+import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import BarchartItemAnnotated from "../../components/BarchartItemAnnotated.vue";
 import Badges from "../../shared/modules/badges/components/Badges.vue";
 import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
@@ -13,6 +14,7 @@ import {VSnackbar} from "vuetify/components/VSnackbar";
 export default {
     name: "DistrictFinderFilterCard",
     components: {
+        AlertMessage,
         BarchartItemAnnotated,
         Badges,
         CustomCard,
@@ -55,6 +57,7 @@ export default {
             selectedFilter: "=",
             selectedYear: new Date().getFullYear() - 1,
             showHint: false,
+            showChart: true,
             tolerance: undefined,
             years: new Array(10).fill(new Date().getFullYear() - 1).map((v, i) => v - i),
             chartConfig: {
@@ -234,8 +237,8 @@ export default {
          */
         meanValue () {
             const values = this.featuresToUse.map(feature => feature?.properties?.[this.selectedCategory])
-                    .filter(value => typeof value === "number"),
-                mean = values.reduce((acc, curr) => acc + curr, 0) / values.length;
+                      .filter(value => typeof value === "number"),
+                  mean = values.reduce((acc, curr) => acc + curr, 0) / values.length;
 
             return Number.isFinite(mean) ? mean.toLocaleString(this.currentLocale || "de-DE", {maximumFractionDigits: 1}) : "-";
         },
@@ -294,25 +297,30 @@ export default {
                 return "-";
             }
             return this.$t("additional:modules.tools.cosi.districtFinder.label.valueType",
-                {context: this.selectedDataset.valueType});
+                           {context: this.selectedDataset.valueType});
         }
     },
     watch: {
         features: {
             handler () {
+                if (this.features.length && this.areAllFeatureValuesZero(this.features, this.selectedCategory)) {
+                    this.showChart = false;
+                    return;
+                }
+                this.showChart = true;
                 this.addChartData();
             },
             deep: true
         },
         referenceValue (val) {
             this.chartConfig.options = Object.assign({}, deepAssign(this.chartConfig.options,
-                {plugins: {annotation: {annotations: {referenceLine: {
-                    borderColor: this.referenceLineColor,
-                    value: typeof val === "number" ? val : undefined,
-                    label: {
-                        content: this.$t("additional:modules.tools.cosi.districtFinder.label.referenceValue")
-                    }
-                }}}}}
+                                                                    {plugins: {annotation: {annotations: {referenceLine: {
+                                                                        borderColor: this.referenceLineColor,
+                                                                        value: typeof val === "number" ? val : undefined,
+                                                                        label: {
+                                                                            content: this.$t("additional:modules.tools.cosi.districtFinder.label.referenceValue")
+                                                                        }
+                                                                    }}}}}
             ));
         },
         resultNames: {
@@ -356,10 +364,24 @@ export default {
          */
         addChartData () {
             const sorted = this.sortedData(),
-                allData = sorted.map(data => data[this.selectedCategory]),
-                allLabels = sorted.map(label => label[this.keyOfAttrNameForSelectedLayer]);
+                  allData = sorted.map(data => data[this.selectedCategory]),
+                  allLabels = sorted.map(label => label[this.keyOfAttrNameForSelectedLayer]);
 
             this.chartConfig.data = Object.assign({}, this.chartConfig.data, {labels: allLabels, datasets: [{...this.chartOptions, data: allData, backgroundColor: this.getChartColors(this.keyOfAttrNameForSelectedLayer)}]});
+        },
+
+        /**
+         * Checks whether all feature values of a given category are 0.
+         * @param {Object[]} features The features to inspect.
+         * @param {String} category The category key to inspect in each feature properties object.
+         * @returns {Boolean} true if every feature value equals 0.
+         */
+        areAllFeatureValuesZero (features, category) {
+            if (!Array.isArray(features) || !features.length || !category) {
+                return false;
+            }
+
+            return features.every(feature => feature?.properties?.[category] === 0);
         },
 
         /**
@@ -464,8 +486,8 @@ export default {
 
             extent.forEach(interval => {
                 const firstYear = interval[0].getFullYear(),
-                    lastYear = interval[1].getFullYear(),
-                    yearsToAdd = new Array(lastYear - firstYear + 1).fill(firstYear).map((v, i) => v + i);
+                      lastYear = interval[1].getFullYear(),
+                      yearsToAdd = new Array(lastYear - firstYear + 1).fill(firstYear).map((v, i) => v + i);
 
                 yearsToAdd.forEach(year => years.add(year));
             });
@@ -554,7 +576,10 @@ export default {
                 return;
             }
 
-            this.selectedYear = this.years[0];
+            if (!this.selectedYear) {
+                this.selectedYear = this.years[0];
+            }
+
             await this.updateYear();
         },
 
@@ -659,19 +684,19 @@ export default {
                     </h5>
                     <div
                         v-if="typeof selectedDataset !== 'undefined' && selectedData === 'statistische Daten'"
-                        class="col-md-3 p-0"
+                        class="col-md-3 p-0 mb-3"
                     >
                         <Dropdown-Autocomplete
+                            v-model="selectedYear"
                             class="flex-grow-1"
                             :items="years"
-                            :model-value="selectedYear"
                             :label="$t('additional:modules.tools.cosi.districtFinder.label.year')"
                             @update:model-value="updateYear"
                         />
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-12 py-0 pe-0">
+                    <div class="col-12 py-0 pe-0 mb-3">
                         <Dropdown-Autocomplete
                             class="flex-grow-1"
                             :items="selectedData === 'statistische Daten' ? datasetStatItems : datasetFachdaten"
@@ -687,7 +712,7 @@ export default {
                 >
                     <div
                         v-if="typeof selectedDataset !== 'undefined'"
-                        class="col-4 pt-1 pb-0 pe-1"
+                        class="col-4"
                     >
                         <Dropdown-Autocomplete
                             v-model="selectedFilter"
@@ -733,8 +758,15 @@ export default {
                 >
                     {{ $t("additional:modules.tools.cosi.districtFinder.errors.relativErr") }}
                 </div>
+                <AlertMessage
+                    v-if="!showChart"
+                    closeable
+                    class="py-3"
+                    :text="'In dem ausgewählten Jahr liegen für diesen Datensatz keine Werte vor. Bitte wählen Sie ein anderes Jahr aus.'"
+                    type="noData"
+                />
                 <div
-                    v-if="typeof selectedDataset !== 'undefined'"
+                    v-if="typeof selectedDataset !== 'undefined' && showChart"
                     class="ps-0 pt-4 pb-1"
                 >
                     <button
@@ -751,7 +783,7 @@ export default {
                     </button>
                 </div>
                 <div
-                    v-if="typeof selectedDataset !== 'undefined' && expandDataInfo"
+                    v-if="typeof selectedDataset !== 'undefined' && expandDataInfo && showChart"
                 >
                     <div
                         v-if="features.length"

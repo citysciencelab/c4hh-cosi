@@ -97,12 +97,12 @@ export default {
             try {
                 this.jobRequestState.loading = true;
                 const response = await fetch(`${this.simulationApiUrl}/jobs/${jobId}`, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            ...additionalHeaders
-                        }
-                    }),
-                    result = await response.json();
+                          headers: {
+                              "Content-Type": "application/json",
+                              ...additionalHeaders
+                          }
+                      }),
+                      result = await response.json();
 
                 if (!response.ok) {
                     this.jobRequestState.error = result.error_message || response.status + ": unknown errror";
@@ -157,12 +157,12 @@ export default {
             try {
                 this.resultRequestState.loading = true;
                 const response = await fetch(`https://${url}`, {
-                        headers: {
-                            "Content-Type": "application/json",
-                            ...additionalHeaders
-                        }
-                    }),
-                    result = await response.json();
+                          headers: {
+                              "Content-Type": "application/json",
+                              ...additionalHeaders
+                          }
+                      }),
+                      result = await response.json();
 
                 if (!response.ok) {
                     this.resultRequestState.error = result.error_message || response.status + ": unknown errror";
@@ -221,8 +221,8 @@ export default {
                 return;
             }
             const blob = new Blob([JSON.stringify(this.jobResultData, null, 2)], {type: "application/json"}),
-                url = window.URL.createObjectURL(blob),
-                a = document.createElement("a");
+                  url = window.URL.createObjectURL(blob),
+                  a = document.createElement("a");
 
             a.href = url;
             a.download = this.job.jobID + "_result.json";
@@ -336,9 +336,9 @@ export default {
             this.mapFilters = this.job.results_metadata.values
                 .map((filterEntry) => {
                     const key = Object.keys(filterEntry)[0],
-                        filterValues = filterEntry[key],
-                        {type, min, max, values} = filterValues,
-                        filter = {};
+                          filterValues = filterEntry[key],
+                          {type, min, max, values} = filterValues,
+                          filter = {};
 
                     // we do not filter for float values
                     if (type.startsWith("float")) {

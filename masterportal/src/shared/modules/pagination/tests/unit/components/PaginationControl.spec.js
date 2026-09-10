@@ -1,8 +1,7 @@
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import PaginationControl from "../../../components/PaginationControl.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/pagination/components/PaginationControl.vue", () => {
 

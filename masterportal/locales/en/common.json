@@ -162,6 +162,10 @@
         "buttonTitle2d": "2D",
         "buttonTitle3d": "3D"
       },
+      "expandable": {
+        "show": "Show more controls",
+        "hide": "Hide additional controls"
+      },
       "fullScreen": {
         "enable": "Enable fullscreen",
         "disable": "Disable fullscreen"
@@ -286,7 +290,8 @@
       "contactName": "Name",
       "contactPhone": "Phone",
       "contactEmail": "E-Mail",
-      "wait": "Please wait"
+      "wait": "Please wait",
+      "license": "License"
     },
     "draw": {
       "description": "Create important markers or mark areas",
@@ -633,6 +638,7 @@
       "addressSuffix": "Address",
       "addressSuffixes": "Layer adresses",
       "attachFileMessage": "Attach file type during download if necessary",
+      "creationDate": "Creation",
       "downloadDataset": "Download dataset",
       "lastModified": "Last modified",
       "legend": "Legend",
@@ -640,7 +646,7 @@
       "noMetadataLoaded": "No metadata could be loaded!",
       "noMetadataLoadedConsole": "Metadata for this layer could not be loaded. There seems to be a problem with the provided services.json.",
       "periodicityTitle": "Data update",
-      "publicationCreation": "Publication / Creation",
+      "publicationDate": "Publication",
       "pointOfContact": "Point of contact",
       "contactInfoMessage": "Write to the point of contact of the topic ",
       "contactPublisher": "Write to the point of contact ",
@@ -651,6 +657,8 @@
     "layerPills": {
       "next": "Show next layers",
       "previous": "Show previous layers",
+      "showMore": "Show all layers",
+      "hide": "Collapse layers",
       "remove": "Remove layer"
     },
     "layerSelection": {
@@ -910,9 +918,11 @@
     "openConfig": {
       "explanation": "Open a map that you have saved as a local configuration file.",
       "loadFileFailed": "The <b>{{targetFileName}}</b> configuration file was not loaded. The file format <b>{{targetFileFormat}}</b> is not supported. Please load a file in the <b>json</b> file format.",
-      "loadFileSuccess": "The <b>{{targetFileName}}</b> configuration file was loaded successfully",
+      "loadFileSuccess": "The <b>{{targetFileName}}</b> configuration file was loaded successfully.",
       "name": "Load map",
-      "openFile": "Open configuration file"
+      "openFile": "Open configuration file",
+      "modulesNotAvailable_one": "Unfortunately, the {{modules}} module is not available",
+      "modulesNotAvailable_other": "Unfortunately, the {{modules}} modules are not available."
     },
     "portalFooter": {
       "designation": "Cartography and design:",
@@ -1247,7 +1257,8 @@
         "zoomToResult": "Zoom to result",
         "startRouting": "Start route",
         "showInTree": "Show topic in folder",
-        "showLayerInfo": "Information and legend"
+        "showLayerInfo": "Information and legend",
+        "addLayerFromCswRecord": "Add layer"
       },
       "showAllResults": "Show all results",
       "searchResults": "search results",
@@ -1267,7 +1278,16 @@
         "street": "street",
         "subject": "subject (external topics)",
         "topic": "issues & topics",
+        "csw": "CSW Metadata",
         "topicBaselayer": "Theme (baselayer)"
+      },
+      "csw": {
+        "noLayerLink": "No WMS or WFS link found in the metadata.",
+        "noServiceResponse": "The service is not responding. Please try again later: {{serviceUrl}}",
+        "largeWfsLayer": "The WFS layer '{{layerName}}' contains {{count}} features and will be loaded for the visible map extent only (bbox strategy).",
+        "largeWfsLayers": "{{layerCount}} WFS layers are large and will be loaded for the visible map extent only (bbox strategy).",
+        "layerAddedTitle": "Layer added successfully",
+        "layerAdded": "The layers from the metadata were added to the topic tree and can be selected via <b>Add layer</b>."
       },
       "specialWFS": {
         "ongoing": "in process",
@@ -1452,7 +1472,8 @@
         "noFeature": "Please draw a geometry for your added properties.",
         "onlyNumbersAllowed": "The input only allows numbers.",
         "requiredPropertiesNotSet": "Please enter a valid value for the required properties {{properties}}.",
-        "fetchFeaturePropError": "Loading of parameters takes longer than expected. Please try again."
+        "fetchFeaturePropError": "Loading of parameters takes longer than expected. Please try again.",
+        "regexInputError": "The input does not match the required pattern."
       },
       "mandatoryInputError": {
         "text": "Regular text characters and special characters like , . / \\ [ ] space and German characters ö ä ü Ö Ä Ü ß and not only numbers are required",

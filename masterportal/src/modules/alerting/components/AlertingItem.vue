@@ -31,6 +31,7 @@ export default {
             "displayedAlerts",
             "fetchBroadcastUrl",
             "initialAlerts",
+            "moduleOpenAlerts",
             "initialClosed",
             "localStorageDisplayedAlertsKey",
             "showTheModal",
@@ -76,6 +77,7 @@ export default {
         }
 
         this.addAlertsFromConfig(this.initialAlerts);
+        this.addModuleOpenAlertsFromConfig(this.moduleOpenAlerts);
     },
     unmounted () {
         if (this.unsubscribeAction) {
@@ -86,6 +88,7 @@ export default {
         ...mapActions(["initializeModule"]),
         ...mapActions("Alerting", [
             "addAlertsFromConfig",
+            "addModuleOpenAlertsFromConfig",
             "addSingleAlert",
             "alertHasBeenRead",
             "cleanup",
@@ -104,7 +107,7 @@ export default {
          */
         axiosCallback: function (response) {
             const data = response.data,
-                collectedAlerts = [];
+                  collectedAlerts = [];
 
             let collectedAlertIds = [];
 
@@ -161,7 +164,14 @@ export default {
          * @returns {void}
          */
         onModalClose: function () {
-            this.cleanup();
+            const visibleAlertHashes = this.sortedAlerts(this.sortedAlertsSwitch)
+                .flatMap(alertCategory => alertCategory.content)
+                .map(singleAlert => singleAlert.hash)
+                .filter(singleAlertHash => typeof singleAlertHash === "string" && singleAlertHash.length > 0);
+
+            this.cleanup({visibleAlertHashes});
+            this.sortedAlertsSwitch = "initial";
+            this.$store.commit("Alerting/setAlertsOnEvent", []);
             this.$store.commit("Alerting/setInitialClosed", true);
         },
         /**

@@ -32,16 +32,18 @@ export default {
 </script>
 
 <template>
-    <div
+    <template
         v-if="Object.keys(feature).length > 0 && feature.get(keys[0])"
-        class="detail-component"
     >
-        <br>
-        <dt class="label">
+        <dt class="detail-component-label">
             {{ label }}:
         </dt>
-        <dd class="value">
-            {{ getValue() }}
-        </dd>
-    </div>
+        <dd>{{ getValue() }}</dd>
+    </template>
 </template>
+
+<style  lang="scss" scoped>
+    .detail-component-label {
+        padding-top: 1rem;
+    }
+</style>

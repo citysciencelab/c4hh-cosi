@@ -1,4 +1,4 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 import {expect} from "chai";
 import WaterRiskCheck from "../../components/WaterRiskCheck.vue";
@@ -11,7 +11,6 @@ import sinon from "sinon";
 import VectorLayer from "ol/layer/Vector.js";
 import spatialOperations from "../../js/spatialOperations.js";
 
-config.global.mocks.$t = key => key;
 /**
  * mocks secondary menu
  * @returns {void}

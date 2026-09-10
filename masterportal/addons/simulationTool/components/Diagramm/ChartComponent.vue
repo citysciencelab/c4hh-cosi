@@ -85,22 +85,22 @@ export default {
             }
 
             const jobIds = Object.keys(this.chartConfigs),
-                unsortedTraces = jobIds.map(jobId => {
-                    const chartConfig = this.chartConfigs[jobId],
+                  unsortedTraces = jobIds.map(jobId => {
+                      const chartConfig = this.chartConfigs[jobId],
 
-                        root = this.getValue(this.jobResultData[jobId], chartConfig.rootProp);
+                            root = this.getValue(this.jobResultData[jobId], chartConfig.rootProp);
 
-                    if (!Array.isArray(root)) {
-                        return [];
-                    }
+                      if (!Array.isArray(root)) {
+                          return [];
+                      }
 
-                    return {
-                        name: jobId,
-                        x: root.map(item => Number(this.getValue(item, chartConfig.xProp))),
-                        y: chartConfig.yProp ? root.map(item => Number(this.getValue(item, chartConfig.yProp))) : undefined,
-                        type: this.type
-                    };
-                });
+                      return {
+                          name: jobId,
+                          x: root.map(item => Number(this.getValue(item, chartConfig.xProp))),
+                          y: chartConfig.yProp ? root.map(item => Number(this.getValue(item, chartConfig.yProp))) : undefined,
+                          type: this.type
+                      };
+                  });
 
             return unsortedTraces.map(trace => {
                 const sortedIndices = trace.x

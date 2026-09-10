@@ -143,7 +143,7 @@ export default {
          */
         async getCalculationData () {
             const calculationDataFeatures = [],
-                dataFeatures = await this.getFeaturesByLayerId(this.layerIdCalculation);
+                  dataFeatures = await this.getFeaturesByLayerId(this.layerIdCalculation);
 
             dataFeatures.forEach(feat => {
                 calculationDataFeatures.push(feat?.getProperties());
@@ -162,9 +162,9 @@ export default {
                 return false;
             }
             const rawLayer = rawLayerList.getLayerWhere({id: layerId}),
-                response = await wfsRequest.getFeatureGET(rawLayer.url, {version: rawLayer.version, featureType: rawLayer.featureType}),
-                wfsReader = new WFS({version: rawLayer.version}),
-                features = wfsReader.readFeatures(response);
+                  response = await wfsRequest.getFeatureGET(rawLayer.url, {version: rawLayer.version, featureType: rawLayer.featureType}),
+                  wfsReader = new WFS({version: rawLayer.version}),
+                  features = wfsReader.readFeatures(response);
 
             return features;
         },
@@ -205,7 +205,7 @@ export default {
                 return false;
             }
             const dataString = keys.split("|"),
-                index = dataString.indexOf("Wohnlage");
+                  index = dataString.indexOf("Wohnlage");
 
             if (index !== -1) {
                 dataString[index] = "Kategorie";
@@ -365,7 +365,7 @@ export default {
                 return false;
             }
             const layer = this.getLayerById(layerId),
-                url = this.getFeatureInfoUrlByLayer(coordinate, layer, this.projectionCode, resolution);
+                  url = this.getFeatureInfoUrlByLayer(coordinate, layer, this.projectionCode, resolution);
 
             this.getResidentialInformation(url, layer, residentialInformation => {
                 this.errorMessage = "";

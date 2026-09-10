@@ -216,11 +216,11 @@ export default {
 
 
         squareSideLengthComputed: {
-        /**
-         * Getter for the computed property squareSideLength based on squareArea
-         * @info the internal representation of squareArea is always in meters
-         * @returns {Number} the current square side length as an integer
-         */
+            /**
+             * Getter for the computed property squareSideLength based on squareArea
+             * @info the internal representation of squareArea is always in meters
+             * @returns {Number} the current square side length as an integer
+             */
             get () {
                 const squareAreaMeters = this.styleSettings?.squareArea || 0;
 
@@ -468,7 +468,8 @@ export default {
                         showInLayerTree: true,
                         typ: "VECTORBASE",
                         type: "layer",
-                        visibility: true
+                        visibility: true,
+                        isDynamic: true
                     },
                     parentKey: treeSubjectsKey
                 }, {root: true});
@@ -574,7 +575,7 @@ export default {
                     return;
                 }
                 const layerModel = layerCollection.getLayerById(layerConfig.id),
-                    legend = layerModel?.get("legend");
+                      legend = layerModel?.get("legend");
 
                 if (layerModel === undefined) {
                     return;

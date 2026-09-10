@@ -15,6 +15,12 @@ export default {
         LayerSliderPlayer,
         NavTab
     },
+    props: {
+        config: {
+            type: Object,
+            default: () => ({})
+        }
+    },
     data () {
         return {
             activeTab: "handle"
@@ -26,19 +32,34 @@ export default {
             "layerIds",
             "sliderType",
             "title"
-        ])
+        ]),
+
+        /**
+         * Returns the configured layer ids for the current menu instance.
+         * @returns {Object[]} The configured layer ids.
+         */
+        configuredLayerIds () {
+            return this.config.layerIds || this.layerIds;
+        }
     },
     beforeMount () {
-        this.checkIfAllLayersAvailable(this.layerIds);
-        this.addInformationToLayerIds(this.layerIds);
+        this.applyConfiguredState();
+        this.checkIfAllLayersAvailable(this.configuredLayerIds);
+        this.addInformationToLayerIds(this.configuredLayerIds);
+    },
+    activated () {
+        this.applyConfiguredState();
+        this.checkIfAllLayersAvailable(this.configuredLayerIds);
+        this.addInformationToLayerIds(this.configuredLayerIds);
     },
     unmounted () {
         this.setWindowsInterval(null);
         this.resetActiveLayer();
-        this.layerIds.forEach((initialLayerInformation) => this.sendModification(initialLayerInformation));
+        this.configuredLayerIds.forEach((initialLayerInformation) => this.sendModification(initialLayerInformation));
     },
     methods: {
         ...mapMutations("Modules/LayerSlider", [
+            "setConfiguredProperties",
             "resetActiveLayer",
             "setWindowsInterval"
         ]),
@@ -47,6 +68,15 @@ export default {
             "checkIfAllLayersAvailable",
             "sendModification"
         ]),
+
+        /**
+         * Applies the menu-provided configuration to the layer slider state.
+         * @returns {void}
+         */
+        applyConfiguredState () {
+            this.setConfiguredProperties(this.config);
+        },
+
         changeTab (tabName) {
             this.activeTab = tabName;
         }

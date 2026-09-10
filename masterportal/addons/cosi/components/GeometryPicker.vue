@@ -426,22 +426,22 @@ export default {
 
 <template lang="html">
     <v-row
-        dense
+        density="comfortable"
     >
         <v-col cols="9">
             <v-text-field
                 :value="geomCoords"
                 :name="geomField.name"
                 :label="$t('additional:modules.tools.cosi.dataTypes.geometry')"
-                dense
+                density="comfortable"
                 @change="setGeomByInput"
             >
                 <template #append>
                     <v-btn
-                        dense
+                        density="comfortable"
                         x-small
                         tile
-                        :color="locationPickerActive ? 'warning' : 'grey lighten-1'"
+                        :color="locationPickerActive ? 'warning' : 'grey-lighten-1'"
                         :title="$t('additional:modules.tools.cosi.scenarioBuilder.chooseLocation')"
                         @click="toggleLocationPicker(geomField.type)"
                     >
@@ -454,10 +454,10 @@ export default {
                     </v-btn>
                     <v-btn
                         v-if="geometry.type === 'Polygon'"
-                        dense
+                        density="comfortable"
                         x-small
                         tile
-                        color="grey lighten-1"
+                        color="grey-lighten-1"
                         :title="$t('additional:modules.tools.cosi.scenarioBuilder.undo')"
                         :disabled="!locationPickerActive"
                         @click="undoDrawPolygonStep"
@@ -471,11 +471,11 @@ export default {
                     </v-btn>
                     <v-btn
                         v-if="geometry.type === 'Polygon'"
-                        dense
+                        density="comfortable"
                         x-small
                         tile
                         class="ms-1"
-                        :color="pickPolygonActive ? 'warning' : 'grey lighten-1'"
+                        :color="pickPolygonActive ? 'warning' : 'grey-lighten-1'"
                         :title="$t('additional:modules.tools.cosi.scenarioBuilder.pick')"
                         :disabled="!locationPickerActive"
                         @click="togglePickPolygon"
@@ -488,10 +488,10 @@ export default {
                         </span>
                     </v-btn>
                     <v-btn
-                        dense
+                        density="comfortable"
                         x-small
                         tile
-                        color="grey lighten-1"
+                        color="grey-lighten-1"
                         class="ms-1"
                         :disabled="!geom"
                         :title="$t('additional:modules.tools.cosi.scenarioBuilder.resetLocation')"

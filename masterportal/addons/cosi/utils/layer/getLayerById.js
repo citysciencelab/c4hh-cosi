@@ -17,7 +17,8 @@ function getLayerById (id, styleOptions) {
         typ: "VECTORBASE",
         id: id,
         name: id,
-        alwaysOnTop: true
+        alwaysOnTop: true,
+        renderer: "webgl"
     });
 
     if (styleOptions) {

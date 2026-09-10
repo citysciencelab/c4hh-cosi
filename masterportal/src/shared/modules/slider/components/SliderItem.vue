@@ -105,12 +105,12 @@ export default {
             }
 
             const min = Number(this.min),
-                max = Number(this.max),
-                range = max - min,
-                rawStepSize = range / (this.maxMarkers - 1),
-                roundedStep = Math.pow(10, Math.floor(Math.log10(rawStepSize))),
-                finalStep = Math.ceil(rawStepSize / roundedStep) * roundedStep,
-                markers = new Set();
+                  max = Number(this.max),
+                  range = max - min,
+                  rawStepSize = range / (this.maxMarkers - 1),
+                  roundedStep = Math.pow(10, Math.floor(Math.log10(rawStepSize))),
+                  finalStep = Math.ceil(rawStepSize / roundedStep) * roundedStep,
+                  markers = new Set();
 
             for (let marker = min; marker <= max; marker += finalStep) {
                 let roundedMarker = marker;
@@ -142,13 +142,13 @@ export default {
          */
         shouldShowMarkers  () {
             const fontSize = 14,
-                charWidthMultiplier = 1.1,
-                charWidth = fontSize * charWidthMultiplier,
-                maxMarkerLength = Math.max(...this.markers.map(marker => String(marker).length)),
-                markerWidth = Math.max(50, charWidth * maxMarkerLength),
+                  charWidthMultiplier = 1.1,
+                  charWidth = fontSize * charWidthMultiplier,
+                  maxMarkerLength = Math.max(...this.markers.map(marker => String(marker).length)),
+                  markerWidth = Math.max(50, charWidth * maxMarkerLength),
 
-                totalWidth = this.markers.length * markerWidth,
-                menuWidth = this.menuType === "mainMenu" ? this.mainMenuWidth : this.secondaryMenuWidth;
+                  totalWidth = this.markers.length * markerWidth,
+                  menuWidth = this.menuType === "mainMenu" ? this.mainMenuWidth : this.secondaryMenuWidth;
 
             return this.showMarkers && menuWidth > totalWidth;
         }

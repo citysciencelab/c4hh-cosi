@@ -157,9 +157,9 @@ export default {
          */
         regulateDeviceMode () {
             const MOBILE = "Mobile",
-                DESKTOP = "Desktop",
-                breakpoint = "(max-width: 768px)",
-                mediaQuery = window.matchMedia(breakpoint);
+                  DESKTOP = "Desktop",
+                  breakpoint = "(max-width: 768px)",
+                  mediaQuery = window.matchMedia(breakpoint);
 
             this.setDeviceMode(mediaQuery.matches ? MOBILE : DESKTOP);
 

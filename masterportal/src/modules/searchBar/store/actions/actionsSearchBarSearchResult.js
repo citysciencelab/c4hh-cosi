@@ -11,6 +11,8 @@ import get3DHighlightColor from "@shared/js/utils/get3DHighlightColor.js";
 import applyTileStyle from "@shared/js/utils/applyTileStyle.js";
 import remove3DFeatureHighlight from "@shared/js/utils/remove3DFeatureHighlight.js";
 import {convertColor} from "@shared/js/utils/convertColor.js";
+import {fetchCswRecordXml, buildAlertPayload, alertCswFetchError, addLayersFromOnlineResources} from "./addLayerFromCswRecordHelper.js";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 /**
  * Contains actions that communicate with other components after an interaction, such as onClick or onHover, with a search result.
@@ -104,12 +106,10 @@ export default {
                         content: i18next.t("common:modules.searchBar.layerResultNotShown")
                     }, {root: true});
                 }
-                window.trackMatomo?.("Layer", "Layer added via Search", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
             });
         }
         else {
             dispatch("activateLayerInTopicTree", {layerId, source});
-            window.trackMatomo?.("Layer", "Layer added via Search", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
         }
     },
 
@@ -289,7 +289,7 @@ export default {
         const layerConfig = await dispatch("retrieveLayerConfig", {layerId, source});
 
         if (layerConfig) {
-            dispatch("Modules/LayerInformation/startLayerInformation", layerConfig, {root: true});
+            useLayerInformationStore().startLayerInformation(layerConfig);
             commit("Modules/LayerSelection/setLayerInfoVisible", true, {root: true});
         }
         else {
@@ -360,6 +360,7 @@ export default {
      */
     zoomToResult: ({dispatch, getters}, {coordinates}) => {
         const numberCoordinates = coordinates?.map(coordinate => parseFloat(coordinate, 10));
+
 
         if (numberCoordinates.length === 4) {
             const map = mapCollection.getMap("2D"),
@@ -559,5 +560,45 @@ export default {
             remove3DFeatureHighlight(state.lastPickedFeatureId);
             commit("setLastPickedFeatureId", null);
         }
+    },
+
+    /**
+     * Fetches the full CSW metadata record for the given fileIdentifier and adds the
+     * first detected WMS or WFS distribution link as a new layer to the topic tree.
+     * @param {Object} param.dispatch the dispatch
+     * @param {Object} payload The payload.
+     * @param {String} payload.fileIdentifier The CSW fileIdentifier (metadata UUID).
+     * @param {String} payload.cswUrl The URL of the CSW endpoint.
+     * @param {String} [payload.recordTitle] The metadata record title from the search result.
+    * @param {String} [payload.showDocUrl] Optional metadata viewer base URL.
+     * @returns {void}
+     */
+    addLayerFromCswRecord: async ({dispatch, rootGetters}, {fileIdentifier, cswUrl, showDocUrl, recordTitle, filterNonQueryableLayers}) => {
+        const gmdNs = "http://www.isotc211.org/2005/gmd",
+            gcoNs = "http://www.isotc211.org/2005/gco";
+        let responseXml;
+
+        try {
+            responseXml = await fetchCswRecordXml(cswUrl, fileIdentifier);
+        }
+        catch {
+            alertCswFetchError(dispatch);
+            return;
+        }
+
+        const onlineResources = responseXml.getElementsByTagNameNS(gmdNs, "CI_OnlineResource"),
+            cswContext = {fileIdentifier, cswUrl, showDocUrl, recordTitle},
+            {layerAdded, unavailableServiceUrls} = await addLayersFromOnlineResources({
+                onlineResources,
+                filterNonQueryableLayers,
+                rootGetters,
+                dispatch,
+                responseXml,
+                gmdNs,
+                gcoNs,
+                cswContext
+            });
+
+        dispatch("Alerting/addSingleAlert", buildAlertPayload({layerAdded, unavailableServiceUrls}), {root: true});
     }
 };

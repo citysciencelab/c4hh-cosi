@@ -39,7 +39,7 @@ export default {
         createScreenshot () {
             if (!this.readonly) {
                 const map = mapCollection.getMap("2D"),
-                    canvas = map.getViewport().querySelector("canvas");
+                      canvas = map.getViewport().querySelector("canvas");
 
                 this.base64Image = canvas.toDataURL("image/png");
                 this.$emit("onScreenshotCreated", this.base64Image);

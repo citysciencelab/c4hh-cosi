@@ -36,6 +36,5 @@ describe("addons/SimulationTool/components/shared/js/getMappedProperty.js", () =
 
         sinon.stub(i18next, "t").callsFake(key => key);
         expect(getMappedProperty("building_height", propertiesMapping)).to.be.equal("Höhe");
-        sinon.restore();
     });
 });

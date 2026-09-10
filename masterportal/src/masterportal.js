@@ -5,14 +5,13 @@ import "regenerator-runtime/runtime";
 import {initiateVueI18Next, initLanguage} from "./plugins/i18next.js";
 import globalUrlParams from "../src/core/urlParams/js/globalUrlParams.js";
 import {createApp} from "vue";
+import {createPinia} from "pinia";
 import App from "./App.vue";
 import bsTooltipDirective from "./directives/bs-tooltip.js";
 import store from "./app-store/index.js";
 import remoteInterface from "./plugins/remoteInterface.js";
 import utilsLogin from "../src/modules/login/js/utilsLogin.js";
-
 import {instantiateVuetify} from "./plugins/vuetify.js";
-
 
 let app;
 
@@ -52,20 +51,11 @@ loadConfigJs.then(() => {
 
     app.directive("bs-tooltip", bsTooltipDirective);
 
+    const pinia = createPinia();
+
+    app.use(pinia);
     app.use(store);
     store.$app = app;
-
-    window.trackMatomo = window.trackMatomo || undefined;
-    if (Config.matomo) {
-        import("./plugins/matomo.js")
-            .then(m => {
-                m.initiateMatomo(app);
-                window.trackMatomo = m.trackMatomo;
-            })
-            .catch(() => {
-                console.warn("Matomo blocked. Using fallback empty function.");
-            });
-    }
 
     if (Config.vuetifyFolder) {
         instantiateVuetify().then(vuetify => {

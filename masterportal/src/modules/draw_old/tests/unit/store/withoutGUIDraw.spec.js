@@ -25,7 +25,6 @@ describe("src/modules/draw/store/actions/withoutGUIDraw.js", () => {
         };
     });
 
-
     describe("cancelDrawWithoutGUI", () => {
         it("should dispatch as intended", () => {
             actions.cancelDrawWithoutGUI.call({$app: mockApp}, {commit, dispatch});

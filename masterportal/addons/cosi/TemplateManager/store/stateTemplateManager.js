@@ -14,10 +14,8 @@
  * @property {Boolean} [resizableWindow=false] - If True, window is resizable (config-param).
  * @property {String} toolToOpen - the tool to be open after this tool is closed.
  * @property {Boolean} [useImport=false] - If true, it is possible to import templates.
- * @property {Boolean} [useTemplatesForMapping=false] - If true, the mapping is overwritten with the statistic data from the templates.
  * @property {Object} templateContents - The selected data from templates.
  * @property {String[]} defaultActiveLayerIds - the default active layer Ids in COSI.
- * @property {Boolean} [multiTemplate=false] - If true, multiple templates are allowed to be active.
  * @property {String[]} importedTemplateNames - the imported template names list.
  * @property {String} reportName - The report name for reporting tool.
  * @property {String[]} reportLayerIds - the report layer ids for reporting tool.
@@ -37,9 +35,9 @@ const state = {
     defaultActiveLayerIds: [],
     icon: "bi-folder2-open",
     id: "templateManager",
+    description: "",
     isVisibleInMenu: true,
     importedTemplateNames: [],
-    multiTemplate: false,
     name: "Vorlagen Manager",
     readmeUrl: {
         "en-US": "https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev_version_2/cosi/manuals/015templates.md",
@@ -54,7 +52,6 @@ const state = {
     ],
     toolToOpen: undefined,
     useImport: false,
-    useTemplatesForMapping: false,
     reportName: "",
     reportLayerIds: [],
     reportCategories: [],

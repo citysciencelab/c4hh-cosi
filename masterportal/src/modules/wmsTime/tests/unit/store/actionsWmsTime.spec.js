@@ -6,7 +6,8 @@ import initialState from "@modules/wmsTime/store/stateWmsTime.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 
 describe("src/modules/wmsTime/store/actionsWmsTime.js", () => {
-    let commit, dispatch, getters, rootGetters, state, map, updateTimeSpy;
+    let commit, dispatch, getters, rootGetters, state, map, updateTimeSpy,
+        originalInnerWidth;
 
     beforeAll(() => {
         mapCollection.clear();
@@ -23,9 +24,14 @@ describe("src/modules/wmsTime/store/actionsWmsTime.js", () => {
         updateTimeSpy = sinon.spy();
         commit = sinon.spy();
         dispatch = sinon.spy();
+        originalInnerWidth = window.innerWidth;
+        Object.defineProperty(window, "innerWidth", {configurable: true, writable: true, value: 1000});
         getters = {
             currentTimeSliderObject: {keyboardMovement: 5},
-            defaultDimensionName: "TIME"
+            defaultDimensionName: "TIME",
+            windowWidth: 900,
+            minWidth: false,
+            defaultValue: "2020"
         };
         rootGetters = {
             "Modules/LayerSwiper/active": false,
@@ -69,6 +75,9 @@ describe("src/modules/wmsTime/store/actionsWmsTime.js", () => {
         });
     });
 
+    afterEach(() => {
+        Object.defineProperty(window, "innerWidth", {configurable: true, writable: true, value: originalInnerWidth});
+    });
 
     describe("toggleSwiper", () => {
         beforeEach(() => {
@@ -77,15 +86,21 @@ describe("src/modules/wmsTime/store/actionsWmsTime.js", () => {
             state = {...initialState, layerSwiper: {active: false}};
         });
 
-        it("should activate LayerSwiper if currently inactive", async () => {
-            await actions.toggleSwiper({commit, state, getters, dispatch, rootGetters}, "someId");
+        it("should activate LayerSwiper consistently for base and second layer ids", async () => {
+            for (const id of ["someId", "someId_secondLayer"]) {
+                commit.resetHistory();
+                updateTimeSpy.resetHistory();
 
-            expect(commit.calledWith("Modules/LayerSwiper/setActive", true, {root: true})).to.be.true;
-            expect(commit.calledWith("Modules/LayerSwiper/setTargetLayerId", null, {root: true})).to.be.true;
-            expect(updateTimeSpy.calledOnce).to.be.true;
-            expect(updateTimeSpy.firstCall.args[0]).to.equals("someId");
-            expect(updateTimeSpy.firstCall.args[1]).to.equals("TIME");
-            expect(updateTimeSpy.firstCall.args[2]).to.equals("2020");
+                await actions.toggleSwiper({commit, state, getters, dispatch, rootGetters}, id);
+
+                expect(commit.calledWith("Modules/LayerSwiper/setActive", true, {root: true})).to.be.true;
+                expect(commit.calledWith("Modules/LayerSwiper/setSourceLayerId", "someId", {root: true})).to.be.true;
+                expect(commit.calledWith("Modules/LayerSwiper/setTargetLayerId", "someId_secondLayer", {root: true})).to.be.true;
+                expect(updateTimeSpy.calledOnce).to.be.true;
+                expect(updateTimeSpy.firstCall.args[0]).to.equals("someId_secondLayer");
+                expect(updateTimeSpy.firstCall.args[1]).to.equals("TIME");
+                expect(updateTimeSpy.firstCall.args[2]).to.equals("2020");
+            }
         });
 
         it("should deactivate LayerSwiper if currently active", async () => {
@@ -97,15 +112,59 @@ describe("src/modules/wmsTime/store/actionsWmsTime.js", () => {
             expect(dispatch.calledWith("replaceByIdInLayerConfig")).to.be.true;
         });
 
-        it("should dispatch updateLayerConfigZIndex and assign correct zIndex when comparing time layers", async () => {
+        it("should always remove second layer from tree for both deactivate entry ids", async () => {
             rootGetters["Modules/LayerSwiper/active"] = true;
+            for (const id of ["someId", "someId_secondLayer"]) {
+                dispatch.resetHistory();
+
+                await actions.toggleSwiper({commit, state, getters, dispatch, rootGetters}, id);
+
+                const secondLayerUpdateCall = dispatch.getCalls().find(call => call.args[0] === "replaceByIdInLayerConfig"
+                    && call.args[1]?.layerConfigs?.[0]?.id === "someId_secondLayer"
+                );
+
+                expect(secondLayerUpdateCall).to.exist;
+                expect(secondLayerUpdateCall.args[1].layerConfigs[0].layer.showInLayerTree).to.be.false;
+            }
+        });
+
+        it("should keep displayed slider time in sync when deactivating via second layer id", async () => {
+            rootGetters["Modules/LayerSwiper/active"] = true;
+
+            await actions.toggleSwiper({commit, state, getters, dispatch, rootGetters}, "someId_secondLayer");
+
+            expect(commit.calledWith("setTimeSliderDefaultValue", "2020")).to.be.true;
+        });
+
+        it("should take remaining base layer time when second layer is removed", async () => {
+            rootGetters["Modules/LayerSwiper/active"] = true;
+            layerCollection.getLayerById.callsFake(id => ({
+                getLayerSource: () => ({getParams: () => ({TIME: id === "someId" ? "2019" : "2020"})}),
+                attributes: {transparency: "30", zIndex: 3},
+                getLayer: () => ({once: sinon.stub(), on: sinon.stub(), un: sinon.stub()}),
+                updateTime: updateTimeSpy
+            }));
+
+
+            await actions.toggleSwiper({commit, state, getters, dispatch, rootGetters}, "someId_secondLayer");
+
+            expect(commit.calledWith("setTimeSliderDefaultValue", "2019")).to.be.true;
+        });
+
+        it("should dispatch updateLayerConfigZIndex and assign correct zIndex when comparing time layers", async () => {
+            rootGetters["Modules/LayerSwiper/active"] = false;
             rootGetters.allLayerConfigs = [
                 {id: "layer1", zIndex: 2},
                 {id: "layer2", zIndex: 5},
                 {id: "layer3"},
                 {id: "layer4", zIndex: "notANumber"}
             ];
-            layerCollection.getLayerById.returns({attributes: {zIndex: 3}});
+            layerCollection.getLayerById.returns({
+                attributes: {zIndex: 3},
+                getLayerSource: () => ({getParams: () => ({TIME: "2020"})}),
+                getLayer: () => ({once: sinon.stub(), on: sinon.stub(), un: sinon.stub()}),
+                updateTime: updateTimeSpy
+            });
 
             await actions.toggleSwiper({commit, state, getters, dispatch, rootGetters}, "someId");
 

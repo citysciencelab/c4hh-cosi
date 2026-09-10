@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import DrawModuleComponent from "@modules/draw/components/DrawModule.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/draw/components/DrawModule.vue", () => {
     let selectedDrawType,

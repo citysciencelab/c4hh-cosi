@@ -116,7 +116,7 @@ export default {
             this.changeCurrentComponent({
                 type: this.layerSelectionType,
                 side: this.menuSide,
-                props: {name: this.layerSelectionName}}
+                props: {layerId: this.layerConf.id, name: this.layerSelectionName}}
             );
             this.showLayer({layerId: this.layerConf.id});
         }
@@ -145,11 +145,9 @@ export default {
             class="d-flex transparency-container"
         >
             <i class="bi-droplet-half" />
-            <label
-                :for="'layer-component-sub-menu-transparency-input-' + layerConf.id"
-            >
+            <span class="transparency-text">
                 {{ $t("common:modules.layerTree.iconTransparency") + ":" }}
-            </label>
+            </span>
             <SliderItem
                 :id="'layer-component-sub-menu-transparency-input-' + layerConf.id"
                 :aria="$t('common:modules.aria.sliderAria') + `${transparency}%`"
@@ -200,7 +198,7 @@ export default {
             &:has(.markers) {
                 align-items: baseline;
 
-                label {
+                .transparency-text {
                     margin-right: .75rem;
                 }
             }
@@ -211,9 +209,10 @@ export default {
                 align-self: normal;
             }
 
-            label {
+            .transparency-text {
                 margin-right: .5rem;
                 align-self: normal;
+                user-select: none;
             }
 
             .transparency-input {

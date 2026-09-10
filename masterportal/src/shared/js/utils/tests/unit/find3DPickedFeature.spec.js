@@ -43,10 +43,10 @@ function createTile (content) {
  * @returns {Object} Mock tileset.
  */
 function createTileset (tiles) {
-    const tileset = {_selectedTiles: tiles};
+    // Create with the expected prototype instead of mutating prototypes.
+    const tileset = Object.create(global.Cesium.Cesium3DTileset.prototype);
 
-    // Make instanceof Cesium.Cesium3DTileset work via the global mock
-    Object.setPrototypeOf(tileset, global.Cesium.Cesium3DTileset.prototype);
+    tileset._selectedTiles = tiles;
     return tileset;
 }
 
@@ -64,14 +64,17 @@ function createScene (tilesets) {
 }
 
 describe("src/shared/js/utils/find3DPickedFeature.js", () => {
+    let originalCesium;
+
     beforeAll(() => {
+        originalCesium = global.Cesium;
         global.Cesium = {
             Cesium3DTileset: function Cesium3DTileset () { /* mock constructor */ }
         };
     });
 
     afterAll(() => {
-        delete global.Cesium;
+        global.Cesium = originalCesium;
     });
 
     describe("find3DPickedFeature", () => {

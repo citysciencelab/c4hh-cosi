@@ -505,13 +505,13 @@ export default {
          */
         setLayerStyle (layer, styleBuilding, styleParcel) {
             const building = new Style({
-                    stroke: new Stroke(styleBuilding.stroke),
-                    fill: new Fill(styleBuilding.fill)
-                }),
-                parcel = new Style({
-                    stroke: new Stroke(styleParcel.stroke),
-                    fill: new Fill(styleParcel.fill)
-                });
+                      stroke: new Stroke(styleBuilding.stroke),
+                      fill: new Fill(styleBuilding.fill)
+                  }),
+                  parcel = new Style({
+                      stroke: new Stroke(styleParcel.stroke),
+                      fill: new Fill(styleParcel.fill)
+                  });
 
             layer.setStyle((feature) => {
                 if (feature.get("idflurst")) {
@@ -562,8 +562,8 @@ export default {
 
             this.showSpinner = true;
             const addressPoint = new Point(this.addressCoordinates),
-                addressPointWGS8 = addressPoint.clone().transform("EPSG:25832", "EPSG:4326"),
-                parcelGeometry = new MultiPolygon([]);
+                  addressPointWGS8 = addressPoint.clone().transform("EPSG:25832", "EPSG:4326"),
+                  parcelGeometry = new MultiPolygon([]);
 
             this.layer.getLayerSource().clear();
             this.parcel = await this.fetchFeatures(addressPointWGS8, "Flurstueck", this.alkisBaseUrl, "geometrie", true);
@@ -681,7 +681,7 @@ export default {
          */
         async addDataByParcel (data, parcelFeature, parcelGeometry) {
             const unbuiltArea = spatialOperations.getUnbuiltArea(parcelFeature, this.buildingsToUse),
-                localData = {...data};
+                  localData = {...data};
 
             for (const key of Object.keys(localData)) {
                 if (localData[key].type === "WCS") {
@@ -714,12 +714,12 @@ export default {
         async fetchFeatures (geometry, collection, url, geom, flag = false) {
             try {
                 const filter = getOAFFeature.getOAFGeometryFilter(geometry, geom, "intersects"),
-                    geoJson = await getOAFFeature.getOAFFeatureGet(url, collection, {
-                        limit: 100,
-                        filter,
-                        filterCrs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84",
-                        crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
-                    });
+                      geoJson = await getOAFFeature.getOAFFeatureGet(url, collection, {
+                          limit: 100,
+                          filter,
+                          filterCrs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84",
+                          crs: "http://www.opengis.net/def/crs/OGC/1.3/CRS84"
+                      });
 
                 if (flag) {
                     const features = getOAFFeature.readAllOAFToGeoJSON(geoJson, {dataProjection: "EPSG:4326", featureProjection: "EPSG:25832"});
@@ -792,9 +792,9 @@ export default {
          */
         async createMapfishDialog () {
             const mapConf = await this.getMapConf(this.parcel[0], this.config?.specification),
-                legends = this.getLegends(this.config?.legends),
-                pdfPageNames = this.preparePDFPageNames(this.pdfPages),
-                attributes = this.getAttributes(mapConf, legends, pdfPageNames);
+                  legends = this.getLegends(this.config?.legends),
+                  pdfPageNames = this.preparePDFPageNames(this.pdfPages),
+                  attributes = this.getAttributes(mapConf, legends, pdfPageNames);
 
             this.mapfishData = {
                 "layout": "A4 Hochformat",
@@ -815,20 +815,20 @@ export default {
             this.isCreatingPDF = true;
             setTimeout(() => {
                 this.startPrint(this.printUrl, "pdf",
-                    this.pdfAppId,
-                    mapfishDialog,
-                    (url, payload) => {
-                        return axios.post(url, payload);
-                    },
-                    error => {
-                        console.error(error);
-                    },
-                    url => {
-                        this.downloadLink = url;
-                        this.isCreatingPDF = false;
-                        this.formStarted = false;
-                        this.formFinished = true;
-                    });
+                                this.pdfAppId,
+                                mapfishDialog,
+                                (url, payload) => {
+                                    return axios.post(url, payload);
+                                },
+                                error => {
+                                    console.error(error);
+                                },
+                                url => {
+                                    this.downloadLink = url;
+                                    this.isCreatingPDF = false;
+                                    this.formStarted = false;
+                                    this.formFinished = true;
+                                });
             }, 2000);
         },
         /**
@@ -1028,8 +1028,8 @@ export default {
             }
 
             const features = spatialOperations.intersect(data[type].geoJsonParcelFeatures, this.buildingsToUse[0]),
-                property = propertyToUse || data[type].propertyToUse,
-                floodDepth = [];
+                  property = propertyToUse || data[type].propertyToUse,
+                  floodDepth = [];
             let deepestFloodDepth = "";
 
             if (Array.isArray(features)) {

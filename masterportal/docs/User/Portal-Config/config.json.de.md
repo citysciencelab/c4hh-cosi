@@ -227,17 +227,20 @@ Ermöglicht dem User die Darstellung im Vollbildmodus (ohne Tabs und Adressleist
 ***
 
 ##### portalConfig.map.controls.orientation {data-toc-label='Orientation'}
-Orientation nutzt die geolocation des Browsers zur Standortbestimmung des Nutzers. Es wird eine Liste von Features in der Umgebung des Standortes angezeigt.
+Orientation nutzt die geolocation des Browsers zur Standortbestimmung des Nutzers. Es wird eine Liste von Features in der Umgebung des Standortes angezeigt. Die Genauigkeit des angezeigten Standortes kann als Kreises um den Standortmarker angezeigt werden. Mittels eines Richtungsmarkers kann auch die Bewegungsrichtung dargestellt werden. 
 
 |Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
 |----|-------------|---|-------|------------|------|
 |customPosition|nein|String|"common:modules.controls.orientation.poiChoiceCustomPosition"|Damit kann gesteuert werden, welcher Text für `customPosition` in der poiChoice angezeigt wird. Das hier angegebene muss dem Pfad für den Parameter in der Übersetzungsdatei entsprechen.|false|
 |iconGeolocate|nein|String|"bi-geo-alt"|Icon das im Controls-Menü für das Control Standpunkt angezeigt wird. Zur Auswahl siehe **[Bootstrap Icons](https://icons.getbootstrap.com/)**|false|
+|iconDirectionArrow|nein|String|"bi-triangle-fil"|Icon das in der Karte als Indikator der Richtung angezeigt wird. Wird nur angezeigt, wenn 'showDirection=true'. Zur Auswahl siehe **[Bootstrap Icons](https://icons.getbootstrap.com/)**|false|
 |iconGeolocatePOI|nein|String|"bi-record-circle"|Icon das im Controls-Menü für das Control "In meiner Nähe" angezeigt wird. Zur Auswahl siehe **[Bootstrap Icons](https://icons.getbootstrap.com/)**|false|
 |iconGeolocationMarker|nein|String|"bi-circle-fill"|Icon das in der Karte die aktuelle Position in der Karte markiert. Zur Auswahl siehe **[Bootstrap Icons](https://icons.getbootstrap.com/)**|false|
 |iFrameGeolocationEnabled|nein|Boolean|false|Wenn 'iFrameGeolocationEnabled' true ist, wird innerhalb eines iFrames versucht, die Geolocation auszuführen. Innerhalb von Iframes funktioniert dies nur, wenn das iFrame-Tag der übergeordneten Seite das Attribut allow="geolocation" beinaltet.|false|
 |onlyFilteredFeatures|nein|boolean|false|Wenn 'onlyFilteredFeatures' true ist, werden in der Ergebnissanzeige von poi nur über den Filter gefilterte Features berücksichtigt.|false|
 |poiDistances|nein|Boolean/Integer[]|true|Bei poiDistances=true werden die Defaultwerte verwendet. Legt fest, ob "In meiner Nähe" geladen wird und zeigt eine Liste von Features in der Umgebung an. Bei Angabe eines Array werden die darin definierten Abstände in Metern angeboten. Bei Angabe von true werden diese Abstände angeboten: [500,1000,2000].|false|
+|showAccuracy|nein|Boolean|false|Wenn 'showAccuracy' true ist, wird um 'iconGeolocate' ein Kreis gerendert, der die Genauigkeit der Standortdaten verdeutlicht.|false|
+|showDirection|nein|Boolean|false|Wenn 'showDirection' true ist, wird bei Bewegung des Nutzers die Richtung mit 'iconDirectionArrow' angezeigt.|false|
 |supportedDevices|nein|String|["Desktop", "Mobile"]|Geräte auf denen das Modul verwendbar ist und im Menü angezeigt wird.|false|
 |supportedMapModes|nein|String|["2D", "3D"]|Karten modi in denen das Modul verwendbar ist und im Menü angezeigt wird.|false|
 |zoomMode|nein|enum["once", "always"]|"once"|Der Standort wird bestimmt und der Marker wird an- oder ausgeschaltet. Dafür ist es notwendig das Portal über **https** zu laden. Modi: *once* (Es wird einmalig auf den Standort gezoomt. ), *always* (Die Karte wird mit jedem Einschalten auf den Standort gezoomt.).|false|
@@ -250,7 +253,10 @@ Orientation nutzt die geolocation des Browsers zur Standortbestimmung des Nutzer
     "iconGeolocatePOI": "bi-record-circle",
     "iconGeolocationMarker": "bi-circle-fill",
     "zoomMode": "once",
-    "poiDistances": true
+    "poiDistances": true,
+    "showAccuracy": true,
+    "showDirection": true,
+    "iconDirectionArrow": "bi-capslock-fill"
 }
 ```
 
@@ -1270,6 +1276,7 @@ Definitionen der Suchschnittstellen.
 |Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
 |----|-------------|---|-------|------------|------|
 |bkg|nein|**[bkg](#portalconfigmenusearchbarsearchinterfacesbkg)**||Konfiguration des BKG Suchdienstes.|false|
+|csw|nein|**[csw](#portalconfigmenusearchbarsearchinterfacescsw)**||Konfiguration der CSW-Metadatensuche.|false|
 |elasticSearch|nein|**[elasticSearch](#portalconfigmenusearchbarsearchinterfaceselasticsearch)**||Konfiguration des ElasticSearch Suchdienstes.|false|
 |gazetteer|nein|**[gazetteer](#portalconfigmenusearchbarsearchinterfacesgazetteer)**||Konfiguration des Gazetteer Suchdienstes.|false|
 |komootPhoton|nein|**[komootPhoton](#portalconfigmenusearchbarsearchinterfaceskomootphoton)**||Konfiguration des Komoot Photon Suchdienstes.|false|
@@ -1601,6 +1608,65 @@ Suche bei OpenStreetMap über Stadt, Strasse und Hausnummer. Wird nur durch Klic
 
 ***
 
+###### portalConfig.menu.searchBar.searchInterfaces.csw {data-toc-label='CSW'}
+
+[type:resultEvents]: # (portalConfig.menu.searchBar.searchInterfaces.resultEvents)
+
+Durchsucht einen CSW-Dienst (Catalogue Service for the Web) über eine ISO-19139-`GetRecords`-Anfrage mit einem AnyText-Volltext-Filter. Über das Array `definitions` können mehrere CSW-Endpunkte konfiguriert werden. Die Ergebnisliste zeigt Datensatztitel; ein Klick auf ein Ergebnis öffnet das Layer-Informationsfenster, zoomt auf die Ausdehnung des Datensatzes oder fügt den ersten gefundenen WMS-/WFS-Distribuitionslink als neuen Layer hinzu.
+Bitte beachten, dass der [addLayerButton](#portalConfig.tree.addLayerButton) als `"active": true` konfiguriert sein muss, um Zugriff auf "Externen Fachdaten" zu haben. Dienste, die das CRS des Portals nicht unterstützen, werden nicht der Karte hinzugefügt.
+
+> **Hinweis:** Wenn der CSW-Endpunkt keine CORS-Header sendet, muss ein Proxy konfiguriert werden.
+
+|Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
+|----|-------------|---|-------|------------|------|
+|definitions|ja|**[definition](#portalconfigmenusearchbarsearchinterfacescswdefinition)** *[]||Liste der CSW-Endpunkt-Definitionen.|false|
+|hitTemplate|nein|String|"default"|Template für die Darstellung der Ergebnisliste.|false|
+|resultEvents|nein|**[resultEvents](#portalconfigmenusearchbarsearchinterfacesresultevents)**|{"onClick": ["addLayerFromCswRecord", "zoomToResult"], "buttons": ["showLayerInfo"]}|Aktionen, die bei einer Interaktion mit einem Suchergebnis ausgeführt werden. Mögliche Ereignisse: "addLayerFromCswRecord", "showLayerInfo", "zoomToResult".|false|
+|searchInterfaceId|nein|String|"csw"|Eindeutige ID dieser Suchschnittstellen-Instanz.|false|
+|type|ja|String|"csw"|Typ der Suchschnittstelle. Definiert welche Suchschnittstelle konfiguriert ist.|false|
+
+**Beispiel**
+
+```json
+{
+    "type": "csw",
+    "searchInterfaceId": "csw_1",
+    "definitions": [
+        {
+            "url": "https://example.org/geonetwork/srv/ger/csw",
+            "version": "2.0.2",
+            "maxRecords": 10,
+            "serviceTypeFilter": ["view", "download"],
+            "showDocUrl": "https://example.org/metadatenkatalog?docuuid="
+        }
+    ],
+    "resultEvents": {
+        "onClick": ["addLayerFromCswRecord", "zoomToResult"],
+        "buttons": ["showLayerInfo"]
+    }
+}
+```
+
+***
+
+###### portalConfig.menu.searchBar.searchInterfaces.csw.definition {data-toc-label='Definition'}
+
+Konfiguration eines einzelnen CSW-Endpunkts innerhalb des Arrays `definitions`.
+
+|Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
+|----|-------------|---|-------|------------|------|
+|elementSetName|nein|String|"brief"|ISO-Elementset für die GetRecords-Anfrage. Unterstützte Werte: `"brief"`, `"summary"`, `"full"`. GeoNetwork-Server (z. B. GeoPortal-BW) liefern `gmd:distributionInfo` erst ab `"summary"` — dieser Wert ist für die Vorfilterung in `normalizeResults` erforderlich. `"brief"` ist sicherer für Server die bei `"summary"` keine Titel für föderierte Records liefern (z. B. IngridPortal/metaver.de).|false|
+|filterNonQueryableLayers|nein|Boolean|false|Wenn `true`, werden WMS-Layer ohne `queryable`-Attribut (d. h. `queryable="0"`) beim Hinzufügen in den Themenbaum herausgefiltert. INSPIRE harmonisierte View-Layer (z. B. `LU.SpatialPlan`) sind typischerweise nicht queryable und rendern ohne INSPIRE SLD-Stylesheet transparent — mit diesem Flag werden sie nicht in den Themenbaum aufgenommen.|false|
+|filterOnMissingDistribution|nein|Boolean|false|Wenn `true`, werden Records ohne `gmd:distributionInfo` in der Suchantwort aus den Ergebnissen gefiltert. Sinnvoll für GeoNetwork-Server (z. B. GeoPortal-BW mit `elementSetName: "summary"`), bei denen das Fehlen von `distributionInfo` bedeutet, dass kein OGC-Dienst verfügbar ist. Standard `false` — Records ohne Distribution-Info werden weiterhin angezeigt (sicher für Server, die `distributionInfo` nie liefern).|false|
+|maxRecords|nein|Integer|10|Maximale Anzahl der zurückgegebenen Datensätze pro Anfrage.|false|
+|serviceTypeFilter|nein|String[]|null|Optionaler INSPIRE-ServiceType-Filter. Schränkt die Ergebnisse auf Datensätze mit passendem ServiceType ein (z. B. `["view"]` für nur WMS, `["view", "download"]` für WMS+WFS). Wird der Filter vom CSW-Server nicht unterstützt, erfolgt automatisch ein erneuter Versuch ohne Filter.|false|
+|showDocUrl|nein|String|""|Basis-URL zum Erstellen der Metadatenkatalog-Verlinkung, indem der Identifier eines Layers angehängt wird (`md_id`/fileIdentifier). Beispiel: `https://example.org/metadatenkatalog?docuuid=`.|false|
+|typeName|nein|String|"gmd:MD_Metadata"|Typname für die CSW-Anfrage (ISO-19139-Standard).|false|
+|url|ja|String||URL des CSW-Endpunkts.|false|
+|version|nein|String|"2.0.2"|CSW-Version. Unterstützte Werte: "2.0.2" (OGC Filter 1.1) und "3.0" (FES 2.0).|false|
+
+***
+
 ###### portalConfig.menu.searchBar.searchInterfaces.specialWFS {data-toc-label='Special WFS'}
 
 [type:resultEvents]: # (portalConfig.menu.searchBar.searchInterfaces.resultEvents)
@@ -1749,7 +1815,7 @@ Folgende Events existieren. Welche Events konfiguriert werden können ist den Be
 
 - activateLayerInTopicTree: Aktiviert den gefunden layer im Themenbaum und in der Karte.
 - addLayerToTopicTree: Fügt den gefundenen Layer zum Themenbaum und der Karte hinzu.
-- highligtFeature: Hebt das Scuhergebniss auf der Karte hervor.
+- highlightFeature: Hebt das Suchergebnis auf der Karte hervor.
 - openGetFeatureInfo: Öffnet die GetFeatureInfo zum Suchtreffer im Menü.
 - setMarker: Es wird ein Marker in der Karte platziert.
 - showInTree: Öffnet die Themenauswahl und zeigt den ausgewählten Layer an.
@@ -4694,10 +4760,11 @@ Eine Instanz der WFS Suche, welche durch ein Dropdown Menü im Werkzeug ausgewä
 WFS-T Modul zur Visualisierung (*getFeature*), Erstellung (*insert*), Veränderung (*update*) und zum Löschen (*delete*) von Features eines bestehenden Web Feature Service (*WFS*), welcher Transaktionen entgegennehmen kann.
 Zur Nutzung dieses Moduls muss ein WFS-T Layer mit der Version 1.1.0 bereitgestellt werden. Bitte beachten Sie **[services.json](../Global-Config/services.json.md)** für weitere Konfigurationsinformationen.
 
-Beim Bearbeiten eines Features / Hinzufügen von Attributen zu einem neuen Feature werden bestimmte Werte in der Nutzeroberfläche angezeigt. Die Werte und auch dessen Label stehen im direkten Zusammenhang mit den `gfiAttributes` des Dienstes. Bitte beachten Sie **[services.json](../Global-Config/services.json.md)** für weitere Informationen.
+Beim Bearbeiten eines Features / Hinzufügen von Attributen zu einem neuen Feature werden bestimmte Werte in der Nutzeroberfläche angezeigt. Die Werte und auch dessen Label stehen im direkten Zusammenhang mit den `gfiAttributes` des Dienstes. Jedes Attribut kann zusätzlich eine optionale `regex` (und `regexError`) tragen, um die Nutzereingabe beim einzelnen Anlegen und Bearbeiten zu validieren. Bitte beachten Sie **[services.json](../Global-Config/services.json.md)** für weitere Informationen.
 
 |Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
 |----|-------------|---|-------|------------|------|
+|activateLayerInTree|nein|Boolean|false|Legt fest, ob der aktuell im Modul ausgewählte Layer automatisch im Themenbaum aktiviert wird. Beim Wechsel des Layers oder beim Verlassen des Moduls wird der Ursprungszustand des Layers wiederhergestellt.|false|
 |delete|nein|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)/Boolean|false|Legt fest, welche der zu `layerIds` zugehörigen Layer das Löschen von Geometrien erlauben.|false|
 |icon|nein|String|"bi-globe"|Icon das im Menü vor dem Modulnamen angezeigt wird. Zur Auswahl siehe **[Bootstrap Icons](https://icons.getbootstrap.com/)**|false|
 |layerIds|ja|String[]||Array an Ids von in **[services.json](../Global-Config/services.json.md)** definierten Layern.|false|
@@ -4707,10 +4774,12 @@ Beim Bearbeiten eines Features / Hinzufügen von Attributen zu einem neuen Featu
 |pointButton|nein|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)[]/Boolean|[]|Legt fest, welche der zu `layerIds` zugehörigen Layer das Hinzufügen von Punkten erlauben.|false|
 |polygonButton|nein|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)[]/Boolean|[]|Legt fest, welche der zu `layerIds` zugehörigen Layer das Hinzufügen von Polygonen erlauben.|false|
 |showConfirmModal|nein|Boolean|false|Kennzeichen, ob ein modaler Dialog angezeigt werden soll.|false|
+|showLayerLoader|nein|Boolean|false|Legt fest, ob neben der Layerauswahl eine Ladeanzeige angezeigt wird, während der ausgewählte Layer seine Features lädt. Während des Ladens sind Bearbeiten, Erstellen und Löschen deaktiviert.|false|
 |toggleLayer|nein|Boolean|false|Legt fest, ob die Feature des ausgewählten Layers weiterhin angezeigt werden sollen, wenn neue Feature hinzugefügt werden.|false|
 |type|nein|String|"wfst"|Der type des Moduls. Definiert welches Modul konfiguriert ist.|false|
 |update|nein|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)/Boolean|false|Legt fest, welche der zu `layerIds` zugehörigen Layer das Bearbeiten von Geometrien erlauben.|false|
 |multiUpdate|nein|[multiUpdate](#portalconfigmenusectionsmoduleswfstmultiupdate)[]|[]|Definiert, für welche Layer die gleichzeitige Aktualisierung mehrerer Features möglich ist.|false|
+|featurePropertiesValues|nein|[featurePropertiesValues](#portalconfigmenusectionsmoduleswfstfeaturepropertiesvalues)[]|[]|Defaultwerte für die Properties der Features das WFS setzen.|false|
 
 **Beispiel**
 
@@ -4761,8 +4830,38 @@ Beim Bearbeiten eines Features / Hinzufügen von Attributen zu einem neuen Featu
                     "select": "fa-mouse-pointer"
                 }
         }
+    ],
+    "featurePropertiesValues": [
+        {
+            "key":"kategorie",
+            "value":"meine Kategorie"
+        }
     ]
 }
+```
+
+***
+
+###### portalConfig.menu.sections.modules.wfst.featurePropertiesValues {data-toc-label='featurePropertiesValues'}
+
+[inherits]: # (portalConfig.menu.sections.modules.wfst)
+
+Definiert die Konfiguration für die Defaultwerte der Feature Properties.
+
+|Name|Verpflichtend|Typ|Default|Beschreibung|Expert|
+|----|-------------|---|-------|------------|------|
+|key|nein|String||key der WFS Feature Property.|false|
+|value|nein|String||Defaultwert, der im Eingabefeld des Formulars für das mit key spezifizierte Feature Property vorbelegt wird.|false|
+
+**Beispiele**
+
+```json
+"featurePropertiesValues": [
+    {
+        "key":"kategorie",
+        "value":"meine Kategorie"
+    }
+]
 ```
 
 ***
@@ -5627,7 +5726,7 @@ Es wird ein Gruppenlayer erzeugt, der alle Layer der angegeben ids enthält. Sie
 
 ```json
 {
-    "id": [ "27926", "1711", "18104"],
+    "id": [ "27926", "1711"],
     "typ": "GROUP",
     "name": "Gruppe OAF, WFS, SensorThings",
     "visibility": false,
@@ -5642,11 +5741,6 @@ Es wird ein Gruppenlayer erzeugt, der alle Layer der angegeben ids enthält. Sie
             "id": "1711",
             "styleId": "1711",
             "typ": "WFS"
-        },
-        {
-            "id": "18104",
-            "styleId": "18104",
-            "typ": "SensorThings"
         }
     ]
 }

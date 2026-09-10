@@ -29,9 +29,9 @@ export default {
             if (this.gfiFeaturesOfLayer && this.gfiFeaturesOfLayer.length > 0) {
                 items = this.gfiFeaturesOfLayer.map((feature) => {
                     const properties = feature.getProperties(),
-                        attributesToShow = feature.getAttributesToShow(),
-                        showAll = attributesToShow === "showAll",
-                        newProperties = {};
+                          attributesToShow = feature.getAttributesToShow(),
+                          showAll = attributesToShow === "showAll",
+                          newProperties = {};
 
                     Object.keys(properties).forEach((key) => {
                         if (!this.ignoredKeys.includes(key.toUpperCase())) {

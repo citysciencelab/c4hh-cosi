@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import SnippetInput from "@modules/filter/components/SnippetInput.vue";
 import {expect} from "chai";
 import {nextTick} from "vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/SnippetInput.vue", () => {
     describe("constructor", () => {

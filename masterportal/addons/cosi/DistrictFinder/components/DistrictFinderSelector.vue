@@ -176,8 +176,8 @@ export default {
          */
         collectSelectedDistricts () {
             const selectedDistricts = [],
-                districts = this.showSubLevel ? this.subLevel.subLevel.districts : this.subLevel.districts,
-                selection = this.showSubLevel ? this.subLevelSelection : this.topLevelSelection;
+                  districts = this.showSubLevel ? this.subLevel.subLevel.districts : this.subLevel.districts,
+                  selection = this.showSubLevel ? this.subLevelSelection : this.topLevelSelection;
 
             districts.forEach(district => {
                 if (selection.includes(district.referencDistrictName)) {
@@ -222,8 +222,8 @@ export default {
          */
         removeSubLevelDistricts (districts, referenceDistrict) {
             const districtsToRemove = this.getDistrictsByReference(districts, referenceDistrict),
-                tmpSubLevelDistricts = [...this.subLevelDistricts],
-                tmpSublLevelSelection = [...this.subLevelSelection];
+                  tmpSubLevelDistricts = [...this.subLevelDistricts],
+                  tmpSublLevelSelection = [...this.subLevelSelection];
 
             districtsToRemove.forEach(district => {
                 this.removeElementFromArray(district, tmpSubLevelDistricts);
@@ -261,8 +261,8 @@ export default {
         },
         updateSublevelSelection (newValue) {
             const oldValue = this.subLevelSelection,
-                difference = differenceJs(newValue, oldValue),
-                diff = differenceJs(oldValue, newValue);
+                  difference = differenceJs(newValue, oldValue),
+                  diff = differenceJs(oldValue, newValue);
 
             if (diff.length) {
                 this.removeFromSubLevelSelection(diff[0]);

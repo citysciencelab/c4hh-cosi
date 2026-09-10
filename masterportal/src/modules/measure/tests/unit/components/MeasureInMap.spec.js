@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {nextTick} from "vue";
 import {expect} from "chai";
 import sinon from "sinon";
 import MeasureInMapComponent from "@modules/measure/components/MeasureInMap.vue";
 import MeasureModule from "@modules/measure/store/indexMeasure.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/measure/components/MeasureInMap.vue", () => {
     let store,

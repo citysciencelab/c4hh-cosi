@@ -6,9 +6,11 @@ import transformer from "@shared/js/utils/coordToPixel3D.js";
 
 describe("src/shared/js/utils/coordToPixel3D", () => {
     let fromDegrees,
-        wgs84ToWindowCoordinates;
+        wgs84ToWindowCoordinates,
+        originalCesium;
 
     beforeAll(() => {
+        originalCesium = global.Cesium;
         mapCollection.clear();
         const map3d = {
                 id: "1",
@@ -43,6 +45,10 @@ describe("src/shared/js/utils/coordToPixel3D", () => {
             wgs84ToWindowCoordinates: sinon.stub().returns(wgs84ToWindowCoordinates)
         };
         crs.registerProjections();
+    });
+
+    afterAll(() => {
+        global.Cesium = originalCesium;
     });
 
     describe("coordToPixel3D", () => {

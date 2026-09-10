@@ -3,6 +3,7 @@
         "tools": {
             "cosi": {
                 "featuresList": {
+                    "description": "Mit dieser Funktion können Sie themenspezifische, fachliche Informationen wie z.B. Grünflächen, Bäume oder Kitas zu einzelnen Sachverhalten oder Standorten einsehen. Die Informationen sind georeferenziert. Sie können sie zur detaillierten Analyse, Planung und Verwaltung von Stadt- und Raumstrukturen nutzen.",
                     "title": "Einrichtungsübersicht",
                     "titleLocationScore": "Standortbewertung",
                     "help": "Listet alle geladenen Einrichtungen für die ausgewählten Gebiete",

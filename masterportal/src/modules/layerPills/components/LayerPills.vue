@@ -1,7 +1,10 @@
 <script>
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapActions as mapPiniaActions} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 import layerTypes from "@core/layers/js/layerTypes.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 
 /**
  * Layer Pills: show enabled toplayers as Buttons on top of the map. Adds Ability to remove Layers and call Layerinformation without using Layertree or open Menu.
@@ -18,7 +21,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters(["isMobile", "visibleSubjectDataLayerConfigs"]),
+        ...mapGetters(["visibleSubjectDataLayerConfigs"]),
         ...mapGetters("Modules/LayerPills", [
             "active",
             "configPaths",
@@ -29,29 +32,18 @@ export default {
         ]),
         ...mapGetters("Modules/LayerTree", ["layerTreeSortedLayerConfigs"]),
         ...mapGetters("Maps", ["mode"]),
-        ...mapGetters("Menu", ["currentSecondaryMenuWidth", "currentMainMenuWidth"]),
-        /**
-         * combinedMenuState keeps track of the state of menu, i.e. whether the menus are expanded and their current width.
-         * Enables the use of a single watcher on all four variables.
-         */
-        combinedMenuWidthState () {
-            return {
-                currentMainMenuWidth: this.currentMainMenuWidth,
-                currentSecondaryMenuWidth: this.currentSecondaryMenuWidth
-            };
-        },
+
         /**
          * Returns all visible subject data layers in the correct display order
          * for the LayerPills component.
          * The order is primarily defined by the LayerTree configuration
-         * (`layerTreeSortedLayerConfigs`). Layers that are visible but not part
-         * of the LayerTree (e.g. `showInLayerTree: false`) are appended afterwards
-         * to maintain backward compatibility.
+         * (`layerTreeSortedLayerConfigs`).
+         * Layers with `showInLayerTree: false` are not visible.
          * @returns {Array<Object>} Sorted list of visible layer configuration objects
          */
         sortedVisibleLayerPills () {
             const treeLayers = this.layerTreeSortedLayerConfigs(false),
-                visible = this.visibleSubjectDataLayerConfigs;
+                  visible = this.visibleSubjectDataLayerConfigs.filter(layer => layer.showInLayerTree !== false);
 
             return [
                 ...treeLayers.filter(l => visible.some(v => v.id === l.id)),
@@ -81,30 +73,12 @@ export default {
             );
 
             this.setVisibleLayers(sortedByTree, value);
-        },
-        /**
-         * Detects changes to the menu state and width to update the layerPills accordingly.
-         * Animation of menus opening or closing make the timeout necessary.
-         * @returns {void}
-         */
-        combinedMenuWidthState: {
-            handler () {
-                if (this.active) {
-                    this.setToggleButtonVisibility();
-                }
-            }
         }
     },
     created () {
         this.initializeModule({configPaths: this.configPaths, type: this.type});
-        const layers = this.layerTreeSortedLayerConfigs(false);
-
-        if (layers) {
-            const sortedByTree = this.layerTreeSortedLayerConfigs(false).filter(
-                l => this.visibleSubjectDataLayerConfigs.some(n => n.id === l.id)
-            );
-
-            this.setVisibleLayers(sortedByTree, this.mode);
+        if (this.layerTreeSortedLayerConfigs(false)) {
+            this.setVisibleLayers(this.sortedVisibleLayerPills, this.mode);
         }
     },
     mounted () {
@@ -116,11 +90,9 @@ export default {
         }
     },
     methods: {
-        ...mapMutations("Modules/LayerPills", ["setVisibleSubjectDataLayers", "setActive"]),
-        ...mapMutations(["setVisibleSubjectDataLayerConfigs"]),
+        ...mapMutations("Modules/LayerPills", ["setVisibleSubjectDataLayers"]),
         ...mapActions(["initializeModule", "replaceByIdInLayerConfig"]),
-        ...mapActions("Modules/LayerInformation", ["startLayerInformation"]),
-
+        ...mapPiniaActions(useLayerInformationStore, ["startLayerInformation"]),
         /**
          * Initializes and registers a ResizeObserver for the layer pills container.
          * Ensures that the observer is created only once and only after the container
@@ -155,8 +127,8 @@ export default {
 
             if (mapMode === "2D") {
                 const layerTypes3d = layerTypes.getLayerTypes3d(),
-                    visible2DLayers = visibleLayers.filter(layer => !layerTypes3d.includes(layer.typ?.toUpperCase())
-                        && !layer.isNeverVisibleInTree);
+                      visible2DLayers = visibleLayers.filter(layer => !layerTypes3d.includes(layer.typ?.toUpperCase())
+                          && !layer.isNeverVisibleInTree);
 
                 this.setVisibleSubjectDataLayers(visible2DLayers);
             }
@@ -165,6 +137,10 @@ export default {
             }
             this.setToggleButtonVisibility();
         },
+        /**
+         * Toggles the visibility of all layers.
+         * @returns {void}
+         */
         toggleLayerVisibility () {
             this.showAllLayers = !this.showAllLayers;
         },
@@ -174,15 +150,18 @@ export default {
          * @returns {void}
          */
         removeLayerFromVisibleLayers (layer) {
-            this.replaceByIdInLayerConfig({
-                layerConfigs: [{
-                    id: layer.id,
-                    layer: {
+            this.replaceByIdInLayerConfig(addSourceToPayload(
+                this,
+                {
+                    layerConfigs: [{
                         id: layer.id,
-                        visibility: false
-                    }
-                }]
-            });
+                        layer: {
+                            id: layer.id,
+                            visibility: false
+                        }
+                    }]
+                }
+            ));
         },
         /**
          * starts the Module layerInformation for given Layer
@@ -191,7 +170,7 @@ export default {
          */
         showLayerInformationInMenu (layerConf) {
             if (layerConf.datasets || layerConf.typ?.startsWith("GROUP")) {
-                this.startLayerInformation(layerConf);
+                this.startLayerInformation(addSourceToPayload(this, layerConf));
             }
         },
         /**
@@ -200,21 +179,27 @@ export default {
          */
         setToggleButtonVisibility () {
             this.$nextTick(() => {
-                this.setupResizeObserver();
+
+                const pillMargin = 10;
+                const roundingTolerance = 2;
+                let totalPillWidth = 0;
+
                 const container = this.$refs.layerPillsContainer,
-                    pills = container?.querySelectorAll(".nav-item"),
-                    pillWidth = pills?.[0]
-                        ? (pills[0].offsetWidth + 10) * this.visibleSubjectDataLayers.length
-                        : 0,
-                    containerWidth = container?.querySelector(".nav-pills")
-                        ? container.querySelector(".nav-pills").getBoundingClientRect().width
-                        : 0;
+                      pills = container?.querySelectorAll(".nav-pills > li"),
+                      containerWidth = container?.querySelector(".nav-pills")
+                          ? container.querySelector(".nav-pills").getBoundingClientRect().width
+                          : 0;
 
                 if (!container || !pills || !pills[0]) {
                     this.showToggleButton = false;
                     return;
                 }
-                this.showToggleButton = pillWidth > containerWidth;
+
+                pills.forEach(pill => {
+                    totalPillWidth += pill.offsetWidth + pillMargin;
+                });
+
+                this.showToggleButton = Math.round(totalPillWidth) > Math.round(containerWidth) + roundingTolerance;
             });
         }
     }
@@ -270,6 +255,8 @@ export default {
             <button
                 v-if="showToggleButton"
                 class="nav-link"
+                :aria-label="showAllLayers ? $t('common:modules.layerPills.hide') : $t('common:modules.layerPills.showMore')"
+                :aria-expanded="showAllLayers ? 'true' : 'false'"
                 @click="toggleLayerVisibility"
             >
                 <i

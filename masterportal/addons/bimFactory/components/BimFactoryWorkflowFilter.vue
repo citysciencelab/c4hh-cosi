@@ -57,13 +57,13 @@ export default {
         filteredData (newValue) {
             if (this.config.component.renderAs === "table" && newValue.features?.length) {
                 const rows = newValue.features?.map(singleFeature => singleFeature?.properties),
-                    columns = Object.keys(newValue.features[0]?.properties).map((key, index) => {
-                        return {
-                            "name": key,
-                            "order": "origin",
-                            "index": index
-                        };
-                    });
+                      columns = Object.keys(newValue.features[0]?.properties).map((key, index) => {
+                          return {
+                              "name": key,
+                              "order": "origin",
+                              "index": index
+                          };
+                      });
 
                 this.data = {
                     headers: columns,
@@ -114,17 +114,17 @@ export default {
         ...mapMutations("Modules/BimFactory", ["setFilterLayer", "setWorkflowFormDataBbox", "setGeneratedIfcUrl"]),
         onFilter () {
             const polygon = new Polygon(this.selectedAreaGeoJson.coordinates),
-                bbox = polygon.getExtent(),
-                targetProjection = "EPSG:4326",
-                sourceProjection = crs.getMapProjection(mapCollection.getMap("2D")),
-                bboxLowerLeftCorner = crs.transform(sourceProjection, targetProjection, [Number(bbox[0]), Number(bbox[1])]),
-                bboxUpperRightCorner = crs.transform(sourceProjection, targetProjection, [Number(bbox[2]), Number(bbox[3])]),
-                transformedBbox = {
-                    "min_x": bboxLowerLeftCorner[0],
-                    "min_y": bboxLowerLeftCorner[1],
-                    "max_x": bboxUpperRightCorner[0],
-                    "max_y": bboxUpperRightCorner[1]
-                };
+                  bbox = polygon.getExtent(),
+                  targetProjection = "EPSG:4326",
+                  sourceProjection = crs.getMapProjection(mapCollection.getMap("2D")),
+                  bboxLowerLeftCorner = crs.transform(sourceProjection, targetProjection, [Number(bbox[0]), Number(bbox[1])]),
+                  bboxUpperRightCorner = crs.transform(sourceProjection, targetProjection, [Number(bbox[2]), Number(bbox[3])]),
+                  transformedBbox = {
+                      "min_x": bboxLowerLeftCorner[0],
+                      "min_y": bboxLowerLeftCorner[1],
+                      "max_x": bboxUpperRightCorner[0],
+                      "max_y": bboxUpperRightCorner[1]
+                  };
 
             this.filterRequests({bboxLowerLeftCorner, bboxUpperRightCorner, endpoint: this.config.component.endpoint});
 

@@ -87,7 +87,7 @@ export default {
 
                 categories.forEach(category => {
                     const searchResultsByCategory = this.searchResults.filter(searchResult => searchResult.category === category),
-                        searchInterfaceIds = [...new Set(searchResultsByCategory.map(searchResult => searchResult.searchInterfaceId))];
+                          searchInterfaceIds = [...new Set(searchResultsByCategory.map(searchResult => searchResult.searchInterfaceId))];
 
                     if (searchInterfaceIds.length > 1) {
                         let count = 0;
@@ -115,7 +115,7 @@ export default {
          */
         limitedSortedSearchResults () {
             const results = {},
-                currentShowAllList = [];
+                  currentShowAllList = [];
 
             results.categoryProvider = {};
             this.setSearchSuggestions([]);
@@ -171,7 +171,7 @@ export default {
                         this.setShowAllResults(false);
                         this.setShowSearchResultsInTree(false);
                         this.setCurrentActionEvent("");
-                        this.navigateBack(this.currentSide);
+                        this.navigateBack({side: this.currentSide});
                     }
                 }
                 if (newVal === "layerSelection" && this.addLayerButtonSearchActive === true) {
@@ -336,7 +336,7 @@ export default {
 
                 for (const searchResult of this.searchResults) {
                     const category = searchResult.category.toLowerCase(),
-                        name = (searchResult.name || "").toLowerCase().trim();
+                          name = (searchResult.name || "").toLowerCase().trim();
 
                     if (
                         category.includes("adresse") ||

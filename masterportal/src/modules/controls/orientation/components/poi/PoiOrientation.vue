@@ -5,9 +5,10 @@ import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createSty
 import mutations from "../../store/mutationsOrientation.js";
 import {extractEventCoordinates} from "@shared/js/utils/extractEventCoordinates.js";
 import svgFactory from "@shared/js/utils/svgFactory.js";
+import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 
 /**
- * Orientation control that allowsthe user to locate themselves on the map.
+ * Orientation control that allows the user to locate themselves on the map.
  * @module modules/controls/PoiOrientation
  * @vue-prop {Boolean | Array} poiDistances - The point of interest distances.
  * @vue-prop {Function} getFeaturesInCircle - Function to get Features within distance.
@@ -15,6 +16,9 @@ import svgFactory from "@shared/js/utils/svgFactory.js";
  */
 export default {
     name: "PoiOrientation",
+    components: {
+        NavTab
+    },
     props: {
         poiDistances: {
             type: [Boolean, Array],
@@ -90,7 +94,7 @@ export default {
          */
         show () {
             const el = document.querySelector(".modal"),
-                backdrop = document.querySelector(".modal-backdrop");
+                  backdrop = document.querySelector(".modal-backdrop");
 
             if (el) {
                 el.style.display = "block";
@@ -122,8 +126,8 @@ export default {
          */
         getFeatures (layerConfigs) {
             const poiDistances = this.poiDistances,
-                poiFeatures = [],
-                centerPosition = this.position;
+                  poiFeatures = [],
+                  centerPosition = this.position;
             let featInCircle = [];
 
             poiDistances.forEach(distance => {
@@ -190,18 +194,18 @@ export default {
          */
         zoomFeature (evt) {
             const id = evt.currentTarget.id,
-                poiFeatures = this.poiFeatures,
-                activeCategory = this.activeCategory,
-                selectedPoiFeatures = poiFeatures.find(poi => {
-                    return poi.category === activeCategory;
-                }),
-                feature = selectedPoiFeatures.features.find(feat => {
-                    return feat.getId() === id;
-                }),
-                extent = feature.getGeometry().getExtent(),
-                coordinate = extractEventCoordinates(extent),
-                resolutions = mapCollection.getMapView("2D").getResolutions(),
-                index = resolutions.indexOf(0.2645831904584105) === -1 ? resolutions.length : resolutions.indexOf(0.2645831904584105);
+                  poiFeatures = this.poiFeatures,
+                  activeCategory = this.activeCategory,
+                  selectedPoiFeatures = poiFeatures.find(poi => {
+                      return poi.category === activeCategory;
+                  }),
+                  feature = selectedPoiFeatures.features.find(feat => {
+                      return feat.getId() === id;
+                  }),
+                  extent = feature.getGeometry().getExtent(),
+                  coordinate = extractEventCoordinates(extent),
+                  resolutions = mapCollection.getMapView("2D").getResolutions(),
+                  index = resolutions.indexOf(0.2645831904584105) === -1 ? resolutions.length : resolutions.indexOf(0.2645831904584105);
 
             this.zoomToExtent({extent: coordinate, options: {maxZoom: index}});
             this.$store.dispatch("Maps/removePointMarker");
@@ -212,14 +216,12 @@ export default {
         },
 
         /**
-         * Changing default category
-         * @param {Event} evt click event
-         * @return {String} SVG
-         */
-        changedCategory (evt) {
-            const currentTabId = evt.target.getAttribute("aria-controls");
-
-            this.setActiveCategory(parseFloat(currentTabId));
+        * Sets the active category in Vuex state.
+        * @param {number} category The category distance value
+        * @returns {void}
+        */
+        changedCategory (category) {
+            this.setActiveCategory(category);
         },
 
         /**
@@ -233,7 +235,7 @@ export default {
             this.imgPathByFeature[feat.getId()] = "";
             if (styleObject) {
                 const featureStyleObject = createStyle.getGeometryStyle(feat, styleObject.rules, false, Config.wfsImgPath),
-                    featureStyle = createStyle.createStyle(styleObject, feat, false, Config.wfsImgPath);
+                      featureStyle = createStyle.createStyle(styleObject, feat, false, Config.wfsImgPath);
 
                 if (featureStyleObject.attributes?.type === "icon") {
                     this.imgPathByFeature[feat.getId()] = featureStyle.getImage()?.getSrc() ? featureStyle.getImage()?.getSrc() : "";
@@ -242,7 +244,7 @@ export default {
                 else {
                     createStyle.returnLegendByStyleId(feat.styleId).then(layerLegends => {
                         layerLegends.legendInformation.forEach(legendInfo => {
-                            if (legendInfo.geometryType === "Point" && legendInfo.styleObject.attributes.type === "circle" && legendInfo.label === feat.legendValue) {
+                            if (legendInfo.geometryType === "Point" && legendInfo.styleObject.attributes?.type === "circle" && legendInfo.label === feat.legendValue) {
                                 this.imgPathByFeature[feat.getId()] = svgFactory.createCircle(legendInfo.styleObject);
                             }
                             else if (legendInfo.geometryType === "LineString" && legendInfo.label === feat.legendValue) {
@@ -289,39 +291,27 @@ export default {
                 </div>
                 <div>
                     <ul
-                        class="nav nav-pills"
+                        class="nav nav-tabs"
                         role="tablist"
                     >
-                        <li
+                        <NavTab
                             v-for="(feature, index) in poiFeatures"
+                            :id="`poi-tab-${feature.category}`"
                             :key="index"
-                            class="nav-item"
+                            :label="`${feature.category}m`"
+                            :active="feature.category === activeCategory"
+                            :target="`#poi-distance-${feature.category}`"
+                            :interaction="() => changedCategory(feature.category)"
                         >
-                            <button
-                                class="nav-link"
-                                :class="
-                                    feature.category === activeCategory
-                                        ? 'active'
-                                        : ''
-                                "
-                                :href="feature.category"
-                                :aria-controls="feature.category"
-                                data-bs-toggle="pill"
-                                @click="changedCategory"
-                                @keydown.enter="changedCategory"
-                            >
-                                {{ feature.category + "m" }}
-                                <span
-                                    class="badge"
-                                    :aria-controls="feature.category"
-                                >{{ feature.features.length }}</span>
-                            </button>
-                        </li>
+                            <span
+                                class="result-count"
+                            >{{ feature.features.length }}</span>
+                        </NavTab>
                     </ul>
                     <div class="tab-content">
                         <div
                             v-for="(feature, index) in poiFeatures"
-                            :id="feature.category"
+                            :id="`poi-distance-${feature.category}`"
                             :key="'list' + index"
                             role="tabpanel"
                             :class="[
@@ -431,6 +421,16 @@ export default {
         }
         .modal-dialog {
             z-index: 1051;
+        }
+        .result-count {
+            background-color: $dark_blue;
+            color: white;
+            border-radius: 12px;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+            vertical-align: middle;
         }
         .tab-content {
             max-height: 78vh;

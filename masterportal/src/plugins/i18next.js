@@ -137,7 +137,7 @@ export function initLanguage (portalLanguageConfig, portalLocales) {
             parseMissingKeyHandler: (key) => {
                 return key
                     .replace(/^(common:|additional:)/, "")
-                    .replace(/(?<=\s|^)([01]?[0-9]|2[0-3])\.([0-5][0-9])(?=\s|$)/g, "$1:$2");
+                    .replace(/(?<=\s|^)([01]\d|2[0-3])\.([0-5]\d)(?=\s|$)/g, "$1:$2");
             }
         })
         .then(() => {

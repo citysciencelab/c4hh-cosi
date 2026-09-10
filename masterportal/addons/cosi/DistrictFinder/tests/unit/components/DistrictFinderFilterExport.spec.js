@@ -84,7 +84,6 @@ describe.skip("addons/cosi/DistrictFinder/components/DistrictFinderFilterExport.
             await buttonWrapper.trigger("click");
 
             expect(stubExport.calledOnce).to.be.true;
-            sinon.restore();
         });
     });
 });

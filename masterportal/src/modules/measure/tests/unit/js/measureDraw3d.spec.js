@@ -47,6 +47,11 @@ describe("tools/measure/utils/measureDraw3d", () => {
             getCesiumScene: () => scene,
             getDataSourceDisplay: () => dataSourceDisplay
         };
+    let originalCesium;
+
+    beforeAll(() => {
+        originalCesium = global.Cesium;
+    });
 
     beforeEach(() => {
 
@@ -107,6 +112,7 @@ describe("tools/measure/utils/measureDraw3d", () => {
     afterEach(() => {
         dataSourceDisplay.defaultDataSource.entities.removeAll();
         mapCollection.clear();
+        global.Cesium = originalCesium;
     });
 
     describe("createLabelEntity", () => {

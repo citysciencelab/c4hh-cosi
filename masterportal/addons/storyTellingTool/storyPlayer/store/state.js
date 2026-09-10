@@ -11,8 +11,11 @@
  * @property {Boolean} isVisibleInMenu - if true, tool is selectable in menu (config-param)
  * @property {Boolean} deactivateGFI - flag if tool should deactivate gfi (config-param)
  * Addon state
+ * @property {String} currentStoryName the name of the currently loaded story file (without extension).
+ * @property {Number} duration Duration used for StoryPlayer animations.
  * @property {String} fixedStoryName the fixed story file name.
  * @property {String} fixedStoryPath the relative path in portalconfigs to contain fixed stories.
+ * @property {ol/layer[]} originalLayerConfig the original layer configs.
  */
 
 const state = {
@@ -26,12 +29,14 @@ const state = {
     icon: "bi-book",
 
     // Addon state
-    autoplay: false,
+    currentStoryName: null,
+    duration: 1000,
     fixedStoryName: null,
     fixedStoryPath: null,
+    imageAssetsById: {},
     mode: null,
-    storyConf: {},
-    storyConfJson: null
+    originalLayerConfig: undefined,
+    storyConf: {}
 };
 
 export default state;

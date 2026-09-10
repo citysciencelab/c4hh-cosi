@@ -1,6 +1,7 @@
 import {expect} from "chai";
 import sinon from "sinon";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
+import Layer2dVector from "@core/layers/js/layer2dVector.js";
 import Layer2dVectorVectorbase from "@core/layers/js/layer2dVectorVectorbase.js";
 
 describe("src/core/js/layers/layer2dVectorVectorbase.js", () => {
@@ -30,6 +31,8 @@ describe("src/core/js/layers/layer2dVectorVectorbase.js", () => {
     });
 
     beforeEach(() => {
+        // Set prototype of Layer2dVectorVectorbase to Layer2dVector to avoid errors in tests
+        Object.setPrototypeOf(Layer2dVectorVectorbase.prototype, Layer2dVector.prototype);
         attributes = {
             id: "id",
             layers: "layer1,layer2",

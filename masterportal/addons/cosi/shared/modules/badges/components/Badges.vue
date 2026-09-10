@@ -9,7 +9,7 @@ export default {
         },
         color: {
             type: String,
-            default: "#212529"
+            default: "#151C27"
         },
         icon: {
             type: String,

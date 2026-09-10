@@ -3,6 +3,7 @@
     "storyCreator": {
       "storyNav": "Story",
       "chapterNav": "Chapter",
+      "autosaveHint": "The change was automatically saved.",
       "title": "Story Creator",
       "addChapter": "Add Chapter",
       "saveStory": "Save story",
@@ -15,6 +16,7 @@
       "introText": "This tool is designed for creating interactive, map-based stories. After entering general information such as the name, description, author, and cover image, you can flexibly add individual chapters below. Using the buttons at the bottom of the page, you can preview, save, or discard the story.",
       "labels": {
         "storyTitle": "Enter story name",
+        "storyname": "Story name",
         "storyDescription": "Story description (optional)",
         "storyAuthor": "Author of the story (optional)",
         "fileDrop": "Drop file here",
@@ -28,16 +30,25 @@
         "wrongFormat": "Only image files (e.g. JPG, PNG) are permitted.",
         "wrongFormatTitle": "Invalid file format",
         "emptyChapter": "No chapters have been created yet.",
-        "mapPosition": "Map position"
+        "mapPosition": "Map position",
+        "videoLink": "Video-URL (MP4, WebM, Ogg or YouTube-Link)",
+        "videoTitle": "Video-Title (Optional)",
+        "videoAccessibleText": "Text for accessibility",
+        "imageRequiredAlt": "Alternative text for an accessible image description is missing.",
+        "imageRequiredCopyright": "A copyright notice is required.",
+        "imageRequiredFields": "Required fields must be filled out."
       },
       "buttons": {
           "confirm": "Confirm",
           "discardImage": "Discard image",
-          "abort": "Abort"
+          "discardStory": "Discard story",
+          "discardChanges": "Discard changes",
+          "discardVideo": "Discard video"
       },
       "headlines": {
         "addImages": "Add new image",
         "addTexts": "Add new text",
+        "addVideo": "Add new video",
         "chapterList": "List of Chapters",
         "addImageTitle": "Add new title image",
         "coverOfStory": "Cover photo for the story"
@@ -49,16 +60,23 @@
         "mapPosition": "Apply map position",
         "currentPosition": "Current map position",
         "layerList": "Layers to include (optional)",
+        "baseLayerList": "Base layer to use",
         "toolList": "Tool to open (optional)",
         "zoomLevel": "Zoom level",
         "save": "Save chapter",
         "cancel": "Cancel",
+        "cancelNew": "Discard chapter",
+        "cancelEdit": "Discard changes",
         "successAlert": "The map position has been successfully saved!",
         "positionChangedHint": "The location does not match the current view of the map.",
         "addContent": "Add content",
         "title": "Enter chapter title",
         "initialText": "Click here to add a chapter description...",
         "toolListPlaceholder": "Select tool...",
+        "noFeatureLinked": "No feature linked",
+        "noSubjectLayerHint": "Please select layers to be able to link a feature.",
+        "addFeatureDescription": "By clicking on a feature in the map, it will be linked to the current chapter. You can add additional information and define which attributes will later be visible in the info popup.",
+        "baseLayerListPlaceholder": "Select base layer...",
         "layerListPlaceholder": "Select layers..."
       },
       "addElementDropdown": {
@@ -68,9 +86,20 @@
         },
         "items": {
           "text": "Text",
+          "feature": "Link feature",
           "separator": "Separator",
           "image": "Image",
           "video": "Video"
+        },
+        "feature": {
+          "title": "Title (max. 200 signs)",
+          "description": "Description (optional, max. 500 signs)",
+          "editAttribute": "Edit attribute",
+          "addImage": "Add image",
+          "remove": "Remove",
+          "cancel": "Discard feature",
+          "save": "Save Feature",
+          "info": "In playback mode, a button appears in the chapter. Clicking it centers the map on the linked object and opens the info pop-up."
         }
       }
     }

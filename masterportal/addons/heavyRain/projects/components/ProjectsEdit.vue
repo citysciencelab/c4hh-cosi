@@ -2,8 +2,10 @@
 import {convertColor} from "@shared/js/utils/convertColor";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import HrDraw from "../../shared/components/HrDraw.vue";
+import HrFooter from "../../shared/components/HrFooter.vue";
+import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
-import {mapGetters} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 
 export default {
@@ -11,12 +13,21 @@ export default {
     components: {
         FileUpload,
         HrDraw,
+        HrFooter,
+        HrSnackbar,
         InputText,
         Multiselect
     },
     data () {
         return {
-            chosenCriteria: []
+            chosenCriteria: [],
+            projectName: "",
+            creator: "",
+            contactPerson: "",
+            invalid: false,
+            showSnackbar: false,
+            snackbarMessage: "",
+            snackbarColor: "error"
         };
     },
     computed: {
@@ -38,6 +49,26 @@ export default {
             });
 
             return convertColor(this.criteria[Math.min(...index)].color, "rgb");
+        }
+    },
+    methods: {
+        ...mapMutations("Modules/Projects", ["setCurrentView"]),
+
+        /**
+         * Handles the save action.
+         * @returns {void}
+         */
+        onSave () {
+            if (this.projectName.trim() === "" || this.creator.trim() === "" || this.contactPerson.trim() === "") {
+                this.snackbarMessage = this.$t("additional:modules.projects.messages.invalid");
+                this.showSnackbar = true;
+                this.invalid = true;
+                return;
+            }
+
+            this.invalid = false;
+            this.$emit("showSnackbarMessage", this.$t("additional:modules.projects.messages.saveSuccess"));
+            this.setCurrentView("main");
         }
     }
 };
@@ -75,6 +106,8 @@ export default {
             <div class="col-12">
                 <InputText
                     id="project-name"
+                    v-model="projectName"
+                    :class="projectName.trim() === '' && invalid ? 'invalid': ''"
                     :label="$t('additional:modules.projects.labels.projectName')"
                     :placeholder="$t('additional:modules.projects.labels.projectName')"
                 />
@@ -106,6 +139,8 @@ export default {
             <div class="col-12">
                 <InputText
                     id="createdBy"
+                    v-model="creator"
+                    :class="creator.trim() === '' && invalid ? 'invalid': ''"
                     :label="$t('additional:modules.projects.labels.createdBy')"
                     :placeholder="$t('additional:modules.projects.labels.createdBy')"
                 />
@@ -138,6 +173,8 @@ export default {
             <div class="col-12">
                 <InputText
                     id="contact"
+                    v-model="contactPerson"
+                    :class="contactPerson.trim() === '' && invalid ? 'invalid': ''"
                     :label="$t('additional:modules.projects.labels.contact')"
                     :placeholder="$t('additional:modules.projects.labels.contact')"
                 />
@@ -195,6 +232,18 @@ export default {
                 />
             </div>
         </div>
+        <HrSnackbar
+            :model-value="showSnackbar"
+            :message="snackbarMessage"
+            :color="snackbarColor"
+            @update:model-value="val => showSnackbar = val"
+        />
+        <HrFooter
+            :cancel-text="$t('additional:modules.projects.cancelButtonLabel')"
+            :save-text="$t('additional:modules.projects.saveButtonLabel')"
+            @click:save="onSave"
+            @click:cancel="setCurrentView('main')"
+        />
     </div>
 </template>
 
@@ -262,5 +311,10 @@ export default {
 .criteria-select .multiselect__option--highlight,
 .criteria-select .multiselect__option--highlight:after {
     background: $secondary;
+}
+
+.invalid {
+    outline: 0;
+    box-shadow: inset 0 1px 2px rgba(225, 0, 25, 0.075), 0 0 0 0.25rem rgba(225, 0, 25, 0.25);
 }
 </style>

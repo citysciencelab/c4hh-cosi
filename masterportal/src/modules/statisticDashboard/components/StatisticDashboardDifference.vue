@@ -22,11 +22,11 @@ export default {
     data () {
         return {
             buttonGroupReference: [{
-                name: i18next.t("common:modules.statisticDashboard.label.year")
-            },
-            {
-                name: i18next.t("common:modules.statisticDashboard.label.area")
-            }],
+                                       name: i18next.t("common:modules.statisticDashboard.label.year")
+                                   },
+                                   {
+                                       name: i18next.t("common:modules.statisticDashboard.label.area")
+                                   }],
             dateOptions: this.referenceData.date,
             regionOptions: this.referenceData.region,
             selectedDate: "",
@@ -128,7 +128,7 @@ export default {
                 return [];
             }
             const lastChild = flattenedRegions[flattenedRegions.length - 1],
-                selectedLayer = rawLayerList.getLayerWhere({id: this.selectedLevel?.layerId});
+                  selectedLayer = rawLayerList.getLayerWhere({id: this.selectedLevel?.layerId});
             let uniqueObject = {};
 
             if (lastChild?.values?.length) {

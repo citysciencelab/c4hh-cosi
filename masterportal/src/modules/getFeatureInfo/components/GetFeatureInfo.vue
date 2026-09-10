@@ -119,7 +119,7 @@ export default {
          */
         visible (value) {
             const menuSides = ["mainMenu", "secondaryMenu"],
-                otherSide = menuSides.find((element) => element !== this.menuSide);
+                  otherSide = menuSides.find((element) => element !== this.menuSide);
 
             if (!value) {
                 this.reset();
@@ -220,7 +220,7 @@ export default {
             handler (newFeatures, oldFeatures) {
                 let featuresChanged = oldFeatures === null;
                 const menuCollapsed = !this.expanded(this.menuSide),
-                    hasIframeGfi = Array.isArray(newFeatures) && newFeatures.some(feature => feature?.getMimeType?.() === "text/html");
+                      hasIframeGfi = Array.isArray(newFeatures) && newFeatures.some(feature => feature?.getMimeType?.() === "text/html");
 
                 if (newFeatures?.length > 0) {
                     if (oldFeatures !== null) {

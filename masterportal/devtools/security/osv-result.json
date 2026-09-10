@@ -1,0 +1,88 @@
+{
+  "results": [
+    {
+      "source": {"path": "/build/package-lock.json", "type": "lockfile"},
+      "packages": [
+        {
+          "package": {"name": "form-data", "version": "4.0.6", "ecosystem": "npm"},
+          "vulnerabilities": [
+            {
+              "id": "GHSA-hmw2-7cc7-3qxx",
+              "aliases": ["CVE-2025-1111"],
+              "summary": "CRLF injection through unescaped multipart field names",
+              "details": "A field name containing CRLF allows forging additional MIME part headers.",
+              "severity": [{"type": "CVSS_V3", "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H"}]
+            }
+          ],
+          "groups": [
+            {
+              "ids": ["GHSA-hmw2-7cc7-3qxx"],
+              "aliases": ["GHSA-hmw2-7cc7-3qxx", "CVE-2025-1111"],
+              "max_severity": "8.7"
+            }
+          ]
+        },
+        {
+          "package": {"name": "nanoid", "version": "3.3.12", "ecosystem": "npm"},
+          "vulnerabilities": [
+            {
+              "id": "GHSA-2v37-7h3g-55p8",
+              "summary": "Infinite loop when a custom generator is called with size zero",
+              "details": "",
+              "severity": [{"type": "CVSS_V3", "score": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H"}]
+            }
+          ],
+          "groups": []
+        },
+        {
+          "package": {"name": "tmp", "version": "0.2.1", "ecosystem": "npm"},
+          "vulnerabilities": [
+            {
+              "id": "GHSA-0000-below-thresh",
+              "aliases": ["CVE-2025-3333"],
+              "summary": "Low severity finding used to verify the CVSS threshold filter",
+              "details": "",
+              "severity": []
+            }
+          ],
+          "groups": [
+            {"ids": ["GHSA-0000-below-thresh"], "max_severity": "2.5"}
+          ]
+        }
+      ]
+    },
+    {
+      "source": {"path": "/build/addons/package-lock.json", "type": "lockfile"},
+      "packages": [
+        {
+          "package": {"name": "form-data", "version": "4.0.6", "ecosystem": "npm"},
+          "vulnerabilities": [
+            {
+              "id": "GHSA-hmw2-7cc7-3qxx",
+              "aliases": ["CVE-2025-1111"],
+              "summary": "CRLF injection through unescaped multipart field names",
+              "details": "",
+              "severity": []
+            }
+          ],
+          "groups": [
+            {"ids": ["GHSA-hmw2-7cc7-3qxx"], "max_severity": "8.7"}
+          ]
+        },
+        {
+          "package": {"name": "brace-expansion", "version": "5.0.6", "ecosystem": "npm"},
+          "vulnerabilities": [
+            {
+              "id": "GHSA-3jxr-9vmj-r5cp",
+              "aliases": ["CVE-2025-2222"],
+              "summary": "Regular expression denial of service in brace expansion",
+              "details": "",
+              "severity": [{"type": "CVSS_V4", "score": "7.5"}]
+            }
+          ],
+          "groups": []
+        }
+      ]
+    }
+  ]
+}

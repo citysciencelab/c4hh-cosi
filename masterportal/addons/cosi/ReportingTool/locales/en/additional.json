@@ -5,7 +5,7 @@
           "creatingReport": "Report is being created. Please wait.",
           "reportSuccess": "The report has been successfully generated. The download will start automatically.",
           "title": "Create report",
-          "toolInfoText": "This tool converts your current portal status directly into a structured report. All active technical data, statistics, and accessibility analyses are automatically recorded. An interactive stepper guides you through the individual chapters, where you can refine your selection for the report—including an appendix with legends and sources. For quick documentation, you can skip the detailed configuration on the first page to immediately output all portal contents in a complete document. Translated with DeepL.com (free version)",
+          "toolInfoText": "This tool converts your current CoSI session directly into a structured report. All active subject data, statistical data and accessibility analyses are automatically recorded. An interactive step-by-step assistant guides you through the individual chapters, where you can customize the contents of the report including annex, legends and sources. For quick documentation, you can skip the detailed configuration on the first page and immediately generate a complete document with all portal content.",
           "generateReport": "Complete and finish",
           "printReport": "Download report",
           "finishingUpReport": "Finishing up the report",

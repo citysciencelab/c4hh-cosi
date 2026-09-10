@@ -197,9 +197,9 @@ export default {
                             icon="bi bi-layers"
                             :aria="subjectLabel"
                             :disabled="!subjectDataDisabled"
-                            :interaction="() => $emit('subjectDataSet')"
                             data-bs-toggle="dropdown"
                             data-bs-auto-close="outside"
+                            @click.stop="$emit('subjectDataSet')"
                         />
                         <span
                             v-if="!subjectDataDisabled"
@@ -213,9 +213,9 @@ export default {
                             class="p-1"
                             icon="bi bi-download"
                             :aria="'Download'"
-                            :interaction="() => $emit('downloadSet')"
                             data-bs-toggle="dropdown"
                             data-bs-auto-close="outside"
+                            @click.stop="$emit('downloadSet')"
                         />
                         <slot name="download-menu" />
                     </div>
@@ -224,21 +224,21 @@ export default {
                         class="p-1"
                         :aria="'Externen Link öffnen'"
                         icon="bi bi-link-45deg"
-                        :interaction="() => $emit('linkOpened')"
+                        @click.stop="$emit('linkOpened')"
                     />
                     <IconButton
                         v-if="visible"
                         class="p-1"
                         :aria="'visible'"
                         :icon="status === 'active' ? 'bi bi-eye' : 'bi bi-eye-slash'"
-                        :interaction="() => $emit('hideSet')"
+                        @click.stop="$emit('hideSet')"
                     />
                     <IconButton
                         v-if="removable"
                         class="p-1"
                         :aria="'Löschen'"
                         icon="bi bi-trash"
-                        :interaction="() => $emit('removeSet')"
+                        @click.stop="$emit('removeSet')"
                     />
                 </div>
             </div>

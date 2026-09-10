@@ -6,6 +6,7 @@ import store from "@appstore/index.js";
 
 describe("src/shared/js/utils/processUrlParams.js", () => {
     let spyMenu;
+    const originStoreGetter = store.getters;
 
     beforeEach(() => {
         spyMenu = sinon.spy();
@@ -13,6 +14,10 @@ describe("src/shared/js/utils/processUrlParams.js", () => {
         store.getters = {
             getUrlParamValue: () => "draw"
         };
+    });
+
+    afterEach(() => {
+        store.getters = originStoreGetter;
     });
 
     it("should start the function of MENU param", () => {

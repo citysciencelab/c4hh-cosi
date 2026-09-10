@@ -1,9 +1,13 @@
 import sinon from "sinon";
 import {expect} from "chai";
+import axios from "axios";
+import {createPinia, setActivePinia} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 import WKTUtil from "@shared/js/utils/getWKTGeom.js";
 import wmsGFIUtil from "@shared/js/utils/getWmsFeaturesByMimeType.js";
 import actions from "@modules/searchBar/store/actions/actionsSearchBarSearchResult.js";
+import {buildAdditionalLayerProps, buildAlertPayload, fetchCswRecordXml} from "@modules/searchBar/store/actions/addLayerFromCswRecordHelper.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import mapMarker from "@core/maps/js/mapMarker.js";
 import markerHelper from "@modules/searchBar/js/marker.js";
@@ -14,7 +18,9 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
         commit,
         getters,
         zoomLevel,
-        map;
+        map,
+        layerInformationStore,
+        startLayerInformationSpy;
 
     beforeEach(() => {
         zoomLevel = 5;
@@ -45,6 +51,17 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
             return {getExtent: sinon.stub()};
         }});
         sinon.stub(markerHelper, "extentIsValid").returns(true);
+        sinon.stub(console, "warn").callsFake(sinon.spy());
+        sinon.stub(console, "error").callsFake(sinon.spy());
+        setActivePinia(createPinia());
+
+        layerInformationStore = useLayerInformationStore();
+        startLayerInformationSpy = sinon.spy();
+        layerInformationStore.startLayerInformation = startLayerInformationSpy;
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe("activateLayerInTopicTree", () => {
@@ -273,14 +290,12 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
         });
 
         it("should warn and show alert if layerConfig does not exist", async () => {
-            const layerId = "123",
-                warnSpy = sinon.spy();
+            const layerId = "123";
 
-            sinon.stub(console, "warn").callsFake(warnSpy);
             dispatch = sinon.stub().resolves(undefined);
             await actions.showInTree({commit, dispatch}, {layerId});
 
-            expect(warnSpy.callCount).to.equal(1);
+            expect(console.warn.callCount).to.equal(1);
             expect(dispatch.callCount).to.equal(3);
             expect(dispatch.firstCall.args[0]).to.equals("retrieveLayerConfig");
             expect(dispatch.firstCall.args[1]).to.be.deep.equals({layerId, source: undefined});
@@ -298,47 +313,28 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
 
     });
 
-    describe("showLayerInfo", () => {
-        it("should call startLayerInformation - layer in layerConfig", async () => {
-            const layerId = "123",
-                config = {
-                    layerId
-                },
-                source = {
-                    id: "sourceId"
-                };
+    it("should call startLayerInformation - layer in layerConfig", async () => {
+        const layerId = "123",
+            config = {
+                layerId
+            },
+            source = {
+                id: "sourceId"
+            };
 
-            dispatch = sinon.stub().resolves(config);
-            await actions.showLayerInfo({dispatch, commit}, {layerId, source});
+        dispatch = sinon.stub().resolves(config);
+        await actions.showLayerInfo({dispatch, commit}, {layerId, source});
 
-            expect(dispatch.calledTwice).to.be.true;
-            expect(dispatch.firstCall.args[0]).to.equals("retrieveLayerConfig");
-            expect(dispatch.firstCall.args[1]).to.be.deep.equals({layerId, source});
-            expect(dispatch.secondCall.args[0]).to.equals("Modules/LayerInformation/startLayerInformation");
-            expect(dispatch.secondCall.args[1]).to.be.deep.equals(config);
-            expect(commit.calledOnce).to.be.true;
-            expect(commit.firstCall.args[0]).to.equals("Modules/LayerSelection/setLayerInfoVisible");
-            expect(commit.firstCall.args[1]).to.be.true;
-        });
+        expect(dispatch.calledOnce).to.be.true;
+        expect(dispatch.firstCall.args[0]).to.equals("retrieveLayerConfig");
+        expect(dispatch.firstCall.args[1]).to.be.deep.equals({layerId, source});
 
-        it("should call startLayerInformation - layer not in layerConfig", async () => {
-            const layerId = "123",
-                warnSpy = sinon.spy();
+        expect(startLayerInformationSpy.calledOnce).to.be.true;
+        expect(startLayerInformationSpy.firstCall.args[0]).to.be.deep.equals(config);
 
-            sinon.stub(console, "warn").callsFake(warnSpy);
-            dispatch = sinon.stub().resolves(undefined);
-            await actions.showLayerInfo({dispatch, commit}, {layerId});
-
-            expect(warnSpy.callCount).to.equal(1);
-            expect(dispatch.callCount).to.equal(2);
-            expect(dispatch.firstCall.args[0]).to.equals("retrieveLayerConfig");
-            expect(dispatch.firstCall.args[1]).to.be.deep.equals({layerId, source: undefined});
-            expect(dispatch.secondCall.args[0]).to.equals("Alerting/addSingleAlert");
-            expect(dispatch.secondCall.args[1]).to.be.deep.equals({
-                category: "info",
-                content: i18next.t("common:modules.searchBar.layerInfoNotShown")
-            });
-        });
+        expect(commit.calledOnce).to.be.true;
+        expect(commit.firstCall.args[0]).to.equals("Modules/LayerSelection/setLayerInfoVisible");
+        expect(commit.firstCall.args[1]).to.be.true;
     });
 
     describe("retrieveLayerConfig", () => {
@@ -716,7 +712,7 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
     });
 
     describe("detectAndHighlight3DTile", () => {
-        let mockScene, mockState, mockDispatch, mockCommit, mockCartesian, warnStub;
+        let mockScene, mockState, mockDispatch, mockCommit, mockCartesian;
 
         beforeEach(() => {
             mockCartesian = {x: 1, y: 2, z: 3};
@@ -726,7 +722,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
             mockState = {lastPickedFeatureId: null};
             mockDispatch = sinon.spy();
             mockCommit = sinon.spy();
-            warnStub = sinon.stub(console, "warn");
             global.Cesium = {
                 SceneTransforms: {
                     worldToWindowCoordinates: sinon.stub().returns({x: 100, y: 200})
@@ -735,7 +730,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
         });
 
         afterEach(() => {
-            warnStub.restore();
             global.Cesium = null;
         });
 
@@ -759,9 +753,9 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
                 {scene: mockScene, cartesian: mockCartesian}
             );
 
-            expect(warnStub.calledTwice).to.be.true;
-            expect(warnStub.firstCall.args[0]).to.equals("Unable to project the position into screen space.");
-            expect(warnStub.secondCall.args[0]).to.equals("Unable to project the position into screen space.");
+            expect(console.warn.calledTwice).to.be.true;
+            expect(console.warn.firstCall.args[0]).to.equals("Unable to project the position into screen space.");
+            expect(console.warn.secondCall.args[0]).to.equals("Unable to project the position into screen space.");
         });
 
         it("commits and highlights immediately when drillPick finds a feature with _batchId", async () => {
@@ -823,7 +817,7 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
     });
 
     describe("handleLayerLoading", () => {
-        let mockScene, mockDispatch, mockCommit, mockCartesian, clock, postRenderCallback, removeListenerSpy, warnStub;
+        let mockScene, mockDispatch, mockCommit, mockCartesian, clock, postRenderCallback, removeListenerSpy;
 
         beforeEach(() => {
             clock = sinon.useFakeTimers();
@@ -841,7 +835,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
             };
             mockDispatch = sinon.spy();
             mockCommit = sinon.spy();
-            warnStub = sinon.stub(console, "warn");
             global.Cesium = {
                 SceneTransforms: {
                     worldToWindowCoordinates: sinon.stub().returns({x: 100, y: 200})
@@ -850,7 +843,6 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
         });
 
         afterEach(() => {
-            warnStub.restore();
             clock.restore();
             global.Cesium = null;
         });
@@ -920,8 +912,214 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
             );
             postRenderCallback();
 
-            expect(warnStub.calledOnce).to.be.true;
-            expect(warnStub.firstCall.args[0]).to.equals("Unable to project the position into screen space.");
+            expect(console.warn.calledOnce).to.be.true;
+            expect(console.warn.firstCall.args[0]).to.equals("Unable to project the position into screen space.");
+        });
+    });
+
+    describe("addLayerFromCswRecord", () => {
+        const fileIdentifier = "test-uuid-123",
+            cswUrl = "https://example.com/csw",
+            recordTitle = "Test Layer Title",
+            gmdNs = "http://www.isotc211.org/2005/gmd",
+            gcoNs = "http://www.isotc211.org/2005/gco";
+
+        let axiosStub;
+
+        beforeEach(() => {
+            axiosStub = sinon.stub(axios, "get");
+        });
+
+        afterEach(() => {
+            sinon.restore();
+        });
+
+        it("should fetch and parse a CSW record XML payload", async () => {
+            const responseXml = new DOMParser().parseFromString("<root/>", "application/xml");
+
+            axiosStub.resolves({request: {responseXML: responseXml}, data: "<root/>"});
+
+            expect(await fetchCswRecordXml(cswUrl, fileIdentifier)).to.equal(responseXml);
+        });
+
+        it("should parse response data with DOMParser when responseXML is missing", async () => {
+            axiosStub.resolves({request: {}, data: "<root><child>ok</child></root>"});
+
+            const xml = await fetchCswRecordXml(cswUrl, fileIdentifier);
+
+            expect(xml.getElementsByTagName("child")[0].textContent).to.equal("ok");
+        });
+
+        it("should build WMTS-specific additional layer props", () => {
+            expect(buildAdditionalLayerProps({
+                typ: "WMTS",
+                baseUrl: "https://example.com/wmts",
+                wmtsCapabilitiesUrl: "",
+                wmtsFormat: "image/png",
+                wmtsTileMatrixSet: "EPSG_25832"
+            })).to.deep.equal({
+                optionsFromCapabilities: true,
+                capabilitiesUrl: "https://example.com/wmts?SERVICE=WMTS&REQUEST=GetCapabilities",
+                format: "image/png",
+                tileMatrixSet: "EPSG_25832"
+            });
+        });
+
+        it("should build OAF-specific additional layer props", () => {
+            expect(buildAdditionalLayerProps({typ: "OAF"})).to.deep.equal({
+                bbox: false,
+                crs: false,
+                loadingStrategy: "all"
+            });
+        });
+
+        it("should build an info alert payload when no layer was added", () => {
+            const payload = buildAlertPayload({layerAdded: false, unavailableServiceUrls: new Set()});
+
+            expect(payload.category).to.equal("info");
+            expect(payload.once).to.equal(true);
+            expect(payload.initial).to.equal(false);
+        });
+
+        it("should add WMS layer to external folder when OGC:WMS protocol is found", async () => {
+            const wmsXml = `<?xml version="1.0"?>
+<csw:GetRecordByIdResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2">
+  <gmd:MD_Metadata xmlns:gmd="${gmdNs}" xmlns:gco="${gcoNs}">
+    <gmd:distributionInfo>
+      <gmd:MD_Distribution>
+        <gmd:transferOptions>
+          <gmd:MD_DigitalTransferOptions>
+            <gmd:onLine>
+              <gmd:CI_OnlineResource>
+                <gmd:linkage><gmd:URL>https://wms.example.com/service</gmd:URL></gmd:linkage>
+                <gmd:protocol><gco:CharacterString>OGC:WMS</gco:CharacterString></gmd:protocol>
+                <gmd:name><gco:CharacterString>layer_name</gco:CharacterString></gmd:name>
+              </gmd:CI_OnlineResource>
+            </gmd:onLine>
+          </gmd:MD_DigitalTransferOptions>
+        </gmd:transferOptions>
+      </gmd:MD_Distribution>
+    </gmd:distributionInfo>
+  </gmd:MD_Metadata>
+</csw:GetRecordByIdResponse>`,
+                domDoc = new DOMParser().parseFromString(wmsXml, "application/xml");
+
+            axiosStub.resolves({request: {responseXML: domDoc}, data: wmsXml});
+
+            dispatch = sinon.stub().resolves(true);
+            await actions.addLayerFromCswRecord({dispatch, rootGetters: {allFolders: []}}, {fileIdentifier, cswUrl});
+
+            const addCall = dispatch.getCalls().find(c => c.args[0] === "addLayerToLayerConfig" && c.args[1]?.layerConfig?.type === "layer");
+
+            expect(addCall).to.exist;
+            expect(addCall.args[1].layerConfig.typ).to.equal("WMS");
+            expect(addCall.args[1].layerConfig.url).to.equal("https://wms.example.com/service");
+            expect(addCall.args[1].layerConfig.metaID).to.equal(fileIdentifier);
+            expect(addCall.args[1].layerConfig.showInLayerTree).to.be.true;
+            expect(addCall.args[1].layerConfig.visibility).to.be.true;
+        });
+
+        it("should add WFS layer to external folder when OGC:WFS protocol is found", async () => {
+            const wfsXml = `<?xml version="1.0"?>
+<csw:GetRecordByIdResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2">
+  <gmd:MD_Metadata xmlns:gmd="${gmdNs}" xmlns:gco="${gcoNs}">
+    <gmd:distributionInfo>
+      <gmd:MD_Distribution>
+        <gmd:transferOptions>
+          <gmd:MD_DigitalTransferOptions>
+            <gmd:onLine>
+              <gmd:CI_OnlineResource>
+                <gmd:linkage><gmd:URL>https://wfs.example.com/service</gmd:URL></gmd:linkage>
+                <gmd:protocol><gco:CharacterString>OGC:WFS</gco:CharacterString></gmd:protocol>
+                <gmd:name><gco:CharacterString>featureType</gco:CharacterString></gmd:name>
+              </gmd:CI_OnlineResource>
+            </gmd:onLine>
+          </gmd:MD_DigitalTransferOptions>
+        </gmd:transferOptions>
+      </gmd:MD_Distribution>
+    </gmd:distributionInfo>
+  </gmd:MD_Metadata>
+</csw:GetRecordByIdResponse>`,
+                domDoc = new DOMParser().parseFromString(wfsXml, "application/xml");
+
+            axiosStub.resolves({request: {responseXML: domDoc}, data: wfsXml});
+
+            dispatch = sinon.stub().resolves(true);
+            await actions.addLayerFromCswRecord({dispatch, rootGetters: {allFolders: []}}, {fileIdentifier, cswUrl});
+
+            const addCall = dispatch.getCalls().find(c => c.args[0] === "addLayerToLayerConfig" && c.args[1]?.layerConfig?.type === "layer");
+
+            expect(addCall).to.exist;
+            expect(addCall.args[1].layerConfig.typ).to.equal("WFS");
+            expect(addCall.args[1].layerConfig.showInLayerTree).to.be.true;
+            expect(addCall.args[1].layerConfig.visibility).to.be.true;
+        });
+
+        it("should skip WMS resource without layer name and dispatch info alert", async () => {
+            const noNameXml = `<?xml version="1.0"?>
+<csw:GetRecordByIdResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2">
+  <gmd:MD_Metadata xmlns:gmd="${gmdNs}" xmlns:gco="${gcoNs}">
+    <gmd:distributionInfo>
+      <gmd:MD_Distribution>
+        <gmd:transferOptions>
+          <gmd:MD_DigitalTransferOptions>
+            <gmd:onLine>
+              <gmd:CI_OnlineResource>
+                <gmd:linkage><gmd:URL>https://wms.example.com/service</gmd:URL></gmd:linkage>
+                <gmd:protocol><gco:CharacterString>OGC:WMS</gco:CharacterString></gmd:protocol>
+              </gmd:CI_OnlineResource>
+            </gmd:onLine>
+          </gmd:MD_DigitalTransferOptions>
+        </gmd:transferOptions>
+      </gmd:MD_Distribution>
+    </gmd:distributionInfo>
+  </gmd:MD_Metadata>
+</csw:GetRecordByIdResponse>`,
+                domDoc = new DOMParser().parseFromString(noNameXml, "application/xml");
+
+            axiosStub.resolves({request: {responseXML: domDoc}, data: noNameXml});
+
+            dispatch = sinon.stub().resolves(true);
+            await actions.addLayerFromCswRecord({dispatch, rootGetters: {allFolders: []}}, {fileIdentifier, cswUrl});
+
+            const layerCall = dispatch.getCalls().find(c => c.args[0] === "addLayerToLayerConfig" && c.args[1]?.layerConfig?.type === "layer");
+            const alertCall = dispatch.getCalls().find(c => c.args[0] === "Alerting/addSingleAlert");
+
+            expect(layerCall).to.not.exist;
+            expect(alertCall).to.exist;
+            expect(alertCall.args[1].category).to.equal("info");
+        });
+
+        it("should dispatch info alert when no WMS or WFS link is found", async () => {
+            const noLinkXml = `<?xml version="1.0"?>
+<csw:GetRecordByIdResponse xmlns:csw="http://www.opengis.net/cat/csw/2.0.2">
+  <gmd:MD_Metadata xmlns:gmd="${gmdNs}" xmlns:gco="${gcoNs}">
+  </gmd:MD_Metadata>
+</csw:GetRecordByIdResponse>`,
+                domDoc = new DOMParser().parseFromString(noLinkXml, "application/xml");
+
+            axiosStub.resolves({request: {responseXML: domDoc}, data: noLinkXml});
+
+            await actions.addLayerFromCswRecord({dispatch}, {fileIdentifier, recordTitle, cswUrl});
+
+            const alertCall = dispatch.getCalls().find(c => c.args[0] === "Alerting/addSingleAlert");
+
+            expect(alertCall).to.exist;
+            expect(alertCall.args[1].category).to.equal("info");
+        });
+
+        it("should warn and dispatch error alert when axios request fails", async () => {
+            axiosStub.rejects(new Error("Network Error"));
+
+            await actions.addLayerFromCswRecord({dispatch}, {fileIdentifier, recordTitle, cswUrl});
+
+            expect(console.warn.calledOnce).to.be.true;
+            expect(console.warn.firstCall.args[0]).to.include("addLayerFromCswRecord");
+
+            const alertCall = dispatch.getCalls().find(c => c.args[0] === "Alerting/addSingleAlert");
+
+            expect(alertCall).to.exist;
+            expect(alertCall.args[1].category).to.equal("error");
         });
     });
 });

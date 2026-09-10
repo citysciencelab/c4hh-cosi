@@ -1,7 +1,7 @@
 <script>
-/* eslint-disable no-undef */
-import {mapGetters} from "vuex";
-import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
+import {mapGetters, mapActions} from "vuex";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import thousandsSeparator from "@shared/js/utils/thousandsSeparator";
 import mouseOverCotentLivingLocation from "../utils/mouseOverContent.js";
 import {optimizeValueRootedInComplexType} from "../utils/complexType.js";
 
@@ -9,9 +9,9 @@ export default {
     name: "BildungsatlasThemeSchulenWohnort",
     props: {
         /**
-         * checks if the given tab name is currently active
-         * @param {String} tab the tab name
-         * @returns {Boolean}  true if the given tab name is active
+         * Checks if the given tab name is currently active.
+         * @param {String} tab The tab name.
+         * @returns {Boolean} True if the given tab name is active.
          */
         isActiveTab: {
             type: Function,
@@ -19,10 +19,10 @@ export default {
         },
 
         /**
-         * translates the given key, checkes if the key exists and throws a console warning if not
-         * @param {String} key the key to translate
-         * @param {Object} [options=null] for interpolation, formating and plurals
-         * @returns {String} the translation or the key itself on error
+         * Translates the given key, checks if the key exists and throws a console warning if not.
+         * @param {String} key The key to translate.
+         * @param {Object} [options=null] Options for interpolation, formatting, and plurals.
+         * @returns {String} The translation or the key itself on error.
          */
         translate: {
             type: Function,
@@ -30,22 +30,25 @@ export default {
         },
 
         /**
-         * Parsing the text with Html Tags into Html Format
-         * @param {String} str the text
-         * @returns {String} html format text
+         * Parses the text containing HTML tags into an HTML format.
+         * @param {String} str The text to parse.
+         * @returns {String} The formatted HTML text.
          */
         parseTranslationInHtml: {
             type: Function,
             required: true
         },
 
+        /**
+         * The currently selected feature.
+         */
         feature: {
             type: Object,
             required: true
         },
 
         /**
-         * the featureType of current layer
+         * The featureType of the current layer.
          */
         featureType: {
             type: String,
@@ -53,14 +56,15 @@ export default {
         },
 
         /**
-         * the properties as a key value object
+         * The properties of the feature as a key-value object.
          */
         properties: {
             type: Object,
             required: true
         },
+
         /**
-         * the BildungsatlasApi to access data via wfs with
+         * The Bildungsatlas API object to access WFS data.
          */
         api: {
             type: Object,
@@ -69,62 +73,96 @@ export default {
     },
     data () {
         return {
-            schoolLevels: {"de.hh.up:einzug_einzugsgebiete_primarstufe": "Primarstufe", "de.hh.up:einzug_einzugsgebiete_sekundarstufe": "Sekundarstufe I"},
-            schoolNumbers: {"de.hh.up:einzug_einzugsgebiete_primarstufe": "anzahl_sus_primarstufe", "de.hh.up:einzug_einzugsgebiete_sekundarstufe": "anzahl_sus_sekundarstufe"},
+            schoolLevels: {
+                "de.hh.up:einzug_einzugsgebiete_primarstufe": "Primarstufe",
+                "de.hh.up:einzug_einzugsgebiete_sekundarstufe": "Sekundarstufe I"
+            },
+            schoolNumbers: {
+                "de.hh.up:einzug_einzugsgebiete_primarstufe": "anzahl_sus_primarstufe",
+                "de.hh.up:einzug_einzugsgebiete_sekundarstufe": "anzahl_sus_sekundarstufe"
+            },
+            layerNameCorrelation: {
+                "de.hh.up:einzug_einzugsgebiete_primarstufe": "internal Layer for primary schule am wohnort",
+                "de.hh.up:einzug_einzugsgebiete_sekundarstufe": "internal Layer for middle schule am wohnort"
+            },
             schoolLevelTitle: "",
-            layerNameCorrelation: {"de.hh.up:einzug_einzugsgebiete_primarstufe": "internal Layer for primary schule am wohnort", "de.hh.up:einzug_einzugsgebiete_sekundarstufe": "internal Layer for middle schule am wohnort"},
             numberOfStudentsInDistrictFormated: 0,
-            statgeb_id: 0,
-            stadtteil_name: "",
+            statgebId: "",
+            stadtteilName: "",
             featureIds: [],
-            infoText: ""
+            infoText: "",
+            layerSchools: null
         };
     },
     computed: {
-        ...mapGetters({
-            isMobile: "mobile"
-        }),
+        ...mapGetters([
+            "isMobile",
+            "allLayerConfigs"
+        ]),
 
-        // The id of current layer
+        /**
+         * Retrieves the theme of the current layer.
+         * @returns {Object|String} The GFI theme object or an empty string.
+         */
         getGfiTheme () {
             if (this.feature && typeof this.feature === "object" && this.feature?.getTheme) {
                 return this.feature.getTheme();
             }
-
             return "";
         },
 
-        // The id of current layer
+        /**
+         * Retrieves the ID of the current layer.
+         * @returns {String} The GFI ID.
+         */
         getGfiId () {
             if (this.feature && typeof this.feature === "object" && this.feature?.getId) {
                 return this.feature.getId();
             }
-
             return "";
         },
 
-        // The title/name of current layer
+        /**
+         * Retrieves the title or name of the current layer.
+         * @returns {String} The name of the layer.
+         */
         getName () {
             if (this.feature && typeof this.feature === "object" && this.feature?.getTitle) {
                 return this.feature.getTitle();
             }
-
             return "";
         }
     },
     watch: {
-        // when the gfi window is switched, the gfi is refreshed
-        properties (oldVal) {
+        /**
+         * Watches for property changes to refresh the GFI content cleanly.
+         * @param {Object} newVal The new properties object.
+         * @param {Object} oldVal The previous properties object.
+         * @returns {void}
+         */
+        properties (newVal, oldVal) {
             if (oldVal) {
                 this.reset(oldVal);
+            }
+            if (newVal) {
                 this.refreshGfi();
             }
         },
 
+        /**
+         * Watches the featureIds array and updates layer visibility when populated.
+         * @param {String[]} val Array of feature IDs.
+         * @returns {void}
+         */
         featureIds (val) {
             if (val && val.length) {
                 if (this.layerSchools) {
-                    this.layerSchools.setIsSelected(true);
+                    if (typeof this.layerSchools.set === "function") {
+                        this.layerSchools.set("isSelected", true);
+                    }
+                    else if (typeof this.layerSchools.setVisible === "function") {
+                        this.layerSchools.setVisible(true);
+                    }
                 }
                 this.showFeaturesByIds(this.layerSchools, val);
             }
@@ -137,23 +175,25 @@ export default {
         this.reset(null);
     },
     methods: {
+        ...mapActions("Maps", ["addLayerById"]),
+
         /**
-         * refreshes the gfi
+         * Refreshes the GFI content based on the current feature type and properties.
          * @returns {void}
          */
         refreshGfi () {
             let themeType = "";
 
-            this.statgeb_id = this.properties?.statgeb_id ? this.properties.statgeb_id : "";
-            this.stadtteil_name = this.properties?.stadtteil_name ? this.properties.stadtteil_name : "";
+            this.statgebId = this.properties?.statgeb_id ? this.properties.statgeb_id : "";
+            this.stadtteilName = this.properties?.stadtteil_name ? this.properties.stadtteil_name : "";
 
             if (this.featureType !== "") {
                 this.schoolLevelTitle = this.schoolLevels[this.featureType];
                 themeType = this.featureType === "de.hh.up:einzug_einzugsgebiete_primarstufe" ? "primary" : "secondary";
             }
 
-            if (this.statgeb_id !== "") {
-                this.api.getValueStatistischeGebiete(this.schoolNumbers[this.featureType], this.statgeb_id, value => {
+            if (this.statgebId !== "") {
+                this.api.getValueStatistischeGebiete(this.schoolNumbers[this.featureType], this.statgebId, value => {
                     this.numberOfStudentsInDistrictFormated = value !== undefined ? thousandsSeparator(value) : 0;
                 }, error => {
                     console.error(error);
@@ -168,39 +208,55 @@ export default {
 
             this.getActiveSchoolLayer();
 
-            Backbone.Events.listenTo(Radio.channel("VectorLayer"), {
-                "featuresLoaded": this.getActiveSchoolLayer
-            });
+            if (this.layerSchools) {
+                const olLayer = typeof this.layerSchools.getSource === "function" ? this.layerSchools : this.layerSchools.get("layer"),
+                      source = olLayer?.getSource();
+
+                if (source) {
+                    source.on("featuresloadend", this.getActiveSchoolLayer);
+                }
+            }
 
             this.infoText = this.parseTranslationInHtml(this.translate("additional:addons.gfiThemes.bildungsatlas.schulenWohnort.info." + themeType));
         },
 
         /**
-         * shows the features of the area layer, hides school layers
-         * @param {?Object} feature - the feature to be reset
+         * Shows the features of the area layer and hides school layers, resetting the state.
+         * @param {Object} [feature] The feature to be reset.
          * @returns {void}
          */
         reset (feature) {
             const layerStatisticAreas = this.getLayerStatisticAreas(feature),
-                layerSchools = this.getLayerSchools();
+                  layerSchools = this.layerSchools;
 
             this.showAllFeatures(layerStatisticAreas);
 
             if (layerSchools) {
                 this.showAllFeatures(layerSchools);
-                layerSchools.setIsSelected(false);
+
+                if (typeof layerSchools.set === "function") {
+                    layerSchools.set("isSelected", false);
+                }
+                else if (typeof layerSchools.setVisible === "function") {
+                    layerSchools.setVisible(false);
+                }
+
+                const olLayer = typeof layerSchools.getSource === "function" ? layerSchools : layerSchools.get("layer"),
+                      source = olLayer?.getSource();
+
+                if (source) {
+                    source.un("featuresloadend", this.getActiveSchoolLayer);
+                }
             }
-            Backbone.Events.stopListening(Radio.channel("VectorLayer"), "featuresLoaded");
         },
 
         /**
-         * returns the areas layer
-         * @param {?Object} feature - the feature to be reset if there exists
-         * @returns {Object|Boolean}  - the areas layer or false if there is no such layer
+         * Returns the statistical areas layer from the layer collection.
+         * @param {ol/Feature} feature The feature to check for theme/title overrides.
+         * @returns {ol/layer/Layer|Boolean} The areas layer or false if not found.
          */
         getLayerStatisticAreas (feature) {
-            let layers = [],
-                gfiTheme = this.getGfiTheme,
+            let gfiTheme = this.getGfiTheme,
                 gfiName = this.getName;
 
             if (feature && typeof feature === "object") {
@@ -212,73 +268,90 @@ export default {
                 }
             }
 
-            layers = Radio.request("ModelList", "getModelsByAttributes", {"gfiTheme": gfiTheme, "name": gfiName});
+            const targetThemeName = typeof gfiTheme === "object" ? gfiTheme.name : gfiTheme,
+                  allLayers = layerCollection.getLayers(),
+                  matchingLayers = allLayers.filter(layer => {
+                      const lTheme = layer.get("gfiTheme"),
+                            lThemeName = typeof lTheme === "object" ? lTheme.name : lTheme;
 
-            if (!layers || !layers.length || layers.length === 0) {
+                      return lThemeName === targetThemeName && layer.get("name") === gfiName;
+                  });
+
+            if (!matchingLayers || matchingLayers.length === 0) {
                 return false;
             }
 
-            return layers[0];
+            return matchingLayers[0];
         },
 
         /**
-         * Requests the Modellist for layer with layerNameCorrelation. If necessary this function starts its creation.
-         * @fires Core.ModelList#RadioRequestModelListGetModelByAttributes
-         * @returns {?ol/layer/Layer}  - the layer of schools or false if there aren't any
+         * Requests the configuration from Vuex and creates the school layer if needed.
+         * @returns {ol/layer/Layer|Boolean} The layer of schools or false if not found.
          */
         getLayerSchools () {
-            const modelAttributes = {"name": this.layerNameCorrelation[this.featureType]},
-                /**
-                 * conf as {Object} - a simple object {id, ...} with config parameters (see config.json -> Themenconfig)
-                 * conf is the config of the module based on config.json Themenconfig found by name (see defaults.layerNameCorrelation) choosen by themeType
-                 */
-                conf = Radio.request("Parser", "getItemByAttributes", modelAttributes);
-            let layer = Radio.request("ModelList", "getModelByAttributes", modelAttributes);
+            const layerName = this.layerNameCorrelation[this.featureType],
+                  configs = this.allLayerConfigs || [],
+                  conf = configs.find(c => c.name === layerName),
+                  allLayers = layerCollection.getLayers();
 
-            if (!layer && conf && conf?.id) {
-                Radio.trigger("ModelList", "addModelsByAttributes", {id: conf.id});
-                layer = Radio.request("ModelList", "getModelByAttributes", {id: conf.id});
-                layer.setIsSelected(true);
+            let layer = allLayers.find(l => l.get("name") === layerName);
+
+            if (!layer && conf && conf.id) {
+                this.addLayerById(conf.id);
+                layer = layerCollection.getLayerById(conf.id);
+
+                if (layer && typeof layer.set === "function") {
+                    layer.set("isSelected", true);
+                }
+                else if (layer && typeof layer.setVisible === "function") {
+                    layer.setVisible(true);
+                }
             }
 
             return layer;
         },
 
         /**
-         * Hide all features in all given layers except all features with given id and adding mouseover attributes to the visible features
-         * @param {ol/layer/Layer} layer the Layer filtered by gfiTheme
-         * @param {String[]} featureIds Array of feature Id to keep
+         * Hides all features in the given layer except the specified IDs and attaches mouseover code.
+         * @param {ol/layer/Layer} layer The layer to be filtered.
+         * @param {String[]} featureIds Array of feature IDs to keep visible.
          * @returns {void}
          */
         showFeaturesByIds (layer, featureIds) {
             const schoolLevelTitle = this.schoolLevelTitle;
-
             let schools;
 
-            if (featureIds.length && layer && layer.get("isSelected")) {
-                layer.showFeaturesByIds(featureIds);
+            if (featureIds.length && layer) {
+                const isSelected = typeof layer.get === "function" ? layer.get("isSelected") : layer.getVisible();
 
-                schools = layer.get("layer").getSource().getFeatures();
+                if (isSelected && typeof layer.showFeaturesByIds === "function") {
+                    layer.showFeaturesByIds(featureIds);
 
-                this.addHtmlMouseHoverCode(schools, schoolLevelTitle);
+                    const olLayer = typeof layer.getSource === "function" ? layer : layer.get("layer");
+
+                    if (olLayer && olLayer.getSource()) {
+                        schools = olLayer.getSource().getFeatures();
+                        this.addHtmlMouseHoverCode(schools, schoolLevelTitle);
+                    }
+                }
             }
         },
 
         /**
-         * creates an array of featureIds to select by the model
-         * @param {ol/Feature[]} schools an array of features to check
-         * @param {String} statGeb_Nr the urban area number based on the customers content (equals StatGeb_Nr)
-         * @returns {void}
+         * Creates an array of feature IDs to be selected by the model based on the area number.
+         * @param {ol/Feature[]} schools An array of school features to check.
+         * @param {String} statGebNr The urban area number based on the feature properties.
+         * @returns {String[]} Array of valid feature IDs.
          */
-        getFeatureIds (schools, statGeb_Nr) {
+        getFeatureIds (schools, statGebNr) {
             const featureIds = [],
-                schoolAssoc = {};
+                  schoolAssoc = {};
 
             if (!Array.isArray(schools)) {
                 return featureIds;
             }
 
-            if (statGeb_Nr !== "") {
+            if (statGebNr !== "") {
                 schools.forEach(school => {
                     const id = school.get("schul_id").split("-").shift();
 
@@ -287,11 +360,12 @@ export default {
                     }
                     schoolAssoc[id].push(school);
                 });
-                this.api.getEinzugsgebieteValue(this.featureType, "statgeb_id", statGeb_Nr, value => {
+
+                this.api.getEinzugsgebieteValue(this.featureType, "statgeb_id", statGebNr, value => {
                     if (Array.isArray(value) && value.length) {
                         value.forEach(data => {
                             const id = data.get("schule_id"),
-                                schoolList = Object.prototype.hasOwnProperty.call(schoolAssoc, id) ? schoolAssoc[id] : false;
+                                  schoolList = Object.prototype.hasOwnProperty.call(schoolAssoc, id) ? schoolAssoc[id] : false;
 
                             if (Array.isArray(schoolList)) {
                                 schoolList.forEach(school => {
@@ -300,6 +374,7 @@ export default {
                                     school.set("anteil_sus_schule_stageb_an_anzahl_sus_stageb", data.get("anteil_sus_schule_stageb_an_anzahl_sus_stageb") ? data.get("anteil_sus_schule_stageb_an_anzahl_sus_stageb") : "");
                                     school.set("anzahl_sus_schule", data.get("anzahl_sus_schule") ? data.get("anzahl_sus_schule") : "");
                                     school.set("schueleranzahl_all", this.getTotalNumber(school.get("anzahl_schueler_gesamt") ? school.get("anzahl_schueler_gesamt") : null));
+
                                     featureIds.push(school.getId());
                                 });
                             }
@@ -314,9 +389,9 @@ export default {
         },
 
         /**
-         * Get the total number of students
-         * @param {String} val the attribute text from properties
-         * @returns {string} total number
+         * Extracts the total number of students from a potentially mixed string.
+         * @param {String} val The attribute text from properties.
+         * @returns {String} The extracted total number.
          */
         getTotalNumber: function (val) {
             if (typeof val === "string") {
@@ -326,35 +401,47 @@ export default {
         },
 
         /**
-         * Show all features in all given layers
-         * @param {ol/layer/Layer} layer Layer to show
+         * Shows all features in the given layer (removes any active filters).
+         * @param {ol/layer/Layer} layer The layer to be fully displayed.
          * @returns {void}
          */
         showAllFeatures (layer) {
-            if (layer && layer.get("isSelected")) {
-                layer.showAllFeatures();
+            if (layer) {
+                const isSelected = typeof layer.get === "function" ? layer.get("isSelected") : layer.getVisible();
+
+                if (isSelected && typeof layer.showAllFeatures === "function") {
+                    layer.showAllFeatures();
+                }
             }
         },
 
         /**
-         * activates selected features of the school layer and adds html data for mouse hovering
+         * Activates selected features of the school layer and triggers the generation of HTML data for hover tooltips.
          * @returns {void}
          */
         getActiveSchoolLayer: function () {
-            const statGeb_Nr = this.statgeb_id,
-                layerSchools = this.getLayerSchools(),
-                schools = layerSchools ? layerSchools.get("layer").getSource().getFeatures() : [];
+            const statGebNr = this.statgebId,
+                  layerSchools = this.getLayerSchools();
+
+            let schools = [];
+
+            if (layerSchools) {
+                const olLayer = typeof layerSchools.getSource === "function" ? layerSchools : layerSchools.get("layer");
+
+                if (olLayer && olLayer.getSource()) {
+                    schools = olLayer.getSource().getFeatures();
+                }
+            }
 
             this.layerSchools = layerSchools;
-            this.featureIds = this.getFeatureIds(schools, statGeb_Nr);
+            this.featureIds = this.getFeatureIds(schools, statGebNr);
         },
 
         /**
-         * returns the html as hover information
-         * @param   {Object} school an object type Feature with the school information
-         * @param   {function(String):*} school.get a function to request information from the feature
-         * @param   {String} schoolLevelTitle the school level as defined in defaults.schoolLevels and selected with themeType
-         * @returns {Object} - the data for the mouseoverTemplate used by the view to fill its html placeholders
+         * Prepares the data object required by the mouse hover template.
+         * @param {Object} school The OpenLayers Feature representing the school.
+         * @param {String} schoolLevelTitle The configured title for the school level.
+         * @returns {Object} The data object mapped to template placeholders.
          */
         getDataForMouseHoverTemplate (school, schoolLevelTitle) {
             const data = {
@@ -376,7 +463,7 @@ export default {
                 data.address.city = school.get("adresse_ort");
                 data.numberOfStudents = school.get("schueleranzahl_all");
                 data.numberOfStudentsStep = school.get("anzahl_sus_schule");
-                data.percentageOfStudentsFromDistrict = data.percentageOfStudentsFromDistrict = optimizeValueRootedInComplexType(school.get("anteil_sus_schule_stageb_an_anzahl_sus_stageb"), 0);
+                data.percentageOfStudentsFromDistrict = optimizeValueRootedInComplexType(school.get("anteil_sus_schule_stageb_an_anzahl_sus_stageb"), 0);
                 data.numberOfStudentsFromDistrict = school.get("anzahl_sus_schule_stageb");
             }
 
@@ -384,11 +471,9 @@ export default {
         },
 
         /**
-         * adds html mouse hover code to all school features where the StatGeb_Nr valids StatGeb_Nr
-         * @pre features may or may not have mouse hover html code already attatched
-         * @post all features with a StatGeb_Nr validated by StatGeb_Nr have attatched mouse hover html code
-         * @param {ol/Feature[]} schools schools an array of features to check
-         * @param {String} schoolLevelTitle schoolLevelTitle the school level as defined in defaults.schoolLevelTitle
+         * Attaches HTML mouse hover code to all provided school features.
+         * @param {ol/Feature[]} schools Array of school features to process.
+         * @param {String} schoolLevelTitle The configured title for the school level.
          * @returns {void}
          */
         addHtmlMouseHoverCode: function (schools, schoolLevelTitle) {
@@ -410,12 +495,12 @@ export default {
                 <thead>
                     <tr>
                         <th colspan="2">
-                            {{ translate("additional:addons.gfiThemes.bildungsatlas.schulenWohnort.statgeb") }}: {{ statgeb_id }}<br>({{ stadtteil_name }})
+                            {{ translate("additional:addons.gfiThemes.bildungsatlas.schulenWohnort.statgeb") }}: {{ statgebId }}<br>({{ stadtteilName }})
                         </th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr colspan="2">
+                    <tr>
                         <td><b> {{ translate("additional:addons.gfiThemes.bildungsatlas.schulenWohnort.countInArea") }} {{ schoolLevelTitle }}: </b></td>
                         <td>{{ numberOfStudentsInDistrictFormated }}</td>
                     </tr>

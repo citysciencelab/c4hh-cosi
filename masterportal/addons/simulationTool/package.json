@@ -3,9 +3,9 @@
     "private": true,
     "version": "0.0.1",
     "dependencies": {
-        "lodash": "^4.17.21"
+        "flatgeobuf": "^4.4.0"
     },
-    "temporaryDisabled": {
-      "plotly.js-dist": "^2.35.2"
+    "devDependencies": {
+        "@types/geojson": "^7946.0.16"
     }
 }

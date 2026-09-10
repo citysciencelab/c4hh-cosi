@@ -1,9 +1,8 @@
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import StatisticDashboardLegend from "@modules/statisticDashboard/components/StatisticDashboardLegend.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/statiscticDashboard/components/StatisticDashboardLegend.vue", () => {
     let store;

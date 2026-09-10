@@ -1,122 +1,76 @@
 <script>
-import {mapGetters, mapActions, mapMutations} from "vuex";
-import tabStatus from "../constantsTabStatus.js";
+import {mapGetters, mapActions} from "vuex";
 import FeatureDetailView from "./FeatureDetailView.vue";
 import FeatureListView from "./FeatureListView.vue";
 import LayerListView from "./LayerListView.vue";
+import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 
 /**
  * Feature Lister
  * @module modules/FeatureLister
- * @vue-data {String} enabledTabClass - The CSS-Class for the enabled tab.
- * @vue-data {String} activeTabClass - The CSS-Class "active" tab.
- * @vue-computed {String} themeTabClasses - The class for the current theme-tab.
  */
 export default {
     name: "FeatureLister",
     components: {
         LayerListView,
         FeatureListView,
-        FeatureDetailView
-    },
-    data () {
-        return {
-            enabledTabClass: "",
-            activeTabClass: "active",
-            disabledTabClass: "disabled",
-            tabStatus: tabStatus
-        };
+        FeatureDetailView,
+        NavTab
     },
     computed: {
         ...mapGetters("Modules/FeatureLister", [
             "layer",
-            "layerListView",
-            "featureListView",
-            "featureDetailView"
-        ]),
-        themeTabClasses: function () {
-            return this.layerListView ? this.activeTabClass : this.defaultTabClass;
-        }
+            "activeTab",
+            "selectedRow"
+        ])
     },
     unmounted () {
-        this.resetToThemeChooser();
-        this.removeHighlightFeature();
-        this.removePointMarker();
-        this.removePolygonMarker();
+        this.switchToThemes();
     },
     methods: {
         ...mapActions("Modules/FeatureLister", [
             "switchBackToList",
             "switchToThemes",
             "switchToDetails"
-        ]),
-        ...mapActions("Maps", ["removeHighlightFeature", "removePointMarker", "removePolygonMarker"]),
-        ...mapMutations("Modules/FeatureLister", [
-            "resetToThemeChooser"
-        ]),
-        /**
-         * Returns the CSS classes for the tab based on its status.
-         * @param {String} view - The current view status of the tab.
-         * @returns {String} - The CSS class for the tab.
-         */
-        tabClasses: function (view) {
-            switch (view) {
-                case tabStatus.ACTIVE:
-                    return this.activeTabClass;
-                case tabStatus.ENABLED:
-                    return this.enabledTabClass;
-                case tabStatus.DISABLED:
-                    return this.disabledTabClass;
-                default:
-                    return this.disabledTabClass;
-            }
-        }
+        ])
     }
 };
 </script>
 
 <template lang="html">
-    <div id="feature-lister">
-        <ul class="nav nav-tabs">
-            <li
+    <div
+        id="feature-lister"
+    >
+        <ul
+            class="nav nav-tabs"
+            role="tablist"
+        >
+            <NavTab
                 id="module-feature-lister-themeChooser"
-                role="presentation"
-                class="nav-item"
-            >
-                <a
-                    href="#"
-                    class="nav-link"
-                    :class="tabClasses(layerListView)"
-                    @click.prevent="switchToThemes()"
-                >{{ $t("common:modules.featureLister.chooseTheme") }}</a>
-            </li>
-            <li
+                label="common:modules.featureLister.chooseTheme"
+                :active="activeTab === 'themes'"
+                target="#feature-lister-themes"
+                :interaction="switchToThemes"
+            />
+            <NavTab
                 id="module-feature-lister-list"
-                role="presentation"
-                class="nav-item"
-            >
-                <a
-                    href="#"
-                    class="nav-link"
-                    :class="tabClasses(featureListView)"
-                    @click.prevent="switchBackToList()"
-                >{{ $t("common:modules.featureLister.list") }}</a>
-            </li>
-            <li
+                label="common:modules.featureLister.list"
+                :active="activeTab === 'list'"
+                :disabled="!layer"
+                target="#feature-lister-list"
+                :interaction="switchBackToList"
+            />
+            <NavTab
                 id="module-feature-lister-details"
-                role="presentation"
-                class="nav-item"
-            >
-                <a
-                    href="#"
-                    class="nav-link"
-                    :class="tabClasses(featureDetailView)"
-                    @click.prevent="switchToDetails()"
-                >{{ $t("common:modules.featureLister.details") }}</a>
-            </li>
+                label="common:modules.featureLister.details"
+                :active="activeTab === 'details'"
+                :disabled="!selectedRow"
+                target="#feature-lister-details"
+                :interaction="switchToDetails"
+            />
         </ul>
         <template
-            v-if="layerListView === tabStatus.ACTIVE"
+            v-if="activeTab === 'themes'"
         >
             <div
                 id="feature-lister-themes"
@@ -131,7 +85,7 @@ export default {
                 <LayerListView />
             </div>
         </template>
-        <template v-if="featureListView === tabStatus.ACTIVE">
+        <template v-if="activeTab === 'list'">
             <div
                 id="feature-lister-list-header"
                 class="panel-heading"
@@ -145,7 +99,7 @@ export default {
                 <FeatureListView />
             </div>
         </template>
-        <template v-if="featureDetailView === tabStatus.ACTIVE">
+        <template v-if="activeTab === 'details'">
             <div
                 id="feature-lister-details-header"
                 class="panel-heading"
@@ -160,6 +114,10 @@ export default {
 
 <style lang="scss" scoped>
 
+.nav-tabs {
+border: 0;
+}
+
 .feature-lister-list {
     margin-bottom: 0;
     display: contents;
@@ -168,10 +126,7 @@ export default {
 .panel-heading {
     color: $dark_grey;
     cursor: default;
-    border-left: 1px solid $light_grey;
-    border-right: 1px solid $light_grey;
     padding: 10px 15px;
-    border-bottom: 1px solid transparent;
     font-weight: bold;
 }
 

@@ -8,6 +8,7 @@ import layerCollection from "@core/layers/js/layerCollection.js";
 
 describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", () => {
     let interfaceVectorTilesIntern = null;
+    const originStoreGetter = store.getters;
 
     beforeEach(() => {
         interfaceVectorTilesIntern = new InterfaceVectorTilesIntern(false, {
@@ -15,6 +16,10 @@ describe("src/modules/filter/interfaces/utils/interface.vectortiles.intern.js", 
             isFeatureInMapExtent: false,
             isFeatureInGeometry: false
         });
+    });
+
+    afterEach(() => {
+        store.getters = originStoreGetter;
     });
     describe("getAttrTypes", () => {
         it("should call onerror function, if layermodel doesn't exist", () => {

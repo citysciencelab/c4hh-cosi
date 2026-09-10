@@ -260,7 +260,7 @@ export default {
         */
         setChartData (data) {
             const barChartData = this.createChartData(data, "bar"),
-                lineChartData = this.createChartData(data, "line");
+                  lineChartData = this.createChartData(data, "line");
 
             this.selectedChartData === "hourly" ? this.hourlyXLabels = barChartData.labels : this.dailyXLabels = barChartData.labels;
 
@@ -290,18 +290,18 @@ export default {
         */
         createChartData (responseData, chartType) {
             const labels = [],
-                mondayToSaturdayData = [],
-                sundayData = [];
+                  mondayToSaturdayData = [],
+                  sundayData = [];
             let datasets = {
                 label: this.selectedChartData === "hourly" ? this.translate("additional:modules.tools.vpidashboard.unique.numberVisitorsHour") : this.translate("additional:modules.tools.vpidashboard.unique.numberVisitorsDay")
             };
 
             responseData.forEach((element) => {
                 const date = dayjs(element.properties.datum).utc(true).locale(this.currentLocale),
-                    labelXAxis = this.selectedChartData === "hourly"
-                        ? date.format("dd, DD.MM.YYYY") + ` ${element.properties.startuhrzeit}:00`
-                        : date.format("dd, DD.MM.YYYY"),
-                    dataValue = this.selectedChartData === "hourly" ? element.properties.besucher : Math.ceil(element.properties.besucher / 100) * 100;
+                      labelXAxis = this.selectedChartData === "hourly"
+                          ? date.format("dd, DD.MM.YYYY") + ` ${element.properties.startuhrzeit}:00`
+                          : date.format("dd, DD.MM.YYYY"),
+                      dataValue = this.selectedChartData === "hourly" ? element.properties.besucher : Math.ceil(element.properties.besucher / 100) * 100;
 
                 labels.push(labelXAxis);
 

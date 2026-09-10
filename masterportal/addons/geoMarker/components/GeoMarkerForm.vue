@@ -84,6 +84,8 @@ export default {
             "newGeoMarkerFeature",
             "geoMarkerFeatureList",
             "geoMarkerUpdateFeature",
+            "geoMarkerNonEditFeatureId",
+            "geoMarkerEditFeatureId",
             "isFilterApplied",
             "geoMarkerShortFeatureId",
             "geoMarkerState",
@@ -97,10 +99,10 @@ export default {
          */
         tableDataConfig () {
             const departmentIds = Object.keys(this.departmentData || {}),
-                headers = [
-                    {itemProperty: "Abteilung", displayName: "Abteilung"},
-                    {itemProperty: "Status", displayName: "Status"}
-                ];
+                  headers = [
+                      {itemProperty: "Abteilung", displayName: "Abteilung"},
+                      {itemProperty: "Status", displayName: "Status"}
+                  ];
 
             if (this.mode === "edit") {
                 headers.push({itemProperty: "ReminderDate", displayName: "WiedervorlageDatum"});
@@ -163,7 +165,6 @@ export default {
             }
 
             return {
-                id: this.selectedFeature.getId(),
                 kategorie: this.categories[this.selectedCategoryId]?.name,
                 anhang_name: this.attachment ? this.attachment.name : null,
                 anhang_base_64: this.attachment ? this.attachment.base64 : null,
@@ -186,9 +187,9 @@ export default {
 
             Object.keys(this.departmentData || {}).forEach(departmentId => {
                 const department = this.departments?.[departmentId],
-                    departmentFormData = this.departmentData[departmentId] || {},
-                    departmentFormDataInitial = this.departmentDataInitial[departmentId] || {},
-                    currentStatus = departmentFormData.status;
+                      departmentFormData = this.departmentData[departmentId] || {},
+                      departmentFormDataInitial = this.departmentDataInitial[departmentId] || {},
+                      currentStatus = departmentFormData.status;
 
                 if (department?.fields) {
                     Object.entries(department.fields).forEach(([fieldKey, fieldValue]) => {
@@ -220,7 +221,7 @@ export default {
          */
         layerIdsForSelectedDepartments () {
             const departmentIds = Object.keys(this.departmentData || {}),
-                layerIdsArray = [];
+                  layerIdsArray = [];
 
             departmentIds.forEach(departmentId => {
                 if (this.departments[departmentId]?.layerIds) {
@@ -249,7 +250,7 @@ export default {
             }
 
             const today = new Date(),
-                selected = new Date(newDate);
+                  selected = new Date(newDate);
 
             this.statusForSelectedDepartments = selected <= today ? "offen" : "inaktiv";
 
@@ -378,9 +379,9 @@ export default {
 
             Object.keys(this.departments).forEach(departmentId => {
                 const department = this.departments[departmentId],
-                    hasData = Object.values(department?.fields || {}).some(fieldKey => {
-                        return featureProps[fieldKey] !== undefined && featureProps[fieldKey] !== null;
-                    });
+                      hasData = Object.values(department?.fields || {}).some(fieldKey => {
+                          return featureProps[fieldKey] !== undefined && featureProps[fieldKey] !== null;
+                      });
 
                 if (!department?.fields) {
                     return;
@@ -547,13 +548,13 @@ export default {
          */
         onAttachmentChange (e) {
             const reader = new FileReader(),
-                allowedTypes = [
-                    "application/pdf",
-                    "image/png",
-                    "image/jpeg",
-                    "application/zip",
-                    "application/x-zip-compressed"
-                ];
+                  allowedTypes = [
+                      "application/pdf",
+                      "image/png",
+                      "image/jpeg",
+                      "application/zip",
+                      "application/x-zip-compressed"
+                  ];
 
             let file = null;
 
@@ -658,11 +659,11 @@ export default {
             if (transactionFeature && transactionResponse) {
                 this.addSingleAlert({
                     content: this.$t("additional:modules.geoMarker.geoMarkerForm.successMessageAfterSave",
-                        {id: this.geoMarkerShortFeatureId(transactionResponse.featureIds[0])}),
+                                     {id: this.geoMarkerShortFeatureId(transactionResponse.featureIds[0])}),
                     category: "success"
                 });
 
-                await this.loadNewlyCreatedOrUpdatedGeoMarker(transactionResponse.featureIds[0]);
+                await this.loadNewlyCreatedOrUpdatedGeoMarker(this.geoMarkerShortFeatureId(transactionResponse.featureIds[0]));
             }
 
             this.resetForm();
@@ -677,7 +678,7 @@ export default {
                 this.refreshNewFeaturePointOnMap();
             }
 
-            this.moveUpdatedFeatureToTop(transactionResponse.featureIds[0]);
+            this.moveUpdatedFeatureToTop(this.geoMarkerShortFeatureId(transactionResponse.featureIds[0]));
         },
         /**
          * Updates an existing geomarker and saves changes to the database
@@ -711,9 +712,9 @@ export default {
 
                     await this.updateGeoMarkerFeatureListAfterEdit();
 
-                    await this.loadNewlyCreatedOrUpdatedGeoMarker(this.selectedFeature.getId());
+                    await this.loadNewlyCreatedOrUpdatedGeoMarker(this.geoMarkerShortFeatureId(this.selectedFeature.getId()));
 
-                    this.moveUpdatedFeatureToTop(this.selectedFeature.getId());
+                    this.moveUpdatedFeatureToTop(this.geoMarkerShortFeatureId(this.selectedFeature.getId()));
 
                     if (this.isFilterApplied) {
                         this.layerIdsForSelectedDepartments.forEach(async layerId => {
@@ -826,13 +827,15 @@ export default {
         },
         /**
          * Moves the updated feature to the top of the list
+         * @param {String} shortFeatureId - The short numeric id of the feature that shall be moved in the list
          * @returns {void}
          */
-        moveUpdatedFeatureToTop (featureId) {
-            const updatedList = [...this.geoMarkerFeatureList],
-                updatedFeatureIndex = updatedList.findIndex(
-                    feature => feature.getId() === featureId
-                );
+        moveUpdatedFeatureToTop (shortFeatureId) {
+            const featureId = this.geoMarkerNonEditFeatureId(shortFeatureId),
+                  updatedList = [...this.geoMarkerFeatureList],
+                  updatedFeatureIndex = updatedList.findIndex(
+                      feature => feature.getId() === featureId
+                  );
 
             if (updatedFeatureIndex > -1) {
                 const updatedFeature = updatedList.splice(updatedFeatureIndex, 1)[0];
@@ -843,74 +846,75 @@ export default {
         },
         /**
          * Loads the newly created or updated GeoMarker and displays it in the list, makes relevant layer(s) visible or reload them, if necessary
-         * @param {String} featureId - The id of the feature that was just created / updated
+         * @param {String} shortFeatureId - The short numeric id of the feature that was just created / updated
          * @returns {Promise<void>}
          */
-        async loadNewlyCreatedOrUpdatedGeoMarker (featureId) {
-            const relevantLayerIds = [...new Set(this.layerIdsForSelectedDepartments.concat(this.layerIdsForChangedDepartments))],
-                loadPromises = relevantLayerIds.map(layerId => {
-                    return new Promise(resolve => {
-                        const layer = layerCollection.getLayerById(layerId);
+        async loadNewlyCreatedOrUpdatedGeoMarker (shortFeatureId) {
+            const featureId = this.geoMarkerNonEditFeatureId(shortFeatureId),
+                  relevantLayerIds = [...new Set(this.layerIdsForSelectedDepartments.concat(this.layerIdsForChangedDepartments))],
+                  loadPromises = relevantLayerIds.map(layerId => {
+                      return new Promise(resolve => {
+                          const layer = layerCollection.getLayerById(layerId);
 
-                        // the layer is currently visible
-                        if (layer && layer.layer && layer.layer.isVisible()) {
-                            const layerSource = layer.getLayerSource();
+                          // the layer is currently visible
+                          if (layer && layer.layer && layer.layer.isVisible()) {
+                              const layerSource = layer.getLayerSource();
 
-                            layerSource.once("featuresloadend", () => {
-                                resolve();
-                            });
+                              layerSource.once("featuresloadend", () => {
+                                  resolve();
+                              });
 
-                            layerSource.refresh();
-                        }
-                        // the layer is currently not visible
-                        else {
-                            this.$store.dispatch("replaceByIdInLayerConfig", {
-                                layerConfigs: [{
-                                    id: layerId,
-                                    layer: {
-                                        visibility: true,
-                                        showInLayerTree: true
-                                    }
-                                }]
-                            }, {root: true}).then(() => {
-                                const layerSource = this.map?.getLayers().getArray().find(l => l.get("id") === layerId).getSource();
+                              layerSource.refresh();
+                          }
+                          // the layer is currently not visible
+                          else {
+                              this.$store.dispatch("replaceByIdInLayerConfig", {
+                                  layerConfigs: [{
+                                      id: layerId,
+                                      layer: {
+                                          visibility: true,
+                                          showInLayerTree: true
+                                      }
+                                  }]
+                              }, {root: true}).then(() => {
+                                  const layerSource = this.map?.getLayers().getArray().find(l => l.get("id") === layerId).getSource();
 
-                                // the layer has been visible before = all features are already loaded
-                                // Info: This workaround does not work, if a layer has no features at all
-                                if (layerSource.getFeatures().length) {
-                                    layerSource.refresh();
-                                    layerSource.once("featuresloadend", () => {
-                                        // make layer invisible again since it has been invisible before
-                                        this.$store.dispatch("replaceByIdInLayerConfig", {
-                                            layerConfigs: [{
-                                                id: layerId,
-                                                layer: {
-                                                    visibility: false
-                                                }
-                                            }]
-                                        });
-                                        resolve();
-                                    });
-                                }
-                                // the layer has never been visible before = no features have been loaded yet
-                                else {
-                                    layerSource.once("featuresloadend", () => {
-                                        // make layer invisible again since it has been invisible before
-                                        this.$store.dispatch("replaceByIdInLayerConfig", {
-                                            layerConfigs: [{
-                                                id: layerId,
-                                                layer: {
-                                                    visibility: false
-                                                }
-                                            }]
-                                        });
-                                        resolve();
-                                    });
-                                }
-                            });
-                        }
-                    });
-                });
+                                  // the layer has been visible before = all features are already loaded
+                                  // Info: This workaround does not work, if a layer has no features at all
+                                  if (layerSource.getFeatures().length) {
+                                      layerSource.refresh();
+                                      layerSource.once("featuresloadend", () => {
+                                          // make layer invisible again since it has been invisible before
+                                          this.$store.dispatch("replaceByIdInLayerConfig", {
+                                              layerConfigs: [{
+                                                  id: layerId,
+                                                  layer: {
+                                                      visibility: false
+                                                  }
+                                              }]
+                                          });
+                                          resolve();
+                                      });
+                                  }
+                                  // the layer has never been visible before = no features have been loaded yet
+                                  else {
+                                      layerSource.once("featuresloadend", () => {
+                                          // make layer invisible again since it has been invisible before
+                                          this.$store.dispatch("replaceByIdInLayerConfig", {
+                                              layerConfigs: [{
+                                                  id: layerId,
+                                                  layer: {
+                                                      visibility: false
+                                                  }
+                                              }]
+                                          });
+                                          resolve();
+                                      });
+                                  }
+                              });
+                          }
+                      });
+                  });
 
             await Promise.all(loadPromises);
 
@@ -936,8 +940,8 @@ export default {
 
                 layerSource.once("featuresloadend", () => {
                     const style = layer.getStyleAsFunction(layer.get("style")),
-                        allFeaturesOnLayer = layerSource.getFeatures(),
-                        geoMarkerFeatureListIds = this.geoMarkerFeatureList.map(feature => feature.getId());
+                          allFeaturesOnLayer = layerSource.getFeatures(),
+                          geoMarkerFeatureListIds = this.geoMarkerFeatureList.map(feature => feature.getId());
 
                     allFeaturesOnLayer.forEach(feature => {
                         if (geoMarkerFeatureListIds.includes(feature.getId())) {
@@ -965,7 +969,7 @@ export default {
          */
         findAndDisplayNewFeature (featureId, relevantLayerIds) {
             const list = this.geoMarkerFeatureList,
-                feature = layerCollection.getLayerById(relevantLayerIds[0])?.getLayerSource()?.getFeatureById(featureId);
+                  feature = layerCollection.getLayerById(relevantLayerIds[0])?.getLayerSource()?.getFeatureById(featureId);
 
             if (feature && this.mode === "create") {
                 list.push(feature);
@@ -979,11 +983,11 @@ export default {
          */
         async downloadAttachment () {
             const base64Data = await this.loadPropertyOfFeatureById({
-                    geomarkerId: this.selectedFeature.getId(),
-                    propertyName: "anhang_base_64"
-                }),
-                fileType = this.getFileTypeFromBase64(base64Data),
-                link = document.createElement("a");
+                      geomarkerId: this.selectedFeature.getId(),
+                      propertyName: "anhang_base_64"
+                  }),
+                  fileType = this.getFileTypeFromBase64(base64Data),
+                  link = document.createElement("a");
 
             if (!base64Data) {
                 return;
@@ -1092,11 +1096,11 @@ export default {
          */
         checkIfFeatureHasChangedOnServer (featureFromServer) {
             const localFeature = this.selectedFeature,
-                localGeom = localFeature.getGeometry(),
-                serverGeom = featureFromServer.getGeometry(),
-                geometryChanged = JSON.stringify(localGeom.getCoordinates()) !== JSON.stringify(serverGeom.getCoordinates()),
-                localProps = {...localFeature.getProperties()},
-                serverProps = {...featureFromServer.getProperties()};
+                  localGeom = localFeature.getGeometry(),
+                  serverGeom = featureFromServer.getGeometry(),
+                  geometryChanged = JSON.stringify(localGeom.getCoordinates()) !== JSON.stringify(serverGeom.getCoordinates()),
+                  localProps = {...localFeature.getProperties()},
+                  serverProps = {...featureFromServer.getProperties()};
 
             delete localProps.geom;
             delete serverProps.geom;
@@ -1151,17 +1155,17 @@ export default {
                 */
 
             const localFeature = this.selectedFeature,
-                localProps = {...localFeature.getProperties()},
-                serverProps = {...featureFromServer.getProperties()},
-                localDepartmentsData = this.extractDepartmentData(localProps),
-                serverDepartmentsData = this.extractDepartmentData(serverProps),
-                allUsedLayerIds = {};
+                  localProps = {...localFeature.getProperties()},
+                  serverProps = {...featureFromServer.getProperties()},
+                  localDepartmentsData = this.extractDepartmentData(localProps),
+                  serverDepartmentsData = this.extractDepartmentData(serverProps),
+                  allUsedLayerIds = {};
 
             Object.keys(this.departments).forEach(departmentId => {
 
                 if (localDepartmentsData[departmentId]) {
                     const status = localDepartmentsData[departmentId].status,
-                        layerId = this.departments[departmentId].layerIds[status];
+                          layerId = this.departments[departmentId].layerIds[status];
 
                     localDepartmentsData[departmentId].layerId = layerId;
                     allUsedLayerIds[layerId] = {status: "remove"};
@@ -1169,7 +1173,7 @@ export default {
 
                 if (serverDepartmentsData[departmentId]) {
                     const status = serverDepartmentsData[departmentId].status,
-                        layerId = this.departments[departmentId].layerIds[status];
+                          layerId = this.departments[departmentId].layerIds[status];
 
                     serverDepartmentsData[departmentId].layerId = layerId;
 
@@ -1184,7 +1188,7 @@ export default {
 
             await Promise.all(Object.keys(allUsedLayerIds).map(layerId => new Promise(resolve => {
                 const layerSource = this.map?.getLayers().getArray().find(l => l.get("id") === layerId)?.getSource(),
-                    featureOnLayer = layerSource?.getFeatureById(featureFromServer.getId());
+                      featureOnLayer = layerSource?.getFeatureById(featureFromServer.getId());
 
                 switch (allUsedLayerIds[layerId].status) {
                     case "update":
@@ -1253,15 +1257,15 @@ export default {
          */
         findLayerIdsForChangedDepartments () {
             const layerIdsArray = [],
-                previousDepartments = Object.keys(this.selectedFeature.getProperties()).filter((prop) => prop.startsWith("sta_")),
-                newDepartments = Object.keys(this.departmentData || {}).map((prop) => {
-                    return prop !== "gebaeude" ? "sta_" + prop : "sta_gemis";
-                });
+                  previousDepartments = Object.keys(this.selectedFeature.getProperties()).filter((prop) => prop.startsWith("sta_")),
+                  newDepartments = Object.keys(this.departmentData || {}).map((prop) => {
+                      return prop !== "gebaeude" ? "sta_" + prop : "sta_gemis";
+                  });
 
             previousDepartments.forEach(departmentId => {
                 const statusPrevious = this.selectedFeature.get(departmentId),
-                    statusNew = this.updatedGeoMarker[departmentId],
-                    index = newDepartments.indexOf(departmentId);
+                      statusNew = this.updatedGeoMarker[departmentId],
+                      index = newDepartments.indexOf(departmentId);
 
                 if (statusPrevious !== statusNew) {
                     const departmentKey = departmentId.replace("sta_", "");
@@ -1282,7 +1286,7 @@ export default {
 
             newDepartments.forEach(departmentId => {
                 const statusNew = this.updatedGeoMarker[departmentId],
-                    departmentKey = departmentId.replace("sta_", "");
+                      departmentKey = departmentId.replace("sta_", "");
 
                 layerIdsArray.push(this.departments[departmentKey].layerIds[statusNew]);
             });
@@ -1619,6 +1623,8 @@ export default {
         </ModalItem>
     </div>
 </template>
+
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style lang="scss" scoped>
 

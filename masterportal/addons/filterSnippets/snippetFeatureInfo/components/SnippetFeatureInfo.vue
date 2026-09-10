@@ -89,7 +89,7 @@ export default {
         filteredItems: {
             handler (items) {
                 const attributesObject = this.getUniqueObjectFromAttributes(this.attrName, items),
-                    localFeatureInfo = this.featureInfo ? this.featureInfo : {};
+                      localFeatureInfo = this.featureInfo ? this.featureInfo : {};
                 let beautifiedObjects;
 
                 if (attributesObject === null) {
@@ -161,7 +161,7 @@ export default {
                 return null;
             }
             const uniqueObjects = {},
-                result = {};
+                  result = {};
 
             features.forEach(feature => {
                 attrName.forEach(attr => {

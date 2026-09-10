@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import ShareViewComponent from "@modules/shareView/components/ShareView.vue";
 import ShareView from "@modules/shareView/store/indexShareView.js";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/shareView/components/ShareView.vue", () => {
     const mockConfigJson = {
@@ -102,28 +101,45 @@ describe("src/modules/shareView/components/ShareView.vue", () => {
     });
 
     describe("copyToClipboard", () => {
-        let localWindow,
-            localNavigator;
+        let originalSecureContextDescriptor,
+            originalClipboardDescriptor,
+            originalLocation;
 
         beforeAll(() => {
-            localWindow = global.window;
-            localNavigator = global.navigator;
+            originalSecureContextDescriptor = Object.getOwnPropertyDescriptor(window, "isSecureContext");
+            originalClipboardDescriptor = Object.getOwnPropertyDescriptor(navigator, "clipboard");
+            originalLocation = global.location;
         });
 
         afterEach(() => {
-            global.window = localWindow;
-            global.navigator = localNavigator;
+            if (originalSecureContextDescriptor) {
+                Object.defineProperty(window, "isSecureContext", originalSecureContextDescriptor);
+            }
+            else {
+                delete window.isSecureContext;
+            }
+
+            if (originalClipboardDescriptor) {
+                Object.defineProperty(navigator, "clipboard", originalClipboardDescriptor);
+            }
+            else {
+                delete navigator.clipboard;
+            }
+
+            global.location = originalLocation;
         });
 
         it("copy to clipboard for secure websites", function () {
             let text = "";
 
-            window.isSecureContext = true;
-            navigator.clipboard = {
-                writeText: (aText) => {
-                    text = aText;
-                }
-            };
+            Object.defineProperty(window, "isSecureContext", {value: true, configurable: true});
+            Object.defineProperty(navigator, "clipboard", {
+                configurable: true,
+                value: {
+                    writeText: (aText) => {
+                        text = aText;
+                    }
+                }});
             const writeTextStub = sinon.stub(navigator.clipboard, "writeText").resolves(text);
 
             wrapper = shallowMount(ShareViewComponent, {
@@ -138,7 +154,7 @@ describe("src/modules/shareView/components/ShareView.vue", () => {
         });
 
         it("draw an alert for unsecure websites", () => {
-            global.window.isSecureContext = false;
+            Object.defineProperty(window, "isSecureContext", {value: false, configurable: true});
             wrapper = shallowMount(ShareViewComponent, {
                 global: {
                     plugins: [store]
@@ -155,12 +171,14 @@ describe("src/modules/shareView/components/ShareView.vue", () => {
         it("copies the URL with attached # to clipboard", function () {
             let text = "";
 
-            window.isSecureContext = true;
-            navigator.clipboard = {
-                writeText: (aText) => {
-                    text = aText;
-                }
-            };
+            Object.defineProperty(window, "isSecureContext", {value: true, configurable: true});
+            Object.defineProperty(navigator, "clipboard", {
+                configurable: true,
+                value: {
+                    writeText: (aText) => {
+                        text = aText;
+                    }
+                }});
             const writeTextStub = sinon.stub(navigator.clipboard, "writeText").resolves(text);
 
             wrapper = shallowMount(ShareViewComponent, {
@@ -193,7 +211,6 @@ describe("src/modules/shareView/components/ShareView.vue", () => {
                     "Maps/urlParams": mockMapUrlParams,
                     "Menu/urlParams": mockMenuUrlParams
                 },
-                originalLocation = global.location,
                 state = {},
                 getters = {},
                 expectedURL = "https://self.example.org/portal/?MAP=mapValue&MENU={\"main\":{\"currentComponent\":\"root\"},\"secondary\":{\"currentComponent\":\"root\"}}&LAYERS=[{\"id\":\"layer1\",\"visibility\":true},{\"id\":\"layer2\",\"visibility\":false}]&ADDONPARAM=addonValue";
@@ -206,7 +223,6 @@ describe("src/modules/shareView/components/ShareView.vue", () => {
             };
 
             expect(decodeURI(ShareView.getters.url(state, getters, {}, rootGetters))).to.equal(expectedURL);
-            global.location = originalLocation;
         });
         it("ignore existing basic URL parameters in the share URL", () => {
             const mockLayerUrlParams = [
@@ -228,7 +244,6 @@ describe("src/modules/shareView/components/ShareView.vue", () => {
                     "Maps/urlParams": mockMapUrlParams,
                     "Menu/urlParams": mockMenuUrlParams
                 },
-                originalLocation = global.location,
                 state = {},
                 getters = {},
                 expectedURL = "https://self.example.org/portal/?MAP=mapValue&MENU={\"main\":{\"currentComponent\":\"root\"},\"secondary\":{\"currentComponent\":\"root\"}}&LAYERS=[{\"id\":\"layer1\",\"visibility\":true},{\"id\":\"layer2\",\"visibility\":false}]&ADDONPARAM=addonValue";
@@ -241,7 +256,6 @@ describe("src/modules/shareView/components/ShareView.vue", () => {
             };
 
             expect(decodeURI(ShareView.getters.url(state, getters, {}, rootGetters))).to.equal(expectedURL);
-            global.location = originalLocation;
         });
     });
 

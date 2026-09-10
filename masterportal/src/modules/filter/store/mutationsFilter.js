@@ -9,6 +9,17 @@ const mutations = {
      * will be returned.
      */
     ...generateSimpleMutations(filterState),
+    /**
+     * Applies a configuration object to the current filter state.
+     * @param {Object} state current state
+     * @param {Object} config The configuration object.
+     * @returns {void}
+     */
+    setConfiguredProperties (state, config) {
+        if (config instanceof Object) {
+            Object.assign(state, JSON.parse(JSON.stringify(config)));
+        }
+    },
     addSpotForRule (state, payload) {
         state.rulesOfFilters[payload.filterId] = [];
     },

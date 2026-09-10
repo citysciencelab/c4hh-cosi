@@ -9,6 +9,7 @@ import Layer2dVectorTile from "@core/layers/js/layer2dVectorTile.js";
 describe("src/modules/filter/utils/mapHandler.js", () => {
     let lastError = false,
         onerror = null;
+    const originStoreGetter = store.getters;
 
     /**
      * Creates a MapHandler instance with default handlers, which can be overridden or extended
@@ -89,6 +90,9 @@ describe("src/modules/filter/utils/mapHandler.js", () => {
             },
             determineZIndex: () => 1
         };
+    });
+    afterEach(() => {
+        store.getters = originStoreGetter;
     });
     describe("constructor", () => {
         it("should pipe an error if function getLayerByLayerId is missing with the given handlers", () => {
@@ -731,18 +735,34 @@ describe("src/modules/filter/utils/mapHandler.js", () => {
         });
     });
     describe("setObserverAutoInterval", () => {
-        it("should set the given handler as observer", () => {
-            let last_observer = false;
-            const map = createMapHandler(onerror.call, {});
+        it("should return without registering an observer if no layer was found in layerCollection", () => {
+            const map = createMapHandler(onerror.call, {}),
+                getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").returns(false);
 
             map.layers.filterId = {
-                setObserverAutoInterval: observer => {
-                    last_observer = observer;
-                }
+                id: "layerId"
             };
 
-            map.setObserverAutoInterval("filterId", "handler");
-            expect(last_observer).to.equal("handler");
+            map.setObserverAutoInterval("filterId", () => false);
+
+            expect(getLayerByIdStub.calledOnceWithExactly("layerId")).to.be.true;
+        });
+
+        it("should forward the given handler to the layer from layerCollection", () => {
+            const map = createMapHandler(onerror.call, {}),
+                handler = sinon.spy(),
+                setObserverAutoIntervalSpy = sinon.spy();
+
+            map.layers.filterId = {
+                id: "layerId"
+            };
+            sinon.stub(layerCollection, "getLayerById").returns({
+                setObserverAutoInterval: setObserverAutoIntervalSpy
+            });
+
+            map.setObserverAutoInterval("filterId", handler);
+
+            expect(setObserverAutoIntervalSpy.calledOnceWithExactly(handler)).to.be.true;
         });
     });
     describe("hasAutoRefreshInterval", () => {

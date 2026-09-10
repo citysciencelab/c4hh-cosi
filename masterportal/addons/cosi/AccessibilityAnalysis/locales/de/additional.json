@@ -5,7 +5,7 @@
                 "accessibilityAnalysis": {
                     "areaOutsideMRH": "Für dieses Gebiet können keine Einwohner berechnet werden. Bitte wählen Sie ein Gebiet innerhalb der Metropolregion Hamburg.",
                     "title": "Erreichbarkeitsanalyse",
-                    "description": "Zeigt ein Gebiet auf der Karte an, welches von einem ausgewählten Punkt, entlang einer Route oder ab einer Einrichtung innerhalb einer festgelegten Entfernung erreichbar ist. Die Entfernung kann in Zeit oder in Metern angegeben werden. Die Erreichbarkeit wird abhängig vom Verkehrsmittel berechnet.",
+                    "description": "Mit diesem Werkzeug können Sie sich auf der Karte Gebiete anzeigen lassen, die von einem ausgewählten Punkt, entlang einer Route oder innerhalb einer festgelegten Entfernung erreichbar sind. Die Erreichbarkeit kann je nach Verkehrsmittel berechnet und als Zeit oder Entfernung in Metern angegeben werden.",
                     "dropdownInfo": "Bitte wählen Sie den Modus, in dem Sie arbeiten möchten",
                     "points": "Punkte",
                     "pointMode": "Erreichbarkeit ab einem Referenzpunkt",

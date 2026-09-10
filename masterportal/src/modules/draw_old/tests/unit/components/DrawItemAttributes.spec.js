@@ -1,11 +1,10 @@
 import DrawItemAttributes from "@modules/draw_old/components/DrawItemAttributes.vue";
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/draw/components/DrawItemAttributes.vue", () => {
     let testFeature, testLayer, wrapper;

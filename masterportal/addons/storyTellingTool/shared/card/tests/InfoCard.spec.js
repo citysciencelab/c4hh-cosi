@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import InfoCard from "../components/InfoCard.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/shared/components/InfoCard.vue", () => {
     describe("Component DOM", () => {

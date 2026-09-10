@@ -112,7 +112,7 @@ export default {
          */
         async downloadResults (filename, downloadObjects) {
             const csv = this.createCsvToDownload(downloadObjects),
-                downloadFilename = this.createDownloadFilename(filename);
+                  downloadFilename = this.createDownloadFilename(filename);
 
             if (typeof navigator.msSaveOrOpenBlob === "function") {
                 window.navigator.msSaveOrOpenBlob(new Blob(["\ufeff", csv], {
@@ -121,7 +121,7 @@ export default {
             }
             else {
                 const url = `data:text/plain;charset=utf-8,${encodeURIComponent(csv)}`,
-                    a = document.createElement("a");
+                      a = document.createElement("a");
 
                 a.href = url;
                 a.download = downloadFilename;
@@ -141,7 +141,7 @@ export default {
                 return ".csv";
             }
             const parts = filename.split("."),
-                partsWithoutExtension = parts.slice(0, parts.length - 1);
+                  partsWithoutExtension = parts.slice(0, parts.length - 1);
 
             return partsWithoutExtension.join(".") + ".csv";
         },
@@ -157,9 +157,9 @@ export default {
                     return;
                 }
                 const content = filecontent.replace(/[\r]/g, "").trim(),
-                    lines = content.split("\n"),
-                    count = lines.length,
-                    tasks = [];
+                      lines = content.split("\n"),
+                      count = lines.length,
+                      tasks = [];
 
                 if (content.length === 0 || count === 0) {
                     reject(new Error(this.$t("common:modules.routing.directions.batchProcessing.errorNoEntries")));
@@ -172,7 +172,7 @@ export default {
 
                 for (let i = 0; i < count; i++) {
                     const line = lines[i],
-                        lineParts = line.split(";");
+                          lineParts = line.split(";");
 
                     if (lineParts.length === 1 && lineParts.includes("")) {
                         continue;
@@ -206,20 +206,20 @@ export default {
          */
         async parseLineParts (lineParts) {
             const id = lineParts[0],
-                startLon = Number(lineParts[1]),
-                startLat = Number(lineParts[2]),
-                endeLon = Number(lineParts[3]),
-                endeLat = Number(lineParts[4]),
-                result = {
-                    ID: id,
-                    [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.xStart")]: startLon,
-                    [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.yStart")]: startLat,
-                    [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.xEnd")]: endeLon,
-                    [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.yEnd")]: endeLat,
-                    [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.time")]: null,
-                    [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.distance")]: null,
-                    [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.profile")]: this.settings.speedProfile
-                };
+                  startLon = Number(lineParts[1]),
+                  startLat = Number(lineParts[2]),
+                  endeLon = Number(lineParts[3]),
+                  endeLat = Number(lineParts[4]),
+                  result = {
+                      ID: id,
+                      [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.xStart")]: startLon,
+                      [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.yStart")]: startLat,
+                      [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.xEnd")]: endeLon,
+                      [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.yEnd")]: endeLat,
+                      [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.time")]: null,
+                      [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.distance")]: null,
+                      [this.$t("common:modules.routing.directions.batchProcessing.downloadHeader.profile")]: this.settings.speedProfile
+                  };
 
             try {
                 this.serviceRequests += 1;

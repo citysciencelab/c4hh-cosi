@@ -72,11 +72,11 @@ export default {
          */
         resetChart (data) {
             const ctx = this.$el.getContext("2d"),
-                config = {
-                    type: this.diagramType,
-                    data: data,
-                    options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
-                };
+                  config = {
+                      type: this.diagramType,
+                      data: data,
+                      options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
+                  };
 
             if (this.chart instanceof ChartJs) {
                 this.chart.destroy();

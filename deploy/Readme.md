@@ -140,13 +140,19 @@ therefore proxies **all** traffic to both hosts:
   hence the `$http_host`-based rewrite instead of relative paths.
 - Responses are cached on disk (volume `hh-upstream-cache`, survives
   redeploys). While Hamburg is up you always get **live data** (cache entries
-  are revalidated after 6 h). When Hamburg errors, times out or is plain
+  are revalidated after 6 h, in the background — a cached copy is never held
+  back waiting for a slow upstream). When Hamburg errors, times out or is plain
   unreachable, nginx serves the last cached copy instead
   (`proxy_cache_use_stale` + an `error_page 502/504` fallback that covers
   DNS-level failures, i.e. a fully offline box still works).
 - OAF pagination `next` links in JSON responses are rewritten too, so page 2+
   stays on the proxy. Check any response's `X-Cache-Status` header:
   `MISS`/`HIT`/`STALE`.
+- Only a URL that was cached at least once can be served stale. An **uncached**
+  request still waits for the upstream, and a proxy in front of this one (Plesk
+  defaults to a 60 s `proxy_read_timeout`) may 504 before it answers — the fetch
+  keeps running here (`proxy_ignore_client_abort`), so the next try is a `HIT`.
+  Hence: warm the cache.
 
 **Before a presentation**, warm the cache — only URLs seen at least once can be
 served stale. Either click through the demo while Hamburg is up, or run:
@@ -158,9 +164,15 @@ deploy/warm-hh-cache.py https://cosi.example.org   # or http://localhost:8080
 It replays the app's exact requests (byte-identical URLs = same cache keys) for
 the critical datasets: all district levels (Stadtteile/Bezirke/Hamburg), the
 full Regionalstatistik matrix (~800 filtered OAF queries), HVV Haltestellen +
-Staatliche Schulen (WFS), map styles + icons. Takes a few minutes; needs only
-Python 3. Anything it doesn't cover (e.g. basemap tiles for areas you'll pan
-to, other Fachdaten layers) is warmed by simply browsing it once.
+Staatliche Schulen (WFS), the social-infrastructure Fachdaten, map styles +
+icons. Takes a few minutes; needs only Python 3. Anything it doesn't cover
+(e.g. basemap tiles for areas you'll pan to, other Fachdaten layers) is warmed
+by simply browsing it once.
+
+It exits non-zero if anything failed to warm, so it can gate a deploy. Resources
+that upstream answers with a `404` are reported as `MISSING` and don't count as
+a failure — `style_v3.json` references a handful of icons that were never
+published, and there is nothing to warm about them.
 
 ## Dev vs prod
 
@@ -196,9 +208,17 @@ The build is **heavy** (full layered npm install of Masterportal + COSI addon,
 then a Vite production build). Suggested tagging: by Masterportal+COSI version,
 e.g. `cosi-portal:mp3.23.0-cosi1.2.0`, plus `:latest`. If/when we host a fork
 (BACKLOG §2.5), publish to GHCR (`ghcr.io/<org>/cosi-portal`) from CI so servers
-pull a prebuilt image instead of building on the box. `ARG MASTERCODE_VERSION_FOLDER`
-(default `3_23_0`) pins the `mastercode/<version>` asset folder for a deterministic,
-git-independent build.
+pull a prebuilt image instead of building on the box.
+
+`ARG MASTERCODE_VERSION_FOLDER` names the `mastercode/<version>` asset folder;
+left empty (the default) the build stamps a fresh `3_23_0_<UTC timestamp>` into
+it. That name must stay unique per build — nginx serves `/mastercode/` as
+`immutable` for 30 days, so it is the only cache key there is. With a constant
+name a browser keeps the previous `masterportal.js` and pairs it with newly
+fetched lazy chunks; their minified import names are regenerated every build, so
+the mix resolves to `undefined` and the app dies at startup with errors that look
+like bundler noise (`X.default is undefined`, `o is undefined`). Only set the ARG
+to reproduce a specific build's asset paths.
 
 ## TLS / public hostname
 

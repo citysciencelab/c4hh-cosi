@@ -62,19 +62,19 @@ export default {
         centerVisibleMap (feature) {
             if (feature && !this.isMobile) {
                 const coordinates = feature.getProperties().geometry.getCoordinates(),
-                    map = mapCollection.getMap("2D"),
-                    pixelAtCoordinates = map?.getPixelFromCoordinate(coordinates),
-                    rightPadding = this.expanded("secondaryMenu")
-                        ? document.getElementById("mp-menu-secondaryMenu").offsetWidth + 20
-                        : 100,
-                    leftPadding = this.expanded("mainMenu")
-                        ? document.getElementById("mp-menu-mainMenu").offsetWidth + 20
-                        : 20,
-                    offset = (rightPadding - leftPadding) / 2;
+                      map = mapCollection.getMap("2D"),
+                      pixelAtCoordinates = map?.getPixelFromCoordinate(coordinates),
+                      rightPadding = this.expanded("secondaryMenu")
+                          ? document.getElementById("mp-menu-secondaryMenu").offsetWidth + 20
+                          : 100,
+                      leftPadding = this.expanded("mainMenu")
+                          ? document.getElementById("mp-menu-mainMenu").offsetWidth + 20
+                          : 20,
+                      offset = (rightPadding - leftPadding) / 2;
 
                 if (pixelAtCoordinates) {
                     const shiftedPixelX = [pixelAtCoordinates[0] + offset, pixelAtCoordinates[1]],
-                        shiftedCoordinate = map.getCoordinateFromPixel(shiftedPixelX);
+                          shiftedCoordinate = map.getCoordinateFromPixel(shiftedPixelX);
 
                     this.setCenter(shiftedCoordinate);
                 }

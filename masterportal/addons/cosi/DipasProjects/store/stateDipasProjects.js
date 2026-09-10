@@ -12,6 +12,7 @@ const state = {
     id: "Dipas",
     name: "DIPAS Projekte",
     icon: "bi-people",
+    description: "",
     isVisibleInMenu: true,
     deactivateGFI: false,
     baseUrl: "https://beteiligung.hamburg/drupal/dipas-pds/projects"

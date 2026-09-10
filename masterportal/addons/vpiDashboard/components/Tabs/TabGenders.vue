@@ -198,7 +198,7 @@ export default {
          */
         createChartData (responseData, chartType) {
             const tempData = [],
-                xLabels = new Set();
+                  xLabels = new Set();
 
             responseData.forEach((element) => {
                 this.gendersChartLabels.forEach((labelObj, index) => {

@@ -1,5 +1,6 @@
 <script>
 import axios from "axios";
+import {markRaw} from "vue";
 import Card from "../../shared/modules/cards/components/Card.vue";
 import {geoJsonCollectionToFeatures} from "../../utils/features/convertFromGeoJson";
 import dayjs from "dayjs";
@@ -123,13 +124,13 @@ export default {
          */
         async fetchGeoJson (url) {
             const ret = await axios(url, {
-                    method: "GET",
-                    headers: {
-                        "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
-                        "Content-Type": "application/json"
-                    }
-                }),
-                json = await ret.data;
+                      method: "GET",
+                      headers: {
+                          "Accept": "application/json, application/geo+json, application/gpx+xml, img/png; charset=utf-8",
+                          "Content-Type": "application/json"
+                      }
+                  }),
+                  json = await ret.data;
 
             if (json.error) {
                 throw Error(JSON.stringify(json));
@@ -152,7 +153,7 @@ export default {
                 }
             }
 
-            return geoJsonCollectionToFeatures(featureCollection);
+            return geoJsonCollectionToFeatures(featureCollection).map(feature => markRaw(feature));
         },
 
         /**
@@ -202,7 +203,7 @@ export default {
 
         getDateString (feature) {
             const startDate = dayjs(feature.get("dateStart")).format("DD.MM.YYYY"),
-                endDate = dayjs(feature.get("dateEnd")).format("DD.MM.YYYY");
+                  endDate = dayjs(feature.get("dateEnd")).format("DD.MM.YYYY");
 
             return `${startDate} - ${endDate}`;
         },
@@ -262,7 +263,7 @@ export default {
             this.isExpanded = false;
 
             const foundProject = this.projects.find(project => project.id === id),
-                activeProject = this.projects.find(project => project.status === "active");
+                  activeProject = this.projects.find(project => project.status === "active");
 
             this.addFeatureToLayer(foundProject.feature, this.layer.getLayer());
 

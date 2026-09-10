@@ -1,16 +1,13 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import FullScreen from "@modules/controls/fullScreen/components/FullScreen.vue";
 
-config.global.mocks.$t = key => key;
-
 
 describe("src/modules/controls/fullScreen/components/FullScreen.vue", () => {
     let store,
-        originalWindow,
         windowOpenSpy;
 
     beforeEach(() => {
@@ -50,13 +47,7 @@ describe("src/modules/controls/fullScreen/components/FullScreen.vue", () => {
                 }
             }
         });
-        originalWindow = global.window;
-
         windowOpenSpy = sinon.spy();
-    });
-
-    afterEach(() => {
-        global.window = originalWindow;
     });
 
 
@@ -71,11 +62,11 @@ describe("src/modules/controls/fullScreen/components/FullScreen.vue", () => {
     });
 
     it("use shareView for fullscreen in frame", () => {
-        global.window = {
+        sinon.stub(global, "window").value({
             top: "https://outerpage/location",
             self: "https://masterportal/location",
             open: windowOpenSpy
-        };
+        });
 
         const wrapper = mount(FullScreen, {
             global: {
@@ -90,11 +81,11 @@ describe("src/modules/controls/fullScreen/components/FullScreen.vue", () => {
     });
 
     it("do not open new window", () => {
-        global.window = {
+        sinon.stub(global, "window").value({
             top: "https://outerpage/location",
             self: "https://masterportal/location",
             open: windowOpenSpy
-        };
+        });
         store.commit("Controls/FullScreen/setNewTabFromFrame", false);
 
         const wrapper = mount(FullScreen, {

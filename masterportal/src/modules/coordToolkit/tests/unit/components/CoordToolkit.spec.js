@@ -1,7 +1,7 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import CoordToolkitComponent from "@modules/coordToolkit/components/CoordToolkit.vue";
@@ -16,7 +16,6 @@ const namedProjections = [
     ["EPSG:4326", "+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"]
 ];
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
     const registerListenerSpy = sinon.spy(),
@@ -79,7 +78,12 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
         validateInputSpy,
         initHeightLayerSpy,
         transformCoordinatesFromToSpy,
-        positionClickedSpy;
+        positionClickedSpy,
+        originalCesium;
+
+    beforeAll(() => {
+        originalCesium = global.Cesium;
+    });
 
     beforeEach(() => {
         isMobile = false;
@@ -142,6 +146,14 @@ describe("src/modules/coordToolkit/components/CoordToolkit.vue", () => {
             }
         };
         copyStub = sinon.stub(navigator.clipboard, "writeText").resolves(text);
+    });
+
+    afterEach(() => {
+        if (wrapper) {
+            wrapper.unmount();
+            wrapper = null;
+        }
+        global.Cesium = originalCesium;
     });
 
     it("renders CoordToolkit without height field", () => {

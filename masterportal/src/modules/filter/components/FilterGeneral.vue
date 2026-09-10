@@ -1,6 +1,6 @@
 <script>
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
-import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations, mapState} from "vuex";
 import getters from "../store/gettersFilter.js";
 import mutations from "../store/mutationsFilter.js";
 import LayerFilterSnippet from "./LayerFilterSnippet.vue";
@@ -13,9 +13,6 @@ import isObject from "@shared/js/utils/isObject.js";
 import {isRule} from "../utils/isRule.js";
 import GeometryFilter from "./GeometryFilter.vue";
 import {getFeaturesOfAdditionalGeometries} from "../utils/getFeaturesOfAdditionalGeometries.js";
-import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
-import getFeature from "@shared/js/api/wfs/getFeature.js";
-import {WFS} from "ol/format.js";
 import UrlHandler from "../utils/urlHandler.js";
 import Cluster from "ol/source/Cluster.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
@@ -34,7 +31,6 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
  * @vue-data {Array} preparedLayerGroups - List of prepared layer groups.
  * @vue-data {Array} flattenPreparedLayerGroups - List of prepared, flattened layer groups.
  * @vue-data {Object} layerLoaded - The loaded layer.
- * @vue-data {String} layerFilterSnippetPostKey - The layer filter snippet post key.
  */
 export default {
     name: "FilterGeneral",
@@ -46,6 +42,12 @@ export default {
         LayerFilterSnippet,
         FilterList,
         IconButton
+    },
+    props: {
+        config: {
+            type: Object,
+            default: () => ({})
+        }
     },
     data () {
         return {
@@ -62,7 +64,6 @@ export default {
             layerRules: [],
             flattenPreparedLayerGroups: [],
             layerLoaded: {},
-            layerFilterSnippetPostKey: "",
             urlHandler: new UrlHandler(this.mapHandler),
             alreadyWatching: null,
             mapMoveListeners: {},
@@ -74,6 +75,7 @@ export default {
         };
     },
     computed: {
+        ...mapState("Modules/Filter", {filterModuleState: state => state}),
         ...mapGetters("Modules/Filter", Object.keys(getters)),
         ...mapGetters({appStoreUrlParams: "urlParams"}),
 
@@ -82,17 +84,13 @@ export default {
         },
 
         currentURL () {
-            const url = new URL(window.location.href);
-
-            url.searchParams.set("MENU", "{\""
-                + (this.menuSide === "mainMenu" ? "main" : "secondary")
-                + "\":{\"currentComponent\":\"filter\"}}"
+            return this.urlHandler.createFilterUrl(
+                window.location.href,
+                this.menuSide,
+                this.type.toUpperCase(),
+                this.urlParams
             );
-            url.searchParams.set(this.type.toUpperCase(), this.urlParams);
-            return url;
         },
-
-        console: () => console,
         filters () {
             return this.layerConfigs.layers.filter(layer => {
                 return isObject(layer);
@@ -109,6 +107,8 @@ export default {
         }
     },
     mounted () {
+        this.applyConfiguredState();
+
         const selectedFilterIds = [];
 
         getFeaturesOfAdditionalGeometries(this.geometrySelectorOptions.additionalGeometries).then(additionalGeometries => {
@@ -148,22 +148,32 @@ export default {
             this.setSelectedAccordions(this.transformLayerConfig([...this.layerConfigs.layers, ...this.flattenPreparedLayerGroups], selectedFilterIds));
         }
 
-        this.urlHandler.readFromUrlParams(this.getFilterUrlParams(this.appStoreUrlParams), this.layerConfigs, this.mapHandler, params => {
+        const filterUrlParams = this.urlHandler.getFilterUrlParamsFromAppStore(this.appStoreUrlParams, this.type.toUpperCase());
+
+        this.urlHandler.readFromUrlParams(filterUrlParams, this.layerConfigs, this.mapHandler, async params => {
             this.handleStateForAlreadyActiveLayers(params);
-            this.deserializeState({...params, setLateActive: true});
+            await this.deserializeState({...params, setLateActive: true});
+            await this.applyDeserializedFilters(params?.selectedAccordions);
             this.addWatcherToWriteUrl();
         });
-        this.addWatcherToWriteUrl();
+
+        const hasInitialFilterUrlState = Array.isArray(filterUrlParams) || this.urlHandler.isNewFilterUrlState(filterUrlParams);
+
+        if (!hasInitialFilterUrlState) {
+            this.addWatcherToWriteUrl();
+        }
     },
     beforeUnmount () {
         if (this.mapMoveRegistered) {
             this.unregisterMapMoveListeners();
         }
     },
+    activated () {
+        this.applyConfiguredState();
+    },
     methods: {
         ...mapMutations("Modules/Filter", Object.keys(mutations)),
         ...mapActions("Modules/Filter", [
-            "initialize",
             "updateRules",
             "deleteAllRules",
             "updateFilterHits",
@@ -175,32 +185,13 @@ export default {
         isRule,
 
         /**
-         * Check if there are active filter.
-         * @param {Object[]} rules The rules of filter.
+         * Applies the menu-provided configuration to the filter state.
          * @returns {void}
          */
-        checkActiveFilter (rules) {
-            if (!Array.isArray(rules) || !rules.length) {
-                this.isFilterActive = false;
-                return;
-            }
-
-            for (let i = 0; i < rules.length; i++) {
-                if (rules[i] === null) {
-                    this.isFilterActive = false;
-                }
-                else if (Array.isArray(rules[i]) && rules[i].length) {
-                    this.isFilterActive = rules[i].filter(v => v !== false && v !== null && !v?.fixed).length > 0;
-                }
-                else {
-                    this.isFilterActive = false;
-                }
-
-                if (this.isFilterActive) {
-                    break;
-                }
-            }
+        applyConfiguredState () {
+            this.setConfiguredProperties(this.config);
         },
+
         /**
          * Generates the layer rules.
          * @param {Object[]} rules The rules of filter.
@@ -237,18 +228,6 @@ export default {
         },
 
         /**
-         * Gets the filter url params from the app store url params.
-         * @param {Object} appStoreUrlParams The url params from the app store.
-         * @returns {Object} The filter url params.
-         */
-        getFilterUrlParams (appStoreUrlParams) {
-            if (typeof appStoreUrlParams?.FILTER === "string") {
-                return JSON.parse(appStoreUrlParams.FILTER);
-            }
-            return Object.values(JSON.parse(appStoreUrlParams?.MENU || "{}")).filter(value => value.currentComponent === "filter").map(obj => obj.attributes)[0] || {};
-        },
-
-        /**
          * Handles the state for already activated layers by given params.
          * The given params are set for the matching layer if it is already active but has no features loaded yet.
          * This function edits the given param and removes the rules and
@@ -267,7 +246,7 @@ export default {
 
             while (selecetedAccordionsLen--) {
                 const accordion = params.selectedAccordions[selecetedAccordionsLen],
-                    rulesOfAccordeon = params.rulesOfFilters[accordion?.filterId];
+                      rulesOfAccordeon = params.rulesOfFilters[accordion?.filterId];
                 let layerModel = null,
                     layerConfig = null,
                     layerSource = null;
@@ -285,15 +264,16 @@ export default {
                     typeof layerSource?.getFeatures === "function"
                     && layerSource.getFeatures().length === 0)
                     || (typeof layerModel?.getFeatures === "function"
-                    && layerModel.getFeatures().length === 0))) {
+                        && layerModel.getFeatures().length === 0))) {
                     (layerConfig?.typ === "SensorThings" ? layerModel : layerSource).once("featuresloadend", async () => {
                         const rulesOfFiltersTmp = [...this.rulesOfFilters],
-                            selectedAccordionsTmp = [...this.selectedAccordions];
+                              selectedAccordionsTmp = [...this.selectedAccordions];
 
                         rulesOfFiltersTmp[accordion.filterId] = rulesOfAccordeon;
                         selectedAccordionsTmp.push(accordion);
                         await this.setRulesArray({rulesOfFilters: rulesOfFiltersTmp});
                         this.setSelectedAccordions(selectedAccordionsTmp);
+                        await this.applyDeserializedFilters([accordion]);
                     });
                     params.selectedAccordions.splice(selecetedAccordionsLen, 1);
                     params.rulesOfFilters[accordion.filterId] = null;
@@ -310,45 +290,32 @@ export default {
                 if (typeof this.alreadyWatching === "function") {
                     return;
                 }
-                this.alreadyWatching = this.$watch("$store.state.Modules.Filter", this.writeUrlParams, {
+                this.alreadyWatching = this.$watch("filterModuleState", this.writeUrlParams, {
                     deep: true
                 });
+                this.writeUrlParams(this.filterModuleState);
             }
         },
         /**
-         * Gets the features of the additional geometries by the given layer id.
-         * @param {Object[]} additionalGeometries - The additional geometries.
-         * @param {String} additionalGeometries[].layerId - The id of the layer.
-         * @returns {void}
+         * Applies deserialized rules to selected filter snippets and triggers filtering.
+         * @param {Object[]} accordions The selected accordions to trigger.
+         * @returns {Promise<void>} A promise resolving after next render tick.
          */
-        async getFeaturesOfAdditionalGeometries (additionalGeometries) {
-            if (additionalGeometries) {
-                const wfsReader = new WFS();
+        async applyDeserializedFilters (accordions) {
+            if (!Array.isArray(accordions) || accordions.length === 0) {
+                return;
+            }
+            await this.$nextTick();
 
-                for (const additionalGeometry of additionalGeometries) {
-                    const rawLayer = rawLayerList.getLayerWhere({id: additionalGeometry.layerId}),
-                        features = await getFeature.getFeatureGET(rawLayer.url, {version: rawLayer.version, featureType: rawLayer.featureType});
+            accordions.forEach(accordion => {
+                const layerFilterComp = this.$refs[`filter-${accordion?.filterId}`];
+                const layerFilterCompRef = Array.isArray(layerFilterComp) ? layerFilterComp[0] : layerFilterComp;
 
-                    additionalGeometry.features = wfsReader.readFeatures(features);
+                if (typeof layerFilterCompRef?.applyDeserializedState !== "function") {
+                    return;
                 }
-            }
-        },
-        /**
-         * Update selected layer group.
-         * @param {Number} layerGroupIndex index of the layer group
-         * @returns {void}
-         */
-        updateSelectedGroups (layerGroupIndex) {
-            const selectedGroups = JSON.parse(JSON.stringify(this.selectedGroups)),
-                index = selectedGroups.indexOf(layerGroupIndex);
-
-            if (index >= 0) {
-                selectedGroups.splice(index, 1);
-            }
-            else {
-                selectedGroups.push(layerGroupIndex);
-            }
-            this.setSelectedGroups(selectedGroups);
+                layerFilterCompRef.applyDeserializedState();
+            });
         },
         /**
          * Update selectedAccordions array in groups.
@@ -357,8 +324,8 @@ export default {
          */
         updateSelectedAccordions (filterId) {
             const selectedGroups = JSON.parse(JSON.stringify(this.selectedGroups)),
-                filterIdsOfAccordions = [],
-                collapseButtonGroups = this.preparedLayerGroups.filter(group => group.collapseButtons);
+                  filterIdsOfAccordions = [],
+                  collapseButtonGroups = this.preparedLayerGroups.filter(group => group.collapseButtons);
             let selectedAccordionIndex = -1;
 
             if (!this.multiLayerSelector || collapseButtonGroups.length || this.collapseButtons) {
@@ -524,8 +491,11 @@ export default {
          */
         writeUrlParams (newState) {
             const params = this.urlHandler.getParamsFromState(newState, this.neededUrlParams),
-                generatedParams = JSON.stringify(params);
+                  generatedParams = JSON.stringify(params);
 
+            if (this.urlParams === generatedParams) {
+                return;
+            }
             this.setUrlParams(generatedParams);
         },
         /**
@@ -575,12 +545,17 @@ export default {
                     return;
                 }
                 if (this.runningMapMoveListeners[filterId]) {
-                    this.layerConfigs.layers[filterId].api.stop(() => {
-                        this.runningMapMoveListeners[filterId] = true;
-                        mapMoveListener(evt);
-                    }, error => {
-                        console.error("Error while stopping layer for map move listener with filterId " + filterId, error);
-                    });
+                    const layerConfig = [...this.flattenPreparedLayerGroups, ...this.layerConfigs.layers]
+                        .find(layer => layer.filterId === filterId);
+
+                    if (typeof layerConfig?.api?.stop === "function") {
+                        layerConfig.api.stop(() => {
+                            this.runningMapMoveListeners[filterId] = true;
+                            mapMoveListener(evt);
+                        }, error => {
+                            console.error("Error while stopping layer for map move listener with filterId " + filterId, error);
+                        });
+                    }
                     return;
                 }
                 this.runningMapMoveListeners[filterId] = true;

@@ -1,28 +1,30 @@
 <script>
 /* eslint-disable no-undef */
-import {mapGetters} from "vuex";
 import axios from "axios";
+import dayjs from "dayjs";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import {mapGetters} from "vuex";
 import {TrafficCountCache} from "../utils/trafficCountCache.js";
 import {DauerzaehlstellenRadApi} from "../utils/dauerzaehlstellenRadApi.js";
 import TrafficCountInfo from "./TrafficCountInfo.vue";
 import TrafficCountDay from "./TrafficCountDay.vue";
+import TrafficCountHeader from "./TrafficCountHeader.vue";
 import TrafficCountWeek from "./TrafficCountWeek.vue";
 import TrafficCountYear from "./TrafficCountYear.vue";
-import TrafficCountFooter from "./TrafficCountFooter.vue";
-import TrafficCountDownloads from "./TrafficCountDownloads.vue";
 import convertHttpLinkToSSL from "../../../../src/shared/js/utils/convertHttpLinkToSSL.js";
 import NavTab from "../../../../src/shared/modules/tabs/components/NavTab.vue";
+import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 
 export default {
     name: "TrafficCount",
     components: {
+        FlatButton,
+        NavTab,
         TrafficCountInfo,
         TrafficCountDay,
+        TrafficCountHeader,
         TrafficCountWeek,
-        TrafficCountYear,
-        TrafficCountFooter,
-        TrafficCountDownloads,
-        NavTab
+        TrafficCountYear
     },
     props: {
         feature: {
@@ -35,6 +37,7 @@ export default {
             api: null,
             propThingId: 0,
             propMeansOfTransport: "",
+            selectedTimeView: "day",
             title: "",
             type: "",
             meansOfTransport: "",
@@ -44,7 +47,6 @@ export default {
             keyDay: "day",
             keyWeek: "week",
             keyYear: "year",
-            keyDownloads: "downloads",
             dayCheckReset: false,
             weekCheckReset: false,
             yearCheckReset: false,
@@ -64,7 +66,11 @@ export default {
                 "secondDayOfChristmas",
                 "newYearsEve"
             ],
-            checkGurlittInsel: false
+            checkGurlittInsel: false,
+            lastDayValueSecond: undefined,
+            lastUpdate: "",
+            isMqttLive: true,
+            statusHandler: null
         };
     },
     computed: {
@@ -85,8 +91,8 @@ export default {
             return this.$t("additional:modules.tools.gfi.themes.trafficCount.yearLabel");
         },
 
-        downloadsLabel: function () {
-            return this.$t("additional:modules.tools.gfi.themes.trafficCount.downloads");
+        lastupdateLabel: function () {
+            return this.$t("additional:modules.tools.gfi.themes.trafficCount.lastupdateLabel");
         },
 
         typeAssoc: function () {
@@ -135,6 +141,14 @@ export default {
             }
 
             return this.propMeansOfTransport + "_" + this.propThingId + "_" + this.direction;
+        },
+
+        /**
+         * Gets if the information about heavy traffic is available, currently only for "Anzahl_Kfz" and only if the last day value of "Anzahl_Schwerverkehr" is available
+         * @return {Boolean} True if the information about heavy traffic is available, false otherwise.
+         */
+        isHeavyTrafficAvailable () {
+            return typeof this.lastDayValueSecond !== "undefined";
         }
     },
     watch: {
@@ -154,6 +168,7 @@ export default {
                         }, null);
                         this.checkGurlittInsel = false;
                     }
+                    this.isMqttLive = true;
                     this.setHeader(this.api, this.propThingId, this.propMeansOfTransport);
                     this.setComponentKey(this.propThingId + this.propMeansOfTransport);
                     this.setActiveDefaultTab();
@@ -162,13 +177,28 @@ export default {
             },
             immediate: true
         },
-
+        propThingId: {
+            handler (_newVal, oldVal) {
+                if (oldVal) {
+                    this.isMqttLive = true;
+                }
+            },
+            immediate: true,
+            deep: true
+        },
+        propMeansOfTransport: {
+            handler (_newVal, oldVal) {
+                if (oldVal) {
+                    this.isMqttLive = true;
+                }
+            },
+            immediate: true
+        },
         // When language is switched, the header will be rerendered
         currentLocale: function (newVal, oldVal) {
             if (oldVal) {
                 this.setHeader(this.api, this.propThingId, this.propMeansOfTransport);
                 this.setComponentKey(newVal);
-                this.setActiveDefaultTab();
             }
         }
     },
@@ -187,10 +217,20 @@ export default {
         }
     },
     mounted: function () {
+        this.statusHandler = (status) => {
+            this.isMqttLive = status;
+        };
+
+        if (typeof this.api?.api?.onMqttStatusChange === "function") {
+            this.api.api.onMqttStatusChange(this.statusHandler);
+        }
         this.setHeader(this.api, this.propThingId, this.propMeansOfTransport);
         this.setHolidays(this.feature);
     },
     beforeUnmount: function () {
+        if (typeof this.api?.api?.offMqttStatusChange === "function" && this.statusHandler) {
+            this.api.api.offMqttStatusChange(this.statusHandler);
+        }
         this.api.unsubscribeEverything();
     },
     methods: {
@@ -238,17 +278,17 @@ export default {
          */
         createDataConnection: function (feature, onerror, sensorThingsApiOpt = null) {
             const thingId = feature["@iot.id"],
-                meansOfTransport = this.getMeansOfTransportFromDatastream(feature.Datastreams, Object.keys(this.typeAssoc)),
-                url = feature.requestUrl,
-                sensorThingsApiVersion = "v" + feature.versionUrl,
-                mqttOptions = {
-                    host: url.split("/")[2],
-                    rhPath: url,
-                    context: this,
-                    path: "/mqtt",
-                    protocol: "wss",
-                    mqttVersion: "3.1.1"
-                };
+                  meansOfTransport = this.getMeansOfTransportFromDatastream(feature.Datastreams, Object.keys(this.typeAssoc)),
+                  url = feature.requestUrl,
+                  sensorThingsApiVersion = "v" + feature.versionUrl,
+                  mqttOptions = {
+                      host: url.split("/")[2],
+                      rhPath: url,
+                      context: this,
+                      path: "/mqtt",
+                      protocol: "wss",
+                      mqttVersion: "3.1.1"
+                  };
 
             this.api = new TrafficCountCache(url, sensorThingsApiVersion, mqttOptions, sensorThingsApiOpt);
             this.propThingId = thingId;
@@ -294,9 +334,6 @@ export default {
         setActiveDefaultTab: function () {
             this.$el.querySelector("#info-tab").click();
         },
-        isActiveTab (tabId) {
-            return this.currentTabId === tabId;
-        },
         /**
          * set the current tab id after clicking.
          * @param {String} id the id of current tab
@@ -306,6 +343,21 @@ export default {
             if (id) {
                 this.currentTabId = id;
             }
+        },
+
+        /**
+         * setup of the last update date for the header
+         * @param {Object} api instance of TrafficCountApi
+         * @param {String} thingId the thingId to be send to any api call
+         * @param {String} meansOfTransport the meansOfTransport to be send with any api call
+         * @returns {void}
+         */
+        updateLastUpdate: function (api, thingId, meansOfTransport) {
+            api.subscribeLastUpdate(thingId, meansOfTransport, datetime => {
+                this.lastUpdate = dayjs(datetime, "YYYY-MM-DD HH:mm:ss").format("DD.MM.YYYY HH:mm [Uhr]");
+            }, () => {
+                this.lastUpdate = "";
+            });
         },
 
         /**
@@ -360,6 +412,20 @@ export default {
                     category: "Info"
                 });
             });
+
+            if (meansOfTransport === "Anzahl_Kfz" || meansOfTransport === "Anzahl_Schwerverkehr") {
+                const meansOfTransportSecond = meansOfTransport === "Anzahl_Kfz" ? "Anzahl_Schwerverkehr" : "Anzahl_Kfz";
+
+                api.updateDay(thingId, meansOfTransportSecond, dayjs().subtract(1, "day").format("YYYY-MM-DD"), (_, secondValue) => {
+                    this.lastDayValueSecond = thousandsSeparator(secondValue);
+                }, errormsg => {
+                    this.lastDayValueSecond = undefined;
+                    console.warn("The last update last day of traffic is incomplete:", errormsg);
+                });
+            }
+
+            // last update for header
+            this.updateLastUpdate(api, thingId, meansOfTransport);
         },
 
         /**
@@ -390,7 +456,6 @@ export default {
             this.keyDay = value + "day";
             this.keyWeek = value + "week";
             this.keyYear = value + "year";
-            this.keyDownloads = value + "downloads";
         },
 
         /**
@@ -400,27 +465,11 @@ export default {
          */
         setHolidays (feature) {
             const gfiTheme = feature?.getTheme(),
-                gfiParams = gfiTheme?.params,
-                holidays = gfiParams?.holidays;
+                  gfiParams = gfiTheme?.params,
+                  holidays = gfiParams?.holidays;
 
             if (Array.isArray(holidays) && holidays.length) {
                 this.holidays = holidays;
-            }
-        },
-
-        /**
-         * changing resetting check status for the active tab
-         * @returns {void} -
-         */
-        resetTab: function () {
-            if (this.currentTabId === "day") {
-                this.dayCheckReset = !this.dayCheckReset;
-            }
-            else if (this.currentTabId === "week") {
-                this.weekCheckReset = !this.weekCheckReset;
-            }
-            else if (this.currentTabId === "year") {
-                this.yearCheckReset = !this.yearCheckReset;
             }
         }
     }
@@ -429,12 +478,20 @@ export default {
 
 <template>
     <div class="trafficCount-gfi">
-        <div class="header">
-            <span class="title">{{ idLabel }} {{ title }}</span><br>
-            {{ typeLabel }} <span class="type">{{ type }}</span><br>
-            {{ meansOfTransportLabel }} <span class="meansOfTransport">{{ meansOfTransport }}</span><br>
-            {{ $t("additional:modules.tools.gfi.themes.trafficCount.directionLabel") }} <span class="direction">{{ direction }}</span>
-        </div>
+        <TrafficCountHeader
+            :title="title"
+            :type="type"
+            :direction="direction"
+            :api="api"
+            :thing-id="propThingId"
+            :holidays="holidays"
+            :download-url="downloadUrl"
+            :download-filename="downloadFilename"
+            :means-of-transport="propMeansOfTransport"
+            :is-mqtt-live="isMqttLive"
+            :is-heavy-traffic-available="isHeavyTrafficAvailable"
+            :last-update="lastUpdate"
+        />
         <div>
             <ul
                 id="traffic-count-tabs"
@@ -447,35 +504,16 @@ export default {
                     :active="true"
                     :target="'#info'"
                     :label="infoLabel"
+                    :icon="'bi-info-circle'"
                     :interaction="() => setCurrentTabId('info')"
                 />
                 <NavTab
-                    :id="'day-tab'"
+                    :id="'analysis-tab'"
                     :active="false"
-                    :target="'#day'"
-                    :label="dayLabel"
-                    :interaction="() => setCurrentTabId('day')"
-                />
-                <NavTab
-                    :id="'week-tab'"
-                    :active="false"
-                    :target="'#week'"
-                    :label="weekLabel"
-                    :interaction="() => setCurrentTabId('week')"
-                />
-                <NavTab
-                    :id="'year-tab'"
-                    :active="false"
-                    :target="'#year'"
-                    :label="yearLabel"
-                    :interaction="() => setCurrentTabId('year')"
-                />
-                <NavTab
-                    :id="'downloads-tab'"
-                    :active="false"
-                    :target="'#downloads'"
-                    :label="downloadsLabel"
-                    :interaction="() => setCurrentTabId('downloads')"
+                    :target="'#analysis'"
+                    :label="'Analyse'"
+                    :icon="'bi-bar-chart'"
+                    :interaction="() => setCurrentTabId('analysis')"
                 />
             </ul>
             <div class="tab-content">
@@ -489,70 +527,86 @@ export default {
                     :means-of-transport="propMeansOfTransport"
                     :active-tab="currentTabId === 'info'"
                 />
-                <TrafficCountDay
-                    id="day"
-                    :key="keyDay"
-                    :class="{ 'tab-pane': true, 'active': currentTabId === 'day' }"
-                    :api="api"
-                    :thing-id="propThingId"
-                    :means-of-transport="propMeansOfTransport"
-                    :reset="dayCheckReset"
-                    :holidays="holidays"
-                    :check-gurlitt-insel="checkGurlittInsel"
-                    :active-tab="currentTabId === 'day'"
-                />
-                <TrafficCountWeek
-                    id="week"
-                    :key="keyWeek"
-                    :class="{ 'tab-pane': true, 'active': currentTabId === 'week' }"
-                    :api="api"
-                    :thing-id="propThingId"
-                    :means-of-transport="propMeansOfTransport"
-                    :reset="weekCheckReset"
-                    :holidays="holidays"
-                    :active-tab="currentTabId === 'week'"
-                />
-                <TrafficCountYear
-                    id="year"
-                    :key="keyYear"
-                    :class="{ 'tab-pane': true, 'active': currentTabId === 'year' }"
-                    :api="api"
-                    :thing-id="propThingId"
-                    :means-of-transport="propMeansOfTransport"
-                    :reset="yearCheckReset"
-                    :holidays="holidays"
-                    :check-gurlitt-insel="checkGurlittInsel"
-                    :active-tab="currentTabId === 'year'"
-                />
-                <TrafficCountDownloads
-                    id="downloads"
-                    :key="keyDownloads"
-                    :class="{ 'tab-pane': true, 'active': currentTabId === 'downloads' }"
-                    :api="api"
-                    :holidays="holidays"
-                    :thing-id="propThingId"
-                    :means-of-transport="propMeansOfTransport"
-                    :download-url="downloadUrl"
-                    :download-filename="downloadFilename"
-                    :active-tab="currentTabId === 'downloads'"
-                />
+                <div
+                    id="analysis"
+                    :class="{ 'tab-pane': true, 'active': currentTabId === 'analysis' }"
+                    :active-tab="currentTabId === 'analysis'"
+                >
+                    <div class="mt-2 ms-2 small text-secondary">
+                        {{ $t("additional:modules.tools.gfi.themes.trafficCount.period") }}
+                    </div>
+                    <div
+                        class="d-flex gap-2 flex-wrap m-2"
+                        role="group"
+                        :aria-label="$t('additional:modules.tools.gfi.themes.trafficCount.timeViewLabel')"
+                    >
+                        <FlatButton
+                            :secondary="selectedTimeView !== 'day'"
+                            :text="dayLabel"
+                            :interaction="() => selectedTimeView = 'day'"
+                            :aria-pressed="selectedTimeView === 'day'"
+                        />
+                        <FlatButton
+                            :secondary="selectedTimeView !== 'week'"
+                            :text="weekLabel"
+                            :interaction="() => selectedTimeView = 'week'"
+                            :aria-pressed="selectedTimeView === 'week'"
+                        />
+                        <FlatButton
+                            :secondary="selectedTimeView !== 'year'"
+                            :text="yearLabel"
+                            :interaction="() => selectedTimeView = 'year'"
+                            :aria-pressed="selectedTimeView === 'year'"
+                        />
+                    </div>
+                    <keep-alive>
+                        <TrafficCountDay
+                            v-if="selectedTimeView === 'day'"
+                            :key="keyDay"
+                            :api="api"
+                            :thing-id="propThingId"
+                            :means-of-transport="propMeansOfTransport"
+                            :reset="dayCheckReset"
+                            :holidays="holidays"
+                            :check-gurlitt-insel="checkGurlittInsel"
+                        />
+                        <TrafficCountWeek
+                            v-else-if="selectedTimeView === 'week'"
+                            :key="keyWeek"
+                            :api="api"
+                            :thing-id="propThingId"
+                            :means-of-transport="propMeansOfTransport"
+                            :reset="weekCheckReset"
+                            :holidays="holidays"
+                        />
+                        <TrafficCountYear
+                            v-else-if="selectedTimeView === 'year'"
+                            :key="keyYear"
+                            :api="api"
+                            :thing-id="propThingId"
+                            :means-of-transport="propMeansOfTransport"
+                            :reset="yearCheckReset"
+                            :holidays="holidays"
+                            :check-gurlitt-insel="checkGurlittInsel"
+                        />
+                    </keep-alive>
+                </div>
             </div>
         </div>
-        <TrafficCountFooter
-            class="footer"
-            :current-tab-id="currentTabId"
-            :api="api"
-            :thing-id="propThingId"
-            :means-of-transport="propMeansOfTransport"
-            @reset-tab="resetTab"
-        />
+        <div
+            v-if="currentTabId !== 'info'"
+            class="indication"
+        >
+            {{ $t("additional:modules.tools.gfi.themes.trafficCount.notice") }}
+        </div>
     </div>
 </template>
 
 <style lang="scss" scoped>
-
 .trafficCount-gfi {
     padding: 10px 5px 0;
+    container-type: inline-size;
+    container-name: trafficCountGfi;
 
     @media (max-width: 600px) {
         width: inherit;
@@ -566,6 +620,22 @@ export default {
         }
     }
 
+    .last-update-bar {
+        font-size: 12px;
+        color: #555;
+        padding: 4px 8px 6px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    #traffic-count-tabs {
+        :deep(.nav-link.active) {
+            color: #3C5F94;
+            border-bottom-color: #3C5F94;
+        }
+    }
+
     .nav-pills {
 
         & > li > a {
@@ -573,18 +643,40 @@ export default {
         }
     }
 
-    .header {
-        min-width: 280px;
-        max-width: 320px;
-        margin: 0 auto 10px;
-        padding: 0 40px;
-        text-align: left;
-    }
-    .footer {
+    .indication {
+        font-size: 10px;
         position: relative;
         display: inline-block;
         width: 100%;
         padding-bottom: 5px;
+    }
+
+    // Shared styling for the date selectors of the day, week and year tabs (all use class "dateSelector").
+    :deep(.dateSelector) {
+        .mx-datepicker {
+            width: 100%;
+        }
+        .mx-input {
+            border-radius: var(--bs-border-radius);
+        }
+        .wrap-input {
+            height: auto;
+            min-height: calc(1.5em + 0.75rem + 2px);
+            white-space: normal;
+            word-break: break-word;
+            overflow-wrap: anywhere;
+            cursor: pointer;
+        }
+        .wrap-input-placeholder {
+            color: $dark_grey;
+        }
+        .mx-icon-calendar,
+        .mx-icon-clear {
+            .bi {
+                font-size: 16px;
+                color: rgba($black, 0.5);
+            }
+        }
     }
 }
 </style>

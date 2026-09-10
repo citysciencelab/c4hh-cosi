@@ -2,6 +2,8 @@ import Cluster from "ol/source/Cluster.js";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 import {GeoJSON} from "ol/format.js";
+import Point from "ol/geom/Point.js";
+import Polygon from "ol/geom/Polygon.js";
 import sinon from "sinon";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
@@ -9,6 +11,7 @@ import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.j
 import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createStyle.js";
 import getGeometryTypeFromService from "@masterportal/masterportalapi/src/vectorStyle/lib/getGeometryTypeFromService.js";
 import Layer2dVectorGeojson from "@core/layers/js/layer2dVectorGeojson.js";
+import Layer2dVector from "@core/layers/js/layer2dVector.js";
 import webgl from "@core/layers/js/webglRenderer.js";
 
 describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
@@ -38,6 +41,8 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
     });
 
     beforeEach(() => {
+        // Set prototype of Layer2dVectorGeojson to Layer2dVector to avoid errors in tests
+        Object.setPrototypeOf(Layer2dVectorGeojson.prototype, Layer2dVector.prototype);
         attributes = {
             id: "id",
             name: "geojsonTestLayer",
@@ -171,6 +176,135 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
 
             expect(features[0].getId()).to.equals("geojson-id-feature-id-0");
             expect(features[1].getId()).to.equals("geojson-id-feature-id-1");
+        });
+    });
+
+    describe("applyFeaturesFilter", () => {
+        const bboxGeometry = new Polygon([[[0, 0], [0, 20], [20, 20], [20, 0], [0, 0]]]);
+
+        /**
+         * Creates a feature inside the bboxGeometry above.
+         * @returns {module:ol/Feature~Feature} the feature.
+         */
+        function insideFeature () {
+            return new Feature({geometry: new Point([10, 10])});
+        }
+
+        /**
+         * Creates a feature outside the bboxGeometry above.
+         * @returns {module:ol/Feature~Feature} the feature.
+         */
+        function outsideFeature () {
+            return new Feature({geometry: new Point([100, 100])});
+        }
+
+        it("should remove the features outside the bboxGeometry from the source", () => {
+            const geojsonLayer = new Layer2dVectorGeojson({...attributes, bboxGeometry}),
+                features = [insideFeature(), outsideFeature()],
+                source = geojsonLayer.getLayer().getSource();
+
+            source.addFeatures(features);
+            geojsonLayer.applyFeaturesFilter({...attributes, bboxGeometry}, features);
+
+            expect(source.getFeatures()).to.deep.equals([features[0]]);
+        });
+
+        it("should keep all features if no bboxGeometry is set", () => {
+            const geojsonLayer = new Layer2dVectorGeojson(attributes),
+                features = [insideFeature(), outsideFeature()],
+                source = geojsonLayer.getLayer().getSource();
+
+            source.addFeatures(features);
+            geojsonLayer.applyFeaturesFilter(attributes, features);
+
+            expect(source.getFeatures()).to.deep.equals(features);
+        });
+
+        it("should remove the features from the underlying source of a cluster source", () => {
+            const geojsonLayer = new Layer2dVectorGeojson({...attributes, bboxGeometry, clusterDistance: 10}),
+                features = [insideFeature(), outsideFeature()],
+                source = geojsonLayer.getLayer().getSource().getSource();
+
+            source.addFeatures(features);
+            geojsonLayer.applyFeaturesFilter({...attributes, bboxGeometry, clusterDistance: 10}, features);
+
+            expect(source.getFeatures()).to.deep.equals([features[0]]);
+        });
+    });
+
+    describe("startAutoRefresh", () => {
+        it("should register featuresloadend, refresh layer source and notify observers", () => {
+            const geojsonLayer = new Layer2dVectorGeojson(attributes),
+                layerSource = {
+                    once: sinon.stub(),
+                    refresh: sinon.spy()
+                },
+                features = [
+                    new Feature()
+                ],
+                observerSpy = sinon.spy(),
+                clock = sinon.useFakeTimers();
+
+            geojsonLayer.setLayerSource(layerSource);
+            geojsonLayer.layer = {
+                getSource: () => {
+                    return {
+                        getFeatures: () => features
+                    };
+                }
+            };
+            sinon.stub(geojsonLayer, "afterLoading");
+            geojsonLayer.setObserverAutoInterval(observerSpy);
+
+            geojsonLayer.startAutoRefresh(10);
+            clock.tick(10);
+            layerSource.once.firstCall.args[1]();
+
+            expect(layerSource.once.calledOnceWithExactly("featuresloadend", sinon.match.func)).to.be.true;
+            expect(layerSource.refresh.calledOnce).to.be.true;
+            expect(geojsonLayer.afterLoading.calledOnceWithExactly(geojsonLayer.attributes, features)).to.be.true;
+            expect(observerSpy.calledOnce).to.be.true;
+
+            geojsonLayer.stopAutoRefresh();
+            clock.restore();
+        });
+
+        it("should use wrapped vector source when layer source is a cluster", () => {
+            const geojsonLayer = new Layer2dVectorGeojson(attributes),
+                wrappedSource = {
+                    once: sinon.stub(),
+                    refresh: sinon.spy()
+                },
+                clusterSource = new Cluster({
+                    source: new VectorSource(),
+                    distance: 10
+                }),
+                observerSpy = sinon.spy(),
+                clock = sinon.useFakeTimers();
+
+            sinon.stub(clusterSource, "getSource").returns(wrappedSource);
+            geojsonLayer.setLayerSource(clusterSource);
+            geojsonLayer.layer = {
+                getSource: () => {
+                    return {
+                        getFeatures: () => []
+                    };
+                }
+            };
+            sinon.stub(geojsonLayer, "afterLoading");
+            geojsonLayer.setObserverAutoInterval(observerSpy);
+
+            geojsonLayer.startAutoRefresh(10);
+            clock.tick(10);
+            wrappedSource.once.firstCall.args[1]();
+
+            expect(wrappedSource.once.calledOnceWithExactly("featuresloadend", sinon.match.func)).to.be.true;
+            expect(wrappedSource.refresh.calledOnce).to.be.true;
+            expect(geojsonLayer.afterLoading.calledOnce).to.be.true;
+            expect(observerSpy.calledOnce).to.be.true;
+
+            geojsonLayer.stopAutoRefresh();
+            clock.restore();
         });
     });
 

@@ -102,9 +102,9 @@ export default {
                         },
                         onClick: (e, legendItem, legend) => {
                             const index = legendItem.datasetIndex,
-                                chart = legend.chart,
-                                isVisible = chart.isDatasetVisible(index),
-                                newHiddenStatus = isVisible;
+                                  chart = legend.chart,
+                                  isVisible = chart.isDatasetVisible(index),
+                                  newHiddenStatus = isVisible;
 
                             this.$emit("legend-change", legendItem.text, newHiddenStatus);
                         }
@@ -279,7 +279,7 @@ export default {
 
             if (this.effectiveChartMode === "bar") {
                 const rawData = entry.data?.[0],
-                    labels = Object.keys(rawData);
+                      labels = Object.keys(rawData);
 
                 this.chartdata.bar = {
                     labels: [""],
@@ -338,8 +338,8 @@ export default {
          */
         generateDownloadName () {
             const title = this.chartOptions.plugins.title.text || "Statistikdaten-Diagramm",
-                adjustedTitle = title.toLowerCase().trim().replace(/[^a-z0-9äöüß\s-]/gi, "").replace(/\s+/g, "-"),
-                date = dayjs().format("YYYY-MM-DD");
+                  adjustedTitle = title.toLowerCase().trim().replace(/[^a-z0-9äöüß\s-]/gi, "").replace(/\s+/g, "-"),
+                  date = dayjs().format("YYYY-MM-DD");
 
             return `${adjustedTitle}-${date}.png`;
         },

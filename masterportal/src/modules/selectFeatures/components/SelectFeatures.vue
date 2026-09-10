@@ -73,10 +73,10 @@ export default {
          */
         createInteractions: function () {
             const select = new Select({
-                    condition: (event) => event.originalEvent.ctrlKey && event.type === "pointerdown",
-                    style: null
-                }),
-                dragBox = new DragBox(this.isMobile ? {condition: touchOnly} : {condition: platformModifierKeyOnly});
+                      condition: (event) => event.originalEvent.ctrlKey && event.type === "pointerdown",
+                      style: null
+                  }),
+                  dragBox = new DragBox(this.isMobile ? {condition: touchOnly} : {condition: platformModifierKeyOnly});
 
             dragBox.on("boxend", this.setFeaturesFromDrag.bind(this));
 
@@ -151,7 +151,7 @@ export default {
          */
         setFeaturesFromDrag: function () {
             const map = mapCollection.getMap("2D"),
-                extent = this.dragBoxInteraction.getGeometry().getExtent();
+                  extent = this.dragBoxInteraction.getGeometry().getExtent();
 
             map.getLayers()
                 .getArray()
@@ -162,7 +162,7 @@ export default {
 
                         features.forEach(feature => {
                             const featureId = feature.getId(),
-                                alreadySelected = this.selectedFeatures.some(f => f.getId() === featureId);
+                                  alreadySelected = this.selectedFeatures.some(f => f.getId() === featureId);
 
                             if (!alreadySelected) {
                                 feature.setStyle(this.selectedFeatureStyle);
@@ -175,7 +175,7 @@ export default {
                             extent,
                             feature => {
                                 const featureId = feature.getId(),
-                                    alreadySelected = this.selectedFeatures.some(f => f.getId() === featureId);
+                                      alreadySelected = this.selectedFeatures.some(f => f.getId() === featureId);
 
                                 if (!alreadySelected) {
                                     feature.setStyle(this.selectedFeatureStyle);
@@ -194,8 +194,8 @@ export default {
          */
         setFeaturesFromClick: function (event) {
             const map = mapCollection.getMap("2D"),
-                coordinate = event.coordinate,
-                pixel = map.getPixelFromCoordinate(coordinate);
+                  coordinate = event.coordinate,
+                  pixel = map.getPixelFromCoordinate(coordinate);
 
             map.forEachFeatureAtPixel(pixel, (feature, layer) => {
                 if (!layer) {
@@ -205,7 +205,7 @@ export default {
 
                 if (layer.get("visible") && layer.get("source") instanceof VectorSource) {
                     const featureId = feature.getId(),
-                        alreadySelected = this.selectedFeatures.some(f => f.getId() === featureId);
+                          alreadySelected = this.selectedFeatures.some(f => f.getId() === featureId);
 
                     if (!alreadySelected) {
                         feature.setStyle(this.selectedFeatureStyle);
@@ -377,8 +377,8 @@ export default {
          */
         featureZoom: function (event) {
             const map = mapCollection.getMap("2D"),
-                featureIndex = event.currentTarget.id.split("-")[0],
-                selected = this.selectedFeaturesWithRenderInformation[featureIndex];
+                  featureIndex = event.currentTarget.id.split("-")[0],
+                  selected = this.selectedFeaturesWithRenderInformation[featureIndex];
 
             map.getView().fit(selected.item.getGeometry());
             this.highlightFeature({feature: selected.item, layerId: selected.layerId});

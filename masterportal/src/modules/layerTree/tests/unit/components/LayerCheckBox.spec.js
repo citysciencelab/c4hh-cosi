@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
@@ -8,7 +8,6 @@ import layerTypes from "@core/layers/js/layerTypes.js";
 import LayerCheckBox from "@modules/layerTree/components/LayerCheckBox.vue";
 import baselayerHandler from "@modules/layerSelection/js/handleSingleBaselayer.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
     let store,
@@ -203,6 +202,7 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
     });
 
     it("renders layer with visibility true and checkbox, name is bold", () => {
+
         propsData.conf.visibility = true;
 
         wrapper = shallowMount(LayerCheckBox, {
@@ -212,9 +212,12 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
             propsData
         });
 
-        expect(wrapper.find("#layer-checkbox-" + propsData.conf.id).exists()).to.be.true;
-        expect(wrapper.find("#layer-checkbox-" + propsData.conf.id).attributes("title")).to.not.be.undefined;
-        expect(wrapper.find("#layer-checkbox-" + propsData.conf.id).attributes("aria-checked")).to.equal("true");
+        const checkbox = wrapper.find("#layer-checkbox-" + propsData.conf.id);
+
+        expect(checkbox.exists()).to.be.true;
+        expect(checkbox.attributes("role")).to.equal("checkbox");
+        expect(checkbox.attributes("aria-label")).to.equal(propsData.conf.name);
+        expect(checkbox.attributes("aria-checked")).to.equal("true");
         expect(wrapper.findAll(".layer-tree-layer-checkbox").length).to.be.equals(1);
         expect(wrapper.find(".bi-check-square").exists()).to.be.true;
         expect(wrapper.find(".layer-tree-layer-label").text()).to.equal(propsData.conf.name);
@@ -315,7 +318,8 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                     id: layer.id,
                     visibility: true
                 }
-            }]
+            }],
+            _source: LayerCheckBox.name
         };
         let checkbox = null;
 
@@ -345,7 +349,8 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                     id: layer.id,
                     visibility: false
                 }
-            }]
+            }],
+            _source: LayerCheckBox.name
         };
         let checkbox = null;
 
@@ -376,7 +381,8 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                     id: layer.id,
                     visibility: true
                 }
-            }]
+            }],
+            _source: LayerCheckBox.name
         };
         let checkbox = null;
 
@@ -403,7 +409,8 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                     id: layer.id,
                     visibility: true
                 }
-            }]
+            }],
+            _source: LayerCheckBox.name
         };
         let checkbox = null;
 
@@ -430,7 +437,8 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                     id: layer.id,
                     visibility: false
                 }
-            }]
+            }],
+            _source: LayerCheckBox.name
         };
         let radio = null;
 

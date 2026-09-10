@@ -127,7 +127,10 @@ export default {
             distScoreLayer: null,
             exportDetails: false,
             dipasInFeaturesList: true,
-            sumUpLayers: false
+            sumUpLayers: false,
+            withDetails: {
+                visibility: true
+            }
         };
     },
     computed: {
@@ -280,14 +283,18 @@ export default {
             this.additionalColumns = this.getColumns(this.getActiveLayers(), "additionalValues");
         },
 
-        items (newItems) {
-            if (newItems.length > 0 && newItems.some(item => item.group === "DIPAS")) {
-                this.dipasInFeaturesList = true;
-            }
-            else {
-                this.dipasInFeaturesList = false;
-            }
-            this.showDistanceScoreFeatures();
+        items: {
+            hander (newItems) {
+                if (newItems.length > 0 && newItems.some(item => item.group === "DIPAS")) {
+                    this.dipasInFeaturesList = true;
+                }
+                else {
+                    this.dipasInFeaturesList = false;
+                }
+                this.showDistanceScoreFeatures();
+            },
+            deep: true,
+            immediate: true
         },
 
         layerFilter () {
@@ -315,7 +322,6 @@ export default {
         // ...mapActions("Modules/DistanceScoreService", ["getDistanceScore", "getFeatureValues"]),
         ...mapActions("Modules", ["setToolActive"]),
         ...mapActions("Maps", ["removeHighlightFeature", "addNewLayerIfNotExists"]),
-        ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
         ...chartMethods,
 
         getNumericalColumns () {
@@ -445,6 +451,9 @@ export default {
                 if (this.selected.length > 0 && !this.selected.includes(item)) {
                     return false;
                 }
+                if (this.districtFilter.length > 0 && !this.districtFilter.some(district => district === item.district)) {
+                    return false;
+                }
                 if (this.layerFilter.length > 0 && !this.layerFilter.map(l => l.layerId).includes(item.layerId)) {
                     return false;
                 }
@@ -490,8 +499,8 @@ export default {
          */
         exportTable (withDetails) {
             const data = this.getActiveItems(),
-                exportData = withDetails ? prepareDetailsExport(data, {}) : prepareTableExport(data),
-                filename = composeFilename(this.$t("additional:modules.tools.cosi.featuresList.exportFilename"));
+                  exportData = withDetails ? prepareDetailsExport(data, {}) : prepareTableExport(data),
+                  filename = composeFilename(this.$t("additional:modules.tools.cosi.featuresList.exportFilename"));
 
             exportXlsx([], exportData, filename, {exclude: this.excludedPropsForExport});
         },
@@ -567,11 +576,11 @@ export default {
         },
         getNumericalValueStyle (item, key) {
             const val = parseFloat(item[key]),
-                maxVal = Math.max(
-                    ...this.items
-                        .map(_item => parseFloat(_item[key]))
-                        .filter(_item => !isNaN(_item))
-                );
+                  maxVal = Math.max(
+                      ...this.items
+                          .map(_item => parseFloat(_item[key]))
+                          .filter(_item => !isNaN(_item))
+                  );
 
             return {
                 padding: 0,
@@ -615,8 +624,8 @@ export default {
             }
 
             const test = Object.keys(this.selected[0].score.distance.facilities),
-                colorMap = test.reduce((acc, layerId, index) => (
-                    {...acc, [layerId]: getColorFromNumber(index, test.length)}), {});
+                  colorMap = test.reduce((acc, layerId, index) => (
+                      {...acc, [layerId]: getColorFromNumber(index, test.length)}), {});
 
             this.selected.forEach(item => {
                 if (item.score.distance) {
@@ -667,6 +676,9 @@ export default {
         },
         setDistrictFilter (value) {
             this.districtFilter = value;
+        },
+        setWithDetails (value) {
+            this.withDetails = value;
         }
     }
 };
@@ -676,11 +688,12 @@ export default {
     <div>
         <ToolInfo
             :url="readmeUrl"
-            :locale="currentLocale"
+            :summary="$t('additional:modules.tools.cosi.featuresList.description')"
         />
         <v-app id="features-list-wrapper">
             <FeaturesListToolbar
                 v-model:setting-items="columns"
+                :group-buttons="[]"
                 :filter-items="groupActiveLayer"
                 :mandatory-setting-items="mandatoryColumns"
                 :district-items="districtItems"
@@ -690,7 +703,8 @@ export default {
                 @setSearch="setSearch"
                 @createCharts="createCharts"
                 @createDipasCharts="createDipasCharts"
-                @exportTable="exportTable(true)"
+                @exportTable="exportTable(withDetails.visibility)"
+                @showDetails="setWithDetails({visibility: !withDetails.visibility})"
             />
             <v-divider />
             <div id="features-list">
@@ -716,7 +730,10 @@ export default {
                             @click:row="handleClickRow"
                             @current-items="setFilteredItems"
                         >
-                            <template #expanded-row="{columns: {length: colspan}, item }">
+                            <template
+                                v-if="withDetails.visibility"
+                                #expanded-row="{columns: {length: colspan}, item }"
+                            >
                                 <td
                                     class="detail-view"
                                     :colspan
@@ -780,7 +797,7 @@ export default {
                                                 :style="getNumericalValueStyle(item, col.value)"
                                                 :color="getNumericalValueColor(item, col.value, col.invertColor)"
                                                 dark
-                                                dense
+                                                density="compact"
                                             />
                                         </div>
                                     </div>

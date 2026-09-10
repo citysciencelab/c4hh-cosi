@@ -285,7 +285,8 @@
       "contactName": "Nombre",
       "contactPhone": "Tel.",
       "contactEmail": "Correo electrónico",
-      "wait": "Un momento, por favor"
+      "wait": "Un momento, por favor",
+      "license": "Licencia"
     },
     "draw": {
       "description": "Cree marcaciones importantes o marque superficies",
@@ -633,6 +634,7 @@
       "addressSuffix": "Dirección",
       "addressSuffixes": "Direcciones de capas",
       "attachFileMessage": "Adjuntar, si procede, el tipo de archivo al descargar",
+      "creationDate": "Creación",
       "downloadDataset": "Descargar conjunto de datos",
       "lastModified": "Última modificación",
       "legend": "Leyenda",
@@ -640,7 +642,7 @@
       "noMetadataLoaded": "¡No se pudieron cargar los metadatos!",
       "noMetadataLoadedConsole": "No se pudieron recuperar los metadatos de esta capa. Esto indica un problema con el archivo services.json integrado.",
       "periodicityTitle": "Actualización de datos",
-      "publicationCreation": "Publicación / creación",
+      "publicationDate": "Publicación",
       "pointOfContact": "Persona de contacto",
       "contactInfoMessage": "Escriba a la persona de contacto del tema ",
       "contactPublisher": "Escriba a la persona de contacto ",

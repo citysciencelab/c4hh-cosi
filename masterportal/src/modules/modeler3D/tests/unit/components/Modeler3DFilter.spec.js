@@ -1,12 +1,11 @@
 import {expect} from "chai";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import sinon from "sinon";
 import {createStore} from "vuex";
 import Modeler3DFilterComponent from "@modules/modeler3D/components/Modeler3DFilter.vue";
 import Modeler3D from "@modules/modeler3D/store/indexModeler3D.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/tools/modeler3D/components/Modeler3DFilter.vue", () => {
     let store,

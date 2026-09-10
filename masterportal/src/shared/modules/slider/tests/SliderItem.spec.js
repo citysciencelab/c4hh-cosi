@@ -1,10 +1,9 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
 import SliderItem from "@shared/modules/slider/components/SliderItem.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/components/SliderItem.vue", () => {
     let interactionSpy, props;

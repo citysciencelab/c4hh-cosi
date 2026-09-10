@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import Component from "../../../components/PopulationRequest.vue";
@@ -7,7 +7,6 @@ import GraphicalSelectComponent from "../../../../../src/shared/modules/graphica
 import SwitchInputComponent from "../../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 import PopulationRequest from "../../../store/indexPopulationRequest.js";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/PopulationRequest/components/PopulationRequest.vue", () => {
     const geographicValues = ["Box", "Circle", "Polygon"],

@@ -1,13 +1,22 @@
 
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
+import {vi} from "vitest";
 import SimulationParameter from "../../../../components/Simulation/SimulationParameter.vue";
 import sinon from "sinon";
 import axios from "axios";
 import getOAFFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import layerFactory from "@core/layers/js/layerFactory.js";
 
-config.global.mocks.$t = key => key;
+const {deserializeHelperMock} = vi.hoisted(() => ({
+    deserializeHelperMock: vi.fn()
+}));
+
+vi.mock("../../../../js/deserializeFlatGeobufToGeoJsonFeatureCollection.js", () => ({
+    default: deserializeHelperMock
+}));
 
 describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", () => {
     let consoleWarnSpy, store;
@@ -22,7 +31,13 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                     };
                 },
                 global: {
-                    plugins: [store]
+                    plugins: [store],
+                    stubs: {
+                        AccordionItem: {
+                            template: "<div><div><slot /></div></div>",
+                            props: ["id", "title", "icon", "isOpen", "fontSize", "colouredHeader"]
+                        }
+                    }
                 }
             });
         },
@@ -35,7 +50,13 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                     };
                 },
                 global: {
-                    plugins: [store]
+                    plugins: [store],
+                    stubs: {
+                        AccordionItem: {
+                            template: "<div><div><slot /></div></div>",
+                            props: ["id", "title", "icon", "isOpen", "fontSize", "colouredHeader"]
+                        }
+                    }
                 }
             });
         }
@@ -44,7 +65,23 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
     /**
      * Creates a Vuex store with a mock state and getters for the SimulationTool module.
      */
-    function getStore (simulations) {
+    function getStore (options) {
+        let simulations,
+            planningScenarios,
+            accessToken;
+
+        if (typeof options === "undefined") {
+            // Keep legacy default behavior when no argument is provided.
+        }
+        else if (Object.prototype.hasOwnProperty.call(options, "simulations")
+            || Object.prototype.hasOwnProperty.call(options, "planningScenarios")
+            || Object.prototype.hasOwnProperty.call(options, "accessToken")) {
+            ({simulations, planningScenarios, accessToken} = options);
+        }
+        else {
+            simulations = options;
+        }
+
         return createStore({
             namespaced: true,
             modules: {
@@ -62,7 +99,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                             },
                             getters: {
                                 currentPlanningScenarioId: () => "planningScenarioId",
-                                planningScenarios: () => [
+                                planningScenarios: () => planningScenarios || [
                                     {
                                         id: "planningScenarioId",
                                         inputs: {}
@@ -101,7 +138,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                         Login: {
                             namespaced: true,
                             getters: {
-                                accessToken: () => "accessToken"
+                                accessToken: () => accessToken === undefined ? "accessToken" : accessToken
                             }
                         },
                         Alerting: {
@@ -122,6 +159,10 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
         sinon.stub(axios, "get").resolves({data: {}});
         sinon.stub(console, "warn").callsFake(consoleWarnSpy);
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
 
@@ -178,6 +219,48 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                 }
             });
             expect(wrapper.find("#startSimulation").attributes()).have.property("disabled");
+        });
+
+        it("positive: should hide output selection UI when showOutputSelection is false", async () => {
+            store = getStore({
+                simulations: {
+                    id: "simulationId",
+                    showOutputSelection: false,
+                    title: "Simulation A",
+                    inputs: {},
+                    outputs: {},
+                    processes: []
+                }
+            });
+
+            const wrapper = factory.getMount();
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find("#outputParam").exists()).to.be.false;
+        });
+
+        it("negative: should show output selection UI when showOutputSelection is true", async () => {
+            store = getStore({
+                simulations: {
+                    id: "simulationId",
+                    showOutputSelection: true,
+                    title: "Simulation A",
+                    inputs: {},
+                    outputs: {},
+                    processes: [{id: "p1", url: "https://example.com/processes/p1"}]
+                }
+            });
+
+            const wrapper = factory.getMount();
+
+            await wrapper.setData({
+                isLoading: false,
+                processDescriptions: [{outputs: {result: {}}}]
+            });
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find("#outputParam").exists()).to.be.true;
         });
     });
 
@@ -276,6 +359,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
             });
             expect(wrapper.vm.isSomeOafLoading).to.be.true;
         });
+
     });
 
     describe("User Interaction", () => {
@@ -299,6 +383,76 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
     });
 
     describe("Methods", () => {
+        describe("selectedOutputOptions watcher", () => {
+            it("positive: should omit outputs with omit=true from serialized request payload", async () => {
+                store = getStore({
+                    simulations: {
+                        id: "simulationId",
+                        title: "Simulation A",
+                        inputs: {},
+                        outputs: {
+                            includedOutput: {
+                                value: {
+                                    transmissionMode: "value"
+                                }
+                            },
+                            omittedOutput: {
+                                omit: true
+                            }
+                        },
+                        processes: []
+                    }
+                });
+
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.requestBodies = [{outputs: {}, inputs: {}}];
+                wrapper.vm.$options.watch.selectedOutputOptions.call(wrapper.vm, [
+                    {code: "includedOutput"},
+                    {code: "omittedOutput"}
+                ]);
+
+                const serializedRequestBody = JSON.stringify(wrapper.vm.requestBodies[0]);
+
+                expect(wrapper.vm.requestBodies[0].outputs.includedOutput).to.deep.equal({
+                    transmissionMode: "value"
+                });
+                expect(wrapper.vm.requestBodies[0].outputs.omittedOutput).to.be.undefined;
+                expect(serializedRequestBody).to.contain("includedOutput");
+                expect(serializedRequestBody).not.to.contain("omittedOutput");
+            });
+
+            it("negative: should keep outputs without omit=true in serialized request payload", async () => {
+                store = getStore({
+                    simulations: {
+                        id: "simulationId",
+                        title: "Simulation A",
+                        inputs: {},
+                        outputs: {
+                            includedOutput: {
+                                value: {
+                                    transmissionMode: "value"
+                                }
+                            }
+                        },
+                        processes: []
+                    }
+                });
+
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.requestBodies = [{outputs: {}, inputs: {}}];
+                wrapper.vm.$options.watch.selectedOutputOptions.call(wrapper.vm, [{code: "includedOutput"}]);
+
+                const serializedRequestBody = JSON.stringify(wrapper.vm.requestBodies[0]);
+
+                expect(wrapper.vm.requestBodies[0].outputs.includedOutput).to.deep.equal({
+                    transmissionMode: "value"
+                });
+                expect(serializedRequestBody).to.contain("includedOutput");
+            });
+        });
+
         describe("getRequestBodyInputByKey", () => {
             it("should return default value if the keys are not string", () => {
                 const wrapper = factory.getMount();
@@ -780,6 +934,51 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
 
                 expect(getStub.called).to.be.false;
             });
+
+            it("should request OAF features without planning scenario geometry if the simulation can omit a scenario", async () => {
+                store = getStore({
+                    simulations: {
+                        id: "simulationId",
+                        canOmitScenario: true,
+                        title: "Simulation A",
+                        inputs: {
+                            anOafInput: {
+                                source: {
+                                    url: "https://example.com",
+                                    collection: "buildings",
+                                    options: {
+                                        crs: "EPSG:25832"
+                                    }
+                                }
+                            }
+                        },
+                        outputs: {},
+                        processes: []
+                    },
+                    planningScenarios: []
+                });
+
+                const wrapper = factory.getShallowMount(),
+                    getStub = sinon.stub(getOAFFeature, "getOAFFeatureGet").resolves([{id: 1}]),
+                    filterStub = sinon.stub(getOAFFeature, "getOAFGeometryFilter"),
+                    setRequestBodyInputSpy = sinon.spy(wrapper.vm, "setRequestBodyInput");
+
+                await wrapper.vm.onOafSwitchChange({target: {checked: true}}, "anOafInput");
+
+                expect(filterStub.called).to.be.false;
+                expect(getStub.calledOnceWithExactly(
+                    "https://example.com",
+                    "buildings",
+                    {limit: 100, filter: "", filterCrs: "EPSG:25832", crs: "EPSG:25832"}
+                )).to.be.true;
+                expect(setRequestBodyInputSpy.calledOnce).to.be.true;
+                expect(setRequestBodyInputSpy.firstCall.args[0]).to.equal("anOafInput");
+                expect(setRequestBodyInputSpy.firstCall.args[1]).to.equal("");
+                expect(setRequestBodyInputSpy.firstCall.args[2]).to.deep.equal({
+                    type: "FeatureCollection",
+                    features: [{id: 1}]
+                });
+            });
             it("should set a top-level input in the request body", () => {
                 const wrapper = factory.getMount();
 
@@ -981,5 +1180,180 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                 expect(wrapper.vm.requestBodies[0].inputs.anOafInput).to.be.undefined;
             });
         });
+
+        describe("createRequestBodies", () => {
+            it("should include constant inputs even if no planning scenario is selected", () => {
+                store = getStore({
+                    simulations: {
+                        id: "simulationId",
+                        canOmitScenario: true,
+                        title: "Simulation A",
+                        inputs: {
+                            constantInput: {
+                                source: {
+                                    type: "constant",
+                                    value: "constantValue"
+                                }
+                            }
+                        },
+                        outputs: {},
+                        processes: []
+                    },
+                    planningScenarios: []
+                });
+
+                const wrapper = factory.getShallowMount();
+
+                wrapper.vm.processDescriptions = [{inputs: {}, outputs: {}}];
+                wrapper.vm.ignoreProperties = [];
+
+                wrapper.vm.createRequestBodies();
+
+                expect(wrapper.vm.requestBodies).to.deep.equal([
+                    {
+                        inputs: {
+                            constantInput: "constantValue"
+                        },
+                        outputs: {},
+                        response: "document"
+                    }
+                ]);
+            });
+        });
+
+        describe("loadRequiredOafInputs", () => {
+            it("should pass fetched FeatureCollection payload to setRequestBodyInput", async () => {
+                const wrapper = factory.getShallowMount(),
+                    setRequestBodyInputSpy = sinon.spy(wrapper.vm, "setRequestBodyInput"),
+                    fetchedFeatures = [
+                        {
+                            type: "Feature",
+                            geometry: {
+                                type: "Point",
+                                coordinates: [10, 53]
+                            },
+                            properties: {
+                                id: "feature-1"
+                            }
+                        },
+                        {
+                            type: "Feature",
+                            geometry: {
+                                type: "Point",
+                                coordinates: [11, 54]
+                            },
+                            properties: {
+                                id: "feature-2"
+                            }
+                        }
+                    ];
+
+                wrapper.vm.addLayerToLayerConfig = sinon.stub();
+                wrapper.vm.changeVisibility = sinon.stub();
+                Object.defineProperty(wrapper.vm, "simulation", {
+                    value: {
+                        id: "simulationId",
+                        inputs: {
+                            requiredInput: {
+                                required: true,
+                                source: {
+                                    url: "https://example.com/oaf",
+                                    collection: "buildings",
+                                    options: {}
+                                }
+                            }
+                        }
+                    },
+                    configurable: true
+                });
+                wrapper.vm.processDescriptions = [{
+                    inputs: {
+                        requiredInput: {
+                            title: "Required Input",
+                            schema: {
+                                allOf: [{format: "geojson-feature-collection"}]
+                            }
+                        }
+                    },
+                    outputs: {}
+                }];
+
+                sinon.stub(getOAFFeature, "getOAFFeatureGet").resolves(fetchedFeatures);
+                sinon.stub(layerCollection, "getLayerById").returns(undefined);
+                sinon.stub(layerCollection, "addLayer");
+                sinon.stub(layerFactory, "createLayer").returns({});
+
+                await wrapper.vm.loadRequiredOafInputs();
+
+                expect(setRequestBodyInputSpy.calledOnce).to.be.true;
+                expect(setRequestBodyInputSpy.firstCall.args).to.deep.equal([
+                    "requiredInput",
+                    "",
+                    {
+                        type: "FeatureCollection",
+                        features: fetchedFeatures
+                    }
+                ]);
+            });
+
+            it("should not call getOAFFeatureGet and should pass existing layer payload if required input layer already exists", async () => {
+                const wrapper = factory.getShallowMount(),
+                    existingLayer = {
+                        layer: {
+                            getSource: () => ({
+                                getFeatures: () => []
+                            })
+                        }
+                    },
+                    getOAFFeatureGetSpy = sinon.spy(getOAFFeature, "getOAFFeatureGet"),
+                    setRequestBodyInputSpy = sinon.spy(wrapper.vm, "setRequestBodyInput");
+
+                wrapper.vm.addLayerToLayerConfig = sinon.stub();
+                wrapper.vm.changeVisibility = sinon.stub();
+                Object.defineProperty(wrapper.vm, "simulation", {
+                    value: {
+                        id: "simulationId",
+                        inputs: {
+                            requiredInput: {
+                                required: true,
+                                source: {
+                                    url: "https://example.com/oaf",
+                                    collection: "buildings",
+                                    options: {}
+                                }
+                            }
+                        }
+                    },
+                    configurable: true
+                });
+                wrapper.vm.processDescriptions = [{
+                    inputs: {
+                        requiredInput: {
+                            title: "Required Input",
+                            schema: {
+                                allOf: [{format: "geojson-feature-collection"}]
+                            }
+                        }
+                    },
+                    outputs: {}
+                }];
+
+                sinon.stub(layerCollection, "getLayerById").returns(existingLayer);
+
+                await wrapper.vm.loadRequiredOafInputs();
+
+                expect(getOAFFeatureGetSpy.called).to.be.false;
+                expect(setRequestBodyInputSpy.calledOnce).to.be.true;
+                expect(setRequestBodyInputSpy.firstCall.args).to.deep.equal([
+                    "requiredInput",
+                    "",
+                    {
+                        type: "FeatureCollection",
+                        features: []
+                    }
+                ]);
+            });
+        });
+
     });
 });

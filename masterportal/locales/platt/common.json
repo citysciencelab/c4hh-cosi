@@ -285,7 +285,8 @@
       "contactName": "Naam",
       "contactPhone": "Tel.",
       "contactEmail": "E-Mail",
-      "wait": "Een lütten Momang bidde"
+      "wait": "Een lütten Momang bidde",
+      "license": "Lizenz"
     },
     "draw": {
       "description": "Wichtige Markern maken oder Flächen kennteken",
@@ -633,6 +634,7 @@
       "addressSuffix": "Adress",
       "addressSuffixes": "Layer-Adressen",
       "attachFileMessage": "eventuell Dateityp bi’n Download anhängen",
+      "creationDate": "Opstellen",
       "downloadDataset": "Datensett daalladen",
       "lastModified": "Leste Ännern",
       "legend": "Legenn",
@@ -640,7 +642,7 @@
       "noMetadataLoaded": "Dat keen Metadaten laden worrn sünd!",
       "noMetadataLoadedConsole": "De Metadaten för dissen Layer köönt nich affraagt warrn. Dat wiest op en Problem mit de inbunnen services.json hen.",
       "periodicityTitle": "Datenaktualisatschoon",
-      "publicationCreation": "Publikatschoon / Opstellen",
+      "publicationDate": "Publikatschoon",
       "pointOfContact": "Anspreekpartner",
       "contactInfoMessage": "Schriev den Anspreekpartner vun dat Thema ",
       "contactPublisher": "Schriev den Anspreekpartner ",

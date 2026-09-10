@@ -1,5 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
+import "../../../../../../devtools/tests/cesiumMocks.js";
 import drawCesiumMask from "@modules/print/js/drawCesiumMask.js";
 describe("drawCesiumMask", () => {
     describe("autoDrawMask", () => {

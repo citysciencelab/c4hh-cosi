@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import TabContainer, {TAB_SET_CURRENT} from "@shared/modules/tabs/components/TabContainer.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/tabs/components/TabContainer.vue", () => {
     let wrapper;

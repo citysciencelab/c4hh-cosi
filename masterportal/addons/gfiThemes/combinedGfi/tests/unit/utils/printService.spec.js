@@ -1,6 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import {sendPrintRequest} from "../../../utils/printService.js";
+import {sendPrintRequest, sendPrintRequestToServer} from "../../../utils/printService.js";
 
 describe("addons/gfiThemes/combinedGfi/utils/printService.js", () => {
     let originalFetch, originalConsoleError;
@@ -41,5 +41,29 @@ describe("addons/gfiThemes/combinedGfi/utils/printService.js", () => {
         expect(onLoadingChangeSpy.calledTwice).to.be.true;
         expect(onLoadingChangeSpy.firstCall.calledWith(true)).to.be.true;
         expect(onLoadingChangeSpy.secondCall.calledWith(false)).to.be.true;
+    });
+
+    it("should throw if no printServerUrl is available", async () => {
+        const preparePrintRequestStub = sinon.stub().resolves({
+            layout: "A4 Hochformat",
+            attributes: {title: "test", datasource: []}
+        });
+
+        try {
+            await sendPrintRequestToServer(
+                preparePrintRequestStub,
+                {},
+                "/resources/combinedGfiPrintConfig.json",
+                [],
+                null,
+                "",
+                []
+            );
+            expect.fail("Expected sendPrintRequestToServer to throw");
+        }
+        catch (error) {
+            expect(error.message).to.include("No print server URL available");
+            expect(global.fetch.called).to.be.false;
+        }
     });
 });

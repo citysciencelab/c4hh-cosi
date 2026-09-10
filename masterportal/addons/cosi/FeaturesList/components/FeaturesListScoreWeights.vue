@@ -49,7 +49,7 @@ export default {
             width="500"
         >
             <v-card>
-                <v-card-title class="text-h5 white lighten-2">
+                <v-card-title class="text-headline-small">
                     {{ $t('additional:modules.tools.cosi.featuresList.weighting') }}
                 </v-card-title>
 

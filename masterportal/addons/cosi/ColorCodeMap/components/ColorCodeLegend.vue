@@ -83,14 +83,15 @@ export default {
 
                     this.legendColors = [colorScale.scale(colorScale.legend.values[0]), colorScale.scale((colorScale.legend.values[colorScale.legend.values.length - 1] + colorScale.legend.values[0]) / 2), colorScale.scale(colorScale.legend.values[colorScale.legend.values.length - 1])];
 
-                    this.loVal = colorScale.legend.values[0].toLocaleString(this.currentLocale);
-                    this.hiVal = colorScale.legend.values[colorScale.legend.values.length - 1].toLocaleString(this.currentLocale);
+                    // see ColorCodeMap.vue: currentLocale is "" until the language menu was opened
+                    this.loVal = colorScale.legend.values[0].toLocaleString(this.currentLocale || "de-DE");
+                    this.hiVal = colorScale.legend.values[colorScale.legend.values.length - 1].toLocaleString(this.currentLocale || "de-DE");
                 }
             }
         },
         markerPosition (index) {
             const value = this.matchResults[index].getProperties()[this.yearSelector + this.selectedYear],
-                relativeValue = ((value - this.colorScale.legend.values[0]) * 100) / (this.colorScale.legend.values[this.colorScale.legend.values.length - 1] - this.colorScale.legend.values[0]);
+                  relativeValue = ((value - this.colorScale.legend.values[0]) * 100) / (this.colorScale.legend.values[this.colorScale.legend.values.length - 1] - this.colorScale.legend.values[0]);
 
             if (index > this.matchResults.length) {
                 return "display:none";

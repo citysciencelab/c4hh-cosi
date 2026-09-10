@@ -1,10 +1,9 @@
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {nextTick} from "vue";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 import ListGroup from "../../../../../components/shared/components/ListGroup.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/SimulationTool/components/shared/components/ListGroup.vue", () => {
 

@@ -5,6 +5,8 @@ import {getDefaultOperatorBySnippetType} from "../utils/getDefaultOperatorBySnip
 import dayjs from "dayjs";
 import customParseFormat from "dayjs/plugin/customParseFormat";
 import SnippetInfo from "./SnippetInfo.vue";
+import DatePicker from "vue-datepicker-next";
+import "vue-datepicker-next/index.css";
 
 dayjs.extend(customParseFormat);
 
@@ -44,7 +46,8 @@ dayjs.extend(customParseFormat);
 export default {
     name: "SnippetDateRange",
     components: {
-        SnippetInfo
+        SnippetInfo,
+        DatePicker
     },
     props: {
         adjustment: {
@@ -178,29 +181,13 @@ export default {
             currentSliderMin: -1,
             currentSliderMax: -1,
             visibleDatepicker: false,
-            initialDateRef: []
+            initialDateRef: [],
+            dateFrom: null,
+            dateUntil: null,
+            updateSource: "slider"
         };
     },
     computed: {
-        dateFromComputed: {
-            get () {
-                return this.initialDateRef[this.sliderFrom] ? this.initialDateRef[this.sliderFrom] : this.initialDateRef[0];
-            },
-            set (date) {
-                clearTimeout(this.sliderChangeTimeout);
-                this.sliderChangeTimeout = setTimeout(() => {
-                    this.sliderFrom = this.getSliderIdxCloseToFromDate(date);
-                }, this.timeoutInput);
-            }
-        },
-        dateUntilComputed: {
-            get () {
-                return this.initialDateRef[this.sliderUntil] ? this.initialDateRef[this.sliderUntil] : this.initialDateRef[this.initialDateRef.length - 1];
-            },
-            set (date) {
-                this.sliderUntil = this.getSliderIdxCloseToUntilDate(date);
-            }
-        },
         dateMinComputed () {
             return this.initialDateRef[this.currentSliderMin] ? this.initialDateRef[this.currentSliderMin] : this.initialDateRef[0];
         },
@@ -215,70 +202,117 @@ export default {
             }
             this.$nextTick(() => {
                 const mindayjs = dayjs(adjusting?.adjust?.min, this.getFormat("from"), true),
-                    maxdayjs = dayjs(adjusting?.adjust?.max, this.getFormat("until"), true);
+                      maxdayjs = dayjs(adjusting?.adjust?.max, this.getFormat("until"), true);
 
                 if (adjusting.start) {
                     this.isAdjusting = true;
                     this.adjustMinMax = [];
                 }
 
-                if (mindayjs.isValid() && (typeof this.adjustMinMax[0] === "undefined" || this.adjustMinMax[0].isBefore(mindayjs))) {
+                if (mindayjs.isValid() && (typeof this.adjustMinMax[0] === "undefined" || mindayjs.isBefore(this.adjustMinMax[0]))) {
                     this.adjustMinMax[0] = mindayjs;
                 }
-                if (maxdayjs.isValid() && (typeof this.adjustMinMax[1] === "undefined" || this.adjustMinMax[1].isAfter(maxdayjs))) {
+
+                if (maxdayjs.isValid() && (typeof this.adjustMinMax[1] === "undefined" || maxdayjs.isAfter(this.adjustMinMax[1]))) {
                     this.adjustMinMax[1] = maxdayjs;
                 }
 
-                if (adjusting.finish) {
-                    if (!this.isSelfSnippetId(adjusting?.snippetId)) {
-                        this.currentSliderMin = typeof this.adjustMinMax[0] !== "undefined" ? this.getSliderIdxCloseToFromDate(this.adjustMinMax[0].format(this.internalFormat)) : 0;
-                        this.currentSliderMax = typeof this.adjustMinMax[1] !== "undefined" ? this.getSliderIdxCloseToUntilDate(this.adjustMinMax[1].format(this.internalFormat)) : this.initialDateRef.length - 1;
-                        if (!this.hasRuleSet || this.currentSliderMin > this.sliderFrom) {
-                            this.sliderFrom = this.currentSliderMin;
-                        }
-                        if (!this.hasRuleSet || this.currentSliderMax < this.sliderUntil) {
-                            this.sliderUntil = this.currentSliderMax;
-                        }
+                if (!adjusting.finish) {
+                    return;
+                }
+                if (!this.isSelfSnippetId(adjusting?.snippetId)) {
+                    const finalMinDate = this.adjustMinMax[0];
+                    const finalMaxDate = this.adjustMinMax[1];
+
+                    this.currentSliderMin = typeof finalMinDate !== "undefined"
+                        ? this.getSliderIdxCloseToFromDate(finalMinDate.format(this.internalFormat))
+                        : 0;
+
+                    this.currentSliderMax = typeof finalMaxDate !== "undefined"
+                        ? this.getSliderIdxCloseToUntilDate(finalMaxDate.format(this.internalFormat))
+                        : this.initialDateRef.length - 1;
+
+                    if (this.currentSliderMin > this.currentSliderMax) {
+                        this.currentSliderMax = this.currentSliderMin;
                     }
 
-                    this.$nextTick(() => {
-                        this.isAdjusting = false;
-                        if (Array.isArray(this.prechecked)) {
-                            const sliderFrom = this.getSliderIdxCloseToFromDate(this.prechecked[0]),
-                                sliderUntil = this.getSliderIdxCloseToUntilDate(this.prechecked[1]);
+                    const currentFromDate = dayjs(this.dateFrom);
+                    const currentUntilDate = dayjs(this.dateUntil);
 
-                            if (this.currentSliderMin > sliderFrom) {
-                                this.sliderFrom = this.currentSliderMin;
-                            }
-                            if (this.currentSliderMax < sliderUntil) {
-                                this.sliderUntil = this.currentSliderMax;
-                            }
-                        }
-                    });
+                    if (
+                        !this.hasRuleSet
+                        || !currentFromDate.isValid()
+                        || currentFromDate.isBefore(finalMinDate)
+                    ) {
+                        this.sliderFrom = this.currentSliderMin;
+                        this.dateFrom = finalMinDate.toDate();
+                    }
+
+                    if (
+                        !this.hasRuleSet
+                        || !currentUntilDate.isValid()
+                        || currentUntilDate.isAfter(finalMaxDate)
+                    ) {
+                        this.sliderUntil = this.currentSliderMax;
+                        this.dateUntil = finalMaxDate.toDate();
+                    }
                 }
+
+                this.$nextTick(() => {
+                    this.isAdjusting = false;
+                    if (!this.isPrecheckedValid(this.prechecked)) {
+                        return;
+                    }
+                    const sliderFrom = this.getSliderIdxCloseToFromDate(dayjs(this.prechecked[0], this.getFormat("from"), true).format(this.internalFormat));
+                    const sliderUntil = this.getSliderIdxCloseToUntilDate(dayjs(this.prechecked[1], this.getFormat("until"), true).format(this.internalFormat));
+
+                    if (this.currentSliderMin > sliderFrom) {
+                        this.sliderFrom = this.currentSliderMin;
+                        this.dateFrom = this.getDateBySliderIndex(this.currentSliderMin);
+                    }
+
+                    if (this.currentSliderMax < sliderUntil) {
+                        this.sliderUntil = this.currentSliderMax;
+                        this.dateUntil = this.getDateBySliderIndex(this.currentSliderMax);
+                    }
+                });
             });
         },
         sliderFrom (val) {
             if (parseInt(val, 10) > parseInt(this.sliderUntil, 10)) {
                 this.sliderUntil = val;
+                return;
             }
-            else if (!this.isInitializing && !this.isAdjusting) {
-                this.emitCurrentRule([
-                    dayjs(this.initialDateRef[this.sliderFrom], this.internalFormat).format(this.getFormat("from")),
-                    dayjs(this.initialDateRef[this.sliderUntil], this.internalFormat).format(this.getFormat("until"))
-                ]);
+            if (this.isInitializing || this.isAdjusting || this.updateSource === "datepicker") {
+                return;
             }
+
+            const sliderDate = this.getDateBySliderIndex(this.sliderFrom);
+
+            if (sliderDate === null) {
+                return;
+            }
+
+            this.dateFrom = sliderDate;
+            this.emitSelectedDateRule();
         },
         sliderUntil (val) {
             if (parseInt(val, 10) < parseInt(this.sliderFrom, 10)) {
                 this.sliderFrom = val;
+                return;
             }
-            else if (!this.isInitializing && !this.isAdjusting) {
-                this.emitCurrentRule([
-                    dayjs(this.initialDateRef[this.sliderFrom], this.internalFormat).format(this.getFormat("from")),
-                    dayjs(this.initialDateRef[this.sliderUntil], this.internalFormat).format(this.getFormat("until"))
-                ]);
+            if (this.isInitializing || this.isAdjusting || this.updateSource === "datepicker") {
+                return;
             }
+
+            const sliderDate = this.getDateBySliderIndex(this.sliderUntil);
+
+            if (sliderDate === null) {
+                return;
+            }
+
+            this.dateUntil = sliderDate;
+            this.emitSelectedDateRule();
         },
         unlockIsAdjusting (val) {
             if (val === true) {
@@ -300,6 +334,10 @@ export default {
         ];
     },
     mounted () {
+        this.formatMapper = {
+            "year": "YYYY",
+            "month": ["YYYY.MM", "MM.YYYY"]
+        };
         this.$nextTick(() => {
             if (this.isPrecheckedValid(this.prechecked)) {
                 this.emitCurrentRule(this.prechecked, true, true);
@@ -322,7 +360,7 @@ export default {
                 Promise.allSettled(promises)
                     .then((results) => {
                         const arrErr = [],
-                            concatList = [];
+                              concatList = [];
 
                         results.forEach((result) => {
                             if (result.status === "fulfilled") {
@@ -405,6 +443,8 @@ export default {
                     this.sliderFrom = this.currentSliderMin;
                     this.sliderUntil = this.currentSliderMax;
                 }
+                this.dateFrom = dayjs(this.initialDateRef[this.sliderFrom], this.internalFormat).toDate();
+                this.dateUntil = dayjs(this.initialDateRef[this.sliderUntil], this.internalFormat).toDate();
                 this.$nextTick(() => {
                     this.isInitializing = false;
                 });
@@ -451,10 +491,18 @@ export default {
          * @returns {String} The tagTitle to use.
          */
         getTagTitle () {
-            if (typeof this.dateFromComputed === "undefined" && typeof this.dateUntilComputed === "undefined") {
+            if (this.dateFrom === null && this.dateUntil === null && this.isPrecheckedValid(this.prechecked)) {
                 return this.prechecked[0] + " - " + this.prechecked[1];
             }
-            return dayjs(this.dateFromComputed, this.internalFormat).format(this.getFormat("from")) + " - " + dayjs(this.dateUntilComputed, this.internalFormat).format(this.getFormat("until"));
+
+            const from = dayjs(this.dateFrom),
+                  until = dayjs(this.dateUntil);
+
+            if (!from.isValid() || !until.isValid()) {
+                return "";
+            }
+
+            return from.format(this.getFormat("from")) + " - " + until.format(this.getFormat("until"));
         },
         /**
          * Returns the riskless attrName to use for from.
@@ -540,14 +588,14 @@ export default {
          */
         getInitialDateReference (listFrom, listUntil) {
             const result = [],
-                displayAssoc = {},
-                unixAssoc = {},
-                formatFrom = this.getFormat("from"),
-                formatUntil = this.getFormat("until"),
-                minMoment = dayjs(Array.isArray(this.value) ? this.value[0] : undefined, formatFrom),
-                minValid = minMoment.isValid(),
-                maxMoment = dayjs(Array.isArray(this.value) ? this.value[1] : undefined, formatUntil),
-                maxValid = maxMoment.isValid();
+                  displayAssoc = {},
+                  unixAssoc = {},
+                  formatFrom = this.getFormat("from"),
+                  formatUntil = this.getFormat("until"),
+                  minMoment = dayjs(Array.isArray(this.value) ? this.value[0] : undefined, formatFrom),
+                  minValid = minMoment.isValid(),
+                  maxMoment = dayjs(Array.isArray(this.value) ? this.value[1] : undefined, formatUntil),
+                  maxValid = maxMoment.isValid();
 
             this.addListToUnixAssoc(listFrom, formatFrom, minValid, maxValid, minMoment, maxMoment, unixAssoc);
             this.addListToUnixAssoc(listUntil, formatUntil, minValid, maxValid, minMoment, maxMoment, unixAssoc);
@@ -569,7 +617,7 @@ export default {
          */
         sortResultByTime (obj) {
             const list = Object.keys(obj).sort((a, b) => a - b),
-                sortedResult = {};
+                  sortedResult = {};
 
             list.forEach(function (v, i) {
                 sortedResult[i] = obj[v];
@@ -666,7 +714,7 @@ export default {
          */
         getMeasureLeft () {
             const range = this.currentSliderMax - this.currentSliderMin,
-                left = this.sliderFrom - this.currentSliderMin;
+                  left = this.sliderFrom - this.currentSliderMin;
 
             return String((95 / Math.max(1, range) * left).toFixed(1)) + "%";
         },
@@ -677,7 +725,7 @@ export default {
          */
         getMeasureWidth () {
             const range = this.currentSliderMax - this.currentSliderMin,
-                measure = this.sliderUntil - this.sliderFrom;
+                  measure = this.sliderUntil - this.sliderFrom;
 
             return String((95 / Math.max(1, range) * measure + 5).toFixed(1)) + "%";
         },
@@ -769,6 +817,138 @@ export default {
                     dayjs(this.initialDateRef[this.sliderUntil], this.internalFormat).format(this.getFormat("until"))
                 ]);
             }
+        },
+        /**
+         * Gets the format type by the given format.
+         * @param {String} format the format to get the type for.
+         * @returns {String} the format type for the given format. "date" if no type could be found.
+         */
+        getFormatTypeByFormat (format) {
+            if (typeof format !== "string") {
+                return "date";
+            }
+
+            const normalizedFormat = format.trim();
+
+            return Object.keys(this.formatMapper).find(formatType => Array.isArray(this.formatMapper[formatType])
+                ? this.formatMapper[formatType].includes(normalizedFormat)
+                : this.formatMapper[formatType] === normalizedFormat
+            ) || "date";
+        },
+        /**
+         * Checks if the given date is disabled or selectable.
+         * @param {Date} date the date to check if it should be disabled or not.
+         * @returns {Boolean} true if date is disabled and false if not.
+         */
+        isDateDisabled (date) {
+            if (!this.initialDateRef?.length) {
+                return true;
+            }
+
+            const internalDate = dayjs(date).format(this.internalFormat);
+
+            return internalDate < this.dateMinComputed
+                || internalDate > this.dateMaxComputed;
+        },
+        /**
+         * Returns a valid Date for the given slider index.
+         * @param {Number} index The slider index.
+         * @returns {Date|null} The represented date or null.
+         */
+        getDateBySliderIndex (index) {
+            const value = this.initialDateRef[index],
+                  parsedDate = dayjs(value, this.internalFormat, true);
+
+            return parsedDate.isValid() ? parsedDate.toDate() : null;
+        },
+        /**
+         * Emits the dates currently displayed by the datepickers.
+         * The values are deliberately not read from initialDateRef because a
+         * date selected in the datepicker does not have to exist in that list.
+         * @returns {void}
+         */
+        emitSelectedDateRule () {
+            const from = dayjs(this.dateFrom),
+                  until = dayjs(this.dateUntil);
+
+            if (!from.isValid() || !until.isValid()) {
+                return;
+            }
+
+            this.emitCurrentRule([
+                from.format(this.getFormat("from")),
+                until.format(this.getFormat("until"))
+            ]);
+        },
+        /**
+         * Applies a date selected in the from datepicker.
+         * The datepicker keeps the exact selected date while the slider moves
+         * to the closest suitable entry from initialDateRef.
+         * @param {Date} val The selected date.
+         * @returns {void}
+         */
+        updateDateFrom (val) {
+            const selectedDate = dayjs(val);
+
+            if (!selectedDate.isValid()) {
+                return;
+            }
+
+            this.dateFrom = selectedDate.toDate();
+
+            if (!dayjs(this.dateUntil).isValid() || selectedDate.isAfter(dayjs(this.dateUntil))) {
+                this.dateUntil = selectedDate.toDate();
+            }
+
+            this.updateSource = "datepicker";
+
+            const sliderIndex = this.getSliderIdxCloseToFromDate(selectedDate.format(this.internalFormat));
+
+            this.sliderFrom = sliderIndex;
+            if (sliderIndex > this.sliderUntil) {
+                this.sliderUntil = sliderIndex;
+            }
+
+            this.emitSelectedDateRule();
+
+            this.$nextTick(() => {
+                this.updateSource = "slider";
+            });
+        },
+        /**
+         * Applies a date selected in the until datepicker.
+         * The datepicker keeps the exact selected date while the slider moves
+         * to the closest suitable entry from initialDateRef.
+         * @param {Date} val The selected date.
+         * @returns {void}
+         */
+        updateDateUntil (val) {
+            const selectedDate = dayjs(val);
+
+            if (!selectedDate.isValid()) {
+                return;
+            }
+
+            this.dateUntil = selectedDate.toDate();
+
+            if (!dayjs(this.dateFrom).isValid() || selectedDate.isBefore(dayjs(this.dateFrom))) {
+                this.dateFrom = selectedDate.toDate();
+            }
+
+            this.updateSource = "datepicker";
+
+            const sliderIndex = this.getSliderIdxCloseToUntilDate(selectedDate.format(this.internalFormat));
+
+            this.sliderUntil = sliderIndex;
+            if (sliderIndex < this.sliderFrom) {
+                this.sliderFrom = sliderIndex;
+            }
+
+            this.emitSelectedDateRule();
+
+            this.$nextTick(() => {
+                this.updateSource = "slider";
+            });
         }
     }
 };
@@ -811,7 +991,7 @@ export default {
             </div>
             <input
                 :key="`from-${snippetId}-${currentSliderMin}-${currentSliderMax}`"
-                v-model="sliderFrom"
+                v-model.number="sliderFrom"
                 type="range"
                 :aria-label="$t('common:modules.filter.ariaLabel.sliderRange.min', {param: getAttrNameFrom()})"
                 class="from"
@@ -824,7 +1004,7 @@ export default {
             >
             <input
                 :key="`until-${snippetId}-${currentSliderMin}-${currentSliderMax}`"
-                v-model="sliderUntil"
+                v-model.number="sliderUntil"
                 type="range"
                 :aria-label="$t('common:modules.filter.ariaLabel.sliderRange.max', {param: getAttrNameUntil()})"
                 class="until"
@@ -850,17 +1030,15 @@ export default {
                     >
                         {{ translateKeyWithPlausibilityCheck(getSubTitleFrom(), key => $t(key)) }}
                     </label>
-                    <input
-                        :id="'inputDateRangeFrom-' + snippetId"
-                        v-model="dateFromComputed"
-                        type="date"
-                        :min="dateMinComputed"
-                        :max="dateMaxComputed"
-                        :aria-label="$t('common:modules.filter.ariaLabel.dateRange.from', {param: getAttrNameFrom()})"
+                    <DatePicker
+                        v-model:value="dateFrom"
+                        :type="getFormatTypeByFormat(getFormat('from'))"
+                        :format="getFormat('from')"
+                        :disabled-date="isDateDisabled"
                         :disabled="disabled || outOfZoom"
-                        class="form-control"
-                        :class="{ disabledClass: disabled || outOfZoom }"
-                    >
+                        :clearable="false"
+                        @change="updateDateFrom"
+                    />
                 </div>
                 <div class="until">
                     <label
@@ -869,17 +1047,15 @@ export default {
                     >
                         {{ translateKeyWithPlausibilityCheck(getSubTitleUntil(), key => $t(key)) }}
                     </label>
-                    <input
-                        :id="'inputDateRangeUntil-' + snippetId"
-                        v-model="dateUntilComputed"
-                        type="date"
-                        :min="dateMinComputed"
-                        :max="dateMaxComputed"
-                        :aria-label="$t('common:modules.filter.ariaLabel.dateRange.to', {param: getAttrNameUntil()})"
+                    <DatePicker
+                        v-model:value="dateUntil"
+                        :type="getFormatTypeByFormat(getFormat('until'))"
+                        :format="getFormat('until')"
+                        :disabled-date="isDateDisabled"
                         :disabled="disabled || outOfZoom"
-                        class="form-control"
-                        :class="{ disabledClass: disabled || outOfZoom }"
-                    >
+                        :clearable="false"
+                        @change="updateDateUntil"
+                    />
                 </div>
             </div>
         </div>
@@ -906,38 +1082,128 @@ export default {
             }
         }
         .datepickerWrapper {
-            position: relative;
-            margin: 5px 0 15px;
-            height: 38px;
-            input {
-                border: 1px solid #dee2e6;
-                border-radius: 5px;
-                box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
-                -o-transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-                transition: border-color ease-in-out 0.15s, box-shadow ease-in-out 0.15s;
-                &.disabledClass {
-                    color: #9B9A9A;
-                    background-color: $light_grey;
-                }
-            }
-            label {
-                display: block;
-                height: 18px;
-                margin-bottom: 5px;
-            }
-            .from {
-                position: absolute;
-                left: 0;
-            }
-            .until {
-                position: absolute;
-                right: 0;
-                text-align: right;
-                input {
-                    text-align: right;
-                }
-            }
+    position: relative;
+    min-height: 50px;
+    margin: 5px 0 15px;
+
+    > div {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 15px;
+        width: 100%;
+    }
+
+    label {
+        display: block;
+        height: 18px;
+        margin-bottom: 5px;
+    }
+
+    .from,
+    .until {
+        flex: 0 1 210px;
+        min-width: 0;
+    }
+
+    .until {
+        text-align: right;
+    }
+
+    :deep(.mx-datepicker) {
+        width: 100%;
+        font-family: inherit;
+        font-size: $font-size-base;
+    }
+
+    :deep(.mx-input-wrapper) {
+        width: 100%;
+    }
+
+    :deep(.mx-input) {
+        width: 100%;
+        min-height: 50px;
+        padding: 6px 35px 6px 12px;
+        font-family: inherit;
+        font-size: $font-size-base;
+        line-height: inherit;
+        color: $dark_grey;
+        background-color: $white;
+        background-image: none;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+        transition:
+            border-color ease-in-out 0.15s,
+            box-shadow ease-in-out 0.15s;
+    }
+
+    :deep(.mx-input:hover) {
+        border-color: #dee2e6;
+    }
+
+    :deep(.mx-input:focus) {
+        color: $black;
+        background-color: $white;
+        border-color: $light_blue;
+        outline: 0;
+        box-shadow:
+            inset 0 1px 2px rgb(0 0 0 / 7.5%),
+            0 0 0 0.25rem rgb(13 110 253 / 5%);
+    }
+
+    :deep(.mx-input:disabled),
+    :deep(.mx-input.disabledClass) {
+        color: #9B9A9A;
+        cursor: not-allowed;
+        background-color: $light_grey;
+        border-color: #dee2e6;
+        box-shadow: none;
+    }
+
+    :deep(.mx-icon-calendar) {
+        color: $black;
+    }
+
+    .until :deep(.mx-input) {
+        padding-right: 12px;
+        padding-left: 35px;
+        text-align: right;
+    }
+
+    .until :deep(.mx-icon-calendar) {
+        right: auto;
+        left: 8px;
+    }
+
+    @media (max-width: 500px) {
+        > div {
+            flex-direction: column;
+            align-items: stretch;
         }
+
+        .from,
+        .until {
+            flex-basis: auto;
+            width: 100%;
+        }
+
+        .until {
+            text-align: left;
+        }
+
+        .until :deep(.mx-input) {
+            padding-right: 35px;
+            padding-left: 12px;
+            text-align: left;
+        }
+
+        .until :deep(.mx-icon-calendar) {
+            right: 8px;
+            left: auto;
+        }
+    }
+}
         .sliderWrapper {
             position: relative;
             margin-top: 5px;

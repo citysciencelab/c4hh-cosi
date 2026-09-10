@@ -11,9 +11,12 @@ import mutations from "../store/mutationsCalculateRatio";
 import ResultManagement from "../../shared/modules/resultManagement/components/ResultManagement.vue";
 import utils from "../../utils";
 import DataTable from "./DataTable.vue";
+import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {exportAsGeoJson} from "../utils/exportResults.js";
 import getMappingJson from "../../utils/getMappingJson";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
+import {generateColorScale} from "../../utils/colorScale.js";
 import {getCenter} from "ol/extent";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import layerCollection from "@core/layers/js/layerCollection";
@@ -29,6 +32,8 @@ export default {
         CalculateRatioSelection,
         ChartItem,
         DataTable,
+        DropdownAutocomplete,
+        FlatButton,
         ResultManagement,
         ToolInfo
     },
@@ -99,11 +104,11 @@ export default {
         ...mapGetters("Modules/CalculateRatio", Object.keys(getters)),
         ...mapGetters("Modules/DistrictSelector", ["mapping", "selectedDistrictLevel", "selectedFeatures", "label", "keyOfAttrName", "keyOfAttrNameStats", "loadend"]),
         ...mapGetters("Modules/FeaturesList",
-            {
-            // facilitiesMapping: "mapping",
-            // groupActiveLayer: "groupActiveLayer",
-                isFeatureActive: "isFeatureActive"
-            }),
+                      {
+                          // facilitiesMapping: "mapping",
+                          // groupActiveLayer: "groupActiveLayer",
+                          isFeatureActive: "isFeatureActive"
+                      }),
         ...mapGetters("Modules/ColorCodeMap", ["visualizationState"]),
         ...mapGetters(["layerConfig", "visibleSubjectDataLayerConfigs"]),
 
@@ -115,18 +120,47 @@ export default {
 
             if (this.fActive_A || this.fActive_B) {
                 const capacity = {
-                        name: "Kapazität",
-                        key: "capacity"
-                    },
-                    need = {
-                        name: "Bedarf",
-                        key: "need"
-                    };
+                          name: "Kapazität",
+                          key: "capacity"
+                      },
+                      need = {
+                          name: "Bedarf",
+                          key: "need"
+                      };
 
                 options.push(capacity, need);
             }
 
             return options;
+        },
+
+        /**
+         * Colour ramp for the result set currently drawn on the map. Built from the same
+         * dataset and colour scheme the ColorCodeMap renders with, so the bar and the
+         * districts cannot drift apart. The map itself carries no legend for ratio data.
+         * @returns {Object|null} the css gradient plus its end labels, null if nothing is drawn.
+         */
+        mapLegend () {
+            if (!this.dataToColorCodeMap || this.colorCodeMapDataset.length === 0) {
+                return null;
+            }
+
+            const {legend} = generateColorScale(
+                    this.colorCodeMapDataset.map(entry => entry.data),
+                    this.$store.getters["Modules/ColorCodeMap/colorScheme"]
+                ),
+                values = legend?.values.filter(value => typeof value === "number") || [];
+
+            // a single district, or several with the same value, has no ramp to show
+            if (values.length < 2) {
+                return null;
+            }
+
+            return {
+                gradient: `linear-gradient(90deg, ${legend.colors.join(", ")})`,
+                low: values[0].toLocaleString("de-DE"),
+                high: values[values.length - 1].toLocaleString("de-DE")
+            };
         },
 
         /**
@@ -216,7 +250,10 @@ export default {
         },
         visualizationState (newState) {
             if (!newState) {
-                this.$store.commit("Tools/CalculateRatio/setDataToColorCodeMap", false);
+                // "Tools/..." is the pre-v3 module path; committing it was a silent no-op,
+                // so switching the visualization off in the map left this tool believing
+                // it was still on and the button could not switch it back on.
+                this.setDataToColorCodeMap(false);
             }
         },
         facilitiesMapping () {
@@ -250,9 +287,7 @@ export default {
 
             this.setResults(this.dataSets[newValue].results);
             this.setResultHeaders(this.dataSets[newValue].resultHeaders);
-            const data = this.getDataForColorCodeMap();
-
-            this.setColorCodeMapDataset(data);
+            this.updateColorCodeMap();
         },
         dataSets (newValue) {
             if (newValue.length === 0) {
@@ -266,9 +301,7 @@ export default {
          */
         columnSelector () {
             if (this.dataToColorCodeMap) {
-                const data = this.getDataForColorCodeMap();
-
-                this.setColorCodeMapDataset(data);
+                this.updateColorCodeMap();
             }
         },
 
@@ -278,9 +311,7 @@ export default {
          */
         selectedYear () {
             if (this.dataToColorCodeMap) {
-                const data = this.getDataForColorCodeMap();
-
-                this.setColorCodeMapDataset(data);
+                this.updateColorCodeMap();
             }
         }
     },
@@ -294,7 +325,14 @@ export default {
         // this.getVisibleLayerList();
 
         if (typeof this.selectedDistrictLevel !== "undefined") {
-            this.updateFeaturesList();
+            await this.updateFeaturesList();
+
+            // Statistical data is the more common denominator, so field B starts out on it
+            // when there is any. This is an initial default only — from the first calculation
+            // on, the switches are owned by the selection cards (see setCoverageParams).
+            if (this.featuresList.length !== 0) {
+                this.BSwitch = false;
+            }
         }
 
         if (this.facilityList.length === 0) {
@@ -305,8 +343,6 @@ export default {
     methods: {
         ...mapMutations("Modules/CalculateRatio", Object.keys(mutations)),
         ...mapActions("Alerting", ["addSingleAlert", "cleanup"]),
-        ...mapActions("Modules/ChartGenerator", ["channelGraphData"]),
-        ...mapMutations("Modules/ChartGenerator", ["setNewDataset"]),
 
         getVisibleLayerList () {
             this.layerIdList = this.getVisibleVectorLayers().map(layer => layer.getLayer().get("name"));
@@ -328,7 +364,7 @@ export default {
          * @returns {Array} An array of visible vector layer objects.
          */
         getVisibleVectorLayers () {
-            const supportedLayerTypes = ["WFS", "OAF", "GeoJSON"];
+            const supportedLayerTypes = ["WFS", "OAF", "GeoJSON", "VECTORBASE"];
 
             return layerCollection.getLayers().filter(layer => {
                 return layer.getLayer() instanceof VectorLayer && layer?.attributes.visibility === true && layer?.attributes?.isNeverVisibleInTree !== true && supportedLayerTypes.includes(layer.get("typ"));
@@ -396,10 +432,6 @@ export default {
                         this.featuresListNew.push(attr.value);
                     }
                 });
-            }
-
-            if (this.featuresList.length !== 0) {
-                this.BSwitch = false;
             }
         },
 
@@ -491,8 +523,12 @@ export default {
                     resultHeaders: {},
                     results: {}
                 },
-                dataArray_A = this.coverageFunction("A"),
-                dataArray_B = this.coverageFunction("B");
+                // Which field reads a facility layer and which one statistical data is decided
+                // once, up front: evaluating a field can refresh the tool's state, and reading
+                // the flags per field would let field A's evaluation change field B's branch.
+                isFacility = {A: this.ASwitch, B: this.BSwitch},
+                dataArray_A = this.coverageFunction("A", isFacility.A),
+                dataArray_B = this.coverageFunction("B", isFacility.B);
             let
                 resultHeader_A = this.selectedFieldA,
                 resultHeader_B = this.selectedFieldB;
@@ -510,7 +546,7 @@ export default {
 
             dataArray_A.forEach((obj_A) => {
                 const obj_B = dataArray_B.find(obj => obj.name === obj_A.name),
-                    combined = {...obj_A, ...obj_B};
+                      combined = {...obj_A, ...obj_B};
 
                 allData.push(combined);
             });
@@ -535,8 +571,8 @@ export default {
                 fActive_B: JSON.parse(JSON.stringify(this.fActive_B)),
                 faktorf_A: JSON.parse(JSON.stringify(this.faktorf_A)),
                 faktorf_B: JSON.parse(JSON.stringify(this.faktorf_B)),
-                ASwitch: JSON.parse(JSON.stringify(this.ASwitch)),
-                BSwitch: JSON.parse(JSON.stringify(this.BSwitch)),
+                ASwitch: isFacility.A,
+                BSwitch: isFacility.B,
                 perCalc_A: JSON.parse(JSON.stringify(this.perCalc_A)),
                 perCalc_B: JSON.parse(JSON.stringify(this.perCalc_B)),
                 facilityPropertyList_A: JSON.parse(JSON.stringify(this.facilityPropertyList_A)),
@@ -549,33 +585,33 @@ export default {
         /**
          * @description Fires when user hits calulcate button. Prepares data sets for calculation.
          * @param {String} letter "A" or "B" for selectedFieldA or selectedFieldB.
+         * @param {Boolean} isFacility True if the field reads a facility layer, false for statistical data.
          * @returns {Array} dataArray -> Array containing all collected data for all selected districts.
          */
-        coverageFunction (letter) {
+        coverageFunction (letter, isFacility) {
             const dataArray = [];
 
             this.selectedFeatures.forEach(district => {
                 const name = district.getProperties()[this.keyOfAttrName],
-                    geometry = district.getGeometry();
+                      geometry = district.getGeometry();
 
                 this.calcHelper = {};
                 this.calcHelper.name = name;
                 this.calcHelper["faktorf_" + letter] = this["faktorf_" + letter];
                 this.calcHelper["perCalc_" + letter] = this["perCalc_" + letter];
 
-                if (this[letter + "Switch"]) {
+                if (isFacility) {
                     const findLayer = this.getVisibleVectorLayers().find(layer => layer.getLayer().get("name") === this["selectedField" + letter]),
-                        layerFeatures = getLayerSource(findLayer.getLayer()).getFeatures(),
-                        paramField = this["paramField" + letter],
-                        // the selection only carries the display name, the feature property is the id from the layer config
-                        paramKey = findLayer?.attributes?.numericalValues?.find(value => value.name === paramField?.name)?.id
-                            || paramField?.name?.toLowerCase();
+                          layerFeatures = getLayerSource(findLayer.getLayer()).getFeatures(),
+                          paramField = this["paramField" + letter],
+                          // the selection only carries the display name, the feature property is the id from the layer config
+                          paramKey = findLayer?.attributes?.numericalValues?.find(value => value.name === paramField?.name)?.id || paramField?.name?.toLowerCase();
 
                     this.calcHelper["type_" + letter] = "facility";
                     this.featureVals = [];
                     layerFeatures.forEach(feature => {
 
-                        if (this.isFeatureActive(feature)) {
+                        if (this.isFeatureActive(feature, findLayer.layer)) {
                             const layerGeometry = getCenter(feature.getGeometry().getExtent());
 
                             if (geometry.intersectsCoordinate(layerGeometry)) {
@@ -628,7 +664,7 @@ export default {
                     this.calcHelper["type_" + letter] = "feature";
 
                     const featureData = this.getFeatureData(name, this["selectedField" + letter]),
-                        yearValues = {};
+                          yearValues = {};
 
                     featureData.forEach(year => {
                         yearValues[year.jahr] = year.wert;
@@ -653,14 +689,9 @@ export default {
          */
         getFeatureData (districtName, featureName) {
             const featureDataList = [],
-                selectedDistricts = this.selectedDistrictLevel.districts.filter(district => district.isSelected === true);
+                  selectedDistricts = this.selectedDistrictLevel.districts.filter(district => district.isSelected === true);
 
             this.selectedStatFeatures = selectedDistricts.map(district => district.statFeatures).flat();
-
-
-            if (this.selectedFeatures.length > 0) {
-                this.updateFeaturesList();
-            }
 
             this.selectedStatFeatures.forEach(feature => {
                 if (utils.unifyString(feature.getProperties()[this.keyOfAttrNameStats]) === utils.unifyString(districtName) && utils.unifyString(feature.get("kategorie")) === utils.unifyString(featureName)) {
@@ -724,17 +755,38 @@ export default {
          * @returns {void}
          */
         loadToColorCodeMap () {
-            const switchVar = this.dataToColorCodeMap;
-
-            if (!switchVar) {
-                const data = this.getDataForColorCodeMap();
-
-                this.setColorCodeMapDataset(data);
-                this.setDataToColorCodeMap(!switchVar);
+            if (!this.dataToColorCodeMap) {
+                this.setDataToColorCodeMap(true);
+                this.updateColorCodeMap();
             }
             else {
+                this.setDataToColorCodeMap(false);
+                this.$store.commit("Modules/ColorCodeMap/setVisualizationState", false);
+                this.$store.dispatch("Modules/ColorCodeMap/renderVisualization");
+            }
+        },
 
-                this.setDataToColorCodeMap(!switchVar);
+        /**
+         * @description Picks the result column that is drawn on the map. The dropdown carries
+         * the display name only, so the column object is resolved from it here.
+         * @param {String} name display name of the column
+         * @returns {void}
+         */
+        selectColumn (name) {
+            this.columnSelector = this.availableColumns.find(column => column.name === name) || this.columnSelector;
+        },
+
+        /**
+         * @description Hands the active result set to the ColorCodeMap and redraws it.
+         * Both live in the ColorCodeMap's store, so this works whether or not that tool's
+         * menu entry is open — the same route the Dashboard takes for its row visualization.
+         * @returns {void}
+         */
+        updateColorCodeMap () {
+            this.setColorCodeMapDataset(this.getDataForColorCodeMap());
+
+            if (this.dataToColorCodeMap) {
+                this.$store.dispatch("Modules/ColorCodeMap/renderDataFromCalculateRatio");
             }
         },
 
@@ -746,74 +798,21 @@ export default {
             const prepareData = [];
 
             this.dataSets[this.activeSet].results.forEach(result => {
-                if (result.scope !== "Gesamt" || result.scope !== "Durschnitt") {
-                    const data = {
-                        name: result.scope,
-                        data: Math.round(1000 * result[this.columnSelector.key]) / 1000
-                    };
-
-                    prepareData.push(data);
+                // the aggregate rows match no district, and a district whose denominator is
+                // zero has no finite value to place on a colour scale — one Infinity would
+                // flatten the scale for every other district, so it stays uncoloured
+                if (result.scope === "Gesamt" || result.scope === "Durchschnitt"
+                    || !Number.isFinite(result[this.columnSelector.key])) {
+                    return;
                 }
-            });
 
-            return prepareData;
-        },
-
-        /**
-         * @description Passes data to the Chart Generator Tool.
-         * @returns {Void} Function returns nothing.
-         */
-        loadToChartGenerator () {
-            const graphObj = {
-                    id: "calcratio-" + this.selectedFeatures.map(district => {
-                        return district.id_;
-                    }).join("-") + "-" + this.selectedFieldA.id + "-" + this.paramFieldA.name + "-" + this.selectedFieldB.id + "-" + this.paramFieldB.name,
-                    name: "Versorgungsanalyse - Visualisierung " + this.columnSelector.name + " (" + this.$t("additional:modules.tools.cosi.calculateRatio.title") + ")",
-                    type: ["LineChart", "BarChart"],
-                    color: "rainbow",
-                    source: this.$t("additional:modules.tools.cosi.calculateRatio.title"),
-                    scaleLabels: [this.columnSelector.name, "Jahre"],
-                    data: {
-                        labels: [...this.availableYears],
-                        datasets: []
-                    }
-                },
-
-                dataArray = [];
-
-            this.dataSets[this.activeSet].results.forEach(result => {
-                if (result) {
-                    dataArray.push(result.data);
-                }
-            });
-
-            this.availableYears.forEach(year => {
-                const dataPerYear = utils.calculateRatio(dataArray, year)
-                    .filter(dataset => dataset.scope);
-
-                dataPerYear.forEach(dataset => {
-                    const checkExisting = graphObj.data.datasets.find(set => set.label === dataset.scope);
-
-                    if (checkExisting) {
-                        checkExisting.data.push(dataset[this.columnSelector.key]);
-                    }
-                    else {
-                        const obj = {
-                            label: dataset.scope,
-                            data: [dataset[this.columnSelector.key]]
-                        };
-
-                        graphObj.data.datasets.push(obj);
-                    }
+                prepareData.push({
+                    name: result.scope,
+                    data: Math.round(1000 * result[this.columnSelector.key]) / 1000
                 });
             });
 
-            graphObj.data.labels.reverse();
-            graphObj.data.datasets.forEach(dataset => {
-                dataset.data.reverse();
-            });
-
-            this.channelGraphData(graphObj);
+            return prepareData;
         },
 
         /**
@@ -848,10 +847,10 @@ export default {
          */
         preparesChartData () {
             const chartData = [],
-                inputA = this.dataSets[this.activeSet].inputs.selectedFieldA,
-                inputB = this.dataSets[this.activeSet].inputs.selectedFieldB,
-                parameterA = this.dataSets[this.activeSet].inputs.facilityPropertyList_A.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_A[0] + ")" : "",
-                parameterB = this.dataSets[this.activeSet].inputs.facilityPropertyList_B.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_B[0] + ")" : "";
+                  inputA = this.dataSets[this.activeSet].inputs.selectedFieldA,
+                  inputB = this.dataSets[this.activeSet].inputs.selectedFieldB,
+                  parameterA = this.dataSets[this.activeSet].inputs.facilityPropertyList_A.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_A[0] + ")" : "",
+                  parameterB = this.dataSets[this.activeSet].inputs.facilityPropertyList_B.length ? " (" + this.dataSets[this.activeSet].inputs.facilityPropertyList_B[0] + ")" : "";
 
 
             this.availableColumns.forEach((type, idx) => {
@@ -951,6 +950,38 @@ export default {
                 </ul>
             </template>
             <template #after-card="{index}">
+                <div
+                    v-if="activeSet === index"
+                    class="d-flex flex-row align-items-center gap-3 mb-2"
+                >
+                    <DropdownAutocomplete
+                        class="flex-grow-1"
+                        :items="availableColumns.map(column => column.name)"
+                        :model-value="columnSelector.name"
+                        :label="$t('additional:modules.tools.cosi.calculateRatio.calculationType')"
+                        @update:model-value="selectColumn"
+                    />
+                    <FlatButton
+                        class="flex-shrink-0 mb-3"
+                        :icon="dataToColorCodeMap ? 'bi bi-map-fill' : 'bi bi-map'"
+                        :secondary="!dataToColorCodeMap"
+                        :text="$t('additional:modules.tools.cosi.calculateRatio.visualizeMap')"
+                        :title="$t('additional:modules.tools.cosi.calculateRatio.visualizeMap')"
+                        @click="loadToColorCodeMap()"
+                    />
+                </div>
+                <div
+                    v-if="activeSet === index && mapLegend"
+                    class="ratio-legend d-flex align-items-center mb-3"
+                >
+                    <span>{{ mapLegend.low }}</span>
+                    <span
+                        class="ratio-legend__bar flex-grow-1 mx-2"
+                        :style="{background: mapLegend.gradient}"
+                    />
+                    <span>{{ mapLegend.high }}</span>
+                    <span class="ms-3 text-muted">{{ columnSelector.name }}</span>
+                </div>
                 <DataTable
                     v-if="tableOrChart === 'table' && activeSet === index"
                     class="mb-3"
@@ -972,3 +1003,15 @@ export default {
         </ResultManagement>
     </div>
 </template>
+
+<style lang="scss" scoped>
+    .ratio-legend {
+        font-size: 12px;
+
+        .ratio-legend__bar {
+            height: 12px;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+        }
+    }
+</style>

@@ -5,7 +5,7 @@
                 "accessibilityAnalysis": {
                     "areaOutsideMRH": "Population cannot be calculated for this area. Please select an area within the Hamburg metropolitan region.",
                     "title": "Accessibility Analysis",
-                    "description": "Displays an area on the map that can be reached from a selected point, along a route or from a facility within a specified distance. The distance can be specified in time or in meters. The accessibility is calculated depending on the means of transport.",
+                    "description": "This tool allows you to display areas on the map that can be reached from a selected point, along a route, or within a defined distance. Accessibility can be calculated depending on the mode of transportation and displayed as time or distance in meters.",
                     "dropdownInfo": "Please choose the mode you want to work with:",
                     "points": "Points",
                     "pointMode": "Accessibility from a reference point",

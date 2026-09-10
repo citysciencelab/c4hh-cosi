@@ -17,6 +17,7 @@ const state = {
     id: "templateAdmin",
     type: "templateAdmin",
     name: "additional:modules.cosi.templateAdmin.title",
+    description: "",
     icon: "bi-folder2-open",
     activeMode: {
         type: "create",

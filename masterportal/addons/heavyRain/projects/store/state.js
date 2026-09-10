@@ -45,7 +45,8 @@ const state = {
             "name": "sonstiges",
             "color": "#007A33"
         }
-    ]
+    ],
+    currentView: "main"
 };
 
 export default state;

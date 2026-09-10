@@ -174,7 +174,6 @@ describe.skip("addons/cosi/DistrictFinder/components/DistrictFinderFilterCard.vu
             factory.getShallowMount();
 
             expect(spySetConditionAttributes.calledOnce).to.be.true;
-            sinon.restore();
         });
     });
 
@@ -298,7 +297,6 @@ describe.skip("addons/cosi/DistrictFinder/components/DistrictFinderFilterCard.vu
                 wrapper.vm.$nextTick();
 
                 expect(spyUpdateSelectedCategory.calledOnce).to.be.true;
-                sinon.restore();
             });
         });
 
@@ -331,7 +329,6 @@ describe.skip("addons/cosi/DistrictFinder/components/DistrictFinderFilterCard.vu
                 wrapper.vm.$nextTick();
 
                 expect(wrapper.vm.getChartColors("stadtteil")).to.deep.equal(expectedColors);
-                sinon.restore();
             });
         });
         describe("updateYear", () => {

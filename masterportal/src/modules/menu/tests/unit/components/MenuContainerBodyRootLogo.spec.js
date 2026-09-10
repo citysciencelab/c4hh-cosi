@@ -1,8 +1,7 @@
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import MenuContainerBodyRootLogo from "@modules/menu/components/MenuContainerBodyRootLogo.vue";
 import {expect} from "chai";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/menu/MenuContainerBodyRootLogo.vue", () => {
     let wrapper;

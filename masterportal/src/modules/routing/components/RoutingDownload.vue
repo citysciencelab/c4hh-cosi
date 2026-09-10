@@ -134,9 +134,9 @@ export default {
                     continue;
                 }
                 const clone = feature.clone(),
-                    geometry = clone.getGeometry(),
-                    type = geometry.getType(),
-                    coords = geometry.getCoordinates();
+                      geometry = clone.getGeometry(),
+                      type = geometry.getType(),
+                      coords = geometry.getCoordinates();
 
                 let coordinates = [];
 
@@ -288,9 +288,9 @@ export default {
                 return "unknown";
             }
             const format = this.download.format.toLowerCase(),
-                fileName = this.download.fileName.endsWith(`.${format}`) ? this.download.fileName : `${this.download.fileName}.${format}`,
-                // validate file name without file suffix
-                validation = this.validateFileName(fileName.slice(0, -Math.abs(format.length + 1)));
+                  fileName = this.download.fileName.endsWith(`.${format}`) ? this.download.fileName : `${this.download.fileName}.${format}`,
+                  // validate file name without file suffix
+                  validation = this.validateFileName(fileName.slice(0, -Math.abs(format.length + 1)));
 
             return {
                 name: fileName,
@@ -308,7 +308,7 @@ export default {
                 return;
             }
             const downloadString = await this.getDownloadStringInFormat(this.styleFeatures(this.getDownloadFeatures())),
-                fileName = this.getFileName();
+                  fileName = this.getFileName();
 
             if (fileName.isValid) {
                 if (typeof navigator.msSaveOrOpenBlob === "function") {
@@ -318,7 +318,7 @@ export default {
                 }
                 else {
                     const url = `data:text/plain;charset=utf-8,${encodeURIComponent(downloadString)}`,
-                        a = document.createElement("a");
+                          a = document.createElement("a");
 
                     a.href = url;
                     a.download = fileName.name;

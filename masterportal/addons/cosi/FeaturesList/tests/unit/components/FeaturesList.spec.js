@@ -190,12 +190,6 @@ describe.skip("addons/cosi/FeaturesList/components/FeaturesList.vue", () => {
                                 wmsLayersInfo: ()=>[]
                             }
                         },
-                        ChartGenerator: {
-                            namespaced: true,
-                            actions: {
-                                channelGraphData: sinon.stub()
-                            }
-                        },
                         Alerting: {
                             namespaced: true,
                             actions: {

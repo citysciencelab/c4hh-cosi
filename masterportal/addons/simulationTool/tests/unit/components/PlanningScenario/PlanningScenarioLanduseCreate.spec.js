@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import Feature from "ol/Feature.js";
 import getOAFFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
 import PlanningScenarioLanduseCreate from "../../../../components/PlanningScenario/PlanningScenarioLanduseCreate.vue";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioLanduseCreate.vue", () => {
     let getCollectionSchemaStub,

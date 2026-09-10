@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
 import sinon from "sinon";
-import {config, mount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import MenuToggleButton from "@modules/menu/components/MenuToggleButton.vue";
 
-config.global.mocks.$t = key => key;
 
 /**
  * Factory to create a Vuex store for Menu module tests
@@ -63,7 +62,7 @@ describe("src/modules/menu/MenuToggleButton.vue", () => {
     });
 
     it("should render the button including 'mainToggleButtonIcon' as the icon class for side 'main'", () => {
-        wrapper = mount(MenuToggleButton, {
+        wrapper = shallowMount(MenuToggleButton, {
             global: {
                 plugins: [store]
             },
@@ -81,7 +80,7 @@ describe("src/modules/menu/MenuToggleButton.vue", () => {
     });
     it("should render the button including 'secondaryToggleButtonIcon' as the icon class for side 'secondaryMenu'", () => {
         side = "secondaryMenu";
-        wrapper = mount(MenuToggleButton, {
+        wrapper = shallowMount(MenuToggleButton, {
             global: {
                 plugins: [store]
             },
@@ -99,10 +98,12 @@ describe("src/modules/menu/MenuToggleButton.vue", () => {
     });
 
     it("mainMenu: calls toggleMenu if clicked on button", async () => {
-        wrapper = mount(MenuToggleButton, {
+        wrapper = shallowMount(MenuToggleButton, {
             global: {
                 plugins: [store]
-            }, propsData: {side}});
+            },
+            propsData: {side}
+        });
         const button = wrapper.find(`#${side}-toggle-button`);
 
         await button.trigger("click");
@@ -113,10 +114,12 @@ describe("src/modules/menu/MenuToggleButton.vue", () => {
 
     it("secondaryMenu: calls toggleMenu if clicked on button", async () => {
         side = "secondaryMenu";
-        wrapper = mount(MenuToggleButton, {
+        wrapper = shallowMount(MenuToggleButton, {
             global: {
                 plugins: [store]
-            }, propsData: {side}});
+            },
+            propsData: {side}
+        });
         const button = wrapper.find(`#${side}-toggle-button`);
 
         await button.trigger("click");
@@ -131,7 +134,7 @@ describe("src/modules/menu/MenuToggleButton.vue", () => {
                 toggleMenuSpy
             });
 
-            wrapper = mount(MenuToggleButton, {
+            wrapper = shallowMount(MenuToggleButton, {
                 global: {plugins: [store]},
                 propsData: {side: "secondaryMenu"}
             });
@@ -145,7 +148,7 @@ describe("src/modules/menu/MenuToggleButton.vue", () => {
                 toggleMenuSpy
             });
 
-            wrapper = mount(MenuToggleButton, {
+            wrapper = shallowMount(MenuToggleButton, {
                 global: {plugins: [store]},
                 propsData: {side: "secondaryMenu"}
             });

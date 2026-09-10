@@ -88,16 +88,16 @@ export default {
                 this.isEmpty = true;
                 if (items.length && this.api !== null) {
                     this.api.filter({
-                        rules: [{
-                            attrName: this.api.service.filter.attrName,
-                            operator: this.api.service.filter.operator,
-                            value: items[0].get(this.api.service.filter.attrName)
-                        }]
-                    },
-                    this.addChartData,
-                    error => {
-                        console.warn(error);
-                    });
+                                        rules: [{
+                                            attrName: this.api.service.filter.attrName,
+                                            operator: this.api.service.filter.operator,
+                                            value: items[0].get(this.api.service.filter.attrName)
+                                        }]
+                                    },
+                                    this.addChartData,
+                                    error => {
+                                        console.warn(error);
+                                    });
                 }
                 this.setTooltipUnit(this.tooltipUnit, this.chartConfig);
                 this.isVisible = true;

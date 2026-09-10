@@ -1,4 +1,5 @@
 import {expect} from "chai";
+import sinon from "sinon";
 import {TrafficCountApi} from "../../../utils/trafficCountApi.js";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
@@ -51,53 +52,138 @@ describe("addons/trafficCount/utils/trafficCountApi.js", () => {
         });
 
         describe("SensorThingsMqttClient", () => {
-            it("should set the on message event with an event", () => {
-                let lastEventName = false,
-                    lastCallback = false;
-                const dummySensorThingsMqtt = {
+            /**
+             *
+             */
+            function createMqttDummy () {
+                const handlers = {};
+
+                return {
                     on: (eventName, callback) => {
-                        lastEventName = eventName;
-                        lastCallback = callback;
-                    }
-                };
-
-                new TrafficCountApi("httpHost", "sensorThingsVersion", "mqttOptions", "sensorThingsHttpOpt", dummySensorThingsMqtt, "noSingletonOpt");
-
-                expect(lastEventName).to.equal("message");
-                expect(typeof lastCallback).to.equal("function");
-            });
-            it("should set the on message event with an event(topic, payload) that will give payload to all callbacks stored in subscriptionTopics[topic]", () => {
-                let lastCallback = false;
-                const dummySensorThingsMqtt = {
-                        on: (eventName, callback) => {
-                            lastCallback = callback;
-                        }
+                        handlers[eventName] = callback;
                     },
-                    api = new TrafficCountApi("httpHost", "sensorThingsVersion", "mqttOptions", "sensorThingsHttpOpt", dummySensorThingsMqtt, "noSingletonOpt"),
+                    trigger: (eventName, ...args) => handlers[eventName](...args),
+                    getHandler: (eventName) => handlers[eventName]
+                };
+            }
+
+            it("should set the on message event with an event", () => {
+                const mqttDummy = createMqttDummy();
+
+                new TrafficCountApi("httpHost", "sensorThingsVersion", "mqttOptions", "sensorThingsHttpOpt", mqttDummy, "noSingletonOpt");
+
+                expect(typeof mqttDummy.getHandler("message")).to.equal("function");
+            });
+            it("should set the on message event(topic, payload) that will give payload to all callbacks stored in subscriptionTopics[topic]", () => {
+                const mqttDummy = createMqttDummy(),
+                    api = new TrafficCountApi("httpHost", "sensorThingsVersion", "mqttOptions", "sensorThingsHttpOpt", mqttDummy, "noSingletonOpt"),
                     lastPayloads = [];
 
                 api.setSubscriptionTopics({
                     "foo": [
-                        (payload) => {
-                            lastPayloads.push(payload);
-                        },
-                        (payload) => {
-                            lastPayloads.push(payload);
-                        },
-                        (payload) => {
-                            lastPayloads.push(payload);
-                        }
+                        (payload) => lastPayloads.push(payload),
+                        (payload) => lastPayloads.push(payload),
+                        (payload) => lastPayloads.push(payload)
                     ]
                 });
 
-                expect(typeof lastCallback).to.equal("function");
+                const messageHandler = mqttDummy.getHandler("message");
 
-                lastCallback("baz", "qux");
-                expect(lastPayloads).to.be.an("array").that.is.empty;
+                messageHandler("foo", "bar");
 
-                lastCallback("foo", "bar");
                 expect(lastPayloads).to.deep.equal(["bar", "bar", "bar"]);
             });
+        });
+    });
+
+    describe("MQTT Status and Watchdog (onMqttStatusChange / offMqttStatusChange)", () => {
+        let api,
+            clock,
+            mqttHandlers = {};
+
+        beforeEach(() => {
+            clock = sinon.useFakeTimers();
+            mqttHandlers = {};
+
+            const dummySensorThingsMqtt = {
+                on: (eventName, callback) => {
+                    mqttHandlers[eventName] = callback;
+                }
+            };
+
+            api = new TrafficCountApi("httpHost", "sensorThingsVersion", "mqttOptions", "sensorThingsHttpOpt", dummySensorThingsMqtt, "noSingletonOpt");
+            api.watchdogTimeout = 10000;
+        });
+
+        afterEach(() => {
+            clock.restore();
+            sinon.restore();
+        });
+
+        it("should register a callback via onMqttStatusChange and immediately notify with true", () => {
+            const callbackSpy = sinon.spy();
+
+            api.onMqttStatusChange(callbackSpy);
+
+            expect(api.statusCallbacks.length).to.equal(1);
+            expect(callbackSpy.calledOnce).to.be.true;
+            expect(callbackSpy.calledWith(true)).to.be.true;
+        });
+
+        it("should notify the listener with false after the watchdog timeout expires", () => {
+            const callbackSpy = sinon.spy();
+
+            api.onMqttStatusChange(callbackSpy);
+            expect(callbackSpy.calledWith(true)).to.be.true;
+
+            clock.tick(11000);
+
+            expect(callbackSpy.calledTwice).to.be.true;
+            expect(callbackSpy.calledWith(false)).to.be.true;
+        });
+
+        it("should notify the listener with false immediately on 'offline' or 'error' events", () => {
+            const callbackSpy = sinon.spy();
+
+            api.onMqttStatusChange(callbackSpy);
+
+            if (typeof mqttHandlers.offline === "function") {
+                mqttHandlers.offline();
+            }
+
+            expect(callbackSpy.calledTwice).to.be.true;
+            expect(callbackSpy.lastCall.calledWith(false)).to.be.true;
+        });
+
+        it("should reset the watchdog and notify with true when the 'connect' event fires", () => {
+            const callbackSpy = sinon.spy();
+
+            api.onMqttStatusChange(callbackSpy);
+
+            if (typeof mqttHandlers.offline === "function") {
+                mqttHandlers.offline();
+            }
+
+            if (typeof mqttHandlers.connect === "function") {
+                mqttHandlers.connect();
+            }
+
+            expect(callbackSpy.callCount).to.equal(3);
+            expect(callbackSpy.lastCall.calledWith(true)).to.be.true;
+        });
+
+        it("should successfully remove a callback and clear the timer on offMqttStatusChange", () => {
+            const callbackSpy = sinon.spy();
+
+            api.onMqttStatusChange(callbackSpy);
+            expect(api.statusCallbacks.length).to.equal(1);
+
+            api.offMqttStatusChange(callbackSpy);
+            expect(api.statusCallbacks.length).to.equal(0);
+
+            clock.tick(11000);
+
+            expect(callbackSpy.calledWith(false)).to.be.false;
         });
     });
 

@@ -13,6 +13,7 @@ const state = {
     active: false,
     id: "accessibilityAnalysis",
     type: "accessibilityAnalysis",
+    description: "",
     hasMouseMapInteractions: true,
     // defaults for config.json parameters
     name: "Erreichbarkeitsanalyse",

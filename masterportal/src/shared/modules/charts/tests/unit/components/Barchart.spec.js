@@ -1,17 +1,17 @@
-import {shallowMount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import ChartJs from "chart.js/auto";
 import {nextTick} from "vue";
+
+import ChartJs from "chart.js/auto";
 import BarchartItem from "@shared/modules/charts/components/BarchartItem.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/share-components/charts/components/BarchartItem.vue", () => {
     let wrapper;
 
     beforeEach(() => {
         wrapper = shallowMount(BarchartItem, {
-            propsData: {
+            props: {
                 data: {
                     labels: [],
                     datasets: []
@@ -22,20 +22,17 @@ describe("src/share-components/charts/components/BarchartItem.vue", () => {
     });
 
     describe("mounted", () => {
-        it("should create an instance of ChartJS when mounted", () => {
-            nextTick(() => {
-                expect(wrapper.vm.chart).to.be.an.instanceof(ChartJs);
-            });
+        it("should create an instance of ChartJS when mounted", async () => {
+            await nextTick();
+            expect(wrapper.vm.chart).to.be.an.instanceof(ChartJs);
         });
-        it("should create a chart of type bar when mounted", () => {
-            nextTick(() => {
-                expect(wrapper.vm.chart.config.type).to.equal("bar");
-            });
+        it("should create a chart of type bar when mounted", async () => {
+            await nextTick();
+            expect(wrapper.vm.chart.config.type).to.equal("bar");
         });
-        it("should create a canvas element in its component", () => {
-            nextTick(() => {
-                expect(wrapper.find("canvas").exists()).to.be.true;
-            });
+        it("should create a canvas element in its component", async () => {
+            await nextTick();
+            expect(wrapper.find("canvas").exists()).to.be.true;
         });
     });
     describe.skip("resetChart", () => {

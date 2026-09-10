@@ -134,11 +134,11 @@ export default {
             }
 
             const tooltipEl = document.getElementById("tooltip-overlay-plan-parken"),
-                rect = this.tooltipTargetEl.getBoundingClientRect(),
-                tooltipWidth = tooltipEl?.offsetWidth || 200,
-                spacing = 8,
-                arrowSize = 7,
-                sidePadding = 8;
+                  rect = this.tooltipTargetEl.getBoundingClientRect(),
+                  tooltipWidth = tooltipEl?.offsetWidth || 200,
+                  spacing = 8,
+                  arrowSize = 7,
+                  sidePadding = 8;
 
             const buttonCenterX = rect.left + rect.width / 2;
 
@@ -412,7 +412,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-@import 'variables';
+
 .plan-parken {
     position: relative;
     overflow-y: visible;

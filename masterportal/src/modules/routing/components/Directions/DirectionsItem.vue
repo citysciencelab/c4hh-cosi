@@ -278,7 +278,7 @@ export default {
          */
         afterFileValidation () {
             const modalElement = this.$refs.uploadModal,
-                modal = Modal.getInstance(modalElement);
+                  modal = Modal.getInstance(modalElement);
 
             modal.hide();
         },

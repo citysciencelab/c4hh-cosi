@@ -62,6 +62,18 @@ function getIsVc4 () {
     return iframe?.contentWindow?.vcs?.vcm;
 }
 
+/**
+ * Converts a heading in degrees to a German cardinal direction.
+ * @param {Number} heading Heading in degrees (0 = North)
+ * @returns {String} Cardinal direction in German (Nord, Ost, Süd, West)
+ */
+function headingToCardinal (heading) {
+    const directions = ["Nord", "Ost", "Süd", "West"],
+        index = Math.round(((heading % 360) + 360) % 360 / 90) % 4;
+
+    return directions[index];
+}
+
 const actions = {
     /**
     * InitObliqueView creates a click listener at the map. Creates a listener at the olMap in the oblique application when the oblique aerial images have been moved in the sidebar.
@@ -105,7 +117,8 @@ const actions = {
                         const heading = vp.heading,
                             coordinates = rootGetters["Maps/clickCoordinate"] || rootGetters["Maps/initialCenter"];
 
-                        if (heading !== getters.heading) {
+                        if (headingToCardinal(heading) !== headingToCardinal(getters.heading)) {
+                            commit("setLastCoordinates", crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), vp.groundPosition));
                             dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
                         }
                         commit("setHeading", heading);
@@ -114,8 +127,17 @@ const actions = {
                     dispatch("obliqueView", rootGetters["Maps/center"] || rootGetters["Maps/initialCenter"])
                         .then(() => {
                             map.olMap.on("moveend", () => {
-                                const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), getViewpointSync(map).groundPosition);
+                                const currentVp = getViewpointSync(map);
 
+                                if (!currentVp?.groundPosition) {
+                                    return;
+                                }
+                                const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), currentVp.groundPosition),
+                                    isLargePositionChange = transformedCoordinates.some((coordinate, index) => Math.abs(coordinate - getters.lastCoordinates[index]) > 50);
+
+                                if (headingToCardinal(currentVp.heading) !== headingToCardinal(getters.heading) && !isLargePositionChange) {
+                                    return;
+                                }
                                 transformedCoordinates.every((coordinate, index) => {
                                     if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
                                         dispatch("obliqueView", transformedCoordinates);
@@ -135,13 +157,26 @@ const actions = {
                         if (!vp?.groundPosition) {
                             return;
                         }
+                        const imageName = map._obliqueProvider?.currentImage?.name,
+                            direction = headingToCardinal(vp.heading);
+
+                        commit("setCurrentImageName", imageName ? `${imageName}-${direction}` : "");
                         if (isFirstImageChange) {
                             isFirstImageChange = false;
                             dispatch("obliqueView", rootGetters["Maps/center"] || rootGetters["Maps/initialCenter"])
                                 .then(() => {
                                     map.olMap.on("moveend", () => {
-                                        const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), getViewpointSync(map).groundPosition);
+                                        const currentVp = getViewpointSync(map);
 
+                                        if (!currentVp?.groundPosition) {
+                                            return;
+                                        }
+                                        const transformedCoordinates = crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), currentVp.groundPosition),
+                                            isLargePositionChange = transformedCoordinates.some((coordinate, index) => Math.abs(coordinate - getters.lastCoordinates[index]) > 50);
+
+                                        if (headingToCardinal(currentVp.heading) !== headingToCardinal(getters.heading) && !isLargePositionChange) {
+                                            return;
+                                        }
                                         transformedCoordinates.every((coordinate, index) => {
                                             if (Math.round(coordinate) !== Math.round(getters.lastCoordinates[index]) && (coordinate - getters.lastCoordinates[index] > 50 || coordinate - getters.lastCoordinates[index] < -50)) {
                                                 dispatch("obliqueView", transformedCoordinates);
@@ -156,7 +191,8 @@ const actions = {
                         const heading = vp.heading,
                             coordinates = rootGetters["Maps/clickCoordinate"] || rootGetters["Maps/initialCenter"];
 
-                        if (heading !== getters.heading) {
+                        if (headingToCardinal(heading) !== headingToCardinal(getters.heading)) {
+                            commit("setLastCoordinates", crs.transform("EPSG:4326", mapCollection.getMapView("2D").getProjection().getCode(), vp.groundPosition));
                             dispatch("Maps/placingPointMarker", {rotation: heading, coordinates}, {root: true});
                         }
                         commit("setHeading", heading);
@@ -204,7 +240,8 @@ const actions = {
     * @param {Object} param.getters the getters
     * @returns {void}
     */
-    resetObliqueViewer ({dispatch, getters}) {
+    resetObliqueViewer ({commit, dispatch, getters}) {
+        commit("setCurrentImageName", "");
         const layer = mapMarker.getMapmarkerLayerById("marker_point_layer");
 
         if (layer) {
@@ -332,3 +369,4 @@ const actions = {
 };
 
 export default actions;
+export {headingToCardinal};

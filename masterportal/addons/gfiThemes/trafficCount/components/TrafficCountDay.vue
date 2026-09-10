@@ -1,7 +1,7 @@
 <script>
 import TrafficCountCompDiagram from "./TrafficCountCompDiagram.vue";
 import TrafficCountCompTable from "./TrafficCountCompTable.vue";
-import TrafficCountCheckbox from "./TrafficCountCheckbox.vue";
+import TrafficCountSwitch from "./TrafficCountSwitch.vue";
 import thousandsSeparator from "../../../../src/shared/js/utils/thousandsSeparator.js";
 import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
@@ -11,7 +11,6 @@ import "vue-datepicker-next/index.css";
 import {addMissingDataDay} from "../utils/addMissingData.js";
 import {getPublicHoliday} from "../../../../src/shared/js/utils/calendar.js";
 import {DauerzaehlstellenRadApi} from "../utils/dauerzaehlstellenRadApi.js";
-import {mapGetters, mapMutations} from "vuex";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
@@ -21,7 +20,7 @@ export default {
     components: {
         TrafficCountCompDiagram,
         TrafficCountCompTable,
-        TrafficCountCheckbox,
+        TrafficCountSwitch,
         DatePicker
     },
     props: {
@@ -46,10 +45,6 @@ export default {
             required: true
         },
         checkGurlittInsel: {
-            type: Boolean,
-            required: true
-        },
-        activeTab: {
             type: Boolean,
             required: true
         }
@@ -90,17 +85,14 @@ export default {
                     return meansOfTransports === "Anzahl_Schwerverkehr" ? "triangle" : "circle";
                 }
                 const pointStyle = [],
-                    format = "YYYY-MM-DD";
+                      format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (getPublicHoliday(datetime[i], this.holidays, format)) {
                         pointStyle.push("star");
                     }
-                    else if (meansOfTransports === "Anzahl_Schwerverkehr") {
-                        pointStyle.push("triangle");
-                    }
                     else {
-                        pointStyle.push("circle");
+                        pointStyle.push(false);
                     }
                 }
 
@@ -108,7 +100,7 @@ export default {
             },
             renderPointSize: (datetime) => {
                 const pointSize = [],
-                    format = "YYYY-MM-DD";
+                      format = "YYYY-MM-DD";
 
                 for (let i = 0; i < datetime.length; i++) {
                     if (getPublicHoliday(datetime[i], this.holidays, format)) {
@@ -147,11 +139,6 @@ export default {
             meansOfTransportKey: [this.meansOfTransport]
         };
     },
-    computed: {
-        ...mapGetters("Modules/TrafficCount", [
-            "activeTabId"
-        ])
-    },
     watch: {
         reset () {
             this.initializeDates();
@@ -161,20 +148,12 @@ export default {
                 this.dayDatepickerValueChanged(value);
             },
             deep: true
-        },
-        activeTab () {
-            if (this.activeTab && this.activeTabId !== "day") {
-                this.setActiveTabId("day");
-            }
         }
     },
     mounted () {
         this.initializeDates();
     },
     methods: {
-        ...mapMutations("Modules/TrafficCount", [
-            "setActiveTabId"
-        ]),
         /**
          * Initializes the calendar / resets the date.
          * @returns {void}
@@ -190,10 +169,10 @@ export default {
          */
         dayDatepickerValueChanged: function (dates) {
             const api = this.api,
-                thingId = this.thingId,
-                meansOfTransport = this.meansOfTransport,
-                timeSettings = [],
-                minutesForMissingData = api instanceof DauerzaehlstellenRadApi ? 60 : 15;
+                  thingId = this.thingId,
+                  meansOfTransport = this.meansOfTransport,
+                  timeSettings = [],
+                  minutesForMissingData = api instanceof DauerzaehlstellenRadApi ? 60 : 15;
 
             if (!Array.isArray(dates) || dates.length === 0) {
                 this.apiData = [];
@@ -265,8 +244,8 @@ export default {
                 return true;
             }
             const endDate = this.checkGurlittInsel ? dayjs().subtract(1, "day") : dayjs(),
-                startDate = dayjs().subtract(15, "day"),
-                question = dayjs(date);
+                  startDate = dayjs().subtract(15, "day"),
+                  question = dayjs(date);
 
             if (Array.isArray(currentDates) && currentDates.length >= 5) {
                 for (let i = 0; i < 5; i++) {
@@ -295,7 +274,7 @@ export default {
 </script>
 
 <template>
-    <div v-if="activeTab">
+    <div>
         <div
             id="dayDateSelector"
             class="dateSelector"
@@ -311,9 +290,32 @@ export default {
                 :disabled-date="isDateDisabled"
                 title-format="DD.MM.YYYY"
                 :lang="$t('common:libraries.vue-datepicker-next.lang', {returnObjects: true})"
-            />
+            >
+                <template #input="inputProps">
+                    <div
+                        :class="inputProps.class"
+                        class="mx-input wrap-input"
+                    >
+                        <template v-if="inputProps.value">
+                            {{ inputProps.value }}
+                        </template>
+                        <span
+                            v-else
+                            class="wrap-input-placeholder"
+                        >
+                            {{ inputProps.placeholder }}
+                        </span>
+                    </div>
+                </template>
+                <template #icon-calendar>
+                    <i class="bi bi-calendar4" />
+                </template>
+                <template #icon-clear>
+                    <i class="bi bi-x" />
+                </template>
+            </DatePicker>
         </div>
-        <TrafficCountCheckbox
+        <TrafficCountSwitch
             :current-means-of-transport="meansOfTransport"
             :last-means-of-transport-key="meansOfTransportKey"
             :table-diagram-id="diagramDay"
@@ -331,12 +333,11 @@ export default {
                 :render-label-legend="renderLabelLegend"
                 :render-point-style="renderPointStyle"
                 :render-point-size="renderPointSize"
-                :active-tab="activeTab"
                 :current-means-of-transport="meansOfTransport"
                 :means-of-transport-key="meansOfTransportKey"
             />
         </div>
-        <TrafficCountCheckbox
+        <TrafficCountSwitch
             :table-diagram-id="tableDay"
         />
         <div id="tableDay">
@@ -354,10 +355,3 @@ export default {
     </div>
 </template>
 
-<style lang="scss">
-#dayDateSelector {
-    .mx-input {
-        border-radius: 0px;
-    }
-}
-</style>

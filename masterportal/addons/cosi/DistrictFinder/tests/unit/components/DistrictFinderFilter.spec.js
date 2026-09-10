@@ -16,10 +16,6 @@ beforeAll(() => {
     sinon.stub(getMappingJsonJS, "getMappingJson").resolves([]);
 });
 
-afterAll(() => {
-    sinon.restore();
-});
-
 describe.skip("addons/cosi/DistrictFinder/components/DistrictFinderFilter.vue", () => {
     const store = new Vuex.Store({
             namespaced: true,
@@ -411,7 +407,6 @@ describe.skip("addons/cosi/DistrictFinder/components/DistrictFinderFilter.vue", 
                 await wrapper.vm.$nextTick();
                 expect(spyResetCardList.calledOnce).to.be.true;
                 expect(spyUpdateResultList.calledOnce).to.be.true;
-                sinon.restore();
             });
         });
 

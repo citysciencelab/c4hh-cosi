@@ -1,6 +1,7 @@
 <script>
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
-import {mapActions, mapMutations} from "vuex";
+import {mapActions} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 /**
  * Represents an sub menu button for a layer in the layertree.
@@ -22,7 +23,7 @@ export default {
 
         if (subMenuButton) {
             subMenuButton.addEventListener("show.bs.collapse", () => {
-            // call required functions to load meta data and get contact info from the meta data to be used in the contact button
+                // call required functions to load meta data and get contact info from the meta data to be used in the contact button
                 this.setLayerInfo(this.layerConf);
                 this.setMetadataURL(this.mdid);
                 this.additionalSingleLayerInfo();
@@ -30,8 +31,11 @@ export default {
         }
     },
     methods: {
-        ...mapActions("Modules/LayerInformation", ["setMetadataURL", "additionalSingleLayerInfo"]),
-        ...mapMutations("Modules/LayerInformation", ["setLayerInfo"])
+        ...mapActions(useLayerInformationStore, [
+            "setMetadataURL",
+            "additionalSingleLayerInfo",
+            "setLayerInfo"
+        ])
     }
 };
 </script>

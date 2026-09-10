@@ -1,14 +1,12 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import dayjs from "dayjs";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import sinon from "sinon";
 
 import SensorTheme from "@modules/getFeatureInfo/themes/sensor/components/SensorTheme.vue";
-import SensorChartsData from "@modules/getFeatureInfo/themes/sensor/components/SensorThemeData.vue";
-import SensorChartsBarChart from "@modules/getFeatureInfo/themes/sensor/components/SensorThemeBarChart.vue";
-
-config.global.mocks.$t = key => key;
+import SensorThemeData from "@modules/getFeatureInfo/themes/sensor/components/SensorThemeData.vue";
+import SensorThemeBarChart from "@modules/getFeatureInfo/themes/sensor/components/SensorThemeBarChart.vue";
 
 
 describe("src/modules/getFeatureInfo/themes/senor/components/SensorTheme.vue", () => {
@@ -181,7 +179,7 @@ describe("src/modules/getFeatureInfo/themes/senor/components/SensorTheme.vue", (
         expect(wrapper.find("div").classes("gfi-theme-sensor")).to.be.true;
     });
 
-    it("should render div > div with class 'sensor-text' if header is exists", () => {
+    it("should render div > div with class 'sensor-text' if header exists", () => {
         expect(wrapper.find("div > div").exists()).to.be.true;
         expect(wrapper.findAll("div > div")[1].classes("sensor-text")).to.be.true;
     });
@@ -192,23 +190,19 @@ describe("src/modules/getFeatureInfo/themes/senor/components/SensorTheme.vue", (
         expect(wrapper.findAll("div > div > strong")[2].text()).equals("common:modules.getFeatureInfo.themes.sensor.sensor.header.ownerThing: Eigentümer");
     });
 
-    it("should render a menulist (div > div > ul) with class 'nav nav-pills'", () => {
+    it("should render a menulist (div > div > ul) with class 'nav nav-tabs'", () => {
         expect(wrapper.find("div > div > ul").exists()).to.be.true;
-        expect(wrapper.find("div > div > ul").classes()).to.includes("nav", "nav-pills");
-    });
-
-    it("should render the data tab in menulist with class active by start", () => {
-        expect(wrapper.find("div > div > ul > li").exists()).to.be.true;
-        expect(wrapper.find("div > div > ul > li > a").classes("active")).to.be.true;
-        expect(wrapper.find("div > div > ul > li > a").text()).equals("common:modules.getFeatureInfo.themes.sensor.sensor.dataName");
+        expect(wrapper.find("div > div > ul").classes()).to.includes("nav", "nav-tabs");
     });
 
     it("should render the four tabs in menulist for chart values configured as array", () => {
-        expect(wrapper.findAll("div > div > ul > li > a").length).equals(4);
-        expect(wrapper.findAll("div > div > ul > li > a")[0].text()).equals("common:modules.getFeatureInfo.themes.sensor.sensor.dataName");
-        expect(wrapper.findAll("div > div > ul > li > a")[1].text()).equals("available");
-        expect(wrapper.findAll("div > div > ul > li > a")[2].text()).equals("charging");
-        expect(wrapper.findAll("div > div > ul > li > a")[3].text()).equals("outoforder");
+        const navTabs = wrapper.findAllComponents({name: "NavTab"});
+
+        expect(navTabs.length).equals(4);
+        expect(navTabs[0].props("label")).equals("common:modules.getFeatureInfo.themes.sensor.sensor.dataName");
+        expect(navTabs[1].props("label")).equals("available");
+        expect(navTabs[2].props("label")).equals("charging");
+        expect(navTabs[3].props("label")).equals("outoforder");
     });
 
     it("should render the 4 tabs in menulist for chart values and data configured as object", () => {
@@ -269,50 +263,64 @@ describe("src/modules/getFeatureInfo/themes/senor/components/SensorTheme.vue", (
             }
         });
 
-        expect(wrapper1.findAll("div > div > ul > li > a").length).equals(4);
-        expect(wrapper1.findAll("div > div > ul > li > a")[0].text()).equals("Daten");
-        expect(wrapper1.findAll("div > div > ul > li > a")[1].text()).equals("Verfügbar");
-        expect(wrapper1.findAll("div > div > ul > li > a")[2].text()).equals("Auslastung");
-        expect(wrapper1.findAll("div > div > ul > li > a")[3].text()).equals("Außer Betrieb");
+        const navTabs = wrapper1.findAllComponents({name: "NavTab"});
+
+        expect(navTabs.length).equals(4);
+        expect(navTabs[0].props("label")).equals("Daten");
+        expect(navTabs[1].props("label")).equals("Verfügbar");
+        expect(navTabs[2].props("label")).equals("Auslastung");
+        expect(navTabs[3].props("label")).equals("Außer Betrieb");
     });
 
-    it("should render 4 components => 1 SensorChartsData and 3 SensorChartsBarChart", () => {
-        expect(wrapper.findAllComponents(SensorChartsData).length).equals(1);
-        expect(wrapper.findAllComponents(SensorChartsBarChart).length).equals(3);
+    it("should render 4 components => 1 SensorThemeData and 3 SensorThemeBarChart", () => {
+        expect(wrapper.findAllComponents(SensorThemeData).length).equals(1);
+        expect(wrapper.findAllComponents(SensorThemeBarChart).length).equals(3);
     });
 
-    it("should only data tab is active and the other tabs disabled by default", () => {
-        expect(wrapper.findAll("div > div > ul > li")[0].find("a").classes("active")).to.be.true;
-        expect(wrapper.findAll("div > div > ul > li")[0].classes("disabled")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[1].find("a").classes("active")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[1].classes("disabled")).to.be.true;
-        expect(wrapper.findAll("div > div > ul > li")[2].find("a").classes("active")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[2].classes("disabled")).to.be.true;
-        expect(wrapper.findAll("div > div > ul > li")[3].find("a").classes("active")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[3].classes("disabled")).to.be.true;
+    it("should pass active=true only to the data tab by default", () => {
+        const navTabs = wrapper.findAllComponents({name: "NavTab"});
+
+        expect(navTabs[0].props("active")).to.be.true;
+        expect(navTabs[1].props("active")).to.be.false;
+        expect(navTabs[2].props("active")).to.be.false;
+        expect(navTabs[3].props("active")).to.be.false;
     });
 
-    it("should only data tab is active and the other tabs are not disabled if processedHistoricalDataByWeekday is not empty", async () => {
+    it("should pass disabled=true to chart tabs when no historical data is available", () => {
+        const navTabs = wrapper.findAllComponents({name: "NavTab"});
+
+        expect(navTabs[0].props("disabled")).to.be.false;
+        expect(navTabs[1].props("disabled")).to.be.true;
+        expect(navTabs[2].props("disabled")).to.be.true;
+        expect(navTabs[3].props("disabled")).to.be.true;
+    });
+
+    it("should pass disabled=false to chart tabs when historical data is loaded", async () => {
         await wrapper.setData({processedHistoricalDataByWeekday: [1, 2, 3]});
+        const navTabs = wrapper.findAllComponents({name: "NavTab"});
 
-        expect(wrapper.findAll("div > div > ul > li")[0].find("a").classes("active")).to.be.true;
-        expect(wrapper.findAll("div > div > ul > li")[0].classes("disabled")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[1].find("a").classes("active")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[1].classes("disabled")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[2].find("a").classes("active")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[2].classes("disabled")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[3].find("a").classes("active")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[3].classes("disabled")).to.be.false;
+        expect(navTabs[1].props("disabled")).to.be.false;
+        expect(navTabs[2].props("disabled")).to.be.false;
+        expect(navTabs[3].props("disabled")).to.be.false;
     });
 
-    it("should activate charging tab by click it", async () => {
+    it("should update activeTab to the chart index when a chart tab interaction is called", async () => {
+        await wrapper.setData({processedHistoricalDataByWeekday: [1, 2, 3]});
+        const navTabs = wrapper.findAllComponents({name: "NavTab"});
+
+        navTabs[2].props("interaction")();
         await wrapper.vm.$nextTick();
-        await wrapper.setData({processedHistoricalDataByWeekday: [1, 2, 3]});
-        await wrapper.findAll("div > div > ul > li > a")[2].trigger("click");
 
-        expect(wrapper.findAll("div > div > ul > li")[0].find("a").classes("active")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[1].find("a").classes("active")).to.be.false;
-        expect(wrapper.findAll("div > div > ul > li")[2].find("a").classes("active")).to.be.true;
-        expect(wrapper.findAll("div > div > ul > li")[3].find("a").classes("active")).to.be.false;
+        expect(wrapper.vm.activeTab).equals("1");
+    });
+
+    it("should set activeTab to 'data' when data tab interaction is called", async () => {
+        await wrapper.setData({activeTab: "1"});
+        const navTabs = wrapper.findAllComponents({name: "NavTab"});
+
+        navTabs[0].props("interaction")();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.vm.activeTab).equals("data");
     });
 });

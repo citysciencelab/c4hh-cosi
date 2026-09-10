@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import TiltView from "@modules/controls/tiltView/components/TiltView.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/controls/button3d/components/TiltView.vue", () => {
     let lookDownSpy,

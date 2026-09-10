@@ -1,10 +1,9 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
 import GeoAnalyze from "../../../components/GeoAnalyze.vue";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("addons/geoAnalyze/components/GeoAnalyze.vue", () => {
     let store,

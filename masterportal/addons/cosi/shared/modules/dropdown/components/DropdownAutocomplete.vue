@@ -169,13 +169,10 @@ export default {
                     close-icon="mdi-close"
                     @click="removeItem(item.value)"
                 >
-                    {{ item.value }}
+                    {{ item }}
                 </v-chip>
-                <span
-                    v-if="multiple && index === maxChipCount"
-                    class="grey--text text-caption"
-                >
-                    (+{{ modelValue.length - maxChipCount }} weitere)
+                <span v-if="multiple && index === maxChipCount">
+                    <small>(+{{ modelValue.length - maxChipCount }} weitere)</small>
                 </span>
             </template>
             <template #subheader="{props}">
@@ -216,38 +213,35 @@ export default {
         >
             <template
                 v-if="multiple"
-                #chip="{ item, index, props }"
+                #chip="{ internalItem, index, props }"
             >
                 <v-chip
                     v-if="index < maxChipCount"
                     v-bind="props"
                     closable
                     close-icon="mdi-close"
-                    @click="removeItem(item.value)"
+                    @click="removeItem(internalItem.value)"
                 >
-                    {{ item.value }}
+                    {{ internalItem.value }}
                 </v-chip>
-                <span
-                    v-if="multiple && index === maxChipCount"
-                    class="grey--text text-caption"
-                >
-                    (+{{ modelValue.length - maxChipCount }} weitere)
+                <span v-if="multiple && index === maxChipCount">
+                    <small>(+{{ modelValue.length - maxChipCount }} weitere)</small>
                 </span>
             </template>
-            <template #item="{ props, item }">
+            <template #item="{ props, internalItem }">
                 <v-list-subheader
-                    v-if="typeof item.raw.group !== 'undefined'"
+                    v-if="typeof internalItem.raw.group !== 'undefined'"
                     :class="[
                         'group-title',
-                        item.raw.level ? 'level-' + item.raw.level : ''
+                        internalItem.raw.level ? 'level-' + internalItem.raw.level : ''
                     ]"
                 >
-                    {{ item.raw.group }}
+                    {{ internalItem.raw.group }}
                 </v-list-subheader>
                 <v-list-item
                     v-else
                     v-bind="props"
-                    :title="item.raw.label"
+                    :title="internalItem.raw.label"
                     :class="multiple ? '' : 'pl-8'"
                 >
                     <template
@@ -281,6 +275,11 @@ export default {
         }
         .v-chip__underlay {
             background-color: unset;
+        }
+        .v-chip__close {
+            i {
+                font-size: 1rem;
+            }
         }
         .v-field__outline {
             --v-field-border-width: 0;
