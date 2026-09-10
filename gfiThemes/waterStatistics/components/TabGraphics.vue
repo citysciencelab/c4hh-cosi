@@ -406,12 +406,20 @@ export default {
                         },
                         ticks: {
                             precision: 2,
-                            stepSize: this.stepSizeRight,
                             callback: function (value) {
                                 const decimal = deltaRight < 10 ? 2 : 1;
 
-                                return thousandsSeparator(value.toFixed(decimal));
+                                return value ? thousandsSeparator(value.toFixed(decimal)) : 0;
                             }
+                        },
+                        afterBuildTicks: (scale) => {
+                            scale.ticks = [];
+
+                            scale.chart.scales.y.ticks.forEach((tick) => {
+                                scale.ticks.push({
+                                    value: this.applyRightAxisTransform(tick.value)
+                                });
+                            });
                         }
                     }
                 }
