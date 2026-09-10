@@ -49,6 +49,17 @@ UPSTREAM = {
     "rest": "https://geodienste.hamburg.de/lgv-config/rest-services-internet.json",
 }
 
+# The metadata host ``hmdk.metaver.de`` answers 403 on EVERY path (whole vhost,
+# not just /csw) since ~2026-09, which makes the layer info panel report "Es
+# konnten keine Metadaten geladen werden!" and, in the browser console, a CORS
+# error -- the 403 page simply carries no Access-Control-Allow-Origin. Plain
+# ``metaver.de`` serves the same records with ``Access-Control-Allow-Origin: *``,
+# and most upstream entries already use it. Upstream still ships the dead host
+# for a minority of layers, so rewrite it on the way out; otherwise every
+# regeneration silently reintroduces layers with unreachable metadata.
+DEAD_METADATA_HOST = "hmdk.metaver.de"
+METADATA_HOST = "metaver.de"
+
 
 def fetch(name, url, refresh):
     """Download an upstream registry (cached). Returns parsed JSON (BOM-tolerant)."""
@@ -93,6 +104,40 @@ def referenced_layer_ids(config):
     return refs
 
 
+def normalize_metadata_hosts(entries):
+    """Rewrite DEAD_METADATA_HOST to METADATA_HOST in every string, in place.
+
+    Covers ``csw_url`` / ``show_doc_url`` and anything else the registries carry;
+    a bare host swap is enough, both ``/trefferanzeige`` query forms answer 200.
+    Returns the number of strings changed.
+    """
+    changed = 0
+
+    def swap(val):
+        nonlocal changed
+        changed += 1
+        return val.replace(DEAD_METADATA_HOST, METADATA_HOST)
+
+    def walk(node):
+        if isinstance(node, dict):
+            for key, val in node.items():
+                if isinstance(val, str):
+                    if DEAD_METADATA_HOST in val:
+                        node[key] = swap(val)
+                else:
+                    walk(val)
+        elif isinstance(node, list):
+            for idx, val in enumerate(node):
+                if isinstance(val, str):
+                    if DEAD_METADATA_HOST in val:
+                        node[idx] = swap(val)
+                else:
+                    walk(val)
+
+    walk(entries)
+    return changed
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--refresh", action="store_true", help="re-download upstream registries")
@@ -131,6 +176,8 @@ def main():
         "typ": "Valhalla",
     })
 
+    metadata_fixes = normalize_metadata_hosts(services_out) + normalize_metadata_hosts(rest_out)
+
     (PORTAL_DIR / "services.json").write_text(
         json.dumps(services_out, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     (PORTAL_DIR / "rest-services.json").write_text(
@@ -145,6 +192,8 @@ def main():
         print(f"local-services.json: {len(used)} merged {used}"
               + (f"; not referenced by config.json: {unused}" if unused else ""))
     print(f"rest-services.json: {len(rest_out)} entries (incl. valhalla -> {args.valhalla_url})")
+    print(f"metadata hosts:     {metadata_fixes} url(s) rewritten "
+          f"{DEAD_METADATA_HOST} -> {METADATA_HOST}")
     print(f"\nreferenced but NOT in public registry — omitted ({len(not_public)}):")
     print("  " + ", ".join(not_public))
     print("\n(These FHHNET-only / retired layers should also be pruned from config.json's "
