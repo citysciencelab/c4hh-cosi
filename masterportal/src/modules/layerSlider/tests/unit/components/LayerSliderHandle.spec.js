@@ -1,10 +1,9 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import LayerSliderHandleComponent from "@modules/layerSlider/components/LayerSliderHandle.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/layerSlider/components/LayerSliderHandle.vue", () => {
     const layerIds = [

@@ -1,9 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/components/FlatButton.vue", () => {
 

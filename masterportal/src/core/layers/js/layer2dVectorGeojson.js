@@ -1,3 +1,4 @@
+import Cluster from "ol/source/Cluster.js";
 import {geojson} from "@masterportal/masterportalapi/src/index.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createStyle.js";
@@ -197,3 +198,25 @@ function getLegendKeyFromRule (rule) {
     }
     return Object.values(condProps).map(value => String(value)).join(", ");
 }
+
+/**
+ * Creates and starts an interval to refresh the layer.
+ * @param {Number} autoRefresh The interval in milliseconds.
+ * @returns {void}
+ */
+Layer2dVectorGeojson.prototype.startAutoRefresh = function (autoRefresh) {
+    this.setIntervalAutoRefresh(setInterval(() => {
+        const layerSource = this.getLayerSource() instanceof Cluster ? this.getLayerSource()?.getSource() : this.getLayerSource();
+
+        if (!layerSource) {
+            return;
+        }
+        this.prepareLayerSourceForRefresh(layerSource);
+
+        layerSource.once("featuresloadend", () => {
+            this.afterLoading(this.attributes, this.layer?.getSource?.()?.getFeatures?.());
+            this.autoRefreshObserver.forEach(callback => callback());
+        });
+        layerSource.refresh();
+    }, autoRefresh));
+};

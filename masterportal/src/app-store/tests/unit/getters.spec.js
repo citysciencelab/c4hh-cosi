@@ -574,6 +574,19 @@ describe("src/app-store/getters.js", () => {
                 {
                     type: "draw"
                 }
+            ],
+            section3 = [
+                {
+                    type: "folder",
+                    elements: [
+                        {
+                            type: "templateAdmin"
+                        },
+                        {
+                            type: "templateManager"
+                        }
+                    ]
+                }
             ];
 
         beforeEach(() => {
@@ -585,7 +598,9 @@ describe("src/app-store/getters.js", () => {
                     },
                     sections: []
                 },
-                secondaryMenu: {}
+                secondaryMenu: {
+                    sections: []
+                }
             };
             myGetters = {
                 menuFromConfig: (menuName) => portalConfig[menuName],
@@ -614,6 +629,20 @@ describe("src/app-store/getters.js", () => {
             expect(getters.configuredModules(null, myGetters)[3].type).to.be.equals("language");
             expect(getters.configuredModules(null, myGetters)[4].type).to.be.equals("print");
             expect(getters.configuredModules(null, myGetters)[5].type).to.be.equals("draw");
+        });
+        it("configuredModules mainMenu with 2 sections and secondary menu with 1 section containing of folder", () => {
+            portalConfig.mainMenu.sections.push(section1);
+            portalConfig.mainMenu.sections.push(section2);
+            portalConfig.secondaryMenu.sections.push(section3);
+            expect(getters.configuredModules(null, myGetters).length).to.be.equals(8);
+            expect(getters.configuredModules(null, myGetters)[0].type).to.be.equals("fileImport");
+            expect(getters.configuredModules(null, myGetters)[1].type).to.be.equals("openConfig");
+            expect(getters.configuredModules(null, myGetters)[2].type).to.be.equals("contact");
+            expect(getters.configuredModules(null, myGetters)[3].type).to.be.equals("language");
+            expect(getters.configuredModules(null, myGetters)[4].type).to.be.equals("print");
+            expect(getters.configuredModules(null, myGetters)[5].type).to.be.equals("draw");
+            expect(getters.configuredModules(null, myGetters)[6].type).to.be.equals("templateAdmin");
+            expect(getters.configuredModules(null, myGetters)[7].type).to.be.equals("templateManager");
         });
         it("configuredModules mainMenu with 2 sections and secondary menu with one section", () => {
             portalConfig.mainMenu.sections.push(section1);

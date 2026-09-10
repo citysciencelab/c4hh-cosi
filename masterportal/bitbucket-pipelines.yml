@@ -37,10 +37,7 @@ pipelines:
                         - apt-get update && apt-get install zip && apt-get install -y curl wput jq  && apt-get install zip
                         - pip install -r devtools/docsValidation/python-dependencies.txt
                         - mkdir -p docs/_snippets
-                        - printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md
-                        - git add docs/_snippets/index_title.md
-                        - 'git commit -m "docs: update mkdocs title snippet for $BITBUCKET_TAG" || echo "No changes to commit"'
-                        - git push origin HEAD
+                        - RELEASE_VERSION="${BITBUCKET_TAG#v}" && if grep -q "^## .* v${RELEASE_VERSION}.*LTS.*$" CHANGELOG.md 2>/dev/null; then printf '# Welcome to the Masterportal Documentation (%s (lts))\n' "$RELEASE_VERSION" > docs/_snippets/index_title.md; else printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md; fi
                         - mike deploy $BITBUCKET_TAG
                         - mv $BITBUCKET_CLONE_DIR/site $BITBUCKET_CLONE_DIR/$BITBUCKET_TAG
                         -   pipe: atlassian/ftp-deploy:0.7.1
@@ -52,6 +49,15 @@ pipelines:
                                 LOCAL_PATH: $BITBUCKET_CLONE_DIR/$BITBUCKET_TAG
                                 DEBUG: 'true'
                                 DELETE_FLAG: 'false'
+                        - RELEASE_VERSION="${BITBUCKET_TAG#v}"
+                        - CHANGELOG_RELEASE_HEADER="$(grep -m1 -E "^## .* v${RELEASE_VERSION}( \(LTS\))?$" CHANGELOG.md || true)"
+                        - if [ -z "$CHANGELOG_RELEASE_HEADER" ]; then echo "Could not find release headline for $BITBUCKET_TAG in CHANGELOG.md." && exit 1; fi
+                        - IS_RELEASE_LTS="false"
+                        - if echo "$CHANGELOG_RELEASE_HEADER" | grep -q ' (LTS)$'; then IS_RELEASE_LTS="true"; fi
+                        - RELEASE_PATCH="${RELEASE_VERSION##*.}"
+                        - IS_LTS_HOTFIX="false"
+                        - if [ "$IS_RELEASE_LTS" = "true" ] && [ "$RELEASE_PATCH" != "0" ]; then IS_LTS_HOTFIX="true"; fi
+                        - if [ "$IS_LTS_HOTFIX" = "true" ]; then echo "LTS hotfix detected for $BITBUCKET_TAG - skip Latest docs upload." && exit 0; fi
                         - mv $BITBUCKET_CLONE_DIR/$BITBUCKET_TAG $BITBUCKET_CLONE_DIR/Latest
                         -   pipe: atlassian/ftp-deploy:0.7.1
                             variables:
@@ -88,15 +94,17 @@ pipelines:
                             - echo 'remove lts tag in openCode'
                             - git fetch --all --tags
                             - git checkout tags/lts
-                            - git push --delete https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git lts
-                            - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
-                            - cd masterportal
-                            - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
+                            - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git :refs/tags/lts
 
-                            - echo 'deploy lts to openCode'
+                            - echo 'delete lts branch in openCode'
+                            - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git --delete refs/heads/lts
+
+                            - echo 'deploy lts tag to openCode'
                             - git fetch --all --tags
                             - git checkout tags/lts
-                            - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git lts
+                            - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git refs/tags/lts
+                            
+                            - echo 'create lts branch from lts tag and transfer it to openCode'
                             - git clone --single-branch --branch lts https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
                             - cd masterportal
                             - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git HEAD:refs/heads/lts -f
@@ -109,6 +117,28 @@ pipelines:
                     script:
                         - npm install
                         - npm audit --json
+        osv scan (security):
+            -   step:
+                    name: OSV scan + create Jira ticket (security)
+                    caches:
+                        - node
+                    script:
+                        - npm install
+                        - curl -sSL -o /usr/local/bin/osv-scanner https://github.com/google/osv-scanner/releases/latest/download/osv-scanner_linux_amd64
+                        - chmod +x /usr/local/bin/osv-scanner
+                        - /usr/local/bin/osv-scanner scan -r . --format json > osv-result.json || true
+                        - node -e "const r=require('./osv-result.json'); console.log('OSV scan finished'); console.log('Results:', r.results?.length || 0);"
+                        - export JIRA_PROJECT_KEY="BG"
+                        - export JIRA_BASE_URL="https://lgv-hamburg.atlassian.net"
+                        - export JIRA_ISSUE_TYPE="Task"
+                        - export JIRA_USER_EMAIL="geodatenanwendungen@gv.hamburg.de"
+                        - echo 'JIRA_PROJECT_KEY='$JIRA_PROJECT_KEY
+                        - echo 'JIRA_BASE_URL='$JIRA_BASE_URL
+                        - echo 'JIRA_ISSUE_TYPE='$JIRA_ISSUE_TYPE
+                        - echo 'JIRA_USER_EMAIL='$JIRA_USER_EMAIL
+                        - node devtools/security/createJiraTicketFromOsv.mjs
+                    artifacts:
+                        - osv-result.json
         deploy tag on openCode:
             - variables:
                 - name: BITBUCKET_TAG
@@ -140,9 +170,6 @@ pipelines:
                         - git checkout tags/$BITBUCKET_TAG
                         - mkdir -p docs/_snippets
                         - printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md
-                        - git add docs/_snippets/index_title.md
-                        - 'git commit -m "docs: update mkdocs title snippet for $BITBUCKET_TAG" || echo "No changes to commit"'
-                        - git push origin HEAD
                         - mike deploy $BITBUCKET_TAG
                         - mv $BITBUCKET_CLONE_DIR/site $BITBUCKET_CLONE_DIR/$BITBUCKET_TAG
                         -   pipe: atlassian/ftp-deploy:0.7.1
@@ -170,9 +197,6 @@ pipelines:
                         - git checkout tags/$BITBUCKET_TAG
                         - mkdir -p docs/_snippets
                         - printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md
-                        - git add docs/_snippets/index_title.md
-                        - 'git commit -m "docs: update mkdocs title snippet for $BITBUCKET_TAG" || echo "No changes to commit"'
-                        - git push origin HEAD
                         - mike deploy $BITBUCKET_TAG
                         - mv $BITBUCKET_CLONE_DIR/site $BITBUCKET_CLONE_DIR/Latest
                         -   pipe: atlassian/ftp-deploy:0.7.1
@@ -211,9 +235,6 @@ pipelines:
                         - git checkout tags/$BITBUCKET_TAG
                         - mkdir -p docs/_snippets
                         - printf '# Welcome to the Masterportal Documentation (%s)\n' "$BITBUCKET_TAG" > docs/_snippets/index_title.md
-                        - git add docs/_snippets/index_title.md
-                        - 'git commit -m "docs: update mkdocs title snippet for $BITBUCKET_TAG" || echo "No changes to commit"'
-                        - git push origin HEAD
                         - mike deploy $BITBUCKET_TAG
                         - zip -r masterportal_docs.zip /opt/atlassian/pipelines/agent/build/site
                         - curl -X POST --user "$bbapi_name:$bbapi_key" "https://api.bitbucket.org/2.0/repositories/geowerkstatt-hamburg/masterportal/downloads/" --form files=@"masterportal_docs.zip" --verbose;
@@ -238,14 +259,27 @@ pipelines:
                         - for zipFilePath in $(find dist -name \*.zip); do
                             curl -X POST --user "$bbapi_name:$bbapi_key" "https://api.bitbucket.org/2.0/repositories/geowerkstatt-hamburg/masterportal/downloads" --form files=@"$zipFilePath" --verbose;
                             done
-        deploy lts tag to openCode:
+        deploy tag and branch with same name to openCode:
+            - variables:
+                    - name: BITBUCKET_TAG        
+            -   step:
+                    name: 'deploy tag to openCode'
+                    script:
+                        - echo 'deploy tag to openCode:'$BITBUCKET_TAG
+                        - git fetch --all --tags
+                        - git checkout tags/$BITBUCKET_TAG
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git refs/tags/$BITBUCKET_TAG
+                        - git clone --single-branch --branch lts https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
+                        - cd masterportal
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git HEAD:refs/heads/$BITBUCKET_TAG -f
+        deploy lts tag and lts branch to openCode:
             -   step:
                     name: deploy lts tag to openCode
                     script:
                         - echo 'deploy lts tag to openCode'
                         - git fetch --all --tags
                         - git checkout tags/lts
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git lts
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git refs/tags/lts
                         - git clone --single-branch --branch lts https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
                         - cd masterportal
                         - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git HEAD:refs/heads/lts -f
@@ -255,10 +289,15 @@ pipelines:
             -   step:
                     name: remove tag in openCode
                     script:
-                        - echo 'remove tag in openCodeL:'$BITBUCKET_TAG
+                        - echo 'remove tag in openCode:'$BITBUCKET_TAG
                         - git fetch --all --tags
                         - git checkout tags/$BITBUCKET_TAG
-                        - git push --delete https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git $BITBUCKET_TAG
-                        - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
-                        - cd masterportal
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git :refs/tags/$BITBUCKET_TAG
+        delete branch in openCode:
+            - variables:
+                    - name: BRANCH_NAME
+            -   step:
+                    name: delete branch in openCode
+                    script:
+                        - echo 'delete branch in openCode:'$BRANCH_NAME
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git --delete refs/heads/$BRANCH_NAME

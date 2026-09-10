@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import SnippetDate from "@modules/filter/components/SnippetDate.vue";
 import {expect} from "chai";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/generalFilter/components/SnippetDate.vue", () => {
     describe("constructor", () => {

@@ -285,7 +285,8 @@
       "contactName": "Имя",
       "contactPhone": "Тел.",
       "contactEmail": "E-mail",
-      "wait": "Пожалуйста, подождите"
+      "wait": "Пожалуйста, подождите",
+      "license": "Лицензия"
     },
     "draw": {
       "description": "Создавайте важные отметки или обозначайте области",
@@ -633,6 +634,7 @@
       "addressSuffix": "Адрес",
       "addressSuffixes": "Адреса слоёв",
       "attachFileMessage": "При необходимости прикрепить тип файла при загрузке",
+      "creationDate": "Создание",
       "downloadDataset": "Скачать набор данных",
       "lastModified": "Последнее изменение",
       "legend": "Легенда",
@@ -640,7 +642,7 @@
       "noMetadataLoaded": "Не удалось загрузить метаданные!",
       "noMetadataLoadedConsole": "Метаданные для этого слоя не удалось получить. Это указывает на проблему с подключённым файлом services.json.",
       "periodicityTitle": "Обновление данных",
-      "publicationCreation": "Публикация / создание",
+      "publicationDate": "Публикация",
       "pointOfContact": "Контактное лицо",
       "contactInfoMessage": "Написать контактному лицу темы ",
       "contactPublisher": "Написать контактному лицу ",

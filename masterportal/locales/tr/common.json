@@ -285,7 +285,8 @@
       "contactName": "İsim",
       "contactPhone": "Tel.",
       "contactEmail": "E-posta",
-      "wait": "Lütfen bekleyin"
+      "wait": "Lütfen bekleyin",
+      "license": "Lisans"
     },
     "draw": {
       "description": "Önemli işaretlemeler oluşturun veya alanları işaretleyin",
@@ -633,6 +634,7 @@
       "addressSuffix": "Adres",
       "addressSuffixes": "Katman adresleri",
       "attachFileMessage": "İndirme sırasında gerekirse dosya türünü ekleyin",
+      "creationDate": "Oluşturma",
       "downloadDataset": "Veri setini indir",
       "lastModified": "Son değişiklik",
       "legend": "Lejant",
@@ -640,7 +642,7 @@
       "noMetadataLoaded": "Meta veriler yüklenemedi!",
       "noMetadataLoadedConsole": "Bu katman için meta veriler alınamadı. Bu durum, entegre edilen services.json dosyasıyla ilgili bir soruna işaret ediyor.",
       "periodicityTitle": "Veri güncellemesi",
-      "publicationCreation": "Yayın / oluşturma",
+      "publicationDate": "Yayın",
       "pointOfContact": "İrtibat kişisi",
       "contactInfoMessage": "Konu sorumlusuna yazın ",
       "contactPublisher": "Sorumlu kişiye yazın ",

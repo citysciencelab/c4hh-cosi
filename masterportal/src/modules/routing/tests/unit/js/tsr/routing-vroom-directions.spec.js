@@ -5,6 +5,8 @@ import sinon from "sinon";
 import {fetchTSRDirections} from "@modules/routing/js/tsr/routing-vroom-directions.js";
 
 describe("src/modules/routing/js/tsr/routing-vroom-directions.js", () => {
+    const originStoreGetter = store.getters;
+
     beforeEach(() => {
         sinon.stub(i18next, "t").callsFake((...args) => args);
         store.getters = {
@@ -14,6 +16,9 @@ describe("src/modules/routing/js/tsr/routing-vroom-directions.js", () => {
         };
     });
 
+    afterEach(() => {
+        store.getters = originStoreGetter;
+    });
 
     describe("should fetchRoutingvroomDirections", () => {
         it("should process result correct", async () => {

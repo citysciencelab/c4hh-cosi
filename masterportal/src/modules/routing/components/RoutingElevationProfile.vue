@@ -78,9 +78,10 @@ export default {
         /**
          * Draws chart in canvas
          * @param {Object} canvas element to draw chart inside
+         * @param {Function} [ChartConstructor=Chart] Chart constructor to use; defaults to the imported Chart class. Override in tests to inject a spy.
          * @returns {void}
          */
-        drawChart (canvas) {
+        drawChart (canvas, ChartConstructor = Chart) {
             // create chart for elevation profile
             let borderColor = "",
                 backgroundColor = "";
@@ -93,7 +94,7 @@ export default {
                 borderColor = this.tsrSettings.styleElevationProfile.profileColor;
                 backgroundColor = this.tsrSettings.styleElevationProfile.profileFillColor;
             }
-            const chart = new Chart(canvas, {
+            const chart = new ChartConstructor(canvas, {
                 type: "line",
                 data: {
                     labels: this.distances,
@@ -187,7 +188,7 @@ export default {
             // add current elevation point in route while hovering over corresponding data
             if (hoverData.length) {
                 const index = hoverData[0].index,
-                    point = this.directions.lineString[index];
+                      point = this.directions.lineString[index];
 
                 if (source.getFeatures().length === 0) {
                     const feature = new Feature({
@@ -217,8 +218,8 @@ export default {
             }
             if (chart.tooltip?._active?.length) {
                 const x = chart.tooltip._active[0].element.x,
-                    yAxis = chart.scales.y,
-                    ctx = chart.ctx;
+                      yAxis = chart.scales.y,
+                      ctx = chart.ctx;
 
                 ctx.save();
                 ctx.beginPath();

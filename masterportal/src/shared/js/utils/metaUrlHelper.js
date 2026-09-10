@@ -20,6 +20,9 @@ export function buildMetaURLs (metaId, {layerInfo, metaDataCatalogueId, restServ
     if (layerInfo?.showDocUrl) {
         metaURL = layerInfo.showDocUrl + metaId;
     }
+    else if (layerInfo?.isExternal) {
+        return metaURLs;
+    }
     else if (typeof restServiceById === "function" && metaDataCatalogueId) {
         service = restServiceById(metaDataCatalogueId);
         if (service) {

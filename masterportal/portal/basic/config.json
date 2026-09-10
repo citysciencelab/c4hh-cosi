@@ -346,6 +346,18 @@
           "searchField": [
             "schulname",
             "fremdsprache"
+          ],
+           "datasets": [
+            {
+            "customMetadata": true,
+            "xmd_id": "82c501bc-5a4e-40d5-be55-7e89dbbfbmay",
+            "csw_url": "./resources/metadata/csw.xml",
+            "md_name": "custom metadata example",
+            "attributes":
+            {
+              "Original-Titel über customMetadata": "GetRecordByIdResponse.MD_Metadata.identificationInfo.MD_DataIdentification.citation.CI_Citation.title.CharacterString"
+            }
+          }
           ]
         },
         {

@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import drawInteraction from "@masterportal/masterportalapi/src/maps/interactions/drawInteraction.js";
 import {expect} from "chai";
 import sinon from "sinon";
@@ -7,7 +7,6 @@ import VectorSource from "ol/source/Vector.js";
 
 import DrawTypesComponent from "@shared/modules/draw/components/DrawTypes.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/draw/components/DrawTypes.vue", () => {
     let addInteractionSpy,

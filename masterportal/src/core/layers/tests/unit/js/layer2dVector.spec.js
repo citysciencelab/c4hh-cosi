@@ -1,5 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
+import axios from "axios";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createStyle.js";
 import getGeometryTypeFromService from "@masterportal/masterportalapi/src/vectorStyle/lib/getGeometryTypeFromService.js";
@@ -59,6 +60,32 @@ describe("src/core/js/layers/layer2dVector.js", () => {
 
             expect(layerWrapper).not.to.be.undefined;
             expect(warn.calledOnce).to.be.true;
+        });
+    });
+    describe("addErrorListener", () => {
+        it("registers and executes the featuresloaderror handler", async () => {
+            const listeners = {},
+                layerWrapper = new Layer2dVector({
+                    name: "TestLayer",
+                    typ: "GeoJSON",
+                    url: "https://example.com/service?foo=bar",
+                    version: "2.0.0"
+                }),
+                layerSource = {
+                    on: sinon.stub().callsFake((eventName, handler) => {
+                        listeners[eventName] = handler;
+                    })
+                },
+                errorHandlingSpy = sinon.stub(layerWrapper, "errorHandling");
+
+            sinon.stub(axios, "get").resolves({status: 500});
+
+            layerWrapper.addErrorListener(layerSource);
+            await listeners.featuresloaderror();
+
+            expect(layerSource.on.callCount).to.equal(3);
+            expect(listeners.featuresloaderror).to.be.a("function");
+            expect(errorHandlingSpy.calledOnceWithExactly(500, "TestLayer")).to.be.true;
         });
     });
     describe("updateLayerValues", () => {
@@ -350,6 +377,17 @@ describe("src/core/js/layers/layer2dVector.js", () => {
     });
 
     describe("style funtions", () => {
+        it("initStyle shall not be called on creation if dontInitStyle=true", function () {
+            const initStyleSpy = sinon.spy(Layer2dVector.prototype, "initStyle");
+
+            store.getters = {
+                styleListLoaded: true
+            };
+            new Layer2dVector({...attributes, styleId: "styleId", dontInitStyle: true});
+
+            expect(initStyleSpy.notCalled).to.be.true;
+        });
+
         it("initStyle shall be called on creation and call createStyle if styleListLoaded=true", function () {
             const createStyleSpy = sinon.spy(Layer2dVector.prototype, "createStyle");
 

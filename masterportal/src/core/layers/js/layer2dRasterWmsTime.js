@@ -1,5 +1,6 @@
 import Layer2dRaster from "./layer2dRaster.js";
 import WMSLayer from "./layer2dRasterWms.js";
+import layerCollection from "./layerCollection.js";
 import store from "@appstore/index.js";
 import handleAxiosResponse from "@shared/js/utils/handleAxiosResponse.js";
 import detectIso8601Precision from "@shared/js/utils/detectIso8601Precision.js";
@@ -10,6 +11,54 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
+
+/**
+ * Returns a layer config by id from root getters.
+ * @param {String} layerId The layer id.
+ * @returns {Object|undefined} Layer config or undefined.
+ */
+function getLayerConfigById (layerId) {
+    return store.getters.layerConfigById?.(layerId);
+}
+
+/**
+ * Resolves a robust TIME dimension name and value from layer params.
+ * @param {Object} layer Layer model.
+ * @param {String} configuredDimensionName Preferred configured time dimension.
+ * @param {String} fallbackValue Fallback value if params have no time value.
+ * @returns {Object} Resolved dimensionName and value.
+ */
+function resolveTimeValueForLayer (layer, configuredDimensionName, fallbackValue) {
+    const params = layer?.getLayerSource?.().getParams?.() || {},
+        dimensionName = configuredDimensionName
+            || Object.keys(params).find(key => key.toLowerCase() === "time")
+            || "TIME",
+        possibleKeys = [dimensionName, dimensionName?.toUpperCase(), dimensionName?.toLowerCase(), "TIME", "time"],
+        foundKey = possibleKeys.find(key => key in params),
+        value = foundKey ? params[foundKey] : fallbackValue;
+
+    return {dimensionName, value};
+}
+
+
+/**
+ * Activates TimeSlider for a layer and optionally updates its default value.
+ * @param {String} layerId The active layer id for TimeSlider.
+ * @param {Object} config Layer config for playback settings.
+ * @param {String} dimensionValue Optional default time value.
+ * @returns {void}
+ */
+function activateTimeSlider (layerId, config, dimensionValue) {
+    store.commit("Modules/WmsTime/setTimeSliderActive", {
+        active: true,
+        currentLayerId: layerId,
+        playbackDelay: config?.time?.playbackDelay || 1
+    });
+    store.commit("Modules/WmsTime/setVisibility", true);
+    if (dimensionValue) {
+        store.commit("Modules/WmsTime/setTimeSliderDefaultValue", dimensionValue);
+    }
+}
 
 /**
  * Creates a 2d raster layer of type WMSTime.
@@ -486,21 +535,150 @@ Layer2dRasterWmsTimeLayer.prototype.prepareTimeSliderObject = function (time, fi
  * @returns {void}
  */
 Layer2dRasterWmsTimeLayer.prototype.removeLayer = function (layerId) {
-    // If the swiper is active, two WMS-T are currently active
-    if (store.getters["Modules/WmsTime/timeSlider"].active) {
-        if (!layerId.endsWith(store.getters["Modules/WmsTime/layerAppendix"])) {
-            store.dispatch("replaceByIdInLayerConfig", {layerConfigs: [{
-                id: layerId,
-                layer: {
-                    visibility: true,
-                    showInLayerTree: true
+    if (store.getters["Modules/LayerSwiper/active"]) {
+        const layerAppendix = store.getters["Modules/WmsTime/layerAppendix"],
+            isSecondLayer = layerId.endsWith(layerAppendix),
+            remainingLayerId = isSecondLayer ? layerId.replace(layerAppendix, "") : layerId + layerAppendix,
+            remainingLayerConfig = getLayerConfigById(remainingLayerId),
+            remainingLayer = layerCollection.getLayerById(remainingLayerId),
+            timeSlider = store.getters["Modules/WmsTime/timeSlider"] || {},
+            timeSliderObjects = Array.isArray(timeSlider.objects) ? timeSlider.objects : [],
+            currentTimeSliderObject = timeSliderObjects.find(obj => obj.layerId === timeSlider.currentLayerId),
+            remainingTimeSliderObject = timeSliderObjects.find(obj => obj.layerId === remainingLayerId),
+            configuredDimensionName = store.getters["Modules/WmsTime/defaultDimensionName"],
+            {dimensionName: effectiveDimensionName, value: remainingDimensionValue} = resolveTimeValueForLayer(
+                remainingLayer,
+                configuredDimensionName,
+                remainingTimeSliderObject?.defaultValue
+                ?? currentTimeSliderObject?.defaultValue
+            ),
+            shouldKeepRemainingLayer = remainingLayerConfig?.visibility !== false;
+
+        if (shouldKeepRemainingLayer) {
+            if (isSecondLayer) {
+                store.dispatch("replaceByIdInLayerConfig", {
+                    layerConfigs: [{
+                        id: layerId,
+                        layer: {
+                            id: layerId,
+                            visibility: false,
+                            showInLayerTree: false
+                        }
+                    }]
+                });
+            }
+            else {
+                const baseLayer = layerCollection.getLayerById(layerId);
+
+                store.dispatch("replaceByIdInLayerConfig", {
+                    layerConfigs: [
+                        {id: layerId, layer: {id: layerId, visibility: true, showInLayerTree: true, zIndex: remainingLayerConfig?.zIndex}},
+                        {id: remainingLayerId, layer: {id: remainingLayerId, visibility: false, showInLayerTree: false}}
+                    ]
+                });
+                if (remainingDimensionValue) {
+                    baseLayer?.updateTime?.(layerId, effectiveDimensionName, remainingDimensionValue);
                 }
-            }]});
+            }
+
+            activateTimeSlider(
+                isSecondLayer ? remainingLayerId : layerId,
+                remainingLayerConfig,
+                remainingDimensionValue
+            );
         }
-        store.dispatch("Modules/WmsTime/toggleSwiper", layerId);
+
+        store.dispatch("Modules/WmsTime/deactivateLayerSwiper");
     }
     else {
         store.commit("Modules/WmsTime/setTimeSliderActive", {active: false, currentLayerId: ""});
+    }
+};
+
+/**
+ * Reacts to visibility changes from layerConfig updates (e.g. topic tree toggles).
+ * In active compare mode this delegates removal handling to removeLayer.
+ * @param {Boolean} newValue true if layer is visible
+ * @returns {void}
+ */
+Layer2dRasterWmsTimeLayer.prototype.visibilityChanged = function (newValue) {
+    const layerId = this.get("id"),
+        layerAppendix = store.getters["Modules/WmsTime/layerAppendix"] || "_secondLayer",
+        layerConfig = getLayerConfigById(layerId),
+        isSecondLayer = layerId.endsWith(layerAppendix),
+        remainingLayerId = isSecondLayer ? layerId.replace(layerAppendix, "") : layerId + layerAppendix,
+        remainingLayerConfig = getLayerConfigById(remainingLayerId),
+        shouldReactivateCompare = newValue === true
+            && !store.getters["Modules/LayerSwiper/active"]
+            && layerConfig?.visibility === true
+            && remainingLayerConfig?.visibility === true
+            && layerConfig?.showInLayerTree === true
+            && remainingLayerConfig?.showInLayerTree === true;
+
+    if (newValue === false && store.getters["Modules/LayerSwiper/active"]) {
+        if (layerConfig?.showInLayerTree === false || typeof layerConfig === "undefined") {
+            this.removeLayer(layerId);
+        }
+        else {
+            const defaultDimensionName = store.getters["Modules/WmsTime/defaultDimensionName"] || "TIME",
+                remainingLayer = layerCollection.getLayerById(remainingLayerId),
+                timeSlider = store.getters["Modules/WmsTime/timeSlider"] || {},
+                currentTimeSliderObject = Array.isArray(timeSlider.objects)
+                    ? timeSlider.objects.find(obj => obj.layerId === timeSlider.currentLayerId)
+                    : undefined,
+                remainingTimeSliderObject = Array.isArray(timeSlider.objects)
+                    ? timeSlider.objects.find(obj => obj.layerId === remainingLayerId)
+                    : undefined,
+                {dimensionName: effectiveDimensionName, value: remainingDimensionValueFromLayer} = resolveTimeValueForLayer(
+                    remainingLayer,
+                    defaultDimensionName,
+                    remainingTimeSliderObject?.defaultValue
+                ),
+                remainingDimensionValue = remainingDimensionValueFromLayer ?? currentTimeSliderObject?.defaultValue;
+
+            if (remainingLayerConfig?.visibility !== false) {
+                store.dispatch("Modules/WmsTime/deactivateLayerSwiper");
+                activateTimeSlider(remainingLayerId, remainingLayerConfig, remainingDimensionValue);
+                if (remainingDimensionValue) {
+                    remainingLayer?.updateTime?.(remainingLayerId, effectiveDimensionName, remainingDimensionValue);
+                }
+            }
+            else {
+                store.dispatch("Modules/WmsTime/deactivateLayerSwiper");
+            }
+        }
+    }
+    else if (newValue === false && !store.getters["Modules/LayerSwiper/active"]
+        && !isSecondLayer
+        && layerConfig?.showInLayerTree === false
+        && remainingLayerConfig?.showInLayerTree !== false) {
+        store.dispatch("replaceByIdInLayerConfig", {
+            layerConfigs: [{
+                id: remainingLayerId,
+                layer: {
+                    id: remainingLayerId,
+                    visibility: false,
+                    showInLayerTree: false
+                }
+            }]
+        });
+    }
+    else if (shouldReactivateCompare) {
+        const baseId = isSecondLayer ? layerId.replace(layerAppendix, "") : layerId,
+            baseConfig = getLayerConfigById(baseId),
+            defaultDimensionName = store.getters["Modules/WmsTime/defaultDimensionName"] || "TIME",
+            baseLayer = layerCollection.getLayerById(baseId),
+            {value: currentBaseTimeValue} = resolveTimeValueForLayer(baseLayer, defaultDimensionName);
+
+        store.dispatch("Modules/WmsTime/toggleSwiper", layerId);
+        store.commit("Modules/WmsTime/setTimeSliderActive", {
+            active: true,
+            currentLayerId: baseId,
+            playbackDelay: baseConfig?.time?.playbackDelay || 1
+        });
+        if (currentBaseTimeValue) {
+            store.commit("Modules/WmsTime/setTimeSliderDefaultValue", currentBaseTimeValue);
+        }
     }
 };
 

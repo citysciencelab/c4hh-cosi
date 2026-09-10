@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import SensorThemeData from "@modules/getFeatureInfo/themes/sensor/components/SensorThemeData.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/getFeatureInfo/themes/senor/components/SensorThemeData.vue", () => {
     let wrapper;

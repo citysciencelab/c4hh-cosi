@@ -5,27 +5,26 @@ import SearchInterface from "@modules/searchBar/searchInterfaces/searchInterface
 import SearchInterfaceSpecialWfs from "@modules/searchBar/searchInterfaces/searchInterfaceSpecialWfs.js";
 import mapCollection from "@core/maps/js/mapCollection.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
+import Projection from "ol/proj/Projection.js";
+import {addProjection} from "ol/proj.js";
 
 describe("src/modules/searchBar/searchInterfaces/searchInterfaceSpecialWfs.js", () => {
     let SearchInterface1 = null,
         checkConfigSpy;
     const searchResults = [
-            {
-                coordinates: [["565931.982", "5935196.323", "565869.067", "5935016.323"]],
-                geometryType: "MultiPolygon",
-                icon: "bi-house-fill",
-                identifier: "Rotherbaum37",
-                type: "common:modules.searchBar.specialWFS.ongoing"
-            }],
-        namedProjections = [
-            ["EPSG:31467", "+title=Bessel/Gauß-Krüger 3 +proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=3500000 +y_0=0 +ellps=bessel +datum=potsdam +units=m +no_defs"],
-            ["EPSG:25832", "+title=ETRS89/UTM 32N +proj=utm +zone=32 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"],
-            ["EPSG:8395", "+title=ETRS89/Gauß-Krüger 3 +proj=tmerc +lat_0=0 +lon_0=9 +k=1 +x_0=3500000 +y_0=0 +ellps=GRS80 +datum=GRS80 +units=m +no_defs"],
-            ["EPSG:4326", "+title=WGS 84 (long/lat) +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"]
-        ];
+        {
+            coordinates: [["565931.982", "5935196.323", "565869.067", "5935016.323"]],
+            geometryType: "MultiPolygon",
+            icon: "bi-house-fill",
+            identifier: "Rotherbaum37",
+            type: "common:modules.searchBar.specialWFS.ongoing"
+        }];
 
     beforeAll(() => {
-        crs.registerProjections(namedProjections);
+        addProjection(new Projection({
+            code: "EPSG:25832",
+            units: "m"
+        }));
         checkConfigSpy = sinon.spy(SearchInterface.prototype, "checkConfig");
         SearchInterface1 = new SearchInterfaceSpecialWfs();
 
@@ -53,7 +52,9 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceSpecialWfs.js", 
     });
 
     afterEach(() => {
-        SearchInterface1.clearSearchResults();
+        if (SearchInterface1) {
+            SearchInterface1.clearSearchResults();
+        }
     });
 
     describe("prototype", () => {

@@ -50,8 +50,6 @@ const actions = {
         }
 
         dispatch("replaceByIdInLayerConfig", {layerConfigs}, {root: true});
-
-        window.trackMatomo?.("Layer", "Layer added via layertree", rootGetters.layerConfigById(layerId).name + " (layerId: " + layerId + ")");
     },
 
     /**

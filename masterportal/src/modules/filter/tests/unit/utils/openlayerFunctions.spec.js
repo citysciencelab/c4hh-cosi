@@ -4,6 +4,9 @@ import sinon from "sinon";
 import openlayerFunctions from "@modules/filter/utils/openlayerFunctions.js";
 
 describe("src/modules/filter/utils/openlayerFunctions.js", () => {
+    const originStoreGetter = store.getters,
+        originStoreDispatch = store.dispatch;
+
     describe("setParserAttributeByLayerId", () => {
         let stub = null;
 
@@ -12,6 +15,10 @@ describe("src/modules/filter/utils/openlayerFunctions.js", () => {
             store.dispatch = stub;
         });
 
+        afterEach(() => {
+            store.getters = originStoreGetter;
+            store.dispatch = originStoreDispatch;
+        });
 
         it("should do nothing if no layer with given id is found", () => {
 

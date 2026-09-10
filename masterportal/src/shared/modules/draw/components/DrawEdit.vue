@@ -208,7 +208,7 @@ export default {
         undoRedoFeatures (features, mode) {
             if (features.length > 0) {
                 const source = this.source,
-                    feature = features[features.length - 1];
+                      feature = features[features.length - 1];
 
                 this.mode = mode;
 

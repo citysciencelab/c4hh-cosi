@@ -170,6 +170,21 @@ describe("src/js/api/getCswRecordById.js", () => {
         it("should contain parsed data for property use", () => {
             expect(getCswRecordById.parseConstraints(jsonWithResourceConstraints)).to.be.an("object").that.have.property("use").that.is.an("array").to.have.lengthOf(3);
         });
+        it("should parse JSON constraint into object with url property", () => {
+            const result = getCswRecordById.parseConstraints(jsonWithResourceConstraints);
+
+            expect(result.use[2]).to.be.an("object").that.includes({
+                id: "dl-by-de/2.0",
+                name: "Datenlizenz Deutschland Namensnennung 2.0",
+                url: "https://www.govdata.de/dl-de/by-2-0"
+            });
+        });
+
+        it("should return constraint as string if JSON parsing fails", () => {
+            const result = getCswRecordById.parseConstraints(jsonWithResourceConstraints);
+
+            expect(result.use[0]).to.be.a("string").and.to.include("urheberrechtlich");
+        });
     });
 
     describe("parseContactByRole", () => {

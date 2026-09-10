@@ -11,6 +11,7 @@ import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.j
 import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createStyle.js";
 import getGeometryTypeFromService from "@masterportal/masterportalapi/src/vectorStyle/lib/getGeometryTypeFromService.js";
 import Layer2dVectorGeojson from "@core/layers/js/layer2dVectorGeojson.js";
+import Layer2dVector from "@core/layers/js/layer2dVector.js";
 import webgl from "@core/layers/js/webglRenderer.js";
 
 describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
@@ -40,6 +41,8 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
     });
 
     beforeEach(() => {
+        // Set prototype of Layer2dVectorGeojson to Layer2dVector to avoid errors in tests
+        Object.setPrototypeOf(Layer2dVectorGeojson.prototype, Layer2dVector.prototype);
         attributes = {
             id: "id",
             name: "geojsonTestLayer",
@@ -226,6 +229,82 @@ describe("src/core/js/layers/layer2dVectorGeojson.js", () => {
             geojsonLayer.applyFeaturesFilter({...attributes, bboxGeometry, clusterDistance: 10}, features);
 
             expect(source.getFeatures()).to.deep.equals([features[0]]);
+        });
+    });
+
+    describe("startAutoRefresh", () => {
+        it("should register featuresloadend, refresh layer source and notify observers", () => {
+            const geojsonLayer = new Layer2dVectorGeojson(attributes),
+                layerSource = {
+                    once: sinon.stub(),
+                    refresh: sinon.spy()
+                },
+                features = [
+                    new Feature()
+                ],
+                observerSpy = sinon.spy(),
+                clock = sinon.useFakeTimers();
+
+            geojsonLayer.setLayerSource(layerSource);
+            geojsonLayer.layer = {
+                getSource: () => {
+                    return {
+                        getFeatures: () => features
+                    };
+                }
+            };
+            sinon.stub(geojsonLayer, "afterLoading");
+            geojsonLayer.setObserverAutoInterval(observerSpy);
+
+            geojsonLayer.startAutoRefresh(10);
+            clock.tick(10);
+            layerSource.once.firstCall.args[1]();
+
+            expect(layerSource.once.calledOnceWithExactly("featuresloadend", sinon.match.func)).to.be.true;
+            expect(layerSource.refresh.calledOnce).to.be.true;
+            expect(geojsonLayer.afterLoading.calledOnceWithExactly(geojsonLayer.attributes, features)).to.be.true;
+            expect(observerSpy.calledOnce).to.be.true;
+
+            geojsonLayer.stopAutoRefresh();
+            clock.restore();
+        });
+
+        it("should use wrapped vector source when layer source is a cluster", () => {
+            const geojsonLayer = new Layer2dVectorGeojson(attributes),
+                wrappedSource = {
+                    once: sinon.stub(),
+                    refresh: sinon.spy()
+                },
+                clusterSource = new Cluster({
+                    source: new VectorSource(),
+                    distance: 10
+                }),
+                observerSpy = sinon.spy(),
+                clock = sinon.useFakeTimers();
+
+            sinon.stub(clusterSource, "getSource").returns(wrappedSource);
+            geojsonLayer.setLayerSource(clusterSource);
+            geojsonLayer.layer = {
+                getSource: () => {
+                    return {
+                        getFeatures: () => []
+                    };
+                }
+            };
+            sinon.stub(geojsonLayer, "afterLoading");
+            geojsonLayer.setObserverAutoInterval(observerSpy);
+
+            geojsonLayer.startAutoRefresh(10);
+            clock.tick(10);
+            wrappedSource.once.firstCall.args[1]();
+
+            expect(wrappedSource.once.calledOnceWithExactly("featuresloadend", sinon.match.func)).to.be.true;
+            expect(wrappedSource.refresh.calledOnce).to.be.true;
+            expect(geojsonLayer.afterLoading.calledOnce).to.be.true;
+            expect(observerSpy.calledOnce).to.be.true;
+
+            geojsonLayer.stopAutoRefresh();
+            clock.restore();
         });
     });
 

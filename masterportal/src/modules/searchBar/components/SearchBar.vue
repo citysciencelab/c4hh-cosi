@@ -79,7 +79,7 @@ export default {
 
                 categories.forEach(category => {
                     const searchResultsByCategory = this.searchResults.filter(searchResult => searchResult.category === category),
-                        searchInterfaceIds = [...new Set(searchResultsByCategory.map(searchResult => searchResult.searchInterfaceId))];
+                          searchInterfaceIds = [...new Set(searchResultsByCategory.map(searchResult => searchResult.searchInterfaceId))];
 
                     if (searchInterfaceIds.length > 1) {
                         let count = 0;
@@ -107,7 +107,7 @@ export default {
          */
         limitedSortedSearchResults () {
             const results = {},
-                currentShowAllList = [];
+                  currentShowAllList = [];
 
             results.categoryProvider = {};
             this.setSearchSuggestions([]);
@@ -155,7 +155,7 @@ export default {
                         this.setShowAllResults(false);
                         this.setShowSearchResultsInTree(false);
                         this.setCurrentActionEvent("");
-                        this.navigateBack(this.currentSide);
+                        this.navigateBack({side: this.currentSide, doNotTrack: true});
                     }
                 }
                 if (newVal === "layerSelection" && this.addLayerButtonSearchActive === true) {
@@ -264,7 +264,7 @@ export default {
             }
             else if (currentComponentType === "layerSelection") {
                 if (this.searchInputValue?.length === 0) {
-                    this.navigateBack(this.currentSide);
+                    this.navigateBack({side: this.currentSide, doNotTrack: true});
                     this.startLayerSelectionSearch(this.currentSide);
                     this.startSearch();
                 }
@@ -287,7 +287,7 @@ export default {
                 this.removePointMarker();
                 this.searchResults.forEach(searchResult => {
                     const category = searchResult.category.toLowerCase(),
-                        name = searchResult.name.toLowerCase();
+                          name = searchResult.name.toLowerCase();
 
                     if (category.includes("adresse") ||
                         category.includes("address") ||

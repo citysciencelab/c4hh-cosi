@@ -21,9 +21,14 @@
  * @property {Boolean} transactionProcessing Flag if a process like delete, update is currently active with axios post,get.
  * @property {Boolean} showConfirmModal Flag if the modal dialog should be shown.
  * @property {Boolean} toggleLayer Whether the already added features should be displayed while inserting new features.
+ * @property {Boolean} showLayerLoader Whether a loading spinner is shown next to the layer select while the selected layer loads its features. While loading, editing, creating and deleting is disabled.
+ * @property {Boolean} activateLayerInTree Whether the currently selected layer is automatically activated in the layer tree and restored to its original state on switch or leave.
+ * @property {Boolean} layerLoading Flag if the currently selected layer is loading its features.
+ * @property {(Object|null)} managedLayer Original layer tree state of the layer activated by this module, used to restore it.
  * @property {Number} currentLayerIndex Index of the currently selected layer.
  * @property {FeatureProperty[]} featureProperties Possible properties to be set on a feature for the current layer.
  * @property {featurePropertiesBatch[]} featurePropertiesBatch Feature properties for all selected Objects.
+ * @property {featurePropertiesValues[]} featurePropertiesValues used to set default value for feature property
  * @property {Object} anyInputValue Values of inputs for multiupdate edit from user.
  * @property {TransactionLayer[]} layerInformation Information about the different WFS-T layers configured for the tool.
  * @property {("LineString"|"Point"|"Polygon"|"delete"|"updated"|"selectedUpdate"|null)} selectedInteraction Which selection is currently active, if any.
@@ -56,10 +61,15 @@ const state = {
     showVoidModal: false,
     voidModalCallback: {},
     toggleLayer: false,
+    showLayerLoader: false,
+    activateLayerInTree: false,
     // Actual state
+    layerLoading: false,
+    managedLayer: null,
     currentLayerIndex: -1,
     featureProperties: [],
     featurePropertiesBatch: [],
+    featurePropertiesValues: [],
     anyInputValue: {},
     layerInformation: [],
     selectedInteraction: null,

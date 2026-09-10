@@ -3,12 +3,18 @@ import sinon from "sinon";
 import actions from "@modules/mouseHover/store/actionsMouseHover.js";
 import stateMouseHover from "@modules/mouseHover/store/stateMouseHover.js";
 import Map from "ol/Map.js";
+import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList.js";
 
 
 describe("src/modules/mouseHover/store/actionsMouseHover", () => {
-    let commit, dispatch, state, olMap;
+    let commit, dispatch, state, olMap, rawLayer;
 
     beforeEach(() => {
+        rawLayer = undefined;
+        sinon.stub(rawLayerList, "getLayerWhere").callsFake(() =>{
+            return rawLayer;
+        }
+        );
         olMap = new Map();
         olMap.addOverlay = sinon.spy();
         commit = sinon.spy();
@@ -163,7 +169,7 @@ describe("src/modules/mouseHover/store/actionsMouseHover", () => {
         });
     });
     describe("highlightFeature", () => {
-        it("highlights a feature depending on its geometryType", () => {
+        it("highlights a feature depending on its geometryType: Point", () => {
             const feature = {
                     id: "feature",
                     getId: () => "feature",
@@ -174,17 +180,128 @@ describe("src/modules/mouseHover/store/actionsMouseHover", () => {
                     getProperties: () => []
                 },
                 layer = {
-                    id: "layerId",
                     values_: {
                         id: "layerId"
                     },
                     get: (key) => {
-                        return key;
+                        return layer.values_[key];
                     }
                 };
 
             actions.highlightFeature({state, dispatch}, {feature, layer});
             expect(dispatch.firstCall.args[0]).to.equal("Maps/highlightFeature");
+            expect(dispatch.firstCall.args[1].styleId).to.equal(undefined);
+            expect(dispatch.firstCall.args[1].id).to.equal("feature");
+            expect(dispatch.firstCall.args[1].type).to.equal("increase");
+        });
+
+        it("highlights a feature depending on its geometryType: Polygon", () => {
+            const feature = {
+                    id: "feature",
+                    getId: () => "feature",
+                    getGeometry: () => sinon.spy({
+                        getType: () => "Polygon",
+                        getCoordinates: () => [100, 100]
+                    }),
+                    getProperties: () => []
+                },
+                layer = {
+                    values_: {
+                        id: "layerId"
+                    },
+                    get: (key) => {
+                        return layer.values_[key];
+                    }
+                };
+
+            actions.highlightFeature({state, dispatch}, {feature, layer});
+            expect(dispatch.firstCall.args[0]).to.equal("Maps/highlightFeature");
+            expect(dispatch.firstCall.args[1].styleId).to.equal(undefined);
+            expect(dispatch.firstCall.args[1].id).to.equal("feature");
+            expect(dispatch.firstCall.args[1].type).to.equal("highlightPolygon");
+        });
+
+        it("highlights a feature depending on its geometryType: LineString", () => {
+            const feature = {
+                    id: "feature",
+                    getId: () => "feature",
+                    getGeometry: () => sinon.spy({
+                        getType: () => "LineString",
+                        getCoordinates: () => [100, 100]
+                    }),
+                    getProperties: () => []
+                },
+                layer = {
+                    values_: {
+                        id: "layerId"
+                    },
+                    get: (key) => {
+                        return layer.values_[key];
+                    }
+                };
+
+            actions.highlightFeature({state, dispatch}, {feature, layer});
+            expect(dispatch.firstCall.args[0]).to.equal("Maps/highlightFeature");
+            expect(dispatch.firstCall.args[1].styleId).to.equal(undefined);
+            expect(dispatch.firstCall.args[1].id).to.equal("feature");
+            expect(dispatch.firstCall.args[1].type).to.equal("highlightLine");
+        });
+
+        it("highlights a feature with styleId at layer", () => {
+            const feature = {
+                    id: "feature",
+                    getId: () => "feature",
+                    getGeometry: () => sinon.spy({
+                        getType: () => "Point",
+                        getCoordinates: () => [100, 100]
+                    }),
+                    getProperties: () => []
+                },
+                layer = {
+                    values_: {
+                        id: "layerId",
+                        styleId: "styleId"
+                    },
+                    get: (key) => {
+                        return layer.values_[key];
+                    }
+                };
+
+            actions.highlightFeature({state, dispatch}, {feature, layer});
+
+            expect(dispatch.firstCall.args[0]).to.equal("Maps/highlightFeature");
+            expect(dispatch.firstCall.args[1].styleId).to.equal("styleId");
+            expect(dispatch.firstCall.args[1].id).to.equal("feature");
+        });
+
+        it("highlights a feature with styleId at rawlayer", () => {
+            const feature = {
+                    id: "feature",
+                    getId: () => "feature",
+                    getGeometry: () => sinon.spy({
+                        getType: () => "Point",
+                        getCoordinates: () => [100, 100]
+                    }),
+                    getProperties: () => []
+                },
+                layer = {
+                    values_: {
+                        id: "layerId"
+                    },
+                    get: (key) => {
+                        return layer.values_[key];
+                    }
+                };
+
+            rawLayer = {
+                styleId: "styleId"
+            };
+
+            actions.highlightFeature({state, dispatch}, {feature, layer});
+
+            expect(dispatch.firstCall.args[0]).to.equal("Maps/highlightFeature");
+            expect(dispatch.firstCall.args[1].styleId).to.equal("styleId");
+            expect(dispatch.firstCall.args[1].id).to.equal("feature");
         });
     });
 

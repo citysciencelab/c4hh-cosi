@@ -19,126 +19,310 @@ import layerTypes from "@core/layers/js/layerTypes.js";
 function build (layerList, layerConfig, category, shownLayerConfs = [], categoryChanged = false) {
     const categoryKey = category?.key,
         groups = {},
-        folder = {},
+        folder = {
+            elements: []
+        },
         layersByMdName = {};
-    let bgLayers = [],
-        bgLayerIds = [],
-        subjectDataLayers = [],
-        layers3D = [];
 
     if (!category) {
         return layerList;
     }
-    folder.elements = [];
-    if (layerConfig) {
-        bgLayers = getNestedValues(layerConfig[treeBaselayersKey], "elements", true).flat(Infinity);
-        bgLayerIds = getIdsOfLayers(bgLayers);
 
-        if (layerConfig[treeSubjectsKey]) {
-            subjectDataLayers = getNestedValues(layerConfig[treeSubjectsKey], "elements", true).flat(Infinity);
-            layers3D = get3DLayers(subjectDataLayers);
-            if (categoryChanged) {
-                subjectDataLayers = layers3D;
-                layerConfig[treeSubjectsKey].elements = [];
-            }
+    const {bgLayerIds, subjectDataLayers} = prepareConfiguredLayers(layerList, layerConfig, folder, categoryChanged);
 
-            if (layers3D.length > 0 && layers3D.length === subjectDataLayers.length) {
-                folder.elements = layerConfig[treeSubjectsKey].elements ? layerConfig[treeSubjectsKey].elements : layerConfig[treeSubjectsKey];
-            }
-            else if (!categoryChanged && layers3D.length > 0) {
-                layerConfig[treeSubjectsKey].elements.forEach(element => {
-                    const nestedLayers = getNestedValues(element, "elements", true).flat(Infinity);
+    addLayersToFolder(layerList, folder, groups, layersByMdName, bgLayerIds, subjectDataLayers, shownLayerConfs, categoryKey);
 
-                    if (element.type === "folder" && containsOnly3DLayer(nestedLayers)) {
-                        folder.elements.push(element);
-                    }
-                    else {
-                        const rawLayerConfig = layerList.find(layer => layer.id === element.id);
-
-                        if (rawLayerConfig) {
-                            const index = subjectDataLayers.findIndex(layer => layer.id === rawLayerConfig.id),
-                                replacement = Object.assign({}, rawLayerConfig, element);
-
-                            layerList.splice(layerList.indexOf(rawLayerConfig), 1, replacement);
-                            subjectDataLayers.splice(index, 1);
-                        }
-                    }
-                });
-            }
-            else {
-                subjectDataLayers = [];
-            }
-        }
-    }
-
-    for (let i = 0; i < layerList.length; i++) {
-        let rawLayer = layerList[i],
-            id = null,
-            subFolder;
-
-        if (bgLayerIds.indexOf(rawLayer.id) > -1) {
-            continue;
-        }
-        if (subjectDataLayers.find(conf => conf.id === rawLayer.id) !== undefined) {
-            continue;
-        }
-        if (rawLayer.datasets[0] && (rawLayer.datasets[0][categoryKey] === ""
-            || Array.isArray(rawLayer.datasets[0][categoryKey]) && rawLayer.datasets[0][categoryKey].length === 0
-            || Array.isArray(rawLayer.datasets[0][categoryKey]) && rawLayer.datasets[0][categoryKey].length === 1 && rawLayer.datasets[0][categoryKey][0] === "")) {
-            rawLayer.datasets[0][categoryKey] = "common:modules.layerTree.noCategory";
-        }
-        if (rawLayer.datasets[0] && rawLayer.datasets[0][categoryKey] !== undefined) {
-            shownLayerConfs.forEach(layerConf => {
-                if (layerConf.id === rawLayer.id) {
-                    rawLayer = Object.assign(rawLayer, layerConf);
-                }
-            });
-            const groupNames = getGroupNames(rawLayer, categoryKey);
-
-            id = rawLayer.id;
-            for (let j = 0; j < groupNames.length; j++) {
-                const groupName = groupNames[j],
-                    mdName = rawLayer.datasets[0].md_name;
-                let isFirstLayer = true;
-
-                if (layersByMdName[mdName] && layersByMdName[mdName].find(aLayer => aLayer.id === id)) {
-                    continue;
-                }
-                isFirstLayer = isFirstLayerWithMdName(layersByMdName, rawLayer, mdName);
-
-                if (!Object.keys(groups).find((key) => key === groupName)) {
-                    addGroup(folder, groups, groupName);
-                }
-                subFolder = folder.elements.find((obj) => obj.name === groupName);
-                if (subFolder.id === undefined) {
-                    subFolder.id = getId();
-                }
-
-                if (!Object.keys(groups[groupName]).find((key) => key === mdName)) {
-                    groups[groupName][mdName] = [];
-                    if (isFirstLayer) {
-                        addSingleLayer(subFolder, rawLayer, mdName);
-                    }
-                    else {
-                        addSubGroup(subFolder, groups, groupName, mdName);
-                    }
-                }
-                if (!isFirstLayer) {
-                    const mdNameFolder = subFolder.elements.find((obj) => obj.name === mdName);
-                    let parentId = mdNameFolder ? mdNameFolder.id : subFolder.id;
-
-                    if (layersByMdName[mdName].length === 2) {
-                        parentId = moveFirstLayerToFolder(subFolder, groups, layersByMdName, groupName, mdName);
-                    }
-                    rawLayer.parentId = parentId;
-                    groups[groupName][mdName].push(rawLayer);
-                    sortObjects(groups[groupName][mdName], "name");
-                }
-            }
-        }
-    }
     return folder;
 }
+
+/**
+ * Prepares background layer ids and subject data layers from the given layer configuration.
+ * @param {Object[]} layerList the filtered raw layer list
+ * @param {Object} layerConfig configuration of layer like in the config.json
+ * @param {Object} folder root folder to add already configured folders to
+ * @param {Boolean} categoryChanged true if category has changed
+ * @returns {Object} object containing background layer ids and subject data layers
+ */
+function prepareConfiguredLayers (layerList, layerConfig, folder, categoryChanged) {
+    let bgLayerIds = [],
+        subjectDataLayers = [];
+
+    if (layerConfig) {
+        bgLayerIds = getBackgroundLayerIds(layerConfig);
+
+        if (layerConfig[treeSubjectsKey]) {
+            subjectDataLayers = prepareSubjectDataLayers(layerList, layerConfig, folder, categoryChanged);
+        }
+    }
+
+    return {
+        bgLayerIds,
+        subjectDataLayers
+    };
+}
+
+/**
+ * Returns ids of all configured background layers.
+ * @param {Object} layerConfig configuration of layer like in the config.json
+ * @returns {String[]} background layer ids
+ */
+function getBackgroundLayerIds (layerConfig) {
+    const bgLayers = getNestedValues(layerConfig[treeBaselayersKey], "elements", true).flat(Infinity);
+
+    return getIdsOfLayers(bgLayers);
+}
+
+/**
+ * Prepares subject data layers and handles 3D layer configuration.
+ * @param {Object[]} layerList the filtered raw layer list
+ * @param {Object} layerConfig configuration of layer like in the config.json
+ * @param {Object} folder root folder to add already configured folders to
+ * @param {Boolean} categoryChanged true if category has changed
+ * @returns {Object[]} subject data layers
+ */
+function prepareSubjectDataLayers (layerList, layerConfig, folder, categoryChanged) {
+    let subjectDataLayers = getNestedValues(layerConfig[treeSubjectsKey], "elements", true).flat(Infinity);
+    const layers3D = get3DLayers(subjectDataLayers);
+
+    if (categoryChanged) {
+        subjectDataLayers = layers3D;
+        layerConfig[treeSubjectsKey].elements = [];
+    }
+
+    if (layers3D.length > 0 && layers3D.length === subjectDataLayers.length) {
+        folder.elements = layerConfig[treeSubjectsKey].elements ? layerConfig[treeSubjectsKey].elements : layerConfig[treeSubjectsKey];
+    }
+    else if (!categoryChanged && layers3D.length > 0) {
+        handleMixedSubjectDataLayers(layerList, layerConfig, folder, subjectDataLayers);
+    }
+    else {
+        subjectDataLayers = [];
+    }
+
+    return subjectDataLayers;
+}
+
+/**
+ * Handles subject data layers if configured 3D and non-3D layers are mixed.
+ * @param {Object[]} layerList the filtered raw layer list
+ * @param {Object} layerConfig configuration of layer like in the config.json
+ * @param {Object} folder root folder to add 3D folders to
+ * @param {Object[]} subjectDataLayers configured subject data layers
+ * @returns {void}
+ */
+function handleMixedSubjectDataLayers (layerList, layerConfig, folder, subjectDataLayers) {
+    layerConfig[treeSubjectsKey].elements.forEach(element => {
+        const nestedLayers = getNestedValues(element, "elements", true).flat(Infinity);
+
+        if (element.type === "folder" && containsOnly3DLayer(nestedLayers)) {
+            folder.elements.push(element);
+        }
+        else {
+            replaceLayerConfiguration(layerList, subjectDataLayers, element);
+        }
+    });
+}
+
+/**
+ * Replaces raw layer configuration with configured layer values.
+ * @param {Object[]} layerList the filtered raw layer list
+ * @param {Object[]} subjectDataLayers configured subject data layers
+ * @param {Object} element configured layer element
+ * @returns {void}
+ */
+function replaceLayerConfiguration (layerList, subjectDataLayers, element) {
+    const rawLayerConfig = layerList.find(layer => layer.id === element.id);
+
+    if (rawLayerConfig) {
+        const index = subjectDataLayers.findIndex(layer => layer.id === rawLayerConfig.id),
+            replacement = Object.assign({}, rawLayerConfig, element);
+
+        layerList.splice(layerList.indexOf(rawLayerConfig), 1, replacement);
+        subjectDataLayers.splice(index, 1);
+    }
+}
+
+/**
+ * Adds all valid raw layers to the folder structure.
+ * @param {Object[]} layerList the filtered raw layer list
+ * @param {Object} folder root folder
+ * @param {Object} groups layers grouped by group name and metadata name
+ * @param {Object} layersByMdName layers grouped by metadata name
+ * @param {String[]} bgLayerIds background layer ids
+ * @param {Object[]} subjectDataLayers configured subject data layers
+ * @param {Object[]} shownLayerConfs configured layers to show on first level
+ * @param {String} categoryKey category key
+ * @returns {void}
+ */
+function addLayersToFolder (layerList, folder, groups, layersByMdName, bgLayerIds, subjectDataLayers, shownLayerConfs, categoryKey) {
+    for (let i = 0; i < layerList.length; i++) {
+        const rawLayer = layerList[i];
+
+        if (shouldSkipLayer(rawLayer, bgLayerIds, subjectDataLayers)) {
+            continue;
+        }
+
+        normalizeEmptyCategory(rawLayer, categoryKey);
+
+        if (hasCategory(rawLayer, categoryKey)) {
+            applyShownLayerConfiguration(rawLayer, shownLayerConfs);
+            addLayerToGroups(rawLayer, folder, groups, layersByMdName, categoryKey);
+        }
+    }
+}
+
+/**
+ * Returns true if the given raw layer should not be added to the tree.
+ * @param {Object} rawLayer raw layer
+ * @param {String[]} bgLayerIds background layer ids
+ * @param {Object[]} subjectDataLayers configured subject data layers
+ * @returns {Boolean} true if the layer should be skipped
+ */
+function shouldSkipLayer (rawLayer, bgLayerIds, subjectDataLayers) {
+    return bgLayerIds.indexOf(rawLayer.id) > -1 ||
+        subjectDataLayers.find(conf => conf.id === rawLayer.id) !== undefined;
+}
+
+/**
+ * Replaces empty category values with the no-category translation key.
+ * @param {Object} rawLayer raw layer
+ * @param {String} categoryKey category key
+ * @returns {void}
+ */
+function normalizeEmptyCategory (rawLayer, categoryKey) {
+    if (rawLayer.datasets[0] && (rawLayer.datasets[0][categoryKey] === ""
+        || Array.isArray(rawLayer.datasets[0][categoryKey]) && rawLayer.datasets[0][categoryKey].length === 0
+        || Array.isArray(rawLayer.datasets[0][categoryKey]) && rawLayer.datasets[0][categoryKey].length === 1 && rawLayer.datasets[0][categoryKey][0] === "")) {
+        rawLayer.datasets[0][categoryKey] = "common:modules.layerTree.noCategory";
+    }
+}
+
+/**
+ * Returns true if the given layer has a value for the category key.
+ * @param {Object} rawLayer raw layer
+ * @param {String} categoryKey category key
+ * @returns {Boolean} true if the layer has the category key
+ */
+function hasCategory (rawLayer, categoryKey) {
+    return rawLayer.datasets[0] && rawLayer.datasets[0][categoryKey] !== undefined;
+}
+
+/**
+ * Applies configured shown layer values to the raw layer.
+ * @param {Object} rawLayer raw layer
+ * @param {Object[]} shownLayerConfs configured layers to show on first level
+ * @returns {void}
+ */
+function applyShownLayerConfiguration (rawLayer, shownLayerConfs) {
+    shownLayerConfs.forEach(layerConf => {
+        if (layerConf.id === rawLayer.id) {
+            Object.assign(rawLayer, layerConf);
+        }
+    });
+}
+
+/**
+ * Adds the given layer to all configured category groups.
+ * @param {Object} rawLayer raw layer
+ * @param {Object} folder root folder
+ * @param {Object} groups layers grouped by group name and metadata name
+ * @param {Object} layersByMdName layers grouped by metadata name
+ * @param {String} categoryKey category key
+ * @returns {void}
+ */
+function addLayerToGroups (rawLayer, folder, groups, layersByMdName, categoryKey) {
+    const groupNames = getGroupNames(rawLayer, categoryKey),
+        id = rawLayer.id;
+
+    for (let j = 0; j < groupNames.length; j++) {
+        addLayerToGroup(rawLayer, folder, groups, layersByMdName, groupNames[j], id);
+    }
+}
+
+/**
+ * Adds the given layer to one category group.
+ * @param {Object} rawLayer raw layer
+ * @param {Object} folder root folder
+ * @param {Object} groups layers grouped by group name and metadata name
+ * @param {Object} layersByMdName layers grouped by metadata name
+ * @param {String} groupName name of the category group
+ * @param {String} id id of the raw layer
+ * @returns {void}
+ */
+function addLayerToGroup (rawLayer, folder, groups, layersByMdName, groupName, id) {
+    const mdName = rawLayer.datasets[0].md_name;
+    let isFirstLayer = true;
+
+    if (layersByMdName[mdName] && layersByMdName[mdName].find(aLayer => aLayer.id === id)) {
+        return;
+    }
+
+    isFirstLayer = isFirstLayerWithMdName(layersByMdName, rawLayer, mdName);
+
+    if (!Object.keys(groups).find((key) => key === groupName)) {
+        addGroup(folder, groups, groupName);
+    }
+
+    const subFolder = folder.elements.find((obj) => obj.name === groupName);
+
+    if (subFolder.id === undefined) {
+        subFolder.id = getId();
+    }
+
+    addLayerToMetadataGroup(rawLayer, subFolder, groups, layersByMdName, groupName, mdName, isFirstLayer);
+}
+
+/**
+ * Adds the given layer to its metadata group.
+ * @param {Object} rawLayer raw layer
+ * @param {Object} subFolder category folder
+ * @param {Object} groups layers grouped by group name and metadata name
+ * @param {Object} layersByMdName layers grouped by metadata name
+ * @param {String} groupName name of the category group
+ * @param {String} mdName metadata name of the layer
+ * @param {Boolean} isFirstLayer true if this is the first layer with the given metadata name
+ * @returns {void}
+ */
+function addLayerToMetadataGroup (rawLayer, subFolder, groups, layersByMdName, groupName, mdName, isFirstLayer) {
+    if (!Object.keys(groups[groupName]).find((key) => key === mdName)) {
+        groups[groupName][mdName] = [];
+
+        if (isFirstLayer) {
+            addSingleLayer(subFolder, rawLayer, mdName);
+        }
+        else {
+            addSubGroup(subFolder, groups, groupName, mdName);
+        }
+    }
+
+    if (!isFirstLayer) {
+        addLayerToMetadataFolder(rawLayer, subFolder, groups, layersByMdName, groupName, mdName);
+    }
+}
+
+/**
+ * Adds a layer to an existing metadata folder or creates such a folder if needed.
+ * @param {Object} rawLayer raw layer
+ * @param {Object} subFolder category folder
+ * @param {Object} groups layers grouped by group name and metadata name
+ * @param {Object} layersByMdName layers grouped by metadata name
+ * @param {String} groupName name of the category group
+ * @param {String} mdName metadata name of the layer
+ * @returns {void}
+ */
+function addLayerToMetadataFolder (rawLayer, subFolder, groups, layersByMdName, groupName, mdName) {
+    const mdNameFolder = subFolder.elements.find((obj) => obj.name === mdName);
+    let parentId = mdNameFolder ? mdNameFolder.id : subFolder.id;
+
+    if (layersByMdName[mdName].length === 2) {
+        parentId = moveFirstLayerToFolder(subFolder, groups, layersByMdName, groupName, mdName);
+    }
+
+    rawLayer.parentId = parentId;
+    groups[groupName][mdName].push(rawLayer);
+    sortObjects(groups[groupName][mdName], "name");
+}
+
 /**
  * Sets unique random ids at folders and recursive at all subfolders.
  * @param {Array} folders folders to set ids at

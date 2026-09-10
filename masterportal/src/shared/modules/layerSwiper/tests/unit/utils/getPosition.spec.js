@@ -4,11 +4,23 @@ import getPosition from "@shared/modules/layerSwiper/utils/getPosition.js";
 describe("src/shared/modules/layerSwiper/utils/getPosition.js", () => {
     const keyboardMovement = 5;
     let currentPos,
-        event;
+        event,
+        originalInnerWidth,
+        originalInnerHeight;
 
     beforeEach(() => {
         currentPos = 750;
         event = {pageX: "", pageY: "", type: "pointermove", key: ""};
+
+        originalInnerWidth = window.innerWidth;
+        originalInnerHeight = window.innerHeight;
+        Object.defineProperty(window, "innerWidth", {configurable: true, writable: true, value: 1000});
+        Object.defineProperty(window, "innerHeight", {configurable: true, writable: true, value: 1000});
+    });
+
+    afterEach(() => {
+        Object.defineProperty(window, "innerWidth", {configurable: true, writable: true, value: originalInnerWidth});
+        Object.defineProperty(window, "innerHeight", {configurable: true, writable: true, value: originalInnerHeight});
     });
 
     it("should calculate and return the horizontal position according to the event type keydown", () => {

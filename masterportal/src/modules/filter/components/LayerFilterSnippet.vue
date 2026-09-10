@@ -146,6 +146,7 @@ export default {
             precheckedSnippets: [],
             filteredItems: [],
             isLockedHandleActiveStrategy: false,
+            isApplyingDeserializedState: false,
             filterButtonDisabled: false,
             isLoading: false,
             outOfZoom: false,
@@ -269,6 +270,9 @@ export default {
         },
         triggerAllTagsDeleted () {
             this.resetAllSnippets(this.deleteAllRules());
+            if (!this.hasUnfixedRules(this.filterRules)) {
+                this.amountOfFilteredItems = false;
+            }
         },
         paging (val) {
             if (val?.page >= val?.total) {
@@ -343,7 +347,7 @@ export default {
     },
     created () {
         const filterId = this.layerConfig.filterId,
-            layerId = this.getLayerId(filterId, this.layerConfig?.layerId, this.layerConfig?.service?.layerId);
+              layerId = this.getLayerId(filterId, this.layerConfig?.layerId, this.layerConfig?.service?.layerId);
 
         if (this.api instanceof FilterApi && this.mapHandler instanceof MapHandler) {
             this.mapHandler.initializeLayer(filterId, layerId, this.isExtern(), error => {
@@ -372,7 +376,7 @@ export default {
     mounted () {
         this.$nextTick(() => {
             const filterId = this.layerConfig.filterId,
-                layerConfig = this.mapHandler.getLayerModelByFilterId(filterId);
+                  layerConfig = this.mapHandler.getLayerModelByFilterId(filterId);
 
             if (layerConfig.typ === "VectorTile" && this.mapHandler.isLayerActivated(filterId) === false) {
                 this.setIsLoading(true);
@@ -506,20 +510,47 @@ export default {
             }
 
             rules.forEach((rule) => {
-                if (!this.isRule(rule)) {
+                if (!this.isRule(rule) || !isObject(this.snippets[rule.snippetId])) {
                     return;
                 }
 
                 if (!Array.isArray(rule?.value)
                     && (this.snippets[rule.snippetId]?.type === "dropdown"
-                    || this.snippets[rule.snippetId]?.type === "sliderRange"
-                    || this.snippets[rule.snippetId]?.type === "dateRange"
+                        || this.snippets[rule.snippetId]?.type === "sliderRange"
+                        || this.snippets[rule.snippetId]?.type === "dateRange"
                     )
                 ) {
                     this.snippets[rule.snippetId].prechecked = [rule?.value];
                     return;
                 }
                 this.snippets[rule.snippetId].prechecked = rule?.value;
+            });
+        },
+        /**
+         * Applies deserialized rules to snippets and triggers filtering.
+         * @returns {void}
+         */
+        applyDeserializedState () {
+            this.isApplyingDeserializedState = true;
+            this.setSnippetValueByState(this.filterRules);
+            if (!this.hasUnfixedRules(this.filterRules)) {
+                this.isApplyingDeserializedState = false;
+                return;
+            }
+
+            this.$nextTick(() => {
+                if (!this.isStrategyActive()) {
+                    this.filter();
+                    this.isApplyingDeserializedState = false;
+                    return;
+                }
+
+                const snippetIds = this.filterRules
+                    .filter(rule => this.isRule(rule) && !rule.fixed)
+                    .map(rule => rule.snippetId);
+
+                this.handleActiveStrategy(snippetIds.length ? snippetIds : undefined);
+                this.isApplyingDeserializedState = false;
             });
         },
         /**
@@ -663,14 +694,14 @@ export default {
 
             // Please use the true or false check otherwise the fuzzy logic (true, false, undefined) wouldn't work anymore
             const rules = reset === true ? [] : false,
-                adjust = reset !== true,
-                alterMap = reset !== false && !this.outOfZoom,
-                onfinish = reset === true ? () => this.handleActiveStrategy(snippetId, false) : false;
+                  adjust = reset !== true,
+                  alterMap = reset !== false && !this.outOfZoom,
+                  onfinish = reset === true ? () => this.handleActiveStrategy(snippetId, false) : false;
 
             this.filter(snippetId, filterAnswer => {
                 const adjustments = getSnippetAdjustments(this.snippets, filterAnswer?.items, filterAnswer?.paging?.page, filterAnswer?.paging?.total),
-                    start = typeof adjustments?.start === "boolean" ? adjustments.start : false,
-                    finish = typeof adjustments?.finish === "boolean" ? adjustments.finish : false;
+                      start = typeof adjustments?.start === "boolean" ? adjustments.start : false,
+                      finish = typeof adjustments?.finish === "boolean" ? adjustments.finish : false;
 
                 this.snippets.forEach(snippet => {
                     snippet.adjustment = {
@@ -720,6 +751,9 @@ export default {
                     snippetId: rule.snippetId,
                     rule: Object.assign(!this.isStrategyActive() && !("appliedPassiveValues" in rule) ? {appliedPassiveValues} : {}, rule)
                 });
+                if (this.isApplyingDeserializedState || rule.startup) {
+                    return;
+                }
                 this.deleteRulesOfChildren(this.getSnippetById(rule.snippetId));
                 this.deleteRulesOfParallelSnippets(this.getSnippetById(rule.snippetId));
                 if (ignoreStrategyCheck || (!rule.startup && (this.isStrategyActive() || this.isParentSnippet(rule.snippetId)))) {
@@ -913,17 +947,17 @@ export default {
          */
         filter (snippetId = false, onsuccess = false, onfinish = false, adjustment = true, alterLayer = true, rules = false, resetFilter = false) {
             const filterId = this.layerConfig.filterId,
-                filterQuestion = {
-                    filterId,
-                    snippetId: typeof snippetId === "number" || Array.isArray(snippetId) ? snippetId : false,
-                    commands: {
-                        paging: this.layerConfig?.paging ? this.layerConfig.paging : 1000,
-                        searchInMapExtent: this.getSearchInMapExtent(),
-                        geometryName: this.layerConfig.geometryName,
-                        filterGeometry: this.filterGeometry
-                    },
-                    rules: Array.isArray(rules) ? rules : this.getCleanArrayOfRules()
-                };
+                  filterQuestion = {
+                      filterId,
+                      snippetId: typeof snippetId === "number" || Array.isArray(snippetId) ? snippetId : false,
+                      commands: {
+                          paging: this.layerConfig?.paging ? this.layerConfig.paging : 1000,
+                          searchInMapExtent: this.getSearchInMapExtent(),
+                          geometryName: this.layerConfig.geometryName,
+                          filterGeometry: this.filterGeometry
+                      },
+                      rules: Array.isArray(rules) ? rules : this.getCleanArrayOfRules()
+                  };
 
             this.snippetIdOfLastChange = snippetId;
             this.applyPassiveValuesToTags(this.filterRules);
@@ -1139,20 +1173,20 @@ export default {
                 return;
             }
             this.api.stop(() => {
-                this.showStopButton(false);
-                this.setFormDisable(false);
-                this.paging = {
-                    page: 0,
-                    total: 0
-                };
-                this.isLockedHandleActiveStrategy = false;
-                this.snippets.forEach(snippet => {
-                    snippet.unlockIsAdjusting = true;
-                });
-            },
-            err => {
-                console.warn(err);
-            });
+                              this.showStopButton(false);
+                              this.setFormDisable(false);
+                              this.paging = {
+                                  page: 0,
+                                  total: 0
+                              };
+                              this.isLockedHandleActiveStrategy = false;
+                              this.snippets.forEach(snippet => {
+                                  snippet.unlockIsAdjusting = true;
+                              });
+                          },
+                          err => {
+                              console.warn(err);
+                          });
         },
         /**
          * Get the title or if no title is set get the matching gfiAttribute.
@@ -1202,9 +1236,9 @@ export default {
          */
         getDownloadHandler (onsuccess) {
             const result = [],
-                features = this.filteredItems,
-                model = openlayerFunctions.getLayerByLayerId(this.layerConfig.layerId),
-                gfiAttributes = isObject(model) && typeof model.get === "function" && isObject(model.get("gfiAttributes")) ? model.get("gfiAttributes") : {};
+                  features = this.filteredItems,
+                  model = openlayerFunctions.getLayerByLayerId(this.layerConfig.layerId),
+                  gfiAttributes = isObject(model) && typeof model.get === "function" && isObject(model.get("gfiAttributes")) ? model.get("gfiAttributes") : {};
 
             if (!Array.isArray(features)) {
                 onsuccess([]);
@@ -1215,7 +1249,7 @@ export default {
                     return;
                 }
                 const properties = {},
-                    geometryName = typeof item.getGeometryName === "function" ? item.getGeometryName() : false;
+                      geometryName = typeof item.getGeometryName === "function" ? item.getGeometryName() : false;
 
                 Object.entries(item.getProperties()).forEach(([attrName, value]) => {
                     if (attrName === geometryName) {
@@ -1276,9 +1310,9 @@ export default {
             }
 
             const valueA = ruleA.map(arr => arr?.value),
-                valueB = ruleB.map(arr => arr?.value),
-                sortedValueA = [],
-                sortedValueB = [];
+                  valueB = ruleB.map(arr => arr?.value),
+                  sortedValueA = [],
+                  sortedValueB = [];
 
             JSON.parse(JSON.stringify(valueA)).forEach(value => {
                 if (Array.isArray(value)) {
@@ -1324,6 +1358,19 @@ export default {
                 });
 
                 this.setPostSnippetKey(this.postSnippetKey + 1);
+            }
+        },
+
+        /**
+         * Handles the change of the searchInMapExtent input.
+         * @param {Boolean} val the new value of the option.
+         * @returns {void}
+         */
+        onFilterInMapExtentChange (val) {
+            this.setSearchInMapExtent(val);
+            this.setIsFilterOnMove(val);
+            if (this.isStrategyActive() && this.hasUnfixedRules(this.filterRules)) {
+                this.handleActiveStrategy();
             }
         }
     }
@@ -1387,7 +1434,7 @@ export default {
                     :info="layerConfig.searchInMapExtentInfo"
                     :filter-id="layerConfig.filterId"
                     :preselected="getSearchInMapExtent()"
-                    @command-changed="val => {setSearchInMapExtent(val); setIsFilterOnMove(val)}"
+                    @command-changed="onFilterInMapExtentChange"
                 />
             </div>
             <div

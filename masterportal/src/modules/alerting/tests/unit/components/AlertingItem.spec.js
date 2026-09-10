@@ -1,11 +1,10 @@
 import AlertingItemComponent from "@modules/alerting/components/AlertingItem.vue";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount, config} from "@vue/test-utils";
 import {createStore} from "vuex";
 
 
-config.global.mocks.$t = key => key;
 config.global.mocks.$i18n = {
     i18next: {
         options: {
@@ -200,6 +199,7 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
                         addSingleAlert: sinon.spy(),
                         cleanup: sinon.stub(),
                         addAlertsFromConfig: sinon.stub(),
+                        addModuleOpenAlertsFromConfig: sinon.stub(),
                         alertHasBeenRead: sinon.stub(),
                         activateDisplayOnEventAlerts: sinon.stub()
                     },
@@ -213,6 +213,7 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
                         sortedAlerts: () => () => sortedAlerts,
                         type: () => "alerting",
                         initialAlerts: () => [],
+                        moduleOpenAlerts: () => ({}),
                         displayOnEventList: () => [
                             {
                                 "type": "Test/displayOnEventsAction",
@@ -228,7 +229,8 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
                     },
                     mutations: {
                         setInitialClosed: sinon.stub(),
-                        setShowTheModal: sinon.stub()
+                        setShowTheModal: sinon.stub(),
+                        setAlertsOnEvent: sinon.stub()
                     }
                 },
                 Modules: {
@@ -357,6 +359,12 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
                 wrapper.vm.onModalClose();
                 await wrapper.vm.$nextTick();
                 expect(wrapper.findAll(".singleAlertWrapper").length).to.equal(0);
+            });
+
+            it("resets alert mode to initial on close", () => {
+                wrapper.vm.sortedAlertsSwitch = "onEvent";
+                wrapper.vm.onModalClose();
+                expect(wrapper.vm.sortedAlertsSwitch).to.equal("initial");
             });
         });
 

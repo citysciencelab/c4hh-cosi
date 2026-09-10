@@ -2,6 +2,7 @@
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import LightButton from "@shared/modules/buttons/components/LightButton.vue";
 import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import SelectTypeButtons from "./SelectTypeButtons.vue";
 
 
@@ -11,7 +12,7 @@ import SelectTypeButtons from "./SelectTypeButtons.vue";
  */
 export default {
     name: "WfsTransaction",
-    components: {LightButton, ModalItem, SelectTypeButtons},
+    components: {LightButton, ModalItem, SelectTypeButtons, SpinnerItem},
     computed: {
         ...mapGetters("Modules/Wfst", [
             "currentInteractionConfig",
@@ -36,7 +37,11 @@ export default {
             "selectedUpdate",
             "buttonsDisabled",
             "anyInputValue",
-            "currentLayerId"
+            "currentLayerId",
+            "showLayerLoader",
+            "layerLoading",
+            "activateLayerInTree",
+            "interactionsDisabled"
         ]),
         multiupdateCurrentLayerIndex () {
             return this.multiUpdate.find(
@@ -60,21 +65,35 @@ export default {
     mounted () {
         this.initializeLayers();
         this.prepareEditButton();
+        this.setupSelectedLayer();
     },
     beforeUnmount () {
         this.reset();
+        this.restoreManagedLayer();
     },
     methods: {
         ...mapMutations("Modules/Wfst", ["setTransactionProcessing", "setCurrentLayerIndex", "setLayerInformation", "setShowConfirmModal", "setShowVoidModal", "setHideVoidModal", "setFeaturePropertiesBatch", "setSelectedSelectInteraction", "setIsDrawMode", "addProcessedMultiPolygon", "setVoidModalCallback"]),
-        ...mapActions("Modules/Wfst", ["prepareInteraction", "reset", "resetCancel", "save", "setActive", "saveMulti", "setFeatureProperty", "setFeaturesBatchProperty", "setFeatureProperties", "updateFeatureProperty", "sendTransaction", "switchToDrawMode", "propagateModal", "prepareEditButton", "clearInteractions"]),
+        ...mapActions("Modules/Wfst", ["prepareInteraction", "reset", "resetCancel", "save", "setActive", "saveMulti", "setFeatureProperty", "setFeaturesBatchProperty", "setFeatureProperties", "updateFeatureProperty", "sendTransaction", "switchToDrawMode", "propagateModal", "prepareEditButton", "clearInteractions", "handleLayerSelected", "restoreManagedLayer"]),
+        /**
+         * Selects the first layer if none is active yet and configured to
+         * activate the layer in the tree, then triggers the layer selection.
+         * @returns {void}
+         */
+        setupSelectedLayer () {
+            if (this.activateLayerInTree && this.currentLayerIndex === -1 && this.layerInformation.length > 0) {
+                this.setCurrentLayerIndex(0);
+                this.setFeatureProperties();
+            }
+            this.handleLayerSelected();
+        },
         /**
          * Initializes all layers stored in state's layerIds.
          * @returns {void}
          */
         initializeLayers () {
             const newLayerInformation = this.allLayerConfigs.filter(item => this.layerIds.includes(item.id)),
-                firstActiveLayer = newLayerInformation.findIndex(layer => layer.visibility),
-                currentLayerDeactivated = this.currentLayerIndex > -1 && !newLayerInformation[this.currentLayerIndex].visibility;
+                  firstActiveLayer = newLayerInformation.findIndex(layer => layer.visibility),
+                  currentLayerDeactivated = this.currentLayerIndex > -1 && !newLayerInformation[this.currentLayerIndex].visibility;
 
             this.setLayerInformation(newLayerInformation);
             if ((this.currentLayerIndex === -1 && firstActiveLayer > -1) ||
@@ -97,6 +116,7 @@ export default {
             this.setFeatureProperties();
             this.setFeaturePropertiesBatch();
             this.prepareEditButton();
+            this.handleLayerSelected();
             this.reset();
         },
         /**
@@ -161,20 +181,26 @@ export default {
                 >
                     {{ $t(layerSelectLabel) }}
                 </label>
-                <select
-                    id="tool-wfs-transaction-layer-select-input"
-                    class="form-select"
-                    :disabled="layerSelectDisabled"
-                    @change="layerChanged($event.target.options.selectedIndex)"
-                >
-                    <option
-                        v-for="(layer, index) of layerInformation"
-                        :key="layer.id"
-                        :selected="index === currentLayerIndex"
+                <div class="layer-select-input-wrapper">
+                    <select
+                        id="tool-wfs-transaction-layer-select-input"
+                        class="form-select"
+                        :disabled="layerSelectDisabled"
+                        @change="layerChanged($event.target.options.selectedIndex)"
                     >
-                        {{ $t(layer.name) }}
-                    </option>
-                </select>
+                        <option
+                            v-for="(layer, index) of layerInformation"
+                            :key="layer.id"
+                            :selected="index === currentLayerIndex"
+                        >
+                            {{ $t(layer.name) }}
+                        </option>
+                    </select>
+                    <SpinnerItem
+                        v-if="showLayerLoader && layerLoading"
+                        custom-class="wfst-layer-spinner"
+                    />
+                </div>
             </div>
             <!-- Error message if feature properties are a string -->
             <template v-if="typeof featureProperties === 'string'">
@@ -199,7 +225,7 @@ export default {
                             :key="key"
                             :text="config.text"
                             :icon="config.icon"
-                            :disabled="buttonsDisabled"
+                            :disabled="interactionsDisabled"
                             class="interaction-button"
                             customclasstitle="btn-title-long"
                             :interaction="() => prepareInteraction(key)"
@@ -299,7 +325,7 @@ export default {
                                     :key="`${property.key}-checkbox-input`"
                                     :type="getInputType(property.type)"
                                     :checked="['true', true].includes(property.value) ? true : false"
-                                    class="form-control-checkbox"
+                                    class="form-check-input bi-square-like-checkbox"
                                     @input="event => setFeaturesBatchProperty({key: property.key, type: getInputType(property.type), value: event.target.checked})"
                                 >
                                 <input
@@ -361,7 +387,7 @@ export default {
                                     :key="`${property.key}-checkbox-input`"
                                     :type="getInputType(property.type)"
                                     :checked="['true', true].includes(property.value) ? true : false"
-                                    class="form-control-checkbox"
+                                    class="form-check-input bi-square-like-checkbox"
                                     @input="event => updateFeatureProperty({
                                         key: property.key,
                                         type: getInputType(property.type),
@@ -373,11 +399,15 @@ export default {
                                     :id="`tool-wfs-transaction-form-input-${property.key}`"
                                     :key="`${property.key}-input`"
                                     :class="{
-                                        'form-control__valid': property.required && property.valid === true,
-                                        'form-control__invalid': property.required && property.valid === false
+                                        'form-control__valid': (property.required || property.regex) && property.valid === true,
+                                        'form-control__invalid': (property.required || property.regex) && property.valid === false
                                     }"
                                     :step="property.type === 'decimal' ? getDecimalStep(property.type, property.value) : null"
-                                    :title="property.required && !property.valid ? $t(`common:modules.wfst.mandatoryInputError.${getInputType(property.type)}`): ''"
+                                    :title="(property.required || property.regex) && property.valid === false
+                                        ? $t(property.regex
+                                            ? (property.regexError || 'common:modules.wfst.error.regexInputError')
+                                            : `common:modules.wfst.mandatoryInputError.${getInputType(property.type)}`)
+                                        : ''"
                                     :type="getInputType(property.type)"
                                     :required="property.required"
                                     :value="property.value"
@@ -385,9 +415,19 @@ export default {
                                         key: property.key,
                                         type: getInputType(property.type),
                                         value: property.type === 'decimal' ? formatDecimalValue(property.type, event.target.value) : event.target.value,
-                                        required: property.required
+                                        required: property.required,
+                                        regex: property.regex
                                     })"
                                 >
+                                <span
+                                    v-if="(property.required || property.regex) && property.valid === false"
+                                    :key="`${property.key}-error`"
+                                    class="form-control-error"
+                                >
+                                    {{ $t(property.regex
+                                        ? (property.regexError || 'common:modules.wfst.error.regexInputError')
+                                        : `common:modules.wfst.mandatoryInputError.${getInputType(property.type)}`) }}
+                                </span>
                             </template>
                         </template>
                         <div class="tool-wfs-transaction-form-buttons">
@@ -535,6 +575,35 @@ h3 {
 .scrollable-list li {
   padding: 2px 0;
 }
+
+$checkbox-check-icon: "data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpolyline points='3.75,8.5 6.5,11.25 12.25,4.75' fill='none' stroke='%23151C27' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.2'/%3e%3c/svg%3e";
+$checkbox-check-url: url("#{$checkbox-check-icon}");
+
+.bi-square-like-checkbox {
+    width: 1rem;
+    height: 1rem;
+    border: 1px solid $dark_blue;
+    border-radius: 0;
+    background-color: transparent;
+    align-self: center;
+    margin-top: 0;
+}
+
+.bi-square-like-checkbox:checked {
+    border-color: $dark_blue;
+    background-color: transparent;
+    background-image: $checkbox-check-url;
+}
+
+.bi-square-like-checkbox:focus {
+    border-color: $dark_blue;
+}
+
+
+.bi-square-like-checkbox:focus:checked {
+    background-image: $checkbox-check-url;
+}
+
 #modal-button-left {
     float:left;
     margin: 0 12px 0 0;
@@ -547,12 +616,30 @@ h3 {
     .layer-select-container {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         width: 25em;
 
         #tool-wfs-transaction-layer-select-label {
             width: 5em;
             align-self: center;
             margin-right: 1em;
+        }
+
+        .layer-select-input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            flex: 1;
+
+            .form-select {
+                flex: 1;
+            }
+
+            .wfst-layer-spinner {
+                flex: 0 0 auto;
+                width: 1.25rem;
+                height: 1.25rem;
+            }
         }
     }
 
@@ -591,6 +678,11 @@ h3 {
         }
         .form-control.form-control__invalid {
             border: 1px solid red;
+        }
+        .form-control-error {
+            grid-column: 2;
+            color: red;
+            font-size: 12px;
         }
     }
     .form-label__required::after,

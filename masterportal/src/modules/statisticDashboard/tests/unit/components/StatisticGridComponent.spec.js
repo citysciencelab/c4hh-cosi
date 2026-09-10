@@ -1,10 +1,9 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import StatisticGridComponent from "@modules/statisticDashboard/components/StatisticGridComponent.vue";
 import indexStatisticDashboard from "@modules/statisticDashboard/store/indexStatisticDashboard.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/statiscticDashboard/components/StatisticGridComponent.vue", () => {
 

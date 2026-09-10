@@ -1,5 +1,6 @@
 import {nextTick} from "vue";
 import changeCase from "@shared/js/utils/changeCase.js";
+import {getPiniaModuleStore, isPiniaModule} from "../../modules-store/piniaModules.js";
 
 export default {
     /**
@@ -14,12 +15,17 @@ export default {
      * @returns {void}
      */
     activateCurrentComponent ({commit, dispatch, rootGetters}, {currentComponent, type, side}) {
+        const lowerType = changeCase.lowerFirst(type),
+            name = isPiniaModule(lowerType)
+                ? getPiniaModuleStore(lowerType)().name
+                : rootGetters[`Modules/${type}/name`];
+
         commit("setExpandedBySide", {expanded: true, side: side});
         dispatch("changeCurrentComponent", {
             type: currentComponent.type,
             side: side,
             props: {
-                name: rootGetters[`Modules/${type}/name`]
+                name
             }
         });
     },
@@ -53,9 +59,6 @@ export default {
         }
         else if (props?.name !== currentProps?.name) {
             commit("setCurrentComponentProps", {side, props});
-        }
-        if (type !== "getFeatureInfo" && type !== "searchBar" && type !== "layerSelection") {
-            window.trackMatomo?.("Menu", "Menuitem clicked", i18next.t(props.name));
         }
     },
 
@@ -174,10 +177,12 @@ export default {
      * @param {Object} param.getters the getters
      * @param {Object} param.state the state
      * @param {Object} param.rootGetters the rootGetters
-     * @param {String} side Side on which the navigation action occurred.
+     * @param {Object} payload the payload
+     * @param {String} payload.side Side on which the navigation action occurred.
+     * @param {Boolean} [payload.doNotTrack] Additional flag for user tracking observing this action.
      * @returns {void}
      */
-    navigateBack ({commit, dispatch, getters, state, rootGetters}, side) {
+    navigateBack ({commit, dispatch, getters, state, rootGetters}, {side}) {
         const actionEvent = rootGetters["Modules/SearchBar/currentActionEvent"];
 
         nextTick(() => {
@@ -258,7 +263,7 @@ export default {
         else {
             commit("Modules/SearchBar/setSearchResultsActive", false, {root: true});
             commit("Modules/SearchBar/setShowSearchResultsInTree", false, {root: true});
-            dispatch("Modules/LayerSelection/navigateBack", null, {root: true});
+            dispatch("Modules/LayerSelection/navigateBack", {doNotTrack: true}, {root: true});
         }
         commit("switchToPreviousComponent", side);
     },

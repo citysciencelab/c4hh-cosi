@@ -1,10 +1,9 @@
 import {expect} from "chai";
 import {createStore} from "vuex";
 import Modeler3D from "@modules/modeler3D/store/indexModeler3D.js";
-import {mount, config} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import EntityListComponent from "@modules/modeler3D/components/ui/EntityList.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/modeler3D/components/EntityList.vue", () => {
     let store, wrapper;
@@ -60,7 +59,7 @@ describe("src/modules/modeler3D/components/EntityList.vue", () => {
     });
 
     it("shows buttons for importedModel", () => {
-        wrapper = mount(EntityListComponent, {
+        wrapper = shallowMount(EntityListComponent, {
             propsData: {
                 objects: [{
                     id: "id",
@@ -85,7 +84,7 @@ describe("src/modules/modeler3D/components/EntityList.vue", () => {
     });
 
     it("should render checkboxes", () => {
-        wrapper = mount(EntityListComponent, {
+        wrapper = shallowMount(EntityListComponent, {
             propsData: {
                 objects: [{
                     id: "id",
@@ -106,7 +105,7 @@ describe("src/modules/modeler3D/components/EntityList.vue", () => {
     });
 
     it("should not render checkboxes if enableCheckboxes is false", () => {
-        wrapper = mount(EntityListComponent, {
+        wrapper = shallowMount(EntityListComponent, {
             propsData: {
                 objects: [{
                     id: "id",
@@ -129,7 +128,7 @@ describe("src/modules/modeler3D/components/EntityList.vue", () => {
 
 
     it("shows buttons for hiddenObjects", () => {
-        wrapper = mount(EntityListComponent, {
+        wrapper = shallowMount(EntityListComponent, {
             propsData: {
                 objects: [{
                     id: "id",
@@ -151,7 +150,7 @@ describe("src/modules/modeler3D/components/EntityList.vue", () => {
 
     it("changes activeObject", () => {
         store.commit("Modules/Modeler3D/setCurrentModelId", "someId");
-        wrapper = mount(EntityListComponent, {
+        wrapper = shallowMount(EntityListComponent, {
             propsData: {
                 objects: [
                     {
@@ -181,7 +180,7 @@ describe("src/modules/modeler3D/components/EntityList.vue", () => {
 
     it("should remove active class if active class exists", async () => {
         store.commit("Modules/Modeler3D/setCurrentModelId", "someId");
-        wrapper = mount(EntityListComponent, {
+        wrapper = shallowMount(EntityListComponent, {
             propsData: {
                 objects: [
                     {

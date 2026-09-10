@@ -119,7 +119,7 @@ export default {
 
             if (typeof this.selectableParameters.options === "string" && notRoot && this.parsedSource !== null && Object.keys(this.selectedOptions).length > 0) {
                 const optionsArr = this.selectableParameters.options.split("."),
-                    selectedValues = Object.keys(this.selectedOptions);
+                      selectedValues = Object.keys(this.selectedOptions);
 
                 return !(this.currentInstance.addedOptions?.includes("")
                     && optionsArr.every(option => this.currentInstance.addedOptions.includes(option))
@@ -140,13 +140,13 @@ export default {
                 }
 
                 const optionsArr = this.selectableParameters.options.split("."),
-                    lastIndex = optionsArr.length - 1;
+                      lastIndex = optionsArr.length - 1;
 
                 if (Object.keys(this.selectedOptions).includes("")) {
                     const optionKeysWithoutRoot = Object.keys(this.selectedOptions)
-                            .filter(option => option !== ""),
-                        previousElementsSelected = optionsArr.slice(0, lastIndex)
-                            .every(option => optionKeysWithoutRoot.includes(option));
+                              .filter(option => option !== ""),
+                          previousElementsSelected = optionsArr.slice(0, lastIndex)
+                              .every(option => optionKeysWithoutRoot.includes(option));
 
                     if (previousElementsSelected) {
                         return getOptions(
@@ -174,7 +174,7 @@ export default {
         selectableOptions (newOptions) {
             if (this.value) {
                 const option = Array.isArray(this.options) && !isObject(this.options[0]) ? this.options[0] : this.options,
-                    indexInNewOptions = newOptions.findIndex(e => e.fieldValue === this.value);
+                      indexInNewOptions = newOptions.findIndex(e => e.fieldValue === this.value);
 
                 if (newOptions.length === 0 || (this.selectedOptions[option] === undefined && indexInNewOptions === -1) || (this.selectedOptions[option] !== undefined && indexInNewOptions > -1 && newOptions.findIndex(e => e.fieldValue === this.value) !== this.selectedOptions[option]?.index)) {
                     this.value = undefined;
@@ -248,8 +248,8 @@ export default {
             else if (this.showSuggestions) {
                 this.showLoader = true;
                 const fieldName = Array.isArray(this.fieldName) ? this.fieldName[this.parameterIndex] : this.fieldName,
-                    xmlFilter = buildXmlFilter({fieldName, queryType: "like", value}),
-                    suggestions = await requestProvider.searchFeatures(this.$store, this.currentInstance, this.service, xmlFilter, this?.suggestionsConfig?.featureType);
+                      xmlFilter = buildXmlFilter({fieldName, queryType: "like", value}),
+                      suggestions = await requestProvider.searchFeatures(this.$store, this.currentInstance, this.service, xmlFilter, this?.suggestionsConfig?.featureType);
 
                 this.showLoader = false;
                 // Retrieve the values for the fieldName and make sure they are unique.

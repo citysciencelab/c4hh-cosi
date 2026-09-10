@@ -1,7 +1,6 @@
 import sinon from "sinon";
 import {expect} from "chai";
 import actions from "@modules/draw_old/store/actionsDraw.js";
-import stateDraw from "@modules/draw_old/store/stateDraw.js";
 import Draw from "ol/interaction/Draw.js";
 import Feature from "ol/Feature.js";
 import Polygon from "ol/geom/Polygon.js";
@@ -667,7 +666,6 @@ describe("src/modules/draw/store/actionsDraw.js", () => {
                 iconList: [iconSymbol]
             },
             listener = Symbol(),
-            initialState = Object.assign({}, stateDraw),
             modifyInteraction = Symbol(),
             selectInteractionModify = Symbol(),
             selectInteraction = Symbol(),
@@ -695,15 +693,15 @@ describe("src/modules/draw/store/actionsDraw.js", () => {
 
             expect(commit.callCount).to.equal(10);
             expect(commit.getCall(0).args).to.eql(["setSelectedFeature", null]);
-            expect(commit.getCall(1).args).to.eql(["setDrawType", initialState.drawType]);
-            expect(commit.getCall(2).args).to.eql(["setFreeHand", initialState.freeHand]);
-            expect(commit.getCall(3).args).to.eql(["setPointSize", initialState.pointSize]);
+            expect(commit.getCall(1).args).to.eql(["setDrawType", {id: "drawSymbol", geometry: "Point"}]);
+            expect(commit.getCall(2).args).to.eql(["setFreeHand", false]);
+            expect(commit.getCall(3).args).to.eql(["setPointSize", 16]);
             expect(commit.getCall(4).args).to.eql(["setSymbol", iconSymbol]);
-            expect(commit.getCall(5).args).to.eql(["setWithoutGUI", initialState.withoutGUI]);
-            expect(commit.getCall(6).args).to.eql(["setDownloadDataString", initialState.download.dataString]);
-            expect(commit.getCall(7).args).to.eql(["setDownloadFeatures", initialState.download.features]);
-            expect(commit.getCall(8).args).to.eql(["setDownloadFileName", initialState.download.fileName]);
-            expect(commit.getCall(9).args).to.eql(["setDownloadSelectedFormat", initialState.download.selectedFormat]);
+            expect(commit.getCall(5).args).to.eql(["setWithoutGUI", false]);
+            expect(commit.getCall(6).args).to.eql(["setDownloadDataString", ""]);
+            expect(commit.getCall(7).args).to.eql(["setDownloadFeatures", []]);
+            expect(commit.getCall(8).args).to.eql(["setDownloadFileName", ""]);
+            expect(commit.getCall(9).args).to.eql(["setDownloadSelectedFormat", ""]);
 
             expect(dispatch.callCount).to.equal(9);
             expect(dispatch.getCall(0).args).to.eql(["toggleInteraction", "draw"]);

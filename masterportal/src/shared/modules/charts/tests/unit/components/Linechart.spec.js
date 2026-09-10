@@ -1,11 +1,9 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import Chart from "chart.js/auto";
 import sinon from "sinon";
 import {nextTick} from "vue";
-import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 
-config.global.mocks.$t = key => key;
+import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 
 
 describe("src/shared/modules/charts/components/LinechartItem.vue", () => {
@@ -24,15 +22,17 @@ describe("src/shared/modules/charts/components/LinechartItem.vue", () => {
     });
 
     describe("mounted", () => {
-        it("should create an instance of ChartJS when mounted", () => {
-            nextTick(() => {
-                expect(wrapper.vm.chart).to.be.an.instanceof(Chart);
-            });
+        it("should create an instance of ChartJS when mounted", async () => {
+            await nextTick();
+            expect(wrapper.vm.chart).to.be.an("object");
+            expect(wrapper.vm.chart.config).to.be.an("object");
+            expect(wrapper.vm.chart.destroy).to.be.a("function");
+            expect(wrapper.vm.chart.update).to.be.a("function");
+            expect(wrapper.vm.chart.render).to.be.a("function");
         });
-        it("should create a chart of type line when mounted", () => {
-            nextTick(() => {
-                expect(wrapper.vm.chart.config.type).to.equal("line");
-            });
+        it("should create a chart of type line when mounted", async () => {
+            await nextTick();
+            expect(wrapper.vm.chart.config.type).to.equal("line");
         });
         it("should create a canvas element in its component", () => {
             expect(wrapper.find("canvas").exists()).to.be.true;
@@ -43,6 +43,7 @@ describe("src/shared/modules/charts/components/LinechartItem.vue", () => {
             const destroySpy = sinon.spy();
 
             nextTick(() => {
+                // eslint-disable-next-line no-undef
                 wrapper.vm.chart = new Chart(document.createElement("CANVAS"));
                 wrapper.vm.chart.destroy = destroySpy;
                 wrapper.vm.destroyChart();

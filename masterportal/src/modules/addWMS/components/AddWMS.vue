@@ -4,6 +4,7 @@ import {WMSCapabilities} from "ol/format.js";
 import {intersects} from "ol/extent.js";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 import axios from "axios";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 import {deleteParams} from "@shared/js/utils/deleteUrlParams.js";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
@@ -117,7 +118,7 @@ export default {
          */
         importLayers: function () {
             const serviceUrl = this.$el.querySelector("#wmsUrl").value.trim(),
-                url = this.getUrl(serviceUrl);
+                  url = this.getUrl(serviceUrl);
 
             if (this.invalidUrl === true || url.includes("http:") || url.length === 0) {
                 return;
@@ -131,16 +132,16 @@ export default {
                 .then((data) => {
                     try {
                         const parser = new WMSCapabilities(),
-                            capability = parser.read(data),
-                            version = capability?.version,
-                            checkVersion = this.isVersionEnabled(version),
-                            currentExtent = this.mapViewSettings?.extent,
-                            folder = {
-                                type: "folder",
-                                isExternal: true,
-                                name: "",
-                                elements: []
-                            };
+                              capability = parser.read(data),
+                              version = capability?.version,
+                              checkVersion = this.isVersionEnabled(version),
+                              currentExtent = this.mapViewSettings?.extent,
+                              folder = {
+                                  type: "folder",
+                                  isExternal: true,
+                                  name: "",
+                                  elements: []
+                              };
                         let checkExtent = this.getIfInExtent(capability, currentExtent),
                             finalCapability = capability;
 
@@ -238,6 +239,8 @@ export default {
          * @return {void}
          */
         parseLayerStructure: function (folder, object, level) {
+            const showImportedLayersInLayerList = this.showInLayerTree;
+
             if (Object.prototype.hasOwnProperty.call(object, "Layer")) {
                 const subFolder = {
                     type: "folder",
@@ -273,7 +276,7 @@ export default {
                     isExternal: true,
                     featureCount: this.featureCount,
                     infoFormat: this.infoFormat,
-                    showInLayerTree: this.showInLayerTree,
+                    showInLayerTree: showImportedLayersInLayerList,
                     maxScale: object?.MaxScaleDenominator?.toString(),
                     minScale: object?.MinScaleDenominator?.toString(),
                     legendURL: object?.Style?.[0].LegendURL?.[0].OnlineResource?.toString(),
@@ -290,7 +293,10 @@ export default {
          * @returns {void}
          */
         addLayerToTopicTree: function (folder) {
-            this.addLayerToLayerConfig({layerConfig: folder, parentKey: treeSubjectsKey}).then((addedLayer) => {
+            this.addLayerToLayerConfig(addSourceToPayload(
+                this,
+                {layerConfig: folder, parentKey: treeSubjectsKey}
+            )).then((addedLayer) => {
                 if (addedLayer) {
                     this.addSingleAlert({
                         content: this.showInLayerTree ? this.$t("common:modules.addWMS.completeMessageShowInLayerTree") : this.$t("common:modules.addWMS.completeMessage"),
@@ -338,9 +344,9 @@ export default {
          */
         getIfInExtent: function (capability, currentExtent) {
             const layer = capability?.Capability?.Layer?.BoundingBox?.filter(bbox => {
-                    return bbox?.crs && bbox?.crs.includes("EPSG") && crs.getProjection(bbox?.crs) !== undefined && Array.isArray(bbox?.extent) && bbox?.extent.length === 4;
-                }),
-                layerEPSG4326Projection = layer.find((element) => element.crs === "EPSG:4326");
+                      return bbox?.crs && bbox?.crs.includes("EPSG") && crs.getProjection(bbox?.crs) !== undefined && Array.isArray(bbox?.extent) && bbox?.extent.length === 4;
+                  }),
+                  layerEPSG4326Projection = layer.find((element) => element.crs === "EPSG:4326");
             let layerExtent;
 
             // If there is no extent defined or the extent is not right defined, it will import the external wms layer(s).

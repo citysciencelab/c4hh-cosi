@@ -1,11 +1,9 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import StatisticDashboardFilterRegions from "@modules/statisticDashboard/components/StatisticDashboardFilterRegions.vue";
 import {Multiselect} from "vue-multiselect";
 import sinon from "sinon";
-
-config.global.mocks.$t = key => key;
 
 
 describe("src/modules/statiscticDashboard/components/StatisticDashboardFilterRegions.vue", () => {

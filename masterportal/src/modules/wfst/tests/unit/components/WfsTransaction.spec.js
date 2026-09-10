@@ -1,13 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount, flushPromises} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import WfsTransaction from "@modules/wfst/components/WfsTransaction.vue";
 import WfstModule from "@modules/wfst/store/indexWfst.js";
 import prepareFeaturePropertiesModule from "@modules/wfst/js/prepareFeatureProperties.js";
-
-config.global.mocks.$t = key => key;
-
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 
 describe("src/modules/modules/wfst/components/WfsTransaction.vue", () => {
     const layerIds = ["wfstOne", "wfstTwo"];
@@ -249,5 +247,58 @@ describe("src/modules/modules/wfst/components/WfsTransaction.vue", () => {
         exampleLayerOne.visibility = false;
         wrapper.vm.$options.watch.visibleSubjectDataLayerConfigs.handler.call(wrapper.vm);
         expect(resetSpy.calledOnce).to.be.true;
+    });
+    it("renders the layer loading spinner while the selected layer is loading", async () => {
+        exampleLayerOne.visibility = true;
+        store.commit("Modules/Wfst/setShowLayerLoader", true);
+        store.commit("Modules/Wfst/setLayerIds", layerIds);
+        store.commit("Modules/Wfst/setLayerInformation", [exampleLayerOne, exampleLayerTwo]);
+
+        wrapper = shallowMount(WfsTransaction, {
+            global: {
+                plugins: [store]
+            }
+        });
+        await flushPromises();
+        store.commit("Modules/Wfst/setLayerLoading", true);
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.findComponent(SpinnerItem).exists()).to.be.true;
+    });
+    it("does not render the spinner if the selected layer is not loading", async () => {
+        exampleLayerOne.visibility = true;
+        store.commit("Modules/Wfst/setShowLayerLoader", true);
+        store.commit("Modules/Wfst/setLayerIds", layerIds);
+        store.commit("Modules/Wfst/setLayerInformation", [exampleLayerOne, exampleLayerTwo]);
+
+        wrapper = shallowMount(WfsTransaction, {
+            global: {
+                plugins: [store]
+            }
+        });
+        await flushPromises();
+
+        expect(store.getters["Modules/Wfst/layerLoading"]).to.be.false;
+        expect(wrapper.findComponent(SpinnerItem).exists()).to.be.false;
+    });
+    it("disables the interaction buttons while the selected layer is loading", async () => {
+        exampleLayerOne.visibility = true;
+        store.commit("Modules/Wfst/setShowLayerLoader", true);
+        store.commit("Modules/Wfst/setLineButton", [{layerId: exampleLayerOne.id, available: true}]);
+        store.commit("Modules/Wfst/setLayerIds", layerIds);
+        store.commit("Modules/Wfst/setLayerInformation", [exampleLayerOne, exampleLayerTwo]);
+
+        wrapper = shallowMount(WfsTransaction, {
+            global: {
+                plugins: [store]
+            }
+        });
+        await flushPromises();
+        store.commit("Modules/Wfst/setLayerLoading", true);
+        await wrapper.vm.$nextTick();
+
+        expect(store.getters["Modules/Wfst/interactionsDisabled"]).to.be.true;
+        expect(wrapper.find("#LineString").exists()).to.be.true;
+        expect(wrapper.find("#LineString").attributes("disabled")).to.equal("true");
     });
 });

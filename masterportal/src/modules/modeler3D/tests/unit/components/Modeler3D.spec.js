@@ -1,7 +1,7 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 import Modeler3DComponent from "@modules/modeler3D/components/Modeler3D.vue";
 import Modeler3D from "@modules/modeler3D/store/indexModeler3D.js";
@@ -11,7 +11,6 @@ import Modeler3DImport from "@modules/modeler3D/components/Modeler3DImport.vue";
 import getGfiFeaturesByTileFeatureModule from "@shared/js/utils/getGfiFeaturesByTileFeature.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
     const mockMapGetters = {
@@ -119,6 +118,7 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
 
     let store,
         wrapper,
+        originalCesium,
         updateUISpy,
         movePolygonSpy,
         movePolylineSpy,
@@ -126,6 +126,7 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
 
 
     beforeAll(() => {
+        originalCesium = global.Cesium;
         if (!document.getElementById("map")) {
             document.body.innerHTML = `
               <div id="app"></div>
@@ -294,6 +295,7 @@ describe("src/modules/modeler3D/components/Modeler3D.vue", () => {
         if (typeof wrapper !== "undefined") {
             wrapper.unmount();
         }
+        global.Cesium = originalCesium;
     });
 
     it("renders Modeler3D with import view", async () => {

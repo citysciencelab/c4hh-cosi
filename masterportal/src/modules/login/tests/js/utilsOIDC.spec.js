@@ -28,5 +28,19 @@ describe("src/modules/login/js/utilsOIDC", () => {
             expect(parsedToken).to.deep.equal({});
         });
     });
+
+    describe("getUserUuidFromToken", () => {
+        it("should read uuid from sub claim", () => {
+            const token = "header.eyJzdWIiOiJ1dWlkLXN1YiJ9.sig";
+
+            expect(utilsOIDC.getUserUuidFromToken(token)).toBe("uuid-sub");
+        });
+
+        it("should read uuid claim when sub is missing", () => {
+            const token = "header.eyJ1dWlkIjoidXVpZC1jbGFpbSJ9.sig";
+
+            expect(utilsOIDC.getUserUuidFromToken(token)).toBe("uuid-claim");
+        });
+    });
 });
 

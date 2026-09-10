@@ -1,5 +1,6 @@
 import axios from "axios";
 import store from "@appstore/index.js";
+import state from "@modules/routing/store/stateRouting.js";
 import {expect} from "chai";
 import sinon from "sinon";
 import {RoutingGeosearchResult} from "@modules/routing/js/classes/routing-geosearch-result.js";
@@ -12,6 +13,9 @@ import {
 
 describe("src/modules/routing/js/geosearch/routing-nominatim-geosearch.js", () => {
     let service;
+    const originStoreGetter = store.getters,
+        originGeosearch = structuredClone(state.geosearch),
+        originGeosearchReverse = structuredClone(state.geosearchReverse);
 
     beforeEach(() => {
         service = "https://service";
@@ -21,19 +25,24 @@ describe("src/modules/routing/js/geosearch/routing-nominatim-geosearch.js", () =
                 return {url: service};
             })
         };
-        store.state.Modules.Routing.geosearch = {
+        state.geosearch = {
             serviceId: {
                 url: "http://serviceId.url"
             },
             limit: 1000
         };
-        store.state.Modules.Routing.geosearchReverse = {
+        state.geosearchReverse = {
             serviceId: {
                 url: "http://serviceIdReverse.url"
             }
         };
     });
 
+    afterEach(() => {
+        store.getters = originStoreGetter;
+        state.geosearch = structuredClone(originGeosearch);
+        state.geosearchReverse = structuredClone(originGeosearchReverse);
+    });
 
     describe("should fetchRoutingNominatimGeosearch", () => {
         it("should process result correct", async () => {

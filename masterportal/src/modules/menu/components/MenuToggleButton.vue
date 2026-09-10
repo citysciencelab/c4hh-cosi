@@ -6,6 +6,7 @@ import {mapActions, mapGetters} from "vuex";
  * @module modules/MenuToggleButton
  * @vue-prop {String} side - Defines in which menu the component is being rendered.
  * @vue-computed {String} iconClass - The icon class depending on the side this button is used for.
+ * @vue-computed {Boolean} showButton - True if the toggle button should be shown.
  */
 export default {
     name: "MenuToggleButton",

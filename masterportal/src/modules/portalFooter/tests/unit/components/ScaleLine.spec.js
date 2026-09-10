@@ -1,9 +1,8 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import ScaleLine from "@modules/portalFooter/components/ScaleLine.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/portalFooter/components/ScaleLine.vue", () => {
     let mapMode,

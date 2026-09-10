@@ -184,8 +184,8 @@ export default {
                 return;
             }
             const newValue = isNaN(parseInt(val, 10)) ? this.defaultBuffer : val,
-                jstsGeom = this.ol3Parser.read(this.initFeatureGeometry),
-                buffered = BufferOp.bufferOp(jstsGeom, newValue);
+                  jstsGeom = this.ol3Parser.read(this.initFeatureGeometry),
+                  buffered = BufferOp.bufferOp(jstsGeom, newValue);
 
             if (newValue <= 0) {
                 return;
@@ -348,7 +348,7 @@ export default {
 
             this.draw.on("drawend", (evt) => {
                 const feature = evt.feature,
-                    geometry = this.getGeometryOnDrawEnd(feature, drawType, this.buffer);
+                      geometry = this.getGeometryOnDrawEnd(feature, drawType, this.buffer);
 
                 this.initFeatureGeometry = feature.getGeometry();
                 this.setGeometryAtFeature(feature, geometry, this.invertGeometry);
@@ -397,13 +397,13 @@ export default {
          */
         getGeometries () {
             const result = [],
-                possibleGeometries = {
-                    "Polygon": this.$t("common:modules.filter.geometryFilter.geometryTypes.polygon"),
-                    "Rectangle": this.$t("common:modules.filter.geometryFilter.geometryTypes.rectangle"),
-                    "Circle": this.$t("common:modules.filter.geometryFilter.geometryTypes.circle"),
-                    "LineString": this.$t("common:modules.filter.geometryFilter.geometryTypes.lineString")
-                },
-                additionalGeometries = this.prepareAdditionalGeometries(this.additionalGeometries);
+                  possibleGeometries = {
+                      "Polygon": this.$t("common:modules.filter.geometryFilter.geometryTypes.polygon"),
+                      "Rectangle": this.$t("common:modules.filter.geometryFilter.geometryTypes.rectangle"),
+                      "Circle": this.$t("common:modules.filter.geometryFilter.geometryTypes.circle"),
+                      "LineString": this.$t("common:modules.filter.geometryFilter.geometryTypes.lineString")
+                  },
+                  additionalGeometries = this.prepareAdditionalGeometries(this.additionalGeometries);
 
             this.geometries.forEach(type => {
                 if (Object.prototype.hasOwnProperty.call(possibleGeometries, type)) {
@@ -457,13 +457,28 @@ export default {
          * Checks the number of rings of the polygon and gets only the interior ring as a polygon.
          * If there are more than two rings, the exterior linear ring is available at index 0 and the interior rings at index 1 and beyond
          * @param {ol/Polygon} geometry - Polygon.
-         * @returns {ol/Polygon} The interior ring as a polygon.
+         * @returns {(ol/Polygon|ol/MultiPolygon)} The interior ring as a polygon or multipolygon.
          */
         getInnerPolygon (geometry) {
-            if (geometry.getLinearRingCount() > 1) {
-                return new Polygon([geometry.getLinearRings()[1].getCoordinates()]);
+            const ringCount = geometry.getLinearRingCount();
+
+            if (ringCount <= 1) {
+                return null;
             }
-            return new Polygon([geometry.getLinearRings()[0].getCoordinates()]);
+
+            const innerRings = geometry.getLinearRings().slice(1);
+
+            if (innerRings.length === 1) {
+                return new Polygon([
+                    innerRings[0].getCoordinates()
+                ]);
+            }
+
+            return new MultiPolygon(
+                innerRings.map(ring => [
+                    ring.getCoordinates()
+                ])
+            );
         },
 
         /**
@@ -476,7 +491,7 @@ export default {
         getGeometryOnDrawEnd (feature, type, buffer) {
             if (type === "LineString") {
                 const jstsGeom = this.ol3Parser.read(feature.getGeometry()),
-                    buffered = BufferOp.bufferOp(jstsGeom, buffer);
+                      buffered = BufferOp.bufferOp(jstsGeom, buffer);
 
                 return this.ol3Parser.write(buffered);
             }

@@ -1,5 +1,7 @@
 <script>
+import {mapActions as mapPiniaActions, mapState} from "pinia";
 import {mapActions, mapGetters} from "vuex";
+import {useAboutStore} from "../store/aboutStore.js";
 import LightButton from "@shared/modules/buttons/components/LightButton.vue";
 
 /**
@@ -13,7 +15,7 @@ export default {
     },
     computed: {
         ...mapGetters(["configJs"]),
-        ...mapGetters("Modules/About", [
+        ...mapState(useAboutStore, [
             "abstractText",
             "contact",
             "cswUrl",
@@ -43,9 +45,9 @@ export default {
             return this.mainMenu.sections[0].find(m => {
                 return m.type === "contact";
             })
-            || this.secondaryMenu.sections[0].find(m => {
-                return m.type === "contact";
-            });
+                || this.secondaryMenu.sections[0].find(m => {
+                    return m.type === "contact";
+                });
         },
         /**
          * Returns the menu the about module is in.
@@ -65,7 +67,7 @@ export default {
     },
 
     methods: {
-        ...mapActions("Modules/About", ["initializeAboutInfo", "currentMasterportalVersionNumber"]),
+        ...mapPiniaActions(useAboutStore, ["initializeAboutInfo", "currentMasterportalVersionNumber"]),
         ...mapActions("Menu", ["changeCurrentComponent"]),
         /**
          * Opens the privacy statement URL in a new tab.

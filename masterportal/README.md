@@ -4,6 +4,7 @@ The Masterportal is a tool-kit to create geo web applications based on [OpenLaye
 
 The Masterportal is a project by [Geowerkstatt Hamburg](https://www.hamburg.de/geowerkstatt/).
 
+
 ## MasterPortal Version 3
 
 After more than two years of refactorings we can proudly present the new major Release Masterportal 3.0.0! We completely removed backbonejs and jquery, moved to vue3 and vuex4 and rewrote the application-core. We redesigned the UI to match all the different usecases and usergroups. We have nearly all modules and tools working but still some work to do. Features still to be added/moved to the new version are the following:
@@ -51,7 +52,12 @@ New LTS minor versions (based on the current version 3 development branch) are r
 
 ## Developer section
 ### Community
-* [Issue tracker](https://bitbucket.org/geowerkstatt-hamburg/masterportal/issues?status=new&status=open&status=submitted&is_spam=!spam)
+
+The Bitbucket issue tracker is being removed on August 20, 2026. All issues have been migrated to openCode. You can access them via the link listed below, where you can also create new issues.
+
+**Please do not report security vulnerabilities via the public issue tracker.** Instead, report them privately by email as described in our [Security Policy](./SECURITY.md).
+
+* [Issue tracker](https://gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal/-/work_items)
 * [Community board (User forum)](https://discourse.opencode.de/t/ueber-die-kategorie-masterportal-projekt-413/1691)
 * [Former Community board (User forum is closed - read only!)](https://trello.com/c/qajdXkMa/110-willkommen)
 ### Contributing
@@ -67,6 +73,10 @@ New LTS minor versions (based on the current version 3 development branch) are r
     * A PrePushHook with no errors
     * Hints if your contribution contains adopted external code
     * Unit tests for new functions or updated tests for bugfixes
+
+* [From July 1, 2026 Bitbucket deprecated the option of forked repositories outside the parent workspace](https://community.atlassian.com/forums/Bitbucket-articles/Deprecation-of-Forked-Repositories-Outside-the-Parent-Workspace/ba-p/3155743)
+    * External contributors can contact the product care team via [geodatenanwendungen@gv.hamburg.de](mailto:geodatenanwendungen@gv.hamburg.de) for further pull request steps.
+    * Members or service providers of the Implementierungspartnerschaft Masterportal can relate to the workflow described here: [Workflow for contributors of the Implementierungspartnerschaft](https://lgv-hamburg.atlassian.net/jira/software/c/projects/IPM/boards/254?selectedIssue=IPM-145)
 
 #### Contributor License Agreement
 * Your contribution will be under [MIT License](./License.txt)

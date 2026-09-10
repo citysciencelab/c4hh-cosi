@@ -175,33 +175,33 @@ export default {
                 else {
 
                     const filter = this.getFilterOAF(region.attrName, this.containsAllTag(region.selectedValues) ? region.values : region.selectedValues),
-                        features = await getOAFFeature.getOAFFeatureGet(url, collection, {
-                            filter,
-                            filterCrs: this.selectedLevel.oafRequestCRS,
-                            crs: this.selectedLevel.oafRequestCRS,
-                            propertyNames: [region.child.attrName],
-                            datetime: this.selectedLevel.geomRequestParams?.datetime,
-                            limit: 10000,
-                            skipGeometry: true
-                        }),
-                        fetchedProperties = features.map(feature => feature?.properties);
+                          features = await getOAFFeature.getOAFFeatureGet(url, collection, {
+                              filter,
+                              filterCrs: this.selectedLevel.oafRequestCRS,
+                              crs: this.selectedLevel.oafRequestCRS,
+                              propertyNames: [region.child.attrName],
+                              datetime: this.selectedLevel.geomRequestParams?.datetime,
+                              limit: 10000,
+                              skipGeometry: true
+                          }),
+                          fetchedProperties = features.map(feature => feature?.properties);
 
                     uniqueValues = getUniqueValuesFromOAF(fetchedProperties, [region.child.attrName], true);
                 }
             }
             else {
                 const payload = {
-                        featureTypes: [featureType],
-                        featureNS: featureNS,
-                        srsName: this.projection.getCode(),
-                        propertyNames: [region.child.attrName],
-                        filter: this.getFilterWFS(region.attrName, region.selectedValues)
-                    },
-                    features = await getFeature.getFeaturePOST(url, payload, error => {
-                        console.error(error);
-                    }),
-                    olFeatures = new WFS().readFeatures(features),
-                    attributesWithType = await FetchDataHandler.getAttributesWithType(url, [region.child.attrName], featureType);
+                          featureTypes: [featureType],
+                          featureNS: featureNS,
+                          srsName: this.projection.getCode(),
+                          propertyNames: [region.child.attrName],
+                          filter: this.getFilterWFS(region.attrName, region.selectedValues)
+                      },
+                      features = await getFeature.getFeaturePOST(url, payload, error => {
+                          console.error(error);
+                      }),
+                      olFeatures = new WFS().readFeatures(features),
+                      attributesWithType = await FetchDataHandler.getAttributesWithType(url, [region.child.attrName], featureType);
 
                 uniqueValues = FetchDataHandler.getUniqueValuesFromFeatures(olFeatures, attributesWithType);
             }
@@ -238,7 +238,7 @@ export default {
          */
         updatesTopLevelRegionSelectedValues (value, region) {
             const selectedValues = region.selectedValues,
-                indexOfValue = selectedValues.map(selectedValue => selectedValue.value).indexOf(value.value);
+                  indexOfValue = selectedValues.map(selectedValue => selectedValue.value).indexOf(value.value);
 
             if (indexOfValue !== -1) {
                 selectedValues.splice(indexOfValue, 1);
@@ -315,7 +315,7 @@ export default {
 
             region.values.forEach((value) => {
                 const selectedValues = region?.selectedValues,
-                    indexOfValue = selectedValues.map(selectedValue => selectedValue?.value).indexOf(value?.value);
+                      indexOfValue = selectedValues.map(selectedValue => selectedValue?.value).indexOf(value?.value);
 
                 if (indexOfValue === -1) {
                     selectedValues.push(value);
@@ -335,7 +335,7 @@ export default {
             }
 
             const tmpRegions = [...this.regions].reverse(),
-                position = tmpRegions.findIndex(regionsRegion => regionsRegion.attrName === region.attrName);
+                  position = tmpRegions.findIndex(regionsRegion => regionsRegion.attrName === region.attrName);
 
             if (position === -1) {
                 return true;

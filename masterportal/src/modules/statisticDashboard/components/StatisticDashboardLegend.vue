@@ -60,7 +60,7 @@ export default {
          */
         changeStepValues (index, value) {
             const number = parseFloat(value),
-                values = [...this.stepValues];
+                  values = [...this.stepValues];
 
             if (!Number.isFinite(number)) {
                 return;

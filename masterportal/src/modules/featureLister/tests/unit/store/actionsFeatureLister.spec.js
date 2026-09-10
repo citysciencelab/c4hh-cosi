@@ -3,7 +3,6 @@ import sinon from "sinon";
 import actions from "@modules/featureLister/store/actionsFeatureLister.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import createLayerAddToTreeModule from "@shared/js/utils/createLayerAddToTree.js";
-import tabStatus from "../../../constantsTabStatus.js";
 import spatialSelection from "../../../js/getSpatialSelection.js";
 
 describe("src/modules/featureLister/store/actionsFeatureLister", () => {
@@ -317,10 +316,14 @@ describe("src/modules/featureLister/store/actionsFeatureLister", () => {
             await actions.switchToList({state, rootGetters, commit, dispatch}, layer);
 
             expect(dispatch.calledOnce).to.be.true;
-            expect(commit.callCount).to.equal(5);
+            expect(commit.callCount).to.equal(4);
             expect(commit.firstCall.args[0]).to.equal("setFeatureCount");
             expect(commit.secondCall.args[0]).to.equal("setShownFeatures");
             expect(commit.secondCall.args[1]).to.equal(3);
+            expect(commit.thirdCall.args[0]).to.equal("setSelectedRow");
+            expect(commit.thirdCall.args[1]).to.equal(null);
+            expect(commit.lastCall.args[0]).to.equal("setActiveTab");
+            expect(commit.lastCall.args[1]).to.equal("list");
         });
     });
 
@@ -331,13 +334,9 @@ describe("src/modules/featureLister/store/actionsFeatureLister", () => {
             };
 
             actions.switchBackToList({state, commit});
-            expect(commit.calledThrice).to.be.true;
-            expect(commit.firstCall.args[0]).to.equal("setLayerListView");
-            expect(commit.firstCall.args[1]).to.equal(tabStatus.ENABLED);
-            expect(commit.secondCall.args[0]).to.equal("setFeatureDetailView");
-            expect(commit.secondCall.args[1]).to.equal(tabStatus.ENABLED);
-            expect(commit.thirdCall.args[0]).to.equal("setFeatureListView");
-            expect(commit.thirdCall.args[1]).to.equal(tabStatus.ACTIVE);
+            expect(commit.calledOnce).to.be.true;
+            expect(commit.firstCall.args[0]).to.equal("setActiveTab");
+            expect(commit.firstCall.args[1]).to.equal("list");
         });
     });
 
@@ -361,16 +360,27 @@ describe("src/modules/featureLister/store/actionsFeatureLister", () => {
             const state = {
                 selectedRow: {
                     id: "1"
+                },
+                layer: {
+                    id: "1"
                 }
             };
 
             actions.switchToDetails({state, commit});
-            expect(commit.firstCall.args[0]).to.equal("setLayerListView");
-            expect(commit.firstCall.args[1]).to.equal(tabStatus.ENABLED);
-            expect(commit.secondCall.args[0]).to.equal("setFeatureListView");
-            expect(commit.secondCall.args[1]).to.equal(tabStatus.ENABLED);
-            expect(commit.thirdCall.args[0]).to.equal("setFeatureDetailView");
-            expect(commit.thirdCall.args[1]).to.equal(tabStatus.ACTIVE);
+            expect(commit.calledOnce).to.be.true;
+            expect(commit.firstCall.args[0]).to.equal("setActiveTab");
+            expect(commit.firstCall.args[1]).to.equal("details");
+        });
+
+        it("switches to the details tab even without a selected row", () => {
+            const state = {
+                selectedRow: null,
+                layer: {id: "1"}
+            };
+
+            actions.switchToDetails({state, commit});
+            expect(commit.calledOnce).to.be.true;
+            expect(commit.firstCall.args[0]).to.equal("setActiveTab");
         });
     });
 

@@ -59,6 +59,15 @@ export default {
         state.displayedAlerts = {...state.displayedAlerts, [newAlert.hash]: dayjs().format()};
     },
     /**
+     * Marks a single alert as already shown once in the current session. Not persisted to localStorage.
+     * @param {Object} state state
+     * @param {Object} newAlert alert object that has been shown in the current session
+     * @returns {void}
+     */
+    addToSeenInSessionAlerts (state, newAlert) {
+        state.seenInSessionAlerts = {...state.seenInSessionAlerts, [newAlert.hash]: true};
+    },
+    /**
      * Adds an event to the state's list, which shall trigger an alert.
      * @param {Object} state state
      * @param {Object} newEvent object with information on an event that shall trigger an alert

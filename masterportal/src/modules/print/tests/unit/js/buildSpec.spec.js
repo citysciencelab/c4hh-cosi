@@ -41,7 +41,6 @@ describe("src/modules/print/js/buildSpec", function () {
                 return new CircleStyle();
             }
         },
-        localWindow,
         originalGetFontSize,
         originalGetFontFamily,
         originalGetLabelAlign,
@@ -61,7 +60,6 @@ describe("src/modules/print/js/buildSpec", function () {
                 }
             }
         },
-        originWindow = window,
         originalStyle = style;
 
     beforeAll(() => {
@@ -79,16 +77,28 @@ describe("src/modules/print/js/buildSpec", function () {
         multiPolygonFeatures = createTestFeatures("resources/testFeaturesBplanMultiPolygon.xml");
         lineStringFeatures = createTestFeatures("resources/testFeaturesVerkehrsnetzLineString.xml");
         multiLineStringFeatures = createTestFeatures("resources/testFeaturesVeloroutenMultiLineString.xml");
-        global.window = {location: {origin: "https://example.com", href: "https://example.com/portal/path/"}, getComputedStyle: () => {
-            return {
-                transitionDuration: sinon.stub()
-            };
-        }};
     });
 
     beforeEach(() => {
         buildSpec.getStyleModel = sinon.spy();
-        localWindow = global.window;
+        if (typeof window.getComputedStyle === "function") {
+            sinon.stub(window, "getComputedStyle").callsFake(() => {
+                return {
+                    transitionDuration: "0s"
+                };
+            });
+        }
+        else {
+            Object.defineProperty(window, "getComputedStyle", {
+                configurable: true,
+                writable: true,
+                value: () => {
+                    return {
+                        transitionDuration: "0s"
+                    };
+                }
+            });
+        }
     });
 
     afterEach(() => {
@@ -98,10 +108,6 @@ describe("src/modules/print/js/buildSpec", function () {
         buildSpec.getLabelAlign = originalGetLabelAlign;
         buildSpec.getImageName = originalGetImageName;
         style = originalStyle;
-        global.window = localWindow;
-    });
-    afterAll(() => {
-        global.window = originWindow;
     });
 
     describe("parseAddressToString", function () {
@@ -496,7 +502,6 @@ describe("src/modules/print/js/buildSpec", function () {
                 });
                 sinon.stub(buildSpec, "getMetaData").resolves();
             });
-
 
             it("should generate legend object with unique images", async () => {
                 store.getters = mockStore.getters;
@@ -911,6 +916,31 @@ describe("src/modules/print/js/buildSpec", function () {
 
         it("should return \"styleId\" if styleList is not available", function () {
             expect(buildSpec.getStyleAttributes(vectorLayer, pointFeatures[0], false)).to.eql(["styleId"]);
+        });
+
+        it("should return default if conditions are set without properties", function () {
+            const styleObject = {
+                    rules: [
+                        {
+                            conditions: {
+                                sequence: [0, 100]
+                            },
+                            style: {}
+                        }
+                    ]
+                },
+                getStyleObjectStub = sinon.stub(buildSpec, "getStyleObject").returns(styleObject),
+                warnStub = sinon.stub(console, "warn");
+
+            vectorLayer.set("id", "testLayer");
+            vectorLayer.set("styleId", "testStyle");
+
+            expect(buildSpec.getStyleAttributes(vectorLayer, pointFeatures[0])).to.eql(["default"]);
+            expect(warnStub.calledOnce).to.be.true;
+            expect(warnStub.firstCall.args[0]).to.include("Print: Missing conditions.properties");
+
+            warnStub.restore();
+            getStyleObjectStub.restore();
         });
     });
     describe("getStyleObject", function () {
@@ -1613,44 +1643,36 @@ describe("src/modules/print/js/buildSpec", function () {
         it("should return a url", function () {
             const src = "/img";
 
-            global.window = {
-                location: {
-                    origin: "https://localhost"
-                }
-            };
+            sinon.stub(window, "location").value({
+                origin: "https://localhost"
+            });
             buildSpec.getImageName = sinon.spy();
             expect(buildSpec.buildGraphicPath(src)).to.eql("https://localhost/img");
         });
         it("should return a url", function () {
             const src = "./img";
 
-            global.window = {
-                location: {
-                    href: "https://localhost"
-                }
-            };
+            sinon.stub(window, "location").value({
+                href: "https://localhost"
+            });
             buildSpec.getImageName = sinon.spy();
             expect(buildSpec.buildGraphicPath(src)).to.eql("https://localhost/img");
         });
         it("should return a url", function () {
             const src = "img";
 
-            global.window = {
-                location: {
-                    origin: "https://test"
-                }
-            };
+            sinon.stub(window, "location").value({
+                origin: "https://test"
+            });
             sinon.stub(buildSpec, "getImageName").returns(src);
             expect(buildSpec.buildGraphicPath(src)).to.eql("https://test/lgv-config/img/img");
         });
         it("should return a url", function () {
             const src = "data:image/svg+xml;charset=utf-8";
 
-            global.window = {
-                location: {
-                    origin: "https://localhost"
-                }
-            };
+            sinon.stub(window, "location").value({
+                origin: "https://localhost"
+            });
             buildSpec.getImageName = sinon.spy();
             expect(buildSpec.buildGraphicPath(src)).to.eql("data:image/svg+xml;charset=utf-8");
         });

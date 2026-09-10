@@ -2,12 +2,11 @@ import {createStore} from "vuex";
 import {nextTick} from "vue";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import Modeler3DDrawComponent from "@modules/modeler3D/components/Modeler3DDraw.vue";
 import Modeler3D from "@modules/modeler3D/store/indexModeler3D.js";
 import actions from "@modules/modeler3D/store/actionsModeler3D.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/modeler3D/components/Modeler3DDraw.vue", () => {
     const globalURL = global.URL,
@@ -435,32 +434,32 @@ describe("src/modules/modeler3D/components/Modeler3DDraw.vue", () => {
         it("should undo the last label when CTRL+Z is pressed", async () => {
             store.commit("Modules/Modeler3D/setIsDrawing", true);
             const mockLabel1 =
-                {
-                    position: {x: 100, y: 200, z: 300},
-                    id: "2",
-                    label: {
-                        text: "text1",
-                        show: false
-                    }
-                },
+                    {
+                        position: {x: 100, y: 200, z: 300},
+                        id: "2",
+                        label: {
+                            text: "text1",
+                            show: false
+                        }
+                    },
                 mockLabel2 =
-                {
-                    position: {x: 400, y: 500, z: 300},
-                    id: "3",
-                    label: {
-                        text: "text2",
-                        show: false
-                    }
-                },
+                    {
+                        position: {x: 400, y: 500, z: 300},
+                        id: "3",
+                        label: {
+                            text: "text2",
+                            show: false
+                        }
+                    },
                 mockLabel3 =
-                {
-                    position: {x: 400, y: 500, z: 300},
-                    id: "4",
-                    label: {
-                        text: "text3",
-                        show: false
-                    }
-                },
+                    {
+                        position: {x: 400, y: 500, z: 300},
+                        id: "4",
+                        label: {
+                            text: "text3",
+                            show: false
+                        }
+                    },
                 mockEntity = {
                     id: "someId"
                 };
@@ -479,32 +478,32 @@ describe("src/modules/modeler3D/components/Modeler3DDraw.vue", () => {
         it("should redo the last label when CTRL+Y is pressed", async () => {
             store.commit("Modules/Modeler3D/setIsDrawing", true);
             const mockLabel1 =
-                {
-                    position: {x: 100, y: 200, z: 300},
-                    id: "2",
-                    label: {
-                        text: "text1",
-                        show: false
-                    }
-                },
+                    {
+                        position: {x: 100, y: 200, z: 300},
+                        id: "2",
+                        label: {
+                            text: "text1",
+                            show: false
+                        }
+                    },
                 mockLabel2 =
-                {
-                    position: {x: 400, y: 500, z: 300},
-                    id: "3",
-                    label: {
-                        text: "text2",
-                        show: false
-                    }
-                },
+                    {
+                        position: {x: 400, y: 500, z: 300},
+                        id: "3",
+                        label: {
+                            text: "text2",
+                            show: false
+                        }
+                    },
                 mockLabel3 =
-                {
-                    position: {x: 400, y: 500, z: 300},
-                    id: "4",
-                    label: {
-                        text: "text3",
-                        show: false
-                    }
-                },
+                    {
+                        position: {x: 400, y: 500, z: 300},
+                        id: "4",
+                        label: {
+                            text: "text3",
+                            show: false
+                        }
+                    },
                 mockEntity = {
                     id: "someId"
                 },

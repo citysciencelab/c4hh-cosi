@@ -1,11 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {createPinia, setActivePinia} from "pinia";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import LayerComponentIconInfo from "@modules/layerTree/components/LayerComponentIconInfo.vue";
-
-config.global.mocks.$t = key => key;
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
 describe("src/modules/layerTree/components/LayerComponentIconInfo.vue", () => {
     let icon,
@@ -13,6 +13,8 @@ describe("src/modules/layerTree/components/LayerComponentIconInfo.vue", () => {
         propsData,
         startLayerInformationSpy,
         store,
+        pinia,
+        layerInformationStore,
         wrapper,
         isLayerTree,
         setLayerInfoVisibleSpy;
@@ -39,20 +41,18 @@ describe("src/modules/layerTree/components/LayerComponentIconInfo.vue", () => {
         startLayerInformationSpy = sinon.spy();
         setLayerInfoVisibleSpy = sinon.spy;
 
+        pinia = createPinia();
+        setActivePinia(pinia);
+
+        layerInformationStore = useLayerInformationStore();
+        layerInformationStore.icon = icon;
+        layerInformationStore.startLayerInformation = startLayerInformationSpy;
+
         store = createStore({
             modules: {
                 Modules: {
                     namespaced: true,
                     modules: {
-                        LayerInformation: {
-                            namespaced: true,
-                            actions: {
-                                startLayerInformation: startLayerInformationSpy
-                            },
-                            getters: {
-                                icon: () => icon
-                            }
-                        },
                         LayerSelection: {
                             namespaced: true,
                             mutations: {
@@ -65,7 +65,6 @@ describe("src/modules/layerTree/components/LayerComponentIconInfo.vue", () => {
         });
     });
 
-
     it("renders the info icon given as property to the component", () => {
         wrapper = shallowMount(LayerComponentIconInfo, {
             components: {
@@ -75,7 +74,7 @@ describe("src/modules/layerTree/components/LayerComponentIconInfo.vue", () => {
                 }
             },
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -92,7 +91,7 @@ describe("src/modules/layerTree/components/LayerComponentIconInfo.vue", () => {
                 }
             },
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -109,7 +108,7 @@ describe("src/modules/layerTree/components/LayerComponentIconInfo.vue", () => {
                 }
             },
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });
@@ -138,7 +137,7 @@ describe("src/modules/layerTree/components/LayerComponentIconInfo.vue", () => {
                 }
             },
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             propsData: propsData
         });

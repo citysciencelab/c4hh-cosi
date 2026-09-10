@@ -154,15 +154,15 @@ export default {
             for (let line of csvLines) {
                 line = line.includes(",") ? line.replaceAll(",", ".") : line;
                 const xCoord = parseFloat(line.split(";")[1]),
-                    yCoord = parseFloat(line.split(";")[2]),
+                      yCoord = parseFloat(line.split(";")[2]),
 
-                    // transform to local projection and add to waypoints
-                    tsrGeoSearchResult = await this.fetchTextByCoordinates({coordinates: [xCoord, yCoord]}),
+                      // transform to local projection and add to waypoints
+                      tsrGeoSearchResult = await this.fetchTextByCoordinates({coordinates: [xCoord, yCoord]}),
 
-                    // switch lat/long and transform to local projection
-                    localCoordinates = await this.transformCoordinatesWgs84ToLocalProjection(
-                        tsrGeoSearchResult ? [tsrGeoSearchResult.getCoordinates()[1], tsrGeoSearchResult.getCoordinates()[0]] : [xCoord, yCoord]
-                    );
+                      // switch lat/long and transform to local projection
+                      localCoordinates = await this.transformCoordinatesWgs84ToLocalProjection(
+                          tsrGeoSearchResult ? [tsrGeoSearchResult.getCoordinates()[1], tsrGeoSearchResult.getCoordinates()[0]] : [xCoord, yCoord]
+                      );
 
                 isDuplicate = await this.waypoints.some(x => {
                     if (x.coordinates[0]) {
@@ -174,8 +174,8 @@ export default {
                 if (!isDuplicate) {
                     // add new waypoint with result from geocoder
                     this.addWaypoint({index: this.waypoints.length,
-                        coordinates: localCoordinates,
-                        displayName: tsrGeoSearchResult ? tsrGeoSearchResult.getDisplayName() : `${localCoordinates[0].toFixed(2)}, ${localCoordinates[1].toFixed(2)}`});
+                                      coordinates: localCoordinates,
+                                      displayName: tsrGeoSearchResult ? tsrGeoSearchResult.getDisplayName() : `${localCoordinates[0].toFixed(2)}, ${localCoordinates[1].toFixed(2)}`});
                 }
                 else {
                     csvContainsDuplicate = true;

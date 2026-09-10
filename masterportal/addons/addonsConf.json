@@ -263,5 +263,8 @@
   "mpaddonGfi": {
     "type": "gfiTheme",
     "path": "mpaddon/gfiTheme"
+  },
+  "userTracking": {
+    "type": "javascript"
   }
 }

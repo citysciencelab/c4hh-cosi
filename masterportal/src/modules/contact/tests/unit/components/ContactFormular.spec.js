@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import ContactComponent from "@modules/contact/components/ContactFormular.vue";
 import ContactModule from "@modules/contact/store/indexContact.js";
 
-config.global.mocks.$t = key => key;
 
 /**
  * Fills all form fields with joke data for testing..

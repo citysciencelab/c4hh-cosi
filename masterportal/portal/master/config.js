@@ -40,6 +40,7 @@ const Config = {
             en: "English",
             es: "Español",
             it: "Italiano",
+            fr: "Français",
             platt: "Platt",
             pt: "Português",
             ru: "Русский",

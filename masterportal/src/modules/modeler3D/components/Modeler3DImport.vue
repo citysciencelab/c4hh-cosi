@@ -57,8 +57,8 @@ export default {
         },
         addFile (file) {
             const reader = new FileReader(),
-                fileName = file.name.split(".")[0],
-                fileExtension = file.name.split(".").pop();
+                  fileName = file.name.split(".")[0],
+                  fileExtension = file.name.split(".").pop();
 
             this.setIsLoading(true);
 
@@ -106,9 +106,9 @@ export default {
          */
         async handleObjFile (content, fileName) {
             const {OBJLoader} = await import("three/examples/jsm/loaders/OBJLoader.js"),
-                objLoader = new OBJLoader(),
-                objData = objLoader.parse(content),
-                gltfExporter = new GLTFExporter();
+                  objLoader = new OBJLoader(),
+                  objData = objLoader.parse(content),
+                  gltfExporter = new GLTFExporter();
 
             gltfExporter.parse(objData, async (model) => {
                 const blob = new Blob([model], {type: "model/gltf+json"});
@@ -127,9 +127,9 @@ export default {
          */
         async handleDaeFile (content, fileName) {
             const {ColladaLoader} = await import("three/examples/jsm/loaders/ColladaLoader.js"),
-                colladaLoader = new ColladaLoader(),
-                exporter = new GLTFExporter(),
-                collada = colladaLoader.parse(content);
+                  colladaLoader = new ColladaLoader(),
+                  exporter = new GLTFExporter(),
+                  collada = colladaLoader.parse(content);
 
             exporter.parse(collada.scene, async (gltfData) => {
                 const blob = new Blob([gltfData], {type: "model/gltf-binary"});
@@ -147,7 +147,7 @@ export default {
          */
         changeVisibility (model) {
             const entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(model.id);
+                  entity = entities.getById(model.id);
 
             entity.show = !model.show;
             model.show = entity.show;
@@ -159,10 +159,10 @@ export default {
          */
         zoomTo (id) {
             const scene = mapCollection.getMap("3D").getCesiumScene(),
-                entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
-                entity = entities.getById(id),
-                entityPosition = entity.position.getValue(),
-                destination = Cesium.Cartographic.fromCartesian(entityPosition);
+                  entities = mapCollection.getMap("3D").getDataSourceDisplay().defaultDataSource.entities,
+                  entity = entities.getById(id),
+                  entityPosition = entity.position.getValue(),
+                  destination = Cesium.Cartographic.fromCartesian(entityPosition);
 
             scene.camera.flyTo({
                 destination: Cesium.Cartesian3.fromRadians(destination.longitude, destination.latitude, destination.height + 250)

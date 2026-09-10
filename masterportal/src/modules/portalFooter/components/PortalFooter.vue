@@ -1,6 +1,9 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
+import {mapState} from "pinia";
+import {useAboutStore} from "@modules/about/store/aboutStore.js";
 import ScaleLine from "./ScaleLine.vue";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 
 /**
  * Footer that is displayed below the map. Links can be displayed here.
@@ -27,7 +30,7 @@ export default {
             "mainMenu",
             "secondaryMenu"
         ]),
-        ...mapGetters("Modules/About", [
+        ...mapState(useAboutStore, [
             "hideImprintInFooter"
         ]),
         /**
@@ -78,12 +81,23 @@ export default {
                 this.toggleMenu("secondaryMenu");
             }
 
-            this.changeCurrentComponent({type: "about", side: this.aboutModuleSide, props: {name: this.$t("common:modules.about.name")}});
+            this.changeCurrentComponent(addSourceToPayload(
+                this,
+                {type: "about", side: this.aboutModuleSide, props: {name: this.$t("common:modules.about.name")}}
+            ));
 
             // timeout is needed to scroll to the correct position of the imprint
             setTimeout(() => {
                 document.getElementById("imprint").scrollIntoView({behavior: "smooth", block: "start"});
             }, 500);
+        },
+        /**
+         * Returns true, if isMobile and alias_mobile is filled at url or not mobile.
+         * @param {String} url entry of configured urls
+         * @returns {boolean} true, if url should be shown
+         */
+        showUrl (url) {
+            return !this.isMobile || (typeof url?.alias_mobile === "string" && url.alias_mobile.length > 0);
         }
     }
 };
@@ -110,7 +124,7 @@ export default {
                 v-for="(url, index) in urls"
                 :key="`portal-footer-url-${index}`"
             >
-                <span>
+                <span v-if="showUrl(url)">
                     {{ $t(url.bezeichnung) }}
                     <a
                         :href="url.url"

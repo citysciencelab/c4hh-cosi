@@ -296,11 +296,6 @@ async function renewTokenIfNecessary (access_token, refresh_token, config) {
  * @param {String} token jwt token to be parsed
  * @returns {String} parsed jwt token as object
  */
-/**
- * Parses jwt token. This function does *not* validate the token.
- * @param {String} token jwt token to be parsed
- * @returns {Object} parsed jwt token as object
- */
 function parseJwt (token) {
     try {
         const parts = token.split("."),
@@ -324,6 +319,21 @@ function parseJwt (token) {
     }
 }
 
+/**
+ * Extracts a user uuid from JWT payload if present.
+ *
+ * @param {string} token - The JWT token.
+ * @returns {string|undefined} UUID candidate.
+ */
+function getUserUuidFromToken (token) {
+    const payload = parseJwt(token),
+        uuidCandidate = payload?.sub || payload?.uuid;
+
+    return typeof uuidCandidate === "string" && uuidCandidate.length > 0
+        ? uuidCandidate
+        : undefined;
+}
+
 export default {
     createCodeChallenge,
     generateRandomString,
@@ -337,5 +347,6 @@ export default {
     revokeToken,
     getTokenExpiry,
     renewTokenIfNecessary,
-    parseJwt
+    parseJwt,
+    getUserUuidFromToken
 };

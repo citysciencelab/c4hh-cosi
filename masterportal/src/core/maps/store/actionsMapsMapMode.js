@@ -25,8 +25,6 @@ export default {
                 dispatch("activateMap3d");
             }
         }
-
-        window.trackMatomo?.("MapMode", "Mapmode switched", "Mapmode switched to " + targetMode);
     },
 
     /**

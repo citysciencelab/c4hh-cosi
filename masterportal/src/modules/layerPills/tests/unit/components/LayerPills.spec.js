@@ -1,16 +1,19 @@
 import {createStore} from "vuex";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount, config} from "@vue/test-utils";
 import LayerPillsComponent from "@modules/layerPills/components/LayerPills.vue";
 import {expect} from "chai";
 import sinon from "sinon";
+import {createPinia, setActivePinia} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 
-config.global.mocks.$t = key => key;
 config.global.directives = {"bs-tooltip": {mounted: () => { /* stub */ }}};
 
 let observeSpy, disconnectSpy, ResizeObserverStub;
 
 describe("src/modules/LayerPills.vue", () => {
     let store,
+        pinia,
+        layerInformationStore,
         wrapper,
         visibleLayers,
         active,
@@ -37,7 +40,7 @@ describe("src/modules/LayerPills.vue", () => {
                 }
             },
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             },
             props: {
                 ...props
@@ -73,11 +76,15 @@ describe("src/modules/LayerPills.vue", () => {
         replaceByIdInLayerConfigSpy = sinon.spy();
         setVisibleSubjectDataLayersSpy = sinon.spy();
         startLayerInformationSpy = sinon.spy();
+        pinia = createPinia();
+        setActivePinia(pinia);
+        layerInformationStore = useLayerInformationStore();
+        layerInformationStore.startLayerInformation = startLayerInformationSpy;
         visibleLayers = [
-            {id: 0, name: "layer1", typ: "WMS"},
-            {id: 1, name: "layer2", typ: "WMS"},
-            {id: 2, name: "layer3", typ: "WFS"},
-            {id: 3, name: "layer4", typ: "WFS"}
+            {id: 0, name: "layer1", typ: "WMS", showInLayerTree: true},
+            {id: 1, name: "layer2", typ: "WMS", showInLayerTree: true},
+            {id: 2, name: "layer3", typ: "WFS", showInLayerTree: true},
+            {id: 3, name: "layer4", typ: "WFS", showInLayerTree: true}
         ];
         store = createStore({
             namespaced: true,
@@ -105,12 +112,6 @@ describe("src/modules/LayerPills.vue", () => {
                             namespaced: true,
                             getters: {
                                 layerTreeSortedLayerConfigs: () => () => visibleLayers
-                            }
-                        },
-                        LayerInformation: {
-                            namespaced: true,
-                            actions: {
-                                startLayerInformation: startLayerInformationSpy
                             }
                         }
                     }
@@ -163,7 +164,7 @@ describe("src/modules/LayerPills.vue", () => {
         it("should set up ResizeObserver and observe container on mounted", () => {
             wrapper = mount(LayerPillsComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 attachTo: document.body
             });
@@ -174,7 +175,7 @@ describe("src/modules/LayerPills.vue", () => {
         it("should disconnect ResizeObserver on beforeUnmount", () => {
             wrapper = mount(LayerPillsComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 },
                 attachTo: document.body
             });
@@ -227,7 +228,7 @@ describe("src/modules/LayerPills.vue", () => {
         it("count close-buttons", () => {
             wrapper = mount(LayerPillsComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store, pinia]
                 }});
 
             expect(wrapper.findAll(".close-button").length).to.equals(visibleSubjectDataLayers.length);
@@ -239,8 +240,14 @@ describe("src/modules/LayerPills.vue", () => {
             wrapper = createWrapper();
 
             expect(setVisibleSubjectDataLayersSpy.calledOnce).to.be.true;
-            expect(setVisibleSubjectDataLayersSpy.firstCall.args[1]).to.deep.equal(visibleLayers);
+            expect(setVisibleSubjectDataLayersSpy.firstCall.args[1]).to.deep.equal([
+                {id: 0, name: "layer1", typ: "WMS", showInLayerTree: true},
+                {id: 1, name: "layer2", typ: "WMS", showInLayerTree: true},
+                {id: 2, name: "layer3", typ: "WFS", showInLayerTree: true},
+                {id: 3, name: "layer4", typ: "WFS", showInLayerTree: true}
+            ]);
         });
+
         it("setVisibleLayers only sets 2D layers if 2D mode is selected", () => {
             const visibleLayers3D2D = [
                 {id: 0, name: "layer1", typ: "ENTITIES3D"},
@@ -276,6 +283,23 @@ describe("src/modules/LayerPills.vue", () => {
             );
         });
 
+        it("setVisibleLayers excludes showInLayerTree false layers from pills", () => {
+            visibleLayers = [
+                {id: 0, name: "layer1", typ: "WMS", showInLayerTree: true},
+                {id: 1, name: "layer2", typ: "WMS"},
+                {id: 2, name: "layer3", typ: "WFS", showInLayerTree: false},
+                {id: 3, name: "layer4", typ: "WFS", showInLayerTree: true}
+            ];
+
+            wrapper = createWrapper();
+
+            expect(setVisibleSubjectDataLayersSpy.firstCall.args[1]).to.deep.equal([
+                {id: 0, name: "layer1", typ: "WMS", showInLayerTree: true},
+                {id: 1, name: "layer2", typ: "WMS"},
+                {id: 3, name: "layer4", typ: "WFS", showInLayerTree: true}
+            ]);
+        });
+
         it("removeLayerFromVisibleLayers shall call replaceByIdInLayerConfig", () => {
             wrapper = createWrapper();
             wrapper.vm.removeLayerFromVisibleLayers(visibleLayers[0], "2D");
@@ -288,21 +312,26 @@ describe("src/modules/LayerPills.vue", () => {
                         id: visibleLayers[0].id,
                         visibility: false
                     }
-                }]
+                }],
+                _source: LayerPillsComponent.name
             });
         });
 
-        it.skip("does not show toggle button when there is enough space", async () => {
+        it("does not show toggle button when there is enough space", async () => {
             wrapper = mount(LayerPillsComponent, {
-                global: {plugins: [store]},
+                global: {plugins: [store, pinia]},
                 attachTo: document.body
             });
 
             const container = wrapper.find("#layer-pills").element;
+            const queryAllStub = sinon.stub(container, "querySelectorAll");
+            const querySingleStub = sinon.stub(container, "querySelector");
 
-            sinon.stub(container, "querySelectorAll").returns([{offsetWidth: 100}]);
-            sinon.stub(container, "querySelector").returns({offsetWidth: 50});
-            Object.defineProperty(container, "clientWidth", {value: 400});
+            queryAllStub.withArgs(".nav-pills > li").returns([{offsetWidth: 100}]);
+
+            querySingleStub.withArgs(".nav-pills").returns({
+                getBoundingClientRect: () => ({width: 500})
+            });
 
             await wrapper.vm.$nextTick();
             wrapper.vm.setToggleButtonVisibility();
@@ -311,24 +340,25 @@ describe("src/modules/LayerPills.vue", () => {
             expect(wrapper.vm.showToggleButton).to.be.false;
         });
 
-        it.skip("shows toggle button when pills overflow container", async () => {
+        it("shows toggle button when pills overflow container", async () => {
             visibleSubjectDataLayers = [{name: "l1"}, {name: "l2"}];
 
             wrapper = mount(LayerPillsComponent, {
-                global: {plugins: [store]},
+                global: {plugins: [store, pinia]},
                 attachTo: document.body
             });
 
-            const container = wrapper.vm.$refs.layerPillsContainer,
+            const container = wrapper.vm.$refs.layerPillsContainer;
+            const queryAllStub = sinon.stub(container, "querySelectorAll");
+            const querySingleStub = sinon.stub(container, "querySelector");
 
-                queryStub = sinon.stub(container, "querySelectorAll");
+            queryAllStub.withArgs(".nav-pills > li").returns([{offsetWidth: 150}, {offsetWidth: 150}]);
 
-            queryStub.withArgs(".nav-item").returns([{offsetWidth: 150}]);
-            queryStub.withArgs(".nav-pills").returns([{
-                getBoundingClientRect: () => ({width: 100})
-            }]);
+            querySingleStub.withArgs(".nav-pills").returns({
+                getBoundingClientRect: () => ({width: 250})
+            });
+
             wrapper.vm.setToggleButtonVisibility();
-
             await wrapper.vm.$nextTick();
 
             expect(wrapper.vm.showToggleButton).to.be.true;
@@ -398,7 +428,7 @@ describe("src/modules/LayerPills.vue", () => {
                     }
                 },
                 global: {
-                    plugins: [store],
+                    plugins: [store, pinia],
                     directives: {"bs-tooltip": bsTooltipStub}
                 }
             });
@@ -430,14 +460,12 @@ describe("src/modules/LayerPills.vue", () => {
 
             expect(setVisibleLayersSpy.calledTwice).to.be.true;
 
-            initialSorted = wrapper.vm.layerTreeSortedLayerConfigs().filter(
-                l => wrapper.vm.visibleSubjectDataLayerConfigs.some(n => n.id === l.id)
-            );
+            initialSorted = wrapper.vm.sortedVisibleLayerPills;
 
             expect(setVisibleLayersSpy.firstCall.args[0]).to.deep.equal(initialSorted);
             expect(setVisibleLayersSpy.firstCall.args[1]).to.equal("2D");
 
-            expectedLayers = wrapper.vm.layerTreeSortedLayerConfigs();
+            expectedLayers = wrapper.vm.sortedVisibleLayerPills;
 
             expect(setVisibleLayersSpy.secondCall.args[0]).to.deep.equal(expectedLayers);
             expect(setVisibleLayersSpy.secondCall.args[1]).to.equal("2D");
@@ -454,10 +482,8 @@ describe("src/modules/LayerPills.vue", () => {
 
             wrapper.vm.$options.watch.visibleSubjectDataLayerConfigs.handler.call(wrapper.vm, newValue);
 
-            initialSorted = wrapper.vm.layerTreeSortedLayerConfigs().filter(
-                l => wrapper.vm.visibleSubjectDataLayerConfigs.some(n => n.id === l.id)
-            );
-            expectedLayers = wrapper.vm.layerTreeSortedLayerConfigs();
+            initialSorted = wrapper.vm.sortedVisibleLayerPills;
+            expectedLayers = wrapper.vm.sortedVisibleLayerPills;
 
             expect(setVisibleLayersSpy.calledTwice).to.be.true;
             expect(setVisibleLayersSpy.firstCall.args[0]).to.deep.equal(initialSorted);
@@ -479,48 +505,9 @@ describe("src/modules/LayerPills.vue", () => {
             wrapper.vm.$options.watch.mode.call(wrapper.vm, "3D");
             // called once on mounted and once on watcher call
             expect(setVisibleLayersSpy.calledTwice).to.be.true;
-            expect(setVisibleLayersSpy.secondCall.args[0]).to.be.deep.equals(visibleSubjectDataLayerConfigs);
+            expect(setVisibleLayersSpy.secondCall.args[0]).to.be.deep.equals(wrapper.vm.sortedVisibleLayerPills);
             expect(setVisibleLayersSpy.secondCall.args[1]).to.be.equals("3D");
         });
 
-    });
-    describe("menus", () => {
-        it.skip("should call setToggleButtonVisibility on mount and whenever combinedMenuWidthState changes", async () => {
-            const stubSetToggleButtonVisibility = sinon.stub(LayerPillsComponent.methods, "setToggleButtonVisibility");
-
-            wrapper = createWrapper();
-            expect(stubSetToggleButtonVisibility.calledOnce).to.be.true;
-            store.hotUpdate({
-                modules: {
-                    Menu: {
-                        namespaced: true,
-                        getters: {
-                            currentMainMenuWidth: () => 20,
-                            currentSecondaryMenuWidth: () => 30
-                        }
-                    }
-                }
-            });
-            await wrapper.vm.$nextTick();
-
-            expect(stubSetToggleButtonVisibility.calledTwice).to.be.true;
-
-            store.hotUpdate({
-                modules: {
-                    Menu: {
-                        namespaced: true,
-                        getters: {
-                            currentMainMenuWidth: () => 15,
-                            currentSecondaryMenuWidth: () => 0
-                        }
-                    }
-                }
-            });
-
-            await wrapper.vm.$nextTick();
-
-            expect(stubSetToggleButtonVisibility.calledThrice).to.be.true;
-            stubSetToggleButtonVisibility.restore();
-        });
     });
 });

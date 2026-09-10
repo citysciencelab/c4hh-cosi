@@ -753,8 +753,15 @@ const BuildSpecModel = {
         if (styleObject !== undefined) {
             if (layer.get("styleId")) {
                 const featureRules = getRulesForFeature(styleObject, feature);
+                const conditionProperties = featureRules?.[0]?.conditions?.properties;
 
-                styleFields = featureRules?.[0]?.conditions ? Object.keys(featureRules[0].conditions.properties) : ["default"];
+                if (conditionProperties && Object.keys(conditionProperties).length > 0) {
+                    styleFields = Object.keys(conditionProperties);
+                }
+                else {
+                    console.warn(`Print: Missing conditions.properties for layer "${layerId}" and styleId "${layer.get("styleId")}". Falling back to default style attribute.`);
+                    styleFields = ["default"];
+                }
             }
             else {
                 styleFields = [styleObject.get("styleField")];

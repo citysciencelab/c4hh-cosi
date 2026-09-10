@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount} from "@vue/test-utils";
 import {expect} from "chai";
 import crs from "@masterportal/masterportalapi/src/crs.js";
 import sinon from "sinon";
 import AddWMSComponent from "@modules/addWMS/components/AddWMS.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/addWMS/components/AddWMS.vue", () => {
     let addLayerToLayerConfigSpy,
@@ -382,6 +381,42 @@ describe("src/modules/addWMS/components/AddWMS.vue", () => {
                 ]
             });
         });
+
+        it("should make imported layers directly available in layer list if showInLayerTree is configured", () => {
+            const folder = {
+                    type: "folder",
+                    name: "part 1",
+                    elements: []
+                },
+                object = {
+                    MaxScaleDenominator: undefined,
+                    MinScaleDenominator: undefined,
+                    Name: "geb_sum",
+                    Style: [
+                        {
+                            LegendURL: [
+                                {
+                                    Format: "image/png",
+                                    OnlineResource: "https://geodienste.hamburg.de/HH_WMS_Solaratlas?request=GetLegendGraphic&version=1.3.0&service=WMS&layer=geb_sum&style=style_solaratlas_geb_sum&format=image/png"
+                                }
+                            ],
+                            Name: "style_solaratlas_geb_sum",
+                            Title: "style_solaratlas_geb_sum"
+                        }
+                    ],
+                    Title: "geb_sum"
+                },
+                level = 1;
+
+            showInLayerTree = true;
+
+            wrapper.vm.wmsUrl = "https://geodienste.hamburg.de/HH_WMS_Solaratlas";
+            wrapper.vm.version = "1.3.0";
+            wrapper.vm.infoFormat = "text/xml";
+            wrapper.vm.parseLayerStructure(folder, object, level);
+
+            expect(folder.elements[0].showInLayerTree).to.be.true;
+        });
     });
 
     describe("addLayerToTopicTree", () => {
@@ -413,7 +448,8 @@ describe("src/modules/addWMS/components/AddWMS.vue", () => {
             expect(addLayerToLayerConfigSpy.calledOnce).to.be.true;
             expect(addLayerToLayerConfigSpy.firstCall.args[1]).to.deep.equals({
                 layerConfig: folder,
-                parentKey: "subjectlayer"
+                parentKey: "subjectlayer",
+                _source: AddWMSComponent.name
             });
 
         });

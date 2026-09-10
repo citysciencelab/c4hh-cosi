@@ -1,5 +1,7 @@
 <script>
 import getCswRecordById from "@shared/js/api/getCswRecordById.js";
+import {mapState} from "pinia";
+import {useCopyrightConstraintsStore} from "../store/copyrightConstraintsStore.js";
 import {mapGetters} from "vuex";
 
 /**
@@ -18,13 +20,19 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/CopyrightConstraints", [
+        ...mapState(useCopyrightConstraintsStore, [
             "cswUrl",
             "useLayerCswUrl"
         ]),
-        ...mapGetters(["visibleLayerConfigs"]),
-        getConstraints: function () {
+        ...mapGetters([
+            "visibleLayerConfigs"
+        ]),
+        getConstraints () {
             return this.constraints;
+        },
+        filteredConstraints () {
+            return this.constraints.filter((constraint) => constraint.title && (constraint.accessConstraints || constraint.pointOfContact || constraint.useConstraints?.length > 0)
+            );
         }
     },
     watch: {
@@ -106,16 +114,16 @@ export default {
         <div v-if="ready">
             <p>{{ $t("common:modules.copyrightConstraints.info") }}</p>
             <div
-                v-if="getConstraints.length > 0"
-                :key="getConstraints.length"
+                v-if="filteredConstraints.length > 0"
+                :key="filteredConstraints.length"
             >
                 <ul class="copyrightConstraints_layerList">
                     <li
-                        v-for="(constraintsPerLayer, index) in getConstraints"
+                        v-for="(constraintsPerLayer, index) in filteredConstraints"
                         :key="index"
                     >
                         {{ constraintsPerLayer.title }}
-                        <div v-if="constraintsPerLayer.accessConstraints">
+                        <div v-if="constraintsPerLayer.accessConstraints || constraintsPerLayer.useConstraints?.length > 0">
                             <ul class="copyrightConstraints_constraintsList">
                                 <li
                                     v-if="constraintsPerLayer.accessConstraints"
@@ -126,8 +134,19 @@ export default {
                                     v-for="(useConstraint, useIndex) in constraintsPerLayer.useConstraints"
                                     :key="useIndex"
                                     class="copyright-details"
-                                    v-html="useConstraint.trim()"
-                                />
+                                >
+                                    <template v-if="typeof useConstraint === 'object'">
+                                        <div>
+                                            {{ $t("common:modules.copyrightConstraints.license") }}: <a
+                                                :href="useConstraint.url"
+                                                target="_new"
+                                            >{{ useConstraint.url }}</a>
+                                        </div>
+                                    </template>
+                                    <template v-else>
+                                        <div v-html="useConstraint.trim()" />
+                                    </template>
+                                </li>
                             </ul>
                         </div>
                         <div v-else>
@@ -189,5 +208,9 @@ export default {
 
     .copyright-details {
         white-space: pre-line;
+    }
+
+    .copyrightConstraints_constraintsList {
+        padding-bottom: 1rem;
     }
 </style>

@@ -1,8 +1,7 @@
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import ConfirmModal from "@shared/modules/modals/components/ConfirmModal.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/modals/components/ConfirmModal.vue", () => {
 

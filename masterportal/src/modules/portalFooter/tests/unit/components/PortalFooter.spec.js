@@ -1,27 +1,34 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {createPinia, setActivePinia} from "pinia";
+import {useAboutStore} from "@modules/about/store/aboutStore.js";
+import {shallowMount} from "@vue/test-utils";
 import PortalFooterComponent from "@modules/portalFooter/components/PortalFooter.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/portalFooter/components/PortalFooter.vue", () => {
-    const urls = [{
-        bezeichnung: "abc",
-        url: "https://abc.de",
-        alias: "Alphabet",
-        alias_mobile: "ABC"
-    }];
     let isMobile,
         uiStyle,
         store,
-        hideImprint;
+        pinia,
+        hideImprint,
+        urls;
 
     beforeEach(() => {
+        urls = [{
+            bezeichnung: "abc",
+            url: "https://abc.de",
+            alias: "Alphabet",
+            alias_mobile: "ABC"
+        }];
         isMobile = false;
         uiStyle = "default";
         hideImprint = false;
+        pinia = createPinia();
+        setActivePinia(pinia);
+
+        useAboutStore().hideImprintInFooter = hideImprint;
         store = createStore({
             modules: {
                 Modules: {
@@ -35,12 +42,6 @@ describe("src/modules/portalFooter/components/PortalFooter.vue", () => {
                                 urls: () => urls,
                                 type: () => sinon.stub(),
                                 configPaths: () => sinon.stub()
-                            }
-                        },
-                        About: {
-                            namespaced: true,
-                            getters: {
-                                hideImprintInFooter: () => hideImprint
                             }
                         }
                     }
@@ -95,7 +96,7 @@ describe("src/modules/portalFooter/components/PortalFooter.vue", () => {
     it("renders the footer", () => {
         const wrapper = shallowMount(PortalFooterComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -105,7 +106,7 @@ describe("src/modules/portalFooter/components/PortalFooter.vue", () => {
     it("renders the urls in footer", () => {
         const wrapper = shallowMount(PortalFooterComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -119,7 +120,7 @@ describe("src/modules/portalFooter/components/PortalFooter.vue", () => {
 
         const wrapper = shallowMount(PortalFooterComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -128,10 +129,23 @@ describe("src/modules/portalFooter/components/PortalFooter.vue", () => {
         expect(wrapper.find("a.footerUrl").attributes().href).to.equals("https://abc.de");
     });
 
+    it("doesn’t render the mobile urls, if alias_mobile is not set", () => {
+        isMobile = true;
+        urls[0].alias_mobile = undefined;
+
+        const wrapper = shallowMount(PortalFooterComponent, {
+            global: {
+                plugins: [store, pinia]
+            }
+        });
+
+        expect(wrapper.find("a.footerUrl").exists()).to.be.false;
+    });
+
     it("renders scaleLine exist", () => {
         const wrapper = shallowMount(PortalFooterComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -141,7 +155,7 @@ describe("src/modules/portalFooter/components/PortalFooter.vue", () => {
     it("renders imprint link", () => {
         const wrapper = shallowMount(PortalFooterComponent, {
             global: {
-                plugins: [store]
+                plugins: [store, pinia]
             }
         });
 
@@ -150,8 +164,9 @@ describe("src/modules/portalFooter/components/PortalFooter.vue", () => {
 
     it("does not render imprint link if hideImprintInFooter is true", () => {
         hideImprint = true;
+        useAboutStore().hideImprintInFooter = hideImprint;
         const wrapper = shallowMount(PortalFooterComponent, {
-            global: {plugins: [store]}
+            global: {plugins: [store, pinia]}
         });
 
         expect(wrapper.find(".imprintLink").exists()).to.be.false;

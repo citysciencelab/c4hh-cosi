@@ -1,6 +1,6 @@
 import {createStore} from "vuex";
 import {Polygon, LineString} from "ol/geom.js";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
@@ -8,7 +8,6 @@ import {Style} from "ol/style.js";
 
 import MeasureInMapTooltipComponent from "@modules/measure/components/MeasureInMapTooltip.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/measure/components/MeasureInMapTooltip.vue", () => {
     let store;

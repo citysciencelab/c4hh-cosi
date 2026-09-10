@@ -335,7 +335,7 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
                 }
             };
 
-            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, side);
+            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, {side});
 
             await nextTick(() => {
                 expect(commit.calledTwice).to.be.true;
@@ -353,7 +353,7 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
 
             rootGetters = {"Modules/SearchBar/showAllResults": false};
 
-            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, side);
+            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, {side});
 
             await nextTick(() => {
                 expect(commit.calledOnce).to.be.true;
@@ -373,7 +373,7 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
                 "Modules/SearchBar/currentSide": "mainMenu"
             };
 
-            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, side);
+            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, {side});
 
             await nextTick(() => {
                 expect(commit.calledOnce).to.be.true;
@@ -401,7 +401,7 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
                 }
             };
 
-            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, side);
+            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, {side});
 
             await nextTick(() => {
                 expect(commit.calledOnce).to.be.true;
@@ -428,7 +428,7 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
                 }
             };
 
-            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, side);
+            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, {side});
 
             await nextTick(() => {
                 expect(commit.notCalled).to.be.true;
@@ -454,7 +454,7 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
                 }
             };
 
-            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, side);
+            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, {side});
 
             await nextTick(() => {
                 expect(commit.calledOnce).to.be.true;
@@ -481,7 +481,7 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
                 }
             };
 
-            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, side);
+            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, {side});
 
             await nextTick(() => {
                 expect(commit.calledOnce).to.be.true;
@@ -507,7 +507,7 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
                 }
             };
 
-            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, side);
+            actions.navigateBack({commit, dispatch, getters, state, rootGetters}, {side});
 
             await nextTick(() => {
                 expect(commit.calledOnce).to.be.true;
@@ -633,7 +633,7 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
                 expect(commit.getCall(3).args[1]).to.equal(side);
                 expect(dispatch.calledOnce).to.be.true;
                 expect(dispatch.firstCall.args[0]).to.equal("Modules/LayerSelection/navigateBack");
-                expect(dispatch.firstCall.args[1]).to.deep.equals(null);
+                expect(dispatch.firstCall.args[1]).to.deep.equals({doNotTrack: true});
             });
         });
     });

@@ -1,6 +1,8 @@
 import {expect} from "chai";
 import sinon from "sinon";
 import {SensorThingsMqttConnector} from "../../sensorThingsMqttConnector.js";
+import utilsWebsocket from "@modules/login/js/utilsWebsocket.js";
+import store from "@appstore/index.js";
 
 describe("src/shared/js/api/sensorThingsMqttConnector.js", () => {
     let mqttClient = false;
@@ -8,6 +10,10 @@ describe("src/shared/js/api/sensorThingsMqttConnector.js", () => {
     beforeEach(() => {
         mqttClient = new SensorThingsMqttConnector();
         sinon.stub(console, "error").callsFake(sinon.spy());
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe("constructor", () => {
@@ -448,6 +454,147 @@ describe("src/shared/js/api/sensorThingsMqttConnector.js", () => {
             expect(lastForce).to.equal("force");
             expect(lastOptions).to.equal("options");
             expect(lastOnfinish).to.equal("onfinish");
+        });
+    });
+    describe("token refresh reconnect", () => {
+        it("should register a store watcher for token updates when connecting", () => {
+            const watchSpy = sinon.spy(),
+                mqtt = {
+                    connect: () => {
+                        return {
+                            reconnect: sinon.spy()
+                        };
+                    }
+                };
+            let watchCallback = null;
+
+            sinon.stub(store, "watch").callsFake((getter, callback) => {
+                watchSpy(getter, callback);
+                watchCallback = callback;
+                // eslint-disable-next-line no-empty-function
+                return () => {};
+            });
+
+            mqttClient.setMqttLibObject(mqtt);
+            mqttClient.connect();
+
+            expect(watchSpy.calledOnce).to.be.true;
+            expect(typeof watchCallback).to.equal("function");
+        });
+
+        it("should trigger reconnect when token changes via store watcher", () => {
+            const reconnectSpy = sinon.spy(),
+                mqtt = {
+                    connect: () => {
+                        return {
+                            reconnect: reconnectSpy
+                        };
+                    }
+                };
+            let watchCallback = null;
+
+            sinon.stub(store, "watch").callsFake((getter, callback) => {
+                watchCallback = callback;
+                // eslint-disable-next-line no-empty-function
+                return () => {};
+            });
+
+            mqttClient.setMqttLibObject(mqtt);
+            mqttClient.connect();
+
+            mqttClient.mqttClient = {
+                options: {},
+                reconnect: reconnectSpy
+            };
+
+            // Simulate token change
+            watchCallback("new-token", "old-token");
+
+            expect(reconnectSpy.calledOnce).to.be.true;
+        });
+
+        it("should unwatch store listener when unregisterTokenUpdatedListener is called", () => {
+            const unwatchSpy = sinon.spy(),
+                mqtt = {
+                    connect: () => {
+                        return {
+                            reconnect: sinon.spy()
+                        };
+                    }
+                };
+
+            sinon.stub(store, "watch").returns(unwatchSpy);
+
+            mqttClient.setMqttLibObject(mqtt);
+            mqttClient.connect();
+
+            mqttClient.unregisterTokenUpdatedListener();
+
+            expect(unwatchSpy.calledOnce).to.be.true;
+            expect(mqttClient.tokenUpdatedListener).to.be.null;
+        });
+
+        it("should reconnect mqtt client with updated auth options", () => {
+            const reconnectSpy = sinon.spy(),
+                applyMqttAuthOptionsStub = sinon.stub(utilsWebsocket, "applyMqttAuthOptions").callsFake(options => {
+                    options.username = "new-user";
+                    options.password = "new-token";
+                    return options;
+                });
+
+            mqttClient.mqttClient = {
+                options: {},
+                reconnect: reconnectSpy
+            };
+
+            mqttClient.reconnectWithUpdatedAuth();
+
+            expect(applyMqttAuthOptionsStub.calledOnce).to.be.true;
+            expect(mqttClient.mqttClient.options.username).to.equal("new-user");
+            expect(mqttClient.mqttClient.options.password).to.equal("new-token");
+            expect(reconnectSpy.calledOnce).to.be.true;
+            applyMqttAuthOptionsStub.restore();
+        });
+
+        it("should not reconnect again within debounce window", () => {
+            const reconnectSpy = sinon.spy(),
+                applyMqttAuthOptionsStub = sinon.stub(utilsWebsocket, "applyMqttAuthOptions").returnsArg(0),
+                dateNowStub = sinon.stub(Date, "now").returns(1000);
+
+            mqttClient.mqttClient = {
+                options: {},
+                reconnect: reconnectSpy
+            };
+
+            mqttClient.reconnectWithUpdatedAuth();
+            mqttClient.reconnectWithUpdatedAuth();
+
+            expect(reconnectSpy.calledOnce).to.be.true;
+
+            dateNowStub.restore();
+            applyMqttAuthOptionsStub.restore();
+        });
+
+        it("should reconnect again after debounce window elapsed", () => {
+            const reconnectSpy = sinon.spy(),
+                applyMqttAuthOptionsStub = sinon.stub(utilsWebsocket, "applyMqttAuthOptions").returnsArg(0),
+                dateNowStub = sinon.stub(Date, "now");
+
+            dateNowStub.onFirstCall().returns(1000);
+            dateNowStub.onSecondCall().returns(4000);
+
+            mqttClient.mqttClient = {
+                options: {},
+                reconnect: reconnectSpy
+            };
+
+            mqttClient.reconnectWithUpdatedAuth();
+            mqttClient.reconnectWithUpdatedAuth();
+
+            expect(reconnectSpy.calledTwice).to.be.true;
+
+            dateNowStub.restore();
+            applyMqttAuthOptionsStub.restore();
         });
     });
     describe("simulateRetainedHandling", () => {

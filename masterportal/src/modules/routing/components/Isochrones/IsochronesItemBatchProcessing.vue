@@ -102,7 +102,7 @@ export default {
          */
         async downloadResults (filename, downloadObjects) {
             const downloadString = JSON.stringify(downloadObjects),
-                downloadFilename = this.createDownloadFilename(filename);
+                  downloadFilename = this.createDownloadFilename(filename);
 
             if (typeof navigator.msSaveOrOpenBlob === "function") {
                 window.navigator.msSaveOrOpenBlob(new Blob([downloadString], {
@@ -111,7 +111,7 @@ export default {
             }
             else {
                 const url = `data:text/plain;charset=utf-8,${encodeURIComponent(downloadString)}`,
-                    a = document.createElement("a");
+                      a = document.createElement("a");
 
                 a.href = url;
                 a.download = downloadFilename;
@@ -131,7 +131,7 @@ export default {
                 return ".csv";
             }
             const parts = filename.split("."),
-                partsOhneExtension = parts.slice(0, parts.length - 1);
+                  partsOhneExtension = parts.slice(0, parts.length - 1);
 
             return partsOhneExtension.join(".") + ".geojson";
         },
@@ -147,9 +147,9 @@ export default {
                     return;
                 }
                 const content = filecontent.replace(/[\r]/g, "").trim(),
-                    lines = content.split("\n"),
-                    count = lines.length,
-                    tasks = [];
+                      lines = content.split("\n"),
+                      count = lines.length,
+                      tasks = [];
 
                 if (content.length === 0 || count === 0) {
                     reject(new Error(this.$t("common:modules.routing.isochrones.batchProcessing.errorNoEntries")));
@@ -163,7 +163,7 @@ export default {
 
                 for (let i = 0; i < count; i++) {
                     const line = lines[i],
-                        lineParts = line.split(";");
+                          lineParts = line.split(";");
 
                     if (lineParts.length === 1 && lineParts.includes("")) {
                         continue;
@@ -199,8 +199,8 @@ export default {
          */
         async parseLineParts (lineParts) {
             const id = lineParts[0],
-                startLon = Number(lineParts[1]),
-                startLat = Number(lineParts[2]);
+                  startLon = Number(lineParts[1]),
+                  startLat = Number(lineParts[2]);
 
             try {
                 this.serviceRequests += 1;

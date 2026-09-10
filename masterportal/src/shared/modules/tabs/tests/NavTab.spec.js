@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/tabs/components/NavTab.vue", () => {
 
@@ -35,5 +34,23 @@ describe("src/shared/modules/tabs/components/NavTab.vue", () => {
         expect(iconWrapper.classes()).to.include("bi-geo-alt");
         expect(iconWrapper.classes()).to.include("bi");
         expect(iconWrapper.classes()).to.include("me-2");
+    });
+
+    it("should not add styleVariant classes if styleVariant prop is not set", () => {
+        const wrapper = factory.getShallowMount(),
+            button = wrapper.find("button"),
+            listItem = wrapper.find("li");
+
+        expect(button.classes()).not.to.include("nav-link--blue");
+        expect(listItem.classes()).not.to.include("nav-item--blue");
+    });
+
+    it("should add styleVariant classes to both button and li if styleVariant prop is set", () => {
+        const wrapper = factory.getShallowMount({styleVariant: "blue"}),
+            button = wrapper.find("button"),
+            listItem = wrapper.find("li");
+
+        expect(button.classes()).to.include("nav-link--blue");
+        expect(listItem.classes()).to.include("nav-item--blue");
     });
 });

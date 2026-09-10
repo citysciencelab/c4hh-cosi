@@ -1,8 +1,7 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import ExportButtonCSV from "@shared/modules/buttons/components/ExportButtonCSV.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/shared/modules/buttons/components/ExportButtonCSV.vue", () => {
     beforeAll(() => {

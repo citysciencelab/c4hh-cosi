@@ -1,7 +1,7 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import DirectionsItemBatchProcessingComponent from "@modules/routing/components/Directions/DirectionsItemBatchProcessing.vue";
 import RoutingBatchProcessingComponent from "@modules/routing/components/RoutingBatchProcessing.vue";
 import mutations from "@modules/routing/store/mutationsRouting.js";
@@ -12,7 +12,6 @@ import actionsDirections from "@modules/routing/store/directions/actionsDirectio
 import gettersDirections from "@modules/routing/store/directions/gettersDirections.js";
 import stateDirections from "@modules/routing/store/directions/stateDirections.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/Directions/DirectionsItemBatchProcessing.vue", () => {
     let store, wrapper, props;

@@ -110,7 +110,6 @@ export default {
                 icon="bi-folder"
                 icon-end="bi-chevron-right"
                 customclass="w-100 layer-selection-folder"
-                :title="$t(conf.name)"
             />
         </div>
         <template

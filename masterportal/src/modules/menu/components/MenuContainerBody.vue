@@ -4,8 +4,11 @@ import MenuNavigation from "./MenuNavigation.vue";
 import {mapActions, mapGetters} from "vuex";
 import GetFeatureInfo from "../../getFeatureInfo/components/GetFeatureInfo.vue";
 import MenuComponentKeepAlivePlaceholder from "./MenuComponentKeepAlivePlaceholder.vue";
+import {getPiniaModuleStore, isPiniaModule} from "../../modules-store/piniaModules.js";
+import initializePiniaStore from "@shared/js/utils/initializePiniaStore.js";
 
 /**
+ * The MenuContainerBody component is responsible for rendering the body of the menu, which includes the navigation, the currently visible component, and any feature information. It manages the state of the menu, including which component is currently displayed and which components should be cached using Vue's keep-alive feature. The component also initializes modules based on the menu configuration.
  * @module modules/MenuContainerBody
  * @vue-prop {String} side - The side in which the menu component is being rendered.
  * @vue-computed {Object} menu - The menu configuration for the given menu.
@@ -117,6 +120,9 @@ export default {
                 if (module.type === "folder") {
                     this.initializeModuleConfig(module.elements, `${path}.elements`);
                 }
+                else if (isPiniaModule(module.type)) {
+                    initializePiniaStore(getPiniaModuleStore(module.type)(), module);
+                }
                 else if (module.type !== "customMenuElement") {
                     this.initializeModule({configPaths: [path], type: module.type});
                 }
@@ -142,8 +148,11 @@ export default {
         <keep-alive :include="keepAliveComponents">
             <component
                 :is="currentComponentName"
+                :key="menu.navigation.currentComponent.props?.path?.join('-') || menu.navigation.currentComponent.props?.name || currentComponent"
                 class="menu-body-component"
                 :side="side"
+                :config="menu.navigation.currentComponent.props || {}"
+                v-bind="menu.navigation.currentComponent.props || {}"
             />
         </keep-alive>
         <MenuContainerBodyRoot

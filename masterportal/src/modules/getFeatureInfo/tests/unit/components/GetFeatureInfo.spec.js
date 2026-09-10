@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount, mount} from "@vue/test-utils";
+import {shallowMount, mount, config} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
@@ -17,7 +17,6 @@ let mockMutations,
     wrapper,
     store;
 
-config.global.mocks.$t = key => key;
 config.global.mocks.$gfiThemeAddons = [];
 
 /**

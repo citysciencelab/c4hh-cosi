@@ -108,6 +108,36 @@ describe("src/modules/login/js/utilsAxois.js", () => {
     });
 
     describe("Bearer token for different URLs", () => {
+        it("should keep default behavior and set withCredentials in axios interceptor", () => {
+            const interceptorUrlRegex = "https?://test-url.de*",
+                config = {
+                    headers: {},
+                    url: "https://test-url.de/wms_example"
+                };
+
+            utils.addInterceptor(interceptorUrlRegex);
+
+            const interceptor = axios.interceptors.request.handlers[axios.interceptors.request.handlers.length - 1].fulfilled(config);
+
+            expect(interceptor.headers).to.deep.equals({Authorization});
+            expect(interceptor.withCredentials).to.be.true;
+        });
+
+        it("should not set withCredentials when includeCredentials is false", () => {
+            const interceptorUrlRegex = "https?://test-url.de*",
+                config = {
+                    headers: {},
+                    url: "https://test-url.de/wms_example"
+                };
+
+            utils.addInterceptor(interceptorUrlRegex, false);
+
+            const interceptor = axios.interceptors.request.handlers[axios.interceptors.request.handlers.length - 1].fulfilled(config);
+
+            expect(interceptor.headers).to.deep.equals({Authorization});
+            expect(interceptor.withCredentials).to.be.undefined;
+        });
+
         it("should set Bearer token for url as string.", () => {
             const interceptorUrlRegex = "https?://test-url.de*",
                 config = {

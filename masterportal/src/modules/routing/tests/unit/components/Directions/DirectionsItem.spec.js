@@ -1,7 +1,7 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
 import sinon from "sinon";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import DirectionsComponent from "@modules/routing/components/Directions/DirectionsItem.vue";
 import DirectionsItemBatchProcessingComponent from "@modules/routing/components/Directions/DirectionsItemBatchProcessing.vue";
 import RoutingBatchProcessingCheckboxComponent from "@modules/routing/components/RoutingBatchProcessingCheckbox.vue";
@@ -10,7 +10,6 @@ import RoutingRestrictionsInputComponent from "@modules/routing/components/Routi
 import RoutingElevationProfileComponent from "@modules/routing/components/RoutingElevationProfile.vue";
 import RoutingContextMenuComponent from "../../../../components/RoutingContextMenu.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/routing/components/Directions/DirectionsItem.vue", () => {
     let batchProcessingActive,

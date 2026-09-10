@@ -33,24 +33,26 @@ export default defineConfig(mode => mergeConfig(
         ],
         css: false,
         test: {
-            reporters: ["default"],
+            reporters: [
+                ["tree", {summary: true}]
+            ],
             // reporters: ["default", "html"],
             allowOnly: true,
-            pool: "forks",
+            pool: "threads",
             globals: true,
             environment: "jsdom",
             css: false,
             /**
              * Setting isolate: false disables test isolation, which means all tests in a file share the same environment and global state.
              * This can cause side effects and make tests fail if they depend on a clean state.
-             * But here it is used with 'fileParallelism: false' and that works.
              */
             isolate: false,
-            fileParallelism: false,
+            fileParallelism: true,
             hookTimeout: 5000, // reduce from 20000 to 5000 ms
             include: [
                 "src/**/*.spec.js",
-                "addons/**/*.spec.js"
+                "addons/**/*.spec.js",
+                "devtools/**/*.spec.js"
             ],
             exclude: [
                 // an G31: https://lgv-hamburg.atlassian.net/browse/G31DEV1-3566

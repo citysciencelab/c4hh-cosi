@@ -1,6 +1,7 @@
 <script>
-import {mapGetters, mapMutations} from "vuex";
-import getters from "../store/gettersLanguage.js";
+import {mapActions, mapGetters} from "vuex";
+import getters from "@modules/language/store/gettersLanguage.js";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 
 /**
  * Language Item
@@ -18,10 +19,10 @@ export default {
         ...mapGetters("Modules/Language", Object.keys(getters))
     },
     created: function () {
-        this.setCurrentLocale(i18next.language);
+        this.changeLocale(addSourceToPayload(this, {language: i18next.language, doNotTrack: true}));
     },
     methods: {
-        ...mapMutations("Modules/Language", ["setCurrentLocale"]),
+        ...mapActions("Modules/Language", ["changeLocale"]),
         /**
          * changes the language according user selection and sets current language in state
          * @param {String} language language code e. g. "en"
@@ -29,7 +30,7 @@ export default {
          */
         translate (language) {
             i18next.changeLanguage(language, () => {
-                this.setCurrentLocale(language);
+                this.changeLocale(addSourceToPayload(this, {language}));
             });
         }
     }

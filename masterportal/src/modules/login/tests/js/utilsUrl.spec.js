@@ -124,5 +124,15 @@ describe("src/modules/login/js/utilsUrl", () => {
 
             expect(result.withCredentials).toBe(true);
         });
+
+        it("should not set withCredentials when includeCredentials is false", () => {
+            vi.spyOn(Cookie, "get").mockReturnValue("token");
+            const config = {};
+
+            const result = utilsUrl.getAuthToken(config, false);
+
+            expect(result.headers.Authorization).toBe("Bearer token");
+            expect(result.withCredentials).toBeUndefined();
+        });
     });
 });

@@ -2,6 +2,7 @@
 import {mapGetters} from "vuex";
 import MenuContainerBodyRootItemElement from "./MenuContainerBodyRootItemElement.vue";
 import changeCase from "@shared/js/utils/changeCase.js";
+import {getPiniaModuleStore, isPiniaModule} from "../../modules-store/piniaModules.js";
 
 /**
  * Menu Container Body Root Items
@@ -9,6 +10,7 @@ import changeCase from "@shared/js/utils/changeCase.js";
  * @vue-prop {String} idAppendix - The appendix set on the id to make it unique.
  * @vue-prop {Array} path - The path to find the MenuContainerBodyElement inside the store structure.
  * @vue-prop {String} side - The side in which the menu component is being rendered.
+ * @vue-computed {Array} sections - Returns the sections of this side.
  */
 export default {
     name: "MenuContainerBodyRootItems",
@@ -33,7 +35,23 @@ export default {
         }
     },
     computed: {
-        ...mapGetters("Menu", ["customMenuElementIcon", "section"])
+        ...mapGetters("Menu", ["customMenuElementIcon", "section", "sectionsBySide"]),
+        sections () {
+            return this.sectionsBySide(this.side);
+        }
+    },
+    watch: {
+        sections: {
+            /**
+             * Is triggered if sections change. E.g. if module 'openConfig' is used with another config.json.
+             * Loads new sections.
+             * @returns {void}
+             */
+            handler () {
+                this.prepareItemProps();
+            },
+            deep: true
+        }
     },
     created () {
         this.prepareItemProps();
@@ -49,13 +67,30 @@ export default {
             let properties = item;
 
             if ("type" in item) {
+                if (isPiniaModule(item.type)) {
+                    const piniaStore = getPiniaModuleStore(item.type)();
+
+                    // merge config item with the module's menu metadata from the Pinia store
+                    return {
+                        name: piniaStore.name,
+                        icon: piniaStore.icon,
+                        description: piniaStore.description,
+                        ...item,
+                        type: item.type
+                    };
+                }
+
                 const stateProperties = this.$store.state.Modules[changeCase.upperFirst(item.type)];
 
-                if (item.type === "customMenuElement" && !Object.prototype.hasOwnProperty.call(properties, "icon")) {
-                    properties.icon = this.customMenuElementIcon;
-                }
                 if (typeof stateProperties === "object") {
-                    properties = stateProperties;
+                    properties = {
+                        ...stateProperties,
+                        ...item
+                    };
+                }
+
+                if (item.type === "customMenuElement" && !Object.prototype.hasOwnProperty.call(item, "icon")) {
+                    properties.icon = this.customMenuElementIcon;
                 }
             }
             return properties;

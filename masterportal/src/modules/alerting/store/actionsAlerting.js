@@ -30,15 +30,55 @@ function checkAlertLifespan (alertToCheck) {
 
 }
 /**
+ * Checks if an alert hash exists in localStorage.
+ * Supports both object and array serialization to stay compatible with existing data.
+ * @param {string} storageKey localStorage key for displayed alerts.
+ * @param {string} alertHash hash to check.
+ * @returns {boolean} true if hash is already stored.
+ */
+function hasDisplayedAlertHashInStorage (storageKey, alertHash) {
+    const rawStoredAlerts = localStorage[storageKey];
+
+    if (typeof rawStoredAlerts !== "string" || rawStoredAlerts.length < 1) {
+        return false;
+    }
+
+    try {
+        const parsedStoredAlerts = JSON.parse(rawStoredAlerts);
+
+        if (Array.isArray(parsedStoredAlerts)) {
+            return parsedStoredAlerts.includes(alertHash);
+        }
+
+        if (parsedStoredAlerts && typeof parsedStoredAlerts === "object") {
+            return Object.hasOwn(parsedStoredAlerts, alertHash);
+        }
+    }
+    catch {
+        return rawStoredAlerts.includes(alertHash);
+    }
+
+    return false;
+}
+
+/**
  * Checks if an already displayed alert may be displayed again.
- * @param {Object} displayedAlerts an object as collection of already displayed alerts with their hash value as associated key
  * @param {Object} alertToCheck The alert to check as object{hash, once, ...}
+ * @param {Object} [seenInSessionAlerts={}] hash-keyed map of onceInSession alerts already shown in the current session
  * @returns {Boolean} True if the given alert may be displayed again
  */
-function checkAlertViewRestriction (displayedAlerts, alertToCheck) {
+function checkAlertViewRestriction (alertToCheck, seenInSessionAlerts = {}) {
+    const storageKey = store.getters["Alerting/localStorageDisplayedAlertsKey"];
+    const isModuleOpenAlert = typeof alertToCheck.displayOnEvent === "object" &&
+        alertToCheck.displayOnEvent?.type === "Menu/changeCurrentComponent";
 
     // if hash is already in localStorage then alert is not shown
-    if (localStorage[store.getters["Alerting/localStorageDisplayedAlertsKey"]]?.includes(alertToCheck.hash)) {
+    if (hasDisplayedAlertHashInStorage(storageKey, alertToCheck.hash)) {
+        return false;
+    }
+
+    // onceInSession alerts must not reappear after they have been cleaned up from state.alerts
+    if (alertToCheck.onceInSession === true && Object.hasOwn(seenInSessionAlerts, alertToCheck.hash)) {
         return false;
     }
 
@@ -47,8 +87,9 @@ function checkAlertViewRestriction (displayedAlerts, alertToCheck) {
         return true;
     }
 
-    // displayed and restricted to only a single time
-    if (alertToCheck.once === true) {
+    // for initial alerts and other legacy alerts: keep old once behavior (persist immediately)
+    // for module-open alerts: persist once only after explicit confirmation
+    if (alertToCheck.once === true && (!isModuleOpenAlert || alertToCheck.mustBeConfirmed !== true)) {
         store.commit("Alerting/addToDisplayedAlerts", alertToCheck);
     }
 
@@ -56,19 +97,163 @@ function checkAlertViewRestriction (displayedAlerts, alertToCheck) {
 
 }
 
+/**
+ * Resolves configured alert text. If an i18n key is provided, translated text is returned.
+ * @param {string} text configured text or i18n key.
+ * @returns {string} resolved text.
+ */
+function resolveAlertText (text) {
+    if (typeof text !== "string" || text.length < 1) {
+        return "";
+    }
+
+    if (text.startsWith("common:") || text.startsWith("additional:")) {
+        return i18next.t(text);
+    }
+
+    return text;
+}
+
+/**
+ * Builds a stable hash seed for alert de-duplication and once/localStorage behavior.
+ * Includes event-related fields so config changes (e.g. module type) create a new hash.
+ * @param {Object} alert alert object to hash.
+ * @returns {string} hash seed string.
+ */
+function buildAlertHashSeed (alert) {
+    return objectHash({
+        alertId: alert.alertId,
+        content: alert.content,
+        title: alert.title,
+        category: alert.category,
+        displayFrom: alert.displayFrom,
+        displayUntil: alert.displayUntil,
+        displayOnEvent: alert.displayOnEvent,
+        moduleType: alert.moduleType,
+        modul: alert.modul
+    });
+}
+
+/**
+ * Checks whether the given object is a module-open alert definition.
+ * @param {Object} alertCandidate candidate object.
+ * @returns {boolean} true if object looks like a module-open alert definition.
+ */
+function isModuleOpenAlertDefinition (alertCandidate) {
+    return alertCandidate && typeof alertCandidate === "object" &&
+        (typeof alertCandidate.moduleType === "string" || typeof alertCandidate.modul === "string") &&
+        typeof alertCandidate.content === "string";
+}
+
 export default {
+    /**
+     * Registers module-open alerts from config.js alerting.moduleOpenAlerts.
+     * Accepts either an object map or an array of alert definitions.
+     * @param {Object} context the vuex context.
+     * @param {Function} context.dispatch the dispatch function.
+     * @param {Object|Object[]} moduleOpenAlerts alert definitions to register.
+     * @returns {void}
+     */
+    addModuleOpenAlertsFromConfig ({dispatch}, moduleOpenAlerts) {
+        if (!moduleOpenAlerts || typeof moduleOpenAlerts !== "object") {
+            return;
+        }
+
+        let alertList = [];
+
+        if (Array.isArray(moduleOpenAlerts)) {
+            alertList = moduleOpenAlerts;
+        }
+        else if (isModuleOpenAlertDefinition(moduleOpenAlerts)) {
+            alertList = [moduleOpenAlerts];
+        }
+        else {
+            alertList = Object.entries(moduleOpenAlerts).map(([alertId, moduleOpenAlert]) => ({
+                ...moduleOpenAlert,
+                alertId
+            }));
+        }
+
+        alertList.forEach(moduleOpenAlert => {
+            if (moduleOpenAlert && typeof moduleOpenAlert === "object") {
+                dispatch("addSingleAlertOnModuleOpen", moduleOpenAlert);
+            }
+        });
+    },
+
+    /**
+     * Registers an alert that is displayed when a specific module is opened via menu navigation.
+     * If the module is already open, the event alert is triggered immediately.
+     * @param {Object} context the vuex context.
+     * @param {Function} context.dispatch the dispatch function.
+     * @param {Object} context.rootState the root state.
+     * @param {Object} payload payload for the module-open alert.
+     * @param {string} [payload.alertId] optional stable config identifier for hash generation.
+     * @param {string} payload.moduleType type of the module, e.g. "compareFeatures".
+     * @param {string} payload.content alert content text.
+     * @param {string} [payload.title=""] optional alert title.
+     * @param {string} [payload.category="info"] alert category.
+     * @returns {void}
+     */
+    addSingleAlertOnModuleOpen ({dispatch, rootState}, {alertId, moduleType, modul, content, title = "", category = "info", mustBeConfirmed = false, once = true, onceInSession = true, displayFrom, displayUntil} = {}) {
+        const configuredModuleType = typeof modul === "string" && modul.length > 0 ? modul : moduleType;
+
+        if (typeof configuredModuleType !== "string" || configuredModuleType.length < 1 || typeof content !== "string" || content.length < 1) {
+            return;
+        }
+
+        dispatch("addSingleAlert", {
+            alertId,
+            category,
+            moduleType: configuredModuleType,
+            title: resolveAlertText(title),
+            content: resolveAlertText(content),
+            displayFrom,
+            displayUntil,
+            initial: true,
+            initialConfirmed: mustBeConfirmed,
+            mustBeConfirmed,
+            once,
+            onceInSession,
+            displayOnEvent: {
+                type: "Menu/changeCurrentComponent",
+                value: {
+                    type: configuredModuleType
+                }
+            }
+        });
+
+        if (rootState?.Menu?.mainMenu?.currentComponent === configuredModuleType || rootState?.Menu?.secondaryMenu?.currentComponent === configuredModuleType) {
+            dispatch("activateDisplayOnEventAlerts", {
+                type: "Menu/changeCurrentComponent",
+                payload: {
+                    type: configuredModuleType
+                }
+            });
+        }
+    },
+
     /**
      * Updates localStorage with read and once:true alerts, set displayed alerts as displayed and hide modal.
      * @param {Object} state state
      * @param {Object} commit commit
      * @returns {void}
      */
-    cleanup: function ({state, commit}) {
-        const storageKey = state.localStorageDisplayedAlertsKey;
+    cleanup: function ({state, commit}, {visibleAlertHashes} = {}) {
+        const storageKey = state.localStorageDisplayedAlertsKey,
+            hasVisibleFilter = Array.isArray(visibleAlertHashes);
 
         state.alerts.forEach(singleAlert => {
+            if (hasVisibleFilter && !visibleAlertHashes.includes(singleAlert.hash)) {
+                return;
+            }
+
             if (!singleAlert.mustBeConfirmed && singleAlert.initialConfirmed !== false && singleAlert.initial !== undefined && singleAlert.once === true) {
                 commit("addToDisplayedAlerts", singleAlert);
+                commit("removeFromAlerts", singleAlert);
+            }
+            else if (!singleAlert.mustBeConfirmed && singleAlert.onceInSession === true) {
+                commit("addToSeenInSessionAlerts", singleAlert);
                 commit("removeFromAlerts", singleAlert);
             }
         });
@@ -152,18 +337,11 @@ export default {
             alertProtoClone[key] = newAlertObj[key];
         }
 
-        alertProtoClone.hash = alertProtoClone.content;
-        if (typeof alertProtoClone.displayFrom === "string") {
-            alertProtoClone.hash = alertProtoClone.hash + alertProtoClone.displayFrom;
-        }
-        if (typeof alertProtoClone.displayUntil === "string") {
-            alertProtoClone.hash = alertProtoClone.hash + alertProtoClone.displayUntil;
-        }
-        alertProtoClone.hash = objectHash(alertProtoClone.hash);
+        alertProtoClone.hash = buildAlertHashSeed(alertProtoClone);
         isUnique = findSingleAlertByHash(state.alerts, alertProtoClone.hash) === false;
         onceInSession = !isUnique ? alertProtoClone.onceInSession : false;
         isInTime = checkAlertLifespan(alertProtoClone);
-        isNotRestricted = checkAlertViewRestriction(state.displayedAlerts, alertProtoClone);
+        isNotRestricted = checkAlertViewRestriction(alertProtoClone, state.seenInSessionAlerts);
 
         if (alertProtoClone.isNews) {
             commit("Modules/News/addNews", alertProtoClone, {root: true});
@@ -176,9 +354,9 @@ export default {
         displayAlert = isUnique && isInTime && isNotRestricted;
         if (displayAlert) {
             if ((newAlert.multipleAlert !== true && !newAlert.initial && state.initialClosed === true) || (newAlert.multipleAlert === true && hasInitAlert === true && state.initialClosed === true)) {
-                state.alerts = [];
+                state.alerts = state.alerts.filter(singleAlert => Object.hasOwn(singleAlert, "displayOnEvent"));
             }
-            if (!localStorage[state.localStorageDisplayedAlertsKey]?.includes(alertProtoClone.hash)) {
+            if (!hasDisplayedAlertHashInStorage(state.localStorageDisplayedAlertsKey, alertProtoClone.hash)) {
                 commit("addToAlerts", alertProtoClone);
             }
         }

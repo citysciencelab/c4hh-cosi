@@ -285,7 +285,8 @@
       "contactName": "Nome",
       "contactPhone": "Tel.",
       "contactEmail": "E-mail",
-      "wait": "Un momento per favore"
+      "wait": "Un momento per favore",
+      "license": "Licenza"
     },
     "draw": {
       "description": "Crea annotazioni importanti o evidenzia aree",
@@ -633,6 +634,7 @@
       "addressSuffix": "Indirizzo",
       "addressSuffixes": "Indirizzi del layer",
       "attachFileMessage": "Aggiungere eventualmente il tipo di file durante il download",
+      "creationDate": "Creazione",
       "downloadDataset": "Scarica dataset",
       "lastModified": "Ultima modifica",
       "legend": "Legenda",
@@ -640,7 +642,7 @@
       "noMetadataLoaded": "Impossibile caricare i metadati!",
       "noMetadataLoadedConsole": "Impossibile recuperare i metadati per questo layer. Questo indica un problema con il file services.json incluso.",
       "periodicityTitle": "Aggiornamento dei dati",
-      "publicationCreation": "Pubblicazione / creazione",
+      "publicationDate": "Pubblicazione",
       "pointOfContact": "Referente",
       "contactInfoMessage": "Scrivi al referente del tema ",
       "contactPublisher": "Scrivi al referente ",

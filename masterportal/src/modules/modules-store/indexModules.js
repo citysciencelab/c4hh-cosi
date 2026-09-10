@@ -1,6 +1,5 @@
 import getters from "./gettersModules.js";
 
-import About from "../about/store/indexAbout.js";
 import AddWMS from "../addWMS/store/indexAddWMS.js";
 import BaselayerSwitcher from "../baselayerSwitcher/store/indexBaselayerSwitcher.js";
 import BufferAnalysis from "../bufferAnalysis/store/indexBufferAnalysis.js";
@@ -8,7 +7,6 @@ import Contact from "../contact/store/indexContact.js";
 import CompareMaps from "../compareMaps/store/indexCompareMaps.js";
 import CompareFeatures from "../compareFeatures/store/indexCompareFeatures.js";
 import CoordToolkit from "../coordToolkit/store/indexCoordToolkit.js";
-import CopyrightConstraints from "../copyrightConstraints/store/indexCopyrightConstraints.js";
 import Draw from "../draw/store/indexDraw.js";
 import Draw_old from "../draw_old/store/indexDraw.js";
 import FeatureLister from "../featureLister/store/indexFeatureLister.js";
@@ -18,7 +16,6 @@ import GetFeatureInfo from "../getFeatureInfo/store/indexGetFeatureInfo.js";
 import GraphicalSelect from "@shared/modules/graphicalSelect/store/indexGraphicalSelect.js";
 import Language from "../language/store/indexLanguage.js";
 import LayerClusterToggler from "../layerClusterToggler/store/indexLayerClusterToggler.js";
-import LayerInformation from "../layerInformation/store/indexLayerInformation.js";
 import LayerPills from "../layerPills/store/indexLayerPills.js";
 import LayerPreview from "@shared/modules/layerPreview/store/indexLayerPreview.js";
 import LayerSelection from "../layerSelection/store/indexLayerSelection.js";
@@ -52,7 +49,6 @@ export default {
     getters,
     modules: {
         // modules must be copied, else tests fail in watch mode
-        About: {...About},
         AddWMS: {...AddWMS},
         BaselayerSwitcher: {...BaselayerSwitcher},
         BufferAnalysis: {...BufferAnalysis},
@@ -60,7 +56,6 @@ export default {
         CoordToolkit: {...CoordToolkit},
         CompareMaps: {...CompareMaps},
         CompareFeatures: {...CompareFeatures},
-        CopyrightConstraints: {...CopyrightConstraints},
         Draw: {...Draw},
         Draw_old: {...Draw_old},
         FeatureLister: {...FeatureLister},
@@ -70,7 +65,6 @@ export default {
         GraphicalSelect: {...GraphicalSelect},
         Language: {...Language},
         LayerClusterToggler: {...LayerClusterToggler},
-        LayerInformation: {...LayerInformation},
         LayerPills: {...LayerPills},
         LayerPreview: {...LayerPreview},
         LayerSelection: {...LayerSelection},

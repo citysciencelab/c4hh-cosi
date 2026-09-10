@@ -123,16 +123,16 @@ export default {
          */
         createDate () {
             const year = this.shadowTime.year ? this.shadowTime.year : this.currentYear,
-                checkedMonth = this.shadowTime?.month?.length === 1 ? "0" + this.shadowTime.month : this.shadowTime.month,
-                checkedDay = this.shadowTime?.day?.length === 1 ? "0" + this.shadowTime.day : this.shadowTime.day,
-                checkedHour = this.shadowTime?.hour?.length === 1 ? "0" + this.shadowTime.hour : this.shadowTime.hour,
-                checkedMinute = this.shadowTime?.minute?.length === 1 ? "0" + this.shadowTime.minute : this.shadowTime.minute,
-                month = this.shadowTime.month ? checkedMonth : this.currentMonth,
-                day = this.shadowTime.day ? checkedDay : this.currentDay,
-                hour = this.shadowTime.hour ? checkedHour : this.currentHour,
-                minute = this.shadowTime.minute ? checkedMinute : this.currentMinute,
-                showDate = [year, month, day].join("-"),
-                showTime = [hour, minute].join(":");
+                  checkedMonth = this.shadowTime?.month?.length === 1 ? "0" + this.shadowTime.month : this.shadowTime.month,
+                  checkedDay = this.shadowTime?.day?.length === 1 ? "0" + this.shadowTime.day : this.shadowTime.day,
+                  checkedHour = this.shadowTime?.hour?.length === 1 ? "0" + this.shadowTime.hour : this.shadowTime.hour,
+                  checkedMinute = this.shadowTime?.minute?.length === 1 ? "0" + this.shadowTime.minute : this.shadowTime.minute,
+                  month = this.shadowTime.month ? checkedMonth : this.currentMonth,
+                  day = this.shadowTime.day ? checkedDay : this.currentDay,
+                  hour = this.shadowTime.hour ? checkedHour : this.currentHour,
+                  minute = this.shadowTime.minute ? checkedMinute : this.currentMinute,
+                  showDate = [year, month, day].join("-"),
+                  showTime = [hour, minute].join(":");
 
             this.showTime = showTime;
             this.pickDates = new Date(showDate);
@@ -187,9 +187,9 @@ export default {
          */
         syncTimeSlider (minuteValue) {
             const timeSliderValue = minuteValue,
-                hours = Math.floor(timeSliderValue / 60),
-                minutes = (timeSliderValue % 60).toString(),
-                minutesDisplay = minutes?.length === 1 ? "0" + minutes : minutes;
+                  hours = Math.floor(timeSliderValue / 60),
+                  minutes = (timeSliderValue % 60).toString(),
+                  minutesDisplay = minutes?.length === 1 ? "0" + minutes : minutes;
 
             this.timeSliderValue = minuteValue;
             this.showTime = hours + ":" + minutesDisplay;
@@ -203,8 +203,8 @@ export default {
          */
         syncDatePicker (totalDaysInYear) {
             const startDate = new Date(Number(this.currentYear), 0),
-                calculateDate = new Date(startDate.setDate(Number(totalDaysInYear))), // initialize a date in `year-01-01`
-                formatCalculateDate = dayjs(calculateDate).format("YYYY-MM-DD");
+                  calculateDate = new Date(startDate.setDate(Number(totalDaysInYear))), // initialize a date in `year-01-01`
+                  formatCalculateDate = dayjs(calculateDate).format("YYYY-MM-DD");
 
             if (this.$refs.datePicker) {
                 this.date = formatCalculateDate;

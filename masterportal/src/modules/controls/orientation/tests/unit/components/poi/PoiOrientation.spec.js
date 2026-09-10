@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createStyle.js";
@@ -7,7 +7,6 @@ import PoiOrientationComponent from "@modules/controls/orientation/components/po
 import Feature from "ol/Feature.js";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/controls/orientation/components/PoiOrientation.vue", () => {
     let store,
@@ -15,14 +14,19 @@ describe("src/modules/controls/orientation/components/PoiOrientation.vue", () =>
         wrapper,
         returnLegendByStyleIdSpy,
         styleObj,
+        setActiveCategoryStub,
         featureStyleObject;
 
+
     beforeEach(() => {
+        setActiveCategoryStub = sinon.stub();
+
         store = createStore({
             namespaced: true,
             modules: {
                 Controls: {
                     namespaced: true,
+                    state: {},
                     modules: {
                         Orientation: {
                             namespaced: true,
@@ -31,7 +35,7 @@ describe("src/modules/controls/orientation/components/PoiOrientation.vue", () =>
                                 position: sinon.stub()
                             },
                             mutations: {
-                                setActiveCategory: sinon.stub()
+                                setActiveCategory: setActiveCategoryStub
                             }
                         }
                     }
@@ -44,9 +48,9 @@ describe("src/modules/controls/orientation/components/PoiOrientation.vue", () =>
 
         propsData = {
             poiDistances: [
+                500,
                 1000,
-                5000,
-                10000
+                2000
             ],
             getFeaturesInCircle: () => {
                 const feature = new Feature(),
@@ -146,5 +150,11 @@ describe("src/modules/controls/orientation/components/PoiOrientation.vue", () =>
             expect(returnLegendByStyleIdSpy.calledOnce).to.be.true;
         });
 
+    });
+    describe("changedCategory", function () {
+        it("should call setActiveCategory with the category value", function () {
+            wrapper.vm.changedCategory(500);
+            expect(setActiveCategoryStub.calledWith(sinon.match.any, 500)).to.be.true;
+        });
     });
 });

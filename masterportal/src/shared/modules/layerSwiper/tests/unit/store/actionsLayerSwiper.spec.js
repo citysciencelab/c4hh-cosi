@@ -1,17 +1,12 @@
 import sinon from "sinon";
 import {expect} from "chai";
 import actions from "@shared/modules/layerSwiper/store/actionsLayerSwiper.js";
-import {JSDOM} from "jsdom";
 import layerCollection from "@core/layers/js/layerCollection.js";
 
 describe("actions", () => {
-    let commit, dispatch, state, rootGetters, jsdom, map, originalDocument, originalWindow, originalKeyboardEvent, originalPointerEvent;
+    let commit, dispatch, state, rootGetters, map;
 
     beforeAll(() => {
-        originalDocument = global.document;
-        originalWindow = global.window;
-        originalKeyboardEvent = global.KeyboardEvent;
-        originalPointerEvent = global.PointerEvent;
         mapCollection.clear();
         map = {
             id: "ol",
@@ -24,12 +19,6 @@ describe("actions", () => {
     });
 
     beforeEach(() => {
-        jsdom = new JSDOM("<!doctype html><html><body></body></html>");
-        global.document = jsdom.window.document;
-        global.window = jsdom.window;
-        global.KeyboardEvent = jsdom.window.KeyboardEvent;
-        // PointerEvent is missing in jsdom, using MouseEvent for test instead https://github.com/jsdom/jsdom/issues/2527
-        global.PointerEvent = jsdom.window.MouseEvent;
         commit = sinon.spy();
         dispatch = sinon.spy();
         state = {
@@ -54,17 +43,11 @@ describe("actions", () => {
         }));
     });
 
-    afterEach(() => {
-        global.document = originalDocument;
-        global.window = originalWindow;
-        global.KeyboardEvent = originalKeyboardEvent;
-        global.PointerEvent = originalPointerEvent;
-    });
-
     it("should calculate new position and commit changes on pointermove", () => {
-        const event = new PointerEvent("pointermove", {
-            clientX: 150
-        });
+        const event = {
+            type: "pointermove",
+            pageX: 150
+        };
 
         actions.moveSwiper({state, commit, dispatch}, event);
 
@@ -76,9 +59,10 @@ describe("actions", () => {
     });
 
     it("should calculate new position and commit changes on keydown right arrow", () => {
-        const event = new KeyboardEvent("keydown", {
+        const event = {
+            type: "keydown",
             key: "ArrowRight"
-        });
+        };
 
         actions.moveSwiper({state, commit, dispatch}, event);
 

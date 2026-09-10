@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import SearchBarSuggestionListComponent from "@modules/searchBar/components/SearchBarSuggestionList.vue";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
     let store,
@@ -145,7 +144,7 @@ describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
 
     describe("test the rendering with different parameters", () => {
         it("renders the SearchBarSuggestionList", async () => {
-            wrapper = await mount(SearchBarSuggestionListComponent, {
+            wrapper = await shallowMount(SearchBarSuggestionListComponent, {
                 props: {
                     limitedSortedSearchResults
                 },
@@ -158,7 +157,7 @@ describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
 
         it("not renders the SearchBarSuggestionList if showInTree is true", async () => {
             showInTree = true;
-            wrapper = await mount(SearchBarSuggestionListComponent, {
+            wrapper = await shallowMount(SearchBarSuggestionListComponent, {
                 props: {
                     limitedSortedSearchResults
                 },
@@ -170,7 +169,7 @@ describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
         });
 
         it("shows the showAll button", async () => {
-            wrapper = await mount(SearchBarSuggestionListComponent, {
+            wrapper = await shallowMount(SearchBarSuggestionListComponent, {
                 props: {
                     limitedSortedSearchResults
                 },
@@ -193,7 +192,7 @@ describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
                 }
             );
 
-            wrapper = await mount(SearchBarSuggestionListComponent, {
+            wrapper = await shallowMount(SearchBarSuggestionListComponent, {
                 props: {
                     limitedSortedSearchResults
                 },
@@ -237,7 +236,7 @@ describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
                 }
             );
 
-            wrapper = await mount(SearchBarSuggestionListComponent, {
+            wrapper = await shallowMount(SearchBarSuggestionListComponent, {
                 props: {
                     limitedSortedSearchResults
                 },
@@ -270,7 +269,7 @@ describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
 
     describe("test the method getFirstByCategory and template rendering", () => {
         it("getFirstByCategory returns the first result of the category", async () => {
-            wrapper = await mount(SearchBarSuggestionListComponent, {
+            wrapper = await shallowMount(SearchBarSuggestionListComponent, {
                 props: {
                     limitedSortedSearchResults
                 },
@@ -303,7 +302,7 @@ describe("src/modules/searchBar/components/SearchBarSuggestionList.vue", () => {
                     currentShowAllList: customResults
                 };
 
-            wrapper = await mount(SearchBarSuggestionListComponent, {
+            wrapper = await shallowMount(SearchBarSuggestionListComponent, {
                 props: {
                     limitedSortedSearchResults: customLimitedSortedSearchResults
                 },

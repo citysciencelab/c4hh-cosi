@@ -357,13 +357,6 @@ const actions = {
             response.data.index = printJob.index;
             dispatch("waitForPrintJob", response.data);
         }
-
-        if (printJob.payload?.attributes?.is3dMode) {
-            window.trackMatomo?.("Print", "3D printjob created ", "Layout: " + printJob.payload.layout);
-        }
-        else {
-            window.trackMatomo?.("Print", "2D printjob created ", "Layout: " + printJob.payload.layout);
-        }
     },
 
     /**

@@ -12,7 +12,9 @@ describe("Actions", () => {
     let entity,
         entities,
         scene,
-        getters;
+        getters,
+        originalCesium,
+        originalMapMode;
     const polygon = {
             polygon: {
                 height: 5,
@@ -64,6 +66,11 @@ describe("Actions", () => {
         blob: () => Promise.resolve(new Blob(["mock content"], {type: "application/octet-stream"}))
     })
     );
+
+    beforeAll(() => {
+        originalCesium = global.Cesium;
+        originalMapMode = store.state.Maps.mode;
+    });
 
     beforeEach(() => {
         store.state.Maps.mode = "3D";
@@ -233,7 +240,8 @@ describe("Actions", () => {
         entity = undefined;
         entities.values = [];
         vi.restoreAllMocks();
-        store.state.Maps.mode = "2D";
+        global.Cesium = originalCesium;
+        store.state.Maps.mode = originalMapMode;
 
     });
     describe("deleteEntity", () => {

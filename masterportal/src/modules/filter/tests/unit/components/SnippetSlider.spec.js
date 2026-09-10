@@ -1,10 +1,8 @@
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import SnippetSlider from "@modules/filter/components/SnippetSlider.vue";
 import {expect} from "chai";
 import sinon from "sinon";
 
-
-config.global.mocks.$t = key => key;
 
 describe("src/modules/filter/components/SnippetSlider.vue", () => {
     describe("constructor", () => {

@@ -96,7 +96,7 @@ export default {
          */
         calculateExtent () {
             const resolution = mapCollection.getMapView("2D").getResolutions()[this.previewZoomLevel(this.layerId)],
-                radius = typeof this.radius === "number" ? this.radius : 1000;
+                  radius = typeof this.radius === "number" ? this.radius : 1000;
 
             return buffer(
                 new Point(this.previewCenter(this.layerId)).getExtent(),
@@ -202,9 +202,9 @@ export default {
          */
         createWMTSPreviewUrlFromCapabilities (layerConfig, capabilities) {
             const capabilitiesOptions = {
-                    layer: layerConfig.layers
-                },
-                mapView = mapCollection.getMapView("2D");
+                      layer: layerConfig.layers
+                  },
+                  mapView = mapCollection.getMapView("2D");
             let previewUrl = null,
                 options = null,
                 tileZ = null,
@@ -319,7 +319,7 @@ export default {
                     'previewImg'
                 ]"
                 :src="getPreviewUrl()"
-                alt="previewImg"
+                :alt="layerName"
             >
         </div>
 

@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {config, mount, shallowMount} from "@vue/test-utils";
+import {mount, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 import requestProvider from "@modules/wfsSearch/js/requests.js";
@@ -8,7 +8,6 @@ import WfsSearchLiteral from "@modules/wfsSearch/components/WfsSearchLiteral.vue
 import WfsSearch from "@modules/wfsSearch/components/WfsSearch.vue";
 import WfsSearchModule from "@modules/wfsSearch/store/indexWfsSearch.js";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/wfsSearch/components/WfsSearch.vue", () => {
     let instances,

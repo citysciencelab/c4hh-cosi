@@ -52,6 +52,54 @@ const exampleLayerInformation = {
             type: "geometry",
             value: null
         }
+    ],
+    featurePropertiesValues = [
+        {
+            key: "datum",
+            value: "1.1.2026"
+        },
+        {
+            key: "bemerkung",
+            value: "Ich gebe eine Bemerkung an"
+        },
+        {}
+    ],
+    examplePropertiesWithDefaultValues = [
+        {
+            key: "name",
+            label: "name",
+            required: false,
+            type: "string",
+            value: null
+        },
+        {
+            key: "nummer",
+            label: "nummer",
+            required: false,
+            type: "integer",
+            value: null
+        },
+        {
+            key: "bemerkung",
+            label: "bemerkung",
+            required: false,
+            type: "string",
+            value: "Ich gebe eine Bemerkung an"
+        },
+        {
+            key: "datum",
+            label: "datum",
+            required: false,
+            type: "date",
+            value: "1.1.2026"
+        },
+        {
+            key: "geom",
+            label: "geom",
+            required: false,
+            type: "geometry",
+            value: null
+        }
     ];
 
 describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
@@ -73,7 +121,7 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
         exampleLayerInformation.gfiAttributes = "showAll";
         receivePossiblePropertiesStub.resolves(exampleProperties);
 
-        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, false);
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation);
 
         expect(Array.isArray(properties)).to.be.true;
         expect(properties).to.deep.equal(exampleProperties);
@@ -85,13 +133,81 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
         };
         receivePossiblePropertiesStub.resolves(exampleProperties);
 
-        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, false);
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation);
 
         expect(Array.isArray(properties)).to.be.true;
         expect(properties.length).to.equal(3);
         expect(properties.find(({key}) => key === "name").label).to.equal("Name");
         expect(properties.find(({key}) => key === "datum").label).to.equal("Datum");
         expect(properties.find(({type}) => type === "geometry")).to.exist;
+    });
+    it("should support nested gfiAttributes object entries", async () => {
+        exampleLayerInformation.gfiAttributes = {
+            premiumflaeche: {
+                name: "Premiumflaeche",
+                condition: "contains",
+                type: "boolean",
+                format: {
+                    true: "Ja",
+                    false: "Nein"
+                }
+            }
+        };
+        receivePossiblePropertiesStub.resolves([
+            {
+                key: "premiumflaeche",
+                label: "premiumflaeche",
+                required: false,
+                type: "boolean",
+                value: null
+            },
+            {
+                key: "geom",
+                label: "geom",
+                required: false,
+                type: "geometry",
+                value: null
+            }
+        ]);
+
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation);
+
+        expect(Array.isArray(properties)).to.be.true;
+        expect(properties.length).to.equal(2);
+        expect(properties.find(({key}) => key === "premiumflaeche").label).to.equal("Premiumflaeche");
+        expect(properties.find(({key}) => key === "premiumflaeche").value).to.equal(false);
+        expect(properties.find(({type}) => type === "geometry")).to.exist;
+    });
+    it("should attach regex and regexError from a nested gfiAttributes object and leave plain string labels untouched", async () => {
+        exampleLayerInformation.gfiAttributes = {
+            name: "Name",
+            nummer: {
+                name: "Nummer",
+                regex: "^[0-9]+$",
+                regexError: "common:modules.wfst.error.regexInputError"
+            },
+            bemerkung: "Bemerkung",
+            datum: "Datum"
+        };
+        receivePossiblePropertiesStub.resolves(exampleProperties);
+
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation),
+            nummer = properties.find(({key}) => key === "nummer"),
+            name = properties.find(({key}) => key === "name");
+
+        expect(nummer.regex).to.equal("^[0-9]+$");
+        expect(nummer.regexError).to.equal("common:modules.wfst.error.regexInputError");
+        expect(name.label).to.equal("Name");
+        expect(name.regex).to.be.undefined;
+    });
+    it("should set default values", async () => {
+        exampleLayerInformation.gfiAttributes = "showAll";
+        receivePossiblePropertiesStub.resolves(exampleProperties);
+
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, featurePropertiesValues);
+
+        expect(Array.isArray(properties)).to.be.true;
+        expect(properties).to.deep.equal(examplePropertiesWithDefaultValues);
     });
     it("should throw an Error if the masterportalapi call receivePossibleProperties fails", async () => {
         const expectedError = new Error("Error");
@@ -101,7 +217,7 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
         receivePossiblePropertiesStub.rejects(expectedError);
 
         consoleErrorStub = sinon.stub(console, "error");
-        properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, false);
+        properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation);
 
         expect(properties).to.be.an("array").that.is.empty;
         expect(consoleErrorStub.calledOnce).to.be.true;

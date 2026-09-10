@@ -626,7 +626,7 @@ export default {
                 return false;
             }
             const result = [],
-                dropdownValueAssoc = {};
+                  dropdownValueAssoc = {};
 
             dropdownValue.forEach(value => {
                 dropdownValueAssoc[value] = true;
@@ -797,7 +797,7 @@ export default {
                 return;
             }
             const dropdownValueAssoc = {},
-                configValueAssoc = {};
+                  configValueAssoc = {};
 
             dropdownValue.forEach(value => {
                 dropdownValueAssoc[value] = true;
@@ -827,8 +827,8 @@ export default {
          */
         setDropdownSelectedAfterAdjustment (dropdownValue, dropdownSelected, setDropdownSelected) {
             const selected = typeof dropdownSelected === "string" ? [dropdownSelected] : dropdownSelected,
-                result = [],
-                dropdownSelectedAssoc = {};
+                  result = [],
+                  dropdownSelectedAssoc = {};
 
             if (typeof setDropdownSelected !== "function") {
                 return;
@@ -876,7 +876,7 @@ export default {
             }
 
             const hasSelectAll = this.dropdownValueComputed.some((value) => typeof value === "object"),
-                lowerCaseText = text.toLowerCase();
+                  lowerCaseText = text.toLowerCase();
 
             this.searchedResult = hasSelectAll
                 ? this.dropdownValueComputed.map(

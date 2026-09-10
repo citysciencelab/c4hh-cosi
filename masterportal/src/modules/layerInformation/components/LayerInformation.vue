@@ -1,11 +1,13 @@
 <script>
-import LegendSingleLayer from "../../legend/components/LegendSingleLayer.vue";
+import LegendSingleLayer from "@modules/legend/components/LegendSingleLayer.vue";
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapActions as mapPiniaActions, mapState} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 import {isWebLink} from "@shared/js/utils/urlHelper.js";
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 import {buildMetaURLs} from "@shared/js/utils/metaUrlHelper.js";
-import LayerInfoContactButton from "../../layerTree/components/LayerInfoContactButton.vue";
+import LayerInfoContactButton from "@modules/layerTree/components/LayerInfoContactButton.vue";
 
 /**
  * The Layer Information that gives the user information, links and the legend for a layer
@@ -13,9 +15,6 @@ import LayerInfoContactButton from "../../layerTree/components/LayerInfoContactB
  * @vue-data {string} activeTab - The active tab.
  * @vue-computed {boolean} showAdditionalMetaData - Shows if additional meta data should be displayed.
  * @vue-computed {boolean} showCustomMetaData - Shows if custom meta data should be displayed.
- * @vue-computed {boolean} showPublication - Shows if publication should be displayed.
- * @vue-computed {boolean} showRevision - Determines if the revision date should be displayed.
- * @vue-computed {boolean} showPeriodicity - Shows if periodicity should be displayed.
  * @vue-computed {boolean} showDownloadLinks - Shows if download lonks should be displayed.
  * @vue-computed {boolean} showUrl - Shows if url should be displayed.
  * @vue-computed {boolean} showAttachFile - Shows if file type needs to be attached for download.
@@ -42,9 +41,10 @@ export default {
     },
     computed: {
         ...mapGetters(["configJs", "layerConfigById"]),
-        ...mapGetters("Modules/LayerInformation", [
+        ...mapState(useLayerInformationStore, [
             "abstractText",
             "customText",
+            "dateCreation",
             "datePublication",
             "dateRevision",
             "downloadLinks",
@@ -72,15 +72,6 @@ export default {
         showCustomMetaData () {
             return this.customText;
         },
-        showPublication () {
-            return typeof this.datePublication !== "undefined" && this.datePublication !== null && this.datePublication !== "";
-        },
-        showRevision () {
-            return typeof this.dateRevision !== "undefined" && this.dateRevision !== null && this.dateRevision !== "";
-        },
-        showPeriodicity () {
-            return this.periodicityKey !== "" && this.periodicityKey !== null && this.periodicityKey !== undefined;
-        },
         showDownloadLinks () {
             return this.downloadLinks !== null;
         },
@@ -95,7 +86,7 @@ export default {
         selectedMetaURLs () {
             if (this.layerInfo.typ?.startsWith("GROUP") && Array.isArray(this.layerInfo.layers)) {
                 const selectedLayer = this.layerInfo.layers[this.selectedOption],
-                    metaID = selectedLayer?.metaID;
+                      metaID = selectedLayer?.metaID;
 
                 return buildMetaURLs(metaID, {
                     layerInfo: this.layerInfo,
@@ -182,11 +173,17 @@ export default {
     },
 
     methods: {
-        ...mapActions("Modules/LayerInformation", ["setConfigParams", "additionalSingleLayerInfo", "getAbstractInfo"]),
+        ...mapPiniaActions(useLayerInformationStore, ["setConfigParams", "additionalSingleLayerInfo", "getAbstractInfo"]),
         ...mapActions("Modules/Legend", ["createLegendForLayerInfo"]),
-        ...mapMutations("Modules/LayerInformation", ["setMetaDataCatalogueId", "setSelectedLayerIndex"]),
         ...mapMutations("Modules/Legend", ["setLayerInfoLegend"]),
         ...mapActions("Menu", ["changeCurrentComponent"]),
+        setMetaDataCatalogueId (value) {
+            useLayerInformationStore().metaDataCatalogueId = value;
+        },
+
+        setSelectedLayerIndex (value) {
+            useLayerInformationStore().selectedLayerIndex = value;
+        },
         isWebLink,
 
         /**
@@ -305,7 +302,7 @@ export default {
          */
         getLayerAddress (layerInfo) {
             const typ = layerInfo.typ ?? layerInfo.type,
-                config = this.layerConfigById(layerInfo.id);
+                  config = this.layerConfigById(layerInfo.id);
             let url = config?.origUrl ? config.origUrl : layerInfo.url,
                 urlObject = new URL(url, location.href);
 
@@ -410,13 +407,16 @@ export default {
         </div>
         <br>
         <br>
-        <p v-if="showPublication">
-            {{ $t("common:modules.layerInformation.publicationCreation") }}: {{ datePublication }}
+        <p v-if="datePublication">
+            {{ $t("common:modules.layerInformation.publicationDate") }}: {{ datePublication }}
         </p>
-        <p v-if="showRevision">
+        <p v-if="dateCreation">
+            {{ $t("common:modules.layerInformation.creationDate") }}: {{ dateCreation }}
+        </p>
+        <p v-if="dateRevision">
             {{ $t("common:modules.layerInformation.lastModified") }}: {{ dateRevision }}
         </p>
-        <p v-if="showPeriodicity">
+        <p v-if="periodicityKey">
             {{ $t("common:modules.layerInformation.periodicityTitle") }}: {{ $t(periodicityKey) }}
         </p>
         <template

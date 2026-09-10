@@ -345,7 +345,6 @@ export default {
     }
 }
 .table-wrapper {
-    overflow-x: auto;
     max-width: 100%;
 }
 .table {

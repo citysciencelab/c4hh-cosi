@@ -285,7 +285,8 @@
       "contactName": "Ім’я",
       "contactPhone": "Тел.",
       "contactEmail": "Електронна пошта",
-      "wait": "Будь ласка, зачекайте"
+      "wait": "Будь ласка, зачекайте",
+      "license": "Ліцензія"
     },
     "draw": {
       "description": "Створюйте важливі позначки або виділяйте ділянки",
@@ -633,6 +634,7 @@
       "addressSuffix": "Адреса",
       "addressSuffixes": "Адреси шарів",
       "attachFileMessage": "за потреби додати тип файлу під час завантаження",
+      "creationDate": "Створення",
       "downloadDataset": "Завантажити набір даних",
       "lastModified": "Остання зміна",
       "legend": "Легенда",
@@ -640,7 +642,7 @@
       "noMetadataLoaded": "Не вдалося завантажити метадані!",
       "noMetadataLoadedConsole": "Не вдалося отримати метадані для цього шару. Це вказує на проблему з підключеним файлом services.json.",
       "periodicityTitle": "Оновлення даних",
-      "publicationCreation": "Публікація / створення",
+      "publicationDate": "Публікація",
       "pointOfContact": "Контактна особа",
       "contactInfoMessage": "Написати контактній особі теми ",
       "contactPublisher": "Написати контактній особі ",

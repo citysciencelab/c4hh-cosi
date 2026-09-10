@@ -2,9 +2,9 @@
 import axios from "axios";
 import {mapGetters} from "vuex";
 import dayjs from "dayjs";
-
-import SensorThemeChartsData from "./SensorThemeData.vue";
-import SensorThemeChartsBarChart from "./SensorThemeBarChart.vue";
+import SensorThemeData from "./SensorThemeData.vue";
+import SensorThemeBarChart from "./SensorThemeBarChart.vue";
+import NavTab from "@shared/modules/tabs/components/NavTab.vue";
 import {processHistoricalDataByWeekdays} from "../js/processHistoricalDataByWeekdays.js";
 
 /**
@@ -25,8 +25,9 @@ import {processHistoricalDataByWeekdays} from "../js/processHistoricalDataByWeek
 export default {
     name: "SensorTheme",
     components: {
-        SensorThemeChartsData,
-        SensorThemeChartsBarChart
+        SensorThemeData,
+        SensorThemeBarChart,
+        NavTab
     },
     props: {
         feature: {
@@ -113,12 +114,12 @@ export default {
 
             if (layerConfig) {
                 const url = layerConfig.url,
-                    version = layerConfig.version,
-                    filterDate = this.createFilterDate(this.periodLength, this.periodUnit),
-                    filterDataStream = this.createFilterDataStream(this.feature.getProperties()?.dataStreamId),
-                    requestQuery = `${url}/v${version}/Datastreams?$select=@iot.id&$expand=Observations`
-                        + `($select=result,phenomenonTime;$orderby=phenomenonTime%20desc;$filter=phenomenonTime%20gt%20${filterDate})`
-                        + `&$filter=${filterDataStream}`;
+                      version = layerConfig.version,
+                      filterDate = this.createFilterDate(this.periodLength, this.periodUnit),
+                      filterDataStream = this.createFilterDataStream(this.feature.getProperties()?.dataStreamId),
+                      requestQuery = `${url}/v${version}/Datastreams?$select=@iot.id&$expand=Observations`
+                          + `($select=result,phenomenonTime;$orderby=phenomenonTime%20desc;$filter=phenomenonTime%20gt%20${filterDate})`
+                          + `&$filter=${filterDataStream}`;
 
                 this.fetchObservations(requestQuery);
             }
@@ -167,7 +168,7 @@ export default {
          */
         fetchObservations: function (requestQuery) {
             const loadedDataStreamIndices = [],
-                historicalObservations = [];
+                  historicalObservations = [];
 
             axios.get(requestQuery)
                 .then(response => {
@@ -219,17 +220,6 @@ export default {
         },
 
         /**
-         * Set the current tab id after clicking if the historicaldata be loaded
-         * @param {Object[]} evt The target of current click event.
-         * @returns {void}
-         */
-        setActiveTab (evt) {
-            if (evt?.target?.hash && this.processedHistoricalDataByWeekday.length > 0) {
-                this.activeTab = String(evt.target.hash.substring(1));
-            }
-        },
-
-        /**
          * Returns the classnames for the tab.
          * @param {Object|String} tab The name of the tab depending on property activeTab.
          * @returns {String} The classNames of the tab.
@@ -264,56 +254,41 @@ export default {
                 <br>
             </strong>
         </div>
-        <div>
-            <ul class="nav nav-pills">
-                <li
-                    class="nav-item"
-                    :value="dataName"
-                >
-                    <a
-                        data-bs-toggle="tab"
-                        href="#data"
-                        class="nav-link"
-                        :class="{
-                            active: isActiveTab('data')
-                        }"
-                        @click="setActiveTab"
-                    >
-                        {{ dataName }}
-                    </a>
-                </li>
-                <li
+        <div class="sensor-nav-tabs">
+            <ul
+                class="nav nav-tabs"
+                role="tablist"
+            >
+                <NavTab
+                    id="sensor-data-tab"
+                    :label="dataName"
+                    :active="isActiveTab('data')"
+                    target="#data"
+                    :interaction="() => { activeTab = 'data'; }"
+                    style-variant="blue"
+                />
+                <NavTab
                     v-for="(value, key) in chartvalues"
+                    :id="`sensor-chart-tab-${key}`"
                     :key="key"
-                    value="value?.title || value"
-                    class="nav-item"
-                    :class="{
-                        disabled: processedHistoricalDataByWeekday.length === 0
-                    }"
-                >
-                    <a
-                        class="nav-link"
-                        :data-bs-toggle="processedHistoricalDataByWeekday.length === 0 ? 'buttons' : 'tab'"
-                        :href="processedHistoricalDataByWeekday.length === 0 ? '#' : createHref(key)"
-                        :class="{
-                            active: isActiveTab(key)
-                        }"
-                        @click="setActiveTab"
-                    >
-                        {{ $t(value.title || value) }}
-                    </a>
-                </li>
+                    :label="$t(value.title || value)"
+                    :active="isActiveTab(key)"
+                    :disabled="processedHistoricalDataByWeekday.length === 0"
+                    :target="`#${key}`"
+                    :interaction="() => { activeTab = String(key); }"
+                    style-variant="blue"
+                />
             </ul>
         </div>
         <div>
-            <SensorThemeChartsData
+            <SensorThemeData
                 id="data"
                 key="sensorCharts-dataComponent"
                 :show="isActiveTab('data')"
                 :class="getTabPaneClasses('data')"
                 :feature="feature"
             />
-            <SensorThemeChartsBarChart
+            <SensorThemeBarChart
                 v-for="(value, key) in chartvalues"
                 :key="`sensorCharts-barChartComponent-${key}`"
                 :class="getTabPaneClasses(key)"
@@ -336,5 +311,8 @@ export default {
     }
     .gfi-theme-sensor {
         overflow: auto;
+    }
+    .sensor-nav-tabs {
+        margin-top: 1rem;
     }
 </style>

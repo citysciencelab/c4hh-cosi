@@ -1,7 +1,55 @@
 import {expect} from "chai";
+import Feature from "ol/Feature.js";
+import {LineString, Polygon} from "ol/geom.js";
 import getters from "@modules/measure/store/gettersMeasure.js";
 
 describe("src/modules/measure/store/gettersMeasure", function () {
+    describe("lineLengths and polygonAreas", function () {
+        it("calculates line lengths even if selectedGeometry is Polygon (regression)", function () {
+            const lineFeature = new Feature({
+                    geometry: new LineString([[0, 0], [1, 1]])
+                }),
+                state = {
+                    selectedGeometry: "Polygon",
+                    lines: {line1: lineFeature},
+                    polygons: {},
+                    earthRadius: 6378137,
+                    measurementAccuracy: "meter",
+                    selectedLineStringUnit: "0",
+                    lineStringUnits: ["m"],
+                    geometryUpdateTrigger: 0
+                },
+                rootGetters = {
+                    "Maps/projection": {getCode: () => "EPSG:4326"}
+                },
+                result = getters.lineLengths(state, {}, {}, rootGetters);
+
+            expect(result).to.deep.equal({line1: "157.426 m"});
+        });
+
+        it("calculates polygon areas even if selectedGeometry is LineString (regression)", function () {
+            const polygonFeature = new Feature({
+                    geometry: new Polygon([[[0, 0], [0, 1], [1, 1], [1, 0]]])
+                }),
+                state = {
+                    selectedGeometry: "LineString",
+                    lines: {},
+                    polygons: {poly1: polygonFeature},
+                    earthRadius: 6378137,
+                    measurementAccuracy: "meter",
+                    selectedPolygonUnit: "0",
+                    polygonUnits: ["km²"],
+                    geometryUpdateTrigger: 0
+                },
+                rootGetters = {
+                    "Maps/projection": {getCode: () => "EPSG:4326"}
+                },
+                result = getters.polygonAreas(state, {}, {}, rootGetters);
+
+            expect(result).to.deep.equal({poly1: "12.391,4 km²"});
+        });
+    });
+
     describe("measurementList", function () {
         it("returns an empty array when no measurements exist", function () {
             const state = {lines: {}, polygons: {}, customNames: {}},

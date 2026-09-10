@@ -21,7 +21,7 @@ if (dayjs.locale() !== "de") {
 
 /**
  * TimeSlider component: The timeslider wor wms-time layers.
- * @module src/modules/wmsTime/components/TimeSlider
+ * @module modules/wmsTime/components/TimeSlider
  * @vue-prop {String} layerId The layer id of the current wms-time layer.
  * @vue-data {Boolean} playing - The play button is started.
  * @vue-data {Number} playbackHandle - The playback interval.
@@ -248,8 +248,8 @@ export default {
             }
 
             const layer = layerCollection.getLayerById(this.layerId),
-                targetTime = this.timeRange[this.sliderValue],
-                targetTimeEnd = this.dualRangeSlider ? this.timeRange[this.sliderValueEnd] : null;
+                  targetTime = this.timeRange[this.sliderValue],
+                  targetTimeEnd = this.dualRangeSlider ? this.timeRange[this.sliderValueEnd] : null;
 
             if (layer) {
                 layer.updateTime(this.layerId, this.defaultDimensionName, targetTime, targetTimeEnd, this.staticDimensions);

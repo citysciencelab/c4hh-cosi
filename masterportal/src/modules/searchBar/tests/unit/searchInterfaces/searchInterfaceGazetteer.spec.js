@@ -8,6 +8,7 @@ import store from "@appstore/index.js";
 describe("src/modules/searchBar/searchInterfaces/searchInterfaceGazetteer.js", () => {
     let SearchInterface1 = null,
         checkConfigSpy;
+    const originStoreGetter = store.getters;
 
     beforeAll(() => {
         store.getters = {
@@ -25,6 +26,10 @@ describe("src/modules/searchBar/searchInterfaces/searchInterfaceGazetteer.js", (
 
     afterEach(() => {
         SearchInterface1.clearSearchResults();
+    });
+
+    afterAll(() => {
+        store.getters = originStoreGetter;
     });
 
     describe("prototype", () => {

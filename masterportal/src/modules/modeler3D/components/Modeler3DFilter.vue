@@ -80,8 +80,8 @@ export default {
         },
         sortedGroupedFilters () {
             const groupedFilters = this.groupedFiltersByLayer,
-                orderedGroups = this.filterGroupOrder,
-                sortedGroups = {};
+                  orderedGroups = this.filterGroupOrder,
+                  sortedGroups = {};
 
             orderedGroups.forEach(group => {
                 if (groupedFilters[group]) {
@@ -145,7 +145,7 @@ export default {
          */
         initialize3dLayers () {
             const tilesets = layerCollection.getLayers().filter(layer => layer.get("typ") === "TileSet3D"),
-                activeTileset = tilesets?.filter(layer => layer.get("visibility") === true)[0];
+                  activeTileset = tilesets?.filter(layer => layer.get("visibility") === true)[0];
 
             if (!activeTileset) {
                 this.layers = [];
@@ -157,7 +157,7 @@ export default {
             }
             else {
                 const existingLayerIds = this.layers.map(layer => layer.id),
-                    newLayers = this.createFilterLayers(tilesets).filter(layer => !existingLayerIds.includes(layer.id));
+                      newLayers = this.createFilterLayers(tilesets).filter(layer => !existingLayerIds.includes(layer.id));
 
                 this.layers = this.layers.concat(newLayers);
             }
@@ -211,8 +211,8 @@ export default {
             layerCollection.getLayers().filter(layer => layer.get("typ") === "TileSet3D" && layer.get("id") === this.selectedLayer.id)[0].layer.tileset.then(tileset => {
                 const removeListener = tileset.tileVisible.addEventListener(tile => {
                     const content = tile.content,
-                        feature = content.getFeature(0),
-                        properties = Object.keys(feature.getProperty("attributes"));
+                          feature = content.getFeature(0),
+                          properties = Object.keys(feature.getProperty("attributes"));
 
                     this.attributes = properties.filter(value => this.allowedAttributes.includes(value));
                     this.selectedAttribute = this.attributes[0];
@@ -384,17 +384,17 @@ export default {
                 }
                 else {
                     const data = await response.text(),
-                        parser = new DOMParser(),
-                        xmlDoc = parser.parseFromString(data, "text/xml"),
-                        elements = xmlDoc.getElementsByTagName("dictionaryEntry"),
-                        uniqueNames = new Set();
+                          parser = new DOMParser(),
+                          xmlDoc = parser.parseFromString(data, "text/xml"),
+                          elements = xmlDoc.getElementsByTagName("dictionaryEntry"),
+                          uniqueNames = new Set();
 
                     this.attributeValues = Array.from(elements)
                         .filter(element => element.getElementsByTagName("gml:description")[0].textContent === this.buildingSource)
                         .map(element => {
                             const gid = element.getElementsByTagName("gml:name")[0].textContent.split("_"),
-                                name = element.getElementsByTagName("gml:name")[1].textContent,
-                                id = gid[0] === "31001" ? parseInt(gid[1], 10) : parseInt(gid[1], 10) + (parseInt(gid[0], 10) * 1000);
+                                  name = element.getElementsByTagName("gml:name")[1].textContent,
+                                  id = gid[0] === "31001" ? parseInt(gid[1], 10) : parseInt(gid[1], 10) + (parseInt(gid[0], 10) * 1000);
 
                             if (!uniqueNames.has(name)) {
                                 uniqueNames.add(name);
@@ -447,7 +447,7 @@ export default {
          */
         moveFilterUp (id) {
             const group = this.findGroupByFilterId(id),
-                index = group ? group.findIndex(filter => filter.id === id) : -1;
+                  index = group ? group.findIndex(filter => filter.id === id) : -1;
 
             if (!group || index === -1) {
                 return;
@@ -468,7 +468,7 @@ export default {
          */
         moveFilterDown (id) {
             const group = this.findGroupByFilterId(id),
-                index = group ? group.findIndex(filter => filter.id === id) : -1;
+                  index = group ? group.findIndex(filter => filter.id === id) : -1;
 
             if (!group || index === -1) {
                 return;
@@ -522,12 +522,12 @@ export default {
          */
         onDrop (event, id) {
             const draggedGroup = this.findGroupByFilterId(this.draggedItemIndex),
-                targetGroup = this.findGroupByFilterId(id);
+                  targetGroup = this.findGroupByFilterId(id);
 
             if (draggedGroup === targetGroup) {
                 const draggedIndex = draggedGroup.findIndex(filter => filter.id === this.draggedItemIndex),
-                    targetIndex = targetGroup.findIndex(filter => filter.id === id),
-                    temp = draggedGroup[draggedIndex];
+                      targetIndex = targetGroup.findIndex(filter => filter.id === id),
+                      temp = draggedGroup[draggedIndex];
 
                 draggedGroup[draggedIndex] = targetGroup[targetIndex];
                 targetGroup[targetIndex] = temp;

@@ -171,10 +171,10 @@ describe("src/core/js/layers/layer2d.js", () => {
 
         it("should call refresh on the plain ol source from getLayer().getSource(), not on getLayerSource()", () => {
             const refreshSpy = sinon.spy(),
-                liveSource = {refresh: refreshSpy};
+                liveSource = {refresh: refreshSpy, once: sinon.stub()};
 
             layer2d.getLayer = () => ({getSource: () => liveSource});
-            layer2d.setLayerSource({refresh: sinon.spy()});
+            layer2d.setLayerSource({refresh: sinon.spy(), once: sinon.stub()});
 
             layer2d.startAutoRefresh(100);
             clock.tick(100);
@@ -199,8 +199,8 @@ describe("src/core/js/layers/layer2d.js", () => {
             const staleRefreshSpy = sinon.spy(),
                 liveRefreshSpy = sinon.spy();
 
-            layer2d.getLayer = () => ({getSource: () => ({refresh: liveRefreshSpy})});
-            layer2d.setLayerSource({refresh: staleRefreshSpy});
+            layer2d.getLayer = () => ({getSource: () => ({refresh: liveRefreshSpy, once: sinon.stub()})});
+            layer2d.setLayerSource({refresh: staleRefreshSpy, once: sinon.stub()});
 
             layer2d.startAutoRefresh(100);
             clock.tick(100);
@@ -209,6 +209,80 @@ describe("src/core/js/layers/layer2d.js", () => {
             expect(liveRefreshSpy.calledOnce).to.be.true;
         });
     });
+
+    describe("prepareLayerSourceForRefresh", () => {
+        let clock,
+            layer2d;
+
+        beforeEach(() => {
+            clock = sinon.useFakeTimers();
+            layer2d = new Layer2d({});
+        });
+
+        afterEach(() => {
+            clock.restore();
+        });
+
+        it("should update source params with CACHEID when updateParams and getParams are available", () => {
+            const layerSource = {
+                getParams: sinon.stub().returns({LAYERS: "testLayer"}),
+                updateParams: sinon.spy()
+            };
+
+            layer2d.prepareLayerSourceForRefresh(layerSource);
+
+            expect(layerSource.updateParams.calledOnceWithExactly({
+                LAYERS: "testLayer",
+                CACHEID: 0
+            })).to.be.true;
+        });
+
+        it("should add a cache buster to every URL from getUrls and remember the original base URLs", () => {
+            const layerSource = {
+                getUrls: sinon.stub().returns([
+                    "https://example.com/wms?SERVICE=WMS",
+                    "https://example.com/wms2"
+                ]),
+                setUrls: sinon.spy()
+            };
+
+            layer2d.prepareLayerSourceForRefresh(layerSource);
+            clock.tick(100);
+            layer2d.prepareLayerSourceForRefresh(layerSource);
+
+            expect(layerSource.getUrls.calledOnce).to.be.true;
+            expect(layerSource.setUrls.calledTwice).to.be.true;
+            expect(layerSource.setUrls.firstCall.args[0]).to.deep.equal([
+                "https://example.com/wms?SERVICE=WMS&_refresh=0",
+                "https://example.com/wms2?_refresh=0"
+            ]);
+            expect(layerSource.setUrls.secondCall.args[0]).to.deep.equal([
+                "https://example.com/wms?SERVICE=WMS&_refresh=100",
+                "https://example.com/wms2?_refresh=100"
+            ]);
+        });
+
+        it("should add a cache buster to the single URL from getUrl and remember the original base URL", () => {
+            const layerSource = {
+                getUrl: sinon.stub().returns("https://example.com/wfs?SERVICE=WFS"),
+                setUrl: sinon.spy()
+            };
+
+            layer2d.prepareLayerSourceForRefresh(layerSource);
+            clock.tick(100);
+            layer2d.prepareLayerSourceForRefresh(layerSource);
+
+            expect(layerSource.getUrl.calledOnce).to.be.true;
+            expect(layerSource.setUrl.calledTwice).to.be.true;
+            expect(layerSource.setUrl.firstCall.args[0]).to.equal("https://example.com/wfs?SERVICE=WFS&_refresh=0");
+            expect(layerSource.setUrl.secondCall.args[0]).to.equal("https://example.com/wfs?SERVICE=WFS&_refresh=100");
+        });
+
+        it("should do nothing when no layer source is given", () => {
+            expect(() => layer2d.prepareLayerSourceForRefresh()).not.to.throw();
+        });
+    });
+
 
     describe("getIntervalAutoRefresh and setIntervalAutoRefresh", () => {
         it("should setLayer and getLayer return the layer", () => {

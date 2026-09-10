@@ -13,19 +13,16 @@ import {buildMetaURLs} from "@shared/js/utils/metaUrlHelper.js";
 export default {
     /**
      * Starts drawing layer information. If mobile and menu is closed, menu is opened.
-     * @param {Object} param.commit the commit
-     * @param {Object} param.dispatch the dispatch
-     * @param {Object} param.rootGetters the rootGetters
      * @param {Object} layerConf the layer configuration
      * @returns {void}
      */
-    startLayerInformation ({commit, dispatch, getters, rootGetters}, layerConf) {
+    startLayerInformation (layerConf) {
         const mdid = layerConf?.datasets?.length > 0 ? layerConf.datasets[0].md_id : null,
             legendAvailable = layerConf.legendURL !== "ignore" && layerConf.legend !== "ignore" && layerConf.legend !== false;
         let name = null;
 
-        if (rootGetters.configJs?.metaDataCatalogueId && rootGetters.configJs.metaDataCatalogueId !== getters.metaDataCatalogueId) {
-            commit("setMetaDataCatalogueId", rootGetters.configJs.metaDataCatalogueId);
+        if (store.getters.configJs?.metaDataCatalogueId && store.getters.configJs.metaDataCatalogueId !== this.metaDataCatalogueId) {
+            this.metaDataCatalogueId = store.getters.configJs.metaDataCatalogueId;
         }
 
         if (layerConf?.datasets?.length > 0) {
@@ -35,79 +32,134 @@ export default {
             name = layerConf.name;
         }
 
-        commit("setLegendAvailable", legendAvailable);
-        if (legendAvailable && rootGetters["Modules/Legend/layerInfoLegend"].id !== layerConf.id) {
-            commit("Modules/Legend/setLayerInfoLegend", {}, {root: true});
-            dispatch("Modules/Legend/createLegendForLayerInfo", layerConf.id, {root: true});
+        this.legendAvailable = legendAvailable;
+
+        if (legendAvailable && store.getters["Modules/Legend/layerInfoLegend"].id !== layerConf.id) {
+            store.commit("Modules/Legend/setLayerInfoLegend", {});
+            store.dispatch("Modules/Legend/createLegendForLayerInfo", layerConf.id);
         }
-        if (rootGetters.isMobile && !rootGetters["Menu/expanded"]("mainMenu")) {
-            dispatch("Menu/toggleMenu", "mainMenu", {root: true});
+
+        if (store.getters.isMobile && !store.getters["Menu/expanded"]("mainMenu")) {
+            store.dispatch("Menu/toggleMenu", "mainMenu");
         }
-        dispatch("Menu/changeCurrentComponent", {type: "layerInformation", side: "mainMenu", props: {name}}, {root: true});
-        commit("setLayerInfo", layerConf);
-        dispatch("setMetadataURL", mdid);
-        dispatch("additionalSingleLayerInfo");
+
+        store.dispatch("Menu/changeCurrentComponent", {
+            type: "layerInformation",
+            side: "mainMenu",
+            props: {name}
+        });
+
+        this.setLayerInfo(layerConf);
+        this.setMetadataURL(mdid);
+        this.additionalSingleLayerInfo();
     },
 
     /**
-     * Retrieves layer metadata that is not yet in the store but is saved in the `layerInfo` object.
-     * This function handles fetching metadata for a specified layer based on its `metaID`.
-     *
-     * - If `metaID` is an array, it will use the `selectedLayerIndex` to determine which layer's metadata to fetch.
-     *   - If the `selectedLayerIndex` is out of bounds, the first layer (index 0) will be used by default.
-     * - If `metaID` is a string, it will be used directly as the metadata ID for a single layer.
-     *
-     * This method also constructs a `metaInfo` object, which includes:
-     * - `metaId`: The metadata ID (from the `metaID` array or directly as a string).
-     * - `cswUrl`: The CSW URL from the store.
-     * - `customMetadata`: Any custom metadata that might be associated with the layer.
-     * - `attributes`: Any additional attributes for the layer.
-     *
-     * This `metaInfo` object is then dispatched with the `getAbstractInfo` action to fetch abstract information related to the metadata.
-     *
-     * @param {Object} param.dispatch - The dispatch function to trigger other actions.
-     * @param {Object} param.state - The state object containing information about the current layer and its metadata.
-     * @param {number} [layerIndex=0] - The index of the layer in the `metaID` array to fetch. Defaults to 0 if not provided or if `metaID` is a string.
+     * Sets the layerinfo of the active layer.
+     * @param {Object} layerConf The layer configuration.
      * @returns {void}
      */
-    additionalSingleLayerInfo: async function ({dispatch, state}) {
+    setLayerInfo (layerConf) {
+        const metaID = layerConf?.datasets?.length > 0 ? layerConf.datasets[0].md_id : null,
+            url = layerConf?.url || layerConf?.capabilitiesUrl,
+            layers = [];
+
+        let cswUrl = layerConf?.datasets?.[0]?.csw_url ?? null,
+            customMetadata = layerConf?.datasets?.[0]?.customMetadata ?? null,
+            attributes = layerConf?.datasets?.[0]?.attributes ?? null,
+            showDocUrl = layerConf?.datasets?.[0]?.show_doc_url ?? null;
+
+        if (layerConf?.typ?.startsWith("GROUP")) {
+            layerConf.children.forEach(child => {
+                const childUrl = child.url || child.capabilitiesUrl,
+                    dataset = child.datasets?.[0] || {},
+                    childMetaID = dataset.md_id || null,
+                    childCswUrl = dataset.csw_url || null,
+                    childCustomMetadata = dataset.customMetadata || null,
+                    childAttributes = dataset.attributes || null,
+                    childShowDocUrl = dataset.show_doc_url || null;
+
+                layers.push({
+                    name: child.name,
+                    type: child.typ,
+                    metaID: childMetaID,
+                    url: childUrl
+                });
+
+                if (child.datasets?.length > 0) {
+                    if (!cswUrl) {
+                        cswUrl = childCswUrl;
+                    }
+                    if (!customMetadata) {
+                        customMetadata = childCustomMetadata;
+                    }
+                    if (!attributes) {
+                        attributes = childAttributes;
+                    }
+                    if (!showDocUrl) {
+                        showDocUrl = childShowDocUrl;
+                    }
+                }
+            });
+        }
+
+        this.layerInfo = {
+            cswUrl,
+            id: layerConf?.id,
+            layername: layerConf?.name,
+            showDocUrl,
+            typ: layerConf?.typ,
+            ...customMetadata && {customMetadata},
+            ...attributes && {attributes},
+            ...metaID && {metaID},
+            ...layers.length > 0 && {layers},
+            ...layerConf?.legendURL && {legendURL: layerConf.legendURL},
+            ...url && {url},
+            ...(layerConf?.urlIsVisible !== undefined) && {urlIsVisible: layerConf?.urlIsVisible},
+            ...layerConf?.isExternal && {isExternal: true}
+        };
+    },
+
+    /**
+     * Retrieves layer metadata that is not yet in the store but is saved in the layerInfo object.
+     * @returns {void}
+     */
+    async additionalSingleLayerInfo () {
         let metaId;
 
-        if (Array.isArray(state.layerInfo.metaID) && state.layerInfo.metaID.length > 0) {
-            if (state.selectedLayerIndex < state.layerInfo.metaID.length) {
-                metaId = state.layerInfo.metaID[state.selectedLayerIndex];
+        if (Array.isArray(this.layerInfo.metaID) && this.layerInfo.metaID.length > 0) {
+            if (this.selectedLayerIndex < this.layerInfo.metaID.length) {
+                metaId = this.layerInfo.metaID[this.selectedLayerIndex];
             }
             else {
-                metaId = state.layerInfo.metaID[0];
+                metaId = this.layerInfo.metaID[0];
             }
         }
-        else if (typeof state.layerInfo.metaID === "string") {
-            metaId = state.layerInfo.metaID;
+        else if (typeof this.layerInfo.metaID === "string") {
+            metaId = this.layerInfo.metaID;
         }
         else {
             metaId = null;
         }
 
-        const cswUrl = state.layerInfo.cswUrl,
-            customMetadata = state.layerInfo.customMetadata,
-            attributes = state.layerInfo.attributes,
+        const cswUrl = this.layerInfo.cswUrl,
+            customMetadata = this.layerInfo.customMetadata,
+            attributes = this.layerInfo.attributes,
             metaInfo = {metaId, cswUrl, customMetadata, attributes};
 
-        dispatch("getAbstractInfo", metaInfo);
+        this.getAbstractInfo(metaInfo);
     },
 
     /**
-     * set all the abstract Infos for the layer
-     * @param {Object} param.commit the commit
-     * @param {Object} param.state the state
-     * @param {Object} param.rootGetters the rootGetters
+     * Sets all the abstract Infos for the layer.
      * @param {Object} metaInfo the metaInformation that is necessary
      * @returns {void}
      */
-    getAbstractInfo: async function ({commit, dispatch, state, rootGetters}, metaInfo) {
+    async getAbstractInfo (metaInfo) {
         let metadata;
 
-        commit("setDownloadLinks", null);
+        this.downloadLinks = null;
+
         if (metaInfo.cswUrl && typeof metaInfo.metaId !== "undefined" && metaInfo.metaId !== null) {
             try {
                 metadata = await getCswRecordById.getRecordById(metaInfo.cswUrl, metaInfo.metaId);
@@ -118,10 +170,11 @@ export default {
         }
         // use default csw_url from rest-services.json if csw_url not stated in the specific service
         else if (Config.cswId !== null && typeof Config.cswId !== "undefined") {
-            const service = rootGetters.restServiceById(Config.cswId);
+            const service = store.getters.restServiceById(Config.cswId);
             let metaURL = "";
 
-            commit("setCustomText", null);
+            this.customText = null;
+
             if (service === undefined) {
                 console.warn("Rest Service with the ID " + Config.cswId + " is not configured in rest-services.json!");
             }
@@ -138,126 +191,125 @@ export default {
                 .then(response => xml2json(response.request.responseXML));
 
             metadata = getCswRecordById.getMetadata(metadataAsJson);
-            dispatch("getCustomMetaData", {attributes: metaInfo.attributes, metadataAsJson});
+            this.getCustomMetaData({
+                attributes: metaInfo.attributes,
+                metadataAsJson
+            });
         }
 
         if (typeof metadata === "undefined") {
-            commit("setTitle", "");
-            commit("setPeriodicityKey", "");
-            commit("setDatePublication", "");
-            commit("setAbstractText", i18next.t("common:modules.layerInformation.noMetadataLoaded"));
-            commit("setNoMetadataLoaded", i18next.t("common:modules.layerInformation.noMetadataLoaded"));
-            commit("setPointOfContact", "");
-            commit("setPublisher", "");
-            commit("setDateRevision", "");
+            this.title = "";
+            this.periodicityKey = "";
+            this.datePublication = "";
+            this.abstractText = i18next.t("common:modules.layerInformation.noMetadataLoaded");
+            this.noMetadataLoaded = i18next.t("common:modules.layerInformation.noMetadataLoaded");
+            this.pointOfContact = "";
+            this.publisher = "";
+            this.dateRevision = "";
         }
         else {
-            commit("setTitle", metadata?.getTitle());
-            commit("setAbstractText", metadata?.getAbstract());
-            commit("setPeriodicityKey", metadata?.getFrequenzy());
-            commit("setDownloadLinks", metadata?.getDownloadLinks());
-            commit("setDatePublication", metadata?.getPublicationDate() || metadata?.getCreationDate());
-            commit("setPointOfContact", metadata?.getContact());
-            commit("setPublisher", metadata?.getPublisher());
-            commit("setDateRevision", metadata?.getRevisionDate());
+            this.title = metadata?.getTitle();
+            this.abstractText = metadata?.getAbstract();
+            this.periodicityKey = metadata?.getFrequenzy();
+            this.downloadLinks = metadata?.getDownloadLinks();
+            this.datePublication = metadata?.getPublicationDate();
+            this.dateCreation = metadata?.getCreationDate();
+            this.pointOfContact = metadata?.getContact();
+            this.publisher = metadata?.getPublisher();
+            this.dateRevision = metadata?.getRevisionDate();
         }
 
-        if (state.downloadLinks) {
+        if (this.downloadLinks) {
             const downloadLinks = [];
 
-            state.downloadLinks.forEach(link => {
+            this.downloadLinks.forEach(link => {
                 downloadLinks.push(link);
             });
-            commit("setDownloadLinks", sortBy(downloadLinks, "linkName"));
+
+            this.downloadLinks = sortBy(downloadLinks, "linkName");
         }
     },
 
     /**
-     * Get metadata from path declared in the service configuration
-     * @param {Object} param.commit the commit
+     * Get metadata from path declared in the service configuration.
      * @param {Object} payload object of attributes with paths to metadata information and metadata as json
      * @returns {void}
      */
-    getCustomMetaData: function ({commit}, payload) {
+    getCustomMetaData (payload) {
         const customMetadata = Object.entries(payload.attributes).map(([key, value]) => {
-                return {[key]: value.split(".").reduce((o, i)=> o[i], payload.metadataAsJson).getValue()};
+                return {[key]: value.split(".").reduce((o, i) => o[i], payload.metadataAsJson).getValue()};
             }),
             singleObjectCustomMetadata = {};
 
         for (let i = 0; i < customMetadata.length; i++) {
             Object.assign(singleObjectCustomMetadata, customMetadata[i]);
         }
-        commit("setCustomText", singleObjectCustomMetadata);
+
+        this.customText = singleObjectCustomMetadata;
     },
 
-
     /**
-     * Checks the array of metaIDs and creates array metaURL with complete URL for template. Does not allow duplicated entries
-     * @param {Object} param.state the state
-     * @param {Object} param.commit the commit
+     * Checks the array of metaIDs and creates array metaURL with complete URL for template.
+     * Does not allow duplicated entries.
      * @param {Object} metaId the given metaId for one layer
      * @returns {void}
      */
-    setMetadataURL ({state, commit, rootGetters}, metaId) {
+    setMetadataURL (metaId) {
         const metaURLs = buildMetaURLs(metaId, {
-            layerInfo: state.layerInfo,
-            metaDataCatalogueId: state.metaDataCatalogueId,
-            restServiceById: rootGetters.restServiceById
+            layerInfo: this.layerInfo,
+            metaDataCatalogueId: this.metaDataCatalogueId,
+            restServiceById: store.getters.restServiceById
         });
 
-        commit("setMetaURLs", metaURLs);
+        this.metaURLs = metaURLs;
     },
 
     /**
-     * set Parameters from configuration
-     * @param {Object} param.commit - the commit
-     * @param {Object} config - Configuration
+     * Set Parameters from configuration.
+     * @param {Object} config Configuration
      * @returns {void}
      */
-    setConfigParams ({commit}, config) {
+    setConfigParams (config) {
         if (config.layerInformation !== undefined && config.layerInformation.showUrlGlobal !== null) {
-            commit("setShowUrlGlobal", config.layerInformation.showUrlGlobal);
+            this.showUrlGlobal = config.layerInformation.showUrlGlobal;
         }
         else if (config.layerInformation === undefined) {
-            commit("setShowUrlGlobal", undefined);
+            this.showUrlGlobal = undefined;
         }
     },
 
     /**
      * Restores the layer info from urlParams.
-     * @param {Object} param store context
-     * @param {Object} param.getters the getter
-     * @param {Object} param.dispatch the dispatch
-     * @param {Object} param.rootGetters the rootGetters
      * @param {Object} attributes of urlParams
      * @returns {void}
      */
-    restoreFromUrlParams ({getters, dispatch, rootGetters}, attributes) {
-        const componentName = changeCase.upperFirst(getters.type),
+    restoreFromUrlParams (attributes) {
+        const componentName = changeCase.upperFirst(this.type),
             layerId = attributes.layerInfo.id,
-            layerConfig = rootGetters.layerConfigById(layerId);
+            layerConfig = store.getters.layerConfigById(layerId);
 
-        dispatch("Menu/updateComponentState", {type: componentName, attributes}, {root: true});
-        if (rootGetters.styleListLoaded) {
-            dispatch("Modules/LayerInformation/startLayerInformation", layerConfig, {root: true});
+        store.dispatch("Menu/updateComponentState", {
+            type: componentName,
+            attributes
+        });
+
+        if (store.getters.styleListLoaded) {
+            this.startLayerInformation(layerConfig);
         }
         else {
-            dispatch("waitAndRestoreLayerInformation", layerConfig);
+            this.waitAndRestoreLayerInformation(layerConfig);
         }
     },
+
     /**
      * Waits for loading finished of styleList and restores the layer information.
-     * @param {Object} param store context
-     * @param {Object} param.getters the getter
-     * @param {Object} param.dispatch the dispatch
-     * @param {Object} param.rootGetters the rootGetters
      * @param {Object} layerConfig to restore the info of
      * @returns {void}
      */
-    waitAndRestoreLayerInformation ({dispatch}, layerConfig) {
+    waitAndRestoreLayerInformation (layerConfig) {
         store.watch((state, getters) => getters.styleListLoaded, value => {
             if (value) {
-                dispatch("Modules/LayerInformation/startLayerInformation", layerConfig, {root: true});
+                this.startLayerInformation(layerConfig);
             }
         });
     }

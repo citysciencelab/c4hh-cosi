@@ -162,6 +162,10 @@
         "buttonTitle2d": "2D",
         "buttonTitle3d": "3D"
       },
+      "expandable": {
+        "show": "Weitere Werkzeuge anzeigen",
+        "hide": "Weitere Werkzeuge ausblenden"
+      },
       "fullScreen": {
         "enable": "Vollbild aktivieren",
         "disable": "Vollbild deaktivieren"
@@ -286,7 +290,8 @@
       "contactName": "Name",
       "contactPhone": "Tel.",
       "contactEmail": "E-Mail",
-      "wait": "Einen Moment bitte"
+      "wait": "Einen Moment bitte",
+      "license": "Lizenz"
     },
     "draw": {
       "description": "Erstellen Sie wichtige Markierungen oder kennzeichnen Sie Flächen",
@@ -634,6 +639,7 @@
       "addressSuffix": "Adresse",
       "addressSuffixes": "Layer-Adressen",
       "attachFileMessage": "ggf. Datei-Typ beim Download anhängen",
+      "creationDate": "Erstellung",
       "downloadDataset": "Datensatz herunterladen",
       "lastModified": "Letzte Änderung",
       "legend": "Legende",
@@ -641,7 +647,7 @@
       "noMetadataLoaded": "Es konnten keine Metadaten geladen werden!",
       "noMetadataLoadedConsole": "Die Metadaten für diesen Layer konnten nicht abgerufen werden. Dies deutet auf ein Problem mit der eingebundenen services.json hin.",
       "periodicityTitle": "Datenaktualisierung",
-      "publicationCreation": "Publikation / Erstellung",
+      "publicationDate": "Publikation",
       "pointOfContact": "Ansprechpartner",
       "contactInfoMessage": "Schreiben Sie dem Ansprechpartner des Themas ",
       "contactPublisher": "Schreiben Sie dem Ansprechpartner ",
@@ -652,6 +658,8 @@
     "layerPills": {
       "next": "Nächsten Layer anzeigen",
       "previous": "Vorherigen Layer anzeigen",
+      "showMore": "Alle Layer anzeigen",
+      "hide": "Layer einklappen",
       "remove": "Layer entfernen"
     },
     "layerSelection": {
@@ -913,9 +921,11 @@
     "openConfig": {
       "explanation": "Öffnen Sie eine Karte, die Sie als lokale Konfigurationsdatei abgespeichert haben.",
       "loadFileFailed": "Die Konfigurationsdatei <b>{{targetFileName}}</b> wurde nicht geladen. Das Dateiformat <b>{{targetFileFormat}}</b> wird nicht unterstützt. Bitte laden Sie eine Datei im Dateiformat <b>json</b>.",
-      "loadFileSuccess": "Die Konfigurationsdatei <b>{{targetFileName}}</b> wurde erfolgreich geladen",
+      "loadFileSuccess": "Die Konfigurationsdatei <b>{{targetFileName}}</b> wurde erfolgreich geladen.",
       "name": "Karte öffnen",
-      "openFile": "Konfigurationsdatei öffnen"
+      "openFile": "Konfigurationsdatei öffnen",
+      "modulesNotAvailable_one": "Das Modul {{modules}} steht leider nicht zur Verfügung.",
+      "modulesNotAvailable_other": "Die Module {{modules}} stehen leider nicht zur Verfügung."
     },
     "portalFooter": {
       "designation": "Kartographie und Gestaltung:",
@@ -1259,7 +1269,16 @@
         "street": "Straße",
         "subject": "Thema",
         "topic": "Thema (Fachdaten)",
+        "csw": "CSW Metadaten",
         "topicBaselayer": "Thema (Hintergrundkarten)"
+      },
+      "csw": {
+        "noLayerLink": "Kein WMS- oder WFS-Link in den Metadaten gefunden.",
+        "noServiceResponse": "Der Dienst antwortet nicht. Bitte versuchen Sie es später erneut: {{serviceUrl}}",
+        "largeWfsLayer": "Der WFS-Layer '{{layerName}}' enthält {{count}} Features und wird nur für den sichtbaren Kartenausschnitt geladen (Bbox-Strategie).",
+        "largeWfsLayers": "{{layerCount}} WFS-Layer sind groß und werden nur für den sichtbaren Kartenausschnitt geladen (Bbox-Strategie).",
+        "layerAddedTitle": "Layer erfolgreich hinzugefügt",
+        "layerAdded": "Die Layer aus den Metadaten wurden dem Themenbaum hinzugefügt und können über <b>Themen hinzufügen</b> ausgewählt werden."
       },
       "specialWFS": {
         "ongoing": "im Verfahren",
@@ -1277,7 +1296,8 @@
         "zoomToResult": "Zum Ergebnis zoomen",
         "startRouting": "Route starten",
         "showInTree": "Thema im Ordner anzeigen",
-        "showLayerInfo": "Informationen und Legende"
+        "showLayerInfo": "Informationen und Legende",
+        "addLayerFromCswRecord": "Layer hinzufügen"
       },
       "noInitialResults": "Die initiale Suche ergab keine Treffer.",
       "showAll": "Alle anzeigen",
@@ -1454,7 +1474,8 @@
         "noFeature": "Bitte zeichnen Sie eine zu Ihren Einträgen assoziierte Geometrie.",
         "onlyNumbersAllowed": "Das Eingabefeld erlaubt nur Zahlen.",
         "requiredPropertiesNotSet": "Bitte geben Sie einen validen Wert für die verpflichtenden Felder {{properties}} ein.",
-        "fetchFeaturePropError": "Das Laden der Parameter dauert länger als gewöhnlich. Bitte versuchen Sie es erneut."
+        "fetchFeaturePropError": "Das Laden der Parameter dauert länger als gewöhnlich. Bitte versuchen Sie es erneut.",
+        "regexInputError": "Die Eingabe entspricht nicht dem vorgegebenen Muster."
       },
       "mandatoryInputError": {
         "text": "Normale Textzeichen und Sonderzeichen wie , . / \\ [ ] Leerzeichen und deutsche Zeichen ö ä ü Ö Ä Ü ß und nicht nur Zahlen sind erforderlich.",

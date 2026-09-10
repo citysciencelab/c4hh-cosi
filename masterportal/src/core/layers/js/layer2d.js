@@ -28,6 +28,7 @@ export default function Layer2d (attributes) {
     this.setLayerSource(this.getLayer()?.getSource());
     this.controlAutoRefresh(attributes);
     this.addErrorListener(this.getLayerSource());
+    this.autoRefreshObserver = [];
 }
 
 Layer2d.prototype = Object.create(Layer.prototype);
@@ -48,6 +49,18 @@ Layer2d.prototype.controlAutoRefresh = function (attributes) {
             this.stopAutoRefresh();
         }
     }
+};
+/**
+ * Sets a callback function to the auto refresh observer array,
+ * which will be called when the layer source is refreshed if autoRefresh is activated.
+ * @param {Function} callback The callback function.
+ * @returns {void}
+ */
+Layer2d.prototype.setObserverAutoInterval = function (callback) {
+    if (typeof callback !== "function") {
+        return;
+    }
+    this.autoRefreshObserver.push(callback);
 };
 
 /**
@@ -79,36 +92,51 @@ function addCacheBuster (url, timestamp) {
 Layer2d.prototype.startAutoRefresh = function (autoRefresh) {
     this.setIntervalAutoRefresh(setInterval(() => {
         const olSource = this.getLayer()?.getSource(),
-            layerSource = olSource instanceof Cluster ? olSource.getSource() : olSource,
-            timestamp = Date.now();
+            layerSource = olSource instanceof Cluster ? olSource.getSource() : olSource;
 
         if (!layerSource) {
             return;
         }
+        this.prepareLayerSourceForRefresh(layerSource);
 
-        if (typeof layerSource.updateParams === "function" && typeof layerSource.getParams === "function") {
-            layerSource.updateParams({...layerSource.getParams(), CACHEID: timestamp});
-            return;
-        }
-
-        if (typeof layerSource.getUrls === "function" && typeof layerSource.setUrls === "function") {
-            this.autoRefreshBaseUrls = this.autoRefreshBaseUrls || layerSource.getUrls();
-            if (Array.isArray(this.autoRefreshBaseUrls)) {
-                layerSource.setUrls(this.autoRefreshBaseUrls.map(url => addCacheBuster(url, timestamp)));
-                return;
-            }
-        }
-
-        if (typeof layerSource.getUrl === "function" && typeof layerSource.setUrl === "function") {
-            this.autoRefreshBaseUrl = this.autoRefreshBaseUrl || layerSource.getUrl();
-            if (this.autoRefreshBaseUrl) {
-                layerSource.setUrl(addCacheBuster(this.autoRefreshBaseUrl, timestamp));
-                return;
-            }
-        }
-
+        layerSource.once("featuresloadend", () => {
+            this.autoRefreshObserver.forEach(callback => callback());
+        });
         layerSource.refresh();
     }, autoRefresh));
+};
+
+/**
+ * Prepares the ol layer source for refresh by adding cache busters to the URLs or parameters.
+ * @param {ol/source/Source~Source} layerSource The ol layer source to prepare for refresh by adding cache busters to the URLs or parameters.
+ * @returns {void}
+ */
+Layer2d.prototype.prepareLayerSourceForRefresh = function (layerSource) {
+    const timestamp = Date.now();
+
+    if (!layerSource) {
+        return;
+    }
+
+    if (typeof layerSource.updateParams === "function" && typeof layerSource.getParams === "function") {
+        layerSource.updateParams({...layerSource.getParams(), CACHEID: timestamp});
+        return;
+    }
+
+    if (typeof layerSource.getUrls === "function" && typeof layerSource.setUrls === "function") {
+        this.autoRefreshBaseUrls = this.autoRefreshBaseUrls || layerSource.getUrls();
+        if (Array.isArray(this.autoRefreshBaseUrls)) {
+            layerSource.setUrls(this.autoRefreshBaseUrls.map(url => addCacheBuster(url, timestamp)));
+            return;
+        }
+    }
+
+    if (typeof layerSource.getUrl === "function" && typeof layerSource.setUrl === "function") {
+        this.autoRefreshBaseUrl = this.autoRefreshBaseUrl || layerSource.getUrl();
+        if (this.autoRefreshBaseUrl) {
+            layerSource.setUrl(addCacheBuster(this.autoRefreshBaseUrl, timestamp));
+        }
+    }
 };
 
 /**
@@ -278,6 +306,9 @@ Layer2d.prototype.addErrorListener = function (layerSource) {
         + "&request=describeFeatureType";
 
         await this.errorHandling(await axios.get(url, {withCredentials: true})
+            .then(function (response) {
+                return response.status;
+            })
             .catch(function (error) {
                 return error.toJSON().status;
             }), this.get("name"));
@@ -287,6 +318,9 @@ Layer2d.prototype.addErrorListener = function (layerSource) {
 
         if (url) {
             await this.errorHandling(await axios.get(url, {withCredentials: true})
+                .then(function (response) {
+                    return response.status;
+                })
                 .catch(function (error) {
                     return error.toJSON().status;
                 }), this.get("name"));
@@ -294,6 +328,9 @@ Layer2d.prototype.addErrorListener = function (layerSource) {
     }.bind(this));
     layerSource?.on("imageloaderror", async function (evt) {
         await this.errorHandling(await axios.get(evt.image.src_, {withCredentials: true})
+            .then(function (response) {
+                return response.status;
+            })
             .catch(function (error) {
                 return typeof error.toJSON === "function" ? error.toJSON().status : 0;
             }), this.get("name"));

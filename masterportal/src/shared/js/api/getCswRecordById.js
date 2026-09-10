@@ -81,7 +81,7 @@ function parseTitle (json) {
  * Gets the resourceConstraints of the metadata.
  * @param {Object} json - the response
  * @param {Boolean} parseLinks - default false, true to call setWebLinks for use contraints
- * @returns {Object} object contains String access for access constraint and Array use for list of use contraints
+ * @returns {Object} object containing access {String} and use {(String|Object)[]} - use array contains either plain text strings or parsed JSON license objects
  */
 function parseConstraints (json, parseLinks = false) {
     const constraints = getMdIdentification(json)?.resourceConstraints;
@@ -101,18 +101,37 @@ function parseConstraints (json, parseLinks = false) {
                 if (Array.isArray(otherConstraints)) {
                     use = [];
                     otherConstraints.forEach(otherConstraint => {
-                        let useConstraint = otherConstraint?.CharacterString?.getValue() || "";
+                        const useConstraint = otherConstraint?.CharacterString?.getValue() || "";
 
-                        if (parseLinks) {
-                            useConstraint = setWebLinks(useConstraint);
-                        }
-                        use.push(useConstraint);
+                        use.push(processUseConstraint(useConstraint, parseLinks));
                     });
                 }
             }
         });
     }
     return {access, use};
+}
+
+/**
+ * Processes a use constraint string - parses JSON if present, otherwise applies link parsing
+ * @param {String} constraint - the constraint string
+ * @param {Boolean} parseLinks - whether to parse links in plain text
+  * @returns {String|Object} processed constraint - either a parsed JSON object with license metadata, a formatted string with links, or the original string
+ */
+function processUseConstraint (constraint, parseLinks) {
+    try {
+        const parsed = JSON.parse(constraint);
+
+        if (parsed.url) {
+            return parsed;
+        }
+    }
+    catch {
+        if (parseLinks) {
+            return setWebLinks(constraint);
+        }
+    }
+    return constraint;
 }
 
 /**

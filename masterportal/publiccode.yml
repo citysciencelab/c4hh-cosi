@@ -32,7 +32,7 @@ description:
        Das Masterportal ist Open-Source-Software und setzt auf offene Standards. Es ist unter der [++MIT-Lizenz++](https://bitbucket.org/geowerkstatt-hamburg/masterportal/src/dev/License.txt) veröffentlicht.
 
        # Issues melden
-       Der offizielle Issue Tracker ist auf Bitbucket zu finden: [++Issue Tracker++](https://bitbucket.org/geowerkstatt-hamburg/masterportal/issues?status=new&status=open&status=submitted&is_spam=!spam)
+       Der offizielle Issue Tracker ist auf OpenCode zu finden: [++Issue Tracker++](https://gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal/-/work_items)
 
        # Diskussionsforum des Masterportals
        Das Diskussionsforum findet man auf openCode: [++Diskussionsforum++](https://discourse.opencode.de/t/ueber-die-kategorie-masterportal-projekt-413/1691)
@@ -110,8 +110,8 @@ maintenance:
 name: Masterportal
 platforms:
   - web
-releaseDate: '2026-06-03'
+releaseDate: '2026-09-02'
 roadmap: 'https://bitbucket.org/geowerkstatt-hamburg/masterportal/src/dev/'
 softwareType: standalone/web
-softwareVersion: 3.23.0
+softwareVersion: 3.26.0
 url: 'https://bitbucket.org/geowerkstatt-hamburg/masterportal.git'

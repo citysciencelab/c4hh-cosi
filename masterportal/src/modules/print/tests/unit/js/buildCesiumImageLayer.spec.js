@@ -1,5 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
+import "../../../../../../devtools/tests/cesiumMocks.js";
 import buildCesiumImageLayer from "@modules/print/js/buildCesiumImageLayer.js";
 describe("buildCesiumImageLayer", () => {
     describe("takeOl3DScreenshot", () => {

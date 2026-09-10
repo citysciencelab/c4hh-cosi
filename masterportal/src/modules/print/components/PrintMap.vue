@@ -313,11 +313,11 @@ export default {
          */
         async scaleChanged (event) {
             const scale = parseInt(event.target.value, 10),
-                resolution = {
-                    "scale": scale,
-                    "mapSize": mapCollection.getMap("2D").getSize(),
-                    "printMapSize": this.layoutMapInfo
-                };
+                  resolution = {
+                      "scale": scale,
+                      "mapSize": mapCollection.getMap("2D").getSize(),
+                      "printMapSize": this.layoutMapInfo
+                  };
 
             this.setIsScaleSelectedManually(true);
             this.getOptimalResolution(resolution);
@@ -362,7 +362,7 @@ export default {
 
             if (currentPrintLength <= 10) {
                 const index = this.fileDownloads.length,
-                    layoutAttributes = this.getLayoutAttributes(this.currentLayout, ["subtitle", "textField", "author", "overviewMap", "source"]);
+                      layoutAttributes = this.getLayoutAttributes(this.currentLayout, ["subtitle", "textField", "author", "overviewMap", "source"]);
 
                 this.addFileDownload({
                     index: index,
@@ -429,7 +429,7 @@ export default {
          */
         isValid (value) {
             const regex = /^[a-zA-Z\-_]+$/,
-                valid = regex.test(value);
+                  valid = regex.test(value);
 
             if (!valid) {
                 this.$refs.outputFileTitleWarning.classList.remove("active");
@@ -486,7 +486,7 @@ export default {
 
                             if (foundRawLayer) {
                                 const hrefUrl = foundRawLayer?.datasets[0]?.show_doc_url + foundRawLayer?.datasets[0]?.md_id,
-                                    hrefName = foundRawLayer?.datasets[0]?.md_name;
+                                      hrefName = foundRawLayer?.datasets[0]?.md_name;
 
                                 layoutAttributes.sourceLinks.push({url: hrefUrl, name: hrefName, table: {"columns": [], "data": []}});
                                 layoutAttributes[name].push(foundRawLayer?.datasets[0]?.show_doc_url + foundRawLayer.datasets[0]?.md_id);
@@ -509,7 +509,7 @@ export default {
          */
         getOverviewmapLayerId () {
             const defaultLayerId = this.visibleLayerList[0].values_.id,
-                visibleLayerId = this.visibleLayerList.filter(id => id.values_.id === this.overviewmapLayerId).map(val => val.values_.id).toString();
+                  visibleLayerId = this.visibleLayerList.filter(id => id.values_.id === this.overviewmapLayerId).map(val => val.values_.id).toString();
 
             if (this.overviewmapLayerId !== undefined && visibleLayerId !== "") {
                 return visibleLayerId;

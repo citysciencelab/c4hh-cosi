@@ -1,12 +1,11 @@
 import {createStore} from "vuex";
-import {config, shallowMount} from "@vue/test-utils";
+import {shallowMount} from "@vue/test-utils";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import LegendContainer from "@modules/legend/components/LegendContainer.vue";
 import Legend from "@modules/legend/store/indexLegend.js";
 import {expect} from "chai";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/legend/components/LegendContainer.vue", () => {
     let store,

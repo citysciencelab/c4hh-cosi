@@ -24,7 +24,7 @@ export default {
                 this.$nextTick(() => {
                     newLayerConfigs.forEach(newConfig => {
                         const oldConfig = oldLayerConfigs.find(config => config.id === newConfig.id),
-                            existingLegend = this.legends.find(legendConf => legendConf.id === newConfig.id);
+                              existingLegend = this.legends.find(legendConf => legendConf.id === newConfig.id);
 
                         if (!oldConfig || existingLegend && existingLegend.position !== newConfig.zIndex) {
                             const layer = layerCollection.getLayerById(newConfig.id);

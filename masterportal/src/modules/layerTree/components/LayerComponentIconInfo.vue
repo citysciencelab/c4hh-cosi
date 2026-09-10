@@ -1,6 +1,9 @@
 <script>
-import {mapActions, mapGetters, mapMutations} from "vuex";
+import {mapMutations} from "vuex";
+import {mapActions, mapState} from "pinia";
+import {useLayerInformationStore} from "@modules/layerInformation/store/layerInformationStore.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 
 /**
  * Represents an info button for a layer in the layertree.
@@ -24,17 +27,17 @@ export default {
         }
     },
     computed: {
-        ...mapGetters("Modules/LayerInformation", ["icon"]),
+        ...mapState(useLayerInformationStore, ["icon"]),
         showInfoIcon () {
             return this.layerConf?.datasets !== false;
         }
     },
     methods: {
-        ...mapActions("Modules/LayerInformation", ["startLayerInformation"]),
+        ...mapActions(useLayerInformationStore, ["startLayerInformation"]),
         ...mapMutations("Modules/LayerSelection", ["setLayerInfoVisible"]),
 
         showLayerInformation () {
-            this.startLayerInformation(this.layerConf);
+            this.startLayerInformation(addSourceToPayload(this, this.layerConf));
             if (!this.isLayerTree) {
                 this.setLayerInfoVisible(true);
             }

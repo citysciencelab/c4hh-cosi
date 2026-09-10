@@ -1,11 +1,10 @@
 import {createStore} from "vuex";
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import PrintComponent from "@modules/print/components/PrintMap.vue";
 import Print from "@modules/print/store/indexPrint.js";
 import sinon from "sinon";
 
-config.global.mocks.$t = key => key;
 
 describe("src/modules/Print/components/PrintMap.vue", () => {
     const scales = ["1000", "5000", "10000"],

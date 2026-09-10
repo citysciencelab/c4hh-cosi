@@ -20,6 +20,7 @@ vi.mock("i18next-vue", () => ({
 }));
 
 describe("src/plugins/i18next.js", () => {
+
     describe("initiateVueI18Next", () => {
         let i18nextMock;
         let i18nextVueMock;

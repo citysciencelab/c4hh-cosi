@@ -1,10 +1,8 @@
-import {config, mount} from "@vue/test-utils";
+import {mount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
 
 import ControlIcon from "@modules/controls/components/ControlIcon.vue";
-
-config.global.mocks.$t = key => key;
 
 
 describe("src/modules/controls/components/ControlIcon.vue", () => {

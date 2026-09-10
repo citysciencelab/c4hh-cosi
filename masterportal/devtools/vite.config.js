@@ -15,7 +15,7 @@ import addonModules from "./tasks/addon-modules-plugin.js";
 import emptyAddonModulesPlugin from "./tasks/empty-addon-modules-plugin.js";
 // import { analyzer } from "vite-bundle-analyzer";// Do not delete, comment in for analyzing bundle content and before install: npm install vite-bundle-analyzer --save-dev
 import vmShimPlugin from "./tasks/vm-shim-plugin.js";
-// eslint-disable-next-line no-restricted-syntax
+
 import getMastercodeVersionFolderName from "./tasks/getMastercodeVersionFolderName.mjs";
 import zipPack from "vite-plugin-zip-pack";
 import {HttpsProxyAgent} from "https-proxy-agent";
@@ -317,7 +317,23 @@ export default defineConfig(({mode}) => {
 
                         return `${buildBase}/js/[name].js`;
                     },
-                    chunkFileNames: `${buildBase}/js/[name].js`
+                    chunkFileNames: `${buildBase}/js/[name].js`,
+                    // "$initial" only matches statically reachable modules, so addons and other dynamic imports stay lazy.
+                    codeSplitting: {
+                        groups: [
+                            {
+                                name: "vendor",
+                                test: /[\\/]node_modules[\\/]/,
+                                tags: ["$initial"],
+                                priority: 10
+                            },
+                            {
+                                name: "masterportal",
+                                tags: ["$initial"],
+                                priority: 0
+                            }
+                        ]
+                    }
                 },
                 external (id) {
                     const pid = slash(id);
@@ -358,7 +374,8 @@ export default defineConfig(({mode}) => {
                 "vuex",
                 "olcs",
                 "bootstrap",
-                "axios"
+                "axios",
+                "ol-mapbox-style"
             ],
             exclude: [
                 "sinon",
