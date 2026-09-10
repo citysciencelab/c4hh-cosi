@@ -78,7 +78,14 @@
         "layerListPlaceholder": "Layer auswählen...",
         "noFeatureLinked": "Kein Feature verknüpft",
         "noSubjectLayerHint": "Bitte Fachdaten auswählen um ein Feature verknüpfen zu können.",
-        "addFeatureDescription": "Durch Klicken auf ein Feature in der Karte wird dieses mit dem aktuellen Kapitel verbunden. Es lassen sich zusätzliche Informationen hinzufügen und festlegen, welche Attribute später im Info-Popup sichtbar sind."
+        "addFeatureDescription": "Durch Klicken auf ein Feature in der Karte wird dieses mit dem aktuellen Kapitel verbunden. Es lassen sich zusätzliche Informationen hinzufügen und festlegen, welche Attribute später im Info-Popup sichtbar sind.",
+        "removeColor": "Farbe entfernen",
+        "black": "schwarz",
+        "darkgrey": "dunkelgrau",
+        "red": "rot",
+        "green": "grün",
+        "orange": "orange",
+        "blue": "blau"
       },
       "addElementDropdown": {
         "categories": {

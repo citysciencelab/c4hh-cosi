@@ -77,7 +77,14 @@
         "noSubjectLayerHint": "Please select layers to be able to link a feature.",
         "addFeatureDescription": "By clicking on a feature in the map, it will be linked to the current chapter. You can add additional information and define which attributes will later be visible in the info popup.",
         "baseLayerListPlaceholder": "Select base layer...",
-        "layerListPlaceholder": "Select layers..."
+        "layerListPlaceholder": "Select layers...",
+        "removeColor": "Remove color",
+        "black": "black",
+        "darkgrey": "dark grey",
+        "red": "red",
+        "green": "green",
+        "orange": "orange",
+        "blue": "blue"
       },
       "addElementDropdown": {
         "categories": {
