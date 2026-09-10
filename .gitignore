@@ -19,3 +19,7 @@ coverage/
 # Local env overrides (committed examples: .env.example, valhalla/.env.example)
 .env
 valhalla/.env
+
+# Scratch clone of the upstream addons repo. Its history now lives in this repo
+# under the "upstream" remote, so this directory is only a local convenience.
+/official-repo/
