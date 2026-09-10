@@ -19,6 +19,10 @@ export default {
             type: Boolean,
             default: false
         },
+        disabled: {
+            type: Boolean,
+            default: false
+        },
         id: {
             type: String,
             required: true
@@ -92,6 +96,7 @@ export default {
                 :label="label"
                 :placeholder="placeholder"
                 :model-value="value"
+                :disabled
                 @update:modelValue="$emit('update:value', $event)"
             />
         </template>
@@ -104,6 +109,7 @@ export default {
                 class="form-select m-2"
                 :aria-label="label"
                 :value="selectedEnumValue"
+                :disabled
                 @change="$emit('update:value', $event.target.value)"
             >
                 <option
@@ -122,6 +128,7 @@ export default {
                     :label="label"
                     :aria="aria"
                     :checked="checked"
+                    :disabled
                     :interaction="(event) => $emit('update:checked', event.target.checked)"
                 />
             </div>
@@ -143,6 +150,7 @@ export default {
                 :max="max"
                 :step="step"
                 :value="value"
+                :disabled
                 :interaction="($event) => $emit('update:value', Number($event.target.value))"
             />
         </template>

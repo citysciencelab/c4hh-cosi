@@ -55,6 +55,7 @@ export default {
     computed: {
         ...mapGetters("Modules/SimulationTool", [
             "currentPlanningScenarioId",
+            "isExecutionRequestSubmitting",
             "planningScenarios",
             "previousComponentOfSimulation",
             "shouldSaveSimulations",
@@ -276,6 +277,7 @@ export default {
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",
+            "setIsExecutionRequestSubmitting",
             "setMode",
             "setSimulationIdForResults"
         ]),
@@ -879,26 +881,35 @@ export default {
          * @returns {void}
          */
         async startSimulation () {
-            if (!this.isLoggedIn()) {
+            if (!this.isLoggedIn() || this.isExecutionRequestSubmitting) {
                 return;
             }
             this.removeEmptyCollections(this.requestBodies);
             this.requestBodies = this.replaceEnumValueObjects(this.requestBodies);
 
-            const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId), // Cannot use computed property here, which may change during async call.
-                  executeResponses = await Promise.all(
-                      this.processHandlers.map((handler, index) => handler.execute(this.requestBodies[index], this.accessToken))
-                  ),
-                  jobIDs = executeResponses.map(response => response.jobID),
-                  newSimulationId = jobIDs.join("_"),
+            let executeResponses, jobIDs, newSimulationId;
+            const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId),
                   newSimulation = {
                       name: this.simulationName || this.simulation.title,
                       configId: this.currentSimulationId};
 
-            if (jobIDs.some(ID => !ID)) {
-                console.warn("Not all job IDs returned from process execution.");
+            try {
+                this.setIsExecutionRequestSubmitting(true);
+                executeResponses = await Promise.all(
+                    this.processHandlers.map((handler, index) => handler.execute(this.requestBodies[index], this.accessToken))
+                );
+                jobIDs = executeResponses.map(response => response.jobID);
+                newSimulationId = jobIDs.join("_");
+
+            }
+            catch {
+                console.error("An error occurred while starting the simulation.");
                 return;
             }
+            finally {
+                this.setIsExecutionRequestSubmitting(false);
+            }
+
 
             scenario.simulations ??= {};
             scenario.simulations[newSimulationId] = newSimulation;
@@ -1020,6 +1031,7 @@ export default {
                             class="form-select"
                             :aria-label="$t('additional:modules.tools.simulationTool.selectPlanningScenario')"
                             :value="currentPlanningScenarioId"
+                            :disabled="isExecutionRequestSubmitting"
                             @change="setCurrentPlanningScenarioId($event.target.value)"
                         >
                             <option
@@ -1066,6 +1078,7 @@ export default {
                 v-model="simulationName"
                 :label="$t('additional:modules.tools.simulationTool.simulationName')"
                 :placeholder="$t('additional:modules.tools.simulationTool.simulationName')"
+                :disabled="isExecutionRequestSubmitting"
             />
             <div class="form-floating mb-3">
                 <select
@@ -1073,6 +1086,7 @@ export default {
                     v-model="currentSimulationId"
                     class="form-select"
                     :aria-label="$t('additional:modules.tools.simulationTool.selectSimulation')"
+                    :disabled="isExecutionRequestSubmitting"
                 >
                     <option
                         v-for="model in simulations"
@@ -1105,6 +1119,7 @@ export default {
                                 :min="input.minimum"
                                 :max="input.maximum"
                                 :aria="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
+                                :disabled="isExecutionRequestSubmitting"
                                 @update:value="setRequestBodyInput(input.inputKey, propertyKey, $event, Boolean(input.enum))"
                                 @update:checked="setRequestBodyInput(input.inputKey, propertyKey, $event, Boolean(input.enum))"
                             />
@@ -1135,6 +1150,7 @@ export default {
                             :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                             :interaction="event => onOafSwitchChange(event, inputKey)"
                             :checked="isValueSet(inputKey, input?.default)"
+                            :disabled="isExecutionRequestSubmitting"
                         />
                     </div>
                 </div>
@@ -1168,6 +1184,7 @@ export default {
                                     :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                     :interaction="event => onOafSwitchChange(event, inputKey)"
                                     :checked="isValueSet(inputKey, input?.default)"
+                                    :disabled="isExecutionRequestSubmitting"
                                 />
                             </div>
                         </div>
@@ -1186,6 +1203,7 @@ export default {
                                     :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                     :interaction="event => toggleOptionalBBOXUrlInputs(inputKey, event)"
                                     :checked="isValueSet(inputKey, input?.default)"
+                                    :disabled="isExecutionRequestSubmitting"
                                 />
                             </div>
                             <DynamicInputByType
@@ -1197,6 +1215,7 @@ export default {
                                 :value="getRequestBodyInputByKey(inputKey, '', input.default)"
                                 :min="input.minimum"
                                 :max="input.maximum"
+                                :disabled="isExecutionRequestSubmitting"
                                 @update:value="setRequestBodyInput(inputKey, '', $event, Boolean(input?.enum))"
                                 @update:checked="setRequestBodyInput(inputKey, '', $event, Boolean(input?.enum))"
                             />
@@ -1223,6 +1242,7 @@ export default {
                                     :value="getRequestBodyInputByKey(inputKey, propertyKey, property?.default)"
                                     :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                     :checked="typeof property.default === 'boolean' ? property.default : false"
+                                    :disabled="isExecutionRequestSubmitting"
                                     @update:value="setRequestBodyInput(inputKey, propertyKey, $event, Boolean(property.enum))"
                                     @update:checked="setRequestBodyInput(inputKey, propertyKey, $event, Boolean(property.enum))"
                                 />
@@ -1247,6 +1267,7 @@ export default {
                         :searchable="true"
                         :multiple="true"
                         :open="true"
+                        :disabled="isExecutionRequestSubmitting"
                     >
                         <template #tag="{ option, remove }">
                             <button
@@ -1280,8 +1301,8 @@ export default {
                         :interaction="startSimulation"
                         :aria-label="$t('additional:modules.tools.simulationTool.simulationStart')"
                         :text="$t('additional:modules.tools.simulationTool.simulationStart')"
-                        :disabled="isLoading || !currentPlanningScenario || isSomeOafLoading || !currentSimulationId"
-                        :spinner-trigger="isLoading"
+                        :disabled="isLoading || isExecutionRequestSubmitting || !currentPlanningScenario || isSomeOafLoading || !currentSimulationId"
+                        :spinner-trigger="isLoading || isExecutionRequestSubmitting"
                     />
                 </div>
             </form>

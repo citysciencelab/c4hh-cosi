@@ -42,6 +42,7 @@
  * @property {string|null} selectedProcessId the selected process id
  * @property {String} simulationIdForResults The Id of the simulation that is currently displayed in simulationResult component.
  * @property {Object[]} simulations - A list of all available simulations.
+ * @property {boolean} isExecutionRequestSubmitting Flag indicating whether a simulation execution request is currently being submitted.
  * @property {Boolean} shouldSaveSimulations Flag to enable persistence of planning scenarios and simulations.
  * @property {String|null} simulationApiUrl The URL for the Urban Model Platform API
  * @property {Object} simulationAreaStyle - The default style for the simulation area (BBOX/Extent of planning scenario)
@@ -112,6 +113,7 @@ const state = {
     selectedEnsembleId: null,
     selectedJobId: null,
     selectedProcessId: null,
+    isExecutionRequestSubmitting: false,
     shouldSaveSimulations: true,
     simulationApiUrl: null,
     simulationAreaStyle: {
