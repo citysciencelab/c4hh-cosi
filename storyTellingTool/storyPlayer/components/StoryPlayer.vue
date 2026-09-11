@@ -379,10 +379,12 @@ export default {
 
                     if (!layerConf) {
                         const groupLayers = this.layerConfigsByAttributes({typ: "GROUP"});
+                        let inGroup = false;
 
                         if (groupLayers.length) {
                             groupLayers.forEach(groupLayer => {
                                 if (groupLayer?.children.some(layer => layer.id === layerId)) {
+                                    inGroup = true;
                                     this.addOrReplaceLayer({
                                         layerId: groupLayer.id,
                                         visibility: true,
@@ -391,7 +393,7 @@ export default {
                                 }
                             });
                         }
-                        else {
+                        if (!inGroup) {
                             layerConf = getAndMergeAllRawLayers().find(layer => layer.id === layerId);
 
                             if (layerConf) {
