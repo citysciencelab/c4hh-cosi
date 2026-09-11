@@ -1040,37 +1040,42 @@ export default {
                 v-if="worstJobStatusTag === 'successful'"
                 class="result-output-container"
             >
-                <h5
-                    class="mb-2"
-                >
-                    {{ $t('additional:modules.tools.simulationTool.showResults') }}
-                </h5>
-                <div
-                    class="list-group list-group-flush mt-3"
-                >
-                    <div
-                        v-for="output in outputs"
-                        :key="output"
-                        class="form-check list-group-item list-group-item-action"
-                        :class="output === currentOutput ? 'selected-ouput' : ''"
+                <template v-if="outputs.length >= 2">
+                    <h5
+                        class="mb-2"
                     >
-                        <input
-                            :id="output"
-                            :value="output"
-                            class="form-check-input d-flex justify-content-between align-items-center"
-                            type="radio"
-                            :checked="output === currentOutput"
-                            @input="setCurrentOutput(output)"
+                        {{ $t('additional:modules.tools.simulationTool.showResults') }}
+                    </h5>
+                    <div
+                        class="list-group list-group-flush mt-3"
+                    >
+                        <div
+                            v-for="output in outputs"
+                            :key="output"
+                            class="form-check list-group-item list-group-item-action"
+                            :class="output === currentOutput ? 'selected-ouput' : ''"
                         >
-                        <label
-                            class="form-check-label d-flex justify-content-between align-items-center"
-                            :for="output"
-                        >
-                            {{ getMappedProperty(output, simulationConfig?.outputs?.propertiesMapping) }}
-                        </label>
+                            <input
+                                :id="output"
+                                :value="output"
+                                class="form-check-input d-flex justify-content-between align-items-center"
+                                type="radio"
+                                :checked="output === currentOutput"
+                                @input="setCurrentOutput(output)"
+                            >
+                            <label
+                                class="form-check-label d-flex justify-content-between align-items-center"
+                                :for="output"
+                            >
+                                {{ getMappedProperty(output, simulationConfig?.outputs?.propertiesMapping) }}
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="form-check form-switch mt-2">
+                </template>
+                <div
+                    v-if="Object.keys(tableFeaturesCollection).length"
+                    class="form-check form-switch mt-2"
+                >
                     <SwitchInput
                         id="showTextFeatures"
                         :checked="showTextFeatures"
