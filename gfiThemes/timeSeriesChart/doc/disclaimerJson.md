@@ -1,6 +1,6 @@
 # Disclaimer JSON Format
 
-The disclaimer JSON file describes a simple rich-text document made up of a list of block-level elements, each of which may contain nested inline text elements. This text can be configured and shown as a disclaimer in the waterStatistics GFI Theme.
+The disclaimer JSON file describes a simple rich-text document made up of a list of block-level elements, each of which may contain nested inline text elements. This text can be configured and shown as a disclaimer in the timeSeriesChart GFI Theme.
 
 ## Top-level structure
 
@@ -11,7 +11,7 @@ The disclaimer JSON file describes a simple rich-text document made up of a list
 
 ```json
 {
-  "id": "waterstatistics-disclaimer",
+  "id": "timeserieschart-disclaimer",
   "blocks": []
 }
 ```
@@ -77,7 +77,7 @@ Multiple inline elements can be combined within one paragraph to mix plain and e
 
 ```json
 {
-  "id": "waterstatistics-disclaimer",
+  "id": "timeserieschart-disclaimer",
   "blocks": [
     {
       "type": "h2",

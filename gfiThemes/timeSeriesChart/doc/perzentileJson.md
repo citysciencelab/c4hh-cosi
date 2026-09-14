@@ -1,6 +1,6 @@
 # Perzentile JSON Format (`perzentile_v3.json`)
 
-This file provides monthly percentile classification bands per measuring station, used by the `waterStatistics` GFI theme to overlay/classify chart values.
+This file provides monthly percentile classification bands per measuring station, used by the `timeSeriesChart` GFI theme to overlay/classify chart values.
 
 ## Top-level structure
 

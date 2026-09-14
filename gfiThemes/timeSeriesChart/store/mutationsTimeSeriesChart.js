@@ -1,5 +1,5 @@
 import {generateSimpleMutations} from "../../../../src/shared/js/utils/generators.js";
-import stateWaterStatistics from "./stateWaterStatistics.js";
+import stateTimeSeriesChart from "./stateTimeSeriesChart.js";
 
 const mutations = {
     /**
@@ -8,7 +8,7 @@ const mutations = {
      * {setKey:   (state, payload) => *   state[key] = payload * }
      * will be returned.
      */
-    ...generateSimpleMutations(stateWaterStatistics)
+    ...generateSimpleMutations(stateTimeSeriesChart)
 };
 
 export default mutations;

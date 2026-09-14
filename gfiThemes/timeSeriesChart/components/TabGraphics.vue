@@ -109,7 +109,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/WaterStatistics", [
+        ...mapGetters("Modules/TimeSeriesChart", [
             "statisticValues",
             "oafSchema",
             "dataLoading",
@@ -1010,7 +1010,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions("Modules/WaterStatistics", [
+        ...mapActions("Modules/TimeSeriesChart", [
             "queryOaf",
             "queryPercentiles",
             "addChartToPdf",
@@ -1019,7 +1019,7 @@ export default {
         ...mapActions("Alerting", [
             "addSingleAlert"
         ]),
-        ...mapMutations("Modules/WaterStatistics", [
+        ...mapMutations("Modules/TimeSeriesChart", [
             "setStatisticValues",
             "setDataLoading",
             "setPercentiles"

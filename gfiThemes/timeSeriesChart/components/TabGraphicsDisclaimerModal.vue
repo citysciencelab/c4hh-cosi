@@ -33,7 +33,7 @@ export default {
         }
     },
     methods: {
-        ...mapActions("Modules/WaterStatistics", [
+        ...mapActions("Modules/TimeSeriesChart", [
             "fetchDisclaimer"
         ]),
         /**

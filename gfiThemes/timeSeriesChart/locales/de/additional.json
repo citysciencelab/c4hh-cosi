@@ -1,14 +1,14 @@
 {
     "addons": {
         "gfiThemes": {
-            "waterStatistics": {
-                "title": "Groundwater Monitoring Stations",
+            "timeSeriesChart": {
+                "title": "Zeitreihendiagramm",
                 "tabs": {
                     "tabBasicData": {
-                        "label": "Basic Data"
+                        "label": "Grunddaten"
                     },
                     "tabGraphics": {
-                        "label": "Graphics"
+                        "label": "Grafiken"
                     }
                 }
             }

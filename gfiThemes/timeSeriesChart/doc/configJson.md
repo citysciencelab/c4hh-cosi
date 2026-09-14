@@ -1,17 +1,17 @@
-# GFI Theme: `waterStatistics`
+# GFI Theme: `timeSeriesChart`
 
-The `waterStatistics` GFI theme renders a tabbed detail view for a layer feature, combining classic attribute display with a time-series chart ("Ganglinie"), table, CSV export, and PDF export for time-series data such as measuring-station data (e.g. groundwater level stations).
+The `timeSeriesChart` GFI theme renders a tabbed detail view for a layer feature, combining classic attribute display with a time-series chart ("Ganglinie"), table, CSV export, and PDF export for time-series data such as measuring-station data (e.g. groundwater level stations).
 
 ## Top-level structure
 
 | Parameter | Type | Description |
 |---|---|---|
-| `name` | string | Must be `"waterStatistics"` to activate this GFI theme. |
+| `name` | string | Must be `"timeSeriesChart"` to activate this GFI theme. |
 | `params` | object | Configuration object for the theme, see below. |
 
 ```json
 "gfiTheme": {
-  "name": "waterStatistics",
+  "name": "timeSeriesChart",
   "params": {
     "themeTabs": []
   }
@@ -232,7 +232,7 @@ referenceAttribute - (yAxisLeft-datavalue * factor)
 
 ```json
 "gfiTheme": {
-  "name": "waterStatistics",
+  "name": "timeSeriesChart",
   "params": {
     "themeTabs": [
       {

@@ -3,7 +3,7 @@ import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import TabGraphicsDisclaimerModal from "../../../components/TabGraphicsDisclaimerModal.vue";
 
-describe("addons/gfiThemes/waterStatistics/components/TabGraphicsDisclaimerModal.vue", () => {
+describe("addons/gfiThemes/timeSeriesChart/components/TabGraphicsDisclaimerModal.vue", () => {
     let wrapper, store, fetchDisclaimer;
 
     beforeEach(() => {
@@ -43,7 +43,7 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphicsDisclaimerModal
                 Modules: {
                     namespaced: true,
                     modules: {
-                        WaterStatistics: {
+                        TimeSeriesChart: {
                             namespaced: true,
                             actions: {
                                 fetchDisclaimer

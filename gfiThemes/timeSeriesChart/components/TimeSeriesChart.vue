@@ -5,7 +5,7 @@ import TabBasicData from "./TabBasicData.vue";
 import TabGraphics from "./TabGraphics.vue";
 
 export default {
-    name: "WaterStatistics",
+    name: "TimeSeriesChart",
     components: {
         TabContainer
     },
@@ -16,7 +16,7 @@ export default {
         }
     },
     computed: {
-        ...mapGetters("Modules/WaterStatistics", [
+        ...mapGetters("Modules/TimeSeriesChart", [
             "oafSchema",
             "menuWidthOnStart"
         ]),
@@ -83,12 +83,12 @@ export default {
         }
     },
     methods: {
-        ...mapActions("Modules/WaterStatistics", [
+        ...mapActions("Modules/TimeSeriesChart", [
             "queryOafSchema",
             "increaseSidebarWidth",
             "resetSidebarWidth"
         ]),
-        ...mapMutations("Modules/WaterStatistics", [
+        ...mapMutations("Modules/TimeSeriesChart", [
             "setMenuWidthSelectedForGfi"
         ])
     }
@@ -96,7 +96,7 @@ export default {
 </script>
 
 <template>
-    <div class="water-statistics-theme">
+    <div class="time-series-chart-theme">
         <TabContainer
             ref="tabContainer"
             :tabs="tabs"
@@ -106,7 +106,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-div.water-statistics-theme {
+div.time-series-chart-theme {
 
 }
 </style>

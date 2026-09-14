@@ -1,8 +1,8 @@
 {
-  "name": "waterStatistics",
+  "name": "timeSeriesChart",
   "version": "0.1.0",
-  "description": "GFI Theme to visualize statistics",
-  "title": "Water Statistics",
+  "description": "GFI Theme to visualize time series statistics",
+  "title": "Time Series Chart",
   "license": "MIT",
   "repository": {
     "type": "git",

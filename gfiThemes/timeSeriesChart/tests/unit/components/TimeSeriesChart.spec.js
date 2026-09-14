@@ -18,9 +18,9 @@ vi.mock("chart.js", async () => {
     };
 });
 
-import WaterStatistics from "../../../components/WaterStatistics.vue";
+import TimeSeriesChart from "../../../components/TimeSeriesChart.vue";
 
-describe("addons/gfiThemes/waterStatistics/components/WaterStatistics.vue", () => {
+describe("addons/gfiThemes/timeSeriesChart/components/TimeSeriesChart.vue", () => {
     let store, wrapper, themeTabs;
 
     beforeEach(() => {
@@ -85,7 +85,7 @@ describe("addons/gfiThemes/waterStatistics/components/WaterStatistics.vue", () =
                 Modules: {
                     namespaced: true,
                     modules: {
-                        WaterStatistics: {
+                        TimeSeriesChart: {
                             namespaced: true,
                             actions: {
                                 queryOaf: sinon.spy(),
@@ -109,7 +109,7 @@ describe("addons/gfiThemes/waterStatistics/components/WaterStatistics.vue", () =
             }
         });
 
-        wrapper = shallowMount(WaterStatistics, {
+        wrapper = shallowMount(TimeSeriesChart, {
             global: {
                 plugins: [store]
             },
@@ -145,8 +145,8 @@ describe("addons/gfiThemes/waterStatistics/components/WaterStatistics.vue", () =
         }
     });
 
-    it("should render the WaterStatistics theme", () => {
-        expect(wrapper.find(".water-statistics-theme").exists()).to.be.true;
+    it("should render the TimeSeriesChart theme", () => {
+        expect(wrapper.find(".time-series-chart-theme").exists()).to.be.true;
     });
 
     it("should render two tabs", () => {

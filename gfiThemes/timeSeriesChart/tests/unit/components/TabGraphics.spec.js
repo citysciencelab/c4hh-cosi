@@ -21,7 +21,7 @@ vi.mock("chart.js", async () => {
 
 import TabGraphics from "../../../components/TabGraphics.vue";
 
-describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
+describe("addons/gfiThemes/timeSeriesChart/components/TabGraphics.vue", () => {
     let store, wrapper, queryOaf, queryPercentiles, params, statisticValuesMock, percentilesMock, addSingleAlert, setStatisticValues, allDataMock, addChartToPdf;
 
     beforeEach(() => {
@@ -253,7 +253,7 @@ describe("addons/gfiThemes/waterStatistics/components/TabGraphics.vue", () => {
                 Modules: {
                     namespaced: true,
                     modules: {
-                        WaterStatistics: {
+                        TimeSeriesChart: {
                             namespaced: true,
                             actions: {
                                 queryOaf,
