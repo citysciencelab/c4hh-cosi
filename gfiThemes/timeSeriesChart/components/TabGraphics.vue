@@ -1,10 +1,7 @@
 <script>
 import {Tooltip} from "chart.js";
 import {mapGetters, mapActions, mapMutations} from "vuex";
-// currently using local copy of LinechartItem to allow plugin registration
-// can be switched lateron, when pull request to masterportal core component has been merged
-// import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
-import LinechartItem from "./reusable/LinechartItem.vue";
+import LinechartItem from "@shared/modules/charts/components/LinechartItem.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import thousandsSeparator from "@shared/js/utils/thousandsSeparator.js";
