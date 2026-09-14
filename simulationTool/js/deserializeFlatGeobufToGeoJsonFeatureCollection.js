@@ -9,7 +9,7 @@ import {geojson} from "flatgeobuf";
  * @param {string} base64Value The base64 encoded value.
  * @returns {Uint8Array} The decoded bytes.
  */
-function decodeBase64ToUint8Array (base64Value) {
+export function decodeBase64ToUint8Array (base64Value) {
     // @ts-ignore
     if (typeof Uint8Array.fromBase64 === "function") {
         // @ts-ignore

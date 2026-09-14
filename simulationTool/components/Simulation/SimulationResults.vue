@@ -4,12 +4,18 @@ import SwitchInput from "../../../../src/shared/modules/checkboxes/components/Sw
 import ConvertFeature from "../../js/convertFeatures.js";
 import ConvertStyle from "../../js/convertStyle.js";
 import CircleStyle from "ol/style/Circle.js";
+import {decodeBase64ToUint8Array} from "../../js/deserializeFlatGeobufToGeoJsonFeatureCollection.js";
+import {deserialize} from "flatgeobuf/lib/mjs/ol.js";
 import {getMappedProperty} from "../shared/js/getMappedProperty.js";
 import {Feature} from "ol";
 import FeaturesHandler from "../../../../src/modules/statisticDashboard/js/handleFeatures.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import Fill from "ol/style/Fill.js";
+import getOutputObjectForVariables from "../../js/getOutputObjectForVariables.js";
+import getWebglVariables from "../../js/getWebglVariables.js";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
+import Layer2dWebGLVector from "../../js/layer2dVectorWebGL.js";
+import Layer2dVector from "@core/layers/js/layer2dVector.js";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
 import {LineString} from "ol/geom.js";
@@ -338,9 +344,10 @@ export default {
          * Creates or updates a layer with the given layerId.
          * @param {String} layerId - The ID of the layer to create or update.
          * @param {string} output - The output key.
+         * @param {Record<string, object>} displaySettings - The displaySettings object from the process configuration.
          * @returns {Object} The created or updated layer.
          */
-        createOrUpdateLayer (layerId, output) {
+        createOrUpdateLayer (layerId, output, displaySettings) {
             const existingLayer = layerCollection.getLayerById(layerId);
 
             if (existingLayer) {
@@ -370,7 +377,8 @@ export default {
                       : {
                           typ: layerType,
                           id: layerId,
-                          name: this.currentSimulation?.name || layerId
+                          name: this.currentSimulation?.name || layerId,
+                          dontInitStyle: true
                       };
 
             if (isObject(gfiAttributes)) {
@@ -381,7 +389,15 @@ export default {
                 console.warn(`No reference URL found for result layer ${layerId}.`);
             }
 
-            const layer = layerFactory.createLayer(layerAttributes);
+            if (displaySettings?.[output]?.type === "webgl") {
+                layerAttributes.variables = displaySettings[output].variables;
+                layerAttributes.style = displaySettings[output].style;
+            }
+            const layer = displaySettings?.[output]?.type === "webgl"
+                ? new Layer2dWebGLVector(layerAttributes)
+                : layerFactory.createLayer(layerAttributes);
+
+            layerCollection.addLayer(layer);
 
             this.addLayerToLayerConfig({
                 layerConfig: {
@@ -391,7 +407,7 @@ export default {
                     typ: layerType,
                     visibility: true,
                     showInLayerTree: true,
-                    transparency: 0,
+                    transparency: 40,
                     legendURL
                 },
                 parentKey: "subjectlayer"
@@ -574,8 +590,8 @@ export default {
                 return () => null;
             }
 
-            if (displayOptions?.type !== "dynamic-binary") {
-                console.warn(`Unsupported display option type "${displayOptions?.type}". Expected "dynamic-binary".`);
+            if (!["dynamic-binary", "webgl"].includes(displayOptions?.type)) {
+                console.warn(`Unsupported display option type "${displayOptions?.type}". Expected "dynamic-binary" or "webgl".`);
                 return null;
             }
 
@@ -700,8 +716,9 @@ export default {
 
         /**
          * Shows features in map.
+         * @import {Results} from "../../types/ogcApi.processes.js"
          * @param {String} simulationId the simulation id.
-         * @param {Object} jobs - The jobs.
+         * @param {{jobResults: Results}[]} jobs - The jobs.
          * @param {String[]} outputs - The output array.
          * @returns {void}
          */
@@ -710,35 +727,37 @@ export default {
                 return;
             }
 
+            const outputObjectForVariables = getOutputObjectForVariables(jobs, this.simulationConfig?.processes);
+
             outputs.forEach(output => {
                 if (this.simulationConfig?.outputs?.[output]?.hide === true) {
                     return;
                 }
 
-                const layerId = `${simulationId}-${output}`,
-                      transmissionMode = this.simulationConfig?.outputs?.[output]?.value?.transmissionMode || "value",
-                      layer = this.createOrUpdateLayer(layerId, output),
-                      layerSource = layer.getLayerSource();
+                const layerId = `${simulationId}-${output}`;
 
-                Object.values(jobs).forEach(job => {
+                Object.values(jobs).forEach(async job => {
                     const foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
+                          layer = this.createOrUpdateLayer(layerId, output, foundProcess.displaySettings),
+                          layerSource = layer.getLayerSource(),
                           styleFunction = foundProcess?.displaySettings
                               ? this.getStyleFunctionFromDisplayOptions(foundProcess.displaySettings[output], job.jobResults)
                               : null;
-
-                    if (transmissionMode === "reference") {
-                        layer.layer.setStyle(styleFunction);
-                        return;
-                    }
 
                     const featuresFromJob = job.jobResults?.[output]?.value?.features || job.jobResults?.[output]?.features || [],
                           featuresToAdd = ConvertFeature.geoJsonToOpenlayers(featuresFromJob),
                           isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table";
 
-                    layerSource.clear();
                     if (isTableMode) {
                         this.processAndStylePointFeaturesForTable(layerId, layer, layerSource, featuresToAdd, simulationId, foundProcess?.renderingOptions?.attributeToShow);
                         return;
+                    }
+
+                    if (layer instanceof Layer2dWebGLVector && Array.isArray(foundProcess?.displaySettings?.[output]?.spreadOutputVariables)) {
+                        layer.layer.updateStyleVariables(getWebglVariables(outputObjectForVariables[output]));
+                    }
+                    else if (layer instanceof Layer2dVector && typeof styleFunction === "function") {
+                        layer.setStyle(styleFunction);
                     }
 
                     const transformFromWGS84To = foundProcess.displaySettings?.[output]?.transformFromWGS84to;
@@ -748,6 +767,10 @@ export default {
 
                         if (transformFromWGS84To) {
                             feature.getGeometry().transform("EPSG:4326", transformFromWGS84To);
+                        }
+
+                        if (foundProcess?.displaySettings?.[output]?.type === "webgl" || typeof styleFunction === "function") {
+                            return;
                         }
 
                         if (typeof styleFunction === "function") {
@@ -760,14 +783,22 @@ export default {
                         }
                     });
                     layerSource.addFeatures(featuresToAdd);
-                });
 
-                if (!this.layers.some(existingLayer => existingLayer?.get?.("id") === layerId)) {
-                    this.layers.push(layer);
-                }
-                if (!layerCollection.getLayerById(layerId)) {
-                    layerCollection.addLayer(layer);
-                }
+                    if (job.jobResults[output].mediaType === "application/flatgeobuf" && job.jobResults[output].encoding === "base64") {
+                        const blob = decodeBase64ToUint8Array(job.jobResults[output].value);
+
+                        for await (const feature of deserialize(blob)) {
+                            layerSource.addFeature(feature);
+                        }
+                    }
+
+                    if (!this.layers.some(existingLayer => existingLayer.get("id") === layerId)) {
+                        this.layers.push(layer);
+                    }
+                    if (!layerCollection.getLayerById(layerId)) {
+                        layerCollection.addLayer(layer);
+                    }
+                });
             });
             this.setCurrentOutput(outputs[0]);
         },

@@ -251,6 +251,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
 
                 layerCollection.getLayerById.restore();
                 sinon.stub(layerCollection, "getLayerById").returns(undefined);
+                sinon.stub(layerCollection, "addLayer");
                 wrapper.vm.createOrUpdateLayer("test");
                 expect(createLayerStub.calledOnce).to.be.true;
             });
@@ -820,89 +821,6 @@ describe("addons/SimulationTool/components/Simulation/SimulationResults.vue", ()
 
                 expect(wrapper.vm.getStyleFunctionFromDisplayOptions.calledOnceWithExactly(displaySettings[output], jobs.job1.jobResults)).to.be.true;
                 expect(source.getFeatures()).to.have.length(1);
-                expect(source.getFeatures()[0].getStyle()).to.equal(dynamicStyle);
-                expect(wrapper.vm.setFeatureStyle.called).to.be.false;
-            });
-
-            it("should set layer style and skip feature conversion in reference transmission mode", () => {
-                const wrapper = factory.getShallowMount(),
-                    output = "noise_day",
-                    simulationId = "simulationId",
-                    source = {
-                        clear: sinon.stub(),
-                        addFeatures: sinon.stub()
-                    },
-                    dynamicStyle = new Style(),
-                    setStyleStub = sinon.stub(),
-                    mockLayer = {
-                        get: key => key === "id" ? `${simulationId}-${output}` : undefined,
-                        layer: {
-                            get: key => key === "id" ? `${simulationId}-${output}` : undefined,
-                            setStyle: setStyleStub,
-                            setZIndex: sinon.stub(),
-                            setVisible: sinon.stub()
-                        },
-                        getLayerSource: () => source
-                    },
-                    displaySettings = {
-                        [output]: {
-                            type: "dynamic-binary",
-                            properties: ["propA", "propB"],
-                            classificationBreakOutputs: {
-                                propA: "breaksA",
-                                propB: "breaksB"
-                            },
-                            colors: [["rgba(10, 20, 30, 0.5)"]]
-                        }
-                    },
-                    jobs = {
-                        job1: {
-                            jobStatus: {
-                                processID: "process-1"
-                            },
-                            jobResults: {
-                                [output]: {
-                                    href: "https://example.com/oaf"
-                                },
-                                breaksA: [0],
-                                breaksB: [0]
-                            },
-                            resultStyle: {
-                                type: "polygon",
-                                styles: []
-                            }
-                        }
-                    };
-
-                sinon.stub(wrapper.vm, "createOrUpdateLayer").returns(mockLayer);
-                sinon.stub(wrapper.vm, "getStyleFunctionFromDisplayOptions").returns(() => dynamicStyle);
-                sinon.stub(wrapper.vm, "setFeatureStyle");
-                sinon.stub(wrapper.vm, "setCurrentOutput");
-                sinon.stub(wrapper.vm, "simulationConfig").value({
-                    id: "config-1",
-                    outputs: {
-                        [output]: {
-                            value: {
-                                transmissionMode: "reference"
-                            }
-                        }
-                    },
-                    processes: [
-                        {
-                            id: "process-1",
-                            displaySettings,
-                            renderingOptions: {}
-                        }
-                    ]
-                });
-
-                wrapper.vm.showFeatures(simulationId, jobs, [output]);
-
-                expect(wrapper.vm.getStyleFunctionFromDisplayOptions.calledOnceWithExactly(displaySettings[output], jobs.job1.jobResults)).to.be.true;
-                expect(setStyleStub.calledOnce).to.be.true;
-                expect(setStyleStub.firstCall.args[0]).to.be.a("function");
-                expect(source.clear.called).to.be.false;
-                expect(source.addFeatures.called).to.be.false;
                 expect(wrapper.vm.setFeatureStyle.called).to.be.false;
             });
 
