@@ -740,8 +740,15 @@ export default {
                         this.processAndStylePointFeaturesForTable(layerId, layer, layerSource, featuresToAdd, simulationId, foundProcess?.renderingOptions?.attributeToShow);
                         return;
                     }
+
+                    const transformFromWGS84To = foundProcess.displaySettings?.[output]?.transformFromWGS84to;
+
                     featuresToAdd?.forEach(feature => {
                         feature.set("simulationId", simulationId);
+
+                        if (transformFromWGS84To) {
+                            feature.getGeometry().transform("EPSG:4326", transformFromWGS84To);
+                        }
 
                         if (typeof styleFunction === "function") {
                             const style = styleFunction(feature);
