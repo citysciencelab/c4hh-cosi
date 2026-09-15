@@ -1142,6 +1142,7 @@ export default {
                                 :selected-layers="selectedLayers"
                                 :create-image-asset="createImageAsset"
                                 :image-assets-by-id="imageAssetsById"
+                                :is-edit-mode="true"
                                 @addFeature="handleFeature"
                                 @click:close="closeContentEditor"
                             />
