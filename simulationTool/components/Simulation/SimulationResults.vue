@@ -26,6 +26,7 @@ import Stroke from "ol/style/Stroke.js";
 import Style from "ol/style/Style.js";
 import Text from "ol/style/Text.js";
 import {infrastructureLayerId} from "../../layerIds.js";
+import getStyleFunctionFromDisplayOptions from "../../js/getStyleFunctionFromDisplayOptions.js";
 
 export default {
     name: "SimulationResults",
@@ -580,110 +581,6 @@ export default {
         getMappedProperty,
 
         /**
-         * Gets a dynamic-binary style function for the display options.
-         * @param {Object} displayOptions The display options configuration for the output.
-         * @param {Object} jobResults The job results containing classification break values.
-         * @returns {Function|null} The OpenLayers style function or null.
-         */
-        getStyleFunctionFromDisplayOptions (displayOptions, jobResults) {
-            if (displayOptions?.hide) {
-                return () => null;
-            }
-
-            if (!["dynamic-binary", "webgl"].includes(displayOptions?.type)) {
-                console.warn(`Unsupported display option type "${displayOptions?.type}". Expected "dynamic-binary" or "webgl".`);
-                return null;
-            }
-
-            const properties = Array.isArray(displayOptions?.properties) ? displayOptions.properties : [],
-                  colors = displayOptions?.colors;
-
-            if (properties.length < 2) {
-                console.warn("displayOptions.properties must contain at least two entries for dynamic-binary styling.");
-                return null;
-            }
-
-            if (!Array.isArray(colors) || !colors.length || !colors.some(row => Array.isArray(row) && row.length)) {
-                console.warn("displayOptions.colors must be a non-empty 2D array for dynamic-binary styling.");
-                return null;
-            }
-
-            const [firstProperty, secondProperty] = properties,
-                  classificationBreakOutputs = displayOptions?.classificationBreakOutputs || {},
-                  firstClassificationBreakOutput = classificationBreakOutputs[firstProperty],
-                  secondClassificationBreakOutput = classificationBreakOutputs[secondProperty];
-
-            if (!firstClassificationBreakOutput || !secondClassificationBreakOutput) {
-                console.warn(`Missing classificationBreakOutputs mapping for properties "${firstProperty}" and/or "${secondProperty}".`);
-            }
-
-            const strokeColor = displayOptions?.strokeColor,
-                  strokeWidth = Number.isFinite(Number(displayOptions?.strokeWidth))
-                      ? Number(displayOptions?.strokeWidth)
-                      : 0,
-                  rowClassCount = colors.length,
-                  columnClassCount = Math.max(...colors.map(row => Array.isArray(row) ? row.length : 0), 0),
-                  maxRowIndex = Math.max(rowClassCount - 1, 0),
-                  maxColumnIndex = Math.max(columnClassCount - 1, 0);
-
-            const styleCache = colors.map(row => Array.isArray(row)
-                ? row.map(color => {
-                    if (!color) {
-                        return null;
-                    }
-                    const styleDefinition = {
-                        fill: new Fill({color})
-                    };
-
-                    if (strokeColor && strokeWidth > 0) {
-                        styleDefinition.stroke = new Stroke({
-                            color: strokeColor,
-                            width: strokeWidth
-                        });
-                    }
-
-                    return new Style(styleDefinition);
-                })
-                : []);
-
-            /**
-             * Gets the classification index for a property value.
-             * @param {String|Number} propertyValue The feature property value.
-             * @param {Number[]} classificationBreaks The classification break values.
-             * @param {Number} maxClassIndex The maximum allowed classification index.
-             * @returns {Number} The classification index between 0 and maxClassIndex.
-             */
-            function getClassificationIndex (propertyValue, classificationBreaks, maxClassIndex) {
-                const numericValue = Number(propertyValue),
-                      numericBreaks = Array.isArray(classificationBreaks) ? classificationBreaks.map(value => Number(value)).filter(value => Number.isFinite(value)) : [];
-
-                if (!Number.isFinite(numericValue) || !numericBreaks.length) {
-                    return 0;
-                }
-
-                let classificationIndex = 0;
-
-                numericBreaks.forEach((classificationBreak, index) => {
-                    if (numericValue >= classificationBreak) {
-                        classificationIndex = Math.min(index + 1, maxClassIndex);
-                    }
-                });
-
-                return classificationIndex;
-            }
-
-            return feature => {
-                const propertyValues = properties.map(property => feature.get(property)),
-                      firstClassificationBreaks = jobResults?.[firstClassificationBreakOutput]?.value || jobResults?.[firstClassificationBreakOutput],
-                      secondClassificationBreaks = jobResults?.[secondClassificationBreakOutput]?.value || jobResults?.[secondClassificationBreakOutput],
-                      firstClassificationIndex = getClassificationIndex(propertyValues[0], firstClassificationBreaks, maxRowIndex),
-                      secondClassificationIndex = getClassificationIndex(propertyValues[1], secondClassificationBreaks, maxColumnIndex);
-
-                return styleCache?.[firstClassificationIndex]?.[secondClassificationIndex] || null;
-            };
-        },
-
-        /**
          * Sets the Feature style according to the value of property.
          * @param {ol/Feature} feature - The feature.
          * @param {Object} currentStyles - The current style objects.
@@ -740,8 +637,8 @@ export default {
                     const foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
                           layer = this.createOrUpdateLayer(layerId, output, foundProcess.displaySettings),
                           layerSource = layer.getLayerSource(),
-                          styleFunction = foundProcess?.displaySettings
-                              ? this.getStyleFunctionFromDisplayOptions(foundProcess.displaySettings[output], job.jobResults)
+                          styleFunction = foundProcess?.displaySettings?.[output]
+                              ? getStyleFunctionFromDisplayOptions(foundProcess.displaySettings[output], job.jobResults)
                               : null;
 
                     const featuresFromJob = job.jobResults?.[output]?.value?.features || job.jobResults?.[output]?.features || [],
@@ -773,12 +670,7 @@ export default {
                             return;
                         }
 
-                        if (typeof styleFunction === "function") {
-                            const style = styleFunction(feature);
-
-                            feature.setStyle(style);
-                        }
-                        else {
+                        if (typeof styleFunction !== "function") {
                             this.setFeatureStyle(feature, job.resultStyle);
                         }
                     });
