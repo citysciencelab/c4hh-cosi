@@ -551,7 +551,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
 
         describe("handleDraw", () => {
             it("should add features when editor index points to add position", async () => {
-                const features = [{title: "feature1"}, {title: "feature2"}];
+                const features = [{title: "feature1"}, {title: "feature2"}],
+                    createDrawObjectStub = sinon.stub(wrapper.vm, "createDrawObject");
 
                 await wrapper.setData({
                     openContentEditor: {
@@ -573,10 +574,12 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         attrs: features
                     }
                 ]);
+                expect(createDrawObjectStub.called).to.be.true;
             });
 
             it("should edit existing features when editor index points to an existing item", async () => {
-                const features = [{title: "feature1"}, {title: "feature2"}];
+                const features = [{title: "feature1"}, {title: "feature2"}],
+                    createDrawObjectStub = sinon.stub(wrapper.vm, "createDrawObject");
 
                 await wrapper.setData({
                     openContentEditor: {
@@ -603,6 +606,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         attrs: [{title: "feature1"}, {title: "feature2"}]
                     }
                 ]);
+                expect(createDrawObjectStub.called).to.be.true;
             });
         });
 

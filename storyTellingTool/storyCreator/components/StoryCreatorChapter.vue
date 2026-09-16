@@ -368,6 +368,13 @@ export default {
                 return;
             }
 
+            if (type === "draw" && this.source?.getFeatures().length) {
+                const drawIndex = this.content.findIndex(element => element.type === "draw" && element.attrs.length);
+
+                this.openContentEditorForEdit(drawIndex, "draw");
+                return;
+            }
+
             this.openContentEditor = {
                 type,
                 index: this.content.length
@@ -382,6 +389,10 @@ export default {
                 type: "",
                 index: null
             };
+
+            if (this.content.some(item => item.type === "draw" && item.attrs.length)) {
+                this.createDrawObject(this.content.find(item => item.type === "draw" && item.attrs.length).attrs);
+            }
         },
         /**
          * Opens the popup window to show the feature atrributes.
@@ -390,6 +401,7 @@ export default {
          */
         createDrawObject (val) {
             this.source = getLayerSource();
+            this.source?.clear();
             this.source.addFeatures(ConvertFeature.geoJsonToOpenlayers(val));
         },
         /**
@@ -737,7 +749,6 @@ export default {
                 });
             }
 
-            this.source = getLayerSource();
             this.closeContentEditor();
         },
         /**
@@ -826,6 +837,10 @@ export default {
 
             if (!item) {
                 return;
+            }
+
+            if (item.type === "draw") {
+                this.source?.clear();
             }
 
             this.content.splice(index, 1);
@@ -1300,7 +1315,7 @@ export default {
                             </div>
                         </div>
                         <div
-                            v-if="element.type === 'draw'"
+                            v-if="element.type === 'draw' && element.attrs?.length"
                             class="chapter-content-item__wrapper"
                         >
                             <i
@@ -1334,6 +1349,7 @@ export default {
                                 <div class="mb-3">
                                     <SimpleCard
                                         icon="bi bi-bezier"
+                                        :closeable="false"
                                         :label="$t('additional:modules.storyCreator.headlines.mapContent')"
                                         :text="element.attrs?.length + ' ' + $t('additional:modules.storyCreator.headlines.drawing')"
                                     />

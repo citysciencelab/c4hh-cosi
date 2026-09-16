@@ -317,7 +317,6 @@ export default {
                 <FlatButton
                     class="mt-2"
                     icon="bi bi-save"
-                    :disabled="!features.length"
                     :text="$t('additional:modules.storyCreator.buttons.saveDraw')"
                     :interaction="addDrawing"
                 />
