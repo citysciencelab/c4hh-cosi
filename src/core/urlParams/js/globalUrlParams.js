@@ -8,14 +8,15 @@ import processUrlParams from "@shared/js/utils/processUrlParams.js";
  */
 
 const globalUrlParams = {
-        CONFIGJSON: setConfigJsonPath,
-        LNG: setLanguage,
-        UISTYLE: setUiStyle
-    },
-    legacyGlobalUrlParams = {
-        CONFIG: setConfigJsonPath,
-        STYLE: setUiStyle
-    };
+    CONFIGJSON: setConfigJsonPath,
+    LNG: setLanguage,
+    UISTYLE: setUiStyle
+};
+
+export const legacyGlobalUrlParams = {
+    CONFIG: setConfigJsonPath,
+    STYLE: setUiStyle
+};
 
 /**
  * Process the menu url params.
