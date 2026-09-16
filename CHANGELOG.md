@@ -23,6 +23,7 @@
 - Issue \#1658: Share View now filters all available legacy URL parameters.
 - Accessibility: Fixed accessibility issues across layer tree and controls (label associations, icon-button naming, ARIA semantics, and preview alt text).
 - AlertingItem: Fixed CSS Regression.
+- Security: XML injection in `highlightFeaturesByAttribute` is prevented by escaping.
 
 ---
 
