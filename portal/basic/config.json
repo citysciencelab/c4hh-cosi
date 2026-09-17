@@ -219,6 +219,22 @@
           },
           {
             "type": "layerSlider",
+            "name": "layerSlider",
+            "layerIds": [
+              
+              {
+                "title": "common:modules.layerSlider.serviceThree",
+                "layerId": "8712.2"
+              },
+              {
+                "title": "common:modules.layerSlider.serviceFour",
+                "layerId": "1711"
+              }
+            ]
+          },
+          {
+            "type": "layerSlider",
+            "name": "layerSlider2",
             "layerIds": [
               {
                 "title": "common:modules.layerSlider.serviceOne",
@@ -227,14 +243,6 @@
               {
                 "title": "common:modules.layerSlider.serviceTwo",
                 "layerId": "2426"
-              },
-              {
-                "title": "common:modules.layerSlider.serviceThree",
-                "layerId": "8712.2"
-              },
-              {
-                "title": "common:modules.layerSlider.serviceFour",
-                "layerId": "1711"
               }
             ]
           },

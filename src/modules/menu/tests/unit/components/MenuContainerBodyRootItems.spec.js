@@ -35,8 +35,8 @@ describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
                     state: () => ({
                         TestModule: {
                             icon: "bi-state",
-                            description: "stateDescription",
-                            someFlag: true
+                            name: "stateName",
+                            description: "stateDescription"
                         }
                     })
                 }
@@ -143,26 +143,6 @@ describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
         expect(wrapper.findAll("#mp-menu-body-items-element-0-secondaryMenu")[0].attributes("path")).to.be.equal(pathSecondaryMenu.join(",") + ",0");
     });
 
-    it("chooseProperties keeps item values when state has defaults for the same module type", () => {
-        wrapper = shallowMount(MenuContainerBodyRootItems, {
-            global: {
-                plugins: [store]
-            },
-            propsData: {idAppendix: "mainMenu", path: pathMainMenu}
-        });
-
-        const properties = wrapper.vm.chooseProperties({
-            type: "testModule",
-            name: "itemName",
-            icon: "bi-item",
-            description: "itemDescription"
-        });
-
-        expect(properties.icon).to.equal("bi-item");
-        expect(properties.description).to.equal("itemDescription");
-        expect(properties.someFlag).to.equal(true);
-    });
-
     it("section contains 'customMenuElement' with icon", () => {
         sections = [{
             type: "customMenuElement",
@@ -183,5 +163,36 @@ describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
         expect(wrapper.findAll("#mp-menu-body-items-element-0-secondaryMenu")[0].attributes("icon")).to.be.equal(sections[0].icon);
         expect(wrapper.findAll("#mp-menu-body-items-element-0-secondaryMenu")[0].attributes("description")).to.be.equal("");
         expect(wrapper.findAll("#mp-menu-body-items-element-0-secondaryMenu")[0].attributes("path")).to.be.equal(pathSecondaryMenu.join(",") + ",0");
+    });
+
+    it("chooseProperties lets each item keep its own name when multiple items share the same module type", () => {
+        wrapper = shallowMount(MenuContainerBodyRootItems, {
+            global: {
+                plugins: [store]
+            },
+            propsData: {idAppendix: "mainMenu", path: pathMainMenu}
+        });
+
+        const firstProperties = wrapper.vm.chooseProperties({type: "testModule", name: "First instance"});
+        const secondProperties = wrapper.vm.chooseProperties({type: "testModule", name: "Second instance"});
+
+        expect(firstProperties.name).to.equal("First instance");
+        expect(secondProperties.name).to.equal("Second instance");
+        expect(firstProperties.icon).to.equal("bi-state");
+        expect(secondProperties.icon).to.equal("bi-state");
+        expect(firstProperties.description).to.equal("stateDescription");
+    });
+
+    it("chooseProperties falls back to the module state's name when the item does not configure its own", () => {
+        wrapper = shallowMount(MenuContainerBodyRootItems, {
+            global: {
+                plugins: [store]
+            },
+            propsData: {idAppendix: "mainMenu", path: pathMainMenu}
+        });
+
+        const properties = wrapper.vm.chooseProperties({type: "testModule"});
+
+        expect(properties.name).to.equal("stateName");
     });
 });
