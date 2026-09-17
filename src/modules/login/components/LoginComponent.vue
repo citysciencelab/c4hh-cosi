@@ -1,17 +1,25 @@
 <script>
-import {mapGetters, mapActions} from "vuex";
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import {mapActions, mapGetters} from "vuex";
 import {translateKeyWithPlausibilityCheck} from "@shared/js/utils/translateKeyWithPlausibilityCheck.js";
 
 export default {
     name: "LoginComponent",
     components: {
+        FlatButton
+    },
+    props: {
+        autoLogin: {
+            type: Boolean,
+            default: false
+        }
     },
     computed: {
         ...mapGetters(["isMobile"]),
-        ...mapGetters("Modules/Login", ["loggedIn", "screenName", "email", "iconLogin", "iconLogged"])
+        ...mapGetters("Modules/Login", ["loggedIn", "screenName", "email", "iconLogin", "iconLogged", "openLoginWindowOnLoad"])
     },
     async mounted () {
-        if (!await this.isLoggedIn()) {
+        if ((!this.autoLogin || this.openLoginWindowOnLoad) && !await this.isLoggedIn()) {
             this.openLoginWindow();
         }
     },
@@ -103,7 +111,10 @@ export default {
 </script>
 
 <template lang="html">
-    <div id="login-component">
+    <div
+        v-if="!autoLogin"
+        id="login-component"
+    >
         <div
             v-show="!screenName && !email"
             class="progress-loader"
@@ -120,20 +131,12 @@ export default {
             <span>{{ email }}</span>
         </div>
         <div><p>&nbsp;</p></div>
-        <button
+        <FlatButton
             id="logout-button"
-            class="btn btn-logout"
-            type="button"
-            :title="translate('common:modules.login.logout')"
-            @click="logoutButton(true)"
-        >
-            <span class="bootstrap-icon logout-icon">
-                <i
-                    id="logout-icon"
-                    class="bi-door-closed"
-                /> {{ translate('common:modules.login.logout') }}
-            </span>
-        </button>
+            :interaction="() => logoutButton(true)"
+            :text="translate('common:modules.login.logout')"
+            :icon="'bi-door-closed'"
+        />
     </div>
 </template>
 

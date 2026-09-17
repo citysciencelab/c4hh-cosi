@@ -18,6 +18,7 @@
  * @property {String} [iconLogin] - Icon displayed next to title if not logged in.
  * @property {String} [iconLogout] - Icon for the logout button.
  * @property {String} [iconLogged] - Icon displayed next to title if logged in.
+ * @property {Boolean} [openLoginWindowOnLoad=false] - Determines whether the login popup opens automatically for users who are not logged in.
  * @property {Boolean} [renderToWindow] - Determines if the component is rendered in a window pane instead of the sidebar.
  * @property {Boolean} [resizableWindow] - If true and if rendered to window pane, the pane is resizable.
  */
@@ -39,7 +40,8 @@ const state = {
     refreshToken: undefined,
     iconLogin: "bi-door-open",
     iconLogout: "bi-door-closed",
-    iconLogged: "bi-person-circle"
+    iconLogged: "bi-person-circle",
+    openLoginWindowOnLoad: false
 };
 
 export default state;

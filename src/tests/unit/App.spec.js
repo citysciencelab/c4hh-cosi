@@ -3,6 +3,7 @@ import {expect} from "chai";
 import sinon from "sinon";
 import {shallowMount} from "@vue/test-utils";
 import AppComponent from "../../App.vue";
+import LoginComponent from "@modules/login/components/LoginComponent.vue";
 import MenuToggleButton from "@modules/menu/components/MenuToggleButton.vue";
 import maps from "@core/maps/js/maps.js";
 import loadAddons from "@plugins/addons";
@@ -12,7 +13,8 @@ describe("src/App.vue", () => {
     let store,
         wrapper,
         actions,
-        initializeMapsSpy;
+        initializeMapsSpy,
+        loggedIn;
     const originMatchMedia = window.matchMedia;
 
     beforeEach(() => {
@@ -20,6 +22,7 @@ describe("src/App.vue", () => {
             addEventListener: sinon.stub(),
             removeEventListener: sinon.stub()
         });
+        loggedIn = false;
         initializeMapsSpy = sinon.stub(maps, "initializeMaps");
         sinon.stub(urlParamsHandler, "startProcessUrlParams");
         actions = {
@@ -30,7 +33,9 @@ describe("src/App.vue", () => {
             loadServicesJson: sinon.spy(),
             initializeVectorStyle: sinon.spy(),
             initializeOther: sinon.stub(),
-            initializeUrlParams: sinon.stub()
+            initializeUrlParams: sinon.stub(),
+            getAuthCodeUrl: sinon.stub().resolves("https://example.com/login"),
+            setUpTokenRefreshInterval: sinon.stub()
         };
 
         store = createStore({
@@ -40,7 +45,19 @@ describe("src/App.vue", () => {
                     actions: {
                         mergeModulesState: sinon.spy()
                     },
-                    namespaced: true
+                    namespaced: true,
+                    modules: {
+                        Login: {
+                            namespaced: true,
+                            actions: {
+                                getAuthCodeUrl: actions.getAuthCodeUrl,
+                                setUpTokenRefreshInterval: actions.setUpTokenRefreshInterval
+                            },
+                            getters: {
+                                loggedIn: () => loggedIn
+                            }
+                        }
+                    }
                 }
             },
             getters: {
@@ -56,7 +73,8 @@ describe("src/App.vue", () => {
                 },
                 visibleLayerConfigs: () => {
                     return [];
-                }
+                },
+                isModuleAvailable: () => moduleType => moduleType === "login"
             },
             actions: actions,
             state: {
@@ -128,5 +146,14 @@ describe("src/App.vue", () => {
         await wrapper.vm.$options.watch.allConfigsLoaded.call(wrapper.vm, true);
         expect(await actions.extendLayers.calledOnce).to.be.true;
         expect(await initializeMapsSpy.calledOnce).to.be.true;
+    });
+
+    it("registers the automatic login component", () => {
+        wrapper = shallowMount(AppComponent, {
+            global: {
+                plugins: [store]
+            }});
+
+        expect(wrapper.vm.$options.components.LoginComponent).to.equal(LoginComponent);
     });
 });

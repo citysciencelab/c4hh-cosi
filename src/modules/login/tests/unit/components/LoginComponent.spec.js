@@ -1,5 +1,5 @@
 import {createStore} from "vuex";
-import {shallowMount} from "@vue/test-utils";
+import {flushPromises, shallowMount} from "@vue/test-utils";
 
 import LoginComponent from "@modules/login/components/LoginComponent.vue";
 import Login from "@modules/login/store/indexLogin.js";
@@ -58,7 +58,8 @@ describe("src/modules/Modules/Login/components/LoginComponent.vue", () => {
         it("should render Login", () => {
             wrapper = shallowMount(LoginComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store],
+                    stubs: {FlatButton: false}
                 }
             });
 
@@ -94,7 +95,8 @@ describe("src/modules/Modules/Login/components/LoginComponent.vue", () => {
         it("should call logout fn if button is clicked", async () => {
             wrapper = shallowMount(LoginComponent, {
                 global: {
-                    plugins: [store]
+                    plugins: [store],
+                    stubs: {FlatButton: false}
                 }
             });
 
@@ -116,6 +118,58 @@ describe("src/modules/Modules/Login/components/LoginComponent.vue", () => {
             });
 
             expect(wrapper.vm.loggedIn).to.be.false;
+        });
+
+        it("opens the login window when an unauthenticated user opens the login module", async () => {
+            wrapper = shallowMount(LoginComponent, {
+                global: {
+                    plugins: [store]
+                }
+            });
+
+            await flushPromises();
+            expect(LoginComponent.methods.openLoginWindow.calledOnce).to.be.true;
+        });
+
+        it("does not open the login window for an authenticated user", async () => {
+            sandbox.stub(LoginComponent.methods, "isLoggedIn").resolves(true);
+            wrapper = shallowMount(LoginComponent, {
+                global: {
+                    plugins: [store]
+                }
+            });
+
+            await flushPromises();
+            expect(LoginComponent.methods.openLoginWindow.called).to.be.false;
+        });
+
+        it("does not open the login window automatically by default", async () => {
+            wrapper = shallowMount(LoginComponent, {
+                props: {
+                    autoLogin: true
+                },
+                global: {
+                    plugins: [store]
+                }
+            });
+
+            await flushPromises();
+            expect(LoginComponent.methods.openLoginWindow.called).to.be.false;
+        });
+
+        it("opens the login window automatically when configured", async () => {
+            store.commit("Modules/Login/setOpenLoginWindowOnLoad", true);
+            wrapper = shallowMount(LoginComponent, {
+                props: {
+                    autoLogin: true
+                },
+                global: {
+                    plugins: [store]
+                }
+            });
+
+            await flushPromises();
+            expect(LoginComponent.methods.openLoginWindow.calledOnce).to.be.true;
         });
 
         it("should be logged in after Login renders", async function () {

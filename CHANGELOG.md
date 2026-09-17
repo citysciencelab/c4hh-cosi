@@ -10,6 +10,7 @@
 ### Added
 - LinechartItem: Added possibility to configure custom plugins to extend Chart.js default behaviour.
 - WFS-T: Added configurable per-field input validation on single insert and update, configurable in the layer's `gfiAttributes`.
+- Login: Added the `openLoginWindowOnLoad` config option to open the login popup automatically for unauthenticated users.
 
 ### Changed
 - Issue \#1654: Relaxed the strict ISO8601 unit validation for WMS-Time layers to a console warning. This enables support for alternative time units.
