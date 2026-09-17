@@ -7,6 +7,7 @@ import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {getLayerSource} from "../../shared/utils/layerHelper.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction.js";
+import {Stroke, Style} from "ol/style.js";
 
 export default {
     name: "StoryCreatorAddDrawCard",
@@ -38,7 +39,16 @@ export default {
             currentModifyInteraction: null,
             source: null,
             featureTitle: [],
-            features: []
+            features: [],
+            activeFeature: null,
+            activeFeatureOriginalStyle: null,
+            activeFeatureSelectionStyle: new Style({
+                stroke: new Stroke({
+                    color: "#ff0000",
+                    width: 7
+                })
+            }),
+            mapClickHandler: null
         };
     },
     computed: {
@@ -71,9 +81,32 @@ export default {
         }
     },
     mounted () {
+        const map = mapCollection.getMap("2D");
+
         this.source = getLayerSource();
         this.source.clear();
         this.source.addFeatures(this.features);
+
+        if (map) {
+            this.mapClickHandler = this.handleMapFeatureClick;
+            map.on("singleclick", this.mapClickHandler);
+        }
+    },
+    beforeUnmount () {
+        const map = mapCollection.getMap("2D");
+
+        if (map && this.mapClickHandler) {
+            map.un("singleclick", this.mapClickHandler);
+        }
+
+        this.mapClickHandler = null;
+
+        this.removeInteraction(this.currentModifyInteraction);
+        this.currentModifyInteraction = null;
+
+        if (this.activeFeature !== null) {
+            this.activeFeature.setStyle(this.activeFeatureOriginalStyle);
+        }
     },
     methods: {
         ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
@@ -86,12 +119,55 @@ export default {
         ]),
 
         /**
+         * Activates a feature and applies the selection style.
+         * @param {ol/Feature} feature - The feature to activate.
+         * @returns {void}
+         */
+        activateFeature (feature) {
+            if (!feature) {
+                return;
+            }
+
+            if (this.activeFeature === feature) {
+                return;
+            }
+
+            if (this.activeFeature !== null) {
+                this.activeFeature.setStyle(this.activeFeatureOriginalStyle);
+            }
+            let styles = [];
+
+            this.activeFeature = feature;
+            this.activeFeatureOriginalStyle = feature.getStyle();
+
+            if (this.activeFeatureOriginalStyle) {
+                if (Array.isArray(this.activeFeatureOriginalStyle)) {
+                    styles = this.activeFeatureOriginalStyle;
+                }
+                else {
+                    styles = [this.activeFeatureOriginalStyle];
+                }
+            }
+
+            feature.setStyle([
+                this.activeFeatureSelectionStyle,
+                ...styles
+            ]);
+        },
+
+        /**
          * Adds a feature to the current editable input of the planning scenario.
          * @param {Object} evt - Draw event emitted by draw interaction.
          * @return {void}
          */
         addChapterFeature (evt) {
+            const feature = evt?.feature;
+
+            if (!feature) {
+                return;
+            }
             this.features.push(evt.feature);
+            this.activateFeature(feature);
         },
 
         /**
@@ -99,6 +175,12 @@ export default {
          * @returns {void}
          */
         addDrawing () {
+            if (this.activeFeature !== null) {
+                this.activeFeature.setStyle(this.activeFeatureOriginalStyle);
+                this.activeFeature = null;
+                this.activeFeatureOriginalStyle = null;
+            }
+
             const jsonFeatures = ConvertFeature.openlayersToGeoJson(this.features);
 
             this.removeInteraction(this.currentModifyInteraction);
@@ -161,13 +243,45 @@ export default {
          * @returns {void}
          */
         handleDiscardButtonClick () {
+            if (this.activeFeature !== null) {
+                this.activeFeature.setStyle(this.activeFeatureOriginalStyle);
+            }
             this.source.clear();
             this.features = [];
             this.featureTitle = [];
+            this.activeFeature = null;
+            this.activeFeatureOriginalStyle = null;
             this.removeInteraction(this.currentModifyInteraction);
             this.currentModifyInteraction = null;
             this.setSelectedDrawType("");
             this.setSelectedDrawTypeMain("");
+        },
+        /**
+         * Activates the feature clicked on the map.
+         * @param {Object} evt - The map click event.
+         * @returns {void}
+         */
+        handleMapFeatureClick (evt) {
+            const map = evt?.map;
+            let clickedFeature = null;
+
+            if (!map) {
+                return;
+            }
+
+            map.forEachFeatureAtPixel(evt.pixel, feature => {
+                if (this.features.includes(feature)) {
+                    clickedFeature = feature;
+                    return true;
+                }
+                return false;
+            });
+
+            if (!clickedFeature) {
+                return;
+            }
+
+            this.activateFeature(clickedFeature);
         },
 
         /**
@@ -176,9 +290,36 @@ export default {
          * @returns {void}
          */
         removeFeature (index) {
+            const feature = this.features[index];
+
+            if (!feature) {
+                return;
+            }
+
             this.source.removeFeature(this.source.getFeatures()[index]);
             this.featureTitle.splice(index, 1);
             this.features.splice(index, 1);
+
+            if (this.activeFeature === feature) {
+                feature.setStyle(this.activeFeatureOriginalStyle);
+                this.activeFeature = null;
+                this.activeFeatureOriginalStyle = null;
+            }
+        },
+        /**
+         * Toggles the active state of a feature.
+         * @param {ol/Feature} feature - The feature to toggle.
+         * @returns {void}
+         */
+        toggleFeatureActive (feature) {
+            if (this.activeFeature === feature) {
+                this.activeFeature.setStyle(this.activeFeatureOriginalStyle);
+                this.activeFeature = null;
+                this.activeFeatureOriginalStyle = null;
+                return;
+            }
+
+            this.activateFeature(feature);
         }
     }
 };
@@ -193,7 +334,6 @@ export default {
                 aria-label="Close"
                 @click="handleCloseButtonClick"
             />
-
             <h5 class="card-title mb-3">
                 {{ $t("additional:modules.storyCreator.headlines.addDrawings") }}
             </h5>
@@ -202,7 +342,7 @@ export default {
                 class="mb-5"
             >
                 <div
-                    id="draw-types"
+                    id="story-draw-types"
                     class="mb-2"
                 >
                     <div
@@ -246,10 +386,11 @@ export default {
                     </div>
                     <div
                         id="draw-layouts"
-                        class="mb-5"
+                        class="mb-5 ps-4 pt-3"
                     >
                         <DrawLayout
                             v-if="selectedDrawType !== '' && selectedDrawTypeMain !== ''"
+                            :stroke-range="[1,5]"
                             :current-layout="currentLayout"
                             :selected-draw-type="selectedDrawType"
                             :set-current-layout="setCurrentLayout"
@@ -264,19 +405,21 @@ export default {
                                 {{ $t("additional:modules.storyCreator.headlines.drawnObjects") }}
                             </h5>
                             <div class="table-wrapper">
-                                <table class="table">
+                                <table class="table table-hover">
                                     <tbody>
                                         <tr
                                             v-for="(feature, key) in features"
-                                            :key="key"
+                                            :key="feature.getId()"
+                                            :class="{'feature-active': activeFeature === feature}"
+                                            class="cursor-pointer"
+                                            @click="toggleFeatureActive(feature)"
                                         >
-                                            <td
-                                                class="font-bold firstCol"
-                                            >
+                                            <td class="font-bold firstCol">
                                                 <button
                                                     class="border-0 bg-transparent large pt-1"
                                                     type="button"
                                                     :aria-label="feature?.getGeometry()?.getType()"
+                                                    @click.stop="toggleFeatureActive(feature)"
                                                 >
                                                     <i :class="getFeatureIcon(feature)" />
                                                 </button>
@@ -285,20 +428,20 @@ export default {
                                                 <input
                                                     :id="'feature' + key"
                                                     v-model.trim="featureTitle[key]"
-                                                    class="form-control-plaintext w-100 fs-5 outline-none-fallback"
+                                                    class="form-control-plaintext w-100 fs-5 outline-none-fallback feature-title"
                                                     :placeholder="'feature' + (key + 1)"
                                                     :aria-label="'feature' + (key + 1)"
                                                     @blur="feature.set('title', featureTitle[key])"
+                                                    @click.stop
                                                 >
                                             </td>
-                                            <td
-                                                class="font-bold"
-                                            >
+
+                                            <td class="font-bold">
                                                 <button
                                                     type="button"
                                                     class="border-0 bg-transparent large pt-1"
                                                     :aria-label="$t('additional:modules.storyCreator.addElementDropdown.feature.remove')"
-                                                    @click="removeFeature(key)"
+                                                    @click.stop="removeFeature(key)"
                                                 >
                                                     <i class="bi bi-trash" />
                                                 </button>
@@ -336,5 +479,54 @@ button {
     &.large {
         font-size: 1.5rem;
     }
+}
+.card-title {
+    font-family: $font_family_default;
+}
+.table-hover {
+    border-radius: 0.375rem;
+    overflow: hidden;
+    --bs-table-hover-bg: #{$light_blue};
+    --bs-table-hover-color: inherit;
+
+    > tbody {
+        > tr {
+            cursor: pointer;
+
+        &:hover .feature-title {
+            border-bottom: 1px solid $dark_blue;
+        }
+            &.feature-active {
+                --bs-table-bg: #{$secondary};
+                --bs-table-color: #{$white};
+                --bs-table-hover-bg: #{$secondary};
+                --bs-table-hover-color: #{$white};
+                > td,
+                button,
+                i {
+                    color: $white;
+                }
+                > td {
+                    vertical-align: middle;
+                }
+                .feature-title {
+                    color: $white;
+
+                    &::placeholder {
+                        color: $white;
+                        opacity: 1;
+                    }
+                }
+                &:hover .feature-title {
+                    border-bottom-color: $white;
+                }
+            }
+        }
+    }
+}
+#story-draw-types :deep(.active) {
+    background-color: $dark_blue;
+    border-color: $dark_blue;
+    color: $white;
 }
 </style>

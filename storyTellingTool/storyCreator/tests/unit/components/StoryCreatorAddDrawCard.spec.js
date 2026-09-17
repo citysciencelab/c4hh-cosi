@@ -16,6 +16,8 @@ describe("addons/storyCreator/components/StoryCreatorAddDrawCard.vue", () => {
             mode: "2D",
             render: sinon.spy(),
             updateSize: sinon.spy(),
+            on: sinon.spy(),
+            un: sinon.spy(),
             getLayers: () => {
                 return {
                     getArray: () => {
@@ -191,19 +193,69 @@ describe("addons/storyCreator/components/StoryCreatorAddDrawCard.vue", () => {
     });
 
     describe("Methods", () => {
+        describe("activateFeature", () => {
+            it("should activate a feature", () => {
+                const feature = {
+                    getStyle: sinon.stub().returns(null),
+                    setStyle: sinon.spy()
+                };
+
+                wrapper.vm.activateFeature(feature);
+
+                expect(wrapper.vm.activeFeature).to.deep.equal(feature);
+                expect(wrapper.vm.activeFeatureOriginalStyle).to.equal(null);
+                expect(feature.setStyle.calledOnce).to.be.true;
+            });
+            it("should not activate an active feature", () => {
+                const feature = {
+                    getStyle: sinon.stub().returns(null),
+                    setStyle: sinon.spy()
+                };
+
+                wrapper.vm.activateFeature(feature);
+
+                const activeFeature = wrapper.vm.activeFeature;
+
+                activeFeature.setStyle.resetHistory();
+
+                wrapper.vm.activateFeature(activeFeature);
+
+                expect(activeFeature.setStyle.called).to.be.false;
+            });
+            it("should restore the previously active feature style", () => {
+                const oldStyle = {},
+                    oldFeature = {
+                        getStyle: sinon.stub().returns(oldStyle),
+                        setStyle: sinon.spy()
+                    },
+                    newFeature = {
+                        getStyle: sinon.stub().returns(null),
+                        setStyle: sinon.spy()
+                    };
+
+                wrapper.vm.activeFeature = oldFeature;
+                wrapper.vm.activeFeatureOriginalStyle = oldStyle;
+
+                wrapper.vm.activateFeature(newFeature);
+
+                expect(oldFeature.setStyle.calledWith(oldStyle)).to.be.true;
+                expect(wrapper.vm.activeFeature).to.deep.equal(newFeature);
+            });
+
+        });
+
         describe("addChapterFeature", () => {
             it("should add a feature to feature array", () => {
                 const evt = {
                     feature: {
+                        getId: () => "feature-3",
                         getGeometry: sinon.stub().returns({
                             getType: () => "Point",
-                            getCoordinates: () => [0, 0]}),
-                        get: (key) => {
-                            if (key === "title") {
-                                return "title 2";
-                            }
-                            return {};
-                        }
+                            getCoordinates: () => [0, 0]
+                        }),
+                        get: key => key === "title" ? "title 2" : {},
+                        getStyle: sinon.stub().returns(null),
+                        setStyle: sinon.spy()
                     }
                 };
 
@@ -269,6 +321,35 @@ describe("addons/storyCreator/components/StoryCreatorAddDrawCard.vue", () => {
 
                 expect(wrapper.vm.featureTitle).to.deep.equal(["title 1"]);
                 expect(wrapper.vm.features).to.be.an("array").with.lengthOf(1);
+            });
+        });
+        describe("toggleFeatureActive", () => {
+            it("should activate an inactive feature", () => {
+                const feature = {
+                    getStyle: sinon.stub().returns(null),
+                    setStyle: sinon.spy()
+                };
+
+                wrapper.vm.toggleFeatureActive(feature);
+
+                expect(wrapper.vm.activeFeature).to.deep.equal(feature);
+            });
+            it("should deactivate the active feature", () => {
+                const originalStyle = {},
+                    feature = {
+                        getStyle: sinon.stub().returns(originalStyle),
+                        setStyle: sinon.spy()
+                    };
+
+                wrapper.vm.activateFeature(feature);
+
+                feature.setStyle.resetHistory();
+
+                wrapper.vm.toggleFeatureActive(wrapper.vm.activeFeature);
+
+                expect(feature.setStyle.calledWith(originalStyle)).to.be.true;
+                expect(wrapper.vm.activeFeature).to.be.null;
+                expect(wrapper.vm.activeFeatureOriginalStyle).to.be.null;
             });
         });
     });
