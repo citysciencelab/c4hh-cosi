@@ -122,7 +122,7 @@ export default {
             </select>
         </template>
         <template v-else-if="inputType === 'boolean'">
-            <div class="form-switch">
+            <div class="mb-3">
                 <SwitchInput
                     :id="id"
                     :label="label"

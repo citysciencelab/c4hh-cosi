@@ -2,6 +2,10 @@ import axios from "axios";
 import sanitizeConfiguredUrl from "./sanitizeConfiguredUrl.js";
 
 /**
+ * @import {ProcessDescription} from "../types/ogcApi.processes.js"
+ */
+
+/**
  * Class representing an OGC API Process.
  * @class OgcApiProcess
 */
@@ -46,7 +50,7 @@ export default class OgcApiProcess {
 
     /**
      * Static method to get the input defaults from the process description.
-     * @param {Object} description - The process description.
+     * @param {ProcessDescription} description - The process description.
      * @param {Object} description.inputs - The inputs of the process.
      * @returns {Object} An object containing the default values for the inputs.
     */
@@ -68,6 +72,17 @@ export default class OgcApiProcess {
                     const property = input.schema.properties[propertyKey];
 
                     defaultsObject[inputKey][propertyKey] = OgcApiProcess.getDefaultWithEnum(property);
+
+                    if (property.type !== "object") {
+                        continue;
+                    }
+                    /** @todo Implement recursive property processing, including all possible types */
+                    for (const nestedPropKey in property.properties) {
+                        const nestedProp = property.properties[nestedPropKey];
+
+                        defaultsObject[inputKey][propertyKey] ??= {};
+                        defaultsObject[inputKey][propertyKey][nestedPropKey] = nestedProp.default;
+                    }
                 }
             }
         }

@@ -333,12 +333,13 @@ export default {
 
         /**
          * Gets the requestBody inputs value according to input and property as key.
-         * @param {String} inputKey the input key.
-         * @param {String} propertyKey the property key.
-         * @param {String} val the value.
-         * @returns {String} the parameter value. It could be the rendered value or default value.
+         * @param {string} inputKey the input key.
+         * @param {string} propertyKey the property key.
+         * @param {string} val the value.
+         * @param {string} nestedPropKey the nested property key.
+         * @returns {string} the parameter value. It could be the rendered value or default value.
          */
-        getRequestBodyInputByKey (inputKey, propertyKey, val) {
+        getRequestBodyInputByKey (inputKey, propertyKey, val, nestedPropKey) {
             if (this.ignoreProperties.includes(propertyKey)) {
                 return undefined;
             }
@@ -354,6 +355,9 @@ export default {
                         enum: requestBody.inputs[inputKey][propertyKey].enum,
                         value: requestBody.inputs[inputKey][propertyKey].value
                     };
+                }
+                if (nestedPropKey) {
+                    return requestBody.inputs[inputKey][propertyKey][nestedPropKey];
                 }
                 return requestBody.inputs[inputKey][propertyKey];
             }
@@ -940,13 +944,14 @@ export default {
 
         /**
          * Sets the inputs value of the request body input according to inputKey and property as key.
-         * @param {String} inputKey the input key.
-         * @param {String} propertyKey the property key.
-         * @param {String} val the value.
-         * @param {Boolean} isEnum whether the input is an enum or not.
+         * @param {string} inputKey the input key.
+         * @param {string} propertyKey the property key.
+         * @param {string} val the value.
+         * @param {boolean} isEnum whether the input is an enum or not.
+         * @param {string} [nestedPropKey=""] the nested property key.
          * @returns {void}
          */
-        setRequestBodyInput (inputKey, propertyKey, val, isEnum = false) {
+        setRequestBodyInput (inputKey, propertyKey, val, isEnum = false, nestedPropKey = "") {
             if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
                 console.warn(`Invalid parameters: inputKey=${inputKey}, propertyKey=${propertyKey}`);
                 return;
@@ -976,6 +981,11 @@ export default {
 
                 if (typeof this.requestBodies[index].inputs[inputKey] === "undefined") {
                     this.requestBodies[index].inputs[inputKey] = {};
+                }
+                if (nestedPropKey) {
+                    this.requestBodies[index].inputs[inputKey][propertyKey] ??= {};
+                    this.requestBodies[index].inputs[inputKey][propertyKey][nestedPropKey] = val;
+                    return;
                 }
                 if (isEnum && this.requestBodies[index].inputs[inputKey][propertyKey]?.value !== undefined) {
                     this.requestBodies[index].inputs[inputKey][propertyKey].value = val;
@@ -1232,6 +1242,7 @@ export default {
                                 :key="propertyKey"
                             >
                                 <DynamicInputByType
+                                    v-if="property.type !== 'object'"
                                     :id="`${inputKey}-${propertyKey}`"
                                     :label="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                     :max="property.maximum"
@@ -1246,6 +1257,26 @@ export default {
                                     @update:value="setRequestBodyInput(inputKey, propertyKey, $event, Boolean(property.enum))"
                                     @update:checked="setRequestBodyInput(inputKey, propertyKey, $event, Boolean(property.enum))"
                                 />
+                                <AccordionItem
+                                    v-else
+                                    :id="propertyKey"
+                                    :title="propertyKey"
+                                    font-size="font-size-small"
+                                >
+                                    <DynamicInputByType
+                                        v-for="(nestedProp, nestedPropKey) in property.properties"
+                                        :id="nestedPropKey"
+                                        :key="nestedPropKey"
+                                        :disabled="isExecutionRequestSubmitting"
+                                        :input-type="nestedProp.type"
+                                        :label="nestedPropKey"
+                                        :max="nestedProp.maximum"
+                                        :min="nestedProp.minimum"
+                                        :step="nestedProp.type === 'integer' ? 1 : 0.1"
+                                        :value="getRequestBodyInputByKey(inputKey, propertyKey, nestedProp?.default, nestedPropKey)"
+                                        @update:value="setRequestBodyInput(inputKey, propertyKey, $event, Boolean(nestedProp.enum), nestedPropKey)"
+                                    />
+                                </AccordionItem>
                             </div>
                         </AccordionItem>
                     </AccordionItem>
