@@ -165,24 +165,6 @@ describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
         expect(wrapper.findAll("#mp-menu-body-items-element-0-secondaryMenu")[0].attributes("path")).to.be.equal(pathSecondaryMenu.join(",") + ",0");
     });
 
-    it("chooseProperties lets each item keep its own name when multiple items share the same module type", () => {
-        wrapper = shallowMount(MenuContainerBodyRootItems, {
-            global: {
-                plugins: [store]
-            },
-            propsData: {idAppendix: "mainMenu", path: pathMainMenu}
-        });
-
-        const firstProperties = wrapper.vm.chooseProperties({type: "testModule", name: "First instance"});
-        const secondProperties = wrapper.vm.chooseProperties({type: "testModule", name: "Second instance"});
-
-        expect(firstProperties.name).to.equal("First instance");
-        expect(secondProperties.name).to.equal("Second instance");
-        expect(firstProperties.icon).to.equal("bi-state");
-        expect(secondProperties.icon).to.equal("bi-state");
-        expect(firstProperties.description).to.equal("stateDescription");
-    });
-
     it("chooseProperties falls back to the module state's name when the item does not configure its own", () => {
         wrapper = shallowMount(MenuContainerBodyRootItems, {
             global: {

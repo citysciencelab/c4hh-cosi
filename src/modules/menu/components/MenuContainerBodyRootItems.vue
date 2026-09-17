@@ -58,11 +58,10 @@ export default {
     },
     methods: {
         /**
-         * Determines the properties to display for a menu item.
-         * The item's own values (from config.json) always take precedence; missing
-         * name, icon and description fall back to the module's state defaults.
+         * Returns the properties from the state, if available.
+         * Otherwise the item (properties from config.json) is returned.
          * @param {Object} item The menu item.
-         * @returns {Object} The merged properties to display for the menu item.
+         * @returns {Object} The properties from state or config.json.
          */
         chooseProperties (item) {
             let properties = item;
@@ -83,18 +82,11 @@ export default {
 
                 const stateProperties = this.$store.state.Modules[changeCase.upperFirst(item.type)];
 
-                if (typeof stateProperties === "object") {
-                    properties = {
-                        name: stateProperties.name,
-                        icon: stateProperties.icon,
-                        description: stateProperties.description,
-                        ...item,
-                        type: item.type
-                    };
-                }
-
                 if (item.type === "customMenuElement" && !Object.prototype.hasOwnProperty.call(properties, "icon")) {
                     properties.icon = this.customMenuElementIcon;
+                }
+                if (typeof stateProperties === "object") {
+                    properties = stateProperties;
                 }
             }
             return properties;
