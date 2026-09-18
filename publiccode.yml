@@ -7,7 +7,7 @@ categories:
   - geographic-information-systems
 description:
   de:
-    apiDocumentation: 'https://bitbucket.org/geowerkstatt-hamburg/addons/src/dev/readme.txt'
+    apiDocumentation: 'https://gitlab.opencode.de/lgvhh/urban-data-solutions/addons/-/tree/dev/readme.txt'
     documentation: 'https://www.masterportal.org/features/features'
     features:
       - OGC-konform
@@ -93,6 +93,6 @@ maintenance:
   type: community
 name: Masterportal Addons
 releaseDate: '2026-09-11'
-roadmap: 'https://bitbucket.org/geowerkstatt-hamburg/masterportal/src/dev/'
+roadmap: 'https://gitlab.opencode.de/lgvhh/urban-data-solutions/addons/-/tree/dev/
 softwareVersion: 3.26.1
-url: 'https://bitbucket.org/geowerkstatt-hamburg/addons.git'
+url: 'https://gitlab.opencode.de/lgvhh/urban-data-solutions/addons.git'
