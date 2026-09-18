@@ -68,25 +68,25 @@ pipelines:
                                 LOCAL_PATH: '$BITBUCKET_CLONE_DIR/Latest'
                                 DEBUG: 'true'
                                 DELETE_FLAG: 'false'
-            -   step:
-                    name: deploy on openCode (also latest tag)
-                    script:
-                        - echo 'deploy to opencode:'$BITBUCKET_TAG
-                        - git fetch --all --tags
-                        - git checkout tags/$BITBUCKET_TAG
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git $BITBUCKET_TAG
-                        - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
-                        - cd masterportal
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
+            # -   step:
+            #         name: deploy on openCode (also latest tag)
+            #         script:
+            #             - echo 'deploy to opencode:'$BITBUCKET_TAG
+            #             - git fetch --all --tags
+            #             - git checkout tags/$BITBUCKET_TAG
+            #             - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git $BITBUCKET_TAG
+            #             - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
+            #             - cd masterportal
+            #             - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
 
-                        - echo 'deploy latest tag to openCode'
-                        - git fetch --all --tags
-                        - git checkout tags/latest
-                        - git push --delete https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git latest
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git latest
-                        - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
-                        - cd masterportal
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
+            #             - echo 'deploy latest tag to openCode'
+            #             - git fetch --all --tags
+            #             - git checkout tags/latest
+            #             - git push --delete https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git latest
+            #             - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git latest
+            #             - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
+            #             - cd masterportal
+            #             - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
             -   step:
                     name: deploy on NEW openCode (also latest tag)
                     script:
@@ -109,27 +109,51 @@ pipelines:
                         - cd masterportal
                         - git push https://$ENCODED_USER:$ENCODED_PASSWORD@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git -f
 
+        # 'lts': 
+        #     -   step:
+        #                 name: deploy lts on openCode
+        #                 script:
+        #                     - echo 'remove lts tag in openCode'
+        #                     - git fetch --all --tags
+        #                     - git checkout tags/lts
+        #                     - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git :refs/tags/lts
+
+        #                     - echo 'delete lts branch in openCode'
+        #                     - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git --delete refs/heads/lts
+
+        #                     - echo 'deploy lts tag to openCode'
+        #                     - git fetch --all --tags
+        #                     - git checkout tags/lts
+        #                     - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git refs/tags/lts
+                            
+        #                     - echo 'create lts branch from lts tag and transfer it to openCode'
+        #                     - git clone --single-branch --branch lts https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
+        #                     - cd masterportal
+        #                     - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git HEAD:refs/heads/lts -f
         'lts': 
             -   step:
-                        name: deploy lts on openCode
+                        name: deploy lts on new openCode
                         script:
-                            - echo 'remove lts tag in openCode'
+                            - export ENCODED_USER=$(node -e "console.log(encodeURIComponent(process.env.OpenCode_User))")
+                            - export ENCODED_PASSWORD=$(node -e "console.log(encodeURIComponent(process.env.OpenCode_Password))")
+                            - echo 'remove lts tag in new openCode'
                             - git fetch --all --tags
                             - git checkout tags/lts
-                            - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git :refs/tags/lts
+                            - git push https://$ENCODED_USER:$ENCODED_PASSWORD@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git :refs/tags/lts
 
-                            - echo 'delete lts branch in openCode'
-                            - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git --delete refs/heads/lts
+                            - echo 'delete lts branch in new openCode'
+                            - git push https://$ENCODED_USER:$ENCODED_PASSWORD@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git --delete refs/heads/lts
 
-                            - echo 'deploy lts tag to openCode'
+                            - echo 'deploy lts tag to new openCode'
                             - git fetch --all --tags
                             - git checkout tags/lts
-                            - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git refs/tags/lts
+                            - git push https://$ENCODED_USER:$ENCODED_PASSWORD@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git refs/tags/lts
                             
-                            - echo 'create lts branch from lts tag and transfer it to openCode'
+                            - echo 'create lts branch from lts tag and transfer it to new openCode'
                             - git clone --single-branch --branch lts https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
                             - cd masterportal
-                            - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git HEAD:refs/heads/lts -f
+                            - git push https://$ENCODED_USER:$ENCODED_PASSWORD@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git HEAD:refs/heads/lts -f
+
     custom: # Pipelines that are triggered manually
         npm audit:
             -   step:
@@ -161,21 +185,21 @@ pipelines:
                         - node devtools/security/createJiraTicketFromOsv.mjs
                     artifacts:
                         - osv-result.json
-        deploy tag on openCode:
+        deploy tag on new openCode:
             - variables:
                 - name: BITBUCKET_TAG
                   description: tag to publish docs for, e.g. v3.1.0
             -   step:
-                    name: deploy tag on openCode
+                    name: deploy tag on new openCode
                     script:
                         - apt-get update && apt-get install -y curl wput jq
                         - git fetch --all --tags
-                        - echo 'deploy to opencode:'$BITBUCKET_TAG
+                        - echo 'deploy to new opencode:'$BITBUCKET_TAG
                         - git checkout tags/$BITBUCKET_TAG
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git $BITBUCKET_TAG
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git $BITBUCKET_TAG
                         - git clone --single-branch --branch dev https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
                         - cd masterportal
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git -f
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git -f
         mkdocs version to masterportal.org (no update of latest):
             - variables:
                 - name: BITBUCKET_TAG
@@ -281,48 +305,48 @@ pipelines:
                         - for zipFilePath in $(find dist -name \*.zip); do
                             curl -X POST --user "$bbapi_name:$bbapi_key" "https://api.bitbucket.org/2.0/repositories/geowerkstatt-hamburg/masterportal/downloads" --form files=@"$zipFilePath" --verbose;
                             done
-        deploy tag and branch with same name to openCode:
+        deploy tag and branch with same name to new openCode:
             - variables:
                     - name: BITBUCKET_TAG        
             -   step:
-                    name: 'deploy tag to openCode'
+                    name: 'deploy tag to new openCode'
                     script:
-                        - echo 'deploy tag to openCode:'$BITBUCKET_TAG
+                        - echo 'deploy tag to new openCode:'$BITBUCKET_TAG
                         - git fetch --all --tags
                         - git checkout tags/$BITBUCKET_TAG
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git refs/tags/$BITBUCKET_TAG
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git refs/tags/$BITBUCKET_TAG
                         - git clone --single-branch --branch lts https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
                         - cd masterportal
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git HEAD:refs/heads/$BITBUCKET_TAG -f
-        deploy lts tag and lts branch to openCode:
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git HEAD:refs/heads/$BITBUCKET_TAG -f
+        deploy lts tag and lts branch to new openCode:
             -   step:
-                    name: deploy lts tag to openCode
+                    name: deploy lts tag to new openCode
                     script:
-                        - echo 'deploy lts tag to openCode'
+                        - echo 'deploy lts tag to new openCode'
                         - git fetch --all --tags
                         - git checkout tags/lts
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git refs/tags/lts
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git refs/tags/lts
                         - git clone --single-branch --branch lts https://geowerkstatt@bitbucket.org/geowerkstatt-hamburg/masterportal.git
                         - cd masterportal
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git HEAD:refs/heads/lts -f
-        remove tag in openCode:
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git HEAD:refs/heads/lts -f
+        remove tag in new openCode:
             - variables:
                     - name: BITBUCKET_TAG
             -   step:
-                    name: remove tag in openCode
+                    name: remove tag in new openCode
                     script:
-                        - echo 'remove tag in openCode:'$BITBUCKET_TAG
+                        - echo 'remove tag in new openCode:'$BITBUCKET_TAG
                         - git fetch --all --tags
                         - git checkout tags/$BITBUCKET_TAG
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git :refs/tags/$BITBUCKET_TAG
-        delete branch in openCode:
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git :refs/tags/$BITBUCKET_TAG
+        delete branch in new openCode:
             - variables:
                     - name: BRANCH_NAME
             -   step:
-                    name: delete branch in openCode
+                    name: delete branch in new openCode
                     script:
                         - echo 'delete branch in openCode:'$BRANCH_NAME
-                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/geowerkstatt-hamburg/masterportal.git --delete refs/heads/$BRANCH_NAME
+                        - git push https://$OpenCode_User:$OpenCode_Password@gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal.git --delete refs/heads/$BRANCH_NAME
         deploy on new openCode (also latest tag):
             - variables:
                 - name: BITBUCKET_TAG
