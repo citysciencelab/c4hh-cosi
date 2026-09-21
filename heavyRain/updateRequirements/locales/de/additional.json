@@ -11,12 +11,17 @@
       "form": {
         "name": "Name",
         "initiator": "Initiator",
+        "creationDate": "Erstellungsdatum",
         "typeOptional": "Art der Angabe (optional)",
         "contact": "Ansprechpartner",
         "commentOptional": "Kommentar/ Beschreibung (optional)",
         "infolinkOptional": "Infolink (optional)",
         "uploadOptional": "Bild hochladen (optional)",
         "pleaseSelect": "Bitte wählen"
+      },
+      "messages": {
+        "invalid": "Die Eingabefelder für Name, Initiator und Ansprechpartner dürfen nicht leer sein.",
+        "saveSuccess": "Die neue Meldung wurde erfolgreich gespeichert!"
       },
       "drawHeading": "Änderungen einzeichnen",
       "cancelButtonLabel": "Vorgang abbrechen",

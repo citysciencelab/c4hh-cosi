@@ -11,12 +11,17 @@
       "form": {
         "name": "Name",
         "initiator": "Initiator",
+        "creationDate": "Creation date",
         "typeOptional": "Type of entry (optional)",
         "contact": "Contact person",
         "commentOptional": "Comment/ description (optional)",
         "infolinkOptional": "Info link (optional)",
         "uploadOptional": "Upload image (optional)",
         "pleaseSelect": "Please select"
+      },
+      "messages": {
+        "invalid": "The input fields for name, initiator and contact person can not be left blank.",
+        "saveSuccess": "The new message has been saved successfully!"
       },
       "drawHeading": "Draw changes",
       "cancelButtonLabel": "Cancel",

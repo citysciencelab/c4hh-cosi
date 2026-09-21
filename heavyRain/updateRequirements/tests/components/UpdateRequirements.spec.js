@@ -42,13 +42,21 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
             expect(wrapper.findComponent({name: "HrFooter"}).exists()).to.be.false;
         });
 
-        it("should render HrFooter in create-new view", async () => {
+        it("should render UpdateEdit in create-new view", async () => {
             const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
 
             await wrapper.setData({currentView: "create-new"});
 
             expect(wrapper.findComponent({name: "HrHeader"}).exists()).to.be.false;
-            expect(wrapper.findComponent({name: "HrFooter"}).exists()).to.be.true;
+            expect(wrapper.findComponent({name: "UpdateEdit"}).exists()).to.be.true;
+        });
+
+        it("should render HrSnackbar", async () => {
+            const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
+
+            await wrapper.setData({showSnackbar: true});
+
+            expect(wrapper.findComponent({name: "HrSnackbar"}).exists()).to.be.true;
         });
     });
 
@@ -57,12 +65,6 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
             const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
 
             expect(wrapper.vm.currentOpinion).to.be.undefined;
-        });
-
-        it("should get strokeColor as standard array", () => {
-            const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
-
-            expect(wrapper.vm.strokeColor).to.deep.equal([0, 0, 0]);
         });
 
         it("should get currentOpinion from the first element of informationType", () => {
@@ -104,41 +106,25 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
                 "color": "#0055A4"
             });
         });
+    });
 
-        it("should get strokeColor from currentOpinion", () => {
-            store = createStore({
-                namespaced: true,
-                modules: {
-                    namespaced: true,
-                    Modules: {
-                        namespaced: true,
-                        modules: {
-                            namespaced: true,
-                            UpdateRequirements: {
-                                namespaced: true,
-                                getters: {
-                                    informationType: () => [
-                                        {
-                                            "cat": "Eingabe",
-                                            "name": "Ortskenntnis",
-                                            "color": "#0055A4"
-                                        },
-                                        {
-                                            "cat": "Aktualisierungsbedarf",
-                                            "name": "SRGK",
-                                            "color": "#D55E00"
-                                        }
-                                    ]
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
+    describe("Methods", () => {
+        it("should set snackbar data on showSnackbarMessage", () => {
             const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
 
-            expect(wrapper.vm.strokeColor).to.deep.equal([0, 85, 164]);
+            wrapper.vm.showSnackbarMessage("test message", "error");
+
+            expect(wrapper.vm.showSnackbar).to.be.true;
+            expect(wrapper.vm.snackbarMessage).to.equal("test message");
+            expect(wrapper.vm.snackbarColor).to.equal("error");
+        });
+
+        it("should default snackbarColor to success", () => {
+            const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
+
+            wrapper.vm.showSnackbarMessage("test message");
+
+            expect(wrapper.vm.snackbarColor).to.equal("success");
         });
     });
 });

@@ -1,42 +1,45 @@
 <script>
-import {convertColor} from "@shared/js/utils/convertColor";
-import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import HrCard from "../../shared/components/HrCard.vue";
-import HrDraw from "../../shared/components/HrDraw.vue";
-import HrFooter from "../../shared/components/HrFooter.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
-import InputText from "@shared/modules/inputs/components/InputText.vue";
+import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 import {mapGetters} from "vuex";
+import UpdateEdit from "./UpdateEdit.vue";
 
 export default {
     name: "UpdateRequirements",
     components: {
-        FileUpload,
         HrCard,
-        HrDraw,
-        HrFooter,
         HrHeader,
-        InputText
+        HrSnackbar,
+        UpdateEdit
     },
     data () {
         return {
             currentView: "main",
-            currentOpinion: undefined
+            currentOpinion: undefined,
+            showSnackbar: false,
+            snackbarMessage: "",
+            snackbarColor: "success"
         };
     },
     computed: {
-        ...mapGetters("Modules/UpdateRequirements", ["informationType"]),
-
-        /**
-         * Gets the stroke color for draw style.
-         * @returns {Number[]} the rgb color code.
-         */
-        strokeColor () {
-            return convertColor(this.currentOpinion?.color, "rgb");
-        }
+        ...mapGetters("Modules/UpdateRequirements", ["informationType"])
     },
     mounted () {
         this.currentOpinion = this.informationType[0];
+    },
+    methods: {
+        /**
+         * Shows a snackbar message.
+         * @param {String} message the message to display
+         * @param {String} color the snackbar color
+         * @returns {void}
+         */
+        showSnackbarMessage (message, color = "success") {
+            this.snackbarMessage = message;
+            this.snackbarColor = color;
+            this.showSnackbar = true;
+        }
     }
 };
 </script>
@@ -117,80 +120,19 @@ export default {
             </HrCard>
         </template>
         <template v-else-if="currentView === 'create-new'">
-            <h5 class="headline mb-3">
-                {{ $t('additional:modules.updateRequirements.createFormTitle') }}
-            </h5>
-            <p class="mb-3">
-                {{ $t('additional:modules.updateRequirements.createNewDescriptionFirst') }}
-            </p>
-            <p class="mb-5">
-                {{ $t('additional:modules.updateRequirements.createNewDescriptionSecond') }}
-            </p>
-            <HrDraw
-                class="mb-4"
-                :heading="$t('additional:modules.updateRequirements.drawHeading')"
-                :stroke-color="strokeColor"
-                @update:drawn-geojson-feature="drawnGeojsonFeature = $event"
-            />
-            <InputText
-                id="update-requirements-name"
-                :label="'additional:modules.updateRequirements.form.name'"
-                :placeholder="'additional:modules.updateRequirements.form.name'"
-            />
-            <InputText
-                id="update-requirements-initiator"
-                :label="'additional:modules.updateRequirements.form.initiator'"
-                :placeholder="'additional:modules.updateRequirements.form.initiator'"
-            />
-            <div class="form-floating mb-3">
-                <select
-                    id="update-requirements-type"
-                    v-model="currentOpinion"
-                    class="form-select"
-                >
-                    <option
-                        v-for="(data, key) in informationType"
-                        :key="key"
-                        :value="data"
-                    >
-                        {{ data.cat + " " + data.name }}
-                    </option>
-                </select>
-                <label for="update-requirements-type">
-                    {{ $t('additional:modules.updateRequirements.form.typeOptional') }}
-                </label>
-            </div>
-            <InputText
-                id="update-requirements-contact"
-                :label="'additional:modules.updateRequirements.form.contact'"
-                :placeholder="'additional:modules.updateRequirements.form.contact'"
-            />
-            <InputText
-                id="update-requirements-comment"
-                html-type="textarea"
-                :label="'additional:modules.updateRequirements.form.commentOptional'"
-                :placeholder="'additional:modules.updateRequirements.form.commentOptional'"
-            />
-            <InputText
-                id="update-requirements-infolink"
-                :label="'additional:modules.updateRequirements.form.infolinkOptional'"
-                :placeholder="'additional:modules.updateRequirements.form.infolinkOptional'"
-            />
-            <h5 class="mb-2">
-                {{ $t('additional:modules.updateRequirements.form.uploadOptional') }}
-            </h5>
-            <FileUpload
-                class="mb-5"
-                :change="() => undefined"
-                :drop="() => undefined"
-            />
-            <HrFooter
-                :cancel-text="$t('additional:modules.updateRequirements.cancelButtonLabel')"
-                :save-text="$t('additional:modules.updateRequirements.saveButtonLabel')"
-                @click:cancel="currentView = 'main'"
+            <UpdateEdit
+                @showSnackbarMessage="showSnackbarMessage"
                 @click:save="currentView = 'main'"
+                @click:cancel="currentView = 'main'"
             />
         </template>
+
+        <HrSnackbar
+            :model-value="showSnackbar"
+            :message="snackbarMessage"
+            :color="snackbarColor"
+            @update:model-value="val => showSnackbar = val"
+        />
     </div>
 </template>
 
