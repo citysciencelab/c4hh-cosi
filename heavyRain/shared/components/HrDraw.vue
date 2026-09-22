@@ -1,11 +1,12 @@
 <script>
 import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
 import {Fill, Stroke, Style} from "ol/style.js";
-import GeoJSON from "ol/format/GeoJSON.js";
+import {fromCircle} from "ol/geom/Polygon.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import layerFactory from "@core/layers/js/layerFactory.js";
 import {mapActions} from "vuex";
+import {markRaw} from "vue";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction.js";
 
 const hrDrawLayerId = "heavy-rain-draw";
@@ -27,7 +28,7 @@ export default {
             default: () => [0, 85, 164]
         }
     },
-    emits: ["update:drawn-geojson-feature"],
+    emits: ["update:drawn-geometry"],
     data () {
         return {
             currentLayout: {
@@ -102,8 +103,7 @@ export default {
         this.source = this.getLayerSource();
     },
     unmounted () {
-        this.removeInteraction(this.currentModifyInteraction);
-        this.currentModifyInteraction = null;
+        this.resetAll();
     },
     methods: {
         ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
@@ -114,7 +114,7 @@ export default {
          */
         clearDrawnFeature () {
             this.resetAll();
-            this.$emit("update:drawn-geojson-feature", null);
+            this.$emit("update:drawn-geometry", null);
         },
 
         /**
@@ -129,10 +129,8 @@ export default {
                 this.selectedInteraction = "";
                 this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.source);
                 this.addInteraction(this.currentModifyInteraction);
-                this.currentModifyInteraction?.on("modifyend", async () => {
-                    const geojson = new GeoJSON().writeFeatureObject(this.source.getFeatures()[0]);
-
-                    this.$emit("update:drawn-geojson-feature", geojson);
+                this.currentModifyInteraction?.on("modifyend", () => {
+                    this.emitDrawnGeometry(this.source.getFeatures()[0]);
                 });
             }
             else {
@@ -142,7 +140,18 @@ export default {
         },
 
         /**
-         * Emits the drawn feature as a GeoJSON object.
+         * Emits a copy of the geometry of the given feature.
+         * A copy is emitted, as the modify interaction changes the geometry of the feature itself.
+         * It is marked as raw, so that Vue does not wrap the OpenLayers geometry in a reactive proxy.
+         * @param {module:ol/Feature} feature The drawn feature.
+         * @returns {void}
+         */
+        emitDrawnGeometry (feature) {
+            this.$emit("update:drawn-geometry", markRaw(feature.getGeometry().clone()));
+        },
+
+        /**
+         * Adds the drawn feature to the source and emits its geometry.
          * @param {Object} event The OpenLayers drawend event.
          * @returns {void}
          */
@@ -155,10 +164,13 @@ export default {
                 event.feature.setId("drawn-feature");
             }
 
-            const geojsonFeature = new GeoJSON().writeFeatureObject(event.feature);
+            // A drawn circle is converted to a polygon, as the services only allow polygons.
+            if (typeof event.feature.getGeometry === "function" && event.feature.getGeometry()?.getType() === "Circle") {
+                event.feature.setGeometry(fromCircle(event.feature.getGeometry()));
+            }
 
             this.source.addFeature(event.feature);
-            this.$emit("update:drawn-geojson-feature", geojsonFeature);
+            this.emitDrawnGeometry(event.feature);
         },
 
         /**

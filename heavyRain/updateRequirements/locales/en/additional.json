@@ -21,6 +21,8 @@
       },
       "messages": {
         "invalid": "The input fields for name, initiator and contact person can not be left blank.",
+        "missingGeometry": "Please draw the affected area as a polygon on the map first.",
+        "saveError": "The message could not be saved. Please try again.",
         "saveSuccess": "The new message has been saved successfully!"
       },
       "drawHeading": "Draw changes",

@@ -6,12 +6,14 @@
  * @property {String} name - Displayed as title.
  * @property {String} icon - Icon next to title.
  * @property {Object[]} informationType - The information type with the color in lists.
+ * @property {String} wfstId - Id of the WFS-T layer the reports are written to.
  */
 const state = {
     id: "updateRequirements",
     type: "updateRequirements",
     name: "additional:modules.updateRequirements.title",
     icon: "bi-building",
+    wfstId: "36013",
     informationType: [
         {
             "cat": "Eingabe",

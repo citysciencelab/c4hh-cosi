@@ -1,11 +1,14 @@
 <script>
 import {convertColor} from "@shared/js/utils/convertColor";
+import dayjs from "dayjs";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import HrDraw from "../../shared/components/HrDraw.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapGetters} from "vuex";
+import {sendWfstTransaction} from "../../shared/js/sendWfstTransaction.js";
+import {wfstAttributes, wfstDateFormat, wfstGeometryName} from "../js/wfstSchema.js";
 
 export default {
     name: "UpdateEdit",
@@ -23,15 +26,52 @@ export default {
             name: "",
             initiator: "",
             contactPerson: "",
-            creationDate: new Date().toLocaleDateString("de-DE"),
+            comment: "",
+            infoLink: "",
+            createdAt: dayjs(),
+            drawnGeometry: null,
             invalid: false,
+            isSaving: false,
             showSnackbar: false,
             snackbarMessage: "",
             snackbarColor: "error"
         };
     },
     computed: {
-        ...mapGetters("Modules/UpdateRequirements", ["informationType"]),
+        ...mapGetters("Modules/UpdateRequirements", ["informationType", "wfstId"]),
+        ...mapGetters("Maps", ["projectionCode"]),
+
+        /**
+         * Gets the creation date of the report for the display in the form.
+         * @returns {String} the creation date.
+         */
+        creationDate () {
+            return this.createdAt.format("DD.MM.YYYY");
+        },
+
+        /**
+         * Gets the values of the form in the structure the transaction expects.
+         * @returns {Object} the values of the form.
+         */
+        formValues () {
+            return {
+                name: this.name.trim(),
+                initiator: this.initiator.trim(),
+                creationDate: this.createdAt.format(wfstDateFormat),
+                informationType: this.currentOpinion ? `${this.currentOpinion.cat} ${this.currentOpinion.name}` : "",
+                contactPerson: this.contactPerson.trim(),
+                comment: this.comment.trim(),
+                infoLink: this.infoLink.trim()
+            };
+        },
+
+        /**
+         * Gets if an area was drawn on the map.
+         * @returns {Boolean} true if there is a drawn area.
+         */
+        hasDrawnGeometry () {
+            return this.drawnGeometry !== null;
+        },
 
         /**
          * Gets the stroke color for draw style.
@@ -46,20 +86,61 @@ export default {
     },
     methods: {
         /**
-         * Handles the save action.
-         * @returns {void}
+         * Handles the save action and sends the report to the WFS-T service.
+         * @returns {Promise<void>} resolves when the transaction is finished.
          */
-        onSave () {
+        async onSave () {
+            if (this.isSaving) {
+                return;
+            }
+
             if (this.name.trim() === "" || this.initiator.trim() === "" || this.contactPerson.trim() === "") {
-                this.snackbarMessage = this.$t("additional:modules.updateRequirements.messages.invalid");
-                this.showSnackbar = true;
                 this.invalid = true;
+                this.showErrorMessage(this.$t("additional:modules.updateRequirements.messages.invalid"));
                 return;
             }
 
             this.invalid = false;
-            this.$emit("showSnackbarMessage", this.$t("additional:modules.updateRequirements.messages.saveSuccess"));
-            this.$emit("click:save");
+
+            if (!this.hasDrawnGeometry) {
+                this.showErrorMessage(this.$t("additional:modules.updateRequirements.messages.missingGeometry"));
+                return;
+            }
+
+            this.isSaving = true;
+
+            try {
+                await sendWfstTransaction({
+                    wfstId: this.wfstId,
+                    projectionCode: this.projectionCode,
+                    geometry: this.drawnGeometry,
+                    formValues: this.formValues,
+                    wfstAttributes,
+                    wfstGeometryName,
+                    transactionMethod: "insert"
+                });
+
+                this.$emit("showSnackbarMessage", this.$t("additional:modules.updateRequirements.messages.saveSuccess"));
+                this.$emit("click:save");
+            }
+            catch (error) {
+                console.error(error);
+                this.showErrorMessage(this.$t("additional:modules.updateRequirements.messages.saveError"));
+            }
+            finally {
+                this.isSaving = false;
+            }
+        },
+
+        /**
+         * Shows the given message in the snackbar of the form.
+         * @param {String} message the message to display.
+         * @returns {void}
+         */
+        showErrorMessage (message) {
+            this.snackbarMessage = message;
+            this.snackbarColor = "error";
+            this.showSnackbar = true;
         }
     }
 };
@@ -80,6 +161,7 @@ export default {
             class="mb-4"
             :heading="$t('additional:modules.updateRequirements.drawHeading')"
             :stroke-color="strokeColor"
+            @update:drawn-geometry="drawnGeometry = $event"
         />
         <InputText
             id="update-requirements-name"
@@ -129,12 +211,14 @@ export default {
         />
         <InputText
             id="update-requirements-comment"
+            v-model="comment"
             html-type="textarea"
             :label="$t('additional:modules.updateRequirements.form.commentOptional')"
             :placeholder="$t('additional:modules.updateRequirements.form.commentOptional')"
         />
         <InputText
             id="update-requirements-infolink"
+            v-model="infoLink"
             :label="$t('additional:modules.updateRequirements.form.infolinkOptional')"
             :placeholder="$t('additional:modules.updateRequirements.form.infolinkOptional')"
         />
