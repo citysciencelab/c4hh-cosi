@@ -287,7 +287,6 @@ export default {
                         <div
                             v-for="(singleAlert, singleAlertIndex) in alertCategory.content"
                             :key="singleAlert.hash"
-                            :class="singleAlert.category"
                         >
                             <div
                                 class="singleAlertContainer row"
