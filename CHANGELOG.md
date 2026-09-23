@@ -13,6 +13,9 @@
 
 ### Changed
 - Issue \#1654: Relaxed the strict ISO8601 unit validation for WMS-Time layers to a console warning. This enables support for alternative time units.
+- The following packages have been updated:
+    - dependencies:
+        - @masterportal/masterportalapi: 2.63.0 to 2.64.0 (This also raised ol to version 10.10.0)
 
 ### Deprecated
 
