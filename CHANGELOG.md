@@ -8,6 +8,8 @@
 
 ### Added
 
+- lzsResearchClient: Added new addon lzsResearchClient for easy searching and access to geoadata in long-term storage
+
 ### Changed
 
 ### Deprecated
