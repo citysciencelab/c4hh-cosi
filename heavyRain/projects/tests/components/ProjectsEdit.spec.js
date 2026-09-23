@@ -1,17 +1,30 @@
-import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
+import Polygon from "ol/geom/Polygon.js";
 import ProjectsEdit from "../../components/ProjectsEdit.vue";
+import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
+import {shallowMount} from "@vue/test-utils";
+import sinon from "sinon";
+import wfs from "@masterportal/masterportalapi/src/layer/wfs";
 
 
 describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
-    let store;
+    let drawnGeometry,
+        setCurrentViewSpy,
+        store;
 
     beforeEach(() => {
+        setCurrentViewSpy = sinon.spy();
         store = createStore({
             namespaced: true,
             modules: {
                 namespaced: true,
+                Maps: {
+                    namespaced: true,
+                    getters: {
+                        projectionCode: () => "EPSG:25832"
+                    }
+                },
                 Modules: {
                     namespaced: true,
                     modules: {
@@ -30,13 +43,22 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
                                 {
                                     "name": "Bekannte Bereiche (z.B. Presse)",
                                     "color": "#D55E00"
-                                }]
+                                }],
+                                wfstId: () => "36016"
+                            },
+                            mutations: {
+                                setCurrentView: setCurrentViewSpy
                             }
                         }
                     }
                 }
             }
         });
+        drawnGeometry = new Polygon([[[0, 0], [0, 1], [1, 1], [0, 0]]]);
+    });
+
+    afterEach(() => {
+        sinon.restore();
     });
 
     describe("Component DOM", () => {
@@ -112,22 +134,102 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
             expect(wrapper.vm.strokeColor).to.deep.equal([213, 94, 0]);
         });
 
-        it("should set invalid to true if there are required fields with empty text ", async () => {
+        it("should trim the values of the form and join the chosen criteria", async () => {
             const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
 
-            wrapper.vm.onSave();
+            await wrapper.setData({
+                chosenCriteria: [{"name": "Bauprojekte (Umsetzungsmaßnahmen)", "color": "#0055A4"}, {"name": "Bekannte Bereiche (z.B. Presse)", "color": "#D55E00"}],
+                projectName: " name ",
+                startDate: "2026-01-01"
+            });
 
-            expect(wrapper.vm.invalid).to.be.true;
+            expect(wrapper.vm.formValues.projectName).to.equal("name");
+            expect(wrapper.vm.formValues.startDate).to.equal("2026-01-01");
+            expect(wrapper.vm.formValues.criteria).to.equal("Bauprojekte (Umsetzungsmaßnahmen), Bekannte Bereiche (z.B. Presse)");
+            expect(wrapper.vm.formValues.lastUpdate).to.match(/^\d{4}-\d{2}-\d{2}$/);
         });
 
-        it("should set invalid to true if there are required fields with empty text ", async () => {
+        it("should detect a drawn geometry", async () => {
             const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
 
-            await wrapper.setData({projectName: "name", creator: "creator", contactPerson: "contactPerson"});
+            expect(wrapper.vm.hasDrawnGeometry).to.be.false;
 
-            wrapper.vm.onSave();
+            await wrapper.setData({drawnGeometry});
+
+            expect(wrapper.vm.hasDrawnGeometry).to.be.true;
+        });
+    });
+
+    describe("Methods", () => {
+        it("should set invalid to true if there are required fields with empty text", async () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            await wrapper.vm.onSave();
+
+            expect(wrapper.vm.invalid).to.be.true;
+            expect(setCurrentViewSpy.notCalled).to.be.true;
+        });
+
+        it("should not send a transaction if no geometry was drawn", async () => {
+            const sendTransactionStub = sinon.stub(wfs, "sendTransaction"),
+                wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", projectName: "name"});
+            await wrapper.vm.onSave();
 
             expect(wrapper.vm.invalid).to.be.false;
+            expect(sendTransactionStub.notCalled).to.be.true;
+            expect(wrapper.vm.showSnackbar).to.be.true;
+            expect(setCurrentViewSpy.notCalled).to.be.true;
+        });
+
+        it("should insert the project and switch to the main view if the form is filled in", async () => {
+            const layerConfig = {id: "36016", url: "https://example.com/wfs"},
+                sendTransactionStub = sinon.stub(wfs, "sendTransaction").resolves("feature"),
+                wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            sinon.stub(rawLayerList, "getLayerWhere").returns(layerConfig);
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", drawnGeometry, projectName: "name"});
+            await wrapper.vm.onSave();
+
+            expect(sendTransactionStub.calledOnce).to.be.true;
+            expect(sendTransactionStub.firstCall.args[0]).to.equal("EPSG:25832");
+            expect(sendTransactionStub.firstCall.args[2]).to.equal(layerConfig.url);
+            expect(sendTransactionStub.firstCall.args[4]).to.equal("insert");
+            expect(wrapper.emitted("showSnackbarMessage")).to.not.be.undefined;
+            expect(setCurrentViewSpy.calledOnce).to.be.true;
+        });
+
+        it("should send the values of the form under the attribute names of the projects service", async () => {
+            const sendTransactionStub = sinon.stub(wfs, "sendTransaction").resolves("feature"),
+                wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36016", url: "https://example.com/wfs"});
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", drawnGeometry, projectName: "name", startDate: "2026-01-01"});
+            await wrapper.vm.onSave();
+
+            const feature = sendTransactionStub.firstCall.args[1];
+
+            expect(feature.get("projektname")).to.equal("name");
+            expect(feature.get("initiator")).to.equal("creator");
+            expect(feature.get("ansprechpartner")).to.equal("contactPerson");
+            expect(feature.get("baubeginn")).to.equal("2026-01-01");
+            expect(feature.getGeometryName()).to.equal("geom");
+            expect(feature.getGeometry().getType()).to.equal("MultiPolygon");
+        });
+
+        it("should show a message and keep the form open if the transaction fails", async () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            sinon.stub(console, "error");
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36016", url: "https://example.com/wfs"});
+            sinon.stub(wfs, "sendTransaction").rejects(new Error("transaction failed"));
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", drawnGeometry, projectName: "name"});
+            await wrapper.vm.onSave();
+
+            expect(wrapper.vm.isSaving).to.be.false;
+            expect(wrapper.vm.showSnackbar).to.be.true;
+            expect(setCurrentViewSpy.notCalled).to.be.true;
         });
     });
 });

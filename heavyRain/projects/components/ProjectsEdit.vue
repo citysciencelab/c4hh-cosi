@@ -1,5 +1,6 @@
 <script>
 import {convertColor} from "@shared/js/utils/convertColor";
+import dayjs from "dayjs";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
 import HrDraw from "../../shared/components/HrDraw.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
@@ -7,6 +8,8 @@ import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
+import {sendWfstTransaction} from "../../shared/js/sendWfstTransaction.js";
+import {wfstAttributes, wfstDateFormat, wfstGeometryName} from "../js/wfstSchema.js";
 
 export default {
     name: "ProjectsEdit",
@@ -21,17 +24,58 @@ export default {
     data () {
         return {
             chosenCriteria: [],
-            projectName: "",
-            creator: "",
+            contactExt: "",
             contactPerson: "",
+            creator: "",
+            description: "",
+            drawnGeometry: null,
+            endDate: "",
+            history: "",
+            infoLink: "",
             invalid: false,
+            isSaving: false,
+            projectName: "",
+            protectedAreas: "",
             showSnackbar: false,
+            snackbarColor: "error",
             snackbarMessage: "",
-            snackbarColor: "error"
+            source: "",
+            startDate: ""
         };
     },
     computed: {
-        ...mapGetters("Modules/Projects", ["criteria"]),
+        ...mapGetters("Modules/Projects", ["criteria", "wfstId"]),
+        ...mapGetters("Maps", ["projectionCode"]),
+
+        /**
+         * Gets the values of the form in the structure the transaction expects.
+         * @returns {Object} the values of the form.
+         */
+        formValues () {
+            return {
+                contactExt: this.contactExt.trim(),
+                contactPerson: this.contactPerson.trim(),
+                creator: this.creator.trim(),
+                criteria: this.chosenCriteria.map(cri => cri.name).join(", "),
+                description: this.description.trim(),
+                endDate: this.endDate,
+                history: this.history.trim(),
+                infoLink: this.infoLink.trim(),
+                lastUpdate: dayjs().format(wfstDateFormat),
+                projectName: this.projectName.trim(),
+                protectedAreas: this.protectedAreas.trim(),
+                source: this.source.trim(),
+                startDate: this.startDate
+            };
+        },
+
+        /**
+         * Gets if an area was drawn on the map.
+         * @returns {Boolean} true if there is a drawn area.
+         */
+        hasDrawnGeometry () {
+            return this.drawnGeometry !== null;
+        },
 
         /**
          * Gets the stroke color for draw style.
@@ -55,20 +99,61 @@ export default {
         ...mapMutations("Modules/Projects", ["setCurrentView"]),
 
         /**
-         * Handles the save action.
-         * @returns {void}
+         * Handles the save action and sends the project to the WFS-T service.
+         * @returns {Promise<void>} resolves when the transaction is finished.
          */
-        onSave () {
+        async onSave () {
+            if (this.isSaving) {
+                return;
+            }
+
             if (this.projectName.trim() === "" || this.creator.trim() === "" || this.contactPerson.trim() === "") {
-                this.snackbarMessage = this.$t("additional:modules.projects.messages.invalid");
-                this.showSnackbar = true;
                 this.invalid = true;
+                this.showErrorMessage(this.$t("additional:modules.projects.messages.invalid"));
                 return;
             }
 
             this.invalid = false;
-            this.$emit("showSnackbarMessage", this.$t("additional:modules.projects.messages.saveSuccess"));
-            this.setCurrentView("main");
+
+            if (!this.hasDrawnGeometry) {
+                this.showErrorMessage(this.$t("additional:modules.projects.messages.drawFirst"));
+                return;
+            }
+
+            this.isSaving = true;
+
+            try {
+                await sendWfstTransaction({
+                    wfstId: this.wfstId,
+                    projectionCode: this.projectionCode,
+                    geometry: this.drawnGeometry,
+                    formValues: this.formValues,
+                    wfstAttributes,
+                    wfstGeometryName,
+                    transactionMethod: "insert"
+                });
+
+                this.$emit("showSnackbarMessage", this.$t("additional:modules.projects.messages.saveSuccess"));
+                this.setCurrentView("main");
+            }
+            catch (error) {
+                console.error(error);
+                this.showErrorMessage(this.$t("additional:modules.projects.messages.saveError"));
+            }
+            finally {
+                this.isSaving = false;
+            }
+        },
+
+        /**
+         * Shows the given message in the snackbar of the form.
+         * @param {String} message the message to display.
+         * @returns {void}
+         */
+        showErrorMessage (message) {
+            this.snackbarMessage = message;
+            this.snackbarColor = "error";
+            this.showSnackbar = true;
         }
     }
 };
@@ -90,6 +175,7 @@ export default {
             <HrDraw
                 class="mb-4"
                 :stroke-color="strokeColor"
+                @update:drawn-geometry="drawnGeometry = $event"
             />
         </div>
 
@@ -149,6 +235,7 @@ export default {
             <div class="col-6">
                 <InputText
                     id="startDate"
+                    v-model="startDate"
                     type="date"
                     :label="$t('additional:modules.projects.labels.startDate')"
                     :placeholder="'YYYY-MM-DD'"
@@ -157,6 +244,7 @@ export default {
             <div class="col-6">
                 <InputText
                     id="endDate"
+                    v-model="endDate"
                     type="date"
                     :label="$t('additional:modules.projects.labels.endDate')"
                     :placeholder="'YYYY-MM-DD'"
@@ -166,6 +254,7 @@ export default {
             <div class="col-12">
                 <InputText
                     id="quelle"
+                    v-model="source"
                     :label="$t('additional:modules.projects.labels.source')"
                     :placeholder="$t('additional:modules.projects.labels.source')"
                 />
@@ -182,6 +271,7 @@ export default {
             <div class="col-12">
                 <InputText
                     id="description"
+                    v-model="description"
                     html-type="textarea"
                     :label="$t('additional:modules.projects.labels.description')"
                     :placeholder="$t('additional:modules.projects.labels.description')"
@@ -190,6 +280,7 @@ export default {
             <div class="col-12">
                 <InputText
                     id="contactExt"
+                    v-model="contactExt"
                     html-type="textarea"
                     :label="$t('additional:modules.projects.labels.contactExt')"
                     :placeholder="$t('additional:modules.projects.labels.contactExt')"
@@ -198,6 +289,7 @@ export default {
             <div class="col-12">
                 <InputText
                     id="infolink"
+                    v-model="infoLink"
                     :label="$t('additional:modules.projects.labels.infolink')"
                     :placeholder="'https://...'"
                 />
@@ -206,6 +298,7 @@ export default {
             <div class="col-12">
                 <InputText
                     id="history"
+                    v-model="history"
                     html-type="textarea"
                     :label="$t('additional:modules.projects.labels.history')"
                     :placeholder="$t('additional:modules.projects.labels.history')"
@@ -215,6 +308,7 @@ export default {
             <div class="col-12">
                 <InputText
                     id="protectedAreas"
+                    v-model="protectedAreas"
                     html-type="textarea"
                     :label="$t('additional:modules.projects.labels.protectedAreas')"
                     :placeholder="$t('additional:modules.projects.labels.protectedAreas')"

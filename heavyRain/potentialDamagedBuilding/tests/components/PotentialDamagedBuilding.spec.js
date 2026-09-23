@@ -82,7 +82,7 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
             wfstId: "wfst-2"
         }];
         getLayerWhere = sinon.stub(rawLayerList, "getLayerWhere");
-        sendTransaction = sinon.stub(wfs, "sendTransaction");
+        sendTransaction = sinon.stub(wfs, "sendTransaction").resolves();
         store = createStore({
             actions: {
                 replaceByIdInLayerConfig
@@ -280,11 +280,14 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
         });
 
         describe("setDataToFeature", () => {
+            beforeEach(() => {
+                sinon.useFakeTimers({now: new Date("2026-09-22T12:00:00"), toFake: ["Date"]});
+            });
+
             it("should set feature data with the configured namespace", () => {
                 const feature = createFeature();
 
                 wrapper.vm.adjustedDamageClass = 5;
-                wrapper.vm.adjustmentDate = "2026-09-22";
                 wrapper.vm.comment = "updated";
                 wrapper.vm.setDataToFeature(feature, "de.hh.up:");
 
@@ -327,9 +330,9 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
 
         describe("hideSelectedItem", () => {
             it("should hide the selected item layer", () => {
-                wrapper.vm.hideSelectedItem();
+                wrapper.vm.hideSelectedItem(wrapper.vm.selectedItem);
 
-                expect(replaceByIdInLayerConfig.calledWith({
+                expect(replaceByIdInLayerConfig.calledWith(sinon.match.any, {
                     layerConfigs: [{
                         id: "wms-1",
                         layer: {

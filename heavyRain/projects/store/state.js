@@ -6,12 +6,14 @@
  * @property {String} name - Displayed as title.
  * @property {String} icon - Icon next to title.
  * @property {Object[]} criteria - The criteria with the color in lists.
+ * @property {String} wfstId - Id of the WFS-T layer the projects are written to.
  */
 const state = {
     id: "projects",
     type: "projects",
     name: "additional:modules.projects.title",
     icon: "bi-building",
+    wfstId: "36016",
     criteria: [
         {
             "name": "Bauprojekte (Umsetzungsmaßnahmen)",
