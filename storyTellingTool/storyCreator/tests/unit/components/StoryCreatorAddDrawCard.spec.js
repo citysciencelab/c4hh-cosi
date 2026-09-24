@@ -255,6 +255,7 @@ describe("addons/storyCreator/components/StoryCreatorAddDrawCard.vue", () => {
                         }),
                         get: key => key === "title" ? "title 2" : {},
                         getStyle: sinon.stub().returns(null),
+                        set: sinon.spy(),
                         setStyle: sinon.spy()
                     }
                 };

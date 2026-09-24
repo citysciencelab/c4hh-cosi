@@ -26,7 +26,7 @@ describe("addons/storyTellingTool/storyCreator/shared/modules/AddElementDropdown
         it("should render all 5 default items when no 'allowedActions' are provided", () => {
             const items = wrapper.findAll(".dropdown-item");
 
-            expect(items.length).to.equal(6);
+            expect(items.length).to.equal(7);
         });
 
         it("should render 2 category headers and exactly 1 divider", () => {
@@ -70,7 +70,7 @@ describe("addons/storyTellingTool/storyCreator/shared/modules/AddElementDropdown
             await wrapper.setProps({allowedActions: []});
             const items = wrapper.findAll(".dropdown-item");
 
-            expect(items.length).to.equal(6);
+            expect(items.length).to.equal(7);
         });
 
         it("should ignore unknown action names in 'allowedActions' and only render valid ones", async () => {

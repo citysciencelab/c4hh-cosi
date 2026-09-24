@@ -10,6 +10,7 @@ import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import store from "@appstore/index.js";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
+import StoryCreatorBreadcrumb from "./StoryCreatorBreadcrumb.vue";
 import StoryCreatorChapter from "./StoryCreatorChapter.vue";
 import Toast from "../../shared/toasts/components/ToastsElement.vue";
 
@@ -23,6 +24,7 @@ export default {
         InfoText,
         InputText,
         StoryCreatorAddImageCard,
+        StoryCreatorBreadcrumb,
         StoryCreatorChapter,
         Toast
     },
@@ -483,42 +485,13 @@ export default {
             type="info"
             :text="$t('additional:modules.storyCreator.autosaveHint')"
         />
-        <nav
-            class="story-breadcrumb d-flex align-items-center mb-1"
-            aria-label="breadcrumb"
-        >
-            <ol class="breadcrumb mb-0 small">
-                <li class="breadcrumb-item">
-                    <a
-                        href="#"
-                        class="story-breadcrumb__link"
-                        @click.prevent="autosaveForNavigation"
-                    >{{ $t('additional:modules.storyManager.title') }}</a>
-                </li>
-                <li
-                    v-if="currentView === 'story'"
-                    class="breadcrumb-item active"
-                    aria-current="page"
-                >
-                    {{ $t('additional:modules.storyCreator.storyNav') }}: {{ title }}
-                </li>
-                <template v-else-if="currentView === 'chapter'">
-                    <li class="breadcrumb-item">
-                        <a
-                            href="#"
-                            class="story-breadcrumb__link"
-                            @click.prevent="autosaveChapterAndGoToStory"
-                        >{{ $t('additional:modules.storyCreator.storyNav') }}: {{ title }}</a>
-                    </li>
-                    <li
-                        class="breadcrumb-item active"
-                        aria-current="page"
-                    >
-                        {{ $t('additional:modules.storyCreator.chapterNav') }}: {{ currentEditingChapterTitle }}
-                    </li>
-                </template>
-            </ol>
-        </nav>
+        <StoryCreatorBreadcrumb
+            :chapter-title="currentEditingChapterTitle"
+            :current-view="currentView"
+            :story-title="title"
+            @go-to-story="autosaveChapterAndGoToStory"
+            @go-to-manager="autosaveForNavigation"
+        />
         <div v-if="currentView === 'story'">
             <h5 class="mb-4">
                 {{ $t("additional:modules.storyCreator.labels.editStory") }}
@@ -712,46 +685,5 @@ export default {
 .hint-fade-enter-from,
 .hint-fade-leave-to {
     opacity: 0;
-}
-</style>
-
-<style lang="scss">
-.story-breadcrumb {
-    font-size: 1rem;
-    --bs-breadcrumb-divider: ">";
-
-    .breadcrumb {
-        flex-wrap: nowrap;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-
-        &-item + &-item::before {
-            color: $link-color;
-        }
-
-        &-item.active {
-            color: $dark_blue;
-            max-width: 20rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            display: inline-block;
-        }
-    }
-
-    &__link {
-        color: $link-color;
-        text-decoration: none;
-        max-width: 12rem;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        display: inline-block;
-
-        &:hover {
-            text-decoration: underline;
-        }
-    }
 }
 </style>

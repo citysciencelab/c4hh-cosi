@@ -3,7 +3,7 @@ import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMe
 import axios from "axios";
 import {boundingExtent} from "ol/extent.js";
 import CookieBanner from "../../shared/cookiebanner/components/CookieBanner.vue";
-import ConvertFeature from "../../../simulationTool/js/convertFeatures.js";
+import ConvertFeature from "../../shared/utils/featureConverter";
 import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
@@ -509,7 +509,7 @@ export default {
 
             if (this.currentChapter?.content.length) {
                 this.currentChapter.content.forEach(item => {
-                    if (item.type === "draw") {
+                    if (item.type === "draw" || item.type === "write") {
                         this.createDrawObject(item.attrs);
                     }
                 });

@@ -1,8 +1,6 @@
 {
   "modules": {
     "storyCreator": {
-      "storyNav": "Story",
-      "chapterNav": "Chapter",
       "autosaveHint": "The change was automatically saved.",
       "title": "Story Creator",
       "addChapter": "Add Chapter",
@@ -14,6 +12,10 @@
       "readOnly": "Read-only",
       "previewNav": "Story preview",
       "introText": "This tool is designed for creating interactive, map-based stories. After entering general information such as the name, description, author, and cover image, you can flexibly add individual chapters below. Using the buttons at the bottom of the page, you can preview, save, or discard the story.",
+      "breadcrumb": {
+        "storyNav": "Story",
+        "chapterNav": "Chapter"
+      },
       "labels": {
         "storyTitle": "Enter story name",
         "storyname": "Story name",
@@ -36,7 +38,19 @@
         "videoAccessibleText": "Text for accessibility",
         "imageRequiredAlt": "Alternative text for an accessible image description is missing.",
         "imageRequiredCopyright": "A copyright notice is required.",
-        "imageRequiredFields": "Required fields must be filled out."
+        "imageRequiredFields": "Required fields must be filled out.",
+        "annotationText": "Text for annotation",
+        "regular": "Regular",
+        "bold": "Bold",
+        "italic": "Italic",
+        "backgroundColor": "Background color",
+        "backgroundOpacity": "Transparency",
+        "textColor": "Text color",
+        "fontSize": "Font size",
+        "fontStyle": "Font style",
+        "lineColor": "Line color",
+        "lineWidth": "Line width",
+        "annotations": "Annotations"
       },
       "buttons": {
           "confirm": "Confirm",
@@ -46,10 +60,17 @@
           "discardVideo": "Discard video",
           "saveDraw": "Save drawing",
           "discardDraw": "Remove drawing",
-          "edit": "Edit"
+          "edit": "Edit",
+          "saveAnnotations": "Save annotations",
+          "discardAnnotations": "Discard annotations",
+          "text": "Text",
+          "arrow": "Arrow",
+          "line": "Line",
+          "lineType": "Line type"
       },
       "headlines": {
         "addDrawings": "Add new drawings",
+        "addMapAnnotations": "add new map annotations",
         "addImages": "Add new image",
         "addTexts": "Add new text",
         "addVideo": "Add new video",
@@ -59,7 +80,10 @@
         "addDraw": "Draw on map",
         "drawnObjects": "Drawn Objects",
         "mapContent": "Map content",
-        "drawing": "Drawing(s)"
+        "drawing": "Drawing(s)",
+        "text": "Text settings",
+        "background": "Background",
+        "line": "Annotation line"
       },
       "chapter": {
         "editChapter": "Edit chapter",
@@ -105,7 +129,8 @@
           "separator": "Separator",
           "image": "Image",
           "video": "Video",
-          "draw": "Drawing"
+          "draw": "Drawing",
+          "write": "Schreiben"
         },
         "feature": {
           "title": "Title (max. 200 signs)",

@@ -1,5 +1,5 @@
 <script>
-import ConvertFeature from "../../../simulationTool/js/convertFeatures.js";
+import ConvertFeature from "../../shared/utils/featureConverter.js";
 import DrawLayout from "@shared/modules/draw/components/DrawLayout.vue";
 import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
@@ -74,6 +74,9 @@ export default {
                 }
 
                 this.features = ConvertFeature.geoJsonToOpenlayers(val.attrs) || [];
+                this.features.forEach(feature => {
+                    feature.set("storyCreatorType", "draw");
+                });
                 this.featureTitle = this.features.map(feature => feature.get("title") || "");
             },
             deep: true,
@@ -84,7 +87,7 @@ export default {
         const map = mapCollection.getMap("2D");
 
         this.source = getLayerSource();
-        this.source.clear();
+        this.removeAllDrawnFeatures(this.source);
         this.source.addFeatures(this.features);
 
         if (map) {
@@ -166,6 +169,8 @@ export default {
             if (!feature) {
                 return;
             }
+
+            evt.feature.set("storyCreatorType", "draw");
             this.features.push(evt.feature);
             this.activateFeature(feature);
         },
@@ -246,7 +251,8 @@ export default {
             if (this.activeFeature !== null) {
                 this.activeFeature.setStyle(this.activeFeatureOriginalStyle);
             }
-            this.source.clear();
+
+            this.removeAllDrawnFeatures(this.source);
             this.features = [];
             this.featureTitle = [];
             this.activeFeature = null;
@@ -296,7 +302,7 @@ export default {
                 return;
             }
 
-            this.source.removeFeature(this.source.getFeatures()[index]);
+            this.source.removeFeature(feature);
             this.featureTitle.splice(index, 1);
             this.features.splice(index, 1);
 
@@ -306,6 +312,22 @@ export default {
                 this.activeFeatureOriginalStyle = null;
             }
         },
+
+        /**
+         * Removes all drawn features from the specified source.
+         * @param {ol/source/Vector} source - The source from which to remove drawn features.
+         * @returns {void}
+         */
+        removeAllDrawnFeatures (source) {
+            const drawFeatures = source?.getFeatures().filter(
+                feature => feature.get("storyCreatorType") === "draw"
+            );
+
+            drawFeatures?.forEach(feature => {
+                source.removeFeature(feature);
+            });
+        },
+
         /**
          * Toggles the active state of a feature.
          * @param {ol/Feature} feature - The feature to toggle.

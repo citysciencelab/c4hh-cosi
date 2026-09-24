@@ -31,9 +31,10 @@ function openlayersToGeoJson (features) {
 /**
  * Converts GeoJSON Features to Openlayers features.
  * @param {GeoJSON} features - GeoJSON features.
+ * @param {Object} properties - Properties to set on each OpenLayers feature.
  * @returns {ol/Feature[]} The openlayers features.
  */
-function geoJsonToOpenlayers (features) {
+function geoJsonToOpenlayers (features, properties = {}) {
     const olFeatures = [];
 
     features.forEach(feature => {
@@ -45,6 +46,7 @@ function geoJsonToOpenlayers (features) {
         else {
             olFeature.setStyle(null);
         }
+        olFeature.setProperties(properties);
 
         olFeatures.push(olFeature);
     });
