@@ -6,9 +6,8 @@ import HrDraw from "../../shared/components/HrDraw.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
-import {mapGetters} from "vuex";
+import {mapGetters, mapMutations} from "vuex";
 import {sendWfstTransaction} from "../../shared/js/sendWfstTransaction.js";
-import {wfstAttributes, wfstDateFormat, wfstGeometryName} from "../js/wfstSchema.js";
 
 export default {
     name: "UpdateEdit",
@@ -38,7 +37,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/UpdateRequirements", ["informationType", "wfstId"]),
+        ...mapGetters("Modules/UpdateRequirements", ["informationType", "currentRequirement", "wfstAttributes", "wfstDateFormat", "wfstGeometryName", "wfstId"]),
         ...mapGetters("Maps", ["projectionCode"]),
 
         /**
@@ -57,11 +56,12 @@ export default {
             return {
                 name: this.name.trim(),
                 initiator: this.initiator.trim(),
-                creationDate: this.createdAt.format(wfstDateFormat),
+                creationDate: this.createdAt.format(this.wfstDateFormat),
                 informationType: this.currentOpinion ? `${this.currentOpinion.cat} ${this.currentOpinion.name}` : "",
                 contactPerson: this.contactPerson.trim(),
                 comment: this.comment.trim(),
-                infoLink: this.infoLink.trim()
+                infoLink: this.infoLink.trim(),
+                lastUpate: dayjs().format(this.wfstDateFormat)
             };
         },
 
@@ -82,9 +82,31 @@ export default {
         }
     },
     mounted () {
-        this.currentOpinion = this.informationType[0];
+        if (typeof this.currentRequirement !== "undefined") {
+            this.name = this.currentRequirement?.formValues?.name;
+            this.initiator = this.currentRequirement?.formValues?.initiator;
+            this.contactPerson = this.currentRequirement?.formValues?.contactPerson;
+            this.currentOpinion = this.currentRequirement?.formValues?.informationType ? this.getCurrentOption(this.currentRequirement?.formValues?.informationType) : this.informationType[0];
+            this.comment = this.currentRequirement?.formValues?.comment;
+            this.infoLink = this.currentRequirement?.formValues?.infoLink;
+            this.drawnGeometry = this.currentRequirement?.geometry;
+        }
+        else {
+            this.currentOpinion = this.informationType[0];
+        }
     },
     methods: {
+        ...mapMutations("Modules/UpdateRequirements", ["setCurrentRequirement"]),
+
+        /**
+         * Hets the current option.
+         * @param {String} value the current option in string
+         * @returns {Object} the current option object.
+         */
+        getCurrentOption (value) {
+            return this.informationType.find(type => type.cat === value.split(" ")?.[0] && type.name === value.split(" ")?.[1]);
+        },
+
         /**
          * Handles the save action and sends the report to the WFS-T service.
          * @returns {Promise<void>} resolves when the transaction is finished.
@@ -115,11 +137,15 @@ export default {
                     projectionCode: this.projectionCode,
                     geometry: this.drawnGeometry,
                     formValues: this.formValues,
-                    wfstAttributes,
-                    wfstGeometryName,
+                    wfstAttributes: this.wfstAttributes,
+                    wfstGeometryName: this.wfstGeometryName,
                     transactionMethod: "insert"
                 });
 
+                this.setCurrentRequirement({
+                    geometry: this.drawnGeometry,
+                    formValues: this.formValues
+                });
                 this.$emit("showSnackbarMessage", this.$t("additional:modules.updateRequirements.messages.saveSuccess"));
                 this.$emit("click:save");
             }

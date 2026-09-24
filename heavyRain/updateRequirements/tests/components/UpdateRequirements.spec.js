@@ -1,13 +1,17 @@
 import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
+import sinon from "sinon";
 import UpdateRequirements from "../../components/UpdateRequirements.vue";
 
-
 describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue", () => {
-    let store;
+    let setCurrentRequirementSpy,
+        setCurrentViewSpy,
+        store;
 
     beforeEach(() => {
+        setCurrentRequirementSpy = sinon.spy();
+        setCurrentViewSpy = sinon.spy();
         store = createStore({
             namespaced: true,
             modules: {
@@ -19,7 +23,15 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
                         UpdateRequirements: {
                             namespaced: true,
                             getters: {
+                                currentRequirement: () => {
+                                    return {};
+                                },
+                                currentView: () => "main",
                                 informationType: () => []
+                            },
+                            mutations: {
+                                setCurrentRequirement: setCurrentRequirementSpy,
+                                setCurrentView: setCurrentViewSpy
                             }
                         }
                     }
@@ -43,9 +55,39 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
         });
 
         it("should render UpdateEdit in create-new view", async () => {
-            const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
+            store = createStore({
+                namespaced: true,
+                modules: {
+                    namespaced: true,
+                    Modules: {
+                        namespaced: true,
+                        modules: {
+                            namespaced: true,
+                            UpdateRequirements: {
+                                namespaced: true,
+                                getters: {
+                                    currentRequirement: () => undefined,
+                                    currentView: () => "create-new",
+                                    informationType: () => [
+                                        {
+                                            "cat": "Eingabe",
+                                            "name": "Ortskenntnis",
+                                            "color": "#0055A4"
+                                        },
+                                        {
+                                            "cat": "Aktualisierungsbedarf",
+                                            "name": "SRGK",
+                                            "color": "#D55E00"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    }
+                }
+            });
 
-            await wrapper.setData({currentView: "create-new"});
+            const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
 
             expect(wrapper.findComponent({name: "HrHeader"}).exists()).to.be.false;
             expect(wrapper.findComponent({name: "UpdateEdit"}).exists()).to.be.true;
@@ -79,6 +121,14 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
                             UpdateRequirements: {
                                 namespaced: true,
                                 getters: {
+                                    currentRequirement: () => {
+                                        return {
+                                            formValues: {
+                                                informationType: "Aktualisierungsbedarf SRGK"
+                                            }
+                                        };
+                                    },
+                                    currentView: () => "main",
                                     informationType: () => [
                                         {
                                             "cat": "Eingabe",
@@ -101,9 +151,9 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
             const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
 
             expect(wrapper.vm.currentOpinion).to.deep.equal({
-                "cat": "Eingabe",
-                "name": "Ortskenntnis",
-                "color": "#0055A4"
+                "cat": "Aktualisierungsbedarf",
+                "name": "SRGK",
+                "color": "#D55E00"
             });
         });
     });

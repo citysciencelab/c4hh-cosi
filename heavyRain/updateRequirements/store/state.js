@@ -5,7 +5,12 @@
  * @property {String} type type of the component.
  * @property {String} name - Displayed as title.
  * @property {String} icon - Icon next to title.
+ * @property {Object} currentRequirement - The current requirement.
+ * @property {Object} currentView - The current tab.
  * @property {Object[]} informationType - The information type with the color in lists.
+ * @property {String} wfstAttributes - Names of the attributes of the feature type "ortskenntnisse_aktualisierungsbedarfe".
+ * @property {String} wfstGeometryName - Name of the geometry attribute. It is written after all other attributes, as it is the last element of the schema..
+ * @property {String} wfstDateFormat - Format in which date attributes are sent to the service..
  * @property {String} wfstId - Id of the WFS-T layer the reports are written to.
  */
 const state = {
@@ -13,7 +18,8 @@ const state = {
     type: "updateRequirements",
     name: "additional:modules.updateRequirements.title",
     icon: "bi-building",
-    wfstId: "36013",
+    currentRequirement: undefined,
+    currentView: "main",
     informationType: [
         {
             "cat": "Eingabe",
@@ -45,7 +51,19 @@ const state = {
             "name": "Starkregenereignis",
             "color": "#512DA8"
         }
-    ]
+    ],
+    wfstAttributes: {
+        comment: "beschreibung",
+        name: "name",
+        initiator: "initiator",
+        informationType: "art_der_angabe",
+        contactPerson: "ansprechpartner",
+        infoLink: "infolink",
+        creationDate: "eingabedatum"
+    },
+    wfstGeometryName: "geom",
+    wfstDateFormat: "YYYY-MM-DD",
+    wfstId: "36013"
 };
 
 export default state;

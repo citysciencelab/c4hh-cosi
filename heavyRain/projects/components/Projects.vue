@@ -18,18 +18,23 @@ export default {
         return {
             showSnackbar: false,
             snackbarMessage: "",
-            snackbarColor: "success",
-            chosenCriteria: []
+            snackbarColor: "success"
         };
     },
     computed: {
-        ...mapGetters("Modules/Projects", ["criteria", "currentView"])
-    },
-    mounted () {
-        this.chosenCriteria = [this.criteria[1], this.criteria[0]];
+        ...mapGetters("Modules/Projects", ["criteria", "currentProject", "currentView"])
     },
     methods: {
-        ...mapMutations("Modules/Projects", ["setCurrentView"]),
+        ...mapMutations("Modules/Projects", ["setCurrentProject", "setCurrentView"]),
+
+        /**
+         * Creates a new project
+         * @returns {void}
+         */
+        createProject () {
+            this.setCurrentProject(undefined);
+            this.setCurrentView("edit");
+        },
 
         /**
          * Gets the background color.
@@ -44,7 +49,7 @@ export default {
             const index = [];
 
             val.forEach(chosenCri => {
-                index.push(this.criteria.findIndex(cri => cri.name === chosenCri.name));
+                index.push(this.criteria.findIndex(cri => cri.name === chosenCri.trim()));
             });
 
             return this.criteria[Math.min(...index)].color;
@@ -71,118 +76,123 @@ export default {
             <HrHeader
                 :text="$t('additional:modules.projects.description')"
                 :button-text="$t('additional:modules.projects.createProject')"
-                @click:button="setCurrentView('edit')"
+                @click:button="createProject"
             />
             <HrCard
-                title="Projektname"
-                edit-aria-label="Projekt bearbeiten"
+                v-if="typeof currentProject !== 'undefined'"
+                :title="$t('additional:modules.projects.labels.projectName')"
+                :edit-aria-label="$t('additional:modules.projects.labels.editProject')"
                 @click:edit="setCurrentView('edit')"
             >
                 <template #above-title>
                     <div class="d-flex flex-wrap gap-2">
                         <span
-                            v-for="(cri, index) in chosenCriteria"
+                            v-for="(cri, index) in currentProject?.formValues?.criteria.split(',')"
                             :key="index"
-                            :style="{background: getBgcolor(chosenCriteria)}"
+                            :style="{background: getBgcolor(currentProject?.formValues?.criteria.split(','))}"
                             class="badge rounded-pill fw-normal px-3 py-2"
                         >
-                            {{ cri.name }}
+                            {{ cri }}
                         </span>
                     </div>
                 </template>
 
-                <div class="row g-3 mb-3">
-                    <div class="col-6">
-                        <p class="mb-0 small fw-semibold">
-                            Eingetragen von
-                        </p>
-                        <p class="mb-0 text-body-secondary">
-                            Lorem Ipsum
-                        </p>
+                <template #card>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <p class="mb-0 small fw-semibold">
+                                {{ $t("additional:modules.projects.labels.createdBy") }}
+                            </p>
+                            <p class="mb-0 text-body-secondary">
+                                {{ currentProject?.formValues?.creator }}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-0 small fw-semibold">
+                                {{ $t("additional:modules.projects.labels.lastUpdate") }}
+                            </p>
+                            <p class="mb-0">
+                                {{ currentProject?.formValues?.createdAt }}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-0 small fw-semibold">
+                                {{ $t("additional:modules.projects.labels.startDate") }}
+                            </p>
+                            <p class="mb-0">
+                                {{ currentProject?.formValues?.startDate }}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-0 small fw-semibold">
+                                {{ $t("additional:modules.projects.labels.endDate") }}
+                            </p>
+                            <p class="mb-0">
+                                {{ currentProject?.formValues?.endDate }}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-0 small fw-semibold">
+                                {{ $t("additional:modules.projects.labels.contact") }}
+                            </p>
+                            <p class="mb-0 text-body-secondary">
+                                {{ currentProject?.formValues?.contactPerson }}
+                            </p>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <p class="mb-0 small fw-semibold">
-                            Aktualisierung
+
+                    <section class="mb-3">
+                        <h6 class="mb-1 fw-semibold">
+                            {{ $t("additional:modules.projects.labels.description") }}
+                        </h6>
+                        <p class="mb-2">
+                            {{ currentProject?.formValues?.description }}
                         </p>
+                        <a
+                            :href="currentProject?.formValues?.infoLink"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {{ currentProject?.formValues?.infoLink }}
+                        </a>
+                    </section>
+
+                    <section class="mb-3">
+                        <h6 class="mb-1 fw-semibold">
+                            {{ $t("additional:modules.projects.labels.source") }}
+                        </h6>
                         <p class="mb-0">
-                            23.02.2026
+                            {{ currentProject?.formValues?.source }}
                         </p>
-                    </div>
-                    <div class="col-6">
-                        <p class="mb-0 small fw-semibold">
-                            Baubeginn
-                        </p>
+                    </section>
+
+                    <section class="mb-3">
+                        <h6 class="mb-1 fw-semibold">
+                            {{ $t("additional:modules.projects.labels.contactExt") }}
+                        </h6>
                         <p class="mb-0">
-                            01.01.2025
+                            {{ currentProject?.formValues?.contactExt }}
                         </p>
-                    </div>
-                    <div class="col-6">
-                        <p class="mb-0 small fw-semibold">
-                            Bauende
-                        </p>
+                    </section>
+
+                    <section class="mb-3">
+                        <h6 class="mb-1 fw-semibold">
+                            {{ $t("additional:modules.projects.labels.history") }}
+                        </h6>
                         <p class="mb-0">
-                            01.08.2025
+                            {{ currentProject?.formValues?.history }}
                         </p>
-                    </div>
-                    <div class="col-6">
-                        <p class="mb-0 small fw-semibold">
-                            Ansprechpartner
+                    </section>
+
+                    <section class="mb-0">
+                        <h6 class="mb-1 fw-semibold">
+                            {{ $t("additional:modules.projects.labels.protectedAreas") }}
+                        </h6>
+                        <p class="mb-0">
+                            {{ currentProject?.formValues?.protectedAreas }}
                         </p>
-                        <p class="mb-0 text-body-secondary">
-                            Lorem ipsum dolor sit amet
-                        </p>
-                    </div>
-                </div>
-
-                <section class="mb-3">
-                    <h6 class="mb-1 fw-semibold">
-                        Kurzbeschreibung / Art der Massnahme
-                    </h6>
-                    <p class="mb-2">
-                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr...
-                    </p>
-                    <a
-                        href="https://www.infolink.de"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >www.infolink.de</a>
-                </section>
-
-                <section class="mb-3">
-                    <h6 class="mb-1 fw-semibold">
-                        Quelle
-                    </h6>
-                    <p class="mb-0">
-                        Lorem ipsum dolor sit amet...
-                    </p>
-                </section>
-
-                <section class="mb-3">
-                    <h6 class="mb-1 fw-semibold">
-                        Kontakt extern
-                    </h6>
-                    <p class="mb-0">
-                        Lorem ipsum dolor sit amet...
-                    </p>
-                </section>
-
-                <section class="mb-3">
-                    <h6 class="mb-1 fw-semibold">
-                        Historie - Zeitpunkt und Meldungen
-                    </h6>
-                    <p class="mb-0">
-                        Lorem ipsum dolor sit amet...
-                    </p>
-                </section>
-
-                <section class="mb-0">
-                    <h6 class="mb-1 fw-semibold">
-                        Bereiche, wo die Kriterien des Schutzniveaus erreicht sind
-                    </h6>
-                    <p class="mb-0">
-                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr
-                    </p>
-                </section>
+                    </section>
+                </template>
             </HrCard>
         </div>
 

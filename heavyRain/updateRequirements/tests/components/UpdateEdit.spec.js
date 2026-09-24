@@ -42,7 +42,30 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
                                         "color": "#D55E00"
                                     }
                                 ],
+                                currentRequirement: () => undefined,
+                                wfstAttributes: () => {
+                                    return {
+                                        projectName: "projektname",
+                                        creator: "initiator",
+                                        startDate: "baubeginn",
+                                        endDate: "bauende",
+                                        source: "quelle",
+                                        contactPerson: "ansprechpartner",
+                                        lastUpdate: "letzte_aktualisierung",
+                                        description: "art_der_massnahme",
+                                        contactExt: "kontakt_extern",
+                                        infoLink: "info_link",
+                                        criteria: "kriterien",
+                                        history: "historie",
+                                        protectedAreas: "schutzniveau"
+                                    };
+                                },
+                                wfstGeometryName: () => "geom",
+                                wfstDateFormat: () => "YYYY-MM-DD",
                                 wfstId: () => "36013"
+                            },
+                            mutations: {
+                                setCurrentRequirement: sinon.spy()
                             }
                         }
                     }

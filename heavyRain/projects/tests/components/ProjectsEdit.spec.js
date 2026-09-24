@@ -11,10 +11,12 @@ import wfs from "@masterportal/masterportalapi/src/layer/wfs";
 describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
     let drawnGeometry,
         setCurrentViewSpy,
+        setCurrentProject,
         store;
 
     beforeEach(() => {
         setCurrentViewSpy = sinon.spy();
+        setCurrentProject = sinon.spy();
         store = createStore({
             namespaced: true,
             modules: {
@@ -44,10 +46,31 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
                                     "name": "Bekannte Bereiche (z.B. Presse)",
                                     "color": "#D55E00"
                                 }],
+                                currentProject: () => undefined,
+                                wfstAttributes: () => {
+                                    return {
+                                        projectName: "projektname",
+                                        creator: "initiator",
+                                        startDate: "baubeginn",
+                                        endDate: "bauende",
+                                        source: "quelle",
+                                        contactPerson: "ansprechpartner",
+                                        lastUpdate: "letzte_aktualisierung",
+                                        description: "art_der_massnahme",
+                                        contactExt: "kontakt_extern",
+                                        infoLink: "info_link",
+                                        criteria: "kriterien",
+                                        history: "historie",
+                                        protectedAreas: "schutzniveau"
+                                    };
+                                },
+                                wfstGeometryName: () => "geom",
+                                wfstDateFormat: () => "YYYY-MM-DD",
                                 wfstId: () => "36016"
                             },
                             mutations: {
-                                setCurrentView: setCurrentViewSpy
+                                setCurrentView: setCurrentViewSpy,
+                                setCurrentProject: setCurrentProject
                             }
                         }
                     }
@@ -146,7 +169,6 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
             expect(wrapper.vm.formValues.projectName).to.equal("name");
             expect(wrapper.vm.formValues.startDate).to.equal("2026-01-01");
             expect(wrapper.vm.formValues.criteria).to.equal("Bauprojekte (Umsetzungsmaßnahmen), Bekannte Bereiche (z.B. Presse)");
-            expect(wrapper.vm.formValues.lastUpdate).to.match(/^\d{4}-\d{2}-\d{2}$/);
         });
 
         it("should detect a drawn geometry", async () => {

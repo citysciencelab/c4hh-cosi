@@ -9,7 +9,6 @@ import InputText from "@shared/modules/inputs/components/InputText.vue";
 import {mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import {sendWfstTransaction} from "../../shared/js/sendWfstTransaction.js";
-import {wfstAttributes, wfstDateFormat, wfstGeometryName} from "../js/wfstSchema.js";
 
 export default {
     name: "ProjectsEdit",
@@ -44,7 +43,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/Projects", ["criteria", "wfstId"]),
+        ...mapGetters("Modules/Projects", ["criteria", "currentProject", "wfstAttributes", "wfstDateFormat", "wfstGeometryName", "wfstId"]),
         ...mapGetters("Maps", ["projectionCode"]),
 
         /**
@@ -56,12 +55,13 @@ export default {
                 contactExt: this.contactExt.trim(),
                 contactPerson: this.contactPerson.trim(),
                 creator: this.creator.trim(),
+                createdAt: dayjs().format(this.wfstDateFormat),
                 criteria: this.chosenCriteria.map(cri => cri.name).join(", "),
                 description: this.description.trim(),
                 endDate: this.endDate,
                 history: this.history.trim(),
                 infoLink: this.infoLink.trim(),
-                lastUpdate: dayjs().format(wfstDateFormat),
+                lastUpdate: dayjs().format(this.wfstDateFormat),
                 projectName: this.projectName.trim(),
                 protectedAreas: this.protectedAreas.trim(),
                 source: this.source.trim(),
@@ -95,8 +95,44 @@ export default {
             return convertColor(this.criteria[Math.min(...index)].color, "rgb");
         }
     },
+    mounted () {
+        if (typeof this.currentProject !== "undefined") {
+            this.chosenCriteria = this.getChosenCriteria(this.currentProject?.formValues?.criteria);
+            this.projectName = this.currentProject?.formValues?.projectName;
+            this.creator = this.currentProject?.formValues?.creator;
+            this.contactPerson = this.currentProject?.formValues?.contactPerson;
+            this.startDate = this.currentProject?.formValues?.startDate;
+            this.endDate = this.currentProject?.formValues?.endDate;
+            this.source = this.currentProject?.formValues?.source;
+            this.description = this.currentProject?.formValues?.description;
+            this.contactExt = this.currentProject?.formValues?.contactExt;
+            this.infoLink = this.currentProject?.formValues?.infoLink;
+            this.history = this.currentProject?.formValues?.history;
+            this.protectedAreas = this.currentProject?.formValues?.protectedAreas;
+            this.drawnGeometry = this.currentProject?.geometry;
+        }
+    },
     methods: {
-        ...mapMutations("Modules/Projects", ["setCurrentView"]),
+        ...mapMutations("Modules/Projects", ["setCurrentView", "setCurrentProject"]),
+
+        /**
+         * Gets the parsed chosen criteria.
+         * @param {String} value the criteria in string.
+         * @returns {Object[]} the chosen criteria.
+         */
+        getChosenCriteria (value) {
+            const result = [];
+
+            if (typeof value !== "string" || value === "") {
+                return result;
+            }
+
+            value.split(",").forEach(val => {
+                result.push(...this.criteria.filter(cri => cri.name === val.trim()));
+            });
+
+            return result;
+        },
 
         /**
          * Handles the save action and sends the project to the WFS-T service.
@@ -128,12 +164,16 @@ export default {
                     projectionCode: this.projectionCode,
                     geometry: this.drawnGeometry,
                     formValues: this.formValues,
-                    wfstAttributes,
-                    wfstGeometryName,
+                    wfstAttributes: this.wfstAttributes,
+                    wfstGeometryName: this.wfstGeometryName,
                     transactionMethod: "insert"
                 });
 
                 this.$emit("showSnackbarMessage", this.$t("additional:modules.projects.messages.saveSuccess"));
+                this.setCurrentProject({
+                    geometry: this.drawnGeometry,
+                    formValues: this.formValues
+                });
                 this.setCurrentView("main");
             }
             catch (error) {

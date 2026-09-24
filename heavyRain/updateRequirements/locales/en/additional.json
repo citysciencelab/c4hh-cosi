@@ -17,7 +17,10 @@
         "commentOptional": "Comment/ description (optional)",
         "infolinkOptional": "Info link (optional)",
         "uploadOptional": "Upload image (optional)",
-        "pleaseSelect": "Please select"
+        "pleaseSelect": "Please select",
+        "lastUpdate": "Last update",
+        "createdAt": "Created on: ",
+        "createdBy": "Created by: "
       },
       "messages": {
         "invalid": "The input fields for name, initiator and contact person can not be left blank.",

@@ -27,10 +27,11 @@ describe("addons/heavyRain/projects/components/Projects.vue", () => {
                                     "name": "Bekannte Bereiche (z.B. Presse)",
                                     "color": "#D55E00"
                                 }],
-                                currentView: () => "main"
+                                currentView: () => "main",
+                                currentProject: () => undefined
                             },
                             mutations: {
-                                setCurrentView: sinon.stub()
+                                setCurrentView: sinon.spy()
                             }
                         }
                     }
@@ -63,10 +64,7 @@ describe("addons/heavyRain/projects/components/Projects.vue", () => {
 
             it("should return the right color from chosen criteria", () => {
                 const wrapper = shallowMount(Projects, {global: {plugins: [store]}}),
-                    chosenCriteria = [{
-                        "name": "Bekannte Bereiche (z.B. Presse)",
-                        "color": "#D55E00"
-                    }];
+                    chosenCriteria = ["Bekannte Bereiche (z.B. Presse)"];
 
                 expect(wrapper.vm.getBgcolor(chosenCriteria)).to.deep.equal("#D55E00");
             });

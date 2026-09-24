@@ -17,7 +17,10 @@
         "commentOptional": "Kommentar/ Beschreibung (optional)",
         "infolinkOptional": "Infolink (optional)",
         "uploadOptional": "Bild hochladen (optional)",
-        "pleaseSelect": "Bitte wählen"
+        "pleaseSelect": "Bitte wählen",
+        "lastUpdate": "letzte Aktualisierung",
+        "createdAt": "erstellt am: ",
+        "createdBy": "Initiator: "
       },
       "messages": {
         "invalid": "Die Eingabefelder für Name, Initiator und Ansprechpartner dürfen nicht leer sein.",
