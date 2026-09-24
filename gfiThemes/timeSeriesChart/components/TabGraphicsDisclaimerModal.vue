@@ -145,11 +145,6 @@ export default {
         width: 90%;
     }
 
-    div:first-child {
-        display: flex;
-        justify-content: end;
-    }
-
     p {
         margin: 0 1rem 1rem 0;
         font-size: 1rem;
