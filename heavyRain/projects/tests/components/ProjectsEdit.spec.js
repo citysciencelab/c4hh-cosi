@@ -1,5 +1,6 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
+import layerCollection from "@core/layers/js/layerCollection.js";
 import Polygon from "ol/geom/Polygon.js";
 import ProjectsEdit from "../../components/ProjectsEdit.vue";
 import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
@@ -66,7 +67,7 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
                                 },
                                 wfstGeometryName: () => "geom",
                                 wfstDateFormat: () => "YYYY-MM-DD",
-                                wfstId: () => "36016"
+                                wfstLayerId: () => "36016"
                             },
                             mutations: {
                                 setCurrentView: setCurrentViewSpy,
@@ -222,6 +223,20 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
             expect(setCurrentViewSpy.calledOnce).to.be.true;
         });
 
+        it("should reload the layer of the saved projects after the project was inserted", async () => {
+            const refreshSpy = sinon.spy(),
+                getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").returns({getLayerSource: () => ({refresh: refreshSpy})}),
+                wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36016", url: "https://example.com/wfs"});
+            sinon.stub(wfs, "sendTransaction").resolves("feature");
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", drawnGeometry, projectName: "name"});
+            await wrapper.vm.onSave();
+
+            expect(getLayerByIdStub.calledOnceWith("36016")).to.be.true;
+            expect(refreshSpy.calledOnce).to.be.true;
+        });
+
         it("should send the values of the form under the attribute names of the projects service", async () => {
             const sendTransactionStub = sinon.stub(wfs, "sendTransaction").resolves("feature"),
                 wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
@@ -241,7 +256,8 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
         });
 
         it("should show a message and keep the form open if the transaction fails", async () => {
-            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+            const getLayerByIdSpy = sinon.spy(layerCollection, "getLayerById"),
+                wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
 
             sinon.stub(console, "error");
             sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36016", url: "https://example.com/wfs"});
@@ -249,6 +265,7 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
             await wrapper.setData({contactPerson: "contactPerson", creator: "creator", drawnGeometry, projectName: "name"});
             await wrapper.vm.onSave();
 
+            expect(getLayerByIdSpy.notCalled).to.be.true;
             expect(wrapper.vm.isSaving).to.be.false;
             expect(wrapper.vm.showSnackbar).to.be.true;
             expect(setCurrentViewSpy.notCalled).to.be.true;

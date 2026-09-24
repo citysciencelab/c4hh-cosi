@@ -1,5 +1,6 @@
 import {createStore} from "vuex";
 import {expect} from "chai";
+import layerCollection from "@core/layers/js/layerCollection.js";
 import Polygon from "ol/geom/Polygon.js";
 import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 import {shallowMount} from "@vue/test-utils";
@@ -62,7 +63,7 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
                                 },
                                 wfstGeometryName: () => "geom",
                                 wfstDateFormat: () => "YYYY-MM-DD",
-                                wfstId: () => "36013"
+                                wfstLayerId: () => "36013"
                             },
                             mutations: {
                                 setCurrentRequirement: sinon.spy()
@@ -186,8 +187,23 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
             expect(wrapper.emitted("click:save")).to.not.be.undefined;
         });
 
+        it("should reload the layer of the saved reports after the report was inserted", async () => {
+            const refreshSpy = sinon.spy(),
+                getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").returns({getLayerSource: () => ({refresh: refreshSpy})}),
+                wrapper = await mountFilledForm();
+
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36013", url: "https://example.com/wfs"});
+            sinon.stub(wfs, "sendTransaction").resolves("feature");
+
+            await wrapper.vm.onSave();
+
+            expect(getLayerByIdStub.calledOnceWith("36013")).to.be.true;
+            expect(refreshSpy.calledOnce).to.be.true;
+        });
+
         it("should show a message and keep the form open if the transaction fails", async () => {
-            const wrapper = await mountFilledForm();
+            const getLayerByIdSpy = sinon.spy(layerCollection, "getLayerById"),
+                wrapper = await mountFilledForm();
 
             sinon.stub(console, "error");
             sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36013", url: "https://example.com/wfs"});
@@ -195,6 +211,7 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
 
             await wrapper.vm.onSave();
 
+            expect(getLayerByIdSpy.notCalled).to.be.true;
             expect(wrapper.vm.isSaving).to.be.false;
             expect(wrapper.vm.showSnackbar).to.be.true;
             expect(wrapper.emitted("click:save")).to.be.undefined;

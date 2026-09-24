@@ -11,7 +11,7 @@
  * @property {String} wfstAttributes - Names of the attributes of the feature type "ortskenntnisse_aktualisierungsbedarfe".
  * @property {String} wfstGeometryName - Name of the geometry attribute. It is written after all other attributes, as it is the last element of the schema..
  * @property {String} wfstDateFormat - Format in which date attributes are sent to the service..
- * @property {String} wfstId - Id of the WFS-T layer the reports are written to.
+ * @property {String} wfstLayerId - Id of the WFS-T layer the reports are written to. It is shown on the map when the module is opened.
  */
 const state = {
     id: "updateRequirements",
@@ -63,7 +63,7 @@ const state = {
     },
     wfstGeometryName: "geom",
     wfstDateFormat: "YYYY-MM-DD",
-    wfstId: "36013"
+    wfstLayerId: "36013"
 };
 
 export default state;

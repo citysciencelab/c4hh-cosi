@@ -1,8 +1,10 @@
 <script>
+import {createPolygonStyle} from "../../shared/js/createPolygonStyle.js";
 import HrCard from "../../shared/components/HrCard.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
-import {mapGetters, mapMutations} from "vuex";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import ProjectsEdit from "./ProjectsEdit.vue";
 
 export default {
@@ -22,9 +24,23 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/Projects", ["criteria", "currentProject", "currentView"])
+        ...mapGetters("Modules/Projects", ["criteria", "currentProject", "currentView", "wfstAttributes", "wfstLayerId"])
+    },
+    async mounted () {
+        if (this.wfstLayerId) {
+            await this.addOrReplaceLayer({layerId: this.wfstLayerId, visibility: true});
+            // the layer is created by a watcher of the layer config, so it exists after the next tick
+            await this.$nextTick();
+            layerCollection.getLayerById(this.wfstLayerId)?.setStyle(createPolygonStyle(this.getFeatureColor));
+        }
+    },
+    unmounted () {
+        if (this.wfstLayerId) {
+            this.replaceByIdInLayerConfig({layerConfigs: [{id: this.wfstLayerId, layer: {visibility: false}}]});
+        }
     },
     methods: {
+        ...mapActions(["addOrReplaceLayer", "replaceByIdInLayerConfig"]),
         ...mapMutations("Modules/Projects", ["setCurrentProject", "setCurrentView"]),
 
         /**
@@ -53,6 +69,18 @@ export default {
             });
 
             return this.criteria[Math.min(...index)].color;
+        },
+
+        /**
+         * Gets the color of a saved project on the map.
+         * A project with several criteria gets the color of the criterion with the highest priority.
+         * @param {module:ol/Feature} feature the saved project.
+         * @returns {String} the hex color.
+         */
+        getFeatureColor (feature) {
+            const names = feature.get(this.wfstAttributes.criteria)?.split(",") || [];
+
+            return this.getBgcolor(names.filter(name => this.criteria.some(cri => cri.name === name.trim())));
         },
 
         /**

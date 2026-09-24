@@ -1,8 +1,10 @@
 <script>
+import {createPolygonStyle} from "../../shared/js/createPolygonStyle.js";
 import HrCard from "../../shared/components/HrCard.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
-import {mapGetters, mapMutations} from "vuex";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import UpdateEdit from "./UpdateEdit.vue";
 
 export default {
@@ -21,7 +23,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/UpdateRequirements", ["informationType", "currentRequirement", "currentView"]),
+        ...mapGetters("Modules/UpdateRequirements", ["informationType", "currentRequirement", "currentView", "wfstAttributes", "wfstLayerId"]),
 
         /**
          * Gets the current opinion.
@@ -31,8 +33,35 @@ export default {
             return this.informationType.find(type => `${type.cat} ${type.name}` === this.currentRequirement?.formValues?.informationType);
         }
     },
+    async mounted () {
+        if (this.wfstLayerId) {
+            await this.addOrReplaceLayer({layerId: this.wfstLayerId, visibility: true});
+            // the layer is created by a watcher of the layer config, so it exists after the next tick
+            await this.$nextTick();
+            layerCollection.getLayerById(this.wfstLayerId)?.setStyle(createPolygonStyle(this.getFeatureColor));
+        }
+    },
+    unmounted () {
+        if (this.wfstLayerId) {
+            this.replaceByIdInLayerConfig({layerConfigs: [{id: this.wfstLayerId, layer: {visibility: false}}]});
+        }
+    },
     methods: {
+        ...mapActions(["addOrReplaceLayer", "replaceByIdInLayerConfig"]),
         ...mapMutations("Modules/UpdateRequirements", ["setCurrentRequirement", "setCurrentView"]),
+
+        /**
+         * Gets the color of a saved report on the map by its information type.
+         * A report with an unknown information type gets the color of the first information type.
+         * @param {module:ol/Feature} feature the saved report.
+         * @returns {String|undefined} the hex color.
+         */
+        getFeatureColor (feature) {
+            const value = feature.get(this.wfstAttributes.informationType),
+                  type = this.informationType.find(({cat, name}) => `${cat} ${name}` === value);
+
+            return (type || this.informationType[0])?.color;
+        },
 
         /**
          * Shows a snackbar message.

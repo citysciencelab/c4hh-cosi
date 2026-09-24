@@ -6,6 +6,7 @@ import HrDraw from "../../shared/components/HrDraw.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
+import layerCollection from "@core/layers/js/layerCollection.js";
 import {mapGetters, mapMutations} from "vuex";
 import {sendWfstTransaction} from "../../shared/js/sendWfstTransaction.js";
 
@@ -37,7 +38,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/UpdateRequirements", ["informationType", "currentRequirement", "wfstAttributes", "wfstDateFormat", "wfstGeometryName", "wfstId"]),
+        ...mapGetters("Modules/UpdateRequirements", ["informationType", "currentRequirement", "wfstAttributes", "wfstDateFormat", "wfstGeometryName", "wfstLayerId"]),
         ...mapGetters("Maps", ["projectionCode"]),
 
         /**
@@ -133,7 +134,7 @@ export default {
 
             try {
                 await sendWfstTransaction({
-                    wfstId: this.wfstId,
+                    wfstId: this.wfstLayerId,
                     projectionCode: this.projectionCode,
                     geometry: this.drawnGeometry,
                     formValues: this.formValues,
@@ -142,6 +143,7 @@ export default {
                     transactionMethod: "insert"
                 });
 
+                layerCollection.getLayerById(this.wfstLayerId)?.getLayerSource()?.refresh();
                 this.setCurrentRequirement({
                     geometry: this.drawnGeometry,
                     formValues: this.formValues
