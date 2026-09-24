@@ -4,7 +4,7 @@ import {actionCallback} from "./actionCallback.js";
 import {configCommands} from "./configCommands.js";
 import {mutationCallback} from "./mutationCallback.js";
 import {piniaActionCallback} from "./piniaActionCallback.js";
-import {trackMatomoEvent} from "./trackMatomo.js";
+import {trackMatomoEvent, trackMatomoPageView} from "./trackMatomo.js";
 import {assembleSourceInfoForEvent, getBaseUrl, stripBodyParameterFromHref} from "./util.js";
 
 /**
@@ -100,7 +100,10 @@ export function initializeMatomo (config) {
     });
 
     if (config.trackInitialView) {
-        window._paq.push(["trackPageView"]);
+        trackMatomoPageView({
+            url: `${getBaseUrl()}${decodeURI(window.location.search)}`,
+            title: document.title
+        });
     }
 
     const scriptElement = document.createElement("script");

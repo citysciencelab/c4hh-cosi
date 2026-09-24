@@ -7,6 +7,7 @@ import {handleChangeCurrentComponent} from "./handler/handleChangeCurrentCompone
 import {handleChangeLocale} from "./handler/handleChangeLocale.js";
 import {handleChangeMapMode} from "./handler/handleChangeMapMode.js";
 import {handleChangeVisibility} from "./handler/handleChangeVisibility.js";
+import {handleClickedMenuElement} from "./handler/handleClickedMenuElement.js";
 import {handleCreatePrintJob} from "./handler/handleCreatePrintJob.js";
 import {handleDoRequestForSdpDownload} from "./handler/handleDoRequestForSdpDownload.js";
 import {handleDrawClearLayer} from "./handler/handleDrawClearLayer.js";
@@ -39,7 +40,6 @@ import {handleRotate} from "./handler/handleRotate.js";
 import {handleSearch} from "./handler/handleSearch.js";
 import {handleToggleMenu} from "./handler/handleToggleMenu.js";
 import {handleUpdateLayerTransparency} from "./handler/handleUpdateLayerTransparency.js";
-import {convertRgbStringToPackedColorValue} from "./util.js";
 
 /**
  * Evaluates a dispatched Vuex action and triggers the corresponding Matomo tracking event.
@@ -72,6 +72,9 @@ export function actionCallback (action, store) {
                 break;
             case "Menu/changeCurrentComponent":
                 handleChangeCurrentComponent(action.payload, store);
+                break;
+            case "Menu/clickedMenuElement":
+                handleClickedMenuElement(action.payload);
                 break;
             case "Menu/navigateBack":
                 handleMenuNavigateBack(action.payload, store);
@@ -107,27 +110,21 @@ export function actionCallback (action, store) {
                 });
                 break;
             case "Modules/Draw_old/setCircleRadius":
-                handleDrawSetCircleRadius({isOuter: false, value: action.payload});
+                handleDrawSetCircleRadius({isOuter: false});
                 break;
             case "Modules/Draw_old/setCircleOuterRadius":
-                handleDrawSetCircleRadius({isOuter: true, value: action.payload});
+                handleDrawSetCircleRadius({isOuter: true});
                 break;
             case "Modules/Draw_old/setColor":
                 handleDrawSetColor({
                     isOuter: false,
-                    type: "fill",
-                    value: convertRgbStringToPackedColorValue(
-                        action.payload.target.value
-                    )
+                    type: "fill"
                 });
                 break;
             case "Modules/Draw_old/setColorContour":
                 handleDrawSetColor({
                     isOuter: false,
-                    type: "stroke",
-                    value: convertRgbStringToPackedColorValue(
-                        action.payload.target.value
-                    )
+                    type: "stroke"
                 });
                 break;
             case "Modules/Draw_old/setDownloadSelectedFormat":
@@ -144,7 +141,7 @@ export function actionCallback (action, store) {
                 handleDrawSetFontName(action.payload.target.value);
                 break;
             case "Modules/Draw_old/setFontSize":
-                handleDrawSetFontSize(action.payload.target.value);
+                handleDrawSetFontSize();
                 break;
             case "Modules/Draw_old/setOpacity":
                 handleDrawSetFillTransparency({
@@ -155,10 +152,7 @@ export function actionCallback (action, store) {
             case "Modules/Draw_old/setOuterColorContour":
                 handleDrawSetColor({
                     isOuter: true,
-                    type: "stroke",
-                    value: convertRgbStringToPackedColorValue(
-                        action.payload.target.value
-                    )
+                    type: "stroke"
                 });
                 break;
             case "Modules/Draw_old/setSquareMethod":

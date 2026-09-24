@@ -1,3 +1,5 @@
+import {getLowerCasedPathname} from "./util";
+
 /**
  * Maps of configuration command handlers for Matomo initialization.
  *
@@ -14,7 +16,7 @@ export const configCommands = {
             window._paq.push([
                 "setCustomDimension",
                 dimId,
-                window.location.pathname.split("/").filter(Boolean).reverse()[0] ?? "unknown"
+                getLowerCasedPathname().split("/").filter(Boolean).reverse()[0] ?? "unknown"
             ]);
         }]
     ]),

@@ -15,16 +15,14 @@ export function assembleSourceInfoForEvent (funcName, compName) {
  * @param {String} action The Matomo action text describing what happened.
  * @param {Object} params The parameter object.
  * @param {String} params.funcName The name of the calling handler function, used as "_source".
- * @param {Number} [params.value] The numeric value to attach to the event, if any.
  * @param {String} [params.version] The draw tool version (e.g. "2026"), undefined for the legacy tool.
  * @returns {void}
  */
-export function trackDrawToolEvent (action, {funcName, value, version}) {
+export function trackDrawToolEvent (action, {funcName, version}) {
     trackMatomoEvent({
         category: "Tool",
         action,
         name: getDrawToolNameFromVersion(version),
-        ...value !== undefined ? {value} : {},
         _source: assembleSourceInfoForEvent(funcName)
     });
 }
@@ -37,44 +35,18 @@ const drawToolEventTimeouts = new Map();
  * @param {String} action The Matomo action text describing what happened.
  * @param {Object} params The parameter object.
  * @param {String} params.funcName The name of the calling handler function, used as debounce key and "_source".
- * @param {Number} [params.value] The numeric value to attach to the event, if any.
  * @param {String} [params.version] The draw tool version (e.g. "2026"), undefined for the legacy tool.
  * @returns {void}
  */
-export function trackDrawToolEventDebounced (action, {funcName, value, version}) {
+export function trackDrawToolEventDebounced (action, {funcName, version}) {
     if (drawToolEventTimeouts.has(funcName)) {
         clearTimeout(drawToolEventTimeouts.get(funcName));
     }
 
     drawToolEventTimeouts.set(funcName, setTimeout(() => {
-        trackDrawToolEvent(action, {funcName, value, version});
+        trackDrawToolEvent(action, {funcName, version});
         drawToolEventTimeouts.delete(funcName);
     }, 500));
-}
-
-/**
- * Converts an [r, g, b] array into a single packed integer (0xRRGGBB), as used for Matomo event values.
- * Throws error if the array does not have exactly 3 entries.
- * @param {Number[]} rgbArr The RGB array, e.g. [255, 0, 0].
- * @returns {Number} The packed color value.
- */
-export function convertRgbArrayToPackedColorValue (rgbArr) {
-    if (!Array.isArray(rgbArr) || rgbArr.length !== 3) {
-        throw new Error(`${convertRgbArrayToPackedColorValue.name}: invalid rgb value`);
-    }
-
-    return (rgbArr[0] << 16) | (rgbArr[1] << 8) | rgbArr[2];
-}
-
-/**
- * Converts a comma-separated "r,g,b" string into a single packed integer (0xRRGGBB).
- * @param {String} rgbAsString The RGB string, e.g. "255,0,0".
- * @returns {Number} The packed color value.
- */
-export function convertRgbStringToPackedColorValue (rgbAsString) {
-    return convertRgbArrayToPackedColorValue(
-        rgbAsString.split(",").map(value => parseInt(value, 10))
-    );
 }
 
 /**
@@ -98,7 +70,7 @@ export function convertToUriCompatible (text) {
  * @returns {String} The base URL (e.g. "https://localhost:9001/portal/master").
  */
 export function getBaseUrl () {
-    return `${window.location.origin}${window.location.pathname}`;
+    return `${window.location.origin}${getLowerCasedPathname()}`;
 }
 
 /**
@@ -119,6 +91,14 @@ export function getDrawToolNameFromVersion (version) {
  */
 export function getLayerInformation (layerId, store) {
     return layerId ? `Layer: ${store.getters.layerConfigById(layerId)?.name} (id: ${layerId})` : "LayerId unknown";
+}
+
+/**
+ * Returns the location.pathname as lowercase string
+ * @returns {String} The location.pathname as lowercase string
+ */
+export function getLowerCasedPathname () {
+    return window.location.pathname.toLowerCase();
 }
 
 /**

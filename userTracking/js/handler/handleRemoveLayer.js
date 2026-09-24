@@ -18,7 +18,7 @@ export function handleRemoveLayer (payload, store) {
 
     trackMatomoEvent({
         category: "Layer",
-        action: "Removed layer from layertree",
+        action: "Removed layer via button in layer settings",
         name: getLayerInformation(payload.id, store),
         _source: assembleSourceInfoForEvent(funcName)
     });

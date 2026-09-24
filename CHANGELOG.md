@@ -10,8 +10,12 @@
 
 - lzsResearchClient: Added new addon lzsResearchClient for easy searching and access to geoadata in long-term storage
 - ScenarioBuilder: This allows you to add subject data objects and see, within CoSI, how they affect other subject data and demographic data.
+- userTracking: Clicks on a custom menu element that opens an external URL are now also tracked.
 
 ### Changed
+- userTracking: Renamed several Matomo actions for clarity (see userTracking/README.md for details).
+- userTracking: Matomo events no longer send a numeric "value" (see userTracking/README.md for details).
+- userTracking: Page view URLs are now lower-cased consistently to prevent duplicate entries in Matomo caused by casing differences.
 
 ### Deprecated
 
@@ -19,6 +23,8 @@
 
 ### Fixed
 - gfiThemes: The printServerUrl from combinedGfiPrintConfig.json in the combinedGFI theme now takes precedence over the printServerUrl from the layer config, if available.
+- userTracking: opening the layer info panel is tracked accurately without false positives from the layer tree sub-menu.
+- userTracking: Fixed the "Changed map-mode" event being tracked automatically on initial load when the current URL already reflected that map mode.
 
 ---
 

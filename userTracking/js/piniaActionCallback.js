@@ -1,4 +1,4 @@
-import {handleSetLayerInfo} from "./handler/handleSetLayerInfo.js";
+import {handleStartLayerInformation} from "./handler/handleStartLayerInformation.js";
 
 /**
  * Evaluates a called Pinia action and triggers the corresponding Matomo tracking event.
@@ -15,8 +15,8 @@ export function piniaActionCallback (action, store) {
 
     try {
         switch (actionType) {
-            case "layerInformation/setLayerInfo":
-                handleSetLayerInfo(payload, store);
+            case "layerInformation/startLayerInformation":
+                handleStartLayerInformation(payload, store);
                 break;
             default:
                 break;

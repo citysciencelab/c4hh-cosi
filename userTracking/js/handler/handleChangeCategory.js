@@ -5,7 +5,7 @@ import {assembleSourceInfoForEvent, isPayloadValid} from "../util.js";
  * Tracks switching a layertree category.
  * Triggered by: Click on "Themen auswählen" -> expand "Fachdaten" -> click on a category (e.g. Inspire).
  * @param {Object} payload The action payload.
- * @param {String} payload.name The translation key of the selected category.
+ * @param {String} payload.key The translation key of the selected category.
  * @returns {void}
  */
 export function handleChangeCategory (payload) {

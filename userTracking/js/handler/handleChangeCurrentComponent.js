@@ -43,6 +43,7 @@ function handleActions (payload, store, funcName) {
         trackMatomoEvent({
             category: "Layer",
             action: "Started typing into search bar",
+            name: "searchBar",
             _source
         });
     }
@@ -59,6 +60,7 @@ function handleActions (payload, store, funcName) {
             trackMatomoEvent({
                 category: "Layer",
                 action: "Clicked on \"Add layer\"-button",
+                name: "\"Add layer\"-button",
                 _source
             });
         }
@@ -105,14 +107,24 @@ function handleActions (payload, store, funcName) {
 function handlePageView (payload, store, funcName) {
     const {props, side, type} = payload;
 
-    // PageView
     let sectionTitle = "";
 
     if (props.name && props.name !== "none") {
         sectionTitle += typeof i18next !== "undefined" ? i18next.t(props.name) : props.name;
     }
     else if (type === "getFeatureInfo") {
-        sectionTitle += document.querySelector(".gfi-title")?.textContent ?? "";
+        const feature = store.getters["Modules/GetFeatureInfo/currentFeature"];
+
+        // If the page is opened with query-parameters including a GFI then the
+        // store is not ready yet and the page view would be counted multiple times
+        if (!feature) {
+            return;
+        }
+
+        const title = feature.getTitle(),
+            layerId = feature.getLayerId();
+
+        sectionTitle += `${title ?? "noTitle"}${layerId ? `-${layerId}` : ""}`;
     }
 
     let section = "";
@@ -125,11 +137,13 @@ function handlePageView (payload, store, funcName) {
         section += navHistory.length > 0 ? `/${navHistory.join("/")}` : "";
     }
 
-    if (sectionTitle && (type === "layerInformation" || type === "getFeatureInfo" || type === "folder")) {
+    const isFeatureInfoOrLayerInfo = type === "getFeatureInfo" || type === "layerInformation";
+
+    if (sectionTitle && (isFeatureInfoOrLayerInfo || type === "folder")) {
         section += `/${convertToUriCompatible(sectionTitle)}`;
     }
 
-    const title = `${document.title} - ${sectionTitle}`,
+    const title = `${document.title}${isFeatureInfoOrLayerInfo ? ` - ${type}` : ""} - ${sectionTitle}`,
         url = `${getBaseUrl()}${side}${type !== "folder" ? `/${type}` : ""}${section}`;
 
     store.commit("UserTracking/addPageToHistory", {side, title, url});
