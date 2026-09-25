@@ -283,13 +283,14 @@ export default {
      * @param {Object} payload The payload.
      * @param {String} payload.layerId The layer id.
      * @param {String} payload.source The layer source from search result.
+     * @param {String} [payload._source] The component that triggered the layer info display, used for tracking.
      * @returns {void}
      */
-    showLayerInfo: async ({commit, dispatch}, {layerId, source}) => {
+    showLayerInfo: async ({commit, dispatch}, {layerId, source, _source}) => {
         const layerConfig = await dispatch("retrieveLayerConfig", {layerId, source});
 
         if (layerConfig) {
-            useLayerInformationStore().startLayerInformation(layerConfig);
+            useLayerInformationStore().startLayerInformation(_source ? {...layerConfig, _source} : layerConfig);
             commit("Modules/LayerSelection/setLayerInfoVisible", true, {root: true});
         }
         else {

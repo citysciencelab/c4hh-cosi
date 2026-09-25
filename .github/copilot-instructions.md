@@ -125,6 +125,7 @@ Prefer the path aliases (`@appstore`, `@shared`, `@core`, `@modules`, `@plugins`
 - **i18n**: Never hardcode text. Use `$t('common:modules.myModule.key')` in templates, `i18next.t(...)` in JS. Add keys to at least German and English locale files (`locales/de/common.json`, `locales/en/common.json`). Fallback language: German.
 - **Tests**: `**/*.spec.js` under `tests/unit/`. Use **chai** + **vitest** + **sinon**. Each function needs a positive and a negative test. See `.github/instructions/test-conventions.instructions.md` for setup patterns.
 - **Changelog**: Every user-visible or behavioral change needs an entry in `CHANGELOG.md` under `## Unreleased` (`Added`, `Changed`, `Deprecated`, `Removed`, or `Fixed`). Plain English only. Pure housekeeping (JSDoc, test additions, internal refactoring without behavior change) does not require an entry.
+- **Action tracking source**: When dispatching a Vuex or Pinia action whose payload should carry metadata allowing to identify the source dispatching it, wrap the payload with `addSourceToPayload(this, payload)` from `@shared/js/utils/addSourceToPayload.js` instead of setting `_source` manually. See `docs/Dev/Tutorials/tutorial.md` for an example.
 
 ---
 
