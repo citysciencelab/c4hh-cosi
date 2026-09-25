@@ -21,7 +21,8 @@
         "saveError": "Das Projekt konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
         "saveSuccess": "Das neue Projekt wurde erfolgreich gespeichert!",
         "updateSuccess": "Das Projekt wurde erfolgreich aktualisiert!",
-        "invalid": "Die Eingabefelder für Projektname, Eingetragen von und Ansprechpartner dürfen nicht leer sein."
+        "invalid": "Die Eingabefelder für Projektname, Eingetragen von und Ansprechpartner dürfen nicht leer sein.",
+        "fileUpload": "Die Datei {{fileName}} ist hochgeladen."
       },
       "labels": {
         "projectName": "Projektname",

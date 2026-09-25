@@ -27,6 +27,8 @@ export default {
             initiator: "",
             contactPerson: "",
             comment: "",
+            image: undefined,
+            imageName: undefined,
             infoLink: "",
             createdAt: dayjs(),
             drawnGeometry: null,
@@ -61,6 +63,8 @@ export default {
                 informationType: this.currentOpinion ? `${this.currentOpinion.cat} ${this.currentOpinion.name}` : "",
                 contactPerson: this.contactPerson.trim(),
                 comment: this.comment.trim(),
+                image: this.image,
+                imageName: this.imageName,
                 infoLink: this.infoLink.trim(),
                 lastUpate: dayjs().format(this.wfstDateFormat)
             };
@@ -86,6 +90,8 @@ export default {
         if (typeof this.currentRequirement !== "undefined") {
             this.name = this.currentRequirement?.formValues?.name;
             this.initiator = this.currentRequirement?.formValues?.initiator;
+            this.image = this.currentRequirement?.formValues?.image;
+            this.imageName = this.currentRequirement?.formValues?.imageName;
             this.contactPerson = this.currentRequirement?.formValues?.contactPerson;
             this.currentOpinion = this.currentRequirement?.formValues?.informationType ? this.getCurrentOption(this.currentRequirement?.formValues?.informationType) : this.informationType[0];
             this.comment = this.currentRequirement?.formValues?.comment;
@@ -106,6 +112,24 @@ export default {
          */
         getCurrentOption (value) {
             return this.informationType.find(type => type.cat === value.split(" ")?.[0] && type.name === value.split(" ")?.[1]);
+        },
+
+        /**
+         * Loads the image and stores it.
+         * @param {Event} event
+         */
+        async loadImage (event) {
+            const file = event?.dataTransfer?.files?.[0] ?? event?.target?.files?.[0],
+                  reader = new FileReader();
+
+            this.imageName = file.name;
+
+            reader.onload = () => {
+                this.image = reader.result;
+                this.$emit("showSnackbarMessage", this.$t("additional:modules.updateRequirements.messages.imageLoad", {imageName: this.imageName}));
+            };
+
+            reader.readAsDataURL(file);
         },
 
         /**
@@ -253,10 +277,18 @@ export default {
         <h5 class="mb-2">
             {{ $t('additional:modules.updateRequirements.form.uploadOptional') }}
         </h5>
+        <div
+            v-if="typeof image !== 'undefined'"
+            class="mb-2"
+        >
+            {{ $t("additional:modules.updateRequirements.messages.imageLoad", {imageName: imageName}) }}
+        </div>
         <FileUpload
             class="mb-5"
-            :change="() => undefined"
-            :drop="() => undefined"
+            :change="loadImage"
+            :drop="loadImage"
+            :multiple="false"
+            accept="image/*"
         />
         <HrSnackbar
             :model-value="showSnackbar"

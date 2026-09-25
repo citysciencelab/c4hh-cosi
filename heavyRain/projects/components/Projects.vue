@@ -3,6 +3,7 @@ import {createPolygonStyle} from "../../shared/js/createPolygonStyle.js";
 import HrCard from "../../shared/components/HrCard.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import ProjectsEdit from "./ProjectsEdit.vue";
@@ -14,6 +15,7 @@ export default {
         HrCard,
         HrHeader,
         HrSnackbar,
+        IconButton,
         ProjectsEdit
     },
     data () {
@@ -50,6 +52,21 @@ export default {
         createProject () {
             this.setCurrentProject(undefined);
             this.setCurrentView("edit");
+        },
+
+        /**
+         * Downloads the uploaded file.
+         * @returns {void}
+         */
+        downloadFile () {
+            const link = document.createElement("a");
+
+            link.href = this.currentProject?.formValues?.file;
+            link.download = this.currentProject?.formValues?.fileName;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         },
 
         /**
@@ -220,6 +237,17 @@ export default {
                             {{ currentProject?.formValues?.protectedAreas }}
                         </p>
                     </section>
+                    <div
+                        class="position-absolute bottom-0 end-0 p-3"
+                    >
+                        <IconButton
+                            :class-array="['btn-light', 'me-5']"
+                            icon="bi bi-paperclip"
+                            :aria="currentProject?.formValues?.fileName"
+                            :title="currentProject?.formValues?.fileName"
+                            :interaction="() => downloadFile()"
+                        />
+                    </div>
                 </template>
             </HrCard>
         </div>

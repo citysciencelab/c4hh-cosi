@@ -51,6 +51,15 @@ export default {
         ...mapMutations("Modules/UpdateRequirements", ["setCurrentRequirement", "setCurrentView"]),
 
         /**
+         * Creates a new requirement.
+         * @returns {void}
+         */
+        createRequirement () {
+            this.setCurrentRequirement(undefined);
+            this.setCurrentView("create-new");
+        },
+
+        /**
          * Gets the color of a saved report on the map by its information type.
          * A report with an unknown information type gets the color of the first information type.
          * @param {module:ol/Feature} feature the saved report.
@@ -84,7 +93,7 @@ export default {
             <HrHeader
                 :text="$t('additional:modules.updateRequirements.description')"
                 :button-text="$t('additional:modules.updateRequirements.createMessage')"
-                @click:button="setCurrentView('create-new')"
+                @click:button="createRequirement"
             />
             <hr class="my-3">
             <h5
@@ -101,10 +110,13 @@ export default {
                 @click:edit="setCurrentView('create-new')"
             >
                 <template #above-title>
-                    <div class="ratio ratio-16x9 border rounded overflow-hidden mb-3">
+                    <div
+                        v-if="typeof currentRequirement?.formValues?.image !== 'undefined'"
+                        class="ratio ratio-16x9 border rounded overflow-hidden mb-3"
+                    >
                         <img
-                            src="https://picsum.photos/id/1031/1200/675"
-                            alt="Strassenansicht"
+                            :src="currentRequirement?.formValues?.image"
+                            :alt="currentRequirement?.formValues?.imageName"
                             class="w-100 h-100"
                             style="object-fit: cover;"
                         >

@@ -21,7 +21,8 @@
         "saveError": "The project could not be saved. Please try again.",
         "saveSuccess": "The new project has been saved successfully!",
         "updateSuccess": "The project has been updated successfully!",
-        "invalid": "The input fields for Project name, Created vy and contact can not be left blank."
+        "invalid": "The input fields for Project name, Created vy and contact can not be left blank.",
+        "fileUpload": "The file {{fileName}} is uploaded."
       },
       "labels": {
         "projectName": "Project name",

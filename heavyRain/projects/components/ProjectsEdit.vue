@@ -31,6 +31,8 @@ export default {
             drawnGeometry: null,
             endDate: "",
             history: "",
+            file: undefined,
+            fileName: undefined,
             infoLink: "",
             invalid: false,
             isSaving: false,
@@ -60,6 +62,8 @@ export default {
                 criteria: this.chosenCriteria.map(cri => cri.name).join(", "),
                 description: this.description.trim(),
                 endDate: this.endDate,
+                file: this.file,
+                fileName: this.fileName,
                 history: this.history.trim(),
                 infoLink: this.infoLink.trim(),
                 lastUpdate: dayjs().format(this.wfstDateFormat),
@@ -96,6 +100,9 @@ export default {
             return convertColor(this.criteria[Math.min(...index)].color, "rgb");
         }
     },
+    created () {
+        this.chosenCriteria = [this.criteria[0]];
+    },
     mounted () {
         if (typeof this.currentProject !== "undefined") {
             this.chosenCriteria = this.getChosenCriteria(this.currentProject?.formValues?.criteria);
@@ -104,6 +111,8 @@ export default {
             this.contactPerson = this.currentProject?.formValues?.contactPerson;
             this.startDate = this.currentProject?.formValues?.startDate;
             this.endDate = this.currentProject?.formValues?.endDate;
+            this.file = this.currentProject?.formValues?.file;
+            this.fileName = this.currentProject?.formValues?.fileName;
             this.source = this.currentProject?.formValues?.source;
             this.description = this.currentProject?.formValues?.description;
             this.contactExt = this.currentProject?.formValues?.contactExt;
@@ -133,6 +142,24 @@ export default {
             });
 
             return result;
+        },
+
+        /**
+         * Loads the file and stores it.
+         * @param {Event} event
+         */
+        async loadFile (event) {
+            const file = event?.dataTransfer?.files?.[0] ?? event?.target?.files?.[0],
+                  reader = new FileReader();
+
+            this.fileName = file.name;
+
+            reader.onload = () => {
+                this.file = reader.result;
+                this.$emit("showSnackbarMessage", this.$t("additional:modules.projects.messages.fileUpload", {fileName: this.fileName}));
+            };
+
+            reader.readAsDataURL(file);
         },
 
         /**
@@ -361,10 +388,17 @@ export default {
                 <h5 class="mb-2">
                     {{ $t('additional:modules.projects.labels.fileUpload') }}
                 </h5>
+                <div
+                    v-if="typeof file !== 'undefined'"
+                    class="mb-2"
+                >
+                    {{ $t("additional:modules.projects.messages.fileUpload", {fileName: fileName}) }}
+                </div>
                 <FileUpload
                     class="mb-5"
-                    :change="() => undefined"
-                    :drop="() => undefined"
+                    :change="loadFile"
+                    :drop="loadFile"
+                    :multiple="false"
                 />
             </div>
         </div>
