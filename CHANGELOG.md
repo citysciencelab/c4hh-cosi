@@ -26,6 +26,7 @@
 - Issue \#1655: Menu modules now keep their own configuration when multiple modules of the same type are defined in config.json. LayerSlider and Filter no longer reuse the last configured instance.
 - Issue \#1656: Fixed GetFeatureInfo popups for multiple visible WMS layers.
 - Issue \#1658: Share View now filters all available legacy URL parameters.
+- Issue \#1662: Fixed Routing Tool to work correctly with Umlauts.
 - Accessibility: Fixed accessibility issues across layer tree and controls (label associations, icon-button naming, ARIA semantics, and preview alt text).
 - AlertingItem: Fixed CSS Regression.
 - Security: XML injection in `highlightFeaturesByAttribute` is prevented by escaping.
