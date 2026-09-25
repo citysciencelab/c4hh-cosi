@@ -1,8 +1,14 @@
 <script>
 
 import axios from "axios";
+import DOMPurify from "dompurify";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
+
+const PURIFY_CONFIG = {
+    ALLOWED_TAGS: ["b", "br", "i", "strong", "em"],
+    ALLOWED_ATTR: []
+};
 
 /**
  * Alerting
@@ -76,7 +82,20 @@ export default {
             this.fetchBroadcast(this.fetchBroadcastUrl);
         }
 
+        if (this.initialAlerts && typeof this.initialAlerts === "object") {
+            Object.keys(this.initialAlerts).forEach(alertId => {
+                this.sanitizeAlertFields(this.initialAlerts[alertId], ["content", "creationDate", "text"]);
+            });
+        }
+
         this.addAlertsFromConfig(this.initialAlerts);
+
+        if (this.moduleOpenAlerts && typeof this.moduleOpenAlerts === "object") {
+            Object.keys(this.moduleOpenAlerts).forEach(alertId => {
+                this.sanitizeAlertFields(this.moduleOpenAlerts[alertId], ["content", "creationDate", "text"]);
+            });
+        }
+
         this.addModuleOpenAlertsFromConfig(this.moduleOpenAlerts);
     },
     unmounted () {
@@ -134,6 +153,7 @@ export default {
             }
 
             collectedAlerts.forEach(singleAlert => {
+                this.sanitizeAlertFields(singleAlert, ["content", "creationDate", "text"]);
                 singleAlert.initial = true;
                 singleAlert.isNews = true;
                 singleAlert.initialConfirmed = singleAlert.mustBeConfirmed;
@@ -248,6 +268,19 @@ export default {
                 this.sortedAlertsSwitch = "onEvent";
                 this.activateDisplayOnEventAlerts(action);
             }
+        },
+        /**
+         * Sanitizes specified string fields of an alert object.
+         * @param {Object} alert - Alert object
+         * @param {Array<string>} fields - Field names to sanitize
+         * @returns {void}
+         */
+        sanitizeAlertFields: function (alert, fields) {
+            fields.forEach(field => {
+                if (alert && typeof alert[field] === "string") {
+                    alert[field] = DOMPurify.sanitize(alert[field], PURIFY_CONFIG);
+                }
+            });
         }
     }
 };

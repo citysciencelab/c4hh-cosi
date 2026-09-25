@@ -553,6 +553,17 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
             wrapper = shallowMount(AlertingItemComponent, settings);
             expect(wrapper.find(".singleAlertContainer").html().indexOf("Alert Test B")).not.to.equal(-1);
         });
+
+        it("positive: removes dangerous tags like <script>, <img>, <svg>", () => {
+            const alert = {
+                content: "<script>alert('XSS')</script><p>Text</p><img src=x onerror=alert('XSS')>"
+            };
+
+            wrapper.vm.sanitizeAlertFields(alert, ["content"]);
+            expect(alert.content).to.not.include("<script>");
+            expect(alert.content).to.not.include("onerror");
+            expect(alert.content).to.not.include("<img");
+        });
     });
 
     describe("axiosCallback", () => {
