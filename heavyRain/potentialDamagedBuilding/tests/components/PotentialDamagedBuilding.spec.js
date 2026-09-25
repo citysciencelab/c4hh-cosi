@@ -23,12 +23,22 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
      */
     function createFeature (properties = {}) {
         return {
+            id: undefined,
             properties: {...properties},
+            clone () {
+                return createFeature(this.properties);
+            },
             get (key) {
                 return this.properties[key];
             },
+            getId () {
+                return this.id;
+            },
             getProperties () {
                 return {...this.properties};
+            },
+            setId (id) {
+                this.id = id;
             },
             set (key, value) {
                 this.properties[key] = value;
@@ -198,6 +208,27 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
             expect(wrapper.vm.lastUpdatedDate).to.equal("");
             expect(wrapper.vm.formattedAdjustmentDate).to.equal("");
         });
+
+        it("should validate the adjusted damage class", async () => {
+            for (const value of [1, "6", " 3 "]) {
+                await wrapper.setData({adjustedDamageClass: value});
+                expect(wrapper.vm.isDamageClassValid).to.be.true;
+            }
+            for (const value of [undefined, "", 0, "7", "2.5", "abc"]) {
+                await wrapper.setData({adjustedDamageClass: value});
+                expect(wrapper.vm.isDamageClassValid).to.be.false;
+            }
+        });
+
+        it("should validate the comment", async () => {
+            await wrapper.setData({comment: "note"});
+            expect(wrapper.vm.isCommentValid).to.be.true;
+
+            for (const value of [undefined, "", "   ", "a".repeat(256)]) {
+                await wrapper.setData({comment: value});
+                expect(wrapper.vm.isCommentValid).to.be.false;
+            }
+        });
     });
 
 
@@ -240,6 +271,30 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
     });
 
     describe("methods", () => {
+        describe("onSave", () => {
+            it("should mark the form as invalid and not update if the input is invalid", async () => {
+                const updatePotentialDamagedBuilding = sinon.stub(wrapper.vm, "updatePotentialDamagedBuilding");
+
+                await wrapper.setData({adjustedDamageClass: "7", comment: ""});
+                wrapper.vm.onSave();
+
+                expect(wrapper.vm.invalid).to.be.true;
+                expect(wrapper.vm.showSnackbar).to.be.true;
+                expect(wrapper.vm.snackbarColor).to.equal("error");
+                expect(updatePotentialDamagedBuilding.called).to.be.false;
+            });
+
+            it("should update the potential damaged building if the input is valid", async () => {
+                const updatePotentialDamagedBuilding = sinon.stub(wrapper.vm, "updatePotentialDamagedBuilding");
+
+                await wrapper.setData({adjustedDamageClass: "2", comment: "note", invalid: true});
+                wrapper.vm.onSave();
+
+                expect(wrapper.vm.invalid).to.be.false;
+                expect(updatePotentialDamagedBuilding.calledWith(wrapper.vm.selectedItem, wrapper.vm.selectedFeature)).to.be.true;
+            });
+        });
+
         describe("prefixFeatureProperties", () => {
             it("should prefix all feature properties", () => {
                 const feature = createFeature({sk_aktuell: 4, kommentar: "note"});
@@ -276,6 +331,13 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
                 expect(wrapper.vm.adjustedDamageClass).to.equal("");
                 expect(wrapper.vm.adjustedDate).to.equal("");
                 expect(wrapper.vm.comment).to.equal("");
+            });
+
+            it("should reset the invalid state", () => {
+                wrapper.vm.invalid = true;
+                wrapper.vm.setDataFromFeature(createFeature());
+
+                expect(wrapper.vm.invalid).to.be.false;
             });
         });
 
@@ -361,10 +423,26 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
                 const feature = createFeature({sk_aktuell: 4});
                 const item = {...itemList[0], wfstConfig: {url: "wfs-url"}};
 
+                feature.setId("feature-1");
                 wrapper.vm.updatePotentialDamagedBuilding(item, feature);
 
-                expect(sendTransaction.calledWith("EPSG:25832", feature, "wfs-url", item.wfstConfig, "selectedUpdate")).to.be.true;
-                expect(feature.get("de.hh.up:sk_aktuell")).to.equal(4);
+                const transactionFeature = sendTransaction.firstCall.args[1];
+
+                expect(sendTransaction.calledWith("EPSG:25832", sinon.match.object, "wfs-url", item.wfstConfig, "selectedUpdate")).to.be.true;
+                expect(transactionFeature).to.not.equal(feature);
+                expect(transactionFeature.getId()).to.equal("feature-1");
+                expect(transactionFeature.get("de.hh.up:sk_aktuell")).to.equal(4);
+            });
+
+            it("should not change the displayed feature, so the form can still be reset", () => {
+                const feature = createFeature({sk_angepasst: 3, kommentar: "note"});
+                const item = {...itemList[0], wfstConfig: {url: "wfs-url"}};
+
+                wrapper.vm.adjustedDamageClass = "5";
+                wrapper.vm.comment = "updated";
+                wrapper.vm.updatePotentialDamagedBuilding(item, feature);
+
+                expect(feature.properties).to.deep.equal({sk_angepasst: 3, kommentar: "note"});
             });
 
             it("should load missing WFS configuration before sending a transaction", () => {

@@ -34,7 +34,10 @@
       "lastUpdatedHint": "Date of entry: ",
       "commentHint": "Indication of the responsible department, with additional explanations if necessary",
       "reset": "Reset",
-      "save": "Save"
+      "save": "Save",
+      "messages": {
+        "invalid": "Please enter a damage potential class from 1 to 6 and a comment with a maximum of 255 characters."
+      }
     }
   }
 }

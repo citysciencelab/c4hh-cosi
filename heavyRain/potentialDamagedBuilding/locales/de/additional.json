@@ -34,7 +34,10 @@
       "lastUpdatedHint": "Die Anpassung wurde vorgenommen am: ",
       "commentHint": "Angabe der zuständigen Dienststelle mit ggf. weiteren Erläuterungen",
       "reset": "Zurücksetzen",
-      "save": "Speichern"
+      "save": "Speichern",
+      "messages": {
+        "invalid": "Bitte geben Sie eine Schadenspotenzialklasse von 1 bis 6 und einen Kommentar mit maximal 255 Zeichen ein."
+      }
     }
   }
 }
