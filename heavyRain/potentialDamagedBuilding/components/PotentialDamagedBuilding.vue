@@ -194,12 +194,13 @@ export default {
         onSave () {
             if (!this.isDamageClassValid || !this.isCommentValid) {
                 this.invalid = true;
-                this.showErrorMessage(this.$t("additional:modules.potentialDamagedBuilding.messages.invalid"));
+                this.showMessage(this.$t("additional:modules.potentialDamagedBuilding.messages.invalid"), "error");
                 return;
             }
 
             this.invalid = false;
             this.updatePotentialDamagedBuilding(this.selectedItem, this.selectedFeature);
+            this.showMessage(this.$t("additional:modules.potentialDamagedBuilding.messages.success"), "success");
         },
 
         /**
@@ -242,11 +243,12 @@ export default {
         /**
          * Shows the given message in the snackbar of the form.
          * @param {String} message the message to display.
+         * @param {String} type the message type.
          * @returns {void}
          */
-        showErrorMessage (message) {
+        showMessage (message, type) {
             this.snackbarMessage = message;
-            this.snackbarColor = "error";
+            this.snackbarColor = type;
             this.showSnackbar = true;
         },
 
@@ -339,6 +341,13 @@ export default {
             group="building_attributes"
             :selected-value="selectedItem?.name"
             @set-selected-button="updateSelectedItem($event, itemList)"
+        />
+        <HrSnackbar
+            v-if="!invalid"
+            :model-value="showSnackbar"
+            :message="snackbarMessage"
+            :color="snackbarColor"
+            @update:model-value="val => showSnackbar = val"
         />
         <template v-if="selectedFeature">
             <h5 class="mt-5">

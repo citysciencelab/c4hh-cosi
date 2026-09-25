@@ -36,7 +36,8 @@
       "reset": "Zurücksetzen",
       "save": "Speichern",
       "messages": {
-        "invalid": "Bitte geben Sie eine Schadenspotenzialklasse von 1 bis 6 und einen Kommentar mit maximal 255 Zeichen ein."
+        "invalid": "Bitte geben Sie eine Schadenspotenzialklasse von 1 bis 6 und einen Kommentar mit maximal 255 Zeichen ein.",
+        "success": "Die Anpassung wurde gespeichert."
       }
     }
   }

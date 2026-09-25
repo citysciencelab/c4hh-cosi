@@ -36,7 +36,8 @@
       "reset": "Reset",
       "save": "Save",
       "messages": {
-        "invalid": "Please enter a damage potential class from 1 to 6 and a comment with a maximum of 255 characters."
+        "invalid": "Please enter a damage potential class from 1 to 6 and a comment with a maximum of 255 characters.",
+        "success": "The adjustment has been saved."
       }
     }
   }
