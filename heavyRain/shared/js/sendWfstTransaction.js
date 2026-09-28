@@ -39,8 +39,13 @@ function normalizeFeaturePrefix (layerConfig) {
 
 /**
  * Creates the feature which is sent to the WFS-T service.
- * The attributes are set without a namespace prefix, as it is required for an insert transaction.
+ *
+ * For an insert the attributes are set without a namespace prefix, as it is required by the service.
  * Optional values which were not filled in are left out, so that the service keeps its own defaults.
+ *
+ * For an update the feature gets the id of the edited feature and the attributes and the geometry are prefixed with the namespace,
+ * as the service only knows the prefixed property names in an update.
+ * Values which were emptied are set to null, so that the service removes them.
  *
  * The properties are set in the order of the given attributes and the geometry is set last,
  * because the transaction is written in the order in which the properties were set.
@@ -49,27 +54,40 @@ function normalizeFeaturePrefix (layerConfig) {
  * @param {Object} wfstAttributes - The keys are the fields of the form, the values are the attribute names of the service.
  * Has to be in the order of the schema of the service, otherwise the service rejects the properties.
  * @param {String} wfstGeometryName - Name of the geometry attribute of the service.
+ * @param {Object} [update={}] - The options of an update.
+ * @param {String} [update.featureId] - Id of the edited feature. If it is given, the feature is created for an update.
+ * @param {String} [update.featurePrefix] - The namespace prefix of the service without a trailing colon.
  * @returns {module:ol/Feature} The feature to be sent.
  */
-function createTransactionFeature (geometry, formValues, wfstAttributes, wfstGeometryName) {
-    const feature = new Feature();
+function createTransactionFeature (geometry, formValues, wfstAttributes, wfstGeometryName, {featureId, featurePrefix} = {}) {
+    const feature = new Feature(),
+        isUpdate = typeof featureId !== "undefined" && featureId !== null,
+        prefix = isUpdate && featurePrefix ? `${featurePrefix}:` : "";
 
     Object.entries(wfstAttributes).forEach(([key, attributeName]) => {
         const value = formValues[key];
 
         if (value !== undefined && value !== null && value !== "") {
-            feature.set(attributeName, value);
+            feature.set(`${prefix}${attributeName}`, value);
+        }
+        else if (isUpdate) {
+            feature.set(`${prefix}${attributeName}`, null);
         }
     });
 
-    feature.setGeometryName(wfstGeometryName);
+    feature.setGeometryName(`${prefix}${wfstGeometryName}`);
     feature.setGeometry(toMultiPolygon(geometry));
+
+    if (isUpdate) {
+        feature.setId(featureId);
+    }
 
     return feature;
 }
 
 /**
- * Sends the given values to the WFS-T service with the given transaction method.
+ * Sends the given values to the WFS-T service.
+ * An edited feature with an id is updated, otherwise a new feature is inserted.
  * @param {Object} options - The options of the transaction.
  * @param {String} options.wfstId - Id of the WFS-T layer in the services configuration.
  * @param {String} options.projectionCode - Code of the projection of the map, e.g. "EPSG:25832".
@@ -77,23 +95,26 @@ function createTransactionFeature (geometry, formValues, wfstAttributes, wfstGeo
  * @param {Object} options.formValues - The values of the form.
  * @param {Object} options.wfstAttributes - The mapping of the form fields to the attribute names of the service, see createTransactionFeature.
  * @param {String} options.wfstGeometryName - Name of the geometry attribute of the service.
- * @param {String} options.transactionMethod - The transaction to perform, e.g. "insert", "selectedUpdate" or "delete".
+ * @param {String} [options.featureId] - Id of the edited feature in the service. If it is given, the feature is updated.
  * @returns {Promise<module:ol/Feature>} Resolves with the transmitted feature.
  * @throws {Error} If the layer is not configured or the transaction fails.
  */
-async function sendWfstTransaction ({wfstId, projectionCode, geometry, formValues, wfstAttributes, wfstGeometryName, transactionMethod}) {
+async function sendWfstTransaction ({wfstId, projectionCode, geometry, formValues, wfstAttributes, wfstGeometryName, featureId}) {
     const layerConfig = rawLayerList.getLayerWhere({id: wfstId});
 
     if (!layerConfig) {
         throw new Error(`HeavyRain: No layer with the id ${wfstId} was found in the services configuration.`);
     }
 
+    const normalizedConfig = normalizeFeaturePrefix(layerConfig),
+        isUpdate = typeof featureId !== "undefined" && featureId !== null;
+
     return wfs.sendTransaction(
         projectionCode,
-        createTransactionFeature(geometry, formValues, wfstAttributes, wfstGeometryName),
+        createTransactionFeature(geometry, formValues, wfstAttributes, wfstGeometryName, {featureId, featurePrefix: normalizedConfig.featurePrefix}),
         layerConfig.url,
-        normalizeFeaturePrefix(layerConfig),
-        transactionMethod
+        normalizedConfig,
+        isUpdate ? "selectedUpdate" : "insert"
     );
 }
 

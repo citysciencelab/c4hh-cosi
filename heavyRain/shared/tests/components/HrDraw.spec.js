@@ -43,7 +43,7 @@ describe("addons/heavyRain/shared/components/HrDraw.vue", () => {
         layer = {
             getLayerSource: sinon.stub().returns(source)
         };
-        getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").returns(layer);
+        getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").withArgs("heavy-rain-draw").returns(layer);
         addLayerStub = sinon.stub(layerCollection, "addLayer");
         addInteractionStub = sinon.stub(HrDraw.methods, "addInteraction");
         createLayerStub = sinon.stub(layerFactory, "createLayer").returns(layer);
@@ -97,7 +97,8 @@ describe("addons/heavyRain/shared/components/HrDraw.vue", () => {
                 typ: "VECTORBASE",
                 id: "heavy-rain-draw",
                 name: "heavy-rain-draw",
-                alwaysOnTop: true
+                alwaysOnTop: true,
+                dontInitStyle: true
             });
             expect(addLayerStub.calledOnceWith(layer)).to.be.true;
             expect(wrapper.vm.source).to.deep.equal(source);
@@ -110,6 +111,26 @@ describe("addons/heavyRain/shared/components/HrDraw.vue", () => {
 
             expect(source.clear.calledOnce).to.be.true;
             expect(removeInteractionStub.calledOnce).to.be.true;
+        });
+
+        it("should add a copy of the geometry of an edited feature to the draw layer in created", () => {
+            const geometry = new Polygon([[[0, 0], [0, 1], [1, 1], [0, 0]]]);
+
+            shallowMount(HrDraw, {global: {plugins: [store]}, props: {geometry, strokeColor: [213, 94, 0]}});
+
+            const feature = source.addFeature.firstCall.args[0];
+
+            expect(source.addFeature.calledOnce).to.be.true;
+            expect(feature.getId()).to.equal("drawn-feature");
+            expect(feature.getGeometry()).to.not.equal(geometry);
+            expect(feature.getGeometry().getCoordinates()).to.deep.equal(geometry.getCoordinates());
+            expect(feature.getStyle().getStroke().getColor()).to.deep.equal([213, 94, 0]);
+        });
+
+        it("should not add a feature to the draw layer if no geometry is given", () => {
+            shallowMount(HrDraw, {global: {plugins: [store]}});
+
+            expect(source.addFeature.notCalled).to.be.true;
         });
     });
 

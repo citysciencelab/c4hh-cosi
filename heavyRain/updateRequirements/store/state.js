@@ -59,7 +59,8 @@ const state = {
         informationType: "art_der_angabe",
         contactPerson: "ansprechpartner",
         infoLink: "infolink",
-        creationDate: "eingabedatum"
+        creationDate: "eingabedatum",
+        lastUpdate: "aktualisierung"
     },
     wfstGeometryName: "geom",
     wfstDateFormat: "YYYY-MM-DD",

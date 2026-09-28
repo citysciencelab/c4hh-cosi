@@ -10,12 +10,16 @@ import wfs from "@masterportal/masterportalapi/src/layer/wfs";
 
 
 describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
-    let drawnGeometry,
+    let currentProject,
+        drawnGeometry,
+        placingPointMarkerSpy,
         setCurrentViewSpy,
         setCurrentProject,
         store;
 
     beforeEach(() => {
+        currentProject = undefined;
+        placingPointMarkerSpy = sinon.spy();
         setCurrentViewSpy = sinon.spy();
         setCurrentProject = sinon.spy();
         store = createStore({
@@ -24,6 +28,9 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
                 namespaced: true,
                 Maps: {
                     namespaced: true,
+                    actions: {
+                        placingPointMarker: placingPointMarkerSpy
+                    },
                     getters: {
                         projectionCode: () => "EPSG:25832"
                     }
@@ -47,7 +54,7 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
                                     "name": "Bekannte Bereiche (z.B. Presse)",
                                     "color": "#D55E00"
                                 }],
-                                currentProject: () => undefined,
+                                currentProject: () => currentProject,
                                 wfstAttributes: () => {
                                     return {
                                         projectName: "projektname",
@@ -125,6 +132,26 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
         });
     });
 
+    describe("Edited project", () => {
+        it("should hide the edited project on its layer while it is edited and show it again afterwards", () => {
+            const setStyleSpy = sinon.spy();
+
+            currentProject = {id: "starkregenprojekte.7", geometry: drawnGeometry, formValues: {criteria: ""}};
+            sinon.stub(layerCollection, "getLayerById").withArgs("36016").returns({getLayerSource: () => ({getFeatureById: () => ({setStyle: setStyleSpy})})});
+
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            expect(setStyleSpy.calledOnce).to.be.true;
+            expect(setStyleSpy.firstCall.args[0]).to.not.be.undefined;
+            expect(wrapper.findComponent({name: "HrDraw"}).props("geometry")).to.equal(drawnGeometry);
+
+            wrapper.unmount();
+
+            expect(setStyleSpy.calledTwice).to.be.true;
+            expect(setStyleSpy.secondCall.args[0]).to.be.undefined;
+        });
+    });
+
     describe("Computed Properties", () => {
         it("should get strokeColor as standard array", () => {
             const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
@@ -154,6 +181,14 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
                 "name": "Bauprojekte (Umsetzungsmaßnahmen)",
                 "color": "#0055A4"
             }]});
+
+            expect(wrapper.vm.strokeColor).to.deep.equal([213, 94, 0]);
+        });
+
+        it("should get the first strokeColor for a criterion which is not in the list", async () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            await wrapper.setData({chosenCriteria: [{name: "eigenes Kriterium"}]});
 
             expect(wrapper.vm.strokeColor).to.deep.equal([213, 94, 0]);
         });
@@ -212,7 +247,9 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
                 wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
 
             sinon.stub(rawLayerList, "getLayerWhere").returns(layerConfig);
-            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", drawnGeometry, projectName: "name"});
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", projectName: "name"});
+            // assigned directly, as setData copies the geometry into a plain object
+            wrapper.vm.drawnGeometry = drawnGeometry;
             await wrapper.vm.onSave();
 
             expect(sendTransactionStub.calledOnce).to.be.true;
@@ -223,14 +260,77 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
             expect(setCurrentViewSpy.calledOnce).to.be.true;
         });
 
+        it("should update an edited project instead of inserting a copy", async () => {
+            currentProject = {
+                id: "starkregenprojekte.7",
+                formValues: {
+                    contactExt: "",
+                    contactPerson: "contactPerson",
+                    creator: "creator",
+                    criteria: "",
+                    description: "",
+                    endDate: "",
+                    history: "",
+                    infoLink: "",
+                    projectName: "name",
+                    protectedAreas: "",
+                    source: "",
+                    startDate: ""
+                }
+            };
+
+            const sendTransactionStub = sinon.stub(wfs, "sendTransaction").resolves("feature"),
+                wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36016", url: "https://example.com/wfs", featurePrefix: "de.hh.up"});
+            // assigned directly, as setData copies the geometry into a plain object
+            wrapper.vm.drawnGeometry = drawnGeometry;
+            await wrapper.vm.onSave();
+
+            expect(sendTransactionStub.firstCall.args[1].getId()).to.equal("starkregenprojekte.7");
+            expect(sendTransactionStub.firstCall.args[4]).to.equal("selectedUpdate");
+            expect(setCurrentProject.firstCall.args[1].id).to.equal("starkregenprojekte.7");
+        });
+
+        it("should insert a new project", async () => {
+            const sendTransactionStub = sinon.stub(wfs, "sendTransaction").resolves("feature"),
+                wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36016", url: "https://example.com/wfs"});
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", projectName: "name"});
+            // assigned directly, as setData copies the geometry into a plain object
+            wrapper.vm.drawnGeometry = drawnGeometry;
+            await wrapper.vm.onSave();
+
+            expect(sendTransactionStub.firstCall.args[1].getId()).to.be.undefined;
+            expect(sendTransactionStub.firstCall.args[4]).to.equal("insert");
+            expect(setCurrentProject.firstCall.args[1].id).to.be.undefined;
+        });
+
+        it("should place the point marker in the center of the saved project", async () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36016", url: "https://example.com/wfs"});
+            sinon.stub(wfs, "sendTransaction").resolves("feature");
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", projectName: "name"});
+            // assigned directly, as setData copies the geometry into a plain object
+            wrapper.vm.drawnGeometry = drawnGeometry;
+            await wrapper.vm.onSave();
+
+            expect(placingPointMarkerSpy.calledOnce).to.be.true;
+            expect(placingPointMarkerSpy.firstCall.args[1]).to.deep.equal(drawnGeometry.getInteriorPoint().getCoordinates().slice(0, 2));
+        });
+
         it("should reload the layer of the saved projects after the project was inserted", async () => {
             const refreshSpy = sinon.spy(),
-                getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").returns({getLayerSource: () => ({refresh: refreshSpy})}),
+                getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").withArgs("36016").returns({getLayerSource: () => ({refresh: refreshSpy})}),
                 wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
 
             sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36016", url: "https://example.com/wfs"});
             sinon.stub(wfs, "sendTransaction").resolves("feature");
-            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", drawnGeometry, projectName: "name"});
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", projectName: "name"});
+            // assigned directly, as setData copies the geometry into a plain object
+            wrapper.vm.drawnGeometry = drawnGeometry;
             await wrapper.vm.onSave();
 
             expect(getLayerByIdStub.calledOnceWith("36016")).to.be.true;
@@ -242,7 +342,9 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
                 wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
 
             sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36016", url: "https://example.com/wfs"});
-            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", drawnGeometry, projectName: "name", startDate: "2026-01-01"});
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", projectName: "name", startDate: "2026-01-01"});
+            // assigned directly, as setData copies the geometry into a plain object
+            wrapper.vm.drawnGeometry = drawnGeometry;
             await wrapper.vm.onSave();
 
             const feature = sendTransactionStub.firstCall.args[1];
@@ -262,7 +364,9 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
             sinon.stub(console, "error");
             sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36016", url: "https://example.com/wfs"});
             sinon.stub(wfs, "sendTransaction").rejects(new Error("transaction failed"));
-            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", drawnGeometry, projectName: "name"});
+            await wrapper.setData({contactPerson: "contactPerson", creator: "creator", projectName: "name"});
+            // assigned directly, as setData copies the geometry into a plain object
+            wrapper.vm.drawnGeometry = drawnGeometry;
             await wrapper.vm.onSave();
 
             expect(getLayerByIdSpy.notCalled).to.be.true;

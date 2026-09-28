@@ -10,16 +10,23 @@ import wfs from "@masterportal/masterportalapi/src/layer/wfs";
 
 
 describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => {
-    let drawnGeometry,
+    let currentRequirement,
+        drawnGeometry,
+        placingPointMarkerSpy,
         store;
 
     beforeEach(() => {
+        currentRequirement = undefined;
+        placingPointMarkerSpy = sinon.spy();
         store = createStore({
             namespaced: true,
             modules: {
                 namespaced: true,
                 Maps: {
                     namespaced: true,
+                    actions: {
+                        placingPointMarker: placingPointMarkerSpy
+                    },
                     getters: {
                         projectionCode: () => "EPSG:25832"
                     }
@@ -43,7 +50,7 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
                                         "color": "#D55E00"
                                     }
                                 ],
-                                currentRequirement: () => undefined,
+                                currentRequirement: () => currentRequirement,
                                 wfstAttributes: () => {
                                     return {
                                         projectName: "projektname",
@@ -133,6 +140,27 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
     });
 
     describe("Methods", () => {
+        describe("getCurrentOption", () => {
+            it("should return the information type of the given value", () => {
+                const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+                expect(wrapper.vm.getCurrentOption("Aktualisierungsbedarf SRGK")).to.deep.equal({
+                    "cat": "Aktualisierungsbedarf",
+                    "name": "SRGK",
+                    "color": "#D55E00"
+                });
+            });
+
+            it("should return undefined if no information type was selected", () => {
+                const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+                expect(wrapper.vm.getCurrentOption(undefined)).to.be.undefined;
+                expect(wrapper.vm.getCurrentOption(null)).to.be.undefined;
+                expect(wrapper.vm.getCurrentOption("")).to.be.undefined;
+                expect(wrapper.vm.getCurrentOption("unbekannt")).to.be.undefined;
+            });
+        });
+
         /**
          * Mounts the component with all required fields and a drawn geometry filled in.
          * @returns {Object} the wrapper of the component.
@@ -140,7 +168,9 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
         async function mountFilledForm () {
             const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
 
-            await wrapper.setData({name: "name", initiator: "initiator", contactPerson: "contactPerson", drawnGeometry});
+            await wrapper.setData({name: "name", initiator: "initiator", contactPerson: "contactPerson"});
+            // assigned directly, as setData copies the geometry into a plain object
+            wrapper.vm.drawnGeometry = drawnGeometry;
 
             return wrapper;
         }
@@ -187,9 +217,59 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
             expect(wrapper.emitted("click:save")).to.not.be.undefined;
         });
 
+        it("should update an edited report instead of inserting a copy", async () => {
+            currentRequirement = {id: "ortskenntnisse_aktualisierungsbedarfe.42", formValues: {name: "name", initiator: "initiator", contactPerson: "contactPerson", comment: "", infoLink: "", creationDate: "2026-01-15", informationType: "Eingabe Ortskenntnis"}};
+
+            const sendTransactionStub = sinon.stub(wfs, "sendTransaction").resolves("feature"),
+                wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36013", url: "https://example.com/wfs", featurePrefix: "de.hh.up"});
+            // assigned directly, as setData copies the geometry into a plain object
+            wrapper.vm.drawnGeometry = drawnGeometry;
+            await wrapper.vm.onSave();
+
+            expect(sendTransactionStub.firstCall.args[1].getId()).to.equal("ortskenntnisse_aktualisierungsbedarfe.42");
+            expect(sendTransactionStub.firstCall.args[4]).to.equal("selectedUpdate");
+        });
+
+        it("should insert a new report", async () => {
+            const sendTransactionStub = sinon.stub(wfs, "sendTransaction").resolves("feature"),
+                wrapper = await mountFilledForm();
+
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36013", url: "https://example.com/wfs"});
+            await wrapper.vm.onSave();
+
+            expect(sendTransactionStub.firstCall.args[1].getId()).to.be.undefined;
+            expect(sendTransactionStub.firstCall.args[4]).to.equal("insert");
+        });
+
+        it("should place the point marker in the center of the saved report", async () => {
+            const wrapper = await mountFilledForm();
+
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36013", url: "https://example.com/wfs"});
+            sinon.stub(wfs, "sendTransaction").resolves("feature");
+
+            await wrapper.vm.onSave();
+
+            expect(placingPointMarkerSpy.calledOnce).to.be.true;
+            expect(placingPointMarkerSpy.firstCall.args[1]).to.deep.equal(drawnGeometry.getInteriorPoint().getCoordinates().slice(0, 2));
+        });
+
+        it("should not place the point marker if the transaction fails", async () => {
+            const wrapper = await mountFilledForm();
+
+            sinon.stub(console, "error");
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36013", url: "https://example.com/wfs"});
+            sinon.stub(wfs, "sendTransaction").rejects(new Error("transaction failed"));
+
+            await wrapper.vm.onSave();
+
+            expect(placingPointMarkerSpy.notCalled).to.be.true;
+        });
+
         it("should reload the layer of the saved reports after the report was inserted", async () => {
             const refreshSpy = sinon.spy(),
-                getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").returns({getLayerSource: () => ({refresh: refreshSpy})}),
+                getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").withArgs("36013").returns({getLayerSource: () => ({refresh: refreshSpy})}),
                 wrapper = await mountFilledForm();
 
             sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36013", url: "https://example.com/wfs"});
@@ -218,6 +298,59 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
         });
     });
 
+    describe("Edited report", () => {
+        it("should hide the edited report on its layer while it is edited and show it again afterwards", () => {
+            const setStyleSpy = sinon.spy();
+
+            currentRequirement = {id: "ortskenntnisse_aktualisierungsbedarfe.42", formValues: {name: "name", initiator: "initiator", contactPerson: "contactPerson", comment: "", infoLink: "", informationType: ""}};
+            sinon.stub(layerCollection, "getLayerById").withArgs("36013").returns({getLayerSource: () => ({getFeatureById: () => ({setStyle: setStyleSpy})})});
+
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            expect(setStyleSpy.calledOnce).to.be.true;
+            expect(setStyleSpy.firstCall.args[0]).to.not.be.undefined;
+
+            wrapper.unmount();
+
+            expect(setStyleSpy.calledTwice).to.be.true;
+            expect(setStyleSpy.secondCall.args[0]).to.be.undefined;
+        });
+
+        it("should pass the geometry of the edited report to the draw component", () => {
+            currentRequirement = {id: "ortskenntnisse_aktualisierungsbedarfe.42", geometry: drawnGeometry, formValues: {name: "name", initiator: "initiator", contactPerson: "contactPerson", comment: "", infoLink: "", informationType: ""}};
+
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            expect(wrapper.findComponent({name: "HrDraw"}).props("geometry")).to.equal(drawnGeometry);
+        });
+    });
+
+    describe("Creation date", () => {
+        it("should keep the creation date of an edited report", () => {
+            currentRequirement = {formValues: {name: "name", initiator: "initiator", contactPerson: "contactPerson", comment: "", infoLink: "", creationDate: "2026-01-15Z", informationType: "Eingabe Ortskenntnis"}};
+
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            expect(wrapper.vm.creationDate).to.equal("15.01.2026");
+            expect(wrapper.vm.formValues.creationDate).to.equal("2026-01-15");
+            expect(wrapper.vm.formValues.lastUpdate).to.not.equal("2026-01-15");
+        });
+
+        it("should use the current date for a new report", () => {
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            expect(wrapper.vm.formValues.creationDate).to.equal(wrapper.vm.formValues.lastUpdate);
+        });
+
+        it("should use the current date for an edited report without a valid creation date", () => {
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            expect(wrapper.vm.getCreatedAt(undefined).isValid()).to.be.true;
+            expect(wrapper.vm.getCreatedAt("").format("YYYY-MM-DD")).to.equal(wrapper.vm.formValues.lastUpdate);
+            expect(wrapper.vm.getCreatedAt("unbekannt").format("YYYY-MM-DD")).to.equal(wrapper.vm.formValues.lastUpdate);
+        });
+    });
+
     describe("Computed Properties of the transaction", () => {
         it("should trim the values of the form and take the type from the selected opinion", async () => {
             const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
@@ -228,6 +361,7 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
             expect(wrapper.vm.formValues.comment).to.equal("comment");
             expect(wrapper.vm.formValues.informationType).to.equal("Eingabe Ortskenntnis");
             expect(wrapper.vm.formValues.creationDate).to.match(/^\d{4}-\d{2}-\d{2}$/);
+            expect(wrapper.vm.formValues.lastUpdate).to.match(/^\d{4}-\d{2}-\d{2}$/);
         });
 
         it("should detect a drawn geometry", async () => {

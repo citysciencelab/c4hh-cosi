@@ -1,12 +1,13 @@
 <script>
 import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
+import Feature from "ol/Feature.js";
 import {Fill, Stroke, Style} from "ol/style.js";
 import {fromCircle} from "ol/geom/Polygon.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import layerFactory from "@core/layers/js/layerFactory.js";
 import {mapActions} from "vuex";
-import {markRaw} from "vue";
+import {markRaw, toRaw} from "vue";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction.js";
 
 const hrDrawLayerId = "heavy-rain-draw";
@@ -18,6 +19,14 @@ export default {
         IconButton
     },
     props: {
+        /**
+         * The geometry of an edited feature. It is shown on the draw layer, so that it can be modified or drawn again.
+         */
+        geometry: {
+            type: Object,
+            required: false,
+            default: null
+        },
         heading: {
             type: String,
             default: ""
@@ -82,18 +91,7 @@ export default {
                     return;
                 }
 
-                const style = new Style({
-                    stroke: new Stroke({
-                        color: val,
-                        width: this.currentLayout.strokeWidth
-                    }),
-                    fill: new Fill({
-                        color: [255, 255, 255, 0.5]
-                    })
-                });
-
-
-                this.source?.getFeatures()[0].setStyle(style);
+                this.source?.getFeatures()[0].setStyle(this.createDrawStyle(val));
             },
             deep: true,
             immediate: true
@@ -101,6 +99,7 @@ export default {
     },
     created () {
         this.source = this.getLayerSource();
+        this.addGeometry(this.geometry);
     },
     unmounted () {
         this.resetAll();
@@ -109,12 +108,47 @@ export default {
         ...mapActions("Maps", ["addInteraction", "removeInteraction"]),
 
         /**
+         * Adds the geometry of an edited feature to the draw layer, as if it was drawn.
+         * A copy is added, so that the modify interaction does not change the given geometry.
+         * @param {ol/geom/Geometry|null} geometry The geometry of the edited feature.
+         * @returns {void}
+         */
+        addGeometry (geometry) {
+            if (typeof geometry?.clone !== "function") {
+                return;
+            }
+
+            const feature = new Feature(toRaw(geometry).clone());
+
+            feature.setId("drawn-feature");
+            feature.setStyle(this.createDrawStyle(this.strokeColor));
+            this.source.addFeature(feature);
+        },
+
+        /**
          * Clears the current drawing and emits an empty value.
          * @returns {void}
          */
         clearDrawnFeature () {
             this.resetAll();
             this.$emit("update:drawn-geometry", null);
+        },
+
+        /**
+         * Creates the style of the drawn feature.
+         * @param {Number[]} color The stroke color.
+         * @returns {ol/style/Style} The style.
+         */
+        createDrawStyle (color) {
+            return new Style({
+                stroke: new Stroke({
+                    color,
+                    width: this.currentLayout.strokeWidth
+                }),
+                fill: new Fill({
+                    color: [255, 255, 255, 0.5]
+                })
+            });
         },
 
         /**
@@ -143,7 +177,7 @@ export default {
          * Emits a copy of the geometry of the given feature.
          * A copy is emitted, as the modify interaction changes the geometry of the feature itself.
          * It is marked as raw, so that Vue does not wrap the OpenLayers geometry in a reactive proxy.
-         * @param {module:ol/Feature} feature The drawn feature.
+         * @param {ol/Feature} feature The drawn feature.
          * @returns {void}
          */
         emitDrawnGeometry (feature) {
@@ -184,11 +218,13 @@ export default {
                 return existingLayer.getLayerSource();
             }
 
+            // the drawn features are styled by the draw interaction, so the layer needs no style of the style.json
             const layer = layerFactory.createLayer({
                 typ: "VECTORBASE",
                 id: hrDrawLayerId,
                 name: hrDrawLayerId,
-                alwaysOnTop: true
+                alwaysOnTop: true,
+                dontInitStyle: true
             });
 
             layerCollection.addLayer(layer);

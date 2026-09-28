@@ -1,5 +1,7 @@
 <script>
 import {createPolygonStyle} from "../../shared/js/createPolygonStyle.js";
+import {formatDate} from "../../shared/js/formatDate.js";
+import {getClickedWfstFeature} from "../../shared/js/getClickedWfstFeature.js";
 import HrCard from "../../shared/components/HrCard.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
@@ -26,7 +28,17 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/Projects", ["criteria", "currentProject", "currentView", "wfstAttributes", "wfstLayerId"])
+        ...mapGetters("Modules/Projects", ["criteria", "currentProject", "currentView", "wfstAttributes", "wfstLayerId"]),
+
+        /**
+         * Gets the criteria of the current project without empty entries, as the criteria are optional.
+         * @returns {String[]} the criteria of the current project.
+         */
+        projectCriteria () {
+            const value = this.currentProject?.formValues?.criteria;
+
+            return typeof value === "string" ? value.split(",").map(cri => cri.trim()).filter(cri => cri !== "") : [];
+        }
     },
     async mounted () {
         if (this.wfstLayerId) {
@@ -34,22 +46,50 @@ export default {
             // the layer is created by a watcher of the layer config, so it exists after the next tick
             await this.$nextTick();
             layerCollection.getLayerById(this.wfstLayerId)?.setStyle(createPolygonStyle(this.getFeatureColor));
+            // the content of a clicked project is shown in the module, so the gfi is not needed
+            layerCollection.getLayerById(this.wfstLayerId)?.getLayer()?.set("gfiAttributes", "ignore");
+            this.registerListener({type: "singleclick", listener: this.onMapClick, keyForBoundFunctions: "heavyRainProjectsClick"});
         }
     },
     unmounted () {
+        this.removePointMarker();
         if (this.wfstLayerId) {
+            this.unregisterListener({type: "singleclick", listener: this.onMapClick, keyForBoundFunctions: "heavyRainProjectsClick"});
             this.replaceByIdInLayerConfig({layerConfigs: [{id: this.wfstLayerId, layer: {visibility: false}}]});
         }
     },
     methods: {
+        formatDate,
+        ...mapActions("Maps", ["placingPointMarker", "registerListener", "removePointMarker", "unregisterListener"]),
         ...mapActions(["addOrReplaceLayer", "replaceByIdInLayerConfig"]),
         ...mapMutations("Modules/Projects", ["setCurrentProject", "setCurrentView"]),
 
         /**
-         * Creates a new project
+         * Shows the content of the clicked project and marks the clicked position.
+         * Clicks are ignored in the edit view, as the map is used for drawing there.
+         * @param {Object} evt the OpenLayers map click event.
+         * @returns {void}
+         */
+        onMapClick (evt) {
+            if (this.currentView !== "main") {
+                return;
+            }
+
+            const project = getClickedWfstFeature(evt, this.wfstLayerId, this.wfstAttributes);
+
+            if (project) {
+                this.setCurrentProject(project);
+                this.placingPointMarker(evt.coordinate);
+            }
+        },
+
+        /**
+         * Opens the form for a new project.
+         * The current project and its marker are reset, so that the new project does not update it.
          * @returns {void}
          */
         createProject () {
+            this.removePointMarker();
             this.setCurrentProject(undefined);
             this.setCurrentView("edit");
         },
@@ -75,15 +115,13 @@ export default {
          * @returns {String} the hex color.
          */
         getBgcolor (val) {
-            if (!Array.isArray(val) || !val.length) {
-                return this.criteria[0].color;
+            const index = Array.isArray(val) ? val
+                .map(chosenCri => this.criteria.findIndex(cri => cri.name === String(chosenCri).trim()))
+                .filter(idx => idx >= 0) : [];
+
+            if (!index.length) {
+                return this.criteria[0]?.color;
             }
-
-            const index = [];
-
-            val.forEach(chosenCri => {
-                index.push(this.criteria.findIndex(cri => cri.name === chosenCri.trim()));
-            });
 
             return this.criteria[Math.min(...index)].color;
         },
@@ -132,9 +170,9 @@ export default {
                 <template #above-title>
                     <div class="d-flex flex-wrap gap-2">
                         <span
-                            v-for="(cri, index) in currentProject?.formValues?.criteria.split(',')"
+                            v-for="(cri, index) in projectCriteria"
                             :key="index"
-                            :style="{background: getBgcolor(currentProject?.formValues?.criteria.split(','))}"
+                            :style="{background: getBgcolor(projectCriteria)}"
                             class="badge rounded-pill fw-normal px-3 py-2"
                         >
                             {{ cri }}
@@ -157,7 +195,7 @@ export default {
                                 {{ $t("additional:modules.projects.labels.lastUpdate") }}
                             </p>
                             <p class="mb-0">
-                                {{ currentProject?.formValues?.createdAt }}
+                                {{ formatDate(currentProject?.formValues?.lastUpdate) }}
                             </p>
                         </div>
                         <div class="col-6">
@@ -165,7 +203,7 @@ export default {
                                 {{ $t("additional:modules.projects.labels.startDate") }}
                             </p>
                             <p class="mb-0">
-                                {{ currentProject?.formValues?.startDate }}
+                                {{ formatDate(currentProject?.formValues?.startDate) }}
                             </p>
                         </div>
                         <div class="col-6">
@@ -173,7 +211,7 @@ export default {
                                 {{ $t("additional:modules.projects.labels.endDate") }}
                             </p>
                             <p class="mb-0">
-                                {{ currentProject?.formValues?.endDate }}
+                                {{ formatDate(currentProject?.formValues?.endDate) }}
                             </p>
                         </div>
                         <div class="col-6">

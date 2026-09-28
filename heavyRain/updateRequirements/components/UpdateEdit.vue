@@ -2,13 +2,16 @@
 import {convertColor} from "@shared/js/utils/convertColor";
 import dayjs from "dayjs";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
+import {formatDate} from "../../shared/js/formatDate.js";
+import {getGeometryCenter} from "../../shared/js/getGeometryCenter.js";
 import HrDraw from "../../shared/components/HrDraw.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import {sendWfstTransaction} from "../../shared/js/sendWfstTransaction.js";
+import {setWfstFeatureVisibility} from "../../shared/js/setWfstFeatureVisibility.js";
 
 export default {
     name: "UpdateEdit",
@@ -66,7 +69,7 @@ export default {
                 image: this.image,
                 imageName: this.imageName,
                 infoLink: this.infoLink.trim(),
-                lastUpate: dayjs().format(this.wfstDateFormat)
+                lastUpdate: dayjs().format(this.wfstDateFormat)
             };
         },
 
@@ -87,31 +90,54 @@ export default {
         }
     },
     mounted () {
+        // the edited feature is hidden, as its geometry is edited on the draw layer
+        setWfstFeatureVisibility(this.wfstLayerId, this.currentRequirement?.id, false);
         if (typeof this.currentRequirement !== "undefined") {
             this.name = this.currentRequirement?.formValues?.name;
             this.initiator = this.currentRequirement?.formValues?.initiator;
             this.image = this.currentRequirement?.formValues?.image;
             this.imageName = this.currentRequirement?.formValues?.imageName;
             this.contactPerson = this.currentRequirement?.formValues?.contactPerson;
-            this.currentOpinion = this.currentRequirement?.formValues?.informationType ? this.getCurrentOption(this.currentRequirement?.formValues?.informationType) : this.informationType[0];
+            this.currentOpinion = this.getCurrentOption(this.currentRequirement?.formValues?.informationType) || this.informationType[0];
             this.comment = this.currentRequirement?.formValues?.comment;
             this.infoLink = this.currentRequirement?.formValues?.infoLink;
             this.drawnGeometry = this.currentRequirement?.geometry;
+            this.createdAt = this.getCreatedAt(this.currentRequirement?.formValues?.creationDate);
         }
         else {
             this.currentOpinion = this.informationType[0];
         }
     },
+    unmounted () {
+        setWfstFeatureVisibility(this.wfstLayerId, this.currentRequirement?.id, true);
+    },
     methods: {
+        ...mapActions("Maps", ["placingPointMarker"]),
         ...mapMutations("Modules/UpdateRequirements", ["setCurrentRequirement"]),
 
         /**
-         * Hets the current option.
+         * Gets the creation date of an edited report, so that it is kept when saving.
+         * A report without a valid creation date gets the current date.
+         * @param {String} value the creation date of the service, e.g. "2026-09-28" or "2026-09-28Z".
+         * @returns {Object} the creation date as dayjs object.
+         */
+        getCreatedAt (value) {
+            const date = dayjs(formatDate(value, "YYYY-MM-DD"));
+
+            return date.isValid() ? date : dayjs();
+        },
+
+        /**
+         * Gets the current option.
          * @param {String} value the current option in string
-         * @returns {Object} the current option object.
+         * @returns {Object|undefined} the current option object or undefined, if no option matches.
          */
         getCurrentOption (value) {
-            return this.informationType.find(type => type.cat === value.split(" ")?.[0] && type.name === value.split(" ")?.[1]);
+            if (typeof value !== "string" || value.trim() === "") {
+                return undefined;
+            }
+
+            return this.informationType.find(type => `${type.cat} ${type.name}` === value.trim());
         },
 
         /**
@@ -164,14 +190,16 @@ export default {
                     formValues: this.formValues,
                     wfstAttributes: this.wfstAttributes,
                     wfstGeometryName: this.wfstGeometryName,
-                    transactionMethod: "insert"
+                    featureId: this.currentRequirement?.id
                 });
 
                 layerCollection.getLayerById(this.wfstLayerId)?.getLayerSource()?.refresh();
                 this.setCurrentRequirement({
+                    id: this.currentRequirement?.id,
                     geometry: this.drawnGeometry,
                     formValues: this.formValues
                 });
+                this.placingPointMarker(getGeometryCenter(this.drawnGeometry));
                 this.$emit("showSnackbarMessage", this.$t("additional:modules.updateRequirements.messages.saveSuccess"));
                 this.$emit("click:save");
             }
@@ -211,6 +239,7 @@ export default {
         </p>
         <HrDraw
             class="mb-4"
+            :geometry="currentRequirement?.geometry"
             :heading="$t('additional:modules.updateRequirements.drawHeading')"
             :stroke-color="strokeColor"
             @update:drawn-geometry="drawnGeometry = $event"

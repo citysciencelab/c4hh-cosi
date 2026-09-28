@@ -3,8 +3,10 @@ import {expect} from "chai";
 import Feature from "ol/Feature.js";
 import {flushPromises, shallowMount} from "@vue/test-utils";
 import layerCollection from "@core/layers/js/layerCollection.js";
+import Polygon from "ol/geom/Polygon.js";
 import sinon from "sinon";
 import UpdateRequirements from "../../components/UpdateRequirements.vue";
+import VectorLayer from "ol/layer/Vector.js";
 
 describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue", () => {
     const informationTypes = [
@@ -20,7 +22,11 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
         }
     ];
     let addOrReplaceLayerSpy,
+        placingPointMarkerSpy,
+        registerListenerSpy,
+        removePointMarkerSpy,
         replaceByIdInLayerConfigSpy,
+        unregisterListenerSpy,
         setCurrentRequirementSpy,
         setCurrentViewSpy,
         store;
@@ -43,6 +49,15 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
             },
             modules: {
                 namespaced: true,
+                Maps: {
+                    namespaced: true,
+                    actions: {
+                        placingPointMarker: placingPointMarkerSpy,
+                        registerListener: registerListenerSpy,
+                        removePointMarker: removePointMarkerSpy,
+                        unregisterListener: unregisterListenerSpy
+                    }
+                },
                 Modules: {
                     namespaced: true,
                     modules: {
@@ -53,7 +68,7 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
                                 currentRequirement: () => currentRequirement,
                                 currentView: () => currentView,
                                 informationType: () => informationType,
-                                wfstAttributes: () => ({informationType: "art_der_angabe"}),
+                                wfstAttributes: () => ({informationType: "art_der_angabe", name: "name"}),
                                 wfstLayerId: () => wfstLayerId
                             },
                             mutations: {
@@ -69,7 +84,11 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
 
     beforeEach(() => {
         addOrReplaceLayerSpy = sinon.spy();
+        placingPointMarkerSpy = sinon.spy();
+        registerListenerSpy = sinon.spy();
+        removePointMarkerSpy = sinon.spy();
         replaceByIdInLayerConfigSpy = sinon.spy();
+        unregisterListenerSpy = sinon.spy();
         setCurrentRequirementSpy = sinon.spy();
         setCurrentViewSpy = sinon.spy();
         store = createTestStore();
@@ -90,7 +109,7 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
         it("should color the polygons of the layer by the information type when mounted", async () => {
             const setStyleSpy = sinon.spy();
 
-            sinon.stub(layerCollection, "getLayerById").returns({setStyle: setStyleSpy});
+            sinon.stub(layerCollection, "getLayerById").withArgs("36013").returns({getLayer: () => new VectorLayer(), setStyle: setStyleSpy});
             shallowMount(UpdateRequirements, {global: {plugins: [createTestStore({informationType: informationTypes})]}});
             await flushPromises();
 
@@ -107,6 +126,36 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
 
             expect(replaceByIdInLayerConfigSpy.calledOnce).to.be.true;
             expect(replaceByIdInLayerConfigSpy.firstCall.args[1]).to.deep.equal({layerConfigs: [{id: "36013", layer: {visibility: false}}]});
+        });
+
+        it("should disable the gfi of the layer when mounted, as the module shows the clicked report", async () => {
+            const olLayer = new VectorLayer({gfiAttributes: "showAll"});
+
+            sinon.stub(layerCollection, "getLayerById").withArgs("36013").returns({getLayer: () => olLayer, setStyle: sinon.spy()});
+            shallowMount(UpdateRequirements, {global: {plugins: [store]}});
+            await flushPromises();
+
+            expect(olLayer.get("gfiAttributes")).to.equal("ignore");
+        });
+
+        it("should remove the point marker when unmounted", () => {
+            const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
+
+            wrapper.unmount();
+
+            expect(removePointMarkerSpy.calledOnce).to.be.true;
+        });
+
+        it("should register the map click listener when mounted and unregister it when unmounted", async () => {
+            const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
+
+            await flushPromises();
+            wrapper.unmount();
+
+            expect(registerListenerSpy.calledOnce).to.be.true;
+            expect(registerListenerSpy.firstCall.args[1]).to.deep.include({type: "singleclick", keyForBoundFunctions: "heavyRainUpdateRequirementsClick"});
+            expect(unregisterListenerSpy.calledOnce).to.be.true;
+            expect(unregisterListenerSpy.firstCall.args[1]).to.deep.include({type: "singleclick", keyForBoundFunctions: "heavyRainUpdateRequirementsClick"});
         });
 
         it("should neither add nor hide a layer if no layer is configured", () => {
@@ -173,6 +222,59 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
     });
 
     describe("Methods", () => {
+        describe("onMapClick", () => {
+            const olLayer = new VectorLayer(),
+                feature = new Feature({
+                    geometry: new Polygon([[[0, 0], [1, 0], [1, 1], [0, 0]]]),
+                    art_der_angabe: "Aktualisierungsbedarf SRGK",
+                    name: "Meldung A"
+                }),
+                evt = {
+                    coordinate: [565000, 5935000],
+                    pixel: [0, 0],
+                    map: {forEachFeatureAtPixel: (pixel, callback, {layerFilter}) => layerFilter(olLayer) ? callback(feature) : undefined}
+                };
+
+            beforeEach(() => {
+                feature.setId("ortskenntnisse_aktualisierungsbedarfe.42");
+                sinon.stub(layerCollection, "getLayerById").withArgs("36013").returns({getLayer: () => olLayer, setStyle: sinon.spy()});
+            });
+
+            it("should set the clicked feature as current requirement", () => {
+                const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
+
+                wrapper.vm.onMapClick(evt);
+
+                expect(setCurrentRequirementSpy.calledOnce).to.be.true;
+                expect(setCurrentRequirementSpy.firstCall.args[1].id).to.equal("ortskenntnisse_aktualisierungsbedarfe.42");
+                expect(setCurrentRequirementSpy.firstCall.args[1].formValues).to.deep.equal({
+                    informationType: "Aktualisierungsbedarf SRGK",
+                    name: "Meldung A"
+                });
+                expect(setCurrentRequirementSpy.firstCall.args[1].geometry.getCoordinates()).to.deep.equal(feature.getGeometry().getCoordinates());
+                expect(placingPointMarkerSpy.calledOnce).to.be.true;
+                expect(placingPointMarkerSpy.firstCall.args[1]).to.deep.equal([565000, 5935000]);
+            });
+
+            it("should not set a requirement if no feature was clicked", () => {
+                const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
+
+                wrapper.vm.onMapClick({pixel: [0, 0], map: {forEachFeatureAtPixel: () => undefined}});
+
+                expect(setCurrentRequirementSpy.notCalled).to.be.true;
+                expect(placingPointMarkerSpy.notCalled).to.be.true;
+            });
+
+            it("should not set a requirement in the create-new view", () => {
+                const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [createTestStore({informationType: informationTypes, currentView: "create-new"})]}});
+
+                wrapper.vm.onMapClick(evt);
+
+                expect(setCurrentRequirementSpy.notCalled).to.be.true;
+                expect(placingPointMarkerSpy.notCalled).to.be.true;
+            });
+        });
+
         it("should return the color of the information type of the feature", () => {
             const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [createTestStore({informationType: informationTypes})]}});
 
@@ -190,6 +292,17 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
             const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
 
             expect(wrapper.vm.getFeatureColor(new Feature())).to.be.undefined;
+        });
+
+        it("should reset the current report and its marker when a new report is created", () => {
+            const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
+
+            wrapper.vm.createRequirement();
+
+            expect(removePointMarkerSpy.calledOnce).to.be.true;
+            expect(setCurrentRequirementSpy.calledOnce).to.be.true;
+            expect(setCurrentRequirementSpy.firstCall.args[1]).to.be.undefined;
+            expect(setCurrentViewSpy.firstCall.args[1]).to.equal("create-new");
         });
 
         it("should set snackbar data on showSnackbarMessage", () => {

@@ -1,5 +1,7 @@
 <script>
 import {createPolygonStyle} from "../../shared/js/createPolygonStyle.js";
+import {formatDate} from "../../shared/js/formatDate.js";
+import {getClickedWfstFeature} from "../../shared/js/getClickedWfstFeature.js";
 import HrCard from "../../shared/components/HrCard.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
@@ -39,24 +41,52 @@ export default {
             // the layer is created by a watcher of the layer config, so it exists after the next tick
             await this.$nextTick();
             layerCollection.getLayerById(this.wfstLayerId)?.setStyle(createPolygonStyle(this.getFeatureColor));
+            // the content of a clicked report is shown in the module, so the gfi is not needed
+            layerCollection.getLayerById(this.wfstLayerId)?.getLayer()?.set("gfiAttributes", "ignore");
+            this.registerListener({type: "singleclick", listener: this.onMapClick, keyForBoundFunctions: "heavyRainUpdateRequirementsClick"});
         }
     },
     unmounted () {
+        this.removePointMarker();
         if (this.wfstLayerId) {
+            this.unregisterListener({type: "singleclick", listener: this.onMapClick, keyForBoundFunctions: "heavyRainUpdateRequirementsClick"});
             this.replaceByIdInLayerConfig({layerConfigs: [{id: this.wfstLayerId, layer: {visibility: false}}]});
         }
     },
     methods: {
+        formatDate,
         ...mapActions(["addOrReplaceLayer", "replaceByIdInLayerConfig"]),
+        ...mapActions("Maps", ["placingPointMarker", "registerListener", "removePointMarker", "unregisterListener"]),
         ...mapMutations("Modules/UpdateRequirements", ["setCurrentRequirement", "setCurrentView"]),
 
         /**
-         * Creates a new requirement.
+         * Opens the form for a new report.
+         * The current report and its marker are reset, so that the new report does not update it.
          * @returns {void}
          */
         createRequirement () {
+            this.removePointMarker();
             this.setCurrentRequirement(undefined);
             this.setCurrentView("create-new");
+        },
+
+        /**
+         * Shows the content of the clicked report and marks the clicked position.
+         * Clicks are ignored in the edit view, as the map is used for drawing there.
+         * @param {Object} evt the OpenLayers map click event.
+         * @returns {void}
+         */
+        onMapClick (evt) {
+            if (this.currentView !== "main") {
+                return;
+            }
+
+            const requirement = getClickedWfstFeature(evt, this.wfstLayerId, this.wfstAttributes);
+
+            if (requirement) {
+                this.setCurrentRequirement(requirement);
+                this.placingPointMarker(evt.coordinate);
+            }
         },
 
         /**
@@ -139,7 +169,7 @@ export default {
                         <span class="text-body-secondary">
                             {{ $t("additional:modules.updateRequirements.form.createdAt") }}
                         </span>
-                        <span>{{ currentRequirement?.formValues?.creationDate }}</span>
+                        <span>{{ formatDate(currentRequirement?.formValues?.creationDate) }}</span>
                         <span class="text-body-secondary">|</span>
                         <span class="text-body-secondary">Initiator:</span>
                         <span>{{ currentRequirement?.formValues?.initiator }}</span>
@@ -149,7 +179,7 @@ export default {
                         <span class="text-body-secondary">
                             {{ $t("additional:modules.updateRequirements.form.lastUpdate") }}
                         </span>
-                        <span class="ms-1">{{ currentRequirement?.formValues?.lastUpate }}</span>
+                        <span class="ms-1">{{ formatDate(currentRequirement?.formValues?.lastUpdate) }}</span>
                     </p>
 
                     <p class="mb-3">

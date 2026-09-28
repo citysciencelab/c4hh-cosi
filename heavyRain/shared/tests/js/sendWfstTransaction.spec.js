@@ -104,6 +104,52 @@ describe("addons/heavyRain/shared/js/sendWfstTransaction.js", () => {
                 expect(key).to.not.include(":");
             });
         });
+
+        it("should not set an id for an insert", () => {
+            expect(createTransactionFeature(geometry, formValues, wfstAttributes, wfstGeometryName).getId()).to.be.undefined;
+        });
+
+        describe("update", () => {
+            const update = {featureId: "meldungen.42", featurePrefix: "de.hh.up"};
+
+            it("should set the id of the edited feature", () => {
+                expect(createTransactionFeature(geometry, formValues, wfstAttributes, wfstGeometryName, update).getId()).to.equal("meldungen.42");
+            });
+
+            it("should prefix the attributes and the geometry with the namespace in the order of the given attributes with the geometry last", () => {
+                const keys = Object.keys(createTransactionFeature(geometry, formValues, wfstAttributes, wfstGeometryName, update).getProperties());
+
+                expect(keys).to.deep.equal([
+                    "de.hh.up:beschreibung",
+                    "de.hh.up:name",
+                    "de.hh.up:ansprechpartner",
+                    "de.hh.up:eingabedatum",
+                    "de.hh.up:geom"
+                ]);
+            });
+
+            it("should set the filled in values under the prefixed attribute names", () => {
+                const feature = createTransactionFeature(geometry, formValues, wfstAttributes, wfstGeometryName, update);
+
+                expect(feature.get("de.hh.up:name")).to.equal("name");
+                expect(feature.get("de.hh.up:eingabedatum")).to.equal("2026-09-22");
+                expect(feature.getGeometry().getType()).to.equal("MultiPolygon");
+                expect(feature.getGeometryName()).to.equal("de.hh.up:geom");
+            });
+
+            it("should set emptied values to null, so that the service removes them", () => {
+                const feature = createTransactionFeature(geometry, formValues, wfstAttributes, wfstGeometryName, update);
+
+                expect(feature.get("de.hh.up:beschreibung")).to.be.null;
+            });
+
+            it("should not prefix the attributes if the service has no namespace prefix", () => {
+                const feature = createTransactionFeature(geometry, formValues, wfstAttributes, wfstGeometryName, {featureId: "meldungen.42"});
+
+                expect(feature.get("name")).to.equal("name");
+                expect(feature.getGeometryName()).to.equal("geom");
+            });
+        });
     });
 
     describe("normalizeFeaturePrefix", () => {
@@ -131,11 +177,11 @@ describe("addons/heavyRain/shared/js/sendWfstTransaction.js", () => {
     describe("sendWfstTransaction", () => {
         /**
          * Creates the options of the transaction.
-         * @param {String} transactionMethod the transaction to perform.
+         * @param {String} [featureId] the id of the edited feature.
          * @returns {Object} the options of the transaction.
          */
-        function createOptions (transactionMethod) {
-            return {wfstId: "36013", projectionCode: "EPSG:25832", geometry, formValues, wfstAttributes, wfstGeometryName, transactionMethod};
+        function createOptions (featureId) {
+            return {wfstId: "36013", projectionCode: "EPSG:25832", geometry, formValues, wfstAttributes, wfstGeometryName, featureId};
         }
 
         it("should send an insert transaction with the url and the config of the layer", async () => {
@@ -144,7 +190,7 @@ describe("addons/heavyRain/shared/js/sendWfstTransaction.js", () => {
 
             sinon.stub(rawLayerList, "getLayerWhere").returns(layerConfig);
 
-            const result = await sendWfstTransaction(createOptions("insert"));
+            const result = await sendWfstTransaction(createOptions());
 
             expect(sendTransactionStub.calledOnce).to.be.true;
             expect(sendTransactionStub.firstCall.args[0]).to.equal("EPSG:25832");
@@ -156,14 +202,16 @@ describe("addons/heavyRain/shared/js/sendWfstTransaction.js", () => {
             expect(result).to.equal("feature");
         });
 
-        it("should send the given transaction method", async () => {
+        it("should send an update transaction with the prefixed attributes for an edited feature", async () => {
             const sendTransactionStub = sinon.stub(wfs, "sendTransaction").resolves("feature");
 
-            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36013", url: "https://example.com/wfs"});
+            sinon.stub(rawLayerList, "getLayerWhere").returns({id: "36013", url: "https://example.com/wfs", featurePrefix: "de.hh.up:"});
 
-            await sendWfstTransaction(createOptions("delete"));
+            await sendWfstTransaction(createOptions("meldungen.42"));
 
-            expect(sendTransactionStub.firstCall.args[4]).to.equal("delete");
+            expect(sendTransactionStub.firstCall.args[1].getId()).to.equal("meldungen.42");
+            expect(sendTransactionStub.firstCall.args[1].get("de.hh.up:name")).to.equal("name");
+            expect(sendTransactionStub.firstCall.args[4]).to.equal("selectedUpdate");
         });
 
         it("should send the feature prefix of the layer without a trailing colon", async () => {
@@ -172,7 +220,7 @@ describe("addons/heavyRain/shared/js/sendWfstTransaction.js", () => {
 
             sinon.stub(rawLayerList, "getLayerWhere").returns(layerConfig);
 
-            await sendWfstTransaction(createOptions("insert"));
+            await sendWfstTransaction(createOptions());
 
             expect(sendTransactionStub.firstCall.args[3].featurePrefix).to.equal("app");
             expect(sendTransactionStub.firstCall.args[3].featureType).to.equal("meldungen");
@@ -185,7 +233,7 @@ describe("addons/heavyRain/shared/js/sendWfstTransaction.js", () => {
             sinon.stub(rawLayerList, "getLayerWhere").returns(undefined);
 
             try {
-                await sendWfstTransaction(createOptions("insert"));
+                await sendWfstTransaction(createOptions());
             }
             catch (e) {
                 error = e;

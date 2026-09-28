@@ -2,14 +2,16 @@
 import {convertColor} from "@shared/js/utils/convertColor";
 import dayjs from "dayjs";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
+import {getGeometryCenter} from "../../shared/js/getGeometryCenter.js";
 import HrDraw from "../../shared/components/HrDraw.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
-import {mapGetters, mapMutations} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
 import {sendWfstTransaction} from "../../shared/js/sendWfstTransaction.js";
+import {setWfstFeatureVisibility} from "../../shared/js/setWfstFeatureVisibility.js";
 
 export default {
     name: "ProjectsEdit",
@@ -87,15 +89,13 @@ export default {
          * @returns {Number[]} the rgb color code.
          */
         strokeColor () {
-            if (!this.chosenCriteria.length) {
-                return convertColor(this.criteria[0].color, "rgb");
+            const index = this.chosenCriteria
+                .map(chosenCri => this.criteria.findIndex(cri => cri.name === chosenCri?.name))
+                .filter(idx => idx >= 0);
+
+            if (!index.length) {
+                return convertColor(this.criteria[0]?.color, "rgb");
             }
-
-            const index = [];
-
-            this.chosenCriteria.forEach(chosenCri => {
-                index.push(this.criteria.findIndex(cri => cri.name === chosenCri.name));
-            });
 
             return convertColor(this.criteria[Math.min(...index)].color, "rgb");
         }
@@ -104,6 +104,8 @@ export default {
         this.chosenCriteria = [this.criteria[0]];
     },
     mounted () {
+        // the edited feature is hidden, as its geometry is edited on the draw layer
+        setWfstFeatureVisibility(this.wfstLayerId, this.currentProject?.id, false);
         if (typeof this.currentProject !== "undefined") {
             this.chosenCriteria = this.getChosenCriteria(this.currentProject?.formValues?.criteria);
             this.projectName = this.currentProject?.formValues?.projectName;
@@ -122,7 +124,11 @@ export default {
             this.drawnGeometry = this.currentProject?.geometry;
         }
     },
+    unmounted () {
+        setWfstFeatureVisibility(this.wfstLayerId, this.currentProject?.id, true);
+    },
     methods: {
+        ...mapActions("Maps", ["placingPointMarker"]),
         ...mapMutations("Modules/Projects", ["setCurrentView", "setCurrentProject"]),
 
         /**
@@ -194,15 +200,17 @@ export default {
                     formValues: this.formValues,
                     wfstAttributes: this.wfstAttributes,
                     wfstGeometryName: this.wfstGeometryName,
-                    transactionMethod: "insert"
+                    featureId: this.currentProject?.id
                 });
 
                 layerCollection.getLayerById(this.wfstLayerId)?.getLayerSource()?.refresh();
                 this.$emit("showSnackbarMessage", this.$t("additional:modules.projects.messages.saveSuccess"));
                 this.setCurrentProject({
+                    id: this.currentProject?.id,
                     geometry: this.drawnGeometry,
                     formValues: this.formValues
                 });
+                this.placingPointMarker(getGeometryCenter(this.drawnGeometry));
                 this.setCurrentView("main");
             }
             catch (error) {
@@ -243,6 +251,7 @@ export default {
             </h5>
             <HrDraw
                 class="mb-4"
+                :geometry="currentProject?.geometry"
                 :stroke-color="strokeColor"
                 @update:drawn-geometry="drawnGeometry = $event"
             />
