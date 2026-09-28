@@ -554,7 +554,7 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
             expect(wrapper.find(".singleAlertContainer").html().indexOf("Alert Test B")).not.to.equal(-1);
         });
 
-        it("positive: removes dangerous tags like <script>, <img>, <svg>", () => {
+        it("html sanitation: removes dangerous tags like <script>, <img>, <svg>", () => {
             const alert = {
                 content: "<script>alert('XSS')</script><p>Text</p><img src=x onerror=alert('XSS')>"
             };
