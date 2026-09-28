@@ -35,6 +35,7 @@
 - Accessibility: Fixed accessibility issues across layer tree and controls (label associations, icon-button naming, ARIA semantics, and preview alt text).
 - AlertingItem: Fixed CSS Regression.
 - Security: XML injection in `highlightFeaturesByAttribute` is prevented by escaping.
+- Print: Fixed printing of vector layers with icon styling may fail if the icon image has not yet been loaded at the time of serialization.
 
 ---
 

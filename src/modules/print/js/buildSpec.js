@@ -1143,8 +1143,8 @@ const BuildSpecModel = {
     buildPointStyleIcon: function (style, layer) {
         return {
             type: "point",
-            graphicWidth: style.getSize()[0] ? style.getSize()[0] * style.getScale() : 60,
-            graphicHeight: style.getSize()[1] ? style.getSize()[1] * style.getScale() : 60,
+            graphicWidth: style.getSize() && style.getSize()[0] ? style.getSize()[0] * style.getScale() : 60,
+            graphicHeight: style.getSize() && style.getSize()[1] ? style.getSize()[1] * style.getScale() : 60,
             externalGraphic: this.buildGraphicPath(style.getSrc()),
             graphicOpacity: layer.getOpacity()
         };
