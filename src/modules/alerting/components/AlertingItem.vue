@@ -6,8 +6,8 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 
 const PURIFY_CONFIG = {
-          ALLOWED_TAGS: ["h1", "h2", "h3", "h4", "h5", "h6", "hr", "b", "br", "i", "strong", "em", "img"],
-          ALLOWED_ATTR: ["src", "alt", "width", "height"]
+          ALLOWED_TAGS: ["h1", "h2", "h3", "h4", "h5", "h6", "hr", "b", "br", "i", "strong", "em", "img", "a"],
+          ALLOWED_ATTR: ["src", "alt", "width", "height", "href", "title"]
       },
       ALERT_FIELDS_TO_SANITIZE = ["content", "creationDate", "text"];
 
