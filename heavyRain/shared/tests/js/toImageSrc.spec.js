@@ -10,10 +10,10 @@ describe("addons/heavyRain/shared/js/toImageSrc.js", () => {
         expect(toImageSrc("iVBOR")).to.equal("data:image/*;base64,iVBOR");
     });
 
-    it("should return an empty string if there is no image", () => {
-        expect(toImageSrc(undefined)).to.equal("");
-        expect(toImageSrc(null)).to.equal("");
-        expect(toImageSrc("")).to.equal("");
-        expect(toImageSrc("  ")).to.equal("");
+    it("should return undefined if there is no image", () => {
+        expect(toImageSrc(undefined)).to.be.undefined;
+        expect(toImageSrc(null)).to.be.undefined;
+        expect(toImageSrc("")).to.be.undefined;
+        expect(toImageSrc("  ")).to.be.undefined;
     });
 });

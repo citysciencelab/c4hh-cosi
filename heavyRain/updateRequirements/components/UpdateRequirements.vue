@@ -38,7 +38,7 @@ export default {
 
         /**
          * Gets the source of the image of the current report.
-         * @returns {String} the source of the image or an empty string, if the report has no image.
+         * @returns {String|undefined} the source of the image or undefined, if the report has no image.
          */
         imageSrc () {
             return toImageSrc(this.currentRequirement?.formValues?.image);
@@ -150,7 +150,7 @@ export default {
             >
                 <template #above-title>
                     <div
-                        v-if="imageSrc"
+                        v-if="typeof imageSrc !== 'undefined'"
                         class="ratio ratio-16x9 border rounded overflow-hidden mb-3"
                     >
                         <img

@@ -22,7 +22,9 @@
         "saveSuccess": "The new project has been saved successfully!",
         "updateSuccess": "The project has been updated successfully!",
         "invalid": "The input fields for Project name, Created vy and contact can not be left blank.",
-        "fileUpload": "The file {{fileName}} is uploaded."
+        "fileUpload": "The file {{fileName}} is uploaded.",
+        "fileTooLarge": "The file {{fileName}} is too large. It may be at most {{maxSize}} MB.",
+        "fileTypeNotAllowed": "The file {{fileName}} has a file type which is not allowed. Allowed are: {{fileTypes}}."
       },
       "labels": {
         "projectName": "Project name",
@@ -38,6 +40,7 @@
         "description": "Short description / Type of measure",
         "protectedAreas": "Areas where protection level criteria are met",
         "fileUpload": "Upload file (optional)",
+        "removeFile": "Delete file",
         "lastUpdate": "Last update"
       }
     },

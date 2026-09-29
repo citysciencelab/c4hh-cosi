@@ -2,10 +2,12 @@
 import {convertColor} from "@shared/js/utils/convertColor";
 import dayjs from "dayjs";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
+import {getDownloadFileName, hasAllowedExtension} from "../../shared/js/fileData.js";
 import {getGeometryCenter} from "../../shared/js/getGeometryCenter.js";
 import HrDraw from "../../shared/components/HrDraw.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
@@ -20,6 +22,7 @@ export default {
         HrDraw,
         HrFooter,
         HrSnackbar,
+        IconButton,
         InputText,
         Multiselect
     },
@@ -48,8 +51,25 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/Projects", ["criteria", "currentProject", "wfstAttributes", "wfstDateFormat", "wfstGeometryName", "wfstLayerId"]),
+        ...mapGetters("Modules/Projects", ["allowedFileExtensions", "criteria", "currentProject", "maxFileSize", "wfstAttributes", "wfstDateFormat", "wfstGeometryName", "wfstLayerId"]),
         ...mapGetters("Maps", ["projectionCode"]),
+
+        /**
+         * Gets the allowed file types for the file dialog, e.g. ".pdf,.docx".
+         * @returns {String} the allowed file types.
+         */
+        acceptedFileTypes () {
+            return this.allowedFileExtensions.map(extension => `.${extension}`).join(",");
+        },
+
+        /**
+         * Gets the name of the uploaded or saved file for the display in the form.
+         * The name of a saved file is not known, so it is created from the name of the project.
+         * @returns {String} the name of the file.
+         */
+        displayedFileName () {
+            return getDownloadFileName(this.file, this.fileName, this.projectName);
+        },
 
         /**
          * Gets the values of the form in the structure the transaction expects.
@@ -113,7 +133,8 @@ export default {
             this.contactPerson = this.currentProject?.formValues?.contactPerson;
             this.startDate = this.currentProject?.formValues?.startDate;
             this.endDate = this.currentProject?.formValues?.endDate;
-            this.file = this.currentProject?.formValues?.file;
+            // a project without file has an empty value in the service, it is set to undefined to show no file
+            this.file = this.currentProject?.formValues?.file || undefined;
             this.fileName = this.currentProject?.formValues?.fileName;
             this.source = this.currentProject?.formValues?.source;
             this.description = this.currentProject?.formValues?.description;
@@ -151,12 +172,43 @@ export default {
         },
 
         /**
+         * Deletes the uploaded or saved file. When an edited project is saved, the file is removed in the service.
+         * @returns {void}
+         */
+        removeFile () {
+            this.file = undefined;
+            this.fileName = undefined;
+        },
+
+        /**
          * Loads the file and stores it.
-         * @param {Event} event
+         * A file with a type which is not allowed or which is larger than the maximum size is rejected with a message.
+         * @param {Event} event the change or drop event of the file upload.
+         * @returns {void}
          */
         async loadFile (event) {
             const file = event?.dataTransfer?.files?.[0] ?? event?.target?.files?.[0],
                   reader = new FileReader();
+
+            if (!file) {
+                return;
+            }
+
+            if (!hasAllowedExtension(file, this.allowedFileExtensions)) {
+                this.showErrorMessage(this.$t("additional:modules.projects.messages.fileTypeNotAllowed", {
+                    fileName: file.name,
+                    fileTypes: this.allowedFileExtensions.join(", ")
+                }));
+                return;
+            }
+
+            if (file.size > this.maxFileSize) {
+                this.showErrorMessage(this.$t("additional:modules.projects.messages.fileTooLarge", {
+                    fileName: file.name,
+                    maxSize: this.maxFileSize / (1024 * 1024)
+                }));
+                return;
+            }
 
             this.fileName = file.name;
 
@@ -399,15 +451,28 @@ export default {
                 </h5>
                 <div
                     v-if="typeof file !== 'undefined'"
-                    class="mb-2"
+                    class="d-flex align-items-center gap-3 mb-2"
                 >
-                    {{ $t("additional:modules.projects.messages.fileUpload", {fileName: fileName}) }}
+                    <i class="bi bi-file-earmark fs-3" />
+                    <span class="flex-grow-1 text-break">
+                        {{ displayedFileName }}
+                    </span>
+                    <div class="file-remove ms-auto">
+                        <IconButton
+                            :class-array="['btn-primary']"
+                            :aria="$t('additional:modules.projects.labels.removeFile')"
+                            icon="bi bi-trash"
+                            :interaction="removeFile"
+                            :label="$t('additional:modules.projects.labels.removeFile')"
+                        />
+                    </div>
                 </div>
                 <FileUpload
                     class="mb-5"
                     :change="loadFile"
                     :drop="loadFile"
                     :multiple="false"
+                    :accept="acceptedFileTypes"
                 />
             </div>
         </div>
@@ -434,6 +499,11 @@ export default {
         color: var(--bs-secondary);
     }
 }
+// the label is centered below the icon, so the wrapper of the button is only as wide as the label
+.file-remove :deep(.btn-wrapper) {
+    width: auto;
+}
+
 .headline {
     color: #3C5F94;
     font-family: "MasterPortalFont Bold", "Arial Narrow Bold", Arial, sans-serif;

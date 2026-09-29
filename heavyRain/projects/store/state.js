@@ -8,6 +8,8 @@
  * @property {Object[]} criteria - The criteria with the color in lists.
  * @property {Object} currentProject - The current object.
  * @property {Object} currentView - The current tab.
+ * @property {String[]} allowedFileExtensions - File extensions which can be uploaded to a project.
+ * @property {Number} maxFileSize - Maximum size of an uploaded file in bytes.
  * @property {String} wfstAttributes - Names of the attributes of the feature type "starkregenprojekte".
  * @property {String} wfstGeometryName - Name of the geometry attribute. It is written after all other attributes, as it is the last element of the schema..
  * @property {String} wfstDateFormat - Format in which date attributes are sent to the service..
@@ -54,6 +56,8 @@ const state = {
     ],
     currentProject: undefined,
     currentView: "main",
+    allowedFileExtensions: ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "odp", "txt", "csv", "png", "jpg", "jpeg", "gif", "webp"],
+    maxFileSize: 1024 * 1024,
     wfstAttributes: {
         projectName: "projektname",
         creator: "initiator",
@@ -66,6 +70,7 @@ const state = {
         contactExt: "kontakt_extern",
         infoLink: "info_link",
         criteria: "kriterien",
+        file: "datei_bild",
         history: "historie",
         protectedAreas: "schutzniveau"
     },

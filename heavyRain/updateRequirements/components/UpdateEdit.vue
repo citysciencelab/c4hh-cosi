@@ -86,7 +86,7 @@ export default {
 
         /**
          * Gets the source of the uploaded or saved image for the preview.
-         * @returns {String} the source of the image or an empty string, if there is no image.
+         * @returns {String|undefined} the source of the image or undefined, if there is no image.
          */
         imageSrc () {
             return toImageSrc(this.image);
@@ -106,7 +106,8 @@ export default {
         if (typeof this.currentRequirement !== "undefined") {
             this.name = this.currentRequirement?.formValues?.name;
             this.initiator = this.currentRequirement?.formValues?.initiator;
-            this.image = this.currentRequirement?.formValues?.image;
+            // a report without image has an empty value in the service, it is set to undefined to show no image
+            this.image = this.currentRequirement?.formValues?.image || undefined;
             this.imageName = this.currentRequirement?.formValues?.imageName;
             this.contactPerson = this.currentRequirement?.formValues?.contactPerson;
             this.currentOpinion = this.getCurrentOption(this.currentRequirement?.formValues?.informationType) || this.informationType[0];
@@ -341,7 +342,7 @@ export default {
             {{ $t('additional:modules.updateRequirements.form.uploadOptional') }}
         </h5>
         <div
-            v-if="imageSrc"
+            v-if="typeof imageSrc !== 'undefined'"
             class="d-flex align-items-center gap-3 mb-2"
         >
             <img

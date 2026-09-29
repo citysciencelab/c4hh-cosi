@@ -2,6 +2,7 @@
 import {createPolygonStyle} from "../../shared/js/createPolygonStyle.js";
 import {formatDate} from "../../shared/js/formatDate.js";
 import {getClickedWfstFeature} from "../../shared/js/getClickedWfstFeature.js";
+import {getDownloadFileName, toFileHref} from "../../shared/js/fileData.js";
 import HrCard from "../../shared/components/HrCard.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
@@ -29,6 +30,23 @@ export default {
     },
     computed: {
         ...mapGetters("Modules/Projects", ["criteria", "currentProject", "currentView", "wfstAttributes", "wfstLayerId"]),
+
+        /**
+         * Gets the link of the file of the current project for the download.
+         * @returns {String|undefined} the link of the file or undefined, if the project has no file.
+         */
+        fileHref () {
+            return toFileHref(this.currentProject?.formValues?.file);
+        },
+
+        /**
+         * Gets the name of the file of the current project for the download.
+         * The name of a saved file is not known, so it is created from the name of the project.
+         * @returns {String} the name of the file.
+         */
+        downloadFileName () {
+            return getDownloadFileName(this.currentProject?.formValues?.file, this.currentProject?.formValues?.fileName, this.currentProject?.formValues?.projectName);
+        },
 
         /**
          * Gets the criteria of the current project without empty entries, as the criteria are optional.
@@ -95,14 +113,14 @@ export default {
         },
 
         /**
-         * Downloads the uploaded file.
+         * Downloads the file of the current project.
          * @returns {void}
          */
         downloadFile () {
             const link = document.createElement("a");
 
-            link.href = this.currentProject?.formValues?.file;
-            link.download = this.currentProject?.formValues?.fileName;
+            link.href = this.fileHref;
+            link.download = this.downloadFileName;
 
             document.body.appendChild(link);
             link.click();
@@ -276,13 +294,14 @@ export default {
                         </p>
                     </section>
                     <div
-                        class="position-absolute bottom-0 end-0 p-3"
+                        v-if="typeof fileHref !== 'undefined'"
+                        class="position-absolute bottom-0 end-0 p-3 me-5"
                     >
                         <IconButton
-                            :class-array="['btn-light', 'me-5']"
+                            :class-array="['btn-light']"
                             icon="bi bi-paperclip"
-                            :aria="currentProject?.formValues?.fileName || ''"
-                            :title="currentProject?.formValues?.fileName"
+                            :aria="downloadFileName"
+                            :title="downloadFileName"
                             :interaction="() => downloadFile()"
                         />
                     </div>

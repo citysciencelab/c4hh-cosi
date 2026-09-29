@@ -3,11 +3,11 @@
  * An image uploaded in the portal is saved as data url, e.g. "data:image/png;base64,iVBOR...".
  * An image saved as plain base64 by other systems gets a generic data url prefix.
  * @param {String} value - The saved image.
- * @returns {String} The source of the image or an empty string, if there is no image.
+ * @returns {String|undefined} The source of the image or undefined, if there is no image.
  */
 function toImageSrc (value) {
     if (typeof value !== "string" || value.trim() === "") {
-        return "";
+        return undefined;
     }
 
     const image = value.trim();

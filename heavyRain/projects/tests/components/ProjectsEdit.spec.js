@@ -54,7 +54,9 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
                                     "name": "Bekannte Bereiche (z.B. Presse)",
                                     "color": "#D55E00"
                                 }],
+                                allowedFileExtensions: () => ["pdf", "docx", "png"],
                                 currentProject: () => currentProject,
+                                maxFileSize: () => 1024 * 1024,
                                 wfstAttributes: () => {
                                     return {
                                         projectName: "projektname",
@@ -149,6 +151,104 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
 
             expect(setStyleSpy.calledTwice).to.be.true;
             expect(setStyleSpy.secondCall.args[0]).to.be.undefined;
+        });
+    });
+
+    describe("File", () => {
+        /**
+         * Creates a file of the given size.
+         * @param {String} name the name of the file.
+         * @param {Number} size the size of the file in bytes.
+         * @returns {File} the file.
+         */
+        function createFile (name, size) {
+            const file = new File(["x"], name, {type: "application/pdf"});
+
+            Object.defineProperty(file, "size", {value: size});
+            return file;
+        }
+
+        it("should load a file of 1 MB with an allowed type", async () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            wrapper.vm.loadFile({target: {files: [createFile("plan.pdf", 1024 * 1024)]}});
+            await vi.waitFor(() => expect(wrapper.vm.file).to.be.a("string"));
+
+            expect(wrapper.vm.file).to.match(/^data:application\/pdf;base64,/);
+            expect(wrapper.vm.fileName).to.equal("plan.pdf");
+        });
+
+        it("should reject a file which is larger than 1 MB", () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            wrapper.vm.loadFile({target: {files: [createFile("plan.pdf", 1024 * 1024 + 1)]}});
+
+            expect(wrapper.vm.file).to.be.undefined;
+            expect(wrapper.vm.showSnackbar).to.be.true;
+            expect(wrapper.vm.snackbarColor).to.equal("error");
+        });
+
+        it("should reject a file with a type which is not allowed", () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            wrapper.vm.loadFile({dataTransfer: {files: [createFile("programm.exe", 10)]}});
+
+            expect(wrapper.vm.file).to.be.undefined;
+            expect(wrapper.vm.showSnackbar).to.be.true;
+        });
+
+        it("should do nothing if no file was chosen", () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            expect(() => wrapper.vm.loadFile({target: {files: []}})).to.not.throw();
+            expect(wrapper.vm.file).to.be.undefined;
+        });
+
+        it("should allow only the allowed types in the file dialog", () => {
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            expect(wrapper.vm.acceptedFileTypes).to.equal(".pdf,.docx,.png");
+            expect(wrapper.findComponent({name: "FileUpload"}).attributes("accept")).to.equal(".pdf,.docx,.png");
+        });
+
+        it("should show no file for an edited project without file", async () => {
+            currentProject = {
+                id: "starkregenprojekte.7",
+                formValues: {
+                    contactExt: "", contactPerson: "contactPerson", creator: "creator", criteria: "", description: "", endDate: "",
+                    file: "", history: "", infoLink: "", projectName: "Projekt A", protectedAreas: "", source: "", startDate: ""
+                }
+            };
+
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.vm.file).to.be.undefined;
+            expect(wrapper.find(".file-remove").exists()).to.be.false;
+        });
+
+        it("should show the saved file of an edited project with a name from the project and delete it", async () => {
+            currentProject = {
+                id: "starkregenprojekte.7",
+                formValues: {
+                    contactExt: "", contactPerson: "contactPerson", creator: "creator", criteria: "", description: "", endDate: "",
+                    file: "data:application/pdf;base64,JVBERi0", history: "", infoLink: "", projectName: "Projekt A", protectedAreas: "", source: "", startDate: ""
+                }
+            };
+
+            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.vm.displayedFileName).to.equal("Projekt A.pdf");
+            expect(wrapper.text()).to.include("Projekt A.pdf");
+
+            wrapper.vm.removeFile();
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.vm.formValues.file).to.be.undefined;
+            expect(wrapper.text()).to.not.include("Projekt A.pdf");
         });
     });
 

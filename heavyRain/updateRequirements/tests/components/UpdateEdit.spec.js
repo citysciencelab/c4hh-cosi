@@ -339,6 +339,17 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
             expect(wrapper.findAllComponents({name: "IconButton"}).some(button => button.props("icon") === "bi bi-trash")).to.be.true;
         });
 
+        it("should not show a preview for an edited report with an empty image of the service", async () => {
+            currentRequirement = {formValues: {name: "name", initiator: "initiator", contactPerson: "contactPerson", comment: "", infoLink: "", informationType: "", image: ""}};
+
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.vm.image).to.be.undefined;
+            expect(wrapper.find("img.image-preview").exists()).to.be.false;
+        });
+
         it("should not show a preview without an image", () => {
             const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
 

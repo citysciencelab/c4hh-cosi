@@ -210,7 +210,7 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
             const currentRequirement = {formValues: {name: "Meldung A", image: ""}},
                 wrapper = shallowMount(UpdateRequirements, {global: {plugins: [createTestStore({currentRequirement})]}});
 
-            expect(wrapper.vm.imageSrc).to.equal("");
+            expect(wrapper.vm.imageSrc).to.be.undefined;
         });
 
         it("should get currentOpinion as undefined", () => {

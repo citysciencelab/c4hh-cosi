@@ -22,7 +22,9 @@
         "saveSuccess": "Das neue Projekt wurde erfolgreich gespeichert!",
         "updateSuccess": "Das Projekt wurde erfolgreich aktualisiert!",
         "invalid": "Die Eingabefelder für Projektname, Eingetragen von und Ansprechpartner dürfen nicht leer sein.",
-        "fileUpload": "Die Datei {{fileName}} ist hochgeladen."
+        "fileUpload": "Die Datei {{fileName}} ist hochgeladen.",
+        "fileTooLarge": "Die Datei {{fileName}} ist zu groß. Sie darf höchstens {{maxSize}} MB groß sein.",
+        "fileTypeNotAllowed": "Die Datei {{fileName}} hat keinen erlaubten Dateityp. Erlaubt sind: {{fileTypes}}."
       },
       "labels": {
         "projectName": "Projektname",
@@ -38,6 +40,7 @@
         "description": "Kurzbeschreibung / Art der Maßnahme",
         "protectedAreas": "Bereiche, wo die Kriterien des Schutzniveau erreicht sind",
         "fileUpload": "Datei hochladen (optional)",
+        "removeFile": "Datei löschen",
         "lastUpdate": "Aktualisierung"
       }
     },

@@ -167,6 +167,12 @@ describe("addons/heavyRain/projects/components/Projects.vue", () => {
     });
 
     describe("Computed Properties", () => {
+        it("should get no file link if the current project has no file", () => {
+            const wrapper = shallowMount(Projects, {global: {plugins: [store]}});
+
+            expect(wrapper.vm.fileHref).to.be.undefined;
+        });
+
         it("should get no criteria if the current project has none", () => {
             const wrapper = shallowMount(Projects, {global: {plugins: [store]}});
 
