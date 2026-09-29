@@ -6,9 +6,10 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 
 const PURIFY_CONFIG = {
-    ALLOWED_TAGS: ["b", "br", "i", "strong", "em"],
-    ALLOWED_ATTR: []
-};
+          ALLOWED_TAGS: ["h1", "h2", "h3", "h4", "h5", "h6", "hr", "b", "br", "i", "strong", "em"],
+          ALLOWED_ATTR: []
+      },
+      ALERT_FIELDS_TO_SANITIZE = ["content", "creationDate", "text"];
 
 /**
  * Alerting
@@ -66,7 +67,6 @@ export default {
             console.error("Spelling localestorage is not available in this application. Please allow third party cookies in your browser!");
         }
 
-        /* Hint: store.subscribeAction(): https://vuex.vuejs.org/api/#subscribeaction */
         this.unsubscribeAction = this.$store.subscribeAction((action) => {
             this.checkForEventAlerts(action);
         });
@@ -82,20 +82,10 @@ export default {
             this.fetchBroadcast(this.fetchBroadcastUrl);
         }
 
-        if (this.initialAlerts && typeof this.initialAlerts === "object") {
-            Object.keys(this.initialAlerts).forEach(alertId => {
-                this.sanitizeAlertFields(this.initialAlerts[alertId], ["content", "creationDate", "text"]);
-            });
-        }
-
+        this.sanitizeAlertsFromConfig(this.initialAlerts);
         this.addAlertsFromConfig(this.initialAlerts);
 
-        if (this.moduleOpenAlerts && typeof this.moduleOpenAlerts === "object") {
-            Object.keys(this.moduleOpenAlerts).forEach(alertId => {
-                this.sanitizeAlertFields(this.moduleOpenAlerts[alertId], ["content", "creationDate", "text"]);
-            });
-        }
-
+        this.sanitizeAlertsFromConfig(this.moduleOpenAlerts);
         this.addModuleOpenAlertsFromConfig(this.moduleOpenAlerts);
     },
     unmounted () {
@@ -153,7 +143,7 @@ export default {
             }
 
             collectedAlerts.forEach(singleAlert => {
-                this.sanitizeAlertFields(singleAlert, ["content", "creationDate", "text"]);
+                this.sanitizeAlertFields(singleAlert, ALERT_FIELDS_TO_SANITIZE);
                 singleAlert.initial = true;
                 singleAlert.isNews = true;
                 singleAlert.initialConfirmed = singleAlert.mustBeConfirmed;
@@ -281,6 +271,18 @@ export default {
                     alert[field] = DOMPurify.sanitize(alert[field], PURIFY_CONFIG);
                 }
             });
+        },
+        /**
+         * Sanitizes all alerts from a configuration object if it is valid.
+         * @param {Object} alertsConfig - Configuration object containing alerts
+         * @returns {void}
+         */
+        sanitizeAlertsFromConfig: function (alertsConfig) {
+            if (alertsConfig && typeof alertsConfig === "object") {
+                Object.keys(alertsConfig).forEach(alertId => {
+                    this.sanitizeAlertFields(alertsConfig[alertId], ALERT_FIELDS_TO_SANITIZE);
+                });
+            }
         }
     }
 };
