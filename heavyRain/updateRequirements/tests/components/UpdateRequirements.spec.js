@@ -199,6 +199,20 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
     });
 
     describe("Computed Properties", () => {
+        it("should get the source of the saved image of the current report", () => {
+            const currentRequirement = {formValues: {name: "Meldung A", image: "data:image/png;base64,iVBOR"}},
+                wrapper = shallowMount(UpdateRequirements, {global: {plugins: [createTestStore({currentRequirement})]}});
+
+            expect(wrapper.vm.imageSrc).to.equal("data:image/png;base64,iVBOR");
+        });
+
+        it("should get no image source if the report has no image", () => {
+            const currentRequirement = {formValues: {name: "Meldung A", image: ""}},
+                wrapper = shallowMount(UpdateRequirements, {global: {plugins: [createTestStore({currentRequirement})]}});
+
+            expect(wrapper.vm.imageSrc).to.equal("");
+        });
+
         it("should get currentOpinion as undefined", () => {
             const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [store]}});
 

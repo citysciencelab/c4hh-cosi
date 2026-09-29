@@ -17,6 +17,8 @@
         "commentOptional": "Kommentar/ Beschreibung (optional)",
         "infolinkOptional": "Infolink (optional)",
         "uploadOptional": "Bild hochladen (optional)",
+        "removeImage": "Bild löschen",
+        "imagePreview": "Vorschau des Bildes",
         "pleaseSelect": "Bitte wählen",
         "lastUpdate": "letzte Aktualisierung",
         "createdAt": "erstellt am: ",
@@ -27,7 +29,8 @@
         "missingGeometry": "Bitte zeichnen Sie zunächst das betroffene Gebiet als Fläche auf der Karte ein.",
         "saveError": "Die Meldung konnte nicht gespeichert werden. Bitte versuchen Sie es erneut.",
         "saveSuccess": "Die neue Meldung wurde erfolgreich gespeichert!",
-        "imageLoad": "Das Bild {{imageName}} ist hochgeladen."
+        "imageLoad": "Das Bild {{imageName}} ist hochgeladen.",
+        "imageTooLarge": "Das Bild {{imageName}} ist zu groß. Es darf höchstens {{maxSize}} MB groß sein."
       },
       "drawHeading": "Änderungen einzeichnen",
       "cancelButtonLabel": "Vorgang abbrechen",

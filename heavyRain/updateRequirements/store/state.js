@@ -8,6 +8,7 @@
  * @property {Object} currentRequirement - The current requirement.
  * @property {Object} currentView - The current tab.
  * @property {Object[]} informationType - The information type with the color in lists.
+ * @property {Number} maxImageSize - Maximum size of an uploaded image in bytes.
  * @property {String} wfstAttributes - Names of the attributes of the feature type "ortskenntnisse_aktualisierungsbedarfe".
  * @property {String} wfstGeometryName - Name of the geometry attribute. It is written after all other attributes, as it is the last element of the schema..
  * @property {String} wfstDateFormat - Format in which date attributes are sent to the service..
@@ -52,6 +53,7 @@ const state = {
             "color": "#512DA8"
         }
     ],
+    maxImageSize: 1024 * 1024,
     wfstAttributes: {
         comment: "beschreibung",
         name: "name",
@@ -59,6 +61,7 @@ const state = {
         informationType: "art_der_angabe",
         contactPerson: "ansprechpartner",
         infoLink: "infolink",
+        image: "bild_datei",
         creationDate: "eingabedatum",
         lastUpdate: "aktualisierung"
     },

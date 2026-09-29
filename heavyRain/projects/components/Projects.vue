@@ -281,7 +281,7 @@ export default {
                         <IconButton
                             :class-array="['btn-light', 'me-5']"
                             icon="bi bi-paperclip"
-                            :aria="currentProject?.formValues?.fileName"
+                            :aria="currentProject?.formValues?.fileName || ''"
                             :title="currentProject?.formValues?.fileName"
                             :interaction="() => downloadFile()"
                         />

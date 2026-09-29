@@ -17,6 +17,8 @@
         "commentOptional": "Comment/ description (optional)",
         "infolinkOptional": "Info link (optional)",
         "uploadOptional": "Upload image (optional)",
+        "removeImage": "Delete image",
+        "imagePreview": "Preview of the image",
         "pleaseSelect": "Please select",
         "lastUpdate": "Last update",
         "createdAt": "Created on: ",
@@ -27,7 +29,8 @@
         "missingGeometry": "Please draw the affected area as a polygon on the map first.",
         "saveError": "The message could not be saved. Please try again.",
         "saveSuccess": "The new message has been saved successfully!",
-        "imageLoad": "The image {{imageName}} is uploaded"
+        "imageLoad": "The image {{imageName}} is uploaded",
+        "imageTooLarge": "The image {{imageName}} is too large. It may be at most {{maxSize}} MB."
       },
       "drawHeading": "Draw changes",
       "cancelButtonLabel": "Cancel",

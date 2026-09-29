@@ -7,6 +7,7 @@ import HrHeader from "../../shared/components/HrHeader.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
+import {toImageSrc} from "../../shared/js/toImageSrc.js";
 import UpdateEdit from "./UpdateEdit.vue";
 
 export default {
@@ -33,6 +34,14 @@ export default {
          */
         currentOpinion () {
             return this.informationType.find(type => `${type.cat} ${type.name}` === this.currentRequirement?.formValues?.informationType);
+        },
+
+        /**
+         * Gets the source of the image of the current report.
+         * @returns {String} the source of the image or an empty string, if the report has no image.
+         */
+        imageSrc () {
+            return toImageSrc(this.currentRequirement?.formValues?.image);
         }
     },
     async mounted () {
@@ -141,12 +150,12 @@ export default {
             >
                 <template #above-title>
                     <div
-                        v-if="typeof currentRequirement?.formValues?.image !== 'undefined'"
+                        v-if="imageSrc"
                         class="ratio ratio-16x9 border rounded overflow-hidden mb-3"
                     >
                         <img
-                            :src="currentRequirement?.formValues?.image"
-                            :alt="currentRequirement?.formValues?.imageName"
+                            :src="imageSrc"
+                            :alt="typeof currentRequirement?.formValues?.imageName !== 'undefined' ? currentRequirement.formValues.imageName : currentRequirement?.formValues?.name"
                             class="w-100 h-100"
                             style="object-fit: cover;"
                         >

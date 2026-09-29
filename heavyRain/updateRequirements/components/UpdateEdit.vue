@@ -7,11 +7,13 @@ import {getGeometryCenter} from "../../shared/js/getGeometryCenter.js";
 import HrDraw from "../../shared/components/HrDraw.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import {sendWfstTransaction} from "../../shared/js/sendWfstTransaction.js";
 import {setWfstFeatureVisibility} from "../../shared/js/setWfstFeatureVisibility.js";
+import {toImageSrc} from "../../shared/js/toImageSrc.js";
 
 export default {
     name: "UpdateEdit",
@@ -20,6 +22,7 @@ export default {
         HrDraw,
         HrFooter,
         HrSnackbar,
+        IconButton,
         InputText
     },
     emits: ["showSnackbarMessage", "click:save", "click:cancel"],
@@ -43,7 +46,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/UpdateRequirements", ["informationType", "currentRequirement", "wfstAttributes", "wfstDateFormat", "wfstGeometryName", "wfstLayerId"]),
+        ...mapGetters("Modules/UpdateRequirements", ["informationType", "currentRequirement", "maxImageSize", "wfstAttributes", "wfstDateFormat", "wfstGeometryName", "wfstLayerId"]),
         ...mapGetters("Maps", ["projectionCode"]),
 
         /**
@@ -79,6 +82,14 @@ export default {
          */
         hasDrawnGeometry () {
             return this.drawnGeometry !== null;
+        },
+
+        /**
+         * Gets the source of the uploaded or saved image for the preview.
+         * @returns {String} the source of the image or an empty string, if there is no image.
+         */
+        imageSrc () {
+            return toImageSrc(this.image);
         },
 
         /**
@@ -141,12 +152,35 @@ export default {
         },
 
         /**
+         * Deletes the uploaded or saved image. When an edited report is saved, the image is removed in the service.
+         * @returns {void}
+         */
+        removeImage () {
+            this.image = undefined;
+            this.imageName = undefined;
+        },
+
+        /**
          * Loads the image and stores it.
-         * @param {Event} event
+         * An image which is larger than the maximum size is rejected with a message.
+         * @param {Event} event the change or drop event of the file upload.
+         * @returns {void}
          */
         async loadImage (event) {
             const file = event?.dataTransfer?.files?.[0] ?? event?.target?.files?.[0],
                   reader = new FileReader();
+
+            if (!file) {
+                return;
+            }
+
+            if (file.size > this.maxImageSize) {
+                this.showErrorMessage(this.$t("additional:modules.updateRequirements.messages.imageTooLarge", {
+                    imageName: file.name,
+                    maxSize: this.maxImageSize / (1024 * 1024)
+                }));
+                return;
+            }
 
             this.imageName = file.name;
 
@@ -307,10 +341,29 @@ export default {
             {{ $t('additional:modules.updateRequirements.form.uploadOptional') }}
         </h5>
         <div
-            v-if="typeof image !== 'undefined'"
-            class="mb-2"
+            v-if="imageSrc"
+            class="d-flex align-items-center gap-3 mb-2"
         >
-            {{ $t("additional:modules.updateRequirements.messages.imageLoad", {imageName: imageName}) }}
+            <img
+                :src="imageSrc"
+                :alt="$t('additional:modules.updateRequirements.form.imagePreview')"
+                class="image-preview border rounded"
+            >
+            <span
+                v-if="typeof imageName !== 'undefined'"
+                class="flex-grow-1"
+            >
+                {{ $t("additional:modules.updateRequirements.messages.imageLoad", {imageName: imageName}) }}
+            </span>
+            <div class="image-remove ms-auto">
+                <IconButton
+                    :class-array="['btn-primary']"
+                    :aria="$t('additional:modules.updateRequirements.form.removeImage')"
+                    icon="bi bi-trash"
+                    :interaction="removeImage"
+                    :label="$t('additional:modules.updateRequirements.form.removeImage')"
+                />
+            </div>
         </div>
         <FileUpload
             class="mb-5"
@@ -338,6 +391,17 @@ export default {
 .headline {
     color: $secondary;
     font-family: $font-family_accent;
+}
+
+// the label is centered below the icon, so the wrapper of the button is only as wide as the label
+.image-remove :deep(.btn-wrapper) {
+    width: auto;
+}
+
+.image-preview {
+    width: 4rem;
+    height: 4rem;
+    object-fit: cover;
 }
 
 .invalid {

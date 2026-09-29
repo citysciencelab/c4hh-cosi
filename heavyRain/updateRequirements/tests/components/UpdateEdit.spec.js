@@ -51,6 +51,7 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
                                     }
                                 ],
                                 currentRequirement: () => currentRequirement,
+                                maxImageSize: () => 1024 * 1024,
                                 wfstAttributes: () => {
                                     return {
                                         projectName: "projektname",
@@ -322,6 +323,71 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
             const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
 
             expect(wrapper.findComponent({name: "HrDraw"}).props("geometry")).to.equal(drawnGeometry);
+        });
+    });
+
+    describe("Image", () => {
+        it("should show a preview and a delete button for the saved image of an edited report", async () => {
+            currentRequirement = {formValues: {name: "name", initiator: "initiator", contactPerson: "contactPerson", comment: "", infoLink: "", informationType: "", image: "data:image/png;base64,iVBOR"}};
+
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            // the image is set in mounted, so it is rendered after the next tick
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.find("img.image-preview").attributes("src")).to.equal("data:image/png;base64,iVBOR");
+            expect(wrapper.findAllComponents({name: "IconButton"}).some(button => button.props("icon") === "bi bi-trash")).to.be.true;
+        });
+
+        it("should not show a preview without an image", () => {
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            expect(wrapper.find("img.image-preview").exists()).to.be.false;
+        });
+
+        it("should reject an image which is larger than 1 MB", () => {
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}}),
+                file = new File(["x"], "gross.png", {type: "image/png"});
+
+            Object.defineProperty(file, "size", {value: 1024 * 1024 + 1});
+            wrapper.vm.loadImage({target: {files: [file]}});
+
+            expect(wrapper.vm.image).to.be.undefined;
+            expect(wrapper.vm.imageName).to.be.undefined;
+            expect(wrapper.vm.showSnackbar).to.be.true;
+            expect(wrapper.vm.snackbarColor).to.equal("error");
+        });
+
+        it("should load an image of 1 MB", async () => {
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}}),
+                file = new File(["x"], "klein.png", {type: "image/png"});
+
+            Object.defineProperty(file, "size", {value: 1024 * 1024});
+            wrapper.vm.loadImage({target: {files: [file]}});
+            await vi.waitFor(() => expect(wrapper.vm.image).to.be.a("string"));
+
+            expect(wrapper.vm.image).to.match(/^data:image\/png;base64,/);
+            expect(wrapper.vm.imageName).to.equal("klein.png");
+        });
+
+        it("should do nothing if no file was chosen", () => {
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            expect(() => wrapper.vm.loadImage({target: {files: []}})).to.not.throw();
+            expect(wrapper.vm.image).to.be.undefined;
+        });
+
+        it("should delete the image, so that it is removed when the report is saved", async () => {
+            currentRequirement = {formValues: {name: "name", initiator: "initiator", contactPerson: "contactPerson", comment: "", infoLink: "", informationType: "", image: "data:image/png;base64,iVBOR"}};
+
+            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
+
+            wrapper.vm.removeImage();
+            await wrapper.vm.$nextTick();
+
+            expect(wrapper.vm.formValues.image).to.be.undefined;
+            expect(wrapper.vm.formValues.imageName).to.be.undefined;
+            expect(wrapper.find("img.image-preview").exists()).to.be.false;
         });
     });
 
