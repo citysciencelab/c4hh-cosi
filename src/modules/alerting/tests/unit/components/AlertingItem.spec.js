@@ -554,15 +554,18 @@ describe("src/modules/alerting/components/AlertingItem.vue", () => {
             expect(wrapper.find(".singleAlertContainer").html().indexOf("Alert Test B")).not.to.equal(-1);
         });
 
-        it("html sanitation: removes dangerous tags like <script>, <img>, <svg>", () => {
+        it("html sanitation: removes dangerous tags and attributes like <script>, onerror", () => {
             const alert = {
-                content: "<script>alert('XSS')</script><p>Text</p><img src=x onerror=alert('XSS')>"
+                content: "<script>alert('XSS')</script><p>Text</p><img src='https://example.com/img.png' onerror=alert('XSS')><svg onload=alert('xss')></svg>"
             };
 
             wrapper.vm.sanitizeAlertFields(alert, ["content"]);
             expect(alert.content).to.not.include("<script>");
             expect(alert.content).to.not.include("onerror");
-            expect(alert.content).to.not.include("<img");
+            expect(alert.content).to.not.include("<svg");
+            expect(alert.content).to.not.include("onload");
+            expect(alert.content).to.include("<img");
+            expect(alert.content).to.include("src=");
         });
     });
 
