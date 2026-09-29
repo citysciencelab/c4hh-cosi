@@ -27,6 +27,7 @@
 - Issue \#1656: Fixed GetFeatureInfo popups for multiple visible WMS layers.
 - Issue \#1658: Share View now filters all available legacy URL parameters.
 - Issue \#1662: Fixed Routing Tool to work correctly with Umlauts.
+- Issue \#1665: Fixed an issue with URL encoding in the search function for BKG routing.
 - Accessibility: Fixed accessibility issues across layer tree and controls (label associations, icon-button naming, ARIA semantics, and preview alt text).
 - AlertingItem: Fixed CSS Regression.
 - Security: XML injection in `highlightFeaturesByAttribute` is prevented by escaping.
