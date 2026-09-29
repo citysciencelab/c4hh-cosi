@@ -6,8 +6,8 @@ import {mapActions, mapGetters, mapMutations} from "vuex";
 import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
 
 const PURIFY_CONFIG = {
-          ALLOWED_TAGS: ["h1", "h2", "h3", "h4", "h5", "h6", "hr", "b", "br", "i", "strong", "em"],
-          ALLOWED_ATTR: []
+          ALLOWED_TAGS: ["h1", "h2", "h3", "h4", "h5", "h6", "hr", "b", "br", "i", "strong", "em", "img"],
+          ALLOWED_ATTR: ["src", "alt", "width", "height"]
       },
       ALERT_FIELDS_TO_SANITIZE = ["content", "creationDate", "text"];
 
@@ -261,14 +261,14 @@ export default {
         },
         /**
          * Sanitizes specified string fields of an alert object.
-         * @param {Object} alert - Alert object
+         * @param {Object} alertObj - Alert object
          * @param {Array<string>} fields - Field names to sanitize
          * @returns {void}
          */
-        sanitizeAlertFields: function (alert, fields) {
+        sanitizeAlertFields: function (alertObj, fields) {
             fields.forEach(field => {
-                if (alert && typeof alert[field] === "string") {
-                    alert[field] = DOMPurify.sanitize(alert[field], PURIFY_CONFIG);
+                if (alertObj && typeof alertObj[field] === "string") {
+                    alertObj[field] = DOMPurify.sanitize(alertObj[field], PURIFY_CONFIG);
                 }
             });
         },
