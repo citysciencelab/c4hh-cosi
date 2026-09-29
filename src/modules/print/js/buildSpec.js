@@ -1141,10 +1141,12 @@ const BuildSpecModel = {
      * @returns {Object} - Icon Style for mapfish print.
      */
     buildPointStyleIcon: function (style, layer) {
+        const size = style.getSize();
+
         return {
             type: "point",
-            graphicWidth: style.getSize() && style.getSize()[0] ? style.getSize()[0] * style.getScale() : 60,
-            graphicHeight: style.getSize() && style.getSize()[1] ? style.getSize()[1] * style.getScale() : 60,
+            graphicWidth: size && typeof size[0] === "number" && size[0] > 0 ? size[0] * style.getScale() : 60,
+            graphicHeight: size && typeof size[1] === "number" && size[1] > 0 ? size[1] * style.getScale() : 60,
             externalGraphic: this.buildGraphicPath(style.getSrc()),
             graphicOpacity: layer.getOpacity()
         };
