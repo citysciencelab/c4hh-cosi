@@ -35,7 +35,6 @@ export default {
             featureAttributes: null,
             interval: null,
             isHovering: null,
-            isChangeFrom3D: false,
             isCookieAllowed: document.cookie.split("; ").some(cookie => cookie.startsWith("username=storyvideo")),
             loadedContent: null,
             overlay: null,
@@ -444,7 +443,6 @@ export default {
                 this.changeMapMode("3D");
             }
             else if (!this.currentChapter.is3D && this.mode === "3D") {
-                this.isChangeFrom3D = true;
                 this.changeMapMode("2D");
                 this.setToNorth();
             }
@@ -460,19 +458,14 @@ export default {
                           zoomLevel = this.currentChapter.map.zoomLevel;
 
                     if (mapView) {
-                        setTimeout(() => {
-                            const adjustedCenter = this.getCenterOfVisibleMap();
+                        const adjustedCenter = this.getCenterOfVisibleMap();
 
-                            mapView.animate({
-                                center: adjustedCenter,
-                                zoom: zoomLevel,
-                                duration: this.duration,
-                                rotation: 0
-                            });
-
-                            this.isChangeFrom3D = false;
-
-                        }, this.isChangeFrom3D ? 1500 : 0);
+                        mapView.animate({
+                            center: adjustedCenter,
+                            zoom: zoomLevel,
+                            duration: this.duration,
+                            rotation: 0
+                        });
                     }
                 }
             }
