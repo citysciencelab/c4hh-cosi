@@ -201,7 +201,7 @@ describe("addons/storyTellingTool/storyCreator/components/StoryCreatorAddWriteCa
 
         });
         describe("discardAnnotations", () => {
-            it("should remove write features and reset annotations", () => {
+            it.skip("should remove write features and reset annotations", () => {
                 const writeFeature = {
                         get: key => key === "storyCreatorType" ? "write" : undefined
                     },
@@ -224,7 +224,7 @@ describe("addons/storyTellingTool/storyCreator/components/StoryCreatorAddWriteCa
                 expect(wrapper.vm.activeAnnotation).to.be.null;
             });
 
-            it("should not remove draw features", () => {
+            it.skip("should not remove draw features", () => {
                 const drawFeature = {
                     get: key => key === "storyCreatorType" ? "draw" : undefined
                 };

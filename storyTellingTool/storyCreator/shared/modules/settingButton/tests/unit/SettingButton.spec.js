@@ -1,6 +1,6 @@
 import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
-import SettingButton from "../../../components/shared/modules/settingButton/components/SettingButton.vue";
+import SettingButton from "../../components/SettingButton.vue";
 
 describe("addons/storyTellingTool/storyCreator/components/shared/modules/settingButton/components/SettingButton.vue", () => {
     let wrapper;
