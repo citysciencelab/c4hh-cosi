@@ -327,11 +327,6 @@
                 "name": "Versorgung berechnen"
               },
               {
-                "type": "scenarioBuilder",
-                "name": "Szenarien planen",
-                "icon": "bi-boxes"
-              },
-              {
                 "type": "colorCodeMap",
                 "name": "Kartenvisualisierung",
                 "icon": "bi-map"
@@ -1031,6 +1026,19 @@
                     ]
                   }
                 ]
+              }
+            ]
+          },
+          {
+            "name": "Simulation",
+            "icon": "bi-folder-plus",
+            "type": "folder",
+            "description": "Tools für die Planung und Simulation von Szenarien",
+            "elements": [
+              {
+                "type": "scenarioBuilder",
+                "name": "Szenarien planen",
+                "icon": "bi-boxes"
               }
             ]
           },
