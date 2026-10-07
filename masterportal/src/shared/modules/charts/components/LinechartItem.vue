@@ -22,6 +22,20 @@ export default {
         data: {
             type: Object,
             required: true
+        },
+        /**
+         * Optional Chart.js plugins to register with the chart instance.
+         *
+         * Each plugin should follow the Chart.js plugin interface (an object
+         * with lifecycle hook functions such as beforeInit, afterDraw, etc.).
+         *
+         * @type {Array<Object>}
+         * @default []
+         */
+        givenPlugins: {
+            type: Array,
+            required: false,
+            default: () => []
         }
     },
     data () {
@@ -89,7 +103,8 @@ export default {
                   config = {
                       type: "line",
                       data: data,
-                      options: this.getChartJsOptions(this.defaultOptions, this.givenOptions)
+                      options: this.getChartJsOptions(this.defaultOptions, this.givenOptions),
+                      plugins: this.givenPlugins
                   };
 
             if (existingChart) {

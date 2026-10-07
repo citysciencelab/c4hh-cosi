@@ -97,7 +97,8 @@ export default {
             gfiFeaturesAtPixel = getters.gfiFeaturesAtPixel,
             gfiWmsLayerList = getVisibleWmsLayersAtResolution(resolution, rootGetters.visibleSubjectDataLayerConfigs.concat(rootGetters.visibleBaselayerConfigs)).filter(layer => {
                 return layer.get("gfiAttributes") !== "ignore";
-            });
+            }),
+            gfiAsNewWindow = gfiWmsLayerList.find(layer => layer.get("gfiAsNewWindow") && typeof layer.get("gfiAsNewWindow") === "object")?.get("gfiAsNewWindow") || null;
 
         if (!clickCoordinate) {
             // happens on use of plugin remoteInterface to open GFI
@@ -109,11 +110,15 @@ export default {
             commit("setMenuExpandedBeforeGfi", rootGetters["Menu/expanded"](getters.menuSide));
         }
 
+        const windowState = {};
+
         return Promise.allSettled(gfiWmsLayerList.map(layer => {
-            const gfiParams = {
-                INFO_FORMAT: layer.get("infoFormat"),
-                FEATURE_COUNT: layer.get("featureCount")
-            };
+            const ownGfiAsNewWindow = layer.get("gfiAsNewWindow"),
+                forcedGfiAsNewWindow = ownGfiAsNewWindow && typeof ownGfiAsNewWindow === "object" ? gfiAsNewWindow : null,
+                gfiParams = {
+                    INFO_FORMAT: layer.get("infoFormat"),
+                    FEATURE_COUNT: layer.get("featureCount")
+                };
             let url = layer.getSource().getFeatureInfoUrl(clickCoordinate, resolution, projection, gfiParams);
 
             const sourceStyles = layer.getSource().getParams?.()?.STYLES;
@@ -121,7 +126,7 @@ export default {
             if (!sourceStyles && url.indexOf("STYLES") && url.indexOf("STYLES=&") === -1) {
                 url = url.replace(/STYLES=.*?&/g, "STYLES=&");
             }
-            return getWmsFeaturesByMimeType(layer, url);
+            return getWmsFeaturesByMimeType(layer, url, windowState, forcedGfiAsNewWindow);
         }))
             .then((results) => {
                 const rejected = [],

@@ -6,6 +6,7 @@ import MultiPoint from "ol/geom/MultiPoint.js";
 import styleList from "@masterportal/masterportalapi/src/vectorStyle/styleList.js";
 import {WFS} from "ol/format.js";
 import store from "@appstore/index.js";
+import escapeXml from "@shared/js/utils/escapeXml.js";
 
 import layerCollection from "../../layers/js/layerCollection.js";
 import {treeSubjectsKey} from "@shared/js/utils/constants.js";
@@ -254,14 +255,14 @@ export default {
 
         if (isEqual) {
             result = `<ogc:PropertyIsEqualTo matchCase='false' wildCard='${wildCard}' singleChar='${singleChar}' escapeChar='${escapeChar}'>
-                <ogc:PropertyName>${propertyPrefix}${propName}</ogc:PropertyName>
-                <ogc:Literal>${propValue}</ogc:Literal>
+                <ogc:PropertyName>${propertyPrefix}${escapeXml(propName)}</ogc:PropertyName>
+                <ogc:Literal>${escapeXml(propValue)}</ogc:Literal>
             </ogc:PropertyIsEqualTo>`;
         }
         else {
             result = `<ogc:PropertyIsLike matchCase='false' wildCard='${wildCard}' singleChar='${singleChar}' escapeChar='${escapeChar}'>
-                <ogc:PropertyName>${propertyPrefix}${propName}</ogc:PropertyName>
-                <ogc:Literal>${wildCard}${propValue}${wildCard}</ogc:Literal>
+                <ogc:PropertyName>${propertyPrefix}${escapeXml(propName)}</ogc:PropertyName>
+                <ogc:Literal>${wildCard}${escapeXml(propValue)}${wildCard}</ogc:Literal>
             </ogc:PropertyIsLike>`;
         }
         return result;
@@ -294,8 +295,8 @@ export default {
         }
         for (value of valueItems) {
             result += `<ogc:PropertyIsEqualTo matchCase='false' wildCard='${wildCard}' singleChar='${singleChar}' escapeChar='${escapeChar}'>
-                <ogc:PropertyName>${propertyPrefix}${propName}</ogc:PropertyName>
-                <ogc:Literal>${value}</ogc:Literal>
+                <ogc:PropertyName>${propertyPrefix}${escapeXml(propName)}</ogc:PropertyName>
+                <ogc:Literal>${escapeXml(value)}</ogc:Literal>
             </ogc:PropertyIsEqualTo>`;
         }
         if (valueItems.length >= 2) {

@@ -472,17 +472,15 @@ Layer2dRasterWmsTimeLayer.prototype.prepareTime = function (attrs) {
                 timeSource = extent ? extent : dimension;
 
             if (!timeSource) {
-                throw Error(i18next.t("common:modules.wmsTime.layer.invalidTimeLayer", {id: this.id}));
+                throw Error(i18next.t("common:modules.wmsTime.layer.invalidTimeLayer", {id: attrs.id}));
             }
-            else if (dimension && dimension.units !== "ISO8601") {
-                throw Error(`WMS-T layer ${this.id} specifies time dimension in unit ${dimension.units}. Only ISO8601 is supported.`);
+            if (dimension && dimension.units !== "ISO8601") {
+                console.warn(`WMS-T layer ${attrs.layers} specifies time dimension in unit ${dimension.units}. This might cause unexpected behavior.`);
             }
-            else {
-                const {step, timeRange} = this.extractExtentValues(timeSource);
+            const {step, timeRange} = this.extractExtentValues(timeSource);
 
-                return this.filterDimensions(timeRange, time.dimensionRange)
-                    .then(filteredTimeRange => this.prepareTimeSliderObject(time, filteredTimeRange, timeSource, staticDimensions, step, attrs));
-            }
+            return this.filterDimensions(timeRange, time.dimensionRange)
+                .then(filteredTimeRange => this.prepareTimeSliderObject(time, filteredTimeRange, timeSource, staticDimensions, step, attrs));
         })
         .catch(error => {
             console.error(i18next.t("common:modules.wmsTime.layer.errorTimeLayer", {error, id: attrs.id}));

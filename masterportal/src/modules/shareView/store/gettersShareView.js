@@ -2,6 +2,12 @@ import {generateSimpleGetters} from "@shared/js/utils/generators.js";
 import shareViewState from "./stateShareView.js";
 import stateSearchBar from "../../searchBar/store/stateSearchBar.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
+import {legacyLayerUrlParams} from "@core/layers/js/layerUrlParams.js";
+import {legacyMapUrlParams} from "@core/maps/js/mapUrlParams.js";
+import {legacyMenuUrlParams} from "@modules/menu/js/menuUrlParams.js";
+import {legacyGlobalUrlParams} from "@core/urlParams/js/globalUrlParams.js";
+import {legacySearchBarUrlParams} from "@modules/searchBar/js/searchBarUrlParams.js";
+
 
 /**
  * Checks if the attributes can be converted to a string. if not, an error message is displayed and the attributes are removed from the params.
@@ -36,6 +42,21 @@ const simpleGetters = {
      * @returns {String} The Url that can be copied by the user.
      */
     url (state, getters, rootState, rootGetters) {
+
+        /**
+        * Collects all legacy URL parameter keys from across the application.
+        * Used to filter out outdated parameters when generating shareable URLs.
+        *
+        * @type {string[]}
+        */
+        const legacyUrlParamsToIgnore = [
+            ...Object.keys(legacyLayerUrlParams),
+            ...Object.keys(legacyMapUrlParams),
+            ...Object.keys(legacyMenuUrlParams),
+            ...Object.keys(legacyGlobalUrlParams),
+            ...Object.keys(legacySearchBarUrlParams)
+        ].map(key => key.toLowerCase());
+
         const layerParams = rootGetters.layerUrlParams.filter(layer => !isDynamicLayer(layer.id)),
             mapParams = rootGetters["Maps/urlParams"],
             menuParams = rootGetters["Menu/urlParams"],
@@ -101,8 +122,7 @@ const simpleGetters = {
 
         // Add existing URL parameters if there are any
         if (location.search) {
-            const existingParams = new URLSearchParams(location.search),
-                legacyUrlParamsToIgnore = ["map/layerids", "layerids", "visibility", "transparency", "map/mdid"];
+            const existingParams = new URLSearchParams(location.search);
 
             existingParams?.forEach((value, key) => {
                 if (

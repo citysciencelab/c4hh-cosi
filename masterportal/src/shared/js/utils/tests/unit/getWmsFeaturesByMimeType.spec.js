@@ -1,5 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
+import axios from "axios";
 import {
     createGfiFeature,
     openFeaturesInNewWindow,
@@ -9,7 +10,8 @@ import {
     handleHTMLResponse,
     getJSONFeatures,
     handleJSONResponse,
-    mergeFeatures
+    mergeFeatures,
+    getWmsFeaturesByMimeType
 } from "@shared/js/utils/getWmsFeaturesByMimeType.js";
 
 describe("src/shared/js/utils/getWmsFeaturesByMimeType.js", () => {
@@ -321,6 +323,166 @@ describe("src/shared/js/utils/getWmsFeaturesByMimeType.js", () => {
             expect(lastUrl).to.equal("url");
             expect(lastName).to.equal("name");
             expect(lastSpecs).to.equal("specs");
+        });
+
+        it("should still open a popup if no shared window state is provided", () => {
+            let openWindowCallCount = 0;
+
+            const firstResult = openFeaturesInNewWindow("url-1", {name: "_blank"}, () => {
+                    openWindowCallCount += 1;
+                }),
+                secondResult = openFeaturesInNewWindow("url-2", {name: "_blank"}, () => {
+                    openWindowCallCount += 1;
+                });
+
+            expect(firstResult).to.be.true;
+            expect(secondResult).to.be.true;
+            expect(openWindowCallCount).to.equal(2);
+        });
+    });
+
+    describe("getWmsFeaturesByMimeType", () => {
+        let popupWindow,
+            windowState,
+            openWindowSpy,
+            axiosGetStub;
+
+        beforeEach(() => {
+            popupWindow = {
+                closed: false,
+                document: document.implementation.createHTMLDocument("GetFeatureInfo")
+            };
+            windowState = {};
+            openWindowSpy = sinon.spy(() => popupWindow);
+            axiosGetStub = sinon.stub(axios, "get");
+        });
+
+        afterEach(() => {
+            axiosGetStub.restore();
+        });
+
+        it("positive: combines features from multiple layers with data into the same popup window", async () => {
+            const layerWithData = {
+                    get: (key) => {
+                        if (key === "infoFormat") {
+                            return "application/json";
+                        }
+                        if (key === "name") {
+                            return "Layer With Data";
+                        }
+                        if (key === "gfiAsNewWindow") {
+                            return {name: "_blank", specs: ""};
+                        }
+                        return null;
+                    }
+                },
+                layerWithoutData = {
+                    get: (key) => {
+                        if (key === "infoFormat") {
+                            return "application/json";
+                        }
+                        if (key === "name") {
+                            return "Layer Without Data";
+                        }
+                        if (key === "gfiAsNewWindow") {
+                            return {name: "_blank", specs: ""};
+                        }
+                        return null;
+                    }
+                };
+
+            axiosGetStub.onCall(0).resolves({status: 200, statusText: "OK", data: {features: [{id: "1", properties: {name: "foo"}}]}});
+            axiosGetStub.onCall(1).resolves({status: 200, statusText: "OK", data: {features: []}});
+
+            const firstResult = await getWmsFeaturesByMimeType(layerWithData, "https://example.com/gfi-1", windowState, undefined, openWindowSpy),
+                secondResult = await getWmsFeaturesByMimeType(layerWithoutData, "https://example.com/gfi-2", windowState, undefined, openWindowSpy);
+
+            expect(firstResult).to.be.an("array").that.is.empty;
+            expect(secondResult).to.be.an("array").that.is.empty;
+            expect(openWindowSpy.calledOnce).to.be.true;
+            expect(windowState.popupCount).to.equal(1);
+            expect(popupWindow.document.querySelectorAll(".gfi-entry").length).to.equal(1);
+            expect(popupWindow.document.querySelector(".gfi-popup-title").textContent).to.equal("Layer With Data");
+        });
+
+        it("negative: does not open or append to the popup when no layer has features", async () => {
+            const layerWithoutData = {
+                get: (key) => {
+                    if (key === "infoFormat") {
+                        return "application/json";
+                    }
+                    if (key === "gfiAsNewWindow") {
+                        return {name: "_blank", specs: ""};
+                    }
+                    return null;
+                }
+            };
+
+            axiosGetStub.resolves({status: 200, statusText: "OK", data: {features: []}});
+
+            const result = await getWmsFeaturesByMimeType(layerWithoutData, "https://example.com/gfi-1", windowState, undefined, openWindowSpy);
+
+            expect(result).to.be.an("array").that.is.empty;
+            expect(openWindowSpy.calledOnce).to.be.true;
+            expect(windowState.popupCount).to.equal(0);
+            expect(popupWindow.document.querySelectorAll(".gfi-entry").length).to.equal(0);
+            expect(popupWindow.document.querySelector(".gfi-empty-state").textContent).to.equal("No feature information available.");
+        });
+
+        it("positive: navigates between multiple results with the pager arrows", async () => {
+            const firstLayer = {
+                    get: (key) => {
+                        if (key === "infoFormat") {
+                            return "application/json";
+                        }
+                        if (key === "name") {
+                            return "First Layer";
+                        }
+                        if (key === "gfiAsNewWindow") {
+                            return {name: "_blank", specs: ""};
+                        }
+                        return null;
+                    }
+                },
+                secondLayer = {
+                    get: (key) => {
+                        if (key === "infoFormat") {
+                            return "application/json";
+                        }
+                        if (key === "name") {
+                            return "Second Layer";
+                        }
+                        if (key === "gfiAsNewWindow") {
+                            return {name: "_blank", specs: ""};
+                        }
+                        return null;
+                    }
+                };
+
+            axiosGetStub.onCall(0).resolves({status: 200, statusText: "OK", data: {features: [{id: "1", properties: {name: "foo"}}]}});
+            axiosGetStub.onCall(1).resolves({status: 200, statusText: "OK", data: {features: [{id: "2", properties: {name: "bar"}}]}});
+
+            await getWmsFeaturesByMimeType(firstLayer, "https://example.com/gfi-1", windowState, undefined, openWindowSpy);
+            await getWmsFeaturesByMimeType(secondLayer, "https://example.com/gfi-2", windowState, undefined, openWindowSpy);
+
+            const doc = popupWindow.document,
+                title = doc.querySelector(".gfi-popup-title"),
+                leftButton = doc.querySelector(".gfi-pager-left"),
+                rightButton = doc.querySelector(".gfi-pager-right");
+
+            expect(title.textContent).to.equal("First Layer");
+            expect(leftButton.disabled).to.be.true;
+            expect(rightButton.disabled).to.be.false;
+
+            rightButton.click();
+
+            expect(title.textContent).to.equal("Second Layer");
+            expect(leftButton.disabled).to.be.false;
+            expect(rightButton.disabled).to.be.true;
+
+            leftButton.click();
+
+            expect(title.textContent).to.equal("First Layer");
         });
     });
 

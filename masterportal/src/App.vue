@@ -8,6 +8,7 @@ import initializeLayers from "./core/layers/js/layerProcessor.js";
 import maps from "./core/maps/js/maps.js";
 import urlParamsHandler from "./core/urlParams/js/urlParams.js";
 import mapCollection from "./core/maps/js/mapCollection.js";
+import LoginComponent from "./modules/login/components/LoginComponent.vue";
 import MenuContainer from "./modules/menu/components/MenuContainer.vue";
 import MenuToggleButton from "./modules/menu/components/MenuToggleButton.vue";
 import addonsPlugin from "./plugins/addons.js";
@@ -19,6 +20,7 @@ export default {
         Alerting,
         BaselayerSwitcher,
         ControlBar,
+        LoginComponent,
         MenuContainer,
         MenuToggleButton
     },
@@ -33,6 +35,7 @@ export default {
             "allConfigsLoaded",
             "configJs",
             "deviceMode",
+            "isModuleAvailable",
             "mapViewSettings",
             "uiStyle",
             "visibleLayerConfigs"
@@ -64,7 +67,7 @@ export default {
                 await this.$nextTick();
 
                 // Check if login module is available after configs are loaded
-                if (this.$store?.getters?.isModuleAvailable?.("login")) {
+                if (this.isModuleAvailable("login")) {
                     // Start periodic check to verify if user token is still valid
                     await this.setUpTokenRefreshInterval();
                 }
@@ -188,6 +191,10 @@ export default {
         <MenuContainer
             v-if="allConfigsLoaded && addonsLoaded && mainMenu && uiStyle !== 'SIMPLE'"
             side="mainMenu"
+        />
+        <LoginComponent
+            v-if="allConfigsLoaded && addonsLoaded && isModuleAvailable('login')"
+            :auto-login="true"
         />
         <MenuToggleButton
             v-if="allConfigsLoaded && addonsLoaded && mainMenu && uiStyle !== 'SIMPLE'"

@@ -18,13 +18,10 @@ import store from "@appstore/index.js";
  */
 export function requestGfi (mimeType, url, layer) {
     const layerId = layer.get("id"),
-        layerSpecification = store.getters.layerConfigById(layerId) || rawLayerList.getLayerWhere({id: layerId}),
+        layerSpecification = typeof store.getters?.layerConfigById === "function" ? store.getters.layerConfigById(layerId) : rawLayerList.getLayerWhere({id: layerId}),
         layerIsSecured = Boolean(layerSpecification?.isSecured);
 
-    return axios({
-        method: "get",
-        withCredentials: layerIsSecured,
-        url})
+    return axios.get(url, {withCredentials: layerIsSecured})
         .then(response => handleAxiosResponse(response, "requestGfi"))
         .then(responseData => {
             let parsedDocument = null;

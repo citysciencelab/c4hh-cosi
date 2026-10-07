@@ -8,7 +8,7 @@
     "url": "https://www.masterportal.org"
   },
   "bugs": "https://gitlab.opencode.de/lgvhh/urban-data-solutions/masterportal/-/work_items",
-  "version": "3.26.0",
+  "version": "3.27.0",
   "license": "MIT",
   "description": "The MasterPortal as OpenSource Geoportal",
   "repository": {
@@ -45,12 +45,13 @@
     "prepare": "husky"
   },
   "dependencies": {
-    "@masterportal/masterportalapi": "^2.63.0",
+    "@masterportal/masterportalapi": "^2.64.0",
     "@popperjs/core": "^2.11.8",
     "axios": "^1.19.0",
     "bootstrap": "^5.3.8",
     "bootstrap-icons": "^1.13.1",
     "chart.js": "^4.5.1",
+    "dompurify": "^3.4.15",
     "i18next": "^26.1.0",
     "i18next-browser-languagedetector": "^8.2.1",
     "i18next-http-backend": "^4.0.0",

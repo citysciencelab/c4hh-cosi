@@ -380,6 +380,36 @@
       "addedBy": "geodatenanwendungen@gv.hamburg.de",
       "addedOn": "2026-09-08",
       "reviewBy": "2027-09-08"
+    },
+    {
+      "id": "GHSA-82fw-gwwq-j7x9",
+      "package": "@vitest/mocker",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "Test tooling only; the repository uses Vitest with jsdom for local tests and does not expose Vitest browser mode or an unauthenticated Vitest/Vite mocker server. The package is not part of the production browser bundle.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-16",
+      "reviewBy": "2027-09-16"
+    },
+    {
+      "id": "GHSA-82fw-gwwq-j7x9",
+      "package": "vitest",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "Test tooling only; the repository uses Vitest with jsdom for local tests and does not expose Vitest browser mode or an unauthenticated Vitest/Vite mocker server. The package is not part of the production browser bundle.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-16",
+      "reviewBy": "2027-09-16"
+    },
+    {
+      "id": "GHSA-w5vr-8v7q-w6rv",
+      "package": "baseline-browser-mapping",
+      "ecosystem": "npm",
+      "status": "wont-fix",
+      "reason": "Node-side build tooling only; baseline-browser-mapping is reached through the dev-only browserslist/Webpack dependency chain, is not imported by application code, and is not included in the production browser bundle. Invalid parser input can only terminate the local build process.",
+      "addedBy": "geodatenanwendungen@gv.hamburg.de",
+      "addedOn": "2026-09-16",
+      "reviewBy": "2027-09-16"
     }
   ]
 }

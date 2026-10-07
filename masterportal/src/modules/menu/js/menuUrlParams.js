@@ -20,16 +20,17 @@ import {getPiniaModuleStore} from "@modules/modules-store/piniaModules.js";
  */
 
 const menuUrlParams = {
-        MENU: setAttributesToComponent,
-        MAINWIDTH: setMenuWidth,
-        SECONDARYWIDTH: setSecondaryMenuWidth,
-        MAINCLOSED: setMainMenuClosed,
-        SECONDARYCLOSED: setSecondaryMenuClosed
-    },
-    legacyMenuUrlParams = {
-        ISINITOPEN: isInitOpen,
-        STARTUPMODUL: isInitOpen
-    };
+    MENU: setAttributesToComponent,
+    MAINWIDTH: setMenuWidth,
+    SECONDARYWIDTH: setSecondaryMenuWidth,
+    MAINCLOSED: setMainMenuClosed,
+    SECONDARYCLOSED: setSecondaryMenuClosed
+};
+
+export const legacyMenuUrlParams = {
+    ISINITOPEN: isInitOpen,
+    STARTUPMODUL: isInitOpen
+};
 
 /**
  * Process the menu url params.

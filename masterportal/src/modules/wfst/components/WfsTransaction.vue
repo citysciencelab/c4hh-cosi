@@ -325,6 +325,7 @@ export default {
                                     :key="`${property.key}-checkbox-input`"
                                     :type="getInputType(property.type)"
                                     :checked="['true', true].includes(property.value) ? true : false"
+                                    :disabled="property.disabled"
                                     class="form-check-input bi-square-like-checkbox"
                                     @input="event => setFeaturesBatchProperty({key: property.key, type: getInputType(property.type), value: event.target.checked})"
                                 >
@@ -335,6 +336,7 @@ export default {
                                     class="form-control"
                                     :type="getInputType(property.type)"
                                     :required="property.required"
+                                    :disabled="property.disabled"
                                     @input="event => setFeaturesBatchProperty({key: property.key, type: getInputType(property.type), value: event.target.value})"
                                 >
                             </template>
@@ -387,6 +389,7 @@ export default {
                                     :key="`${property.key}-checkbox-input`"
                                     :type="getInputType(property.type)"
                                     :checked="['true', true].includes(property.value) ? true : false"
+                                    :disabled="property.disabled"
                                     class="form-check-input bi-square-like-checkbox"
                                     @input="event => updateFeatureProperty({
                                         key: property.key,
@@ -410,6 +413,7 @@ export default {
                                         : ''"
                                     :type="getInputType(property.type)"
                                     :required="property.required"
+                                    :disabled="property.disabled"
                                     :value="property.value"
                                     @input="event => updateFeatureProperty({
                                         key: property.key,

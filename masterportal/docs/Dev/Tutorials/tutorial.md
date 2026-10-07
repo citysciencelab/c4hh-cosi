@@ -168,6 +168,27 @@ const actions = {
 export default actions;
 ```
 
+### Adding the source-metadata-property as payload
+
+If an action's payload needs to have a source-metadata-property (e.g. in order for tracking by the `userTracking` addon), add a `_source` property identifying the source (typically the component name). Use the `addSourceToPayload` helper instead of setting it manually:
+
+```js
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
+
+    ...
+    methods: {
+        ...
+        /**
+         * Dispatches an action including the source component for tracking.
+         * @returns {void}
+         */
+        triggerTrackedAction () {
+            this.$store.dispatch("Modules/ScaleSwitcher/someAction", addSourceToPayload(this, payload));
+        }
+    }
+    ...
+```
+
 ### Setting up the store/index file
 
 Open the file `modules/scaleSwitcher/store/indexScaleSwitcher.js`. Default export the previously created state, getters, mutations, and actions as an object. This represents a Vuex store, and is pluggable to another Vuex store as a module.
