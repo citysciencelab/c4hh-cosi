@@ -4,8 +4,7 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-10-07 v3.27.0 (LTS)
 
 ### Added
 - LinechartItem: Added possibility to configure custom plugins to extend Chart.js default behaviour.
@@ -21,10 +20,6 @@
 - The following packages have been updated:
     - dependencies:
         - @masterportal/masterportalapi: 2.63.0 to 2.64.0 (This also raised ol to version 10.10.0)
-
-### Deprecated
-
-### Removed
 
 ### Fixed
 - Issue \#1655: Menu modules now keep their own configuration when multiple modules of the same type are defined in config.json. LayerSlider and Filter no longer reuse the last configured instance.
