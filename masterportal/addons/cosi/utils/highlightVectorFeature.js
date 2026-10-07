@@ -26,7 +26,8 @@ export default function highlightVectorFeature (feature, layerId) {
             id: _feature.getId(),
             type: "increase",
             scale: 1.4,
-            layer: {id: layerId}
+            layer: {id: layerId},
+            feature: _feature
         });
     }
     else if (geomType === "Polygon" || geomType === "MultiPolygon") {

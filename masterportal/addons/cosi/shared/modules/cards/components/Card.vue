@@ -208,7 +208,11 @@ export default {
                         />
                         <slot name="subjectData-menu" />
                     </div>
-                    <div class="dropdown custom-dd">
+                    <slot name="custom-icon-button" />
+                    <div
+                        v-if="downloadable"
+                        class="dropdown custom-dd"
+                    >
                         <IconButton
                             class="p-1"
                             icon="bi bi-download"

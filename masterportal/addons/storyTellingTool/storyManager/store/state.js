@@ -13,10 +13,15 @@
  * @property {Boolean} fixedStoryLoaded check if fixed story is load.
  * @property {Object[]} [gfiFeatures=[]] temporary array for features at click to be moved to gfi module.
  * @property {Boolean} [enableVideo=false] - Defines if video is enabled in chapter creator.
-* @property {ol/layer[]} originalLayerConfig the original layer configs.
+ * @property {ol/layer[]} originalLayerConfig the original layer configs.
  * @property {Object[]} storyList List entries with story and image assets.
  * @property {Object} subjectLayerCategory - The subject layer category for layer selection.
  * @property {String[]} [toolStoryWhitelist=[]] - List of tool type IDs to show in the StoryCreator tool selector. Empty array means all configured tools are shown.
+* @property {Object[]} currentLayout - The current layout object.
+ * @property {Object[]} drawTypeLabels - the array of type and labels.
+ * @property {Object[]} selectedDrawType - The selected draw type.
+ * @property {Object[]} selectedDrawTypeMain - The main selected draw type.
+ * @property {Object[]} selectedInteraction - The selected interaction.
  */
 const state = {
     id: "storyManager",
@@ -24,6 +29,22 @@ const state = {
     name: "additional:modules.storyManager.title",
     icon: "bi-file-plus",
     currentStoryIndex: undefined,
+    currentLayout: {
+        fillColor: [60, 95, 148],
+        fillTransparency: 0,
+        strokeColor: [0, 0, 0],
+        strokeWidth: 2
+    },
+    drawTypeLabels: [
+        {type: "polygon", label: "additional:modules.storyCreator.addElementDropdown.draw.freeForm"},
+        {type: "box", label: "additional:modules.storyCreator.addElementDropdown.draw.rectangle"},
+        {type: "circle", label: "additional:modules.storyCreator.addElementDropdown.draw.circle"},
+        {type: "line", label: "additional:modules.storyCreator.addElementDropdown.draw.line"}
+    ],
+    drawTypesMain: ["polygon", "box", "circle", "line"],
+    selectedDrawType: "",
+    selectedDrawTypeMain: "",
+    selectedInteraction: null,
     enableCreator: true,
     enableImport: true,
     enableVideo: false,

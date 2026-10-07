@@ -1,0 +1,17 @@
+{
+    "addons": {
+        "gfiThemes": {
+            "timeSeriesChart": {
+                "title": "Time Series Chart",
+                "tabs": {
+                    "tabBasicData": {
+                        "label": "Basic Data"
+                    },
+                    "tabGraphics": {
+                        "label": "Graphics"
+                    }
+                }
+            }
+        }
+    }
+}

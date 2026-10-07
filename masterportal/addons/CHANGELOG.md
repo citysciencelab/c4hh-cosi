@@ -3,21 +3,29 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-10-07 v3.27.0 (LTS)
 
 ### Added
 
+- lzsResearchClient: Added new addon lzsResearchClient for easy searching and access to geoadata in long-term storage
+- ScenarioBuilder: This allows you to add subject data objects and see, within CoSI, how they affect other subject data and demographic data.
+- userTracking: Clicks on a custom menu element that opens an external URL are now also tracked.
+
 ### Changed
-
-### Deprecated
-
-### Removed
+- userTracking: 
+    - Renamed several Matomo actions for clarity (see userTracking/README.md for details).
+    - Matomo events no longer send a numeric "value" (see userTracking/README.md for details).
+    - Page view URLs are now lower-cased consistently to prevent duplicate entries in Matomo caused by casing differences.
 
 ### Fixed
 - gfiThemes: The printServerUrl from combinedGfiPrintConfig.json in the combinedGFI theme now takes precedence over the printServerUrl from the layer config, if available.
+- userTracking: 
+    - Opening the layer info panel is tracked accurately without false positives from the layer tree sub-menu.
+    - Fixed the "Changed map-mode" event being tracked automatically on initial load when the current URL already reflected that map mode.
 
 ---
+
+## 2026-09-11 v3.26.1
 
 ## 2026-09-02 v3.26.0
 

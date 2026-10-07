@@ -26,9 +26,8 @@ export function handleReplaceByIdInLayerConfig (payload, store) {
     if (Object.keys(layer).length === 2 && layer.id !== undefined && layer.visibility !== undefined) {
         trackMatomoEvent({
             category: "Layer",
-            action: `Changed layer-visibility via ${getSourceFromPayload(payload)}`,
+            action: `Turned layer-visibility ${layer.visibility ? "on" : "off"} via ${getSourceFromPayload(payload)}`,
             name: `Layer: ${store.getters.layerConfigById(layer.id)?.name} (id: ${layer.id})`,
-            value: layer.visibility ? 1 : 0,
             _source: assembleSourceInfoForEvent(funcName, payload._source)
         });
     }

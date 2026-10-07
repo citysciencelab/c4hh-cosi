@@ -3,20 +3,24 @@ import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vu
 import AddElementDropdown from "../shared/modules/addElementDropdown/components/AddElementDropdown.vue";
 import buildTreeStructure from "@appstore/js/buildTreeStructure.js";
 import CookieBanner from "../../shared/cookiebanner/components/CookieBanner.vue";
+import ConvertFeature from "../../shared/utils/featureConverter.js";
 import draggable from "vuedraggable";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import {getDirectVideo, getEmbedLink} from "../../shared/utils/video.js";
-import {getVisibleLayerList} from "../../shared/utils/layerHelper.js";
+import {getLayerSource, getVisibleLayerList} from "../../shared/utils/layerHelper.js";
 import isObject from "@shared/js/utils/isObject.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
 import Multiselect from "vue-multiselect";
+import SimpleCard from "../../../cosi/shared/modules/cards/components/SimpleCard.vue";
 import {sort} from "@shared/js/utils/sort.js";
 import store from "@appstore/index.js";
+import StoryCreatorAddDrawCard from "./StoryCreatorAddDrawCard.vue";
 import StoryCreatorAddFeatureCard from "./StoryCreatorAddFeatureCard.vue";
 import StoryCreatorAddImageCard from "./StoryCreatorAddImageCard.vue";
 import StoryCreatorAddTextCard from "./StoryCreatorAddTextCard.vue";
 import StoryCreatorAddVideoCard from "./StoryCreatorAddVideoCard.vue";
+import StoryCreatorAddWriteCard from "./StoryCreatorAddWriteCard.vue";
 import tipTapJsonToHtml from "../shared/modules/tipTapEditor/js/tipTapJsonToHtml.js";
 import Toast from "../../shared/toasts/components/ToastsElement.vue";
 
@@ -29,10 +33,13 @@ export default {
         Draggable: draggable,
         FlatButton,
         Multiselect,
+        SimpleCard,
+        StoryCreatorAddDrawCard,
         StoryCreatorAddFeatureCard,
         StoryCreatorAddImageCard,
         StoryCreatorAddTextCard,
         StoryCreatorAddVideoCard,
+        StoryCreatorAddWriteCard,
         Toast
     },
     props: {
@@ -91,6 +98,7 @@ export default {
             selectedLayers: [],
             selectedTool: "",
             showToast: false,
+            source: null,
             title: this.$t("additional:modules.storyCreator.chapter.title")
         };
     },
@@ -104,10 +112,10 @@ export default {
          */
         allowedActions () {
             if (this.enableVideo) {
-                return ["text", "divider", "image", "feature", "video"];
+                return ["text", "divider", "image", "feature", "video", "draw", "write"];
             }
 
-            return ["text", "divider", "image", "feature"];
+            return ["text", "divider", "image", "feature", "draw", "write"];
         },
         /**
          * Returns true if the current map coordinate or zoom level differs from the last confirmed values.
@@ -305,6 +313,7 @@ export default {
             this.changeMapMode("2D");
             this.setToNorth();
         }
+        getLayerSource()?.clear();
     },
     methods: {
         ...mapActions(["addOrReplaceLayer", "updateLayerConfigs"]),
@@ -360,6 +369,26 @@ export default {
                 return;
             }
 
+            if (type === "draw") {
+                const drawIndex = this.content.findIndex(
+                    element => element.type === "draw" && element.attrs.length
+                );
+
+                if (drawIndex !== -1) {
+                    this.openContentEditorForEdit(drawIndex, "draw");
+                    return;
+                }
+            }
+
+            if (type === "write") {
+                const writeIndex = this.content.findIndex(element => element.type === "write" && element.attrs.length);
+
+                if (writeIndex !== -1) {
+                    this.openContentEditorForEdit(writeIndex, "write");
+                    return;
+                }
+            }
+
             this.openContentEditor = {
                 type,
                 index: this.content.length
@@ -374,6 +403,47 @@ export default {
                 type: "",
                 index: null
             };
+
+            const drawItem = this.content.find(
+                item => item.type === "draw" && item.attrs.length
+            );
+
+            const writeItem = this.content.find(
+                item => item.type === "write" && item.attrs.length
+            );
+
+            if (drawItem) {
+                this.createDrawObject(drawItem.attrs);
+            }
+
+            if (writeItem) {
+                this.source = getLayerSource();
+
+                const existingWriteFeatures = this.source.getFeatures().filter(
+                    feature => feature.get("storyCreatorType") === "write"
+                );
+
+                existingWriteFeatures.forEach(feature => {
+                    this.source.removeFeature(feature);
+                });
+
+                const writeFeatures = ConvertFeature.geoJsonToOpenlayers(writeItem.attrs, {storyCreatorType: "write"});
+
+                this.source.addFeatures(writeFeatures);
+            }
+        },
+        /**
+         * Opens the popup window to show the feature atrributes.
+         * @param {Object} val the features object.
+         * @returns {void}
+         */
+        createDrawObject (val) {
+            this.source = getLayerSource();
+            this.source?.clear();
+
+            const features = ConvertFeature.geoJsonToOpenlayers(val, {storyCreatorType: "draw"});
+
+            this.source.addFeatures(features);
         },
         /**
          * Opens a content editor to edit an existing item.
@@ -385,6 +455,7 @@ export default {
             if (this.isContentEditorOpen) {
                 return;
             }
+
             if (type === "feature") {
                 const layerId = this.content[index].attrs?.layerId;
 
@@ -392,6 +463,7 @@ export default {
                     this.selectedLayers.push(...this.layerList.filter(layer => layer.layerId === layerId));
                 }
             }
+
             this.openContentEditor = {
                 type,
                 index
@@ -447,6 +519,16 @@ export default {
             this.selectedTool = chapter.map.tool
                 ? this.toolList.find(tool => tool.toolId === chapter.map.tool) || ""
                 : "";
+
+            this.content.forEach(item => {
+                if (item.type === "draw") {
+                    this.createDrawObject(item.attrs);
+                }
+
+                if (item.type === "write") {
+                    this.createWriteObject(item.attrs);
+                }
+            });
         },
         /**
          * Returns true if the add editor for the given type is open.
@@ -692,6 +774,45 @@ export default {
             };
         },
         /**
+         * Handles drawing add/edit by writing it to the content array and closing the open editor.
+         * @param {ol/feature[]} features - The array of drawn features.
+         * @returns {void}
+         */
+        handleDraw (features) {
+            if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
+                const editIndex = this.openContentEditor.index;
+
+                this.content.splice(editIndex, 1, {
+                    type: "draw",
+                    attrs: features
+                });
+            }
+            else {
+                this.content.push({
+                    type: "draw",
+                    attrs: features
+                });
+            }
+
+            this.closeContentEditor();
+        },
+        /**
+         * Saves Write content and closes the content editor.
+         * @param {Object[]} mapText - GeoJSON feature objects.
+         * @returns {void}
+         */
+        handleMapText (mapText) {
+            if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
+                const editIndex = this.openContentEditor.index;
+
+                this.content.splice(editIndex, 1, {type: "write", attrs: mapText});
+            }
+            else {
+                this.content.push({type: "write", attrs: mapText});
+            }
+            this.closeContentEditor();
+        },
+        /**
          * Handles image add/edit by writing it to the content array and closing the open editor.
          * @param {Object} image - The image object containing id, alt, copyright, and objectURL.
          * @returns {void}
@@ -779,8 +900,19 @@ export default {
                 return;
             }
 
+            if (item.type === "draw" || item.type === "write") {
+                const features = this.source?.getFeatures().filter(
+                    feature => feature.get("storyCreatorType") === item.type
+                );
+
+                features?.forEach(feature => {
+                    this.source.removeFeature(feature);
+                });
+            }
+
             this.content.splice(index, 1);
         },
+
         /**
          * Resets the layer config.
          * @returns {void}
@@ -821,6 +953,19 @@ export default {
             mapCollection.getMapView("2D").animate({rotation: 0});
         },
         /**
+         * Sets the type for all features.
+         * @param {ol/Feature[]} features - OpenLayers features.
+         * @param {String} type - StoryCreator feature type.
+         * @returns {ol/Feature[]} The features with the assigned type.
+         */
+        setFeatureType (features, type) {
+            features.forEach(feature => {
+                feature.set("storyCreatorType", type);
+            });
+
+            return features;
+        },
+        /**
          * Updates the current zoom level and coordinate from the map view.
          * @returns {void}
          */
@@ -837,6 +982,18 @@ export default {
 
             this.zoomlevel = mapView.getZoom();
             this.coordinate = [...mapView.getCenter()];
+        },
+        /**
+         * Creates OpenLayers features from saved Write content.
+         * @param {Object[]} val - GeoJSON feature objects.
+         * @returns {void}
+         */
+        createWriteObject (val) {
+            this.source = getLayerSource();
+
+            const features = ConvertFeature.geoJsonToOpenlayers(val, {storyCreatorType: "write"});
+
+            this.source.addFeatures(features);
         }
     }
 };
@@ -1142,6 +1299,7 @@ export default {
                                 :selected-layers="selectedLayers"
                                 :create-image-asset="createImageAsset"
                                 :image-assets-by-id="imageAssetsById"
+                                :is-edit-mode="true"
                                 @addFeature="handleFeature"
                                 @click:close="closeContentEditor"
                             />
@@ -1249,6 +1407,92 @@ export default {
                                 </div>
                             </div>
                         </div>
+                        <div
+                            v-if="element.type === 'draw' && element.attrs?.length"
+                            class="chapter-content-item__wrapper"
+                        >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
+                            <StoryCreatorAddDrawCard
+                                v-if="isEditingContentItem(index)"
+                                class="mt-2"
+                                :initial-content="element"
+                                @addDrawing="handleDraw"
+                                @click:close="closeContentEditor"
+                            />
+                            <div
+                                v-else
+                                class="card rounded-3 border-0 p-4 position-relative chapter-content-item__preview"
+                                :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
+                                role="button"
+                                tabindex="0"
+                                @click="openContentEditorForEdit(index, 'draw')"
+                                @keydown.enter="openContentEditorForEdit(index, 'draw')"
+                                @keydown.space.prevent="openContentEditorForEdit(index, 'draw')"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-1 chapter-content-item__close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
+                                <div class="mb-3">
+                                    <SimpleCard
+                                        icon="bi bi-bezier"
+                                        :closeable="false"
+                                        :label="$t('additional:modules.storyCreator.headlines.mapContent')"
+                                        :text="element.attrs?.length + ' ' + $t('additional:modules.storyCreator.headlines.drawing')"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                        <div
+                            v-if="element.type === 'write' && element.attrs?.length"
+                            class="chapter-content-item__wrapper"
+                        >
+                            <i
+                                v-if="!isContentEditorOpen"
+                                class="bi bi-grip-vertical drag-handle"
+                                aria-hidden="true"
+                            />
+
+                            <StoryCreatorAddWriteCard
+                                v-if="isEditingContentItem(index)"
+                                class="mt-2"
+                                :initial-content="element"
+                                @addMapText="handleMapText"
+                                @click:close="closeContentEditor"
+                            />
+                            <div
+                                v-else
+                                class="card rounded-3 border-0 p-4 position-relative chapter-content-item__preview"
+                                :class="{'chapter-content-item--locked': isContentItemLocked(index), 'chapter-content-item--clickable': !isContentItemLocked(index)}"
+                                role="button"
+                                tabindex="0"
+                                @click="openContentEditorForEdit(index, 'write')"
+                                @keydown.enter="openContentEditorForEdit(index, 'write')"
+                                @keydown.space.prevent="openContentEditorForEdit(index, 'write')"
+                            >
+                                <button
+                                    type="button"
+                                    class="btn-close position-absolute top-0 end-0 m-1 chapter-content-item__close"
+                                    :aria-label="$t('common:button.close')"
+                                    @click.stop="removeContentItem(index)"
+                                />
+
+                                <div class="mb-3">
+                                    <SimpleCard
+                                        icon="bi bi-fonts"
+                                        :closeable="false"
+                                        :label="$t('additional:modules.storyCreator.headlines.mapContent')"
+                                        :text="element.attrs?.length + ' ' + $t('additional:modules.storyCreator.labels.annotations')"
+                                    />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </template>
             </Draggable>
@@ -1286,6 +1530,20 @@ export default {
                 v-else-if="isAddingContentType('video')"
                 class="mt-2"
                 @addVideo="handleVideo"
+                @click:close="closeContentEditor"
+            />
+            <StoryCreatorAddDrawCard
+                v-else-if="isAddingContentType('draw')"
+                class="mt-2"
+                :create-image-asset="createImageAsset"
+                :image-assets-by-id="imageAssetsById"
+                @addDrawing="handleDraw"
+                @click:close="closeContentEditor"
+            />
+            <StoryCreatorAddWriteCard
+                v-else-if="isAddingContentType('write')"
+                class="mt-2"
+                @addMapText="handleMapText"
                 @click:close="closeContentEditor"
             />
         </AccordionItem>

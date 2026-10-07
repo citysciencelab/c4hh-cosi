@@ -724,13 +724,15 @@ export default {
         margin: 6px 0 0 0;
 
         .section-title {
-            color: #003063;
+            color: white;
             font-weight: bold;
-            margin-top: 1.25rem;
+            padding-top: 0.75rem;
+            padding-bottom: 0.5rem;
+            padding-left: 0.5rem;
             margin-bottom: 0.25rem;
 
             &:first-child {
-                margin-top: 0.5rem;
+                margin-top: 0;
             }
         }
 

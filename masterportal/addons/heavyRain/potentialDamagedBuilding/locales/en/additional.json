@@ -6,28 +6,15 @@
       "headline": {
          "buildingAttributes": "Building attributes",
          "buildingOverview": "Overview",
-         "updateData": "Update Data - ",
+         "updateData": "Change proposal - ",
          "adjustedDamagePotentialClass": "adjusted damage potential class",
-         "lastUpdated": "Last updated",
+         "lastUpdated": "Date of entry:",
          "comment": "Comment",
          "potentialDamagedInformation": "Information on the potential for damage - ",
-         "potentialDamagedClass": "Schadenpotenzialklasse",
+         "potentialDamagedClass": "Potential damage class",
          "buildingFunction": "Building function",
          "additionalBuildingFunction": "additional building function",
-         "additionalInformation": "additional Information"
-      },
-      "label": {
-        "potentialDamagedClassCount": "The current risk of damage to this building is estimated at",
-        "potentialDamagedClassUpdate": "Last updated on",
-        "potentialDamagedClassDerive": "Derived from ALKIS",
-        "potentialDamagedClassLastEntry": "The last entry for the adjusted damage potential class is",
-        "buildingKey": "the ALKIS building ID is:",
-        "builingFunction": "the ALKIS building key is:",
-        "additionalBuilingKey": "the additional ALKIS building ID is:",
-        "additionalBuilingFunction": "the additional ALKIS building key is:",
-        "earthSurface": "the orientation relative to the Earth's surface according to ALKIS is",
-        "buildingConstructionType": "the building's construction type according to ALKIS is",
-        "basementLevels": "the number of basement levels in the building is"
+         "additionalInformation": "additional information"
       },
       "popover": {
         "damagePotentialClass": "The damage potential class currently used in the risk analysis calculation. This value may differ from the adjusted damage potential class if the modification date is more recent than the update date.",
@@ -40,11 +27,18 @@
         "basementLevels": "This section indicates whether there are any basement levels and, if so, how many."
       },
       "damagePotentialClass": "Damage Potential Class",
+      "currentlyUsed": "currently used",
+      "updateDateLabel": "Update date",
+      "lastUpdate": "last update",
       "adjustedDamagePotentialClassHint": "The final entry of location-specific values for each property or area.",
-      "lastUpdatedHint": "Adjusted on: ",
+      "lastUpdatedHint": "Date of entry: ",
       "commentHint": "Indication of the responsible department, with additional explanations if necessary",
       "reset": "Reset",
-      "save": "Save"
+      "save": "Save",
+      "messages": {
+        "invalid": "Please enter a damage potential class from 1 to 6 and a comment with a maximum of 255 characters.",
+        "success": "The adjustment has been saved."
+      }
     }
   }
 }

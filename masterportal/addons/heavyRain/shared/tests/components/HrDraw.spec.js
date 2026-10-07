@@ -1,26 +1,27 @@
-import {shallowMount} from "@vue/test-utils";
+import Circle from "ol/geom/Circle.js";
 import {createStore} from "vuex";
 import {expect} from "chai";
-import sinon from "sinon";
-import GeoJSON from "ol/format/GeoJSON.js";
+import Feature from "ol/Feature.js";
 import HrDraw from "../../components/HrDraw.vue";
+import {isReactive} from "vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import layerFactory from "@core/layers/js/layerFactory.js";
 import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction.js";
+import Polygon from "ol/geom/Polygon.js";
+import {shallowMount} from "@vue/test-utils";
+import sinon from "sinon";
 
 
 describe("addons/heavyRain/shared/components/HrDraw.vue", () => {
     let store,
         source,
         layer,
-        geojsonFeature,
         getLayerByIdStub,
         addLayerStub,
         addInteractionStub,
         createLayerStub,
         createModifyInteractionStub,
-        removeInteractionStub,
-        writeFeatureObjectStub;
+        removeInteractionStub;
 
     beforeEach(() => {
         store = createStore({
@@ -42,19 +43,10 @@ describe("addons/heavyRain/shared/components/HrDraw.vue", () => {
         layer = {
             getLayerSource: sinon.stub().returns(source)
         };
-        geojsonFeature = {
-            type: "Feature",
-            geometry: {
-                type: "Polygon"
-            },
-            properties: null
-        };
-
-        getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").returns(layer);
+        getLayerByIdStub = sinon.stub(layerCollection, "getLayerById").withArgs("heavy-rain-draw").returns(layer);
         addLayerStub = sinon.stub(layerCollection, "addLayer");
         addInteractionStub = sinon.stub(HrDraw.methods, "addInteraction");
         createLayerStub = sinon.stub(layerFactory, "createLayer").returns(layer);
-        writeFeatureObjectStub = sinon.stub(GeoJSON.prototype, "writeFeatureObject").returns(geojsonFeature);
         removeInteractionStub = sinon.stub(HrDraw.methods, "removeInteraction");
         createModifyInteractionStub = sinon.stub(modifyInteraction, "createModifyInteraction");
     });
@@ -105,10 +97,40 @@ describe("addons/heavyRain/shared/components/HrDraw.vue", () => {
                 typ: "VECTORBASE",
                 id: "heavy-rain-draw",
                 name: "heavy-rain-draw",
-                alwaysOnTop: true
+                alwaysOnTop: true,
+                dontInitStyle: true
             });
             expect(addLayerStub.calledOnceWith(layer)).to.be.true;
             expect(wrapper.vm.source).to.deep.equal(source);
+        });
+
+        it("should clear the drawn features in unmounted, as the layer is kept in the layer collection", () => {
+            const wrapper = shallowMount(HrDraw, {global: {plugins: [store]}});
+
+            wrapper.unmount();
+
+            expect(source.clear.calledOnce).to.be.true;
+            expect(removeInteractionStub.calledOnce).to.be.true;
+        });
+
+        it("should add a copy of the geometry of an edited feature to the draw layer in created", () => {
+            const geometry = new Polygon([[[0, 0], [0, 1], [1, 1], [0, 0]]]);
+
+            shallowMount(HrDraw, {global: {plugins: [store]}, props: {geometry, strokeColor: [213, 94, 0]}});
+
+            const feature = source.addFeature.firstCall.args[0];
+
+            expect(source.addFeature.calledOnce).to.be.true;
+            expect(feature.getId()).to.equal("drawn-feature");
+            expect(feature.getGeometry()).to.not.equal(geometry);
+            expect(feature.getGeometry().getCoordinates()).to.deep.equal(geometry.getCoordinates());
+            expect(feature.getStyle().getStroke().getColor()).to.deep.equal([213, 94, 0]);
+        });
+
+        it("should not add a feature to the draw layer if no geometry is given", () => {
+            shallowMount(HrDraw, {global: {plugins: [store]}});
+
+            expect(source.addFeature.notCalled).to.be.true;
         });
     });
 
@@ -120,7 +142,7 @@ describe("addons/heavyRain/shared/components/HrDraw.vue", () => {
                 wrapper.vm.clearDrawnFeature();
 
                 expect(source.clear.calledOnce).to.be.true;
-                expect(wrapper.emitted("update:drawn-geojson-feature")).to.deep.equal([[null]]);
+                expect(wrapper.emitted("update:drawn-geometry")).to.deep.equal([[null]]);
             });
         });
 
@@ -151,14 +173,29 @@ describe("addons/heavyRain/shared/components/HrDraw.vue", () => {
         });
 
         describe("onDrawEnd", () => {
-            it("should emit a GeoJSON object", () => {
-                const feature = {id: "feature-1"},
+            it("should add the feature to the source and emit a copy of its geometry", () => {
+                const feature = new Feature(new Polygon([[[0, 0], [0, 1], [1, 1], [0, 0]]])),
                     wrapper = shallowMount(HrDraw, {global: {plugins: [store]}});
 
-                wrapper.vm.onDrawEnd({"feature": feature});
+                wrapper.vm.onDrawEnd({feature});
 
-                expect(writeFeatureObjectStub.calledOnceWith(feature)).to.be.true;
-                expect(wrapper.emitted("update:drawn-geojson-feature")).to.deep.equal([[geojsonFeature]]);
+                const emittedGeometry = wrapper.emitted("update:drawn-geometry")[0][0];
+
+                expect(source.addFeature.calledOnceWith(feature)).to.be.true;
+                expect(emittedGeometry.getType()).to.equal("Polygon");
+                expect(emittedGeometry.getCoordinates()).to.deep.equal([[[0, 0], [0, 1], [1, 1], [0, 0]]]);
+                expect(emittedGeometry).to.not.equal(feature.getGeometry());
+                expect(isReactive(emittedGeometry)).to.be.false;
+            });
+
+            it("should convert a drawn circle to a polygon", () => {
+                const feature = new Feature(new Circle([0, 0], 10)),
+                    wrapper = shallowMount(HrDraw, {global: {plugins: [store]}});
+
+                wrapper.vm.onDrawEnd({feature});
+
+                expect(feature.getGeometry().getType()).to.equal("Polygon");
+                expect(wrapper.emitted("update:drawn-geometry")[0][0].getType()).to.equal("Polygon");
             });
         });
 

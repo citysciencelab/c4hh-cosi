@@ -1,8 +1,14 @@
 <script>
+import {createPolygonStyle} from "../../shared/js/createPolygonStyle.js";
+import {formatDate} from "../../shared/js/formatDate.js";
+import {getClickedWfstFeature} from "../../shared/js/getClickedWfstFeature.js";
+import {getDownloadFileName, toFileHref} from "../../shared/js/fileData.js";
 import HrCard from "../../shared/components/HrCard.vue";
 import HrHeader from "../../shared/components/HrHeader.vue";
 import HrSnackbar from "../../shared/components/HrSnackbar.vue";
-import {mapGetters, mapMutations} from "vuex";
+import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import ProjectsEdit from "./ProjectsEdit.vue";
 
 export default {
@@ -12,24 +18,114 @@ export default {
         HrCard,
         HrHeader,
         HrSnackbar,
+        IconButton,
         ProjectsEdit
     },
     data () {
         return {
             showSnackbar: false,
             snackbarMessage: "",
-            snackbarColor: "success",
-            chosenCriteria: []
+            snackbarColor: "success"
         };
     },
     computed: {
-        ...mapGetters("Modules/Projects", ["criteria", "currentView"])
+        ...mapGetters("Modules/Projects", ["criteria", "currentProject", "currentView", "wfstAttributes", "wfstLayerId"]),
+
+        /**
+         * Gets the link of the file of the current project for the download.
+         * @returns {String|undefined} the link of the file or undefined, if the project has no file.
+         */
+        fileHref () {
+            return toFileHref(this.currentProject?.formValues?.file);
+        },
+
+        /**
+         * Gets the name of the file of the current project for the download.
+         * The name of a saved file is not known, so it is created from the name of the project.
+         * @returns {String} the name of the file.
+         */
+        downloadFileName () {
+            return getDownloadFileName(this.currentProject?.formValues?.file, this.currentProject?.formValues?.fileName, this.currentProject?.formValues?.projectName);
+        },
+
+        /**
+         * Gets the criteria of the current project without empty entries, as the criteria are optional.
+         * @returns {String[]} the criteria of the current project.
+         */
+        projectCriteria () {
+            const value = this.currentProject?.formValues?.criteria;
+
+            return typeof value === "string" ? value.split(",").map(cri => cri.trim()).filter(cri => cri !== "") : [];
+        }
     },
-    mounted () {
-        this.chosenCriteria = [this.criteria[1], this.criteria[0]];
+    async mounted () {
+        if (this.wfstLayerId) {
+            await this.addOrReplaceLayer({layerId: this.wfstLayerId, visibility: true});
+            // the layer is created by a watcher of the layer config, so it exists after the next tick
+            await this.$nextTick();
+            layerCollection.getLayerById(this.wfstLayerId)?.setStyle(createPolygonStyle(this.getFeatureColor));
+            // the content of a clicked project is shown in the module, so the gfi is not needed
+            layerCollection.getLayerById(this.wfstLayerId)?.getLayer()?.set("gfiAttributes", "ignore");
+            this.registerListener({type: "singleclick", listener: this.onMapClick, keyForBoundFunctions: "heavyRainProjectsClick"});
+        }
+    },
+    unmounted () {
+        this.removePointMarker();
+        if (this.wfstLayerId) {
+            this.unregisterListener({type: "singleclick", listener: this.onMapClick, keyForBoundFunctions: "heavyRainProjectsClick"});
+            this.replaceByIdInLayerConfig({layerConfigs: [{id: this.wfstLayerId, layer: {visibility: false}}]});
+        }
     },
     methods: {
-        ...mapMutations("Modules/Projects", ["setCurrentView"]),
+        formatDate,
+        ...mapActions("Maps", ["placingPointMarker", "registerListener", "removePointMarker", "unregisterListener"]),
+        ...mapActions(["addOrReplaceLayer", "replaceByIdInLayerConfig"]),
+        ...mapMutations("Modules/Projects", ["setCurrentProject", "setCurrentView"]),
+
+        /**
+         * Shows the content of the clicked project and marks the clicked position.
+         * Clicks are ignored in the edit view, as the map is used for drawing there.
+         * @param {Object} evt the OpenLayers map click event.
+         * @returns {void}
+         */
+        onMapClick (evt) {
+            if (this.currentView !== "main") {
+                return;
+            }
+
+            const project = getClickedWfstFeature(evt, this.wfstLayerId, this.wfstAttributes);
+
+            if (project) {
+                this.setCurrentProject(project);
+                this.placingPointMarker(evt.coordinate);
+            }
+        },
+
+        /**
+         * Opens the form for a new project.
+         * The current project and its marker are reset, so that the new project does not update it.
+         * @returns {void}
+         */
+        createProject () {
+            this.removePointMarker();
+            this.setCurrentProject(undefined);
+            this.setCurrentView("edit");
+        },
+
+        /**
+         * Downloads the file of the current project.
+         * @returns {void}
+         */
+        downloadFile () {
+            const link = document.createElement("a");
+
+            link.href = this.fileHref;
+            link.download = this.downloadFileName;
+
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        },
 
         /**
          * Gets the background color.
@@ -37,17 +133,27 @@ export default {
          * @returns {String} the hex color.
          */
         getBgcolor (val) {
-            if (!Array.isArray(val) || !val.length) {
-                return this.criteria[0].color;
+            const index = Array.isArray(val) ? val
+                .map(chosenCri => this.criteria.findIndex(cri => cri.name === String(chosenCri).trim()))
+                .filter(idx => idx >= 0) : [];
+
+            if (!index.length) {
+                return this.criteria[0]?.color;
             }
 
-            const index = [];
-
-            val.forEach(chosenCri => {
-                index.push(this.criteria.findIndex(cri => cri.name === chosenCri.name));
-            });
-
             return this.criteria[Math.min(...index)].color;
+        },
+
+        /**
+         * Gets the color of a saved project on the map.
+         * A project with several criteria gets the color of the criterion with the highest priority.
+         * @param {module:ol/Feature} feature the saved project.
+         * @returns {String} the hex color.
+         */
+        getFeatureColor (feature) {
+            const names = feature.get(this.wfstAttributes.criteria)?.split(",") || [];
+
+            return this.getBgcolor(names.filter(name => this.criteria.some(cri => cri.name === name.trim())));
         },
 
         /**
@@ -71,118 +177,135 @@ export default {
             <HrHeader
                 :text="$t('additional:modules.projects.description')"
                 :button-text="$t('additional:modules.projects.createProject')"
-                @click:button="setCurrentView('edit')"
+                @click:button="createProject"
             />
             <HrCard
-                title="Projektname"
-                edit-aria-label="Projekt bearbeiten"
+                v-if="typeof currentProject !== 'undefined'"
+                :title="$t('additional:modules.projects.labels.projectName')"
+                :edit-aria-label="$t('additional:modules.projects.labels.editProject')"
                 @click:edit="setCurrentView('edit')"
             >
                 <template #above-title>
                     <div class="d-flex flex-wrap gap-2">
                         <span
-                            v-for="(cri, index) in chosenCriteria"
+                            v-for="(cri, index) in projectCriteria"
                             :key="index"
-                            :style="{background: getBgcolor(chosenCriteria)}"
+                            :style="{background: getBgcolor(projectCriteria)}"
                             class="badge rounded-pill fw-normal px-3 py-2"
                         >
-                            {{ cri.name }}
+                            {{ cri }}
                         </span>
                     </div>
                 </template>
 
-                <div class="row g-3 mb-3">
-                    <div class="col-6">
-                        <p class="mb-0 small fw-semibold">
-                            Eingetragen von
-                        </p>
-                        <p class="mb-0 text-body-secondary">
-                            Lorem Ipsum
-                        </p>
+                <template #card>
+                    <div class="row g-3 mb-3">
+                        <div class="col-6">
+                            <p class="mb-0 small fw-semibold">
+                                {{ $t("additional:modules.projects.labels.createdBy") }}
+                            </p>
+                            <p class="mb-0 text-body-secondary">
+                                {{ currentProject?.formValues?.creator }}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-0 small fw-semibold">
+                                {{ $t("additional:modules.projects.labels.lastUpdate") }}
+                            </p>
+                            <p class="mb-0">
+                                {{ formatDate(currentProject?.formValues?.lastUpdate) }}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-0 small fw-semibold">
+                                {{ $t("additional:modules.projects.labels.startDate") }}
+                            </p>
+                            <p class="mb-0">
+                                {{ formatDate(currentProject?.formValues?.startDate) }}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-0 small fw-semibold">
+                                {{ $t("additional:modules.projects.labels.endDate") }}
+                            </p>
+                            <p class="mb-0">
+                                {{ formatDate(currentProject?.formValues?.endDate) }}
+                            </p>
+                        </div>
+                        <div class="col-6">
+                            <p class="mb-0 small fw-semibold">
+                                {{ $t("additional:modules.projects.labels.contact") }}
+                            </p>
+                            <p class="mb-0 text-body-secondary">
+                                {{ currentProject?.formValues?.contactPerson }}
+                            </p>
+                        </div>
                     </div>
-                    <div class="col-6">
-                        <p class="mb-0 small fw-semibold">
-                            Aktualisierung
+
+                    <section class="mb-3">
+                        <h6 class="mb-1 fw-semibold">
+                            {{ $t("additional:modules.projects.labels.description") }}
+                        </h6>
+                        <p class="mb-2">
+                            {{ currentProject?.formValues?.description }}
                         </p>
+                        <a
+                            :href="currentProject?.formValues?.infoLink"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {{ currentProject?.formValues?.infoLink }}
+                        </a>
+                    </section>
+
+                    <section class="mb-3">
+                        <h6 class="mb-1 fw-semibold">
+                            {{ $t("additional:modules.projects.labels.source") }}
+                        </h6>
                         <p class="mb-0">
-                            23.02.2026
+                            {{ currentProject?.formValues?.source }}
                         </p>
-                    </div>
-                    <div class="col-6">
-                        <p class="mb-0 small fw-semibold">
-                            Baubeginn
-                        </p>
+                    </section>
+
+                    <section class="mb-3">
+                        <h6 class="mb-1 fw-semibold">
+                            {{ $t("additional:modules.projects.labels.contactExt") }}
+                        </h6>
                         <p class="mb-0">
-                            01.01.2025
+                            {{ currentProject?.formValues?.contactExt }}
                         </p>
-                    </div>
-                    <div class="col-6">
-                        <p class="mb-0 small fw-semibold">
-                            Bauende
-                        </p>
+                    </section>
+
+                    <section class="mb-3">
+                        <h6 class="mb-1 fw-semibold">
+                            {{ $t("additional:modules.projects.labels.history") }}
+                        </h6>
                         <p class="mb-0">
-                            01.08.2025
+                            {{ currentProject?.formValues?.history }}
                         </p>
+                    </section>
+
+                    <section class="mb-0">
+                        <h6 class="mb-1 fw-semibold">
+                            {{ $t("additional:modules.projects.labels.protectedAreas") }}
+                        </h6>
+                        <p class="mb-0">
+                            {{ currentProject?.formValues?.protectedAreas }}
+                        </p>
+                    </section>
+                    <div
+                        v-if="typeof fileHref !== 'undefined'"
+                        class="position-absolute bottom-0 end-0 p-3 me-5"
+                    >
+                        <IconButton
+                            :class-array="['btn-light']"
+                            icon="bi bi-paperclip"
+                            :aria="downloadFileName"
+                            :title="downloadFileName"
+                            :interaction="() => downloadFile()"
+                        />
                     </div>
-                    <div class="col-6">
-                        <p class="mb-0 small fw-semibold">
-                            Ansprechpartner
-                        </p>
-                        <p class="mb-0 text-body-secondary">
-                            Lorem ipsum dolor sit amet
-                        </p>
-                    </div>
-                </div>
-
-                <section class="mb-3">
-                    <h6 class="mb-1 fw-semibold">
-                        Kurzbeschreibung / Art der Massnahme
-                    </h6>
-                    <p class="mb-2">
-                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr...
-                    </p>
-                    <a
-                        href="https://www.infolink.de"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >www.infolink.de</a>
-                </section>
-
-                <section class="mb-3">
-                    <h6 class="mb-1 fw-semibold">
-                        Quelle
-                    </h6>
-                    <p class="mb-0">
-                        Lorem ipsum dolor sit amet...
-                    </p>
-                </section>
-
-                <section class="mb-3">
-                    <h6 class="mb-1 fw-semibold">
-                        Kontakt extern
-                    </h6>
-                    <p class="mb-0">
-                        Lorem ipsum dolor sit amet...
-                    </p>
-                </section>
-
-                <section class="mb-3">
-                    <h6 class="mb-1 fw-semibold">
-                        Historie - Zeitpunkt und Meldungen
-                    </h6>
-                    <p class="mb-0">
-                        Lorem ipsum dolor sit amet...
-                    </p>
-                </section>
-
-                <section class="mb-0">
-                    <h6 class="mb-1 fw-semibold">
-                        Bereiche, wo die Kriterien des Schutzniveaus erreicht sind
-                    </h6>
-                    <p class="mb-0">
-                        Lorem ipsum dolor sit amet, consetetur sadipscing elitr
-                    </p>
-                </section>
+                </template>
             </HrCard>
         </div>
 

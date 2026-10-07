@@ -23,10 +23,7 @@ export function handleChangeVisibility (payload, store) {
 
     trackMatomoEvent({
         category: "Layer",
-        action: `${payload.value
-            ? "Added layer via layertree and turned it on"
-            : "Removed layer via layertree"
-        }`,
+        action: `${payload.value ? "Added" : "Removed"} layer via layertree`,
         name: getLayerInformation(payload.layerId, store),
         _source: assembleSourceInfoForEvent(funcName)
     });

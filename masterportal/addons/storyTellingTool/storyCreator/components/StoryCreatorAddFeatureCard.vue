@@ -41,6 +41,10 @@ export default {
             required: false,
             default: null
         },
+        isEditMode: {
+            type: Boolean,
+            default: false
+        },
         /**
          * The selected layer lists
          * @type {Object[]}
@@ -123,6 +127,10 @@ export default {
          */
         gfiFeatures: {
             handler (val) {
+                if (this.isEditMode) {
+                    return;
+                }
+
                 this.removePointMarker();
                 this.currentFeature = val?.[0];
 
@@ -173,6 +181,10 @@ export default {
          */
         selectedLayers: {
             handler (val) {
+                if (this.isEditMode) {
+                    return;
+                }
+
                 if (!val.length || !val.some(layer => layer.layerId === this.currentFeature?.getLayerId())) {
                     this.currentFeature = null;
                     this.attributes = null;
@@ -287,7 +299,7 @@ export default {
                 title: this.title,
                 description: this.description,
                 layerId: this.currentFeature?.getLayerId() || this.layerId,
-                featureId: this.getDefaultTitle(),
+                featureId: this.currentFeature?.getId() || this.getDefaultTitle(),
                 coordinate: this.coordinate,
                 attributes: this.attributes,
                 zoomlevel: this.zoomlevel,

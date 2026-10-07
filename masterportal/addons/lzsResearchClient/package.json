@@ -1,0 +1,16 @@
+{
+  "name": "lzs-research-client",
+  "version": "0.1.0",
+  "description": "Search in historic geodata",
+  "title": "LZSResearchClient",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+  },
+  "scripts": {},
+  "dependencies": {
+    "fflate": "^0.8.2"
+  }
+}

@@ -3,11 +3,12 @@ import AlertMessage from "../../../cosi/shared/modules/alerts/components/AlertMe
 import axios from "axios";
 import {boundingExtent} from "ol/extent.js";
 import CookieBanner from "../../shared/cookiebanner/components/CookieBanner.vue";
+import ConvertFeature from "../../shared/utils/featureConverter";
 import {extractStoryZip} from "../../storyManager/shared/js/storyZipCreator.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {getAndMergeAllRawLayers} from "@appstore/js/getAndMergeRawLayer.js";
 import {getDirectVideo, getEmbedLink} from "../../shared/utils/video.js";
-import {getVisibleLayerList} from "../../shared/utils/layerHelper.js";
+import {getLayerSource, getVisibleLayerList} from "../../shared/utils/layerHelper.js";
 import LayerGroup from "ol/layer/Group.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import isObject from "@shared/js/utils/isObject.js";
@@ -34,7 +35,6 @@ export default {
             featureAttributes: null,
             interval: null,
             isHovering: null,
-            isChangeFrom3D: false,
             isCookieAllowed: document.cookie.split("; ").some(cookie => cookie.startsWith("username=storyvideo")),
             loadedContent: null,
             overlay: null,
@@ -42,6 +42,7 @@ export default {
             showImportWarning3D: [],
             showMode: "",
             showStickyHeader: false,
+            source: null,
             toolBodyScrollTop: 0
         };
     },
@@ -119,6 +120,7 @@ export default {
          * @returns {void}
          */
         currentChapterIndex () {
+            this.source?.clear();
             this.deactivateSubjectLayer();
             this.loadChapter();
             this.removePointMarker();
@@ -238,6 +240,7 @@ export default {
                 this.closePopup();
                 this.changeMapMode("2D");
                 this.setToNorth();
+                this.source?.clear();
                 return;
             }
             if (this._detectActiveStep) {
@@ -379,10 +382,12 @@ export default {
 
                     if (!layerConf) {
                         const groupLayers = this.layerConfigsByAttributes({typ: "GROUP"});
+                        let inGroup = false;
 
                         if (groupLayers.length) {
                             groupLayers.forEach(groupLayer => {
                                 if (groupLayer?.children.some(layer => layer.id === layerId)) {
+                                    inGroup = true;
                                     this.addOrReplaceLayer({
                                         layerId: groupLayer.id,
                                         visibility: true,
@@ -391,7 +396,7 @@ export default {
                                 }
                             });
                         }
-                        else {
+                        if (!inGroup) {
                             layerConf = getAndMergeAllRawLayers().find(layer => layer.id === layerId);
 
                             if (layerConf) {
@@ -438,7 +443,6 @@ export default {
                 this.changeMapMode("3D");
             }
             else if (!this.currentChapter.is3D && this.mode === "3D") {
-                this.isChangeFrom3D = true;
                 this.changeMapMode("2D");
                 this.setToNorth();
             }
@@ -454,19 +458,14 @@ export default {
                           zoomLevel = this.currentChapter.map.zoomLevel;
 
                     if (mapView) {
-                        setTimeout(() => {
-                            const adjustedCenter = this.getCenterOfVisibleMap();
+                        const adjustedCenter = this.getCenterOfVisibleMap();
 
-                            mapView.animate({
-                                center: adjustedCenter,
-                                zoom: zoomLevel,
-                                duration: this.duration,
-                                rotation: 0
-                            });
-
-                            this.isChangeFrom3D = false;
-
-                        }, this.isChangeFrom3D ? 1500 : 0);
+                        mapView.animate({
+                            center: adjustedCenter,
+                            zoom: zoomLevel,
+                            duration: this.duration,
+                            rotation: 0
+                        });
                     }
                 }
             }
@@ -499,6 +498,14 @@ export default {
                     this.activateTool(this.currentChapter.map.tool);
                 }
                 this.setToNorth();
+            }
+
+            if (this.currentChapter?.content.length) {
+                this.currentChapter.content.forEach(item => {
+                    if (item.type === "draw" || item.type === "write") {
+                        this.createDrawObject(item.attrs);
+                    }
+                });
             }
         },
         /**
@@ -544,6 +551,7 @@ export default {
                 this.scrollToActiveStep();
                 this.removePointMarker();
                 mapCollection.getMap("2D").removeOverlay(this.overlay);
+                this.source?.clear();
             }
         },
         /**
@@ -556,7 +564,17 @@ export default {
                 this.scrollToActiveStep();
                 this.removePointMarker();
                 mapCollection.getMap("2D").removeOverlay(this.overlay);
+                this.source?.clear();
             }
+        },
+        /**
+         * Creates the drawn features.
+         * @param {Object} val the features object.
+         * @returns {void}
+         */
+        createDrawObject (val) {
+            this.source = getLayerSource();
+            this.source.addFeatures(ConvertFeature.geoJsonToOpenlayers(val));
         },
         /**
          * Opens the popup window to show the feature atrributes.
@@ -642,6 +660,7 @@ export default {
                           // also the initial value), the watcher won't fire.
                           // Trigger tools/layers/position manually in that case.
                           if (prevChapterIndex === activeIndex) {
+                              this.source?.clear();
                               this.deactivateSubjectLayer();
                               this.loadChapter();
                               this.removePointMarker();
@@ -1201,6 +1220,10 @@ export default {
         width: 100%;
         height: 100%;
         border: none;
+    }
+
+    .cursor-pointer {
+        cursor: pointer;
     }
 }
 </style>

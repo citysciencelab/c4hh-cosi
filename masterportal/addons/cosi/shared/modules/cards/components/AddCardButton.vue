@@ -16,6 +16,11 @@ export default {
             type: String,
             default: "",
             required: false
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+            required: false
         }
     },
     emits: ["click"]
@@ -27,6 +32,7 @@ export default {
         <button
             class="btn btn-light p-4 rounded-4 d-flex flex-row align-items-center justify-content-center"
             type="button"
+            :disabled="disabled"
             @click="$emit('click')"
         >
             <div
@@ -61,6 +67,11 @@ button {
         background-color: $light_blue;
         border: 2px dashed $secondary;
         color: $secondary;
+    }
+    &:disabled {
+        border-color: $dark_grey;
+        color: $dark_grey;
+        cursor: not-allowed;
     }
 }
 </style>

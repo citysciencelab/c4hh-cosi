@@ -1,0 +1,159 @@
+{
+    "modules": {
+        "lzsResearchClient": {
+            "name": "GeoDataDepot",
+            "description": "The tool for easy searching and access to geodata in long-term storage.",
+            "loadingSpinnerText": {
+                "general": "Data is loading. Please wait..."
+            },
+            "globalError": {
+                "title": "LZS: Error during initialization",
+                "content": "Please try again later."
+            },
+            "generalErrorMessage": "An unknown error has occured.",
+            "multiselect": {
+                "noResult": "No elements found. Consider changing the search query.",
+                "noOptions": "List is empty."
+            },
+            "tabs": {
+                "backToSearchButtonLabel": "Back to search",
+                "tabDetails": {
+                    "label": "Details",
+                    "title": "Detail information",
+                    "datasetInfoTable": {
+                        "archive": "Archive",
+                        "datasetProtectionClass": "Dataset protection class"
+                    },
+                    "numberOfResults": "Number of results:",
+                    "backButtonLabel": "Back",
+                    "loading": "Data is loading...",
+                    "previewAltText": "Preview",
+                    "fileSizeMB": "Size (MB)",
+                    "dateityp": "File type"
+                },
+                "tabSearch": {
+                    "label": "Search",
+                    "backButtonLabel": "Back",
+                    "searchButtonLabel": "Search",
+                    "resetButtonLabel": "Reset",
+                    "selectArchivLabel": "Archive",
+                    "selectYearsLabel": "Years",
+                    "jahrgang": "Year",
+                    "kachelnummer": "Tile Number",
+                    "kachelname": "Tile Name",
+                    "gemarkung": "District",
+                    "flur": "Parcel",
+                    "blatt": "Sheet",
+                    "version": "Version",
+                    "punktkennung": "Point Identifier",
+                    "instanzkachelnummer": "Instance Tile Number",
+                    "nummer": "Number",
+                    "kilometer_quadrat": "Kilometer Square",
+                    "punkt_art": "Type of Point",
+                    "punkt_nummer": "Number of Point",
+                    "auftrag_blatt_nummer": "Order Sheet Number",
+                    "hamburger_karte_id": "Hamburg Map Id",
+                    "filesizemb": "Size (MB)",
+                    "maxValueCount": "Max. Results",
+                    "patternError": "Please enter a numeric value with {{ digitNumber }} digits.",
+                    "patternErrorRange": "Please enter a numeric value with {{ minDigits }} to {{ maxDigits }} digits.",
+                    "numberRangeError": "Please enter a numeric value between {{ minNum }} and {{ maxNum }}.",
+                    "characterError": "Please only use alphabetic characters.",
+                    "spatialSelectionGroup": {
+                        "geometries": "Drawn Area",
+                        "extent": "Map Extent",
+                        "address": "Address",
+                        "parcel": "Parcel"
+                    },
+                    "spatialSelectionLabel": "Search in / by:",
+                    "searchModeSwitchLabel": "Expert search mode",
+                    "extentWarningMessage": "The map scale is smaller than 1:{{ scale }}. Please zoom in to enable searching within the map extent.",
+                    "addressSearchCancel": "Cancel address search",
+                    "addressSearchNoResults": "No results found. Please check your input or your internet connection.",
+                    "geometryAreaWarningMessage": "The area of the drawn geometry is {{ area }} km². This exceeds the maximum allowed area of {{ maxArea }} km². Please draw a smaller area to enable searching.",
+                    "parcelSearch": {
+                        "selectParcelDistrictLabel": "District",
+                        "parcelNumberLabel": "Parcel number",
+                        "selectParcelDistrictPlaceholder": "Please select a parcel district",
+                        "parcelNumberPlaceholder": "Please select a parcel number",
+                        "parcelNumberLoadError": "An error occurred while loading parcel numbers for the district {{district}}. Please try again.",
+                        "parcelRequestError": "An error occurred while fetching parcel geometries for the parcel {{parcelNumber}}. Please try again.",
+                        "parcelDistrictLoadError": "An error occurred while loading parcel districts. Please try again."
+                    },
+                    "selectAll": "Select all",
+                    "loadErrors": {
+                        "years": "An error occurred while loading the years for the selected archives. Please try again.",
+                        "singleYear": "An error occurred while loading the years for the archive {{ archiveName }}. Please try again.",
+                        "layerConfigNotFound": "Layer configuration for the specified layer ID {{ layerId }} could not be found.",
+                        "search": "An error occurred while fetching search results. Please try again."
+                    }
+                },
+                "tabResult": {
+                    "label": "Results",
+                    "numberOfResults": "Number of results:"
+                },
+                "archiveList": {
+                    "toggleAccordions": {
+                        "openAll": "Open all",
+                        "closeAll": "Close all"
+                    },
+                    "selectAll": "Select all",
+                    "selectAllAriaLabel": "Select all for download",
+                    "groupByLabel": "Group by",
+                    "selectOptionLabel": "Select option",
+                    "selected": "{{sum}} selected (incl. metadata)",
+                    "table": {
+                        "showPositionInMap": "Show / Hide position of dataset in map",
+                        "goToDetails": "Show details for this dataset",
+                        "showPreview": "Show preview",
+                        "download": "Download dataset",
+                        "headers": {
+                            "position": "Position",
+                            "details": "Details",
+                            "download": "Download",
+                            "preview": "Preview"
+                      },
+                        "loadErrors": {
+                            "position": "An error occurred while loading the position of the dataset. Please try again.",
+                            "details": "An error occurred while loading the details. Please try again.",
+                            "checkedFiles": "An error occurred while selecting the files. Please try again.",
+                            "checkedSingleFile": "An error occurred while selecting the file. Please try again."
+                        }
+                    }
+                }
+            },
+            "zipAndDownload": {
+              "buttonText": "Download",
+              "buttonAriaLabel": "Download",
+              "progressAriaLabel": "Downloadprogress {{ percent }}%",
+              "withoutArchive": "unknown archive",
+              "withoutYear": "unknown year",
+              "metadataFolderName": "Metadata",
+              "cancelDownloadButtonLabel": "Cancel",
+              "progress": {
+                "start": "Preparing download...",
+                "fetchPrimaryData": "{{ current }} of {{ total }} files fetched...",
+                "fetchDossierData": "Fetching metadata...",
+                "downloadingFile": "{{ current }} of {{ total }} files downloaded...",
+                "zipping": "Building the zip...",
+                "done": "Done!"
+            },
+            "errors": {
+                "fetchPrimaryData": "An error occurred while fetching the files. Please try again.",
+                "fetchDossierData": "An error occurred while fetching the metadata. Please try again.",
+                "downloading": "An error occurred while downloading the files. Please try again.",
+                "zipping": "An error occurred while creating the zip archive. Please try again.",
+                "sumFileSize": "The total file size {{ sumFileSize }} exceeds {{ maxFileSize }}. This cannot be downloaded at once."
+              }
+            },
+            "sumOfCheckedFiles": {
+              "progressAriaLabel": "Percentage of the total download volume accounted for by the selected files: {{ percent }}%",
+              "sumOk": "{{ currentFileSize }} of {{ maxFileSize }} selected",
+              "sumTooHigh": "Please select less files, the download becomes too large with {{ currentFileSize }}!"
+            },
+            "addressSearch": {
+              "searchButtonSelect": "Select"
+            }
+        }
+    }
+}

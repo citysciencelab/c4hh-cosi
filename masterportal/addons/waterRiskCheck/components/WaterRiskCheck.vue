@@ -1785,12 +1785,6 @@ export default {
 
 </style>
 <style lang="scss">
-.modal-rounded-dialog {
-    button.btn {
-        position: absolute;
-        right: 5px;
-    }
-}
 #modal-1-container {
     #modal-1-overlay {
         @media (max-width: 767px) {

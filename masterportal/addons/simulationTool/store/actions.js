@@ -3,40 +3,10 @@ import isObject from "../../../src/shared/js/utils/isObject.js";
 import {extractEventCoordinates} from "../../../src/shared/js/utils/extractEventCoordinates.js";
 import layerCollection from "../../../src/core/layers/js/layerCollection.js";
 import ConvertStyle from "../js/convertStyle.js";
-import deserializeFlatGeobufToGeoJsonFeatureCollection from "../js/deserializeFlatGeobufToGeoJsonFeatureCollection.js";
 import layerFactory from "../../../src/core/layers/js/layerFactory.js";
 import OgcApiProcess from "../js/ogcApiProcess.js";
 import {infrastructureLayerId} from "../layerIds.js";
 import {upsertPlanningScenarioInIndexedDb} from "../js/planningScenariosIndexedDb.js";
-
-/**
- * Converts FlatGeobuf outputs in job results into GeoJSON feature collections.
- * @param {Object} simulationConfig The simulation configuration for output metadata.
- * @param {Object} jobResults The raw job results from backend.
- * @returns {Promise<Object>} The normalized job results.
- */
-async function convertFlatGeobufOutputsIfNeeded (simulationConfig, jobResults) {
-    if (!isObject(jobResults)) {
-        return jobResults;
-    }
-
-    const convertedResults = {...jobResults};
-
-    await Promise.all(Object.entries(convertedResults).map(async ([outputKey, outputValue]) => {
-        const outputMediaType = simulationConfig?.outputs?.[outputKey]?.value?.format?.mediaType;
-
-        if (outputMediaType === "application/flatgeobuf") {
-            const deserializedResult = await deserializeFlatGeobufToGeoJsonFeatureCollection(outputValue);
-
-            convertedResults[outputKey] = deserializedResult ?? outputValue;
-            return;
-        }
-
-        convertedResults[outputKey] = outputValue;
-    }));
-
-    return convertedResults;
-}
 
 export default {
     /**
@@ -200,10 +170,10 @@ export default {
      * @param {Object[]} payload.jobs The simulation job objects to update in place.
      * @param {String[]} payload.jobIds The backend job IDs matching the jobs array.
      * @param {Object[]} payload.processConfigs The process config objects matching jobs.
-     * @param {Object} payload.simulationConfig The simulation config used for output normalization.
+     * @param {Object} [payload.planningScenario] The planning scenario to persist after polling.
      * @returns {Promise<void>}
      */
-    async pollAndAssignSimulationJobsResults ({dispatch, rootGetters}, {jobs, jobIds, processConfigs, simulationConfig}) {
+    async pollAndAssignSimulationJobsResults ({dispatch, getters, rootGetters}, {jobs, jobIds, processConfigs, planningScenario}) {
         const accessToken = rootGetters["Modules/Login/accessToken"];
 
         if (!accessToken || !Array.isArray(jobs) || !Array.isArray(jobIds) || !Array.isArray(processConfigs)) {
@@ -232,12 +202,10 @@ export default {
                     }
                 );
 
-                const normalizedJobResults = await convertFlatGeobufOutputsIfNeeded(simulationConfig, jobResults);
-
                 if (jobs[index] !== currentJob) {
                     return;
                 }
-                currentJob.jobResults = normalizedJobResults;
+                currentJob.jobResults = jobResults;
                 dispatch("jobStatusChanged");
             }
             catch (error) {
@@ -246,6 +214,16 @@ export default {
                     status: "failed"
                 };
                 dispatch("jobStatusChanged");
+            }
+            finally {
+                if (getters.shouldSaveSimulations && isObject(planningScenario) && typeof planningScenario.id === "string") {
+                    try {
+                        await upsertPlanningScenarioInIndexedDb(planningScenario);
+                    }
+                    catch (persistenceError) {
+                        console.warn("Could not persist planning scenario during polling.", persistenceError);
+                    }
+                }
             }
         }));
     },

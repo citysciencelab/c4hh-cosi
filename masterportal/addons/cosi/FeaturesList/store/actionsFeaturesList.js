@@ -134,6 +134,8 @@ const actions = {
 
                     return isActive;
                 }),
+                scenarioFeatures = rootGetters["Modules/ScenarioBuilder/activeScenarioCard"]?.objects.filter(obj => obj.layerId === vectorLayer.get("id")).map(obj => obj.feature) || [],
+                mergedFeatures = [...new Set([...visibleFeatures, ...scenarioFeatures])],
                 layerMap = getters.layerMapById(vectorLayer.get("id")),
                 layerStyleFunction = vectorLayer.getStyleFunction?.(),
                 selectedDistrictLevel = rootGetters["Modules/DistrictSelector/selectedDistrictLevel"],
@@ -151,7 +153,8 @@ const actions = {
             if (selectedDistricts.length === 0) {
                 selectedDistricts = selectedDistrictLevel.districts;
             }
-            visibleFeatures.forEach(feature => {
+
+            mergedFeatures.forEach(feature => {
                 /**
                  * Set area attributes for polygons, where they are not set in the dataset
                  * @todo should go somewhere else...

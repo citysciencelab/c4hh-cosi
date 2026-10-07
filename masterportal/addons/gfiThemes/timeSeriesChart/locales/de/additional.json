@@ -1,0 +1,17 @@
+{
+    "addons": {
+        "gfiThemes": {
+            "timeSeriesChart": {
+                "title": "Zeitreihendiagramm",
+                "tabs": {
+                    "tabBasicData": {
+                        "label": "Grunddaten"
+                    },
+                    "tabGraphics": {
+                        "label": "Grafiken"
+                    }
+                }
+            }
+        }
+    }
+}

@@ -47,7 +47,7 @@ export default {
             class="welcome-user p-2"
         >
             <span>{{ $t("additional:modules.tools.simulationTool.welcome") }}</span>
-            <span v-if="loggedIn">, {{ username }}</span>
+            <span v-if="loggedIn">, {{ username.charAt(0).toUpperCase() + username.slice(1) }}</span>
         </div>
         <span v-else>
             <span class="welcome-user">{{ $t("additional:modules.tools.simulationTool.notLoggedIn") }}</span>
