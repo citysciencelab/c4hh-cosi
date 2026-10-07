@@ -12,16 +12,17 @@ import store from "@appstore/index.js";
  */
 
 const layerUrlParams = {
-        LAYERS: setLayers,
-        MDID: setLayersByMetadataId
-    },
-    legacyLayerUrlParams = {
-        LAYERIDS: collectParams,
-        "MAP/LAYERIDS": collectParams,
-        "MAP/MDID": setLayersByMetadataId,
-        TRANSPARENCY: collectParams,
-        VISIBILITY: collectParams
-    };
+    LAYERS: setLayers,
+    MDID: setLayersByMetadataId
+};
+
+export const legacyLayerUrlParams = {
+    LAYERIDS: collectParams,
+    "MAP/LAYERIDS": collectParams,
+    "MAP/MDID": setLayersByMetadataId,
+    TRANSPARENCY: collectParams,
+    VISIBILITY: collectParams
+};
 
 let baselayerExists = false,
     baselayerIndex = 0,

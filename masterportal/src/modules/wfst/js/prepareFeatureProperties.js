@@ -6,9 +6,11 @@ import wfs from "@masterportal/masterportalapi/src/layer/wfs.js";
  * with the gfiAttributes configuration of the layer.
  *
  * @param {TransactionLayer} layer Layer to retrieve information for.
+ * @param {Object[]} featurePropertiesValues configured default values for properties
+ * @param {("all"|"none"|String[]|Object)} lockedFields configuration for locking fields
  * @returns {FeatureProperty[]} If layer.gfiAttributes !== "ignore", then an array of prepared feature properties; else and empty array.
  */
-async function prepareFeatureProperties (layer, featurePropertiesValues) {
+async function prepareFeatureProperties (layer, featurePropertiesValues, lockedFields) {
     const isGfiAttributesIgnore = layer.gfiAttributes === "ignore";
     const isGfiAttributesShowAll = layer.gfiAttributes === "showAll";
     const url = layer.url;
@@ -70,6 +72,28 @@ async function prepareFeatureProperties (layer, featurePropertiesValues) {
                 }
             });
         });
+    }
+
+    if (lockedFields) {
+        let currentLockedFields = lockedFields;
+
+        if (typeof lockedFields === "object" && lockedFields !== null && !Array.isArray(lockedFields)) {
+            currentLockedFields = lockedFields[layer.id];
+        }
+
+        if (currentLockedFields) {
+            preparedProperties.forEach((preparedProperty) => {
+                if (currentLockedFields === "all") {
+                    preparedProperty.disabled = true;
+                }
+                else if (Array.isArray(currentLockedFields)) {
+                    preparedProperty.disabled = currentLockedFields.includes(preparedProperty.key);
+                }
+                else {
+                    preparedProperty.disabled = false;
+                }
+            });
+        }
     }
 
     return preparedProperties;

@@ -206,6 +206,7 @@ describe("addons/SimulationTool/store/actions", () => {
     describe("pollAndAssignSimulationJobsResults", () => {
         it("positive: polls jobs and assigns normalized results", async () => {
             const dispatch = sinon.spy(),
+                getters = {shouldSaveSimulations: false},
                 rootGetters = {"Modules/Login/accessToken": "token"},
                 jobs = [{jobStatus: {status: "accepted"}}],
                 jobIds = ["job-1"],
@@ -229,7 +230,7 @@ describe("addons/SimulationTool/store/actions", () => {
                 );
 
             await pollAndAssignSimulationJobsResults(
-                {dispatch, rootGetters},
+                {dispatch, getters, rootGetters},
                 {jobs, jobIds, processConfigs, simulationConfig}
             );
 
@@ -240,13 +241,57 @@ describe("addons/SimulationTool/store/actions", () => {
             expect(dispatch.alwaysCalledWith("jobStatusChanged")).to.be.true;
         });
 
+        it("positive: persists planning scenario while polling when enabled", async () => {
+            const indexedDbMock = createIndexedDbMock(),
+                dispatch = sinon.spy(),
+                getters = {shouldSaveSimulations: true},
+                rootGetters = {"Modules/Login/accessToken": "token"},
+                jobs = [{jobStatus: {status: "accepted"}}],
+                jobIds = ["job-1"],
+                processConfigs = [{id: "process-1", url: "https://api.example.org", pollingInterval: 1}],
+                planningScenario = {
+                    id: "scenario-1",
+                    simulations: {
+                        "simulation-1": {
+                            jobs: {
+                                "job-1": jobs[0]
+                            }
+                        }
+                    }
+                },
+                pollingStub = sinon.stub(OgcApiProcess.prototype, "pollJobStatusAndGetResults").callsFake(
+                    async function (accessToken, jobId, pollingInterval, onProgressUpdate) {
+                        onProgressUpdate({status: "running", processID: "process-1"});
+                        return {outputA: {value: {features: []}}};
+                    }
+                );
+
+            globalThis.window = {
+                ...originalWindow || {},
+                indexedDB: indexedDbMock.indexedDB
+            };
+
+            await pollAndAssignSimulationJobsResults(
+                {dispatch, getters, rootGetters},
+                {jobs, jobIds, processConfigs, simulationConfig: {}, planningScenario}
+            );
+
+            const persistedScenarios = await readAllPlanningScenariosFromIndexedDb();
+
+            expect(pollingStub.calledOnce).to.be.true;
+            expect(persistedScenarios).to.have.length(1);
+            expect(persistedScenarios[0].id).to.equal("scenario-1");
+            expect(persistedScenarios[0].simulations["simulation-1"].jobs["job-1"].jobResults).to.deep.equal({outputA: {value: {features: []}}});
+        });
+
         it("negative: returns early when no access token is available", async () => {
             const dispatch = sinon.spy(),
+                getters = {shouldSaveSimulations: true},
                 rootGetters = {"Modules/Login/accessToken": ""},
                 pollingStub = sinon.stub(OgcApiProcess.prototype, "pollJobStatusAndGetResults");
 
             await pollAndAssignSimulationJobsResults(
-                {dispatch, rootGetters},
+                {dispatch, getters, rootGetters},
                 {jobs: [{}], jobIds: ["job-1"], processConfigs: [{}], simulationConfig: {}}
             );
 

@@ -35,8 +35,18 @@ describe("src/core/maps/js/highlightFeaturesByAttribute", () => {
                 </wfs:Query>
             </wfs:GetFeature>`;
 
+    describe("getOGCFilterSnippet", () => {
+        it("should return isLike XML Snippet", function () {
+            const wildCard = "%",
+                singleChar = "#",
+                escapeChar = "!",
+                propPrefix = "app:",
+                propName = "DS_USER_CODE",
+                propValue = "X5555X",
+                isEqual = false;
 
-    describe("getOGCFilterSnippet for isEqual", () => {
+            expect(highlightFeaturesByAttribute.getOGCFilterSnippet(isEqual, wildCard, singleChar, escapeChar, propPrefix, propName, propValue)).to.have.string(expectedIsLikeOGC);
+        });
         it("should return isEqual XML Snippet", function () {
             const wildCard = "%",
                 singleChar = "#",
@@ -48,19 +58,36 @@ describe("src/core/maps/js/highlightFeaturesByAttribute", () => {
 
             expect(highlightFeaturesByAttribute.getOGCFilterSnippet(isEqual, wildCard, singleChar, escapeChar, propPrefix, propName, propValue)).to.have.string(expectedEqualToOGC);
         });
-    });
 
-    describe("getOGCFilterSnippet for isLike", () => {
-        it("should return isLike XML Snippet", function () {
+        it("should escape propName and propValue", function () {
             const wildCard = "%",
                 singleChar = "#",
                 escapeChar = "!",
                 propPrefix = "app:",
-                propName = "DS_USER_CODE",
-                propValue = "X5555X",
-                isEqual = false;
+                propName = "DS_USER_&CODE",
+                propValue = "X<5555X",
+                isEqual = true,
+                snippet = highlightFeaturesByAttribute.getOGCFilterSnippet(isEqual, wildCard, singleChar, escapeChar, propPrefix, propName, propValue);
 
-            expect(highlightFeaturesByAttribute.getOGCFilterSnippet(isEqual, wildCard, singleChar, escapeChar, propPrefix, propName, propValue)).to.have.string(expectedIsLikeOGC);
+            expect(snippet).to.have.string("DS_USER_&amp;CODE");
+            expect(snippet).to.have.string("X&lt;5555X");
+        });
+    });
+
+    describe("getOGCFilterSnippetIn", () => {
+        it("should  escape propName and propValue", function () {
+            const valueDelimiter = ";",
+                wildCard = "*",
+                singleChar = "#",
+                escapeChar = "!",
+                propPrefix = "app:",
+                propName = "DS_USER_&CODE",
+                propValue = "X<55;55X",
+                snippet = highlightFeaturesByAttribute.getOGCFilterSnippetIn(valueDelimiter, wildCard, singleChar, escapeChar, propPrefix, propName, propValue);
+
+            expect(snippet).to.have.string("DS_USER_&amp;CODE");
+            expect(snippet).to.have.string("X&lt;5");
+            expect(snippet).to.have.string("55X");
         });
     });
 

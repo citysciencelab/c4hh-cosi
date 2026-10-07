@@ -1,10 +1,10 @@
 import {shallowMount} from "@vue/test-utils";
 import {createStore} from "vuex";
 import {expect} from "chai";
+import layerCollection from "@core/layers/js/layerCollection.js";
 import sinon from "sinon";
 import StoryCreatorChapter from "../../../components/StoryCreatorChapter.vue";
 import store from "@appstore/index.js";
-
 
 describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
     let localStore, map, originalCesium, wrapper, storyManagerActions;
@@ -93,7 +93,8 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                         mode: () => sinon.stub()
                     },
                     actions: {
-                        changeMapMode: sinon.spy()
+                        changeMapMode: sinon.spy(),
+                        addLayer: sinon.spy()
                     }
                 }
             },
@@ -141,6 +142,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             mode: "2D",
             on: sinon.stub(),
             un: sinon.stub(),
+            addLayer: sinon.stub(),
             getLayers: () => {
                 return {
                     getArray: () => {
@@ -157,6 +159,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             }
         };
         mapCollection.addMap(map, "2D");
+        sinon.stub(layerCollection, "addLayer");
     });
 
     afterEach(() => {
@@ -547,6 +550,67 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             });
         });
 
+        describe("handleDraw", () => {
+            it("should add features when editor index points to add position", async () => {
+                const features = [{title: "feature1"}, {title: "feature2"}],
+                    createDrawObjectStub = sinon.stub(wrapper.vm, "createDrawObject");
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "draw",
+                        index: 0
+                    },
+                    content: []
+                });
+
+                await wrapper.vm.handleDraw(features);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "draw",
+                        attrs: features
+                    }
+                ]);
+                expect(createDrawObjectStub.called).to.be.true;
+            });
+
+            it("should edit existing features when editor index points to an existing item", async () => {
+                const features = [{title: "feature1"}, {title: "feature2"}],
+                    createDrawObjectStub = sinon.stub(wrapper.vm, "createDrawObject");
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "draw",
+                        index: 0
+                    },
+                    content: [
+                        {
+                            type: "draw",
+                            attrs: [{title: "feature1"}, {title: "feature2"}]
+                        }
+                    ]
+                });
+
+                await wrapper.vm.handleDraw(features);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "draw",
+                        attrs: [{title: "feature1"}, {title: "feature2"}]
+                    }
+                ]);
+                expect(createDrawObjectStub.called).to.be.true;
+            });
+        });
+
         describe("handleFeature", () => {
             it("should add a feature when editor index points to add position", async () => {
                 const feature = {
@@ -746,6 +810,46 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     }
                 ]);
             });
+            it("should remove write features without removing draw features", async () => {
+                const drawFeature = {
+                        get: key => key === "storyCreatorType" ? "draw" : undefined
+                    },
+                    writeFeature = {
+                        get: key => key === "storyCreatorType" ? "write" : undefined
+                    },
+                    source = {
+                        getFeatures: () => [drawFeature, writeFeature],
+                        removeFeature: sinon.spy()
+                    };
+
+                Object.defineProperty(wrapper.vm, "source", {
+                    value: source,
+                    writable: true
+                });
+
+                await wrapper.setData({
+                    content: [
+                        {
+                            type: "write",
+                            attrs: []
+                        },
+                        {
+                            type: "draw",
+                            attrs: []
+                        }
+                    ]
+                });
+
+                wrapper.vm.removeContentItem(0);
+
+                expect(source.removeFeature.calledOnceWith(writeFeature)).to.be.true;
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "draw",
+                        attrs: []
+                    }
+                ]);
+            });
         });
 
         describe("resetLayerConfig ", () => {
@@ -780,6 +884,122 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     type: "",
                     index: null
                 });
+            });
+        });
+
+        describe("handleMapText", () => {
+            it("should add write content when editor index points to add position", async () => {
+                const mapText = [{
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [10, 20]
+                    },
+                    properties: {},
+                    style: {
+                        fillColor: [255, 255, 255, 1],
+                        strokeColor: [0, 0, 0, 1],
+                        strokeWidth: 1
+                    }
+                }];
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "write",
+                        index: 0
+                    },
+                    content: []
+                });
+
+                wrapper.vm.handleMapText(mapText);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "write",
+                        attrs: mapText
+                    }
+                ]);
+            });
+
+            it("should edit existing write content when editor index points to an existing item", async () => {
+                const mapText = [{
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [10, 20]
+                    },
+                    properties: {},
+                    style: {
+                        fillColor: [255, 255, 255, 1],
+                        strokeColor: [0, 0, 0, 1],
+                        strokeWidth: 1
+                    }
+                }];
+
+                await wrapper.setData({
+                    openContentEditor: {
+                        type: "write",
+                        index: 0
+                    },
+                    content: [
+                        {
+                            type: "write",
+                            attrs: [{type: "Feature", geometry: {type: "Point"}}]
+                        }
+                    ]
+                });
+
+                wrapper.vm.handleMapText(mapText);
+
+                expect(wrapper.vm.openContentEditor).to.deep.equal({
+                    type: "",
+                    index: null
+                });
+                expect(wrapper.vm.content).to.deep.equal([
+                    {
+                        type: "write",
+                        attrs: mapText
+                    }
+                ]);
+            });
+        });
+        describe("loadChapterData", () => {
+            it("should load draw and write content", async () => {
+                const drawFeatures = [{type: "draw"}],
+                    writeFeatures = [{type: "write"}],
+                    createDrawObjectStub = sinon.stub(wrapper.vm, "createDrawObject"),
+                    createWriteObjectStub = sinon.stub(wrapper.vm, "createWriteObject");
+
+                await wrapper.setProps({
+                    initialChapter: {
+                        title: "Test chapter",
+                        content: [
+                            {
+                                type: "draw",
+                                attrs: drawFeatures
+                            },
+                            {
+                                type: "write",
+                                attrs: writeFeatures
+                            }
+                        ],
+                        map: {
+                            center: [10, 20],
+                            zoomLevel: 5,
+                            layers: [],
+                            tool: null
+                        }
+                    }
+                });
+
+                wrapper.vm.loadChapterData();
+
+                expect(createDrawObjectStub.calledOnceWith(drawFeatures)).to.be.true;
+                expect(createWriteObjectStub.calledOnceWith(writeFeatures)).to.be.true;
             });
         });
     });

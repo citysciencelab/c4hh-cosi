@@ -1,5 +1,6 @@
 import {expect} from "chai";
 import sinon from "sinon";
+import axios from "axios";
 import VectorSource from "ol/source/Vector.js";
 import actions from "@modules/getFeatureInfo/store/actionsGetFeatureInfo.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
@@ -342,6 +343,99 @@ describe("src/modules/getFeatureInfo/store/actionsGetFeatureInfo.js", () => {
             expect(commit.called).to.be.false;
             expect(consoleWarnSpy.called).to.be.true;
             expect(consoleWarnSpy.calledWith("No click coordinate set for GetFeatureInfo.")).to.be.true;
+        });
+
+        it("only routes the layer with its own gfiAsNewWindow config to the popup while a sibling WMS layer still contributes to the gfi menu", async () => {
+            const popupLayer = {
+                    get: (key) => {
+                        if (key === "typ") {
+                            return "WMS";
+                        }
+                        if (key === "id") {
+                            return "popupLayerId";
+                        }
+                        if (key === "maxResolution") {
+                            return 10;
+                        }
+                        if (key === "minResolution") {
+                            return 0;
+                        }
+                        if (key === "gfiAttributes") {
+                            return "showAll";
+                        }
+                        if (key === "gfiAsNewWindow") {
+                            return {name: "_blank", specs: ""};
+                        }
+                        if (key === "infoFormat") {
+                            return "application/json";
+                        }
+                        return null;
+                    },
+                    getVisible: () => true,
+                    getSource: () => ({getFeatureInfoUrl: () => "https://example.com/gfi-popup"})
+                },
+                normalLayer = {
+                    get: (key) => {
+                        if (key === "typ") {
+                            return "WMS";
+                        }
+                        if (key === "id") {
+                            return "normalLayerId";
+                        }
+                        if (key === "maxResolution") {
+                            return 10;
+                        }
+                        if (key === "minResolution") {
+                            return 0;
+                        }
+                        if (key === "gfiAttributes") {
+                            return "showAll";
+                        }
+                        if (key === "gfiAsNewWindow") {
+                            return null;
+                        }
+                        if (key === "infoFormat") {
+                            return "application/json";
+                        }
+                        return null;
+                    },
+                    getVisible: () => true,
+                    getSource: () => ({getFeatureInfoUrl: () => "https://example.com/gfi-normal"})
+                },
+                axiosGetStub = sinon.stub(axios, "get");
+
+            mapCollection.clear();
+            mapCollection.addMap({
+                id: "ol",
+                mode: "2D",
+                getLayers: () => ({getArray: () => [popupLayer, normalLayer]}),
+                getView: () => ({
+                    getProjection: () => ({
+                        getCode: () => "EPSG:25832"
+                    })
+                })
+            }, "2D");
+
+            axiosGetStub.onCall(0).resolves({status: 200, statusText: "OK", data: {features: [{id: "1", properties: {name: "should-not-appear"}}]}});
+            axiosGetStub.onCall(1).resolves({status: 200, statusText: "OK", data: {features: [{id: "2", properties: {name: "should-appear"}}]}});
+
+            rootGetters = {
+                ...rootGetters,
+                visibleSubjectDataLayerConfigs: [{id: "popupLayerId"}, {id: "normalLayerId"}]
+            };
+
+            try {
+                await actions.collectGfiFeatures({getters, commit, dispatch, rootGetters});
+            }
+            finally {
+                axiosGetStub.restore();
+            }
+
+            const setGfiFeaturesCall = commit.getCalls().find(call => call.args[0] === "setGfiFeatures");
+
+            expect(setGfiFeaturesCall).to.not.be.undefined;
+            expect(setGfiFeaturesCall.args[1]).to.be.an("array").with.lengthOf(1);
+            expect(setGfiFeaturesCall.args[1][0].getProperties()).to.deep.equal({name: "should-appear"});
         });
     });
 });

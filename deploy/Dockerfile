@@ -69,7 +69,7 @@ RUN set -eu; \
 # the caches must be busted. index.html is emitted by the same run and therefore
 # always agrees with it.
 WORKDIR /app/masterportal
-RUN MASTERCODE_VERSION_FOLDER="${MASTERCODE_VERSION_FOLDER:-3_26_0_$(date -u +%Y%m%d%H%M%S)}" \
+RUN MASTERCODE_VERSION_FOLDER="${MASTERCODE_VERSION_FOLDER:-3_27_0_$(date -u +%Y%m%d%H%M%S)}" \
     node node_modules/.bin/vite build --config devtools/vite.config.js --mode production \
     && rm -rf dist/portal
 

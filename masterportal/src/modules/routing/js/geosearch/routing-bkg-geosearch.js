@@ -39,7 +39,7 @@ async function getRoutingBkgGeosearchUrl (search) {
     }
     url.searchParams.set("count", state.geosearch.limit);
     url.searchParams.set("properties", "text");
-    url.searchParams.set("query", encodeURIComponent(search));
+    url.searchParams.set("query", search);
     if (bBoxValue) {
         url.searchParams.set("bbox", bBoxValue);
     }

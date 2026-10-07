@@ -99,6 +99,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                             },
                             getters: {
                                 currentPlanningScenarioId: () => "planningScenarioId",
+                                isExecutionRequestSubmitting: () => false,
                                 planningScenarios: () => planningScenarios || [
                                     {
                                         id: "planningScenarioId",

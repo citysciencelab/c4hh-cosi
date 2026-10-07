@@ -1,6 +1,7 @@
 <script>
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
 
 /**
  * Action button to display at each search result and to execute configured actions.
@@ -49,8 +50,10 @@ export default {
          */
         callAction () {
             this.setCurrentActionEvent(this.actionName);
-            this.activateAction({actionName: this.actionName, actionArgs: this.actionArgs});
-
+            this.activateAction({
+                actionName: this.actionName,
+                actionArgs: addSourceToPayload(this, this.actionArgs)
+            });
         }
     }
 };

@@ -337,6 +337,19 @@ describe("src/modules/searchBar/store/actions/actionsSearchBarSearchResult.spec.
         expect(commit.firstCall.args[1]).to.be.true;
     });
 
+    it("should call startLayerInformation with _source added when given in payload", async () => {
+        const layerId = "123",
+            config = {layerId},
+            source = {id: "sourceId"},
+            _source = "ActionButton";
+
+        dispatch = sinon.stub().resolves(config);
+        await actions.showLayerInfo({dispatch, commit}, {layerId, source, _source});
+
+        expect(startLayerInformationSpy.calledOnce).to.be.true;
+        expect(startLayerInformationSpy.firstCall.args[0]).to.be.deep.equals({...config, _source});
+    });
+
     describe("retrieveLayerConfig", () => {
         it("layer contained in getters, no source", () => {
             const layerId = "123",

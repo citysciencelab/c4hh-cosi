@@ -134,42 +134,43 @@ import get3DHighlightColor from "@shared/js/utils/get3DHighlightColor.js";
  */
 
 const mapUrlParams = {
-        FEATUREVIAURL: featureViaUrl,
-        HIGHLIGHTFEATURE: highlightFeature,
-        HIGHLIGHTFEATURESBYATTRIBUTE: highlightFeaturesByAttributes,
-        MAPS: setMapAttributes,
-        MARKER: setMapMarker,
-        ZOOMTOEXTENT: zoomToProjExtent,
-        ZOOMTOFEATUREID: zoomToFeatures,
-        ZOOMTOGEOMETRY: zoomToFeatures,
-        HIGHLIGHTED3D: highlight3DFeatureUrlParam
-    },
-    legacyMapUrlParams = {
-        "API/HIGHLIGHTFEATURESBYATTRIBUTE": highlightFeaturesByAttributes,
-        ATTRIBUTENAME: highlightFeaturesByAttributes,
-        ATTRIBUTEQUERY: highlightFeaturesByAttributes,
-        ATTRIBUTEVALUE: highlightFeaturesByAttributes,
-        BEZIRK: zoomToFeatures,
-        CENTER: zoomToCoordinates,
-        FEATUREID: zoomToFeatures,
-        MAP: setMode,
-        MAPMARKER: setMapMarker,
-        MAPMODE: setMode,
-        "MAP/CENTER": zoomToCoordinates,
-        "MAP/HIGHLIGHTFEATURE": highlightFeature,
-        "MAP/MAPMODE": setMode,
-        "MAP/PROJECTION": processProjection,
-        "MAP/ZOOMLEVEL": zoomToCoordinates,
-        "MAP/ZOOMTOEXTENT": zoomToProjExtent,
-        "MAP/ZOOMTOFEATUREID": zoomToFeatures,
-        "MAP/ZOOMTOGEOMETRY": zoomToFeatures,
-        PROJECTION: processProjection,
-        WFSID: highlightFeaturesByAttributes,
-        ZOOMLEVEL: zoomToCoordinates,
-        HEADING: setCamera,
-        TILT: setCamera,
-        ALTITUDE: setCamera
-    };
+    FEATUREVIAURL: featureViaUrl,
+    HIGHLIGHTFEATURE: highlightFeature,
+    HIGHLIGHTFEATURESBYATTRIBUTE: highlightFeaturesByAttributes,
+    MAPS: setMapAttributes,
+    MARKER: setMapMarker,
+    ZOOMTOEXTENT: zoomToProjExtent,
+    ZOOMTOFEATUREID: zoomToFeatures,
+    ZOOMTOGEOMETRY: zoomToFeatures,
+    HIGHLIGHTED3D: highlight3DFeatureUrlParam
+};
+
+export const legacyMapUrlParams = {
+    "API/HIGHLIGHTFEATURESBYATTRIBUTE": highlightFeaturesByAttributes,
+    ATTRIBUTENAME: highlightFeaturesByAttributes,
+    ATTRIBUTEQUERY: highlightFeaturesByAttributes,
+    ATTRIBUTEVALUE: highlightFeaturesByAttributes,
+    BEZIRK: zoomToFeatures,
+    CENTER: zoomToCoordinates,
+    FEATUREID: zoomToFeatures,
+    MAP: setMode,
+    MAPMARKER: setMapMarker,
+    MAPMODE: setMode,
+    "MAP/CENTER": zoomToCoordinates,
+    "MAP/HIGHLIGHTFEATURE": highlightFeature,
+    "MAP/MAPMODE": setMode,
+    "MAP/PROJECTION": processProjection,
+    "MAP/ZOOMLEVEL": zoomToCoordinates,
+    "MAP/ZOOMTOEXTENT": zoomToProjExtent,
+    "MAP/ZOOMTOFEATUREID": zoomToFeatures,
+    "MAP/ZOOMTOGEOMETRY": zoomToFeatures,
+    PROJECTION: processProjection,
+    WFSID: highlightFeaturesByAttributes,
+    ZOOMLEVEL: zoomToCoordinates,
+    HEADING: setCamera,
+    TILT: setCamera,
+    ALTITUDE: setCamera
+};
 
 /**
  * Process the map url params.

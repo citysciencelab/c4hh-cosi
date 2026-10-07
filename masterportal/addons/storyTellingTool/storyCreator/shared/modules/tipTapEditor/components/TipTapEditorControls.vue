@@ -15,15 +15,56 @@ export default {
     data () {
         return {
             showLinkInput: false,
-            linkUrl: ""
+            linkUrl: "",
+            showColorPicker: false,
+            textColors: [
+                {name: this.$t("additional:modules.storyCreator.chapter.black"), value: "#000000"},
+                {name: this.$t("additional:modules.storyCreator.chapter.darkgrey"), value: "#424242"},
+                {name: this.$t("additional:modules.storyCreator.chapter.red"), value: "#E10019"},
+                {name: this.$t("additional:modules.storyCreator.chapter.blue"), value: "#3C5F94"},
+                {name: this.$t("additional:modules.storyCreator.chapter.green"), value: "#198754"},
+                {name: this.$t("additional:modules.storyCreator.chapter.orange"), value: "#fd7e14"}
+            ]
         };
     },
     methods: {
+        /**
+         * Toggles the visibility of the color picker.
+         * @returns {void}
+         */
+        toggleColorPicker () {
+            this.showColorPicker = !this.showColorPicker;
+        },
+        /**
+         * Sets the selected text color and closes the color picker.
+         * @param {String} color - The color value to apply.
+         * @returns {void}
+         */
+        setTextColor (color) {
+            this.editor?.chain().focus().setColor(color).run();
+            this.showColorPicker = false;
+        },
+        /**
+         * Removes the text color and closes the color picker.
+         * @returns {void}
+         */
+        removeTextColor () {
+            this.editor?.chain().focus().unsetColor().run();
+            this.showColorPicker = false;
+        },
+        /**
+         * Opens the link input and focuses the input field.
+         * @returns {void}
+         */
         openLinkInput () {
             this.linkUrl = this.editor?.getAttributes("link").href ?? "";
             this.showLinkInput = true;
             this.$nextTick(() => this.$refs.linkInput?.focus());
         },
+        /**
+         * Confirms the entered link and closes the link input.
+         * @returns {void}
+         */
         confirmLink () {
             if (this.linkUrl === "") {
                 this.editor?.chain().focus().extendMarkRange("link").unsetLink().run();
@@ -34,6 +75,10 @@ export default {
             this.showLinkInput = false;
             this.linkUrl = "";
         },
+        /**
+         * Cancels the link input.
+         * @returns {void}
+         */
         cancelLink () {
             this.showLinkInput = false;
             this.linkUrl = "";
@@ -138,6 +183,50 @@ export default {
             </button>
         </div>
         <div
+            class="dropdown color-picker-dropdown me-2"
+            :class="{ show: showColorPicker }"
+        >
+            <button
+                type="button"
+                aria-label="text color"
+                class="btn btn-primary rounded-3"
+                :class="{'is-active': showColorPicker || editor?.isActive('textStyle', { color: /.+/ })}"
+                @click="toggleColorPicker"
+            >
+                <strong>A</strong>
+                <span
+                    class="color-indicator d-block mx-auto rounded-pill"
+                    :style="{backgroundColor: editor?.getAttributes('textStyle').color || 'currentColor'}"
+                />
+            </button>
+            <div
+                v-if="showColorPicker"
+                class="dropdown-menu show dropdown-menu-end p-2 rounded-3 shadow-sm"
+            >
+                <div class="d-flex flex-wrap justify-content-center gap-2">
+                    <button
+                        v-for="color in textColors"
+                        :key="color.value"
+                        type="button"
+                        class="color-option btn rounded-circle p-0 border"
+                        :title="color.name"
+                        :style="{ backgroundColor: color.value }"
+                        :aria-label="color.name"
+                        @click="setTextColor(color.value)"
+                    />
+                    <button
+                        type="button"
+                        class="color-option btn btn-light rounded-circle p-0 border text-secondary"
+                        :aria-label="$t('additional:modules.storyCreator.chapter.removeColor')"
+                        :title="$t('additional:modules.storyCreator.chapter.removeColor')"
+                        @click="removeTextColor"
+                    >
+                        <i class="bi bi-x-lg" />
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div
             class="btn-group me-2"
             role="group"
             aria-label="Link group"
@@ -194,5 +283,35 @@ export default {
     .btn.is-active {
         background-color: $dark-blue;
         color: $white;
+    }
+    .btn-toolbar {
+        flex-wrap: nowrap;
+        width: max-content;
+        max-width: 100%;
+        white-space: nowrap;
+    }
+    .btn-group {
+        flex-shrink: 0;
+    }
+    .color-picker-dropdown {
+        position: relative;
+        flex-shrink: 0;
+    }
+    .color-picker-dropdown .dropdown-menu {
+        right: 0;
+        left: auto;
+        max-width: calc(100vw - 1rem);
+    }
+    .color-option:hover,
+    .color-option:focus-visible {
+        box-shadow: 0 0 0 2px $white, 0 0 0 4px $dark_grey;
+    }
+    .color-option {
+        width: 28px;
+        height: 28px;
+    }
+    .color-indicator {
+        width: 14px;
+        height: 3px;
     }
 </style>

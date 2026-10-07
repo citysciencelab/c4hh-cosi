@@ -1,4 +1,7 @@
 {
+  "lzsResearchClient": {
+    "type": "tool"
+  },
   "exampleSearch": {
     "type": "searchInterface",
     "path": "searchInterfaces/exampleSearch"
@@ -87,6 +90,10 @@
   },
   "verkehrsstaerken": {
     "path":"gfiThemes/verkehrsstaerken",
+    "type": "gfiTheme"
+  },
+  "timeSeriesChart": {
+    "path":"gfiThemes/timeSeriesChart",
     "type": "gfiTheme"
   },
   "verkehrsfunctions": {
@@ -221,6 +228,10 @@
   "cosiPrintLayoutSelection": {
     "path": "cosi/cosiPrintLayoutSelection",
     "type": "vueComponent"
+  },
+  "scenarioBuilder": {
+    "path": "cosi/ScenarioBuilder",
+    "type": "tool"
   },
    "waterRiskCheckSearchBar": {
     "path": "waterRiskCheck/searchBar",

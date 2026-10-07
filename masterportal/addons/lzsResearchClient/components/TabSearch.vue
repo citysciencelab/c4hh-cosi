@@ -1,0 +1,1915 @@
+<script>
+import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
+import InputText from "./shared/InputText.vue";
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
+import ButtonGroup from "@shared/modules/buttons/components/ButtonGroup.vue";
+import {TAB_SET_CURRENT} from "@shared/modules/tabs/components/TabContainer.vue";
+import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
+import DrawEdit from "@shared/modules/draw/components/DrawEdit.vue";
+import SwitchInput from "@shared/modules/checkboxes/components/SwitchInput.vue";
+import modifyInteraction from "@masterportal/masterportalapi/src/maps/interactions/modifyInteraction";
+import ExtentInteraction from "ol/interaction/Extent.js";
+import {never} from "ol/events/condition.js";
+import LzsResearchClientSearchBar from "./searchBar/components/LzsResearchClientSearchBar.vue";
+import {roundFileSizeToFixed} from "../utils/zipHelpers";
+import getOAFFeature from "@shared/js/api/oaf/getOAFFeature";
+import {getTranslationForAttribute} from "../utils/translationHelpers";
+import layerCollection from "@core/layers/js/layerCollection.js";
+import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
+import {treeSubjectsKey} from "@shared/js/utils/constants.js";
+
+import Polygon, {fromExtent} from "ol/geom/Polygon";
+import LineString from "ol/geom/LineString";
+import Point from "ol/geom/Point";
+import MultiPolygon from "ol/geom/MultiPolygon.js";
+import Feature from "ol/Feature.js";
+import {Fill, Stroke, Style} from "ol/style";
+import {getArea} from "ol/sphere";
+
+import {mapGetters, mapActions, mapMutations} from "vuex";
+import Multiselect from "vue-multiselect";
+/**
+ * Rectangle interaction class extending ExtentInteraction to handle rectangle drawing events.
+ * It dispatches custom events "modifystart" and "modifyend" when the user starts and ends drawing an extent, respectively.
+ * This allows for more granular control over the drawing process, enabling features like area calculation and validation.
+ * @class RectangleInteraction
+ */
+class RectangleInteraction extends ExtentInteraction {
+    /**
+     * Uses the parent class's handleDownEvent method to determine if the event should be handled.
+     * If the event is handled, it dispatches a "modifystart" event with the original map browser event.
+     * @param {MapBrowserEvent} evt - The map browser event to handle.
+     * @returns {Boolean} - Returns true if the event was handled, false otherwise.
+     */
+    handleDownEvent (evt) {
+        const handled = super.handleDownEvent(evt);
+
+        if (handled) {
+            this.dispatchEvent({
+                type: "modifystart",
+                mapBrowserEvent: evt
+            });
+        }
+
+        return handled;
+    }
+    /**
+     * Uses the parent class's handleUpEvent method to dispatch a "modifyend" event with the original map browser event and the extent that was drawn.
+     * @param {MapBrowserEvent} evt - The map browser event to handle.
+     * @returns {Boolean} - Always returns false.
+     */
+    handleUpEvent (evt) {
+        super.handleUpEvent(evt);
+
+        this.dispatchEvent({
+            type: "modifyend",
+            mapBrowserEvent: evt,
+            extent: this.getExtent()
+        });
+
+        return false;
+    }
+}
+
+export default {
+    name: "TabSearch",
+    components: {
+        FlatButton,
+        InputText,
+        SpinnerItem,
+        DrawTypes,
+        DrawEdit,
+        ButtonGroup,
+        SwitchInput,
+        LzsResearchClientSearchBar,
+        Multiselect
+    },
+    inject: {
+        setCurrentTab: {from: TAB_SET_CURRENT, default: null}
+    },
+    data () {
+        return {
+            attributeSearchModeIsActive: false,
+            selectedArchive: null,
+            searchWithAttributeFormData: [],
+            archives: {},
+            showSpinner: false,
+            isAttributeSearchFormValid: true,
+            selectedArchiveIds: [],
+            selectedYears: [],
+            lzsDrawLayer: null,
+            lzsDrawLayerSource: null,
+            currentModifyInteraction: null,
+            drawEnd: false,
+            searchGeometry: null,
+            selectedButtonGroup: "extent",
+            showAreaWarning: false,
+            searchGeometryArea: null,
+            selectedParcelDistrict: null,
+            parcelNumberInputValue: "",
+            archiveLayerOriginalState: {},
+            bulkYearsLoading: false,
+            selectAllCancelled: false,
+            districtParcels: [],
+            districtParcelsLoading: false
+        };
+    },
+    computed: {
+        ...mapGetters("Modules/LzsResearchClient", [
+            "dataClassList",
+            "placeholderDataClassList",
+            "archiveYears",
+            "archiveList",
+            "archiveHasGeoref",
+            "lzsCurrentLayout",
+            "lzsDrawTypes",
+            "lzsDrawIcons",
+            "lzsSelectedDrawType",
+            "lzsSelectedDrawTypeMain",
+            "lzsSelectedInteraction",
+            "lzsDrawEdits",
+            "minScaleValue",
+            "maxResultValueCount",
+            "addressSearchCoordinates",
+            "maxGeometryArea",
+            "parcelSourceData",
+            "alkisBaseUrl",
+            "parcelSourceDataLoading"
+        ]),
+        ...mapGetters("Maps", [
+            "projectionCode",
+            "scale",
+            "extent"
+        ]),
+        ...mapGetters(["layerConfigById"]),
+        ...mapGetters("Menu", [
+            "expanded"
+        ]),
+        archiveWithGeorefList () {
+            return this.archiveList.filter((archive) => {
+                return this.archiveHasGeoref(archive.id);
+            });
+        },
+        /**
+         * Generates a sorted list of years grouping the selected archives.
+         *
+         * Iterates through selected IDs to build a map keyed by year:
+         * - If the year is encountered for the first time, it initializes a new entry with an empty array.
+         * - Then, it pushes the current archive name into that year's list (whether newly created or existing).
+         *
+         * @returns {Array<{year: string, archiveNames: string[]}>} Ascending sorted array of year objects.
+         */
+        yearsList () {
+            const yearsList = {};
+
+            this.selectedArchiveIds.forEach(id => {
+                const item = this.archiveYears && this.archiveYears[id];
+
+                if (!item || !Array.isArray(item.years)) {
+                    return;
+                }
+
+                item.years.forEach(singleYear => {
+                    if (!yearsList[singleYear]) {
+                        yearsList[singleYear] = {
+                            year: singleYear,
+                            archiveNames: []
+                        };
+                    }
+                    if (!yearsList[singleYear].archiveNames.includes(item.archiveName)) {
+                        yearsList[singleYear].archiveNames.push(item.archiveName);
+                    }
+                });
+            });
+
+            return Object.values(yearsList).sort((a, b) => a.year - b.year);
+        },
+        buttonGroupLevels () {
+            return [
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent")},
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries")},
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address")},
+                {name: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.parcel")}
+            ];
+        },
+        selectedSpatialButtonName () {
+            switch (this.selectedButtonGroup) {
+                case "geometry":
+                    return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries");
+                case "address":
+                    return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address");
+                case "parcel":
+                    return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.parcel");
+                case "extent":
+                default:
+                    return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent");
+            }
+        },
+        isSpatialSearchFormValid () {
+            if (this.selectedArchiveIds.length === 0 || this.selectedYears.length === 0) {
+                return false;
+            }
+
+            if (!this.searchGeometry && ["geometry", "address", "parcel"].includes(this.selectedButtonGroup)) {
+                return false;
+            }
+
+            if (this.scale > this.minScaleValue && this.selectedButtonGroup === "extent") {
+                return false;
+            }
+
+            return true;
+        },
+        maxValueCountPlaceholder () {
+            if (this.maxResultValueCount >= 10) {
+                return "10";
+            }
+            else if (this.maxResultValueCount >= 5) {
+                return "5";
+            }
+
+            return String(this.maxResultValueCount);
+        },
+        maxValueCountDefaultValue () {
+            if (this.maxResultValueCount >= 25) {
+                return "25";
+            }
+            else if (this.maxResultValueCount >= 10) {
+                return "10";
+            }
+
+            return "1";
+        },
+        spatialAreaWarning () {
+            const areaInSquareKilometers = roundFileSizeToFixed(this.searchGeometryArea / 1e6),
+                  maxAreaInSquareKilometers = roundFileSizeToFixed(this.maxGeometryArea / 1e6);
+
+            if (this.selectedButtonGroup === "extent" && this.scale > this.minScaleValue) {
+                return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.extentWarningMessage", {scale: this.minScaleValue});
+            }
+            if (this.selectedButtonGroup === "geometry" && this.showAreaWarning) {
+                return this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.geometryAreaWarningMessage", {maxArea: maxAreaInSquareKilometers, area: areaInSquareKilometers});
+            }
+
+            return null;
+        },
+        pointSelected () {
+            return this.searchGeometry?.type === "Point";
+        },
+        selectAllChecked () {
+            const archiveIdsAreChecked =
+                this.archiveWithGeorefList.length > 0 &&
+                this.archiveWithGeorefList.every(a => this.selectedArchiveIds.includes(a.id));
+
+            const yearsAreChecked =
+                this.yearsList.length > 0 &&
+                this.yearsList.every(y => this.selectedYears.includes(y.year));
+
+            if ((this.bulkYearsLoading && !this.selectAllCancelled) || (archiveIdsAreChecked && yearsAreChecked)) {
+                return true;
+            }
+
+            return false;
+        },
+        parcelDistrictOptions () {
+            if (!this.parcelSourceData) {
+                return [];
+            }
+            return Object.keys(this.parcelSourceData).map(name => ({
+                label: `${name} (${this.parcelSourceData[name].id})`,
+                value: this.parcelSourceData[name].id
+            }));
+        },
+        selectedParcelDistrictObject: {
+            get () {
+                if (!this.selectedParcelDistrict) {
+                    return null;
+                }
+                return this.parcelDistrictOptions.find(opt => opt.value === this.selectedParcelDistrict) || null;
+            },
+            set (val) {
+                this.setSelectedParcelDistrict(val ? val : null);
+            }
+        },
+        districtParcelNumbersSorted () {
+            return [...this.districtParcels]
+                .map(feature => Number(feature.properties.flstnrzae))
+                .sort((a, b) => a - b);
+        }
+    },
+    watch: {
+        selectedArchive (newValue) {
+            if (newValue) {
+                this.validateSearchWithAttributeForm();
+            }
+        },
+        /** Watch the yearsList to update the selectedYears */
+        yearsList (yearsListNewValue) {
+            const availableYears = yearsListNewValue.map(y => y.year);
+
+            this.selectedYears = this.selectedYears.filter(year =>availableYears.includes(year));
+        },
+        lzsSelectedDrawType (newValue, oldValue) {
+            if (this.drawEnd) {
+                this.drawEnd = false;
+                return;
+            }
+
+            if (newValue !== oldValue) {
+                this.removeSearchGeometry();
+                this.showAreaWarning = false;
+            }
+        },
+        async selectedButtonGroup (newValue, oldValue) {
+            if (newValue === "parcel" && oldValue !== "parcel") {
+                if (!this.parcelSourceData) {
+                    await this.retrieveParcelSourceData();
+                }
+            }
+        },
+        pointSelected (newValue) {
+            if (!newValue) {
+                this.toggleAllArchiveIds(false);
+            }
+        }
+    },
+    async created () {
+        this.lzsDrawLayer = await this.addNewLayerIfNotExists({layerName: "lzsDrawLayer", alwaysOnTop: true});
+
+        this.lzsDrawLayerSource = this.lzsDrawLayer.getSource();
+    },
+    async mounted () {
+        await this.fetchDataClassList();
+        await this.fetchPlaceholders();
+
+        this.initializeSearchForm();
+    },
+    methods: {
+        ...mapActions("Modules/LzsResearchClient", [
+            "fetchDataClassList",
+            "searchByAttribute",
+            "fetchPlaceholders",
+            "fetchYears",
+            "searchByGeometry",
+            "retrieveParcelSourceData"
+        ]),
+        ...mapActions("Maps", [
+            "addNewLayerIfNotExists",
+            "addInteraction",
+            "removeInteraction",
+            "removePointMarker",
+            "placingPointMarker",
+            "zoomToExtent"
+        ]),
+        ...mapActions(["addLayerToLayerConfig", "replaceByIdInLayerConfig", "addOrReplaceLayer"]),
+        ...mapActions("Alerting", ["addSingleAlert"]),
+        ...mapMutations("Modules/LzsResearchClient", [
+            "setLzsSelectedDrawType",
+            "setLzsSelectedInteraction",
+            "setSearchInput",
+            "setAddressSearchCoordinates",
+            "setErrorMessage"
+        ]),
+        /**
+         * Update the active search form.
+         * @param {Boolean} attributeSearchMode - Is false if the geometry search form is to be activated.
+         */
+        changeSearchMode (attributeSearchMode) {
+            this.attributeSearchModeIsActive = attributeSearchMode;
+            if (attributeSearchMode) {
+                this.removeSearchGeometry();
+                this.removePointMarker();
+                this.setSearchInput("");
+                this.setAddressSearchCoordinates(null);
+
+                if (this.parcelSourceData) {
+                    this.clearParcelSearch(true);
+                }
+            }
+        },
+        /**
+         * Activates or deactivates the modify interaction without destroying it,
+         * so it can be re-enabled when the user returns to this tab.
+         * @param {Boolean} active Whether the modify interaction should listen to map events.
+         * @returns {void}
+         */
+        setMapInteractionsActive (active) {
+            this.currentModifyInteraction?.setActive(active);
+        },
+        /**
+         * Sets `searchGeometry` to null and removes the map interaction.
+         */
+        removeSearchGeometry () {
+            this.searchGeometry = null;
+
+            this.lzsDrawLayerSource.clear();
+
+            if (this.currentModifyInteraction) {
+                this.currentModifyInteraction.un("modifyend", this.onModifyEnd);
+                this.currentModifyInteraction.un("modifyend", this.onRectangleModifyEnd);
+                this.currentModifyInteraction.un("modifystart", this.onModifyStart);
+
+                this.removeInteraction(this.currentModifyInteraction);
+                this.currentModifyInteraction = null;
+            }
+
+            if (this.showAreaWarning) {
+                this.showAreaWarning = false;
+            }
+        },
+        /**
+         * Set the selected archive identifier.
+         * @param {string} archive - The archive name to select.
+         */
+        setSelectedArchive (archive) {
+            this.selectedArchive = archive;
+        },
+        /**
+         * Set the selected parcel area identifier.
+         * @param {object} parcelDistrict - The parcel district object to select.
+         */
+        setSelectedParcelDistrict (parcelDistrict) {
+            this.selectedParcelDistrict = parcelDistrict?.value ?? null;
+            this.parcelNumberInputValue = "";
+
+            this.getParcelsByDistrict(parcelDistrict, this.alkisBaseUrl, parcelDistrict?.label);
+        },
+        /**
+         * Fetches all parcels for a given district from the OAF Feature service.
+         * @param {string} district - The parcel district to fetch parcels for.
+         * @param {string} baseUrl - The base URL of the ALKIS service.
+         * @returns {Promise<void>}
+         */
+        async getParcelsByDistrict (district, baseUrl, districtLabel) {
+            if (!district || !baseUrl) {
+                return;
+            }
+
+            this.setErrorMessage("");
+
+            this.districtParcelsLoading = true;
+
+            try {
+                this.districtParcels = await getOAFFeature.getOAFFeatureGet(this.alkisBaseUrl, "Flurstueck", {
+                    limit: 10000,
+                    filterCrs: "http://www.opengis.net/def/crs/EPSG/0/25832",
+                    crs: "http://www.opengis.net/def/crs/EPSG/0/25832",
+                    filter: true,
+                    literalFilters: {gemaschl: "02" + this.selectedParcelDistrict},
+                    skipGeometry: true,
+                    propertyNames: ["flstnrzae"]
+                });
+            }
+            catch (error) {
+                this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelNumberLoadError", {district: districtLabel}));
+                this.districtParcels = [];
+                this.setSelectedParcelDistrict(null);
+            }
+            finally {
+                this.districtParcelsLoading = false;
+            }
+        },
+        /**
+         * Initialize archive and form data structures from `dataClassList`.
+         */
+        initializeSearchForm () {
+            const formData = {},
+                  archives = {};
+
+            this.dataClassList?.forEach(element => {
+                const archiveName = element.name,
+                      archiveId = element.id,
+                      attributes = element.highestActiveDataclassVersion.dataclassAttributs
+                          .filter(attribute => attribute.usage === "I")
+                          .map(attribute => ({
+                              ...attribute,
+                              value: "",
+                              placeholder: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.PLACEHOLDER || "",
+                              labelKey: `additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.name.toLowerCase()}`,
+                              pattern: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.PATTERN || "",
+                              testNumberRange: null,
+                              errorKey: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.ERROR_KEY,
+                              errorParams: this.placeholderDataClassList?.[archiveId]?.[attribute.name]?.ERROR_PARAMS || {},
+                              errorMessage: ""
+                          }));
+
+                formData[archiveName] = [
+                    ...attributes,
+                    {
+                        name: "maxValueCount",
+                        value: this.maxValueCountDefaultValue,
+                        labelKey: "additional:modules.lzsResearchClient.tabs.tabSearch.maxValueCount",
+                        pattern: "[0-9]*",
+                        testNumberRange: [1, this.maxResultValueCount],
+                        placeholder: this.maxValueCountPlaceholder,
+                        errorKey: "numberRangeError",
+                        errorParams: {minNum: 1, maxNum: this.maxResultValueCount},
+                        errorMessage: ""
+                    }
+                ];
+
+                archives[element.name] = element.id;
+            });
+
+            this.searchWithAttributeFormData = formData;
+            this.archives = archives;
+            this.setSelectedArchive(this.dataClassList[0]?.name);
+        },
+        /**
+         * Build a search payload from the form data, show a spinner and perform the search.
+         * After search, switch to the result tab.
+         */
+        async searchWithAttribute () {
+            if (!this.isAttributeSearchFormValid) {
+                return;
+            }
+
+            const payload = {
+                dataclassIds: [this.archives[this.selectedArchive]],
+                maxvaluecount: "",
+                fachattribute: []
+            };
+
+            this.searchWithAttributeFormData[this.selectedArchive].forEach(formItem => {
+                if (formItem.usage === "I") {
+                    payload.fachattribute.push({
+                        id: formItem.name.toUpperCase(),
+                        value: formItem.value, type: formItem.usage
+                    });
+                }
+
+                if (formItem.name === "maxValueCount") {
+                    payload.maxvaluecount = formItem.value;
+                }
+            });
+
+            this.showSpinner = true;
+
+            this.searchByAttribute(payload)
+                .then((result) => {
+                    if (result) {
+                        this.setCurrentTab("tabResult");
+                    }
+                })
+                .finally(() => {
+                    this.showSpinner = false;
+                });
+        },
+        /**
+         * Validate form fields against their patterns and set error messages accordingly.
+         */
+        validateSearchWithAttributeForm () {
+            const attributes = this.searchWithAttributeFormData[this.selectedArchive];
+
+            this.isAttributeSearchFormValid = true;
+
+            attributes.forEach(attribute => {
+                attribute.errorMessage = "";
+
+                if (attribute.pattern && attribute.value !== null && String(attribute.value) !== "") {
+                    const regex = new RegExp(`^${attribute.pattern}$`);
+
+                    if (!regex.test(String(attribute.value))) {
+                        attribute.errorMessage = this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.errorKey}`,
+                                                         attribute.errorParams
+                        );
+                        this.isAttributeSearchFormValid = false;
+                    }
+                }
+
+                if (attribute.testNumberRange && attribute.value !== null && Number(attribute.value) !== "") {
+                    if (
+                        Number(attribute.value) < attribute.testNumberRange[0] ||
+                        Number(attribute.value) > attribute.testNumberRange[1]
+                    ) {
+                        attribute.errorMessage = this.$t(`additional:modules.lzsResearchClient.tabs.tabSearch.${attribute.errorKey}`,
+                                                         attribute.errorParams
+                        );
+                        this.isAttributeSearchFormValid = false;
+                    }
+                }
+            });
+        },
+        /**
+         * Reset the attribute form and related validation to initial state.
+         */
+        resetForm () {
+            this.removeArchiveLayers();
+            this.initializeSearchForm();
+            this.validateSearchWithAttributeForm();
+            this.resetGeometricSearchForm();
+            this.removeSearchGeometry();
+            this.setSearchInput("");
+            this.setAddressSearchCoordinates(null);
+            this.clearParcelSearch(true);
+        },
+        /**
+         * Reset the geometric search selection (archive ids).
+         */
+        resetGeometricSearchForm () {
+            this.selectedArchiveIds = [];
+            // IMPORTANT:
+            // we do not reset archiveYears here, because it works like a caching mechanism.
+            // We filter archiveYears according to selectedArchiveIds in yearsList and show yearsList in template. See yearsList computed.
+            // So if we dont reset it, we can use the data later, without sending a new request. See onSelectedArchiveIdsChange method.
+            // For later implementation, please do not reset archiveYears and dont use it directly so that you need to reset it sometime.
+        },
+        /**
+         * Fills or clears `selectedArchiveIds`. If filling, also fetch years for all archive ids and adds them to `selectedYears`.
+         * @param {Boolean} checked - Whether to check or uncheck all archive ids and years.
+         */
+        async toggleAllArchiveIds (checked) {
+            this.setErrorMessage("");
+            if (checked) {
+                this.selectAllCancelled = false;
+                if (this.bulkYearsLoading) {
+                    return;
+                }
+
+                const allArchiveIds = this.archiveWithGeorefList.map(archive => archive.id);
+                const allYearsCached = allArchiveIds.every(id => this.archiveYears[id]);
+
+                if (allYearsCached) {
+                    this.selectedArchiveIds = allArchiveIds;
+                    this.selectedYears = this.yearsList.map(y => y.year);
+                    return;
+                }
+
+                try {
+                    this.bulkYearsLoading = true;
+
+                    const results = await Promise.allSettled(allArchiveIds.map(async archiveId => {
+                        await this.fetchYears(archiveId);
+                        if (!this.archiveYears[archiveId]) {
+                            throw new Error();
+                        }
+                    }));
+
+                    if (!this.selectAllCancelled) {
+                        const anyFailed = results.some(r => r.status === "rejected");
+
+                        if (anyFailed) {
+                            this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.loadErrors.years"));
+                        }
+                        else {
+                            this.setErrorMessage("");
+                            this.selectedArchiveIds = allArchiveIds;
+                            this.selectedYears = this.yearsList.map(y => y.year);
+                        }
+                    }
+                }
+                finally {
+                    this.bulkYearsLoading = false;
+                    this.selectAllCancelled = false;
+                }
+            }
+            else {
+                this.selectedArchiveIds = [];
+                this.selectedYears = [];
+
+                if (this.bulkYearsLoading) {
+                    this.selectAllCancelled = true;
+                }
+            }
+        },
+        /**
+         * Toggle an archive id in `selectedArchiveIds` and fetch years if needed.
+         * @param {string} archiveId - Archive identifier to toggle.
+         * @param {Event} event - The change event from the checkbox.
+         */
+        async onSelectedArchiveIdsChange (archiveId, event) {
+            this.setErrorMessage("");
+            const checked = event.target.checked,
+                  layerConfig = this.placeholderDataClassList?.[archiveId]?.LAYERCONFIG;
+
+            if (checked) {
+                if (!this.selectedArchiveIds.includes(archiveId)) {
+                    this.selectedArchiveIds.push(archiveId);
+                }
+
+                if (!this.archiveYears[archiveId]) {
+                    await this.fetchYears(archiveId);
+
+                    if (!this.archiveYears[archiveId]) {
+                        this.selectedArchiveIds = this.selectedArchiveIds.filter(id => id !== archiveId);
+
+                        const archiveName = this.archiveList.find(archive => archive.id === archiveId)?.name || archiveId;
+
+                        this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.loadErrors.singleYear", {archiveName}));
+                        return;
+                    }
+                }
+
+                if (layerConfig && layerConfig.id) {
+                    this.displayLayerInMap(layerConfig.id);
+                }
+
+            }
+            else {
+                this.selectedArchiveIds = this.selectedArchiveIds.filter(id => id !== archiveId);
+
+                if (layerConfig && layerConfig.id) {
+                    this.replaceByIdInLayerConfig({
+                        layerConfigs: [{
+                            id: layerConfig.id,
+                            layer: {
+                                visibility: this.archiveLayerOriginalState[layerConfig.id]?.visibility ?? false,
+                                showInLayerTree: this.archiveLayerOriginalState[layerConfig.id]?.showInLayerTree ?? false
+                            }
+                        }]
+                    });
+
+                    delete this.archiveLayerOriginalState[layerConfig.id];
+                }
+            }
+        },
+        /**
+         * Toggle a year in `selectedYears`.
+         * @param {number|string} year - Year to toggle.
+         * @param {Event} event - The change event from the checkbox.
+         */
+        onSelectedYearsChange (year, event) {
+            const checked = event.target.checked;
+
+            if (checked) {
+                if (!this.selectedYears.includes(year)) {
+                    this.selectedYears = [...this.selectedYears, year];
+                }
+            }
+            else {
+                this.selectedYears = this.selectedYears.filter(y => y !== year);
+            }
+        },
+        /**
+         * Gets the current map extent and if needed adjusts it for expanded menus,
+         * creates a polygon from the extent and sets the searchGeometry.
+         *
+         *  @returns {void}
+         */
+        getCurrentVisibleMapExtent () {
+            // The search by extent is only possible when the map is zoomed in enough
+            // and the current map scale is smaller or equal to the minScaleValue
+            if (this.scale > this.minScaleValue) {
+                return;
+            }
+
+            // Get only the extent of the visible map area if any menus are expanded
+            const map = mapCollection.getMap("2D"),
+                  bottomLeftPixelAtCoordinates = map?.getPixelFromCoordinate([this.extent[0], this.extent[1]]),
+                  topRightPixelAtCoordinates = map?.getPixelFromCoordinate([this.extent[2], this.extent[3]]),
+                  rightPadding = this.expanded("secondaryMenu")
+                      ? document.getElementById("mp-menu-secondaryMenu").offsetWidth
+                      : 20,
+                  leftPadding = this.expanded("mainMenu")
+                      ? document.getElementById("mp-menu-mainMenu").offsetWidth
+                      : 20,
+                  shiftedBottomLeftPixelX = [bottomLeftPixelAtCoordinates[0] + leftPadding, bottomLeftPixelAtCoordinates[1]],
+                  shiftedBottomLeftCoordinate = map.getCoordinateFromPixel(shiftedBottomLeftPixelX),
+                  shiftedTopRightPixelX = [topRightPixelAtCoordinates[0] - rightPadding, topRightPixelAtCoordinates[1]],
+                  shiftedTopRightCoordinate = map.getCoordinateFromPixel(shiftedTopRightPixelX),
+                  bottomLeft = [
+                      shiftedBottomLeftCoordinate[0],
+                      shiftedBottomLeftCoordinate[1]
+                  ],
+                  topRight = [
+                      shiftedTopRightCoordinate[0],
+                      shiftedTopRightCoordinate[1]
+                  ],
+                  polygonCoordinates = [[
+                      bottomLeft,
+                      [topRight[0], bottomLeft[1]],
+                      topRight,
+                      [bottomLeft[0], topRight[1]],
+                      bottomLeft
+                  ]];
+
+            this.searchGeometry = {
+                type: "Polygon",
+                coordinates: JSON.parse(JSON.stringify(polygonCoordinates))
+            };
+        },
+        resetDrawingInteraction () {
+            this.drawEnd = true;
+
+            this.removeInteraction(this.lzsSelectedInteraction);
+            this.setLzsSelectedDrawType("");
+            this.setLzsSelectedInteraction("");
+        },
+        cancelIncompleteDrawing () {
+            if (this.currentModifyInteraction) {
+                return;
+            }
+            this.resetDrawingInteraction();
+        },
+        /**
+         * Event handler for the 'drawend' event.
+         * Triggered when a drawing operation is completed.
+         *
+         * @param {DrawEvent} event - The event object containing details about the completed drawing.
+         * @returns {void}
+         */
+        onDrawEnd (event) {
+            this.setSearchGeometry(event.feature.getGeometry());
+            const isRectangle = this.lzsSelectedDrawType === "box";
+
+            this.resetDrawingInteraction();
+            this.editFeature(event.feature, isRectangle);
+        },
+        /**
+         * Event handler for the 'modifyend' event from the rectangle interaction.
+         * Triggered when a rectangle modification operation is completed, updating the search geometry accordingly.
+         * @param {DrawEvent} event - The event object containing details about the completed modification.
+         * @returns {void}
+         */
+        onRectangleModifyEnd (event) {
+            const polygon = fromExtent(event.extent);
+
+            this.setSearchGeometry(polygon);
+        },
+        /**
+         * Event handler for the 'modifyend' event from the modify interaction.
+         * Triggered when a modification operation on a feature is completed, updating the search geometry accordingly.
+         *
+         * @param {ModifyEvent} event - The event object containing details about the completed modification.
+         * @returns {void}
+         */
+        onModifyEnd (event) {
+            const feature = event.features.getArray()[0];
+
+            this.setSearchGeometry(feature.getGeometry());
+        },
+        /**
+         * Handles the start of a draw modification event.
+         * Triggered when a modify interaction begins on a feature.
+         *
+         * @returns {void}
+         */
+        onModifyStart () {
+            this.showAreaWarning = false;
+        },
+        /**
+         * Sets the map interaction to modify a feature.
+         *
+         * @param {Feature} feature - The feature to be modified.
+         * @param {Boolean} isRectangle - Indicates if the feature is a rectangle, default is false.
+         * @returns {void}
+         */
+        editFeature (feature, isRectangle = false) {
+            const geometry = feature.getGeometry();
+
+            if (isRectangle) {
+                const style = feature.getStyle();
+
+                feature.setStyle(new Style({
+                    fill: new Fill({
+                        color: "transparent"
+                    }),
+                    stroke: new Stroke({
+                        color: "transparent",
+                        width: 0
+                    })
+                }));
+
+                this.currentModifyInteraction = new RectangleInteraction({
+                    extent: geometry.getExtent(),
+                    source: this.lzsDrawLayerSource,
+                    createCondition: never,
+                    drag: false,
+                    boxStyle: style
+                });
+
+                this.currentModifyInteraction.on("modifyend", this.onRectangleModifyEnd);
+            }
+            else {
+                this.currentModifyInteraction = modifyInteraction.createModifyInteraction(this.lzsDrawLayerSource);
+                this.currentModifyInteraction.on("modifyend", this.onModifyEnd);
+            }
+            this.currentModifyInteraction.on("modifystart", this.onModifyStart);
+
+            this.addInteraction(this.currentModifyInteraction);
+        },
+        /**
+         * Sets the searchGeometry based on the provided geometry.
+         * If the geometry is a LineString, it converts it to a Polygon.
+         * @param {LineString|Polygon|Point} geometry - The geometry to set as searchGeometry.
+         *
+         * @return {void}
+         */
+        setSearchGeometry (geometry) {
+            const style = new Style({
+                fill: new Fill({
+                    color: this.lzsCurrentLayout.fillColor
+                }),
+                stroke: new Stroke({
+                    color: this.lzsCurrentLayout.strokeColor,
+                    width: this.lzsCurrentLayout.strokeWidth
+                })
+            });
+
+            if (geometry instanceof LineString) {
+                const coordinates = geometry.getCoordinates(),
+                      polygonCoordinates = [
+                          [...coordinates, coordinates[0]]
+                      ],
+                      polygon = new Polygon(polygonCoordinates);
+
+                this.searchGeometry = {
+                    type: "Polygon",
+                    coordinates: JSON.parse(JSON.stringify(polygonCoordinates))
+                };
+
+                const feature = new Feature(polygon);
+
+                feature.setStyle(style);
+
+                this.lzsDrawLayerSource.addFeature(feature);
+
+                if (this.checkSearchGeometryArea(polygon)) {
+
+                    this.searchGeometry = {
+                        type: "Polygon",
+                        coordinates: JSON.parse(JSON.stringify(polygonCoordinates))
+                    };
+                }
+            }
+            else if (geometry instanceof Polygon) {
+                if (this.selectedButtonGroup === "address" || this.selectedButtonGroup === "parcel") {
+                    this.lzsDrawLayerSource.clear();
+
+                    const feature = new Feature(geometry);
+
+                    feature.setStyle(style);
+
+                    this.lzsDrawLayerSource.addFeature(feature);
+
+                    this.zoomToExtent({
+                        extent: geometry.getExtent(),
+                        options: {
+                            padding: this.mapZoomToExtentPadding()
+                        }
+                    });
+                }
+
+                if (this.checkSearchGeometryArea(geometry)) {
+                    this.searchGeometry = {
+                        type: "Polygon",
+                        coordinates: JSON.parse(JSON.stringify(geometry.getCoordinates()))
+                    };
+                }
+            }
+            else if (geometry instanceof Point) {
+                this.searchGeometry = {
+                    type: "Point",
+                    coordinates: JSON.parse(JSON.stringify(geometry.getCoordinates()))
+                };
+            }
+            else {
+                this.removeSearchGeometry();
+            }
+        },
+        /**
+         * Checks whether the provided geometry area is within acceptable bounds for performing a search operation.
+         *
+         * @param {Object} geometry - The geometry object whose area needs to be validated.
+         * @param {number} [maxArea] - The maximum allowed area for the search geometry.
+         * @returns {boolean} Returns `true` if the geometry area is valid, `false` otherwise.
+         */
+        checkSearchGeometryArea (geometry) {
+            this.searchGeometryArea = getArea(geometry, {projection: this.projectionCode});
+
+            if (this.searchGeometryArea > this.maxGeometryArea) {
+                this.showAreaWarning = true;
+                this.searchGeometry = null;
+
+                return false;
+            }
+
+            return true;
+        },
+        /**
+         * Build a search payload from the selected geometry, archive IDs and years and perform the search.
+         * After the search, switch to the result tab.
+         *
+         * @return {void}
+         */
+        searchWithGeometry () {
+            const featureDataclassAttribs = this.selectedYears.map(year => {
+                return {
+                    "id": "JAHRGANG",
+                    "type": "I",
+                    "value": year
+                };
+            });
+
+            if (this.selectedButtonGroup === "extent") {
+                this.getCurrentVisibleMapExtent();
+            }
+
+            const payload = {
+                "dataclassIdsWithJahrgang": this.selectedYears.length ? [...this.selectedArchiveIds] : [],
+                "dataclassIdsWithoutJahrgang": !this.selectedYears.length ? [...this.selectedArchiveIds] : [],
+                "srs": Number(this.projectionCode.split(":")[1]),
+                "featuregeometrie": JSON.parse(JSON.stringify(this.searchGeometry)),
+                "featureDataclassAttribs": featureDataclassAttribs
+            };
+
+            this.showSpinner = true;
+            this.setMapInteractionsActive(false);
+
+            this.searchByGeometry(payload)
+                .then((result) => {
+                    if (result) {
+                        this.setCurrentTab("tabResult");
+                    }
+                })
+                .finally(() => {
+                    this.showSpinner = false;
+                });
+        },
+        /**
+         * Initiates the search based on the active search mode.
+         *
+         * @returns {void}
+         */
+        startSearch () {
+            // clear all error messages on start of a search
+            this.setErrorMessage("");
+
+            switch (this.attributeSearchModeIsActive) {
+                case true:
+                    this.searchWithAttribute();
+                    break;
+                case false:
+                default:
+                    this.searchWithGeometry();
+                    break;
+            }
+        },
+        /**
+         * Sets the selected button group for spatial selection.
+         * @param {string} group - The name of the selected button group.
+         *
+         * @return {void}
+         */
+        setSelectedButtonGroup (group) {
+            this.setErrorMessage("");
+
+            switch (group) {
+                case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.geometries"):
+                    this.selectedButtonGroup = "geometry";
+
+                    if (this.addressSearchCoordinates) {
+                        this.removePointMarker();
+                        this.setSearchInput(null);
+                    }
+
+                    this.clearParcelSearch(true);
+
+                    break;
+                case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.address"):
+                    this.selectedButtonGroup = "address";
+
+                    if (this.searchGeometry) {
+                        this.removeSearchGeometry();
+                    }
+
+                    this.clearParcelSearch(true);
+
+
+                    break;
+                case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.parcel"):
+                    this.selectedButtonGroup = "parcel";
+
+                    if (this.searchGeometry) {
+                        this.removeSearchGeometry();
+                    }
+
+                    break;
+                case this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionGroup.extent"):
+                default:
+                    this.selectedButtonGroup = "extent";
+
+                    if (this.searchGeometry) {
+                        this.removeSearchGeometry();
+                    }
+
+                    if (this.addressSearchCoordinates) {
+                        this.removePointMarker();
+                        this.setSearchInput(null);
+                    }
+
+                    this.clearParcelSearch(true);
+                    break;
+            }
+        },
+        /**
+         * Checks if the menu sides are open or closed and
+         * calculates the padding for the zoomToExtent function, depending on the opening state
+         * @returns {Number[]} Padding values for an extent, fitting inbetween the menu sides.
+         */
+        mapZoomToExtentPadding () {
+            const
+                rightPadding = this.expanded("secondaryMenu")
+                    ? document.getElementById("mp-menu-secondaryMenu").offsetWidth + 20
+                    : 20,
+                leftPadding = this.expanded("mainMenu")
+                    ? document.getElementById("mp-menu-mainMenu").offsetWidth + 20
+                    : 20;
+
+            return [20, rightPadding, 20, leftPadding];
+        },
+        /**
+         * Clears the parcel search input and resets the selected parcel district and search geometry.
+         * @param {boolean} clearDistrict - Whether to also clear the selected parcel district.
+         */
+        clearParcelSearch (clearDistrict = false) {
+            this.parcelNumberInputValue = "";
+
+            if (clearDistrict) {
+                this.setSelectedParcelDistrict(null);
+            }
+
+            if (this.searchGeometry) {
+                this.removeSearchGeometry();
+            }
+        },
+        /**
+         * Fetches parcel search results from the OAF feature service.
+         * @async
+         * @returns {Promise<Object|null>} GeoJSON parcel data or null if an error occurs.
+         */
+        async fetchParcelSearchResults () {
+            try {
+                this.showSpinner = true;
+
+                const parcelGeoJson = await getOAFFeature.getOAFFeatureGet(this.alkisBaseUrl, "Flurstueck", {
+                    limit: 100,
+                    filterCrs: "http://www.opengis.net/def/crs/EPSG/0/25832",
+                    crs: "http://www.opengis.net/def/crs/EPSG/0/25832",
+                    filter: true,
+                    literalFilters: {gemaschl: "02" + this.selectedParcelDistrict, flstnrzae: this.parcelNumberInputValue}
+                });
+
+                return parcelGeoJson;
+            }
+            catch (error) {
+                this.setErrorMessage(this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelRequestError", {parcelNumber: this.parcelNumberInputValue}));
+                this.parcelNumberInputValue = "";
+                return null;
+            }
+            finally {
+                this.showSpinner = false;
+            }
+        },
+        /**
+         * Handles the parcel search submission by fetching parcel search results and zooming to the parcel geometry.
+         * @returns {void}
+         */
+        handleParcelSearchSubmit () {
+            this.setSearchGeometry(null);
+            this.setErrorMessage("");
+
+            this.fetchParcelSearchResults()
+                .then((parcelGeoJson) => {
+                    if (parcelGeoJson && parcelGeoJson[0]?.geometry) {
+                        const parcelGeometry = new MultiPolygon([]),
+                              parcel = parcelGeoJson[0];
+
+                        let searchGeometry;
+
+                        parcelGeometry.setCoordinates(parcel.geometry.coordinates);
+
+                        if (parcelGeometry.getPolygons().length === 1) {
+                            searchGeometry = parcelGeometry.getPolygons()[0];
+                        }
+                        else {
+                            searchGeometry = parcelGeometry.getPolygons().reduce((largest, polygon) => {
+                                if (!largest || polygon.getArea() > largest.getArea()) {
+                                    return polygon;
+                                }
+                                return largest;
+                            }, null);
+                        }
+
+                        if (!searchGeometry) {
+                            console.warn("No valid parcel geometry found.");
+                            return;
+                        }
+
+                        this.setSearchGeometry(searchGeometry);
+                        this.zoomToExtent({
+                            extent: searchGeometry.getExtent(),
+                            options: {
+                                padding: this.mapZoomToExtentPadding()
+                            }
+                        });
+                    }
+                });
+        },
+        /**
+         * Returns the translated label for an attribute key, falling back to the raw attribute name if no translation exists.
+         * @param {String} key - The attribute key to translate.
+         * @param {String} fallback - The raw attribute name to use if no translation is found.
+         * @returns {String} The translated label or the fallback value.
+         */
+        getTranslationForAttributeWrapper (key, fallback) {
+            return getTranslationForAttribute(key, fallback);
+        },
+        /**
+         * Displays a layer in the map by adding it or making it visible.
+         * If the layer doesn't exist in the layer tree, it adds it from config.json or services.json.
+         * If it exists but is hidden, it makes it visible and shows it in the layer tree.
+         * @param {String} layerId - The ID of the layer to display.
+         */
+        displayLayerInMap (layerId) {
+            const existingLayer = layerCollection.getLayerById(layerId),
+                  configJsonLayer = this.layerConfigById(layerId),
+                  servicesJsonLayer = rawLayerList.getLayerWhere({id: layerId});
+
+            if (!configJsonLayer && !servicesJsonLayer) {
+                this.addSingleAlert({
+                    content: this.$t("additional:modules.lzsResearchClient.tabs.tabSearch.loadErrors.layerConfigNotFound", {layerId}),
+                    category: "warn",
+                    once: true
+                });
+
+                return;
+            }
+
+            const archiveLayerIds = Object.keys(this.archiveLayerOriginalState),
+                  layerVisible = !(archiveLayerIds.length > 0);
+
+            if (archiveLayerIds.length > 0) {
+                archiveLayerIds.forEach(id => {
+                    this.replaceByIdInLayerConfig({
+                        layerConfigs: [{
+                            id,
+                            layer: {
+                                visibility: false,
+                                showInLayerTree: true
+                            }
+                        }]
+                    });
+                });
+            }
+
+            if (!existingLayer) {
+                if (configJsonLayer) {
+                    this.archiveLayerOriginalState[layerId] = {
+                        visibility: false,
+                        showInLayerTree: configJsonLayer.showInLayerTree
+                    };
+
+                    this.addOrReplaceLayer({layerId});
+                }
+                else if (servicesJsonLayer) {
+                    this.archiveLayerOriginalState[layerId] = {
+                        visibility: false,
+                        showInLayerTree: false
+                    };
+
+                    this.addLayerToLayerConfig({
+                        layerConfig:
+                            {...servicesJsonLayer,
+                             ...{
+                                 showInLayerTree: true,
+                                 visibility: layerVisible,
+                                 type: "layer"
+                             }
+                            },
+                        parentKey: treeSubjectsKey
+                    });
+                }
+            }
+            else if (!configJsonLayer.visibility) {
+                this.archiveLayerOriginalState[layerId] = {
+                    visibility: false,
+                    showInLayerTree: configJsonLayer.showInLayerTree
+                };
+
+                this.replaceByIdInLayerConfig({
+                    layerConfigs: [{
+                        id: layerId,
+                        layer: {
+                            visibility: layerVisible,
+                            showInLayerTree: true
+                        }
+                    }]
+                });
+
+            }
+            else {
+                this.archiveLayerOriginalState[layerId] = {
+                    visibility: true,
+                    showInLayerTree: true
+                };
+
+                this.replaceByIdInLayerConfig({
+                    layerConfigs: [{
+                        id: layerId,
+                        layer: {
+                            visibility: layerVisible,
+                            showInLayerTree: true
+                        }
+                    }]
+                });
+            }
+        },
+
+        /**
+         * Remove archive layers for all selected archives.
+         * Iterates through selected archive IDs, retrieves their layer configurations,
+         * and sets visibility and layer tree display to false.
+         * @returns {void}
+         */
+        removeArchiveLayers () {
+            this.selectedArchiveIds.forEach(archiveId => {
+                const layerConfig = this.placeholderDataClassList?.[archiveId]?.LAYERCONFIG;
+
+                if (layerConfig && layerConfig.id) {
+                    this.replaceByIdInLayerConfig({
+                        layerConfigs: [{
+                            id: layerConfig.id,
+                            layer: {
+                                visibility: this.archiveLayerOriginalState[layerConfig.id]?.visibility ?? false,
+                                showInLayerTree: this.archiveLayerOriginalState[layerConfig.id]?.showInLayerTree ?? false
+                            }
+                        }]
+                    });
+                }
+            });
+        }
+    }
+};
+</script>
+
+<template>
+    <div
+        id="TabSearch"
+        class="InnerLayoutFrame"
+    >
+        <div
+            v-if="showSpinner"
+            class="loadingSpinner"
+        >
+            <SpinnerItem
+                custom-class="spinner"
+                class="ms-3"
+            />
+        </div>
+
+        <div
+            v-else
+            class="InnerLayoutFrame"
+        >
+            <div class="FixedContent top-header switch-container">
+                <SwitchInput
+                    id="idSearchModeSwitch"
+                    class="searchModeSwitch"
+                    :aria="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchModeSwitchLabel')"
+                    :label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchModeSwitchLabel')"
+                    :checked="attributeSearchModeIsActive"
+                    :interaction="(evt) => changeSearchMode(evt.target.checked)"
+                />
+            </div>
+
+            <div class="ScrollableContent">
+                <div
+                    v-if="attributeSearchModeIsActive"
+                    id="searchFormWithAttributes"
+                    class="searchFormWithAttributes"
+                >
+                    <div :class="`archive-select-container ${selectedArchive ? 'selected' : ''}`">
+                        <label for="archive-select">
+                            {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel") }}
+                        </label>
+
+                        <Multiselect
+                            id="archive-select"
+                            v-model="selectedArchive"
+                            :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel')"
+                            :options="Object.keys(searchWithAttributeFormData)"
+                            name="archive-select"
+                            :multiple="false"
+                            :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel')"
+                            :show-labels="false"
+                            open-direction="bottom"
+                            :hide-selected="false"
+                            :allow-empty="false"
+                            :close-on-select="true"
+                            :clear-on-select="false"
+                            :internal-search="true"
+                            @select="a => setSelectedArchive(a)"
+                        >
+                            <template #option="props">
+                                <div class="attribute-option-wrapper">
+                                    <span :class="`attribute-check-icon ${props.option === selectedArchive ? 'bi bi-check2' : ''}`" />
+                                    <span>{{ props.option }}</span>
+                                </div>
+                            </template>
+
+                            <template #noResult>
+                                {{ $t('additional:modules.lzsResearchClient.multiselect.noResult') }}
+                            </template>
+
+                            <template #noOptions>
+                                {{ $t('additional:modules.lzsResearchClient.multiselect.noOptions') }}
+                            </template>
+                        </Multiselect>
+                    </div>
+
+                    <div class="searchWithAttributeForm">
+                        <InputText
+                            v-for="attribute in searchWithAttributeFormData[selectedArchive]"
+                            :id="attribute.name"
+                            :key="attribute.name"
+                            v-model="attribute.value"
+                            :class-obj="['form-control' + (attribute.errorMessage.length > 0 ? ' is-invalid': ' is-valid')]"
+                            :label="getTranslationForAttributeWrapper(attribute.labelKey, attribute.name)"
+                            :placeholder="attribute.placeholder"
+                            :error-message="attribute.errorMessage"
+                            @input="validateSearchWithAttributeForm()"
+                        />
+                    </div>
+                </div>
+
+                <div
+                    v-if="!attributeSearchModeIsActive"
+                    id="searchFormWithGeometry"
+                    class="searchFormWithGeometry"
+                >
+                    <div class="archiveYearsSelection">
+                        <div class="archiveSelection">
+                            <span>
+                                {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectArchivLabel') }}
+                            </span>
+
+                            <div
+                                class="archiveSelectionList"
+                                role="group"
+                                aria-label="archives"
+                            >
+                                <div
+                                    v-for="archive in archiveWithGeorefList"
+                                    :key="archive.id"
+                                    class="archiveCheckboxList"
+                                >
+                                    <input
+                                        :id="`archiveCheckbox-${archive.id}`"
+                                        type="checkbox"
+                                        :value="archive.id"
+                                        :checked="selectedArchiveIds.includes(archive.id)"
+                                        :disabled="bulkYearsLoading && !selectAllCancelled"
+                                        @change="onSelectedArchiveIdsChange(archive.id, $event)"
+                                    >
+
+                                    <label :for="`archiveCheckbox-${archive.id}`">
+                                        {{ archive.name }}
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="yearsSelection">
+                            <span>
+                                {{ $t('additional:modules.lzsResearchClient.tabs.tabSearch.selectYearsLabel') }}
+                            </span>
+
+                            <div
+                                class="yearsSelectionList"
+                                role="group"
+                                aria-label="years"
+                            >
+                                <div
+                                    v-for="yearObject in yearsList"
+                                    :key="yearObject.year"
+                                    class="yearCheckboxItem"
+                                >
+                                    <input
+                                        :id="`yearCheckbox-${yearObject.year}`"
+                                        type="checkbox"
+                                        :value="yearObject.year"
+                                        :checked="selectedYears.includes(yearObject.year)"
+                                        :disabled="bulkYearsLoading && !selectAllCancelled"
+                                        @change="onSelectedYearsChange(yearObject.year, $event)"
+                                    >
+
+                                    <label :for="`yearCheckbox-${yearObject.year}`">
+                                        <span>
+                                            {{ yearObject.year }}
+                                        </span>
+                                        <span>
+                                            ({{ yearObject.archiveNames.join(", ") }})
+                                        </span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="bulkYearsLoading && !selectAllCancelled"
+                            class="loadingSpinner bulkLoadingSpinner"
+                        >
+                            <SpinnerItem
+                                custom-class="spinner"
+                                class="ms-3"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="spatialSelection">
+                        <p class="spatialSelectionLabel">
+                            {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.spatialSelectionLabel") }}
+                        </p>
+
+                        <ButtonGroup
+                            :buttons="buttonGroupLevels"
+                            :pre-checked-value="selectedButtonGroup"
+                            group="spatialSelectionGroups"
+                            class="level-switch"
+                            :selected-value="selectedSpatialButtonName"
+                            @set-selected-button="setSelectedButtonGroup"
+                        />
+
+                        <div
+                            v-if="selectedButtonGroup === 'geometry'"
+                            class="spatialSelectionButtons d-flex align-items-center"
+                        >
+                            <DrawTypes
+                                :source="lzsDrawLayerSource"
+                                :current-layout="lzsCurrentLayout"
+                                :draw-types="lzsDrawTypes"
+                                :draw-icons="lzsDrawIcons"
+                                :selected-draw-type="lzsSelectedDrawType"
+                                :selected-interaction="lzsSelectedInteraction"
+                                :set-selected-draw-type="setLzsSelectedDrawType"
+                                :set-selected-interaction="setLzsSelectedInteraction"
+                                :should-emit-events="true"
+                                @drawend="onDrawEnd"
+                            />
+
+                            <div class="deleteFeature">
+                                <DrawEdit
+                                    :draw-edits="lzsDrawEdits"
+                                    :draw-icons="lzsDrawIcons"
+                                    :layer="lzsDrawLayer"
+                                    :selected-interaction="lzsSelectedInteraction"
+                                    :set-selected-interaction="setLzsSelectedInteraction"
+                                    @click="removeSearchGeometry"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            v-if="selectedButtonGroup === 'address'"
+                            class="addressSearch"
+                        >
+                            <LzsResearchClientSearchBar
+                                @set-search-geometry="setSearchGeometry"
+                            />
+                        </div>
+
+                        <div
+                            v-if="selectedButtonGroup === 'parcel'"
+                            class="spatialSelectionButtons parcelSearch d-flex flex-column"
+                        >
+                            <div class="parcelSearchInputs">
+                                <label for="parcelSearchSelect">
+                                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.selectParcelDistrictLabel") }}
+                                </label>
+
+                                <Multiselect
+                                    id="parcelSearchSelect"
+                                    v-model="selectedParcelDistrictObject"
+                                    :options="parcelDistrictOptions"
+                                    label="label"
+                                    :show-labels="false"
+                                    :searchable="true"
+                                    :multiple="false"
+                                    :close-on-select="true"
+                                    :clear-on-select="false"
+                                    :allow-empty="false"
+                                    :preserve-search="true"
+                                    :hide-selected="false"
+                                    :internal-search="true"
+                                    :disabled="districtParcelsLoading"
+                                    :loading="parcelSourceDataLoading"
+                                    :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.selectParcelDistrictPlaceholder')"
+                                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.selectParcelDistrictLabel')"
+                                    @open="() => {
+                                        if (!parcelDistrictOptions.length) {
+                                            retrieveParcelSourceData();
+                                            setErrorMessage('');
+                                        }
+                                    }"
+                                    @select="val => setSelectedParcelDistrict(val)"
+                                >
+                                    <template #option="props">
+                                        <div class="attribute-option-wrapper">
+                                            <span :class="`attribute-check-icon ${props.option.value === selectedParcelDistrictObject?.value ? 'bi bi-check2' : ''}`" />
+                                            <span>{{ props.option.label }}</span>
+                                        </div>
+                                    </template>
+
+                                    <template #noResult>
+                                        {{ $t('additional:modules.lzsResearchClient.multiselect.noResult') }}
+                                    </template>
+
+                                    <template #noOptions>
+                                        {{ $t('additional:modules.lzsResearchClient.multiselect.noOptions') }}
+                                    </template>
+                                </Multiselect>
+
+                                <label for="parcelNumber">
+                                    {{ $t("additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelNumberLabel") }}
+                                </label>
+
+                                <Multiselect
+                                    id="parcelNumber"
+                                    v-model="parcelNumberInputValue"
+                                    :disabled="!districtParcelNumbersSorted.length || districtParcelsLoading"
+                                    :options="districtParcelNumbersSorted"
+                                    :show-labels="false"
+                                    :searchable="true"
+                                    :multiple="false"
+                                    :close-on-select="true"
+                                    :clear-on-select="false"
+                                    :preserve-search="true"
+                                    :hide-selected="false"
+                                    :allow-empty="false"
+                                    :internal-search="true"
+                                    :loading="districtParcelsLoading"
+                                    :placeholder="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelNumberPlaceholder')"
+                                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.parcelSearch.parcelNumberLabel')"
+                                    @select="handleParcelSearchSubmit"
+                                >
+                                    <template #option="props">
+                                        <div class="attribute-option-wrapper">
+                                            <span :class="`attribute-check-icon ${props.option === parcelNumberInputValue ? 'bi bi-check2' : ''}`" />
+                                            <span>{{ props.option }}</span>
+                                        </div>
+                                    </template>
+
+                                    <template #noResult>
+                                        {{ $t('additional:modules.lzsResearchClient.multiselect.noResult') }}
+                                    </template>
+
+                                    <template #noOptions>
+                                        {{ $t('additional:modules.lzsResearchClient.multiselect.noOptions') }}
+                                    </template>
+                                </Multiselect>
+                            </div>
+                        </div>
+
+                        <p
+                            v-if="spatialAreaWarning"
+                            class="spatialAreaWarning"
+                        >
+                            {{ spatialAreaWarning }}
+                        </p>
+                    </div>
+                    <SwitchInput
+                        v-if="pointSelected"
+                        id="idSelectAllForPoint"
+                        name="selectAllForPoint"
+                        class="selectAllForPoint"
+                        :aria="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectAll')"
+                        :label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.selectAll')"
+                        :checked="selectAllChecked"
+                        :interaction="(evt) => toggleAllArchiveIds(evt.target.checked)"
+                    />
+                </div>
+            </div>
+
+            <div class="FixedContent buttons-footer">
+                <div
+                    class="spacer-div"
+                />
+                <FlatButton
+                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
+                    :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.searchButtonLabel')"
+                    :disabled="attributeSearchModeIsActive ? !isAttributeSearchFormValid : !isSpatialSearchFormValid"
+                    @click="startSearch()"
+                />
+
+                <FlatButton
+                    :aria-label="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
+                    :text="$t('additional:modules.lzsResearchClient.tabs.tabSearch.resetButtonLabel')"
+                    :secondary="true"
+                    @click="resetForm()"
+                />
+            </div>
+        </div>
+    </div>
+</template>
+
+<style src="vue-multiselect/dist/vue-multiselect.css"></style>
+
+<style lang="scss" scoped>
+    #TabSearch {
+        height: 100%;
+
+        div.switch-container {
+            display: flex;
+            flex-direction: column;
+            align-items: end;
+
+            .searchModeSwitch > * {
+                cursor: pointer;
+            }
+        }
+
+        div.searchFormWithAttributes {
+           div.archive-select-container {
+                margin-bottom: 1rem;
+            }
+        }
+
+        div.loadingSpinner {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255,255,255,0.7);
+            z-index: 2;
+
+            div.spinner {
+                width: 4rem;
+                height: 4rem;
+            }
+
+            p {
+                background-color: white;
+                white-space: pre-line;
+                padding: 1.5rem;
+            }
+        }
+
+        div.searchFormWithGeometry {
+            .archiveSelectionList {
+                max-height: 12.5rem;
+                overflow-y: auto;
+                border: 0.0625rem solid rgba(0,0,0,0.1);
+                padding: 0.5rem;
+                margin: 0.5rem 0 1rem 0;
+            }
+
+            .archiveCheckboxList {
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                white-space: nowrap;
+
+                > * {
+                    cursor: pointer;
+                }
+            }
+            .yearsSelection {
+                .yearsSelectionList {
+                    height: 10rem;
+                    overflow-y: auto;
+                    border: 0.0625rem solid rgba(0,0,0,0.1);
+                    padding: 0.5rem;
+                    margin: 0.5rem 0 1rem 0;
+                }
+
+                .yearCheckboxItem {
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    white-space: nowrap;
+
+                    > * {
+                        cursor: pointer;
+                    }
+                }
+            }
+            div.noCommonYearError {
+                color: $light_red;
+            }
+
+            p.spatialAreaWarning {
+                color: $light_red;
+                font-size: 0.875rem;
+                margin: 1rem;
+            }
+
+            div.spatialSelectionButtons {
+                margin-top: 1.5rem;
+                gap: 0.5rem;
+
+                div.deleteFeature {
+                    height: 2.5rem;
+
+                    :deep(hr) {
+                        display: none;
+                    }
+                }
+            }
+
+            div.parcelSearchInputs {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            div.spatialSelection {
+                .level-switch {
+                    :deep(.btn-group) {
+                        flex-wrap: wrap;
+                    }
+
+                    :deep(.btn-group .btn) {
+                        border-radius: 0;
+                        border-left: 1px solid rgba(255, 255, 255);
+                        border-right: 1px solid rgba(255, 255, 255);
+                    }
+                }
+            }
+
+            .selectAllForPoint {
+                padding-top: 1rem;
+
+                > * {
+                    cursor: pointer;
+                }
+            }
+
+            div.addressSearch {
+                margin-top: 1rem;
+                margin-left: 0.25rem;
+            }
+
+            div.archiveYearsSelection {
+                position: relative;
+
+                div.bulkLoadingSpinner {
+                    div.spinner {
+                        width: 2.5rem;
+                        height: 2.5rem;
+                    }
+                }
+            }
+        }
+
+        div.buttons-footer {
+            *:nth-child(2) {
+                margin-left: auto;
+            }
+        }
+
+        :deep(.archive-select-container), :deep(.parcelSearchInputs) {
+            &.selected {
+                .multiselect__tags {
+                    border-color: var(--bs-form-valid-border-color);
+                }
+            }
+
+            .multiselect,
+            .multiselect__input::placeholder,
+            .multiselect__option {
+                color: $black;
+                font-weight: normal;
+            }
+
+            .multiselect {
+                cursor: text;
+            }
+
+            .multiselect__option {
+                &:after,
+                &--selected,
+                &--selected:after {
+                    color: black;
+                    background: $light_grey_hover;
+                }
+
+                &--highlight,
+                &--highlight:after {
+                    color: $white;
+                    background: $secondary;
+                }
+            }
+
+            .multiselect__input:focus::placeholder {
+                color: transparent;
+            }
+
+            .attribute-option-wrapper {
+                display: flex;
+                flex-direction: row;
+                gap: 0.5rem;
+
+                .attribute-check-icon {
+                    width: 16px;
+                }
+            }
+        }
+    }
+</style>

@@ -1,0 +1,159 @@
+{
+    "modules": {
+        "lzsResearchClient": {
+            "name": "GeoDatenDepot",
+            "description": "Das Werkzeug für die einfache Recherche und den Zugang zu Geodaten in der Langzeitspeicherung.",
+            "loadingSpinnerText": {
+                "general": "Daten werden geladen. Bitte warten..."
+            },
+            "globalError": {
+                "title": "LZS: Fehler beim Initialisieren",
+                "content": "Bitte versuchen Sie es später erneut."
+            },
+            "generalErrorMessage": "Es ist ein unbekannter Fehler aufgetreten.",
+            "multiselect": {
+                "noResult": "Keine Einträge gefunden. Bitte ändern Sie den Suchbegriff.",
+                "noOptions": "Liste ist leer."
+            },
+            "tabs": {
+                "backToSearchButtonLabel": "Zurück zur Suche",
+                "tabDetails": {
+                    "label": "Details",
+                    "title": "Detailinformationen",
+                    "datasetInfoTable": {
+                        "archive": "Archiv",
+                        "datasetProtectionClass": "Datenschutzklasse"
+                    },
+                    "numberOfResults": "Anzahl der gefundenen Datensätze:",
+                    "backButtonLabel": "Zurück",
+                    "loading": "Daten werden geladen...",
+                    "previewAltText": "Vorschaubild",
+                    "fileSizeMB": "Größe (MB)",
+                    "dateityp": "Dateityp"
+                },
+                "tabSearch": {
+                    "label": "Suche",
+                    "backButtonLabel": "Zurück",
+                    "searchButtonLabel": "Suchen",
+                    "resetButtonLabel": "Zurücksetzen",
+                    "selectArchivLabel": "Archiv",
+                    "selectYearsLabel": "Jahrgang",
+                    "jahrgang": "Jahrgang",
+                    "kachelnummer": "Kachelnummer",
+                    "kachelname": "Kachelname",
+                    "gemarkung": "Gemarkung",
+                    "flur": "Flur",
+                    "blatt": "Blatt",
+                    "version": "Version",
+                    "punktkennung": "Punktkennung",
+                    "instanzkachelnummer": "Instanzkachelnummer",
+                    "nummer": "Nummer",
+                    "kilometer_quadrat": "Kilometer Quadrat",
+                    "punkt_art": "Punktart",
+                    "punkt_nummer": "Punktnummer",
+                    "auftrag_blatt_nummer": "Auftrag Blattnummer",
+                    "hamburger_karte_id": "Hamburger Karte Id",
+                    "filesizemb": "Größe (MB)",
+                    "maxValueCount": "Max. Trefferanzahl",
+                    "patternError": "Bitte eine Zahl mit {{ digitNumber }} Ziffern eingeben.",
+                    "patternErrorRange": "Bitte eine Zahl mit {{ minDigits }} bis {{ maxDigits }} Ziffern eingeben.",
+                    "numberRangeError": "Bitte eine Zahl zwischen {{ minNum }} und {{ maxNum }} eingeben.",
+                    "characterError": "Bitte nutzen Sie nur Buchstaben.",
+                    "spatialSelectionGroup": {
+                        "geometries": "eingezeichneten Gebiet",
+                        "extent": "Kartenausschnitt",
+                        "address": "Adresse",
+                        "parcel": "Flurstück"
+                    },
+                    "spatialSelectionLabel": "Suche im / nach:",
+                    "searchModeSwitchLabel": "Experten-Suchmodus",
+                    "extentWarningMessage": "Der Maßstab der Karte ist kleiner als 1:{{ scale }}. Bitte zoomen Sie näher heran, um die Suche im Kartenausschnitt zu aktivieren.",
+                    "addressSearchCancel": "Adresssuche abbrechen",
+                    "addressSearchNoResults": "Keine Ergebnisse gefunden. Bitte überprüfen Sie Ihre Eingabe oder Ihre Internetverbindung.",
+                    "geometryAreaWarningMessage": "Die Fläche der eingezeichneten Geometrie beträgt {{ area }} km². Dies überschreitet die maximal erlaubte Fläche von {{ maxArea }} km². Bitte zeichnen Sie eine kleinere Fläche, um die Suche zu aktivieren.",
+                    "parcelSearch": {
+                        "selectParcelDistrictLabel": "Gemarkung",
+                        "parcelNumberLabel": "Flurstücksnummer",
+                        "selectParcelDistrictPlaceholder": "Bitte die Gemarkung auswählen",
+                        "parcelNumberPlaceholder": "Bitte die Flurstücksnummer auswählen",
+                        "parcelNumberLoadError": "Beim Laden der Flurstücksnummern für die Gemarkung {{district}} ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                        "parcelRequestError": "Beim Abrufen der Flurstücksgeometrien für das Flurstück {{parcelNumber}} ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                        "parcelDistrictLoadError": "Beim Laden der Gemarkungen ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+                    },
+                    "selectAll": "Alles auswählen",
+                    "loadErrors": {
+                        "years": "Beim Laden der Jahrgänge für die ausgewählten Archive ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                        "singleYear": "Beim Laden der Jahrgänge für das Archiv {{ archiveName }} ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                        "layerConfigNotFound": "Layer-Konfiguration für die Layer-ID {{ layerId }} konnte nicht gefunden werden.",
+                        "search": "Beim Abrufen der Suchergebnisse ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+                    }
+                },
+                "tabResult": {
+                    "label": "Ergebnisse",
+                    "numberOfResults": "Anzahl der gefundenen Datensätze:"
+                },
+                "archiveList": {
+                    "toggleAccordions": {
+                        "openAll": "Alles aufklappen",
+                        "closeAll": "Alles zuklappen"
+                    },
+                    "selectAll": "Alles auswählen",
+                    "selectAllAriaLabel": "Alles auswählen zum Download",
+                    "groupByLabel": "Gruppieren nach",
+                    "selectOptionLabel": "Option auswählen",
+                    "selected": "{{sum}} ausgewählt (inkl. Metadaten)",
+                    "table": {
+                        "showPositionInMap": "Position des Datensatzes in der Karte anzeigen / ausblenden",
+                        "goToDetails": "Details zum Datensatz anzeigen",
+                        "showPreview": "Vorschau anzeigen",
+                        "download": "Datensatz herunterladen",
+                        "headers": {
+                            "position": "Lage",
+                            "details": "Details",
+                            "download": "Download",
+                            "preview": "Vorschau"
+                        },
+                        "loadErrors": {
+                            "position": "Beim Laden der Lage des Datensatzes ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                            "details": "Beim Laden der Details ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                            "checkedFiles": "Beim Auswählen der Dateien ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                            "checkedSingleFile": "Beim Auswählen der Datei ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut."
+                        }
+                    }
+                }
+            },
+            "zipAndDownload": {
+              "buttonText": "Download",
+              "buttonAriaLabel": "Download",
+              "progressAriaLabel": "Downloadfortschritt {{ percent }}%",
+              "withoutArchive": "unbekanntes Archiv",
+              "withoutYear": "ohne Jahrgang",
+              "metadataFolderName": "Metadaten",
+              "cancelDownloadButtonLabel": "Abbrechen",
+              "progress": {
+                "start": "Download vorbereiten ...",
+                "fetchPrimaryData": "{{ current }} von {{ total }} Dateien abgerufen ...",
+                "fetchDossierData": "Metadaten abrufen ...",
+                "downloadingFile": "{{ current }} von {{ total }} Dateien heruntergeladen ...",
+                "zipping": "Erzeuge das ZIP ...",
+                "done": "Erledigt!"
+            },
+            "errors": {
+                "fetchPrimaryData": "Beim Abrufen der Dateien ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                "fetchDossierData": "Beim Abrufen der Metadaten ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                "downloading": "Beim Herunterladen der Dateien ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                "zipping": "Beim Erstellen des ZIP-Archivs ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.",
+                "sumFileSize": "Die summierte Dateigröße ist größer als {{ maxFileSize }} (nämlich {{ sumFileSize }}). Das kann nicht auf einmal heruntergeladen werden."
+              }
+            },
+            "sumOfCheckedFiles": {
+              "progressAriaLabel": "Anteil der ausgewählten Dateien am gesamten Downloadvolumen {{ percent }}%",
+              "sumOk": "{{ currentFileSize }} von {{ maxFileSize }} ausgewählt",
+              "sumTooHigh": "Bitte wählen Sie weniger Dateien, der Download wird mit {{ currentFileSize }} zu groß!"
+            },
+            "addressSearch": {
+              "searchButtonSelect": "Auswählen"
+            }
+        }
+    }
+}

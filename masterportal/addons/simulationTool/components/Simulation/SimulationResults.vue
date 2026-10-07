@@ -4,12 +4,18 @@ import SwitchInput from "../../../../src/shared/modules/checkboxes/components/Sw
 import ConvertFeature from "../../js/convertFeatures.js";
 import ConvertStyle from "../../js/convertStyle.js";
 import CircleStyle from "ol/style/Circle.js";
+import {decodeBase64ToUint8Array} from "../../js/deserializeFlatGeobufToGeoJsonFeatureCollection.js";
+import {deserialize} from "flatgeobuf/lib/mjs/ol.js";
 import {getMappedProperty} from "../shared/js/getMappedProperty.js";
 import {Feature} from "ol";
 import FeaturesHandler from "../../../../src/modules/statisticDashboard/js/handleFeatures.js";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import Fill from "ol/style/Fill.js";
+import getOutputObjectForVariables from "../../js/getOutputObjectForVariables.js";
+import getWebglVariables from "../../js/getWebglVariables.js";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
+import Layer2dWebGLVector from "../../js/layer2dVectorWebGL.js";
+import Layer2dVector from "@core/layers/js/layer2dVector.js";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import layerFactory from "../../../../src/core/layers/js/layerFactory.js";
 import {LineString} from "ol/geom.js";
@@ -20,6 +26,7 @@ import Stroke from "ol/style/Stroke.js";
 import Style from "ol/style/Style.js";
 import Text from "ol/style/Text.js";
 import {infrastructureLayerId} from "../../layerIds.js";
+import getStyleFunctionFromDisplayOptions from "../../js/getStyleFunctionFromDisplayOptions.js";
 
 export default {
     name: "SimulationResults",
@@ -338,9 +345,10 @@ export default {
          * Creates or updates a layer with the given layerId.
          * @param {String} layerId - The ID of the layer to create or update.
          * @param {string} output - The output key.
+         * @param {Record<string, object>} displaySettings - The displaySettings object from the process configuration.
          * @returns {Object} The created or updated layer.
          */
-        createOrUpdateLayer (layerId, output) {
+        createOrUpdateLayer (layerId, output, displaySettings) {
             const existingLayer = layerCollection.getLayerById(layerId);
 
             if (existingLayer) {
@@ -370,7 +378,8 @@ export default {
                       : {
                           typ: layerType,
                           id: layerId,
-                          name: this.currentSimulation?.name || layerId
+                          name: this.currentSimulation?.name || layerId,
+                          dontInitStyle: true
                       };
 
             if (isObject(gfiAttributes)) {
@@ -381,7 +390,15 @@ export default {
                 console.warn(`No reference URL found for result layer ${layerId}.`);
             }
 
-            const layer = layerFactory.createLayer(layerAttributes);
+            if (displaySettings?.[output]?.type === "webgl") {
+                layerAttributes.variables = displaySettings[output].variables;
+                layerAttributes.style = displaySettings[output].style;
+            }
+            const layer = displaySettings?.[output]?.type === "webgl"
+                ? new Layer2dWebGLVector(layerAttributes)
+                : layerFactory.createLayer(layerAttributes);
+
+            layerCollection.addLayer(layer);
 
             this.addLayerToLayerConfig({
                 layerConfig: {
@@ -391,7 +408,7 @@ export default {
                     typ: layerType,
                     visibility: true,
                     showInLayerTree: true,
-                    transparency: 0,
+                    transparency: 40,
                     legendURL
                 },
                 parentKey: "subjectlayer"
@@ -564,110 +581,6 @@ export default {
         getMappedProperty,
 
         /**
-         * Gets a dynamic-binary style function for the display options.
-         * @param {Object} displayOptions The display options configuration for the output.
-         * @param {Object} jobResults The job results containing classification break values.
-         * @returns {Function|null} The OpenLayers style function or null.
-         */
-        getStyleFunctionFromDisplayOptions (displayOptions, jobResults) {
-            if (displayOptions?.hide) {
-                return () => null;
-            }
-
-            if (displayOptions?.type !== "dynamic-binary") {
-                console.warn(`Unsupported display option type "${displayOptions?.type}". Expected "dynamic-binary".`);
-                return null;
-            }
-
-            const properties = Array.isArray(displayOptions?.properties) ? displayOptions.properties : [],
-                  colors = displayOptions?.colors;
-
-            if (properties.length < 2) {
-                console.warn("displayOptions.properties must contain at least two entries for dynamic-binary styling.");
-                return null;
-            }
-
-            if (!Array.isArray(colors) || !colors.length || !colors.some(row => Array.isArray(row) && row.length)) {
-                console.warn("displayOptions.colors must be a non-empty 2D array for dynamic-binary styling.");
-                return null;
-            }
-
-            const [firstProperty, secondProperty] = properties,
-                  classificationBreakOutputs = displayOptions?.classificationBreakOutputs || {},
-                  firstClassificationBreakOutput = classificationBreakOutputs[firstProperty],
-                  secondClassificationBreakOutput = classificationBreakOutputs[secondProperty];
-
-            if (!firstClassificationBreakOutput || !secondClassificationBreakOutput) {
-                console.warn(`Missing classificationBreakOutputs mapping for properties "${firstProperty}" and/or "${secondProperty}".`);
-            }
-
-            const strokeColor = displayOptions?.strokeColor,
-                  strokeWidth = Number.isFinite(Number(displayOptions?.strokeWidth))
-                      ? Number(displayOptions?.strokeWidth)
-                      : 0,
-                  rowClassCount = colors.length,
-                  columnClassCount = Math.max(...colors.map(row => Array.isArray(row) ? row.length : 0), 0),
-                  maxRowIndex = Math.max(rowClassCount - 1, 0),
-                  maxColumnIndex = Math.max(columnClassCount - 1, 0);
-
-            const styleCache = colors.map(row => Array.isArray(row)
-                ? row.map(color => {
-                    if (!color) {
-                        return null;
-                    }
-                    const styleDefinition = {
-                        fill: new Fill({color})
-                    };
-
-                    if (strokeColor && strokeWidth > 0) {
-                        styleDefinition.stroke = new Stroke({
-                            color: strokeColor,
-                            width: strokeWidth
-                        });
-                    }
-
-                    return new Style(styleDefinition);
-                })
-                : []);
-
-            /**
-             * Gets the classification index for a property value.
-             * @param {String|Number} propertyValue The feature property value.
-             * @param {Number[]} classificationBreaks The classification break values.
-             * @param {Number} maxClassIndex The maximum allowed classification index.
-             * @returns {Number} The classification index between 0 and maxClassIndex.
-             */
-            function getClassificationIndex (propertyValue, classificationBreaks, maxClassIndex) {
-                const numericValue = Number(propertyValue),
-                      numericBreaks = Array.isArray(classificationBreaks) ? classificationBreaks.map(value => Number(value)).filter(value => Number.isFinite(value)) : [];
-
-                if (!Number.isFinite(numericValue) || !numericBreaks.length) {
-                    return 0;
-                }
-
-                let classificationIndex = 0;
-
-                numericBreaks.forEach((classificationBreak, index) => {
-                    if (numericValue >= classificationBreak) {
-                        classificationIndex = Math.min(index + 1, maxClassIndex);
-                    }
-                });
-
-                return classificationIndex;
-            }
-
-            return feature => {
-                const propertyValues = properties.map(property => feature.get(property)),
-                      firstClassificationBreaks = jobResults?.[firstClassificationBreakOutput]?.value || jobResults?.[firstClassificationBreakOutput],
-                      secondClassificationBreaks = jobResults?.[secondClassificationBreakOutput]?.value || jobResults?.[secondClassificationBreakOutput],
-                      firstClassificationIndex = getClassificationIndex(propertyValues[0], firstClassificationBreaks, maxRowIndex),
-                      secondClassificationIndex = getClassificationIndex(propertyValues[1], secondClassificationBreaks, maxColumnIndex);
-
-                return styleCache?.[firstClassificationIndex]?.[secondClassificationIndex] || null;
-            };
-        },
-
-        /**
          * Sets the Feature style according to the value of property.
          * @param {ol/Feature} feature - The feature.
          * @param {Object} currentStyles - The current style objects.
@@ -700,8 +613,9 @@ export default {
 
         /**
          * Shows features in map.
+         * @import {Results} from "../../types/ogcApi.processes.js"
          * @param {String} simulationId the simulation id.
-         * @param {Object} jobs - The jobs.
+         * @param {{jobResults: Results}[]} jobs - The jobs.
          * @param {String[]} outputs - The output array.
          * @returns {void}
          */
@@ -710,57 +624,73 @@ export default {
                 return;
             }
 
+            const outputObjectForVariables = getOutputObjectForVariables(jobs, this.simulationConfig?.processes);
+
             outputs.forEach(output => {
                 if (this.simulationConfig?.outputs?.[output]?.hide === true) {
                     return;
                 }
 
-                const layerId = `${simulationId}-${output}`,
-                      transmissionMode = this.simulationConfig?.outputs?.[output]?.value?.transmissionMode || "value",
-                      layer = this.createOrUpdateLayer(layerId, output),
-                      layerSource = layer.getLayerSource();
+                const layerId = `${simulationId}-${output}`;
 
-                Object.values(jobs).forEach(job => {
+                Object.values(jobs).forEach(async job => {
                     const foundProcess = this.simulationConfig?.processes.find(process => process?.id === job.jobStatus.processID) || {},
-                          styleFunction = foundProcess?.displaySettings
-                              ? this.getStyleFunctionFromDisplayOptions(foundProcess.displaySettings[output], job.jobResults)
+                          layer = this.createOrUpdateLayer(layerId, output, foundProcess.displaySettings),
+                          layerSource = layer.getLayerSource(),
+                          styleFunction = foundProcess?.displaySettings?.[output]
+                              ? getStyleFunctionFromDisplayOptions(foundProcess.displaySettings[output], job.jobResults)
                               : null;
-
-                    if (transmissionMode === "reference") {
-                        layer.layer.setStyle(styleFunction);
-                        return;
-                    }
 
                     const featuresFromJob = job.jobResults?.[output]?.value?.features || job.jobResults?.[output]?.features || [],
                           featuresToAdd = ConvertFeature.geoJsonToOpenlayers(featuresFromJob),
                           isTableMode = foundProcess?.renderingOptions?.featureRenderMode === "table";
 
-                    layerSource.clear();
                     if (isTableMode) {
                         this.processAndStylePointFeaturesForTable(layerId, layer, layerSource, featuresToAdd, simulationId, foundProcess?.renderingOptions?.attributeToShow);
                         return;
                     }
+
+                    if (layer instanceof Layer2dWebGLVector && Array.isArray(foundProcess?.displaySettings?.[output]?.spreadOutputVariables)) {
+                        layer.layer.updateStyleVariables(getWebglVariables(outputObjectForVariables[output]));
+                    }
+                    else if (layer instanceof Layer2dVector && typeof styleFunction === "function") {
+                        layer.setStyle(styleFunction);
+                    }
+
+                    const transformFromWGS84To = foundProcess.displaySettings?.[output]?.transformFromWGS84to;
+
                     featuresToAdd?.forEach(feature => {
                         feature.set("simulationId", simulationId);
 
-                        if (typeof styleFunction === "function") {
-                            const style = styleFunction(feature);
-
-                            feature.setStyle(style);
+                        if (transformFromWGS84To) {
+                            feature.getGeometry().transform("EPSG:4326", transformFromWGS84To);
                         }
-                        else {
+
+                        if (foundProcess?.displaySettings?.[output]?.type === "webgl" || typeof styleFunction === "function") {
+                            return;
+                        }
+
+                        if (typeof styleFunction !== "function") {
                             this.setFeatureStyle(feature, job.resultStyle);
                         }
                     });
                     layerSource.addFeatures(featuresToAdd);
-                });
 
-                if (!this.layers.some(existingLayer => existingLayer?.get?.("id") === layerId)) {
-                    this.layers.push(layer);
-                }
-                if (!layerCollection.getLayerById(layerId)) {
-                    layerCollection.addLayer(layer);
-                }
+                    if (job.jobResults[output].mediaType === "application/flatgeobuf" && job.jobResults[output].encoding === "base64") {
+                        const blob = decodeBase64ToUint8Array(job.jobResults[output].value);
+
+                        for await (const feature of deserialize(blob)) {
+                            layerSource.addFeature(feature);
+                        }
+                    }
+
+                    if (!this.layers.some(existingLayer => existingLayer.get("id") === layerId)) {
+                        this.layers.push(layer);
+                    }
+                    if (!layerCollection.getLayerById(layerId)) {
+                        layerCollection.addLayer(layer);
+                    }
+                });
             });
             this.setCurrentOutput(outputs[0]);
         },
@@ -1040,37 +970,42 @@ export default {
                 v-if="worstJobStatusTag === 'successful'"
                 class="result-output-container"
             >
-                <h5
-                    class="mb-2"
-                >
-                    {{ $t('additional:modules.tools.simulationTool.showResults') }}
-                </h5>
-                <div
-                    class="list-group list-group-flush mt-3"
-                >
-                    <div
-                        v-for="output in outputs"
-                        :key="output"
-                        class="form-check list-group-item list-group-item-action"
-                        :class="output === currentOutput ? 'selected-ouput' : ''"
+                <template v-if="outputs.length >= 2">
+                    <h5
+                        class="mb-2"
                     >
-                        <input
-                            :id="output"
-                            :value="output"
-                            class="form-check-input d-flex justify-content-between align-items-center"
-                            type="radio"
-                            :checked="output === currentOutput"
-                            @input="setCurrentOutput(output)"
+                        {{ $t('additional:modules.tools.simulationTool.showResults') }}
+                    </h5>
+                    <div
+                        class="list-group list-group-flush mt-3"
+                    >
+                        <div
+                            v-for="output in outputs"
+                            :key="output"
+                            class="form-check list-group-item list-group-item-action"
+                            :class="output === currentOutput ? 'selected-ouput' : ''"
                         >
-                        <label
-                            class="form-check-label d-flex justify-content-between align-items-center"
-                            :for="output"
-                        >
-                            {{ getMappedProperty(output, simulationConfig?.outputs?.propertiesMapping) }}
-                        </label>
+                            <input
+                                :id="output"
+                                :value="output"
+                                class="form-check-input d-flex justify-content-between align-items-center"
+                                type="radio"
+                                :checked="output === currentOutput"
+                                @input="setCurrentOutput(output)"
+                            >
+                            <label
+                                class="form-check-label d-flex justify-content-between align-items-center"
+                                :for="output"
+                            >
+                                {{ getMappedProperty(output, simulationConfig?.outputs?.propertiesMapping) }}
+                            </label>
+                        </div>
                     </div>
-                </div>
-                <div class="form-check form-switch mt-2">
+                </template>
+                <div
+                    v-if="Object.keys(tableFeaturesCollection).length"
+                    class="form-check form-switch mt-2"
+                >
                     <SwitchInput
                         id="showTextFeatures"
                         :checked="showTextFeatures"

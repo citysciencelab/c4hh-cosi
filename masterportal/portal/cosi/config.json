@@ -1030,6 +1030,19 @@
             ]
           },
           {
+            "name": "Simulation",
+            "icon": "bi-folder-plus",
+            "type": "folder",
+            "description": "Tools für die Planung und Simulation von Szenarien",
+            "elements": [
+              {
+                "type": "scenarioBuilder",
+                "name": "Szenarien planen",
+                "icon": "bi-boxes"
+              }
+            ]
+          },
+          {
             "name": "Werkzeuge",
             "icon": "bi-folder-plus",
             "type": "folder",

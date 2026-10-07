@@ -206,12 +206,12 @@ docker build -f deploy/Dockerfile -t cosi-portal:<tag> .   # context = repo root
 
 The build is **heavy** (full layered npm install of Masterportal + COSI addon,
 then a Vite production build). Suggested tagging: by Masterportal+COSI version,
-e.g. `cosi-portal:mp3.23.0-cosi1.2.0`, plus `:latest`. If/when we host a fork
+e.g. `cosi-portal:mp3.27.0-cosi1.2.0`, plus `:latest`. If/when we host a fork
 (BACKLOG §2.5), publish to GHCR (`ghcr.io/<org>/cosi-portal`) from CI so servers
 pull a prebuilt image instead of building on the box.
 
 `ARG MASTERCODE_VERSION_FOLDER` names the `mastercode/<version>` asset folder;
-left empty (the default) the build stamps a fresh `3_23_0_<UTC timestamp>` into
+left empty (the default) the build stamps a fresh `3_27_0_<UTC timestamp>` into
 it. That name must stay unique per build — nginx serves `/mastercode/` as
 `immutable` for 30 days, so it is the only cache key there is. With a constant
 name a browser keeps the previous `masterportal.js` and pairs it with newly

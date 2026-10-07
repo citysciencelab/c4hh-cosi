@@ -149,7 +149,9 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
             wrapper.setData({initialRules: [{value: "rule1", startup: true}]});
             await wrapper.vm.$nextTick();
 
-            expect(wrapper.findAllComponents({name: "FlatButton"}).length).to.be.equal(2);
+            expect(wrapper.findAllComponents({name: "FlatButton"})
+                .filter(component => component?.element?.id === "resetButton")[0].exists()
+            ).to.be.true;
         });
         it("should have a loading spinner", () => {
             wrapper = shallowMount(LayerFilterSnippet, {
@@ -819,16 +821,15 @@ describe("src/modules/filter/components/LayerFilterSnippet.vue", () => {
         });
 
         describe("paging", () => {
-            it("should show stop button if paging  was set", async () => {
+            it("should show progressbar if paging  was set", async () => {
                 await wrapper.setData({
                     paging: {
                         page: 1,
                         total: 46
-                    },
-                    showStop: true
+                    }
                 });
 
-                expect(wrapper.find(".btn-secondary").exists()).to.be.true;
+                expect(wrapper.findComponent({name: "ProgressBar"}).exists()).to.be.true;
             });
         });
 

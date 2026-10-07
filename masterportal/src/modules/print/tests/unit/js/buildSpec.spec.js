@@ -1632,6 +1632,16 @@ describe("src/modules/print/js/buildSpec", function () {
             expect(buildSpec.buildPointStyleIcon(style, vectorLayer)).to.be.an("object");
             expect(buildSpec.buildPointStyleIcon(style, vectorLayer).type).to.be.eql("point");
         });
+
+        it("do not fail if size is null", function () {
+            style = {
+                getSize: () => null,
+                getSrc: () => sinon.stub()
+            };
+            sinon.stub(buildSpec, "buildGraphicPath");
+            expect(buildSpec.buildPointStyleIcon(style, vectorLayer)).to.be.an("object");
+            expect(buildSpec.buildPointStyleIcon(style, vectorLayer).type).to.be.eql("point");
+        });
     });
     describe("buildGraphicPath", function () {
         it("should return a url", function () {

@@ -146,6 +146,94 @@ describe("addons/storyCreator/components/StoryCreatorAddFeatureCard.vue", () => 
         });
     });
 
+    describe("Watch", () => {
+        it("should load the linked feature content in edit mode", () => {
+            const initialContent = {
+                attrs: {
+                    attributes: {
+                        name: "Existing feature"
+                    },
+                    coordinate: [10, 20],
+                    description: "Existing description",
+                    featureId: "feature-1",
+                    layerId: "layer-1",
+                    title: "Existing title",
+                    zoomlevel: 8
+                }
+            };
+
+            wrapper = shallowMount(StoryCreatorAddFeatureCard, {
+                global: {
+                    plugins: [store]
+                },
+                props: {
+                    chapterZoomLevel: 1,
+                    isEditMode: true,
+                    selectedLayers: [{layerId: "layer-1"}],
+                    initialContent
+                }
+            });
+
+            expect(wrapper.vm.attributes).to.deep.equal({
+                name: "Existing feature"
+            });
+            expect(wrapper.vm.coordinate).to.deep.equal([10, 20]);
+            expect(wrapper.vm.description).to.equal("Existing description");
+            expect(wrapper.vm.featureId).to.equal("feature-1");
+            expect(wrapper.vm.layerId).to.equal("layer-1");
+            expect(wrapper.vm.title).to.equal("Existing title");
+            expect(wrapper.vm.zoomlevel).to.equal(8);
+        });
+
+        it("should not replace the linked feature when gfi features change in edit mode", async () => {
+            const initialContent = {
+                attrs: {
+                    attributes: {
+                        name: "Stored feature"
+                    },
+                    coordinate: [10, 20],
+                    title: "Stored title",
+                    layerId: "layer-1"
+                }
+            };
+
+            wrapper = shallowMount(StoryCreatorAddFeatureCard, {
+                global: {
+                    plugins: [store]
+                },
+                props: {
+                    chapterZoomLevel: 1,
+                    isEditMode: true,
+                    initialContent
+                }
+            });
+
+            const originalAttributes = wrapper.vm.attributes;
+            const originalTitle = wrapper.vm.title;
+
+            await wrapper.setData({
+                currentFeature: {
+                    getLayerId: () => "layer-2",
+                    getProperties: () => ({
+                        name: "Newly selected feature"
+                    }),
+                    getId: () => "feature-2"
+                }
+            });
+
+            await wrapper.vm.$options.watch.gfiFeatures.handler.call(wrapper.vm, [{
+                getLayerId: () => "layer-2",
+                getProperties: () => ({
+                    name: "Newly selected feature"
+                }),
+                getId: () => "feature-2"
+            }]);
+
+            expect(wrapper.vm.attributes).to.equal(originalAttributes);
+            expect(wrapper.vm.title).to.equal(originalTitle);
+        });
+    });
+
     describe("Methods", () => {
         describe("getTitle", () => {
             it("should return the default title", () => {

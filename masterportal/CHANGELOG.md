@@ -4,21 +4,40 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
-## Unreleased - in development
-### __Breaking Changes__
+## 2026-10-07 v3.27.0 (LTS)
 
 ### Added
+- LinechartItem: Added possibility to configure custom plugins to extend Chart.js default behaviour.
 - WFS-T: Added configurable per-field input validation on single insert and update, configurable in the layer's `gfiAttributes`.
+- Login: Added the `openLoginWindowOnLoad` config option to open the login popup automatically for unauthenticated users.
+- The following packages have been added:
+    - dependencies:
+        - "dompurify": "^3.4.15"
+- AlertingItem: Added HTML sanitation via DOMPurify to prevent Cross-Site Scripting when rendering alerts.
 
 ### Changed
-
-### Deprecated
-
-### Removed
+- Issue \#1654: Relaxed the strict ISO8601 unit validation for WMS-Time layers to a console warning. This enables support for alternative time units.
+- The following packages have been updated:
+    - dependencies:
+        - @masterportal/masterportalapi: 2.63.0 to 2.64.0 (This also raised ol to version 10.10.0)
 
 ### Fixed
 - Issue \#1655: Menu modules now keep their own configuration when multiple modules of the same type are defined in config.json. LayerSlider and Filter no longer reuse the last configured instance.
+- Issue \#1656: Fixed GetFeatureInfo popups for multiple visible WMS layers.
+- Issue \#1658: Share View now filters all available legacy URL parameters.
+- Issue \#1662: Fixed Routing Tool to work correctly with Umlauts.
+- Issue \#1665: Fixed an issue with URL encoding in the search function for BKG routing.
 - Accessibility: Fixed accessibility issues across layer tree and controls (label associations, icon-button naming, ARIA semantics, and preview alt text).
+- AlertingItem: Fixed CSS Regression.
+- Security: XML injection in `highlightFeaturesByAttribute` is prevented by escaping.
+- Print: Fixed printing of vector layers with icon styling may fail if the icon image has not yet been loaded at the time of serialization.
+
+---
+
+## 2026-09-11 v3.26.1
+
+### Changed
+- Build: Added plugin to remove rolldown-runtime.js from index.html
 
 ---
 
@@ -33,7 +52,9 @@
 - Readme: Information and link to issues in opencode added.
 - Security: Updated SECURITY.md to direct vulnerability reports to a private email address instead of the public issue tracker, and added a corresponding note in the README.
 - Alerting: Added first-open alerts for modules via `config.js` (`alerting.moduleOpenAlerts`).
-- WFS-T: Added a loading spinner while fetching features (disabling interactions). The selected layer can automatically activate in the layer tree and restore on exit. Configurable via `showLayerLoader` and `activateLayerInTree`.
+- WFS-T: 
+    - Added a loading spinner while fetching features (disabling interactions). The selected layer can automatically activate in the layer tree and restore on exit. Configurable via `showLayerLoader` and `activateLayerInTree`.
+    - Added new config `lockedFields` to disable the edit capability for specific fields via config.json.
 
 ### Changed
 - GFI: In the gfiTheme `sensor`, replaced navigation pills with the shared NavTab component.

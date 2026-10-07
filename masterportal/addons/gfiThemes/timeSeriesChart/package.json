@@ -1,0 +1,16 @@
+{
+  "name": "timeSeriesChart",
+  "version": "0.1.0",
+  "description": "GFI Theme to visualize time series statistics",
+  "title": "Time Series Chart",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://bitbucket.org/geowerkstatt-hamburg/addons.git"
+  },
+  "scripts": {},
+  "dependencies": {
+    "pdfmake": "^0.2.6",
+    "vue-slider-component": "^4.1.0-beta.7"
+  }
+}

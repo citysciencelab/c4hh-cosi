@@ -23,6 +23,8 @@ export default {
                 {category: "elements", name: "text", icon: "bi-type", action: "text"},
                 {category: "elements", name: "feature", icon: "bi-geo-alt-fill", action: "feature"},
                 {category: "elements", name: "separator", icon: "bi-dash-lg", action: "divider"},
+                {category: "elements", name: "draw", icon: "bi-bezier", action: "draw"},
+                {category: "elements", name: "write", icon: "bi bi-fonts", action: "write"},
                 {category: "media", name: "image", icon: "bi-image", action: "image"},
                 {category: "media", name: "video", icon: "bi-play-btn", action: "video"}
             ]

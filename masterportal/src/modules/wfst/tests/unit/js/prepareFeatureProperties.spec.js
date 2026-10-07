@@ -223,4 +223,47 @@ describe("src/modules/wfst/js/prepareFeatureProperties.js", () => {
         expect(consoleErrorStub.calledOnce).to.be.true;
         expect(consoleErrorStub.calledWith(expectedError)).to.be.true;
     });
+
+    it("should set disabled true on all fields if lockedFields is 'all'", async () => {
+        exampleLayerInformation.gfiAttributes = "showAll";
+        receivePossiblePropertiesStub.resolves(exampleProperties);
+
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, undefined, "all");
+
+        properties.forEach(property => {
+            expect(property.disabled).to.be.true;
+        });
+    });
+
+    it("should set disabled false on all fields if lockedFields is 'none'", async () => {
+        exampleLayerInformation.gfiAttributes = "showAll";
+        receivePossiblePropertiesStub.resolves(exampleProperties);
+
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, undefined, "none");
+
+        properties.forEach(property => {
+            expect(property.disabled).to.be.false;
+        });
+    });
+
+    it("should set disabled correctly if lockedFields is an Array", async () => {
+        exampleLayerInformation.gfiAttributes = "showAll";
+        receivePossiblePropertiesStub.resolves(exampleProperties);
+
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, undefined, ["name", "nummer"]);
+
+        expect(properties.find(p => p.key === "name").disabled).to.be.true;
+        expect(properties.find(p => p.key === "nummer").disabled).to.be.true;
+        expect(properties.find(p => p.key === "bemerkung").disabled).to.be.false;
+    });
+
+    it("should set disabled correctly if lockedFields is an Object", async () => {
+        exampleLayerInformation.gfiAttributes = "showAll";
+        receivePossiblePropertiesStub.resolves(exampleProperties);
+
+        const properties = await prepareFeatureProperties.prepareFeatureProperties(exampleLayerInformation, undefined, {[exampleLayerInformation.id]: ["name"]});
+
+        expect(properties.find(p => p.key === "name").disabled).to.be.true;
+        expect(properties.find(p => p.key === "nummer").disabled).to.be.false;
+    });
 });

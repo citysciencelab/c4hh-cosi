@@ -148,16 +148,15 @@ export default {
                     }
 
                     const pendingEntries = Object.entries(simulation.jobs)
-                        .map(([jobId, job], index) => ({
+                        .map(([jobId, job]) => ({
                             job,
                             jobId,
-                            processConfig: simulationConfig.processes[index]
+                            processConfig: simulationConfig.processes.find(
+                                process => process.id === job.jobStatus.processID
+                            )
                         }))
-                        .filter(({job, processConfig}) => {
-                            return pendingStatuses.has(job?.jobStatus?.status)
-                                && isObject(processConfig)
-                                && processConfig.url
-                                && processConfig.id;
+                        .filter(({job}) => {
+                            return pendingStatuses.has(job?.jobStatus?.status);
                         });
 
                     if (!pendingEntries.length) {
@@ -168,7 +167,8 @@ export default {
                         jobs: pendingEntries.map(({job}) => job),
                         jobIds: pendingEntries.map(({jobId}) => jobId),
                         processConfigs: pendingEntries.map(({processConfig}) => processConfig),
-                        simulationConfig
+                        simulationConfig,
+                        planningScenario: scenario
                     }));
                 });
             });
@@ -212,7 +212,7 @@ export default {
 </script>
 
 <template>
-    <div id="tool-simulationTool">
+    <div id="simulationTool">
         <div class="content">
             <HomePanel
                 v-if="mode === 'home-panel'"
@@ -270,7 +270,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-    #tool-simulationTool {
+    #simulationTool {
         overflow: hidden;
         display: flex;
         flex: 1;

@@ -1,8 +1,6 @@
 {
   "modules": {
     "storyCreator": {
-      "storyNav": "Story",
-      "chapterNav": "Kapitel",
       "autosaveHint": "Die Änderung wurde automatisch gespeichert.",
       "title": "Story Creator",
       "addChapter": "Kapitel hinzufügen",
@@ -14,6 +12,10 @@
       "readOnly": "schreibgeschützt",
       "previewNav": "Story-Vorschau",
       "introText": "Dieses Werkzeug dient der Erstellung interaktiver, kartenbasierter Geschichten. Nach der Eingabe der allgemeinen Informationen, wie Name, Beschreibung, Autor und Titelbild, können darunter die einzelnen Kapitel flexibel hinzugefügt werden. Über die Schaltflächen am Seitenende lässt sich die Story in der Vorschau prüfen, speichern oder verwerfen.",
+      "breadcrumb": {
+        "storyNav": "Story",
+        "chapterNav": "Kapitel"
+      },
       "labels": {
         "storyname": "Story-Name",
         "storyTitle": "Story-Namen eingeben",
@@ -37,22 +39,52 @@
         "videoAccessibleText": "Text für Barrierefreiheit",
         "imageRequiredAlt": "Ein Alternativ-Text zur barrierefreien Bildbeschreibung fehlt.",
         "imageRequiredCopyright": "Es ist eine Urheberrechtsangabe erforderlich.",
-        "imageRequiredFields": "Erforderliche Felder müssen ausgefüllt sein."
+        "imageRequiredFields": "Erforderliche Felder müssen ausgefüllt sein.",
+        "annotationText": "Hinweistext",
+        "regular": "Regular",
+        "bold": "Fett",
+        "italic": "Kursiv",
+        "backgroundColor": "Hintergrundfarbe",
+        "backgroundOpacity": "Transparenz",
+        "textColor": "Textfarbe",
+        "fontSize": "Schriftgröße",
+        "fontStyle": "Schriftstil",
+        "lineColor": "Linienfarbe",
+        "lineWidth": "Linienstärke",
+        "lineType": "Linienart",
+        "annotations": "Beschriftungselemente"
       },
       "buttons": {
           "confirm": "Übernehmen",
           "discardImage": "Bild verwerfen",
           "discardStory": "Story verwerfen",
           "discardChanges": "Änderungen verwerfen",
-          "discardVideo": "Video verwerfen"
+          "discardVideo": "Video verwerfen",
+          "saveDraw": "Zeichnung speichern",
+          "discardDraw": "Zeichnung verwerfen",
+          "edit": "Bearbeiten",
+          "saveAnnotations": "Beschriftung speichern",
+          "discardAnnotations": "Beschriftung verwerfen",
+          "text": "Text",
+          "arrow": "Pfeil",
+          "line": "Linie"
       },
       "headlines": {
+        "addDrawings": "Neue Zeichnungen hinzufügen",
         "addImages": "Neues Bild hinzufügen",
+        "addMapAnnotations": "Neue Kartenbeschriftung hinzufügen",
         "addTexts": "Neuen Text hinzufügen",
         "addVideo": "Neues Video hinzufügen",
         "chapterList": "Übersicht der Kapitel",
         "addImageTitle": "Neues Titelbild hinzufügen",
-        "coverOfStory": "Titelbild der Story"
+        "coverOfStory": "Titelbild der Story",
+        "addDraw": "Auf Karte zeichnen",
+        "drawnObjects": "Gezeichnete Objekte",
+        "mapContent": "Karteninhalte",
+        "drawing": "Zeichnung(en)",
+        "text": "Texteinstellungen",
+        "background": "Hintergrund",
+        "line": "Hinweislinie"
       },
       "chapter": {
         "editChapter": "Kapitel bearbeiten",
@@ -78,7 +110,14 @@
         "layerListPlaceholder": "Layer auswählen...",
         "noFeatureLinked": "Kein Feature verknüpft",
         "noSubjectLayerHint": "Bitte Fachdaten auswählen um ein Feature verknüpfen zu können.",
-        "addFeatureDescription": "Durch Klicken auf ein Feature in der Karte wird dieses mit dem aktuellen Kapitel verbunden. Es lassen sich zusätzliche Informationen hinzufügen und festlegen, welche Attribute später im Info-Popup sichtbar sind."
+        "addFeatureDescription": "Durch Klicken auf ein Feature in der Karte wird dieses mit dem aktuellen Kapitel verbunden. Es lassen sich zusätzliche Informationen hinzufügen und festlegen, welche Attribute später im Info-Popup sichtbar sind.",
+        "removeColor": "Farbe entfernen",
+        "black": "schwarz",
+        "darkgrey": "dunkelgrau",
+        "red": "rot",
+        "green": "grün",
+        "orange": "orange",
+        "blue": "blau"
       },
       "addElementDropdown": {
         "categories": {
@@ -90,7 +129,9 @@
           "feature": "Feature verknüpfen",
           "separator": "Trennlinie",
           "image": "Bild",
-          "video": "Video"
+          "video": "Video",
+          "draw": "Zeichnen",
+          "write": "Schreiben"
         },
         "feature": {
           "title": "Überschrift (max. 200 Zeichen)",
@@ -101,6 +142,12 @@
           "cancel": "Feature verwerfen",
           "save": "Feature verknüpfen",
           "info": "Im Abspielmodus erscheint ein Button im Kapitel. Ein Klick darauf zentriert die Karte auf das verknüpfte Objekt und öffnet das Info-Popup."
+        },
+        "draw": {
+          "freeForm": "Fläche",
+          "rectangle": "Rechteck",
+          "circle": "Kreis",
+          "line": "Linie"
         }
       }
     }

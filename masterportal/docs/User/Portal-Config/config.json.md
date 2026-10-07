@@ -4793,6 +4793,7 @@ When editing properties of a feature / adding properties to a new feature, the a
 |update|no|[TransactionConfig](#portalconfigmenusectionsmoduleswfsttransactionconfig)/Boolean|false|Defines which layers of `layerIds` allow update transactions.|false|
 |multiUpdate|no|[multiUpdate](#portalconfigmenusectionsmoduleswfstmultiupdate)[]|[]|Defines which layers allow multiple features to be updated at once.|false|
 |featurePropertiesValues|no|[featurePropertiesValues](#portalconfigmenusectionsmoduleswfstfeaturepropertiesvalues)[]|[]|Set default value for properties of WFS features.|false|
+|lockedFields|no|String[]|"none"|Defines which fields of the WFS-T form should be locked (read-only). Supports "all", "none", an array of field names (applies to all layers), or an object (keys of the object correspond to the layer IDs, values are arrays of field names to lock, e.g., `{"layerId1": ["lockedField1", "lockedField2"]}`).|false|
 
 **Example**
 
@@ -4849,7 +4850,10 @@ When editing properties of a feature / adding properties to a new feature, the a
             "key":"category",
             "value":"my category"
         }
-    ]
+    ],
+    "lockedFields": {
+        "1234": ["lockedField1", "lockedField2"]
+    }
 }
 ```
 

@@ -213,6 +213,31 @@ describe("src/modules/modules/wfst/components/WfsTransaction.vue", () => {
         expect(wrapper.find("#tool-wfs-transaction-form-input-dateAtt").attributes().type).to.equal("date");
         expect(wrapper.find(".tool-wfs-transaction-form-buttons").exists()).to.be.true;
     });
+    it("renders disabled inputs if property.disabled is true", async () => {
+        exampleLayerOne.visibility = true;
+        store.commit("Modules/Wfst/setLayerIds", layerIds);
+        store.commit("Modules/Wfst/setLayerInformation", [exampleLayerOne, exampleLayerTwo]);
+        store.commit("Modules/Wfst/setSelectedInteraction", "insert");
+        store.commit("Modules/Wfst/setFeatureProperties", [
+            {
+                label: "lockedAtt",
+                key: "lockedAtt",
+                value: null,
+                type: "string",
+                required: false,
+                disabled: true
+            }
+        ]);
+
+        wrapper = shallowMount(WfsTransaction, {
+            global: {
+                plugins: [store]
+            }});
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find("#tool-wfs-transaction-form-input-lockedAtt").exists()).to.be.true;
+        expect(wrapper.find("#tool-wfs-transaction-form-input-lockedAtt").attributes().disabled).to.not.be.undefined;
+    });
     it("initializeLayers - all visible", () => {
         exampleLayerOne.visibility = true;
         exampleLayerTwo.visibility = true;

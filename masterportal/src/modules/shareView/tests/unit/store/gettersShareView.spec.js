@@ -2,6 +2,11 @@ import {expect} from "chai";
 import sinon from "sinon";
 import getters from "@modules/shareView/store/gettersShareView.js";
 import shareViewState from "@modules/shareView/store/stateShareView.js";
+import {legacyLayerUrlParams} from "@core/layers/js/layerUrlParams.js";
+import {legacyMapUrlParams} from "@core/maps/js/mapUrlParams.js";
+import {legacyMenuUrlParams} from "@modules/menu/js/menuUrlParams.js";
+import {legacyGlobalUrlParams} from "@core/urlParams/js/globalUrlParams.js";
+import {legacySearchBarUrlParams} from "@modules/searchBar/js/searchBarUrlParams.js";
 
 describe("src/modules/shareView/store/gettersShareView.js", () => {
     let rootGetters,
@@ -10,13 +15,14 @@ describe("src/modules/shareView/store/gettersShareView.js", () => {
     const testLocation = "https://test.de/app.html?existingKey=existingValue&layerids=abc123";
 
     beforeEach(() => {
+
         rootGetters = {
             layerUrlParams: [
                 {id: "layer1", visibility: true},
                 {id: "highlight_point_layer", visibility: true, isDynamic: true},
                 {id: "layer2", visibility: false}
             ],
-            "Maps/urlParams": "zoom=5&center=10,10",
+            "Maps/urlParams": "MARKER=565874,5934140&ZOOMTOFEATUREID=18,26",
             "Menu/urlParams": {
                 main: {
                     currentComponent: shareViewState.type,
@@ -76,15 +82,37 @@ describe("src/modules/shareView/store/gettersShareView.js", () => {
     });
 
     it("should filter out legacy URL parameters", () => {
-        global.location.search = "?layerids=abc123&visibility=true&transparency=50&map/mdid=xyz456&existingKey=testValue";
+        const expectedLegacyKeys = [
+            ...Object.keys(legacyLayerUrlParams),
+            ...Object.keys(legacyMapUrlParams),
+            ...Object.keys(legacyMenuUrlParams),
+            ...Object.keys(legacyGlobalUrlParams),
+            ...Object.keys(legacySearchBarUrlParams)
+        ].map(key => key.toLowerCase());
+
+        const legacyParamPairs = expectedLegacyKeys.map((key, i) => `${key}=value${i}`).join("&");
+
+        global.location.search = `?${legacyParamPairs}&existingKey=testValue`;
 
         const url = getters.url({}, {}, {}, rootGetters),
-            parsed = new URL(url),
-            legacyKeys = ["layerids", "visibility", "transparency", "map/mdid"];
+            parsed = new URL(url);
 
-        legacyKeys.forEach(key => {
+        expectedLegacyKeys.forEach(key => {
             expect(parsed.searchParams.has(key)).to.be.false;
         });
+
+        expect(parsed.searchParams.get("existingKey")).to.equal("testValue");
+    });
+
+    it("should filter out legacy URL parameters regardless of casing", () => {
+        global.location.search = "?LAYERIDS=abc&Visibility=true&TRANSPARENCY=50&existingKey=testValue";
+
+        const url = getters.url({}, {}, {}, rootGetters),
+            parsed = new URL(url);
+
+        expect(parsed.searchParams.has("LAYERIDS")).to.be.false;
+        expect(parsed.searchParams.has("Visibility")).to.be.false;
+        expect(parsed.searchParams.has("TRANSPARENCY")).to.be.false;
 
         expect(parsed.searchParams.get("existingKey")).to.equal("testValue");
     });

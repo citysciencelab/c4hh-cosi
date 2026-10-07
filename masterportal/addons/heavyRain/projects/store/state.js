@@ -6,6 +6,14 @@
  * @property {String} name - Displayed as title.
  * @property {String} icon - Icon next to title.
  * @property {Object[]} criteria - The criteria with the color in lists.
+ * @property {Object} currentProject - The current object.
+ * @property {Object} currentView - The current tab.
+ * @property {String[]} allowedFileExtensions - File extensions which can be uploaded to a project.
+ * @property {Number} maxFileSize - Maximum size of an uploaded file in bytes.
+ * @property {String} wfstAttributes - Names of the attributes of the feature type "starkregenprojekte".
+ * @property {String} wfstGeometryName - Name of the geometry attribute. It is written after all other attributes, as it is the last element of the schema..
+ * @property {String} wfstDateFormat - Format in which date attributes are sent to the service..
+ * @property {String} wfstLayerId - Id of the WFS-T layer the projects are written to. It is shown on the map when the module is opened.
  */
 const state = {
     id: "projects",
@@ -46,7 +54,29 @@ const state = {
             "color": "#007A33"
         }
     ],
-    currentView: "main"
+    currentProject: undefined,
+    currentView: "main",
+    allowedFileExtensions: ["pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "odt", "ods", "odp", "txt", "csv", "png", "jpg", "jpeg", "gif", "webp"],
+    maxFileSize: 1024 * 1024,
+    wfstAttributes: {
+        projectName: "projektname",
+        creator: "initiator",
+        startDate: "baubeginn",
+        endDate: "bauende",
+        source: "quelle",
+        contactPerson: "ansprechpartner",
+        lastUpdate: "letzte_aktualisierung",
+        description: "art_der_massnahme",
+        contactExt: "kontakt_extern",
+        infoLink: "info_link",
+        criteria: "kriterien",
+        file: "datei_bild",
+        history: "historie",
+        protectedAreas: "schutzniveau"
+    },
+    wfstGeometryName: "geom",
+    wfstDateFormat: "YYYY-MM-DD",
+    wfstLayerId: "36016"
 };
 
 export default state;

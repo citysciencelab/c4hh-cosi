@@ -2,11 +2,12 @@ import store from "@appstore/index.js";
 import processUrlParams from "@shared/js/utils/processUrlParams.js";
 
 const searchBarUrlParams = {
-        QUERY: setQueryToSearchInput
-    },
-    legacySearchBarUrlParams = {
-        "SEARCH/QUERY": setQueryToSearchInput
-    };
+    QUERY: setQueryToSearchInput
+};
+
+export const legacySearchBarUrlParams = {
+    "SEARCH/QUERY": setQueryToSearchInput
+};
 
 /**
  * Process the searchBar url params.

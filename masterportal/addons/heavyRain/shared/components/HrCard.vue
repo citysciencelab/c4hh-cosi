@@ -35,7 +35,7 @@ export default {
                 {{ title }}
             </h5>
             <div class="card-text pe-5 pb-5">
-                <slot />
+                <slot name="card" />
             </div>
             <div class="position-absolute bottom-0 end-0 p-3">
                 <IconButton

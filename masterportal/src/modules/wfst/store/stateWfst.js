@@ -25,6 +25,7 @@
  * @property {Boolean} activateLayerInTree Whether the currently selected layer is automatically activated in the layer tree and restored to its original state on switch or leave.
  * @property {Boolean} layerLoading Flag if the currently selected layer is loading its features.
  * @property {(Object|null)} managedLayer Original layer tree state of the layer activated by this module, used to restore it.
+ * @property {("all"|"none"|String[]|Object)} lockedFields Configuration for fields that should be disabled/locked in the form.
  * @property {Number} currentLayerIndex Index of the currently selected layer.
  * @property {FeatureProperty[]} featureProperties Possible properties to be set on a feature for the current layer.
  * @property {featurePropertiesBatch[]} featurePropertiesBatch Feature properties for all selected Objects.
@@ -63,6 +64,7 @@ const state = {
     toggleLayer: false,
     showLayerLoader: false,
     activateLayerInTree: false,
+    lockedFields: "none",
     // Actual state
     layerLoading: false,
     managedLayer: null,

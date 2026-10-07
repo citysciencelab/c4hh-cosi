@@ -1,3 +1,6 @@
+import layerCollection from "@core/layers/js/layerCollection.js";
+import layerFactory from "@core/layers/js/layerFactory.js";
+
 /**
  * Filters visible layers from an OpenLayers collection.
  * Excludes marker layers by default and optionally a specific layer ID (e.g. the baselayer).
@@ -6,7 +9,7 @@
  * @param {String} [excludeLayerId=null] - Optional ID of a layer that should also be ignored.
  * @returns {ol/Layer[]} Array of visible layers.
  */
-export function getVisibleLayerList (layers, excludeLayerId = null) {
+function getVisibleLayerList (layers, excludeLayerId = null) {
     if (typeof layers?.getArray !== "function") {
         return [];
     }
@@ -20,3 +23,28 @@ export function getVisibleLayerList (layers, excludeLayerId = null) {
         return isVisible && isNotMarkerPoint && isNotMarkerPolygon && isNotExcluded;
     });
 }
+
+/**
+* Creates a layer if it does not yet exist and returns its source.
+* @returns {Object} A vector layer source.
+*/
+function getLayerSource () {
+    if (typeof layerCollection.getLayerById("drawn-story-creator") !== "undefined") {
+        return layerCollection.getLayerById("drawn-story-creator").getLayerSource();
+    }
+    const layer = layerFactory.createLayer({
+        typ: "VECTORBASE",
+        id: "drawn-story-creator",
+        name: "drawn-story-creator",
+        alwaysOnTop: true
+    });
+
+    layerCollection.addLayer(layer);
+
+    return layer.getLayerSource();
+}
+
+export {
+    getVisibleLayerList,
+    getLayerSource
+};

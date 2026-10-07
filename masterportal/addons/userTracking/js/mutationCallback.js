@@ -1,3 +1,4 @@
+import {drawVersion2026} from "./constants.js";
 import {handleClearRedoForFeatureForMeasure} from "./handler/handleClearRedoForFeatureForMeasure.js";
 import {handleDrawInteraction} from "./handler/handleDrawInteraction.js";
 import {handleDrawSetCircleRadius} from "./handler/handleDrawSetCircleRadius.js";
@@ -12,7 +13,6 @@ import {handleDrawSetUnit} from "./handler/handleDrawSetUnit.js";
 import {handleDrawSetVisibility} from "./handler/handleDrawSetVisibility.js";
 import {handleSetProcessDataForPopulationRequest} from "./handler/handleSetProcessDataForPopulationRequest.js";
 import {handleSetSearchedWfsSearch} from "./handler/handleSetSearchedWfsSearch.js";
-import {convertRgbArrayToPackedColorValue} from "./util.js";
 
 /**
  * Evaluates a committed Vuex mutation and triggers the corresponding Matomo tracking event.
@@ -25,27 +25,27 @@ export function mutationCallback (mutation) {
     try {
         switch (mutation.type) {
             case "Modules/Draw/incrementIdCounter":
-                handleDrawInteraction("2026");
+                handleDrawInteraction(drawVersion2026);
                 break;
             case "Modules/Draw/setCircleOptions":
                 if (mutation.payload.interactive !== undefined) {
                     handleDrawSetShapeMethod({
                         method: mutation.payload.interactive ? "interactive" : "defined",
                         shape: "circle",
-                        version: "2026"
+                        version: drawVersion2026
                     });
                 }
 
                 if (mutation.payload.innerRadius !== undefined) {
-                    handleDrawSetCircleRadius({isOuter: false, value: mutation.payload.innerRadius, version: "2026"});
+                    handleDrawSetCircleRadius({isOuter: false, version: drawVersion2026});
                 }
 
                 if (mutation.payload.outerRadius !== undefined) {
-                    handleDrawSetCircleRadius({isOuter: true, value: mutation.payload.outerRadius, version: "2026"});
+                    handleDrawSetCircleRadius({isOuter: true, version: drawVersion2026});
                 }
 
                 if (mutation.payload.unit !== undefined) {
-                    handleDrawSetUnit(mutation.payload.unit, "2026");
+                    handleDrawSetUnit(mutation.payload.unit, drawVersion2026);
                 }
 
                 break;
@@ -54,8 +54,7 @@ export function mutationCallback (mutation) {
                     handleDrawSetColor({
                         isOuter: false,
                         type: "fill",
-                        value: convertRgbArrayToPackedColorValue(mutation.payload.fillColor),
-                        version: "2026"
+                        version: drawVersion2026
                     });
                 }
 
@@ -63,23 +62,23 @@ export function mutationCallback (mutation) {
                     handleDrawSetFillTransparency({
                         isOuter: false,
                         value: mutation.payload.fillTransparency,
-                        version: "2026"
+                        version: drawVersion2026
                     });
                 }
 
                 if (mutation.payload.font !== undefined) {
-                    handleDrawSetFontName(mutation.payload.font, "2026");
+                    handleDrawSetFontName(mutation.payload.font, drawVersion2026);
                 }
 
                 if (mutation.payload.fontSize !== undefined) {
-                    handleDrawSetFontSize(mutation.payload.fontSize, "2026");
+                    handleDrawSetFontSize(drawVersion2026);
                 }
 
                 if (mutation.payload.squareMethod !== undefined) {
                     handleDrawSetShapeMethod({
                         method: mutation.payload.squareMethod,
                         shape: "square",
-                        version: "2026"
+                        version: drawVersion2026
                     });
                 }
 
@@ -87,8 +86,7 @@ export function mutationCallback (mutation) {
                     handleDrawSetColor({
                         isOuter: false,
                         type: "stroke",
-                        value: convertRgbArrayToPackedColorValue(mutation.payload.strokeColor),
-                        version: "2026"
+                        version: drawVersion2026
                     });
                 }
 
@@ -96,12 +94,12 @@ export function mutationCallback (mutation) {
                     handleDrawSetStrokeWidth({
                         isOuter: false,
                         value: mutation.payload.strokeWidth,
-                        version: "2026"
+                        version: drawVersion2026
                     });
                 }
 
                 if (mutation.payload.text !== undefined) {
-                    handleDrawSetText("2026");
+                    handleDrawSetText(drawVersion2026);
                 }
 
                 break;
@@ -110,8 +108,7 @@ export function mutationCallback (mutation) {
                     handleDrawSetColor({
                         isOuter: true,
                         type: "fill",
-                        value: convertRgbArrayToPackedColorValue(mutation.payload.fillColor),
-                        version: "2026"
+                        version: drawVersion2026
                     });
                 }
 
@@ -119,7 +116,7 @@ export function mutationCallback (mutation) {
                     handleDrawSetFillTransparency({
                         isOuter: true,
                         value: mutation.payload.fillTransparency,
-                        version: "2026"
+                        version: drawVersion2026
                     });
                 }
 
@@ -127,8 +124,7 @@ export function mutationCallback (mutation) {
                     handleDrawSetColor({
                         isOuter: true,
                         type: "stroke",
-                        value: convertRgbArrayToPackedColorValue(mutation.payload.strokeColor),
-                        version: "2026"
+                        version: drawVersion2026
                     });
                 }
 
@@ -136,17 +132,17 @@ export function mutationCallback (mutation) {
                     handleDrawSetStrokeWidth({
                         isOuter: true,
                         value: mutation.payload.strokeWidth,
-                        version: "2026"
+                        version: drawVersion2026
                     });
                 }
 
                 break;
             case "Modules/Draw/setSelectedInteraction":
                 if (mutation.payload === "") {
-                    handleDrawSetVisibility(true, "2026");
+                    handleDrawSetVisibility(true, drawVersion2026);
                 }
                 else if (mutation.payload === "hide") {
-                    handleDrawSetVisibility(false, "2026");
+                    handleDrawSetVisibility(false, drawVersion2026);
                 }
 
                 // to-be-added: handleDrawSetInteraction

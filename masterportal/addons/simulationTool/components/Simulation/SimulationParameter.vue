@@ -55,6 +55,7 @@ export default {
     computed: {
         ...mapGetters("Modules/SimulationTool", [
             "currentPlanningScenarioId",
+            "isExecutionRequestSubmitting",
             "planningScenarios",
             "previousComponentOfSimulation",
             "shouldSaveSimulations",
@@ -276,6 +277,7 @@ export default {
         ...mapMutations("Modules/SimulationTool", [
             "setCurrentPlanningComponent",
             "setCurrentPlanningScenarioId",
+            "setIsExecutionRequestSubmitting",
             "setMode",
             "setSimulationIdForResults"
         ]),
@@ -331,12 +333,13 @@ export default {
 
         /**
          * Gets the requestBody inputs value according to input and property as key.
-         * @param {String} inputKey the input key.
-         * @param {String} propertyKey the property key.
-         * @param {String} val the value.
-         * @returns {String} the parameter value. It could be the rendered value or default value.
+         * @param {string} inputKey the input key.
+         * @param {string} propertyKey the property key.
+         * @param {string} val the value.
+         * @param {string} nestedPropKey the nested property key.
+         * @returns {string} the parameter value. It could be the rendered value or default value.
          */
-        getRequestBodyInputByKey (inputKey, propertyKey, val) {
+        getRequestBodyInputByKey (inputKey, propertyKey, val, nestedPropKey) {
             if (this.ignoreProperties.includes(propertyKey)) {
                 return undefined;
             }
@@ -352,6 +355,9 @@ export default {
                         enum: requestBody.inputs[inputKey][propertyKey].enum,
                         value: requestBody.inputs[inputKey][propertyKey].value
                     };
+                }
+                if (nestedPropKey) {
+                    return requestBody.inputs[inputKey][propertyKey][nestedPropKey];
                 }
                 return requestBody.inputs[inputKey][propertyKey];
             }
@@ -879,27 +885,35 @@ export default {
          * @returns {void}
          */
         async startSimulation () {
-            if (!this.isLoggedIn()) {
+            if (!this.isLoggedIn() || this.isExecutionRequestSubmitting) {
                 return;
             }
             this.removeEmptyCollections(this.requestBodies);
             this.requestBodies = this.replaceEnumValueObjects(this.requestBodies);
 
-            const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId), // Cannot use computed property here, which may change during async call.
-                  executeResponses = await Promise.all(
-                      this.processHandlers.map((handler, index) => handler.execute(this.requestBodies[index], this.accessToken))
-                  ),
-                  jobIDs = executeResponses.map(response => response.jobID),
-                  initialStatuses = executeResponses.map(response => response.status),
-                  newSimulationId = jobIDs.join("_"),
+            let executeResponses, jobIDs, newSimulationId;
+            const scenario = this.planningScenarios.find(scnrio => scnrio.id === this.currentPlanningScenarioId),
                   newSimulation = {
                       name: this.simulationName || this.simulation.title,
                       configId: this.currentSimulationId};
 
-            if (jobIDs.some(ID => !ID)) {
-                console.warn("Not all job IDs returned from process execution.");
+            try {
+                this.setIsExecutionRequestSubmitting(true);
+                executeResponses = await Promise.all(
+                    this.processHandlers.map((handler, index) => handler.execute(this.requestBodies[index], this.accessToken))
+                );
+                jobIDs = executeResponses.map(response => response.jobID);
+                newSimulationId = jobIDs.join("_");
+
+            }
+            catch {
+                console.error("An error occurred while starting the simulation.");
                 return;
             }
+            finally {
+                this.setIsExecutionRequestSubmitting(false);
+            }
+
 
             scenario.simulations ??= {};
             scenario.simulations[newSimulationId] = newSimulation;
@@ -909,7 +923,7 @@ export default {
 
             Object.values(newSimulation.jobs).forEach((job, index) => {
                 job.requestBody = JSON.parse(JSON.stringify(this.requestBodies[index]));
-                job.jobStatus = {status: initialStatuses[index]};
+                job.jobStatus = executeResponses[index];
                 job.resultStyle = this.simulation.processes[index].resultStyle;
             });
 
@@ -923,23 +937,21 @@ export default {
                 jobs: Object.values(newSimulation.jobs),
                 jobIds: jobIDs,
                 processConfigs: this.simulation.processes,
-                simulationConfig: this.simulation
+                simulationConfig: this.simulation,
+                planningScenario: scenario
             });
-
-            if (this.shouldSaveSimulations) {
-                await upsertPlanningScenarioInIndexedDb(scenario);
-            }
         },
 
         /**
          * Sets the inputs value of the request body input according to inputKey and property as key.
-         * @param {String} inputKey the input key.
-         * @param {String} propertyKey the property key.
-         * @param {String} val the value.
-         * @param {Boolean} isEnum whether the input is an enum or not.
+         * @param {string} inputKey the input key.
+         * @param {string} propertyKey the property key.
+         * @param {string} val the value.
+         * @param {boolean} isEnum whether the input is an enum or not.
+         * @param {string} [nestedPropKey=""] the nested property key.
          * @returns {void}
          */
-        setRequestBodyInput (inputKey, propertyKey, val, isEnum = false) {
+        setRequestBodyInput (inputKey, propertyKey, val, isEnum = false, nestedPropKey = "") {
             if (typeof inputKey !== "string" || typeof propertyKey !== "string") {
                 console.warn(`Invalid parameters: inputKey=${inputKey}, propertyKey=${propertyKey}`);
                 return;
@@ -969,6 +981,11 @@ export default {
 
                 if (typeof this.requestBodies[index].inputs[inputKey] === "undefined") {
                     this.requestBodies[index].inputs[inputKey] = {};
+                }
+                if (nestedPropKey) {
+                    this.requestBodies[index].inputs[inputKey][propertyKey] ??= {};
+                    this.requestBodies[index].inputs[inputKey][propertyKey][nestedPropKey] = val;
+                    return;
                 }
                 if (isEnum && this.requestBodies[index].inputs[inputKey][propertyKey]?.value !== undefined) {
                     this.requestBodies[index].inputs[inputKey][propertyKey].value = val;
@@ -1024,6 +1041,7 @@ export default {
                             class="form-select"
                             :aria-label="$t('additional:modules.tools.simulationTool.selectPlanningScenario')"
                             :value="currentPlanningScenarioId"
+                            :disabled="isExecutionRequestSubmitting"
                             @change="setCurrentPlanningScenarioId($event.target.value)"
                         >
                             <option
@@ -1070,6 +1088,7 @@ export default {
                 v-model="simulationName"
                 :label="$t('additional:modules.tools.simulationTool.simulationName')"
                 :placeholder="$t('additional:modules.tools.simulationTool.simulationName')"
+                :disabled="isExecutionRequestSubmitting"
             />
             <div class="form-floating mb-3">
                 <select
@@ -1077,6 +1096,7 @@ export default {
                     v-model="currentSimulationId"
                     class="form-select"
                     :aria-label="$t('additional:modules.tools.simulationTool.selectSimulation')"
+                    :disabled="isExecutionRequestSubmitting"
                 >
                     <option
                         v-for="model in simulations"
@@ -1109,6 +1129,7 @@ export default {
                                 :min="input.minimum"
                                 :max="input.maximum"
                                 :aria="getMappedProperty(propertyKey, simulation?.inputs?.[input.inputKey]?.propertiesMapping)"
+                                :disabled="isExecutionRequestSubmitting"
                                 @update:value="setRequestBodyInput(input.inputKey, propertyKey, $event, Boolean(input.enum))"
                                 @update:checked="setRequestBodyInput(input.inputKey, propertyKey, $event, Boolean(input.enum))"
                             />
@@ -1139,6 +1160,7 @@ export default {
                             :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                             :interaction="event => onOafSwitchChange(event, inputKey)"
                             :checked="isValueSet(inputKey, input?.default)"
+                            :disabled="isExecutionRequestSubmitting"
                         />
                     </div>
                 </div>
@@ -1172,6 +1194,7 @@ export default {
                                     :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                     :interaction="event => onOafSwitchChange(event, inputKey)"
                                     :checked="isValueSet(inputKey, input?.default)"
+                                    :disabled="isExecutionRequestSubmitting"
                                 />
                             </div>
                         </div>
@@ -1190,6 +1213,7 @@ export default {
                                     :aria="getMappedProperty(inputKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                     :interaction="event => toggleOptionalBBOXUrlInputs(inputKey, event)"
                                     :checked="isValueSet(inputKey, input?.default)"
+                                    :disabled="isExecutionRequestSubmitting"
                                 />
                             </div>
                             <DynamicInputByType
@@ -1201,6 +1225,7 @@ export default {
                                 :value="getRequestBodyInputByKey(inputKey, '', input.default)"
                                 :min="input.minimum"
                                 :max="input.maximum"
+                                :disabled="isExecutionRequestSubmitting"
                                 @update:value="setRequestBodyInput(inputKey, '', $event, Boolean(input?.enum))"
                                 @update:checked="setRequestBodyInput(inputKey, '', $event, Boolean(input?.enum))"
                             />
@@ -1217,6 +1242,7 @@ export default {
                                 :key="propertyKey"
                             >
                                 <DynamicInputByType
+                                    v-if="property.type !== 'object'"
                                     :id="`${inputKey}-${propertyKey}`"
                                     :label="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                     :max="property.maximum"
@@ -1227,9 +1253,30 @@ export default {
                                     :value="getRequestBodyInputByKey(inputKey, propertyKey, property?.default)"
                                     :aria="getMappedProperty(propertyKey, simulation?.inputs?.[inputKey]?.propertiesMapping)"
                                     :checked="typeof property.default === 'boolean' ? property.default : false"
+                                    :disabled="isExecutionRequestSubmitting"
                                     @update:value="setRequestBodyInput(inputKey, propertyKey, $event, Boolean(property.enum))"
                                     @update:checked="setRequestBodyInput(inputKey, propertyKey, $event, Boolean(property.enum))"
                                 />
+                                <AccordionItem
+                                    v-else
+                                    :id="propertyKey"
+                                    :title="propertyKey"
+                                    font-size="font-size-small"
+                                >
+                                    <DynamicInputByType
+                                        v-for="(nestedProp, nestedPropKey) in property.properties"
+                                        :id="nestedPropKey"
+                                        :key="nestedPropKey"
+                                        :disabled="isExecutionRequestSubmitting"
+                                        :input-type="nestedProp.type"
+                                        :label="nestedPropKey"
+                                        :max="nestedProp.maximum"
+                                        :min="nestedProp.minimum"
+                                        :step="nestedProp.type === 'integer' ? 1 : 0.1"
+                                        :value="getRequestBodyInputByKey(inputKey, propertyKey, nestedProp?.default, nestedPropKey)"
+                                        @update:value="setRequestBodyInput(inputKey, propertyKey, $event, Boolean(nestedProp.enum), nestedPropKey)"
+                                    />
+                                </AccordionItem>
                             </div>
                         </AccordionItem>
                     </AccordionItem>
@@ -1251,6 +1298,7 @@ export default {
                         :searchable="true"
                         :multiple="true"
                         :open="true"
+                        :disabled="isExecutionRequestSubmitting"
                     >
                         <template #tag="{ option, remove }">
                             <button
@@ -1284,8 +1332,8 @@ export default {
                         :interaction="startSimulation"
                         :aria-label="$t('additional:modules.tools.simulationTool.simulationStart')"
                         :text="$t('additional:modules.tools.simulationTool.simulationStart')"
-                        :disabled="isLoading || !currentPlanningScenario || isSomeOafLoading || !currentSimulationId"
-                        :spinner-trigger="isLoading"
+                        :disabled="isLoading || isExecutionRequestSubmitting || !currentPlanningScenario || isSomeOafLoading || !currentSimulationId"
+                        :spinner-trigger="isLoading || isExecutionRequestSubmitting"
                     />
                 </div>
             </form>

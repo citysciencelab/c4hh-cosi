@@ -42,7 +42,8 @@ describe("src/modules/searchBar/components/ActionButton.vue", () => {
                                         openGetFeatureInfo: "bi-info-circle",
                                         setMarker: "bi-geo-alt-fill",
                                         zoomToResult: "bi-zoom-in",
-                                        startRouting: "bi-signpost-2"
+                                        startRouting: "bi-signpost-2",
+                                        showLayerInfo: "bi-info-circle"
                                     }
                                 )
                             }
@@ -63,7 +64,8 @@ describe("src/modules/searchBar/components/ActionButton.vue", () => {
             const props = {
                 actionName: "setMarker",
                 actionArgs: {
-                    coordinates: [1, 2]
+                    coordinates: [1, 2],
+                    _source: "ActionButton"
                 }
             };
 
@@ -88,7 +90,8 @@ describe("src/modules/searchBar/components/ActionButton.vue", () => {
             const props = {
                 actionName: "zoomToResult",
                 actionArgs: {
-                    coordinates: [1, 2]
+                    coordinates: [1, 2],
+                    _source: "ActionButton"
                 }
             };
 
@@ -118,7 +121,8 @@ describe("src/modules/searchBar/components/ActionButton.vue", () => {
                     },
                     layer: {
                         typ: "WMS"
-                    }
+                    },
+                    _source: "ActionButton"
                 }
             };
 
@@ -148,7 +152,8 @@ describe("src/modules/searchBar/components/ActionButton.vue", () => {
                     },
                     layer: {
                         typ: "WMS"
-                    }
+                    },
+                    _source: "ActionButton"
                 }
             };
 
@@ -176,7 +181,8 @@ describe("src/modules/searchBar/components/ActionButton.vue", () => {
                     layerId: "layerId",
                     source: {
                         id: "layerId"
-                    }
+                    },
+                    _source: "ActionButton"
                 }
             };
 
@@ -204,7 +210,8 @@ describe("src/modules/searchBar/components/ActionButton.vue", () => {
                     layerId: "layerId",
                     source: {
                         id: "layerId"
-                    }
+                    },
+                    _source: "ActionButton"
                 }
             };
 
@@ -225,6 +232,7 @@ describe("src/modules/searchBar/components/ActionButton.vue", () => {
             expect(searchBarMutations.setCurrentActionEvent.calledOnce).to.be.true;
         });
     });
+
     describe("methods", () => {
         it("displayAction shall return true if actionName is not 'startRouting'", () => {
             const props = {
