@@ -356,7 +356,7 @@ export default {
                 feature.set(key, value);
             });
 
-            feature.setGeometry(originProperties.geometry);
+            feature.setGeometry(originProperties[feature.getGeometryName()]);
             olLayer.getSource().addFeature(feature);
         },
 

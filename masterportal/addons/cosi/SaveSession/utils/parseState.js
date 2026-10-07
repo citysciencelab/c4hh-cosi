@@ -161,35 +161,37 @@ export default {
 
             scenario.objects.forEach(object => {
                 const parsedFeature = object.feature;
-                let finalFeature;
+                let finalFeature = parsedFeature;
 
                 if (!(parsedFeature instanceof Feature)) {
-                    finalFeature = new Feature({
-                        geometry: new Point([
-                            parsedFeature.values_.geometry.flatCoordinates[0],
-                            parsedFeature.values_.geometry.flatCoordinates[1]
-                        ])
-                    });
+                    // WFS features usually keep their geometry under "the_geom", not "geometry"
+                    const geometryName = parsedFeature.geometryName_ || "geometry",
+                        flatCoordinates = parsedFeature.values_[geometryName].flatCoordinates;
 
+                    finalFeature = new Feature();
+                    finalFeature.setGeometryName(geometryName);
+                    finalFeature.setGeometry(new Point([flatCoordinates[0], flatCoordinates[1]]));
                     finalFeature.setId(parsedFeature.id_);
 
+                    // features styled by their layer have no own style, and not every own style is an icon
                     const style = parsedFeature.style_,
-                        parsedStyle = style ? new Style({
+                        iconSrc = style?.image_?.iconImage_?.src_,
+                        parsedStyle = iconSrc ? new Style({
                             image: new Icon({
-                                src: style?.image_.iconImage_.src_,
-                                scale: style?.image_.scale_,
-                                opacity: style?.image_.opacity_,
-                                rotation: style?.image_.rotation_,
-                                rotateWithView: style?.image_.rotateWithView_,
-                                displacement: style?.image_.displacement_
+                                src: iconSrc,
+                                scale: style.image_.scale_,
+                                opacity: style.image_.opacity_,
+                                rotation: style.image_.rotation_,
+                                rotateWithView: style.image_.rotateWithView_,
+                                displacement: style.image_.displacement_
                             })
-                        }) : style;
+                        }) : null;
 
                     finalFeature.setStyle(parsedStyle);
 
                     // Copy your application properties
                     for (const [key, value] of Object.entries(parsedFeature.values_)) {
-                        if (key !== "geometry") {
+                        if (key !== geometryName) {
                             finalFeature.set(key, value);
                         }
                     }
