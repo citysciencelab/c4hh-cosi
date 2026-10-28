@@ -186,9 +186,9 @@
                 "keyOfAttrNumber": "stadtteil_nummer",
                 "stats": {
                   "keyOfAttrName": ["stadtteil", "stadtteil_name", "stadtteil", "stadtteil_name", "stadtteil_name", "stadtteil_name","stadtteil_name",
-              "stadtteil"],
+              "stadtteil", "stadtteil"],
                   "layerIds": ["31240", "34505", "34896", "34503", "35041", "35046", "35047",
-              "cosi_sozialmonitoring_stadtteile"],
+              "cosi_sozialmonitoring_stadtteile", "cosi_demo_sozialinfra_stadtteile"],
                   "metadataUrls": ["https://www.statistik-nord.de/fileadmin/maps/Stadtteil_Profile_2022/QuellenangabenKarte2023.htm", "https://metaver.de/trefferanzeige?docuuid=F4062BD8-43C4-4C4F-AA45-253D84A3685E", "https://metaver.de/trefferanzeige?docuuid=28C680E0-F158-4271-9004-515D5557DB0A"]
                 },
                 "districtNamesMap": {
@@ -1304,6 +1304,83 @@
           "name": "Fachdaten - Analyse / Simulation",
           "type": "folder",
           "elements": [
+            {
+              "name": "Demo: Förderung & Öffnungszeiten (fiktive Daten)",
+              "type": "folder",
+              "elements": [
+                {
+                  "id": "cosi_demo_sozialinfra_jugend",
+                  "name": "Kinder & Jugend – geförderte Standorte",
+                  "styleId": "33505",
+                  "isFacility": true,
+                  "alwaysOnTop": true,
+                  "searchField": "einrichtung",
+                  "mouseHoverField": ["einrichtung", "angebotstyp"],
+                  "addressField": ["adresse", "ort"],
+                  "numericalValues": [
+                    {"id": "foerderung_standort_eur", "name": "Förderung am Standort (€/Jahr)"},
+                    {"id": "foerderung_zahlung_eur", "name": "Förderung an Zahlungsadresse (€/Jahr)"},
+                    {"id": "besuche_woche", "name": "Besuche pro Woche"},
+                    {"id": "oeffnungsstunden_woche", "name": "Öffnungsstunden pro Woche"}
+                  ],
+                  "loadingStrategy": "all"
+                },
+                {
+                  "id": "cosi_demo_sozialinfra_familie",
+                  "name": "Familie – geförderte Standorte",
+                  "styleId": "19944",
+                  "isFacility": true,
+                  "alwaysOnTop": true,
+                  "searchField": "einrichtung",
+                  "mouseHoverField": ["einrichtung", "angebotstyp"],
+                  "addressField": ["adresse", "ort"],
+                  "numericalValues": [
+                    {"id": "foerderung_standort_eur", "name": "Förderung am Standort (€/Jahr)"},
+                    {"id": "foerderung_zahlung_eur", "name": "Förderung an Zahlungsadresse (€/Jahr)"},
+                    {"id": "besuche_woche", "name": "Besuche pro Woche"},
+                    {"id": "oeffnungsstunden_woche", "name": "Öffnungsstunden pro Woche"}
+                  ],
+                  "loadingStrategy": "all"
+                },
+                {
+                  "id": "cosi_demo_sozialinfra_kitas",
+                  "name": "Kitas – Öffnungszeiten",
+                  "styleId": "753",
+                  "isFacility": true,
+                  "alwaysOnTop": true,
+                  "searchField": "einrichtung",
+                  "mouseHoverField": ["einrichtung", "oeffnungszeiten_text"],
+                  "addressField": ["adresse", "ort"],
+                  "numericalValues": [
+                    {"id": "betreute_kinder", "name": "Betreute Kinder"},
+                    {"id": "oeffnungsstunden_woche", "name": "Öffnungsstunden pro Woche"}
+                  ],
+                  "loadingStrategy": "all"
+                },
+                {
+                  "id": "cosi_demo_sozialinfra_schulen",
+                  "name": "Schulen – Öffnungszeiten",
+                  "styleId": "8712",
+                  "isFacility": true,
+                  "alwaysOnTop": true,
+                  "searchField": "einrichtung",
+                  "mouseHoverField": ["einrichtung", "oeffnungszeiten_text"],
+                  "addressField": ["adresse", "ort"],
+                  "numericalValues": [
+                    {"id": "schueler", "name": "Schülerzahl"},
+                    {"id": "oeffnungsstunden_woche", "name": "Öffnungsstunden pro Woche"}
+                  ],
+                  "loadingStrategy": "all"
+                },
+                {
+                  "id": "cosi_demo_sozialinfra_traegernetz",
+                  "name": "Träger-Verbünde (Hauptsitz → Standort)",
+                  "styleId": "line",
+                  "mouseHoverField": ["traeger", "nach"],
+                  "loadingStrategy": "all"
+                }
+              ]
+            },
             {
               "name": "Bevölkerung und Gesellschaft",
               "type": "folder",

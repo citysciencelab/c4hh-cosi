@@ -2358,5 +2358,68 @@
     "group": "Sozialmonitoring (abgeleitet)",
     "stadtteil": "cosi_sozialmonitoring_stadtteile",
     "valueType": "absolute"
+  },
+  {
+    "category": "demo_foerd_zahladresse_eur",
+    "value": "Förderung nach Zahlungsadresse (€)",
+    "group": "Demo: Förderung & Öffnungszeiten (fiktiv)",
+    "stadtteil": "cosi_demo_sozialinfra_stadtteile",
+    "valueType": "absolute"
+  },
+  {
+    "category": "demo_foerd_wirkungsort_eur",
+    "value": "Förderung nach Wirkungsort (€)",
+    "group": "Demo: Förderung & Öffnungszeiten (fiktiv)",
+    "stadtteil": "cosi_demo_sozialinfra_stadtteile",
+    "valueType": "absolute"
+  },
+  {
+    "category": "demo_foerd_saldo_eur",
+    "value": "Förderung: Saldo Wirkungsort − Zahlungsadresse (€)",
+    "group": "Demo: Förderung & Öffnungszeiten (fiktiv)",
+    "stadtteil": "cosi_demo_sozialinfra_stadtteile",
+    "valueType": "absolute"
+  },
+  {
+    "category": "demo_foerd_je_u18_eur",
+    "value": "Förderung (Wirkungsort) je Einwohner/in unter 18 (€)",
+    "group": "Demo: Förderung & Öffnungszeiten (fiktiv)",
+    "stadtteil": "cosi_demo_sozialinfra_stadtteile",
+    "valueType": "relative"
+  },
+  {
+    "category": "demo_standorte_anz",
+    "value": "Geförderte Standorte (Kinder, Jugend, Familie)",
+    "group": "Demo: Förderung & Öffnungszeiten (fiktiv)",
+    "stadtteil": "cosi_demo_sozialinfra_stadtteile",
+    "valueType": "absolute"
+  },
+  {
+    "category": "demo_traeger_sitz_anz",
+    "value": "Träger mit Sitz im Stadtteil",
+    "group": "Demo: Förderung & Öffnungszeiten (fiktiv)",
+    "stadtteil": "cosi_demo_sozialinfra_stadtteile",
+    "valueType": "absolute"
+  },
+  {
+    "category": "demo_besuche_woche",
+    "value": "Ø Besuche pro Woche (geförderte Standorte)",
+    "group": "Demo: Förderung & Öffnungszeiten (fiktiv)",
+    "stadtteil": "cosi_demo_sozialinfra_stadtteile",
+    "valueType": "absolute"
+  },
+  {
+    "category": "demo_oeffnungsstunden_woche",
+    "value": "Öffnungsstunden pro Woche (geförderte Standorte)",
+    "group": "Demo: Förderung & Öffnungszeiten (fiktiv)",
+    "stadtteil": "cosi_demo_sozialinfra_stadtteile",
+    "valueType": "absolute"
+  },
+  {
+    "category": "demo_standorte_abend_we_anz",
+    "value": "Geförderte Standorte mit Abend- oder Wochenendöffnung",
+    "group": "Demo: Förderung & Öffnungszeiten (fiktiv)",
+    "stadtteil": "cosi_demo_sozialinfra_stadtteile",
+    "valueType": "absolute"
   }
 ]
