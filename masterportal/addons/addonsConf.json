@@ -233,6 +233,10 @@
     "path": "cosi/ScenarioBuilder",
     "type": "tool"
   },
+  "socialInfraMonitor": {
+    "path": "cosi/SocialInfraMonitor",
+    "type": "tool"
+  },
    "waterRiskCheckSearchBar": {
     "path": "waterRiskCheck/searchBar",
     "type": "tool"

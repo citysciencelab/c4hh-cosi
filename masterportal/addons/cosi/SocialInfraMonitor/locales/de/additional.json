@@ -1,0 +1,113 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "socialInfraMonitor": {
+                    "description": "Prototyp: Wohin fließt Fördergeld, wann haben Einrichtungen geöffnet und wie viele Menschen erreichen sie? Demogebiet Hamm, Horn, Eilbek, Wandsbek und Rothenburgsort.",
+                    "demoNote": "Fiktive Demodaten – Lage, Name und Angebotstyp stammen aus Open Data der FHH; Träger, Förderung, Öffnungszeiten und Besuche sind erfunden.",
+                    "loadError": "Die Demodaten konnten nicht geladen werden.",
+                    "clearSelection": "Auswahl aufheben",
+                    "showAll": "Alle {{count}} anzeigen",
+                    "showLess": "Weniger anzeigen",
+                    "tabs": {
+                        "funding": "Förderung",
+                        "hours": "Öffnungszeiten",
+                        "reach": "Reichweite"
+                    },
+                    "categories": {
+                        "Kita": "Kitas",
+                        "Schule": "Schulen",
+                        "Jugend": "Kinder & Jugend",
+                        "Familie": "Familie"
+                    },
+                    "days": {
+                        "short": {
+                            "mo": "Mo",
+                            "tu": "Di",
+                            "we": "Mi",
+                            "th": "Do",
+                            "fr": "Fr",
+                            "sa": "Sa",
+                            "su": "So"
+                        },
+                        "long": {
+                            "mo": "Montag",
+                            "tu": "Dienstag",
+                            "we": "Mittwoch",
+                            "th": "Donnerstag",
+                            "fr": "Freitag",
+                            "sa": "Samstag",
+                            "su": "Sonntag"
+                        }
+                    },
+                    "tooltip": {
+                        "paidHere": "{{value}} an diese Adresse · {{count}} Standort(e)",
+                        "spentHere": "{{value}} hier eingesetzt · {{traeger}}",
+                        "open": "geöffnet",
+                        "closed": "geschlossen",
+                        "reach": "{{visits}} Besuche/Woche · {{value}} pro Jahr"
+                    },
+                    "funding": {
+                        "showAllNetworks": "Alle Träger-Verbünde zeigen",
+                        "total": "Förderung gesamt",
+                        "traeger": "Träger",
+                        "sites": "Standorte",
+                        "legendSize": "Förderung je Zahlungsadresse (€/Jahr)",
+                        "legendLink": "Träger-Verbund: Hauptsitz → Standort",
+                        "traegerKicker": "Träger (fiktiv)",
+                        "traegerTotal": "Förderung {{year}}",
+                        "paidTo": "Gezahlt an",
+                        "spentAt": "Eingesetzt an {{count}} Standort(en)",
+                        "mainSite": "Hauptsitz",
+                        "zoomTraeger": "Auf Verbund zoomen",
+                        "hint": "Klicken Sie auf einen Standort: Gehört er zu einem Träger mit mehreren Standorten, öffnen sich die Schwesterstandorte mit Verbindungslinien.",
+                        "districtsTitle": "Stadtteile",
+                        "coloring": "Karte einfärben",
+                        "coloringNone": "keine Einfärbung",
+                        "coloringSaldo": "Saldo Wirkungsort − Zahlungsadresse",
+                        "coloringPerU18": "Förderung je Einwohner/in unter 18",
+                        "seriesPaid": "nach Zahlungsadresse",
+                        "seriesSpent": "nach Wirkungsort",
+                        "inflow": "Zufluss",
+                        "outflow": "Abfluss",
+                        "perU18Short": "je Einw. u18",
+                        "saldoExplain": "Zahlungsadresse = wohin das Geld überwiesen wird (Sitz des Trägers). Wirkungsort = wo es eingesetzt wird (alle Standorte des Trägers). Abfluss heißt: An Adressen in diesem Stadtteil wird mehr gezahlt, als hier eingesetzt wird."
+                    },
+                    "hours": {
+                        "chartLabel": "Anteil geöffneter Einrichtungen je Kategorie über die Woche",
+                        "play": "Abspielen",
+                        "pause": "Anhalten",
+                        "speed": "Geschwindigkeit",
+                        "now": "Jetzt",
+                        "nowTitle": "Auf den aktuellen Wochentag und die aktuelle Uhrzeit springen",
+                        "slider": "Zeitpunkt in der Woche",
+                        "openNow": "Zu diesem Zeitpunkt geöffnet (Klick blendet aus/ein)",
+                        "openOf": "{{open}} von {{total}}",
+                        "hint": "Klicken Sie auf eine Einrichtung, um ihre Öffnungszeiten über die Woche zu sehen.",
+                        "neverOpen": "keine Öffnungszeiten hinterlegt",
+                        "openUntil": "geöffnet bis {{when}}",
+                        "closedUntil": "geschlossen – öffnet {{when}}",
+                        "perWeek": "{{hours}} Std./Woche"
+                    },
+                    "reach": {
+                        "totalVisits": "Besuche pro Woche",
+                        "avgPerVisit": "Ø Förderung je Besuch",
+                        "legendRing": "Ring: Besuche pro Woche",
+                        "legendDisc": "Kern: Förderung am Standort (€/Jahr)",
+                        "howToRead": "Großer Ring um einen kleinen Kern: viele Besuche für wenig Geld. Kleiner Ring um einen großen Kern: viel Geld, wenige Besuche. Schulen und Kitas sind nicht enthalten.",
+                        "visits": "Besuche/Woche",
+                        "funding": "Förderung/Jahr",
+                        "perVisit": "je Besuch",
+                        "catchment": "Einzugsgebiet berechnen",
+                        "catchmentHint": "Öffnet die Erreichbarkeitsanalyse mit diesem Standort als Startpunkt. Sie zeigt, welches Gebiet in der gewählten Zeit erreichbar ist und wie viele Menschen dort wohnen.",
+                        "ranking": "Standorte",
+                        "sortVisits": "Besuche",
+                        "sortPerVisit": "€ je Besuch",
+                        "visitsValue": "{{value}} / Woche",
+                        "perVisitValue": "{{value}} je Besuch"
+                    }
+                }
+            }
+        }
+    }
+}

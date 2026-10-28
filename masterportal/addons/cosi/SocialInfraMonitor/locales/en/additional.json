@@ -1,0 +1,113 @@
+{
+    "modules": {
+        "tools": {
+            "cosi": {
+                "socialInfraMonitor": {
+                    "description": "Prototype: where does funding go, when are facilities open and how many people do they reach? Demo area Hamm, Horn, Eilbek, Wandsbek and Rothenburgsort.",
+                    "demoNote": "Fictional demo data – location, name and type come from Hamburg open data; operators, funding, opening hours and visits are invented.",
+                    "loadError": "The demo data could not be loaded.",
+                    "clearSelection": "Clear selection",
+                    "showAll": "Show all {{count}}",
+                    "showLess": "Show less",
+                    "tabs": {
+                        "funding": "Funding",
+                        "hours": "Opening hours",
+                        "reach": "Reach"
+                    },
+                    "categories": {
+                        "Kita": "Day care",
+                        "Schule": "Schools",
+                        "Jugend": "Children & youth",
+                        "Familie": "Family"
+                    },
+                    "days": {
+                        "short": {
+                            "mo": "Mon",
+                            "tu": "Tue",
+                            "we": "Wed",
+                            "th": "Thu",
+                            "fr": "Fri",
+                            "sa": "Sat",
+                            "su": "Sun"
+                        },
+                        "long": {
+                            "mo": "Monday",
+                            "tu": "Tuesday",
+                            "we": "Wednesday",
+                            "th": "Thursday",
+                            "fr": "Friday",
+                            "sa": "Saturday",
+                            "su": "Sunday"
+                        }
+                    },
+                    "tooltip": {
+                        "paidHere": "{{value}} paid to this address · {{count}} site(s)",
+                        "spentHere": "{{value}} spent here · {{traeger}}",
+                        "open": "open",
+                        "closed": "closed",
+                        "reach": "{{visits}} visits/week · {{value}} per year"
+                    },
+                    "funding": {
+                        "showAllNetworks": "Show all operator networks",
+                        "total": "Total funding",
+                        "traeger": "Operators",
+                        "sites": "Sites",
+                        "legendSize": "Funding per payment address (€/year)",
+                        "legendLink": "Operator network: head office → site",
+                        "traegerKicker": "Operator (fictional)",
+                        "traegerTotal": "Funding {{year}}",
+                        "paidTo": "Paid to",
+                        "spentAt": "Spent at {{count}} site(s)",
+                        "mainSite": "Head office",
+                        "zoomTraeger": "Zoom to network",
+                        "hint": "Click a site: if its operator runs several sites, the sister sites open up, linked by lines.",
+                        "districtsTitle": "Districts",
+                        "coloring": "Colour map by",
+                        "coloringNone": "no colouring",
+                        "coloringSaldo": "balance place of use − payment address",
+                        "coloringPerU18": "funding per resident under 18",
+                        "seriesPaid": "by payment address",
+                        "seriesSpent": "by place of use",
+                        "inflow": "inflow",
+                        "outflow": "outflow",
+                        "perU18Short": "per resident u18",
+                        "saldoExplain": "Payment address = where the money is transferred (the operator's seat). Place of use = where it is spent (all the operator's sites). Outflow means more is paid to addresses in this district than is spent here."
+                    },
+                    "hours": {
+                        "chartLabel": "Share of facilities open per category over the week",
+                        "play": "Play",
+                        "pause": "Pause",
+                        "speed": "Speed",
+                        "now": "Now",
+                        "nowTitle": "Jump to the current weekday and time",
+                        "slider": "Point in the week",
+                        "openNow": "Open at this time (click to hide/show)",
+                        "openOf": "{{open}} of {{total}}",
+                        "hint": "Click a facility to see its opening hours over the week.",
+                        "neverOpen": "no opening hours recorded",
+                        "openUntil": "open until {{when}}",
+                        "closedUntil": "closed – opens {{when}}",
+                        "perWeek": "{{hours}} h/week"
+                    },
+                    "reach": {
+                        "totalVisits": "Visits per week",
+                        "avgPerVisit": "Avg. funding per visit",
+                        "legendRing": "Ring: visits per week",
+                        "legendDisc": "Core: funding at the site (€/year)",
+                        "howToRead": "A wide ring around a small core: many visits for little money. A small ring around a large core: much money, few visits. Schools and day care are not included.",
+                        "visits": "Visits/week",
+                        "funding": "Funding/year",
+                        "perVisit": "per visit",
+                        "catchment": "Calculate catchment area",
+                        "catchmentHint": "Opens the accessibility analysis with this site as the starting point. It shows the area reachable in the chosen time and how many people live there.",
+                        "ranking": "Sites",
+                        "sortVisits": "Visits",
+                        "sortPerVisit": "€ per visit",
+                        "visitsValue": "{{value}} / week",
+                        "perVisitValue": "{{value}} per visit"
+                    }
+                }
+            }
+        }
+    }
+}

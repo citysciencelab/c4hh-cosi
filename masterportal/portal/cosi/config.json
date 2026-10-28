@@ -1043,6 +1043,19 @@
             ]
           },
           {
+            "name": "Prototypen",
+            "icon": "bi-folder-plus",
+            "type": "folder",
+            "description": "Prototypen mit fiktiven Demodaten",
+            "elements": [
+              {
+                "type": "socialInfraMonitor",
+                "name": "Förderung & Öffnungszeiten",
+                "icon": "bi-cash-coin"
+              }
+            ]
+          },
+          {
             "name": "Werkzeuge",
             "icon": "bi-folder-plus",
             "type": "folder",
