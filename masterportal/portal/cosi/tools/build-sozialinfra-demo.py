@@ -39,6 +39,11 @@ Output (assets/, EPSG:25832)
     demo-sozialinfra-schulen.geojson      schools (opening hours only)
     demo-sozialinfra-traegernetz.geojson  lines Hauptsitz -> Standort
     demo-sozialinfra-stadtteile.geojson   Stadtteil statistics (long table format)
+    demo-sozialinfra-stadtteilgrenzen.geojson
+                                          the five boundaries with the same
+                                          statistics, for the prototype's map —
+                                          shipped so a presentation does not
+                                          depend on api.hamburg.de being up
 
 Opening hours are stored twice: ``oeffnungszeiten`` in OSM opening_hours syntax
 (subset: "Mo-Fr 08:00-16:00; Sa 10:00-14:00") for the prototype to parse, and
@@ -789,6 +794,13 @@ def stats_records(funded, population):
     return records
 
 
+def round_coords(value):
+    """Metre precision is plenty for an outline and keeps the file small."""
+    if isinstance(value[0], (int, float)):
+        return [round(value[0]), round(value[1])]
+    return [round_coords(v) for v in value]
+
+
 def write(name, features, *, crs=True):
     collection = {"type": "FeatureCollection", "name": name.replace("-", "_"), "features": features}
     if crs:
@@ -832,6 +844,11 @@ def main():
     write(f"{PREFIX}-traegernetz", lines)
     write(f"{PREFIX}-stadtteile",
           [{"type": "Feature", "geometry": None, "properties": r} for r in records], crs=False)
+    write(f"{PREFIX}-stadtteilgrenzen", [
+        {"type": "Feature",
+         "geometry": {"type": "MultiPolygon", "coordinates": round_coords(polygons[r["stadtteil"]])},
+         "properties": r}
+        for r in records])
 
     print("\nTräger mit mehreren Standorten:")
     for t in traeger:
