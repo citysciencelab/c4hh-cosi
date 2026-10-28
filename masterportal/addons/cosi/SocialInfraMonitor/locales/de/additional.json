@@ -4,7 +4,9 @@
             "cosi": {
                 "socialInfraMonitor": {
                     "description": "Prototyp: Wohin fließt Fördergeld, wann haben Einrichtungen geöffnet und wie viele Menschen erreichen sie? Demogebiet Hamm, Horn, Eilbek, Wandsbek und Rothenburgsort.",
-                    "demoNote": "Fiktive Demodaten – Lage, Name und Angebotstyp stammen aus Open Data der FHH; Träger, Förderung, Öffnungszeiten und Besuche sind erfunden.",
+                    "demoNote": "Fiktive Demodaten – Lage, Name und Angebotstyp stammen aus Open Data der FHH; Träger, Förderung, Öffnungszeiten und Besuche sind fiktiv und KI-generiert.",
+                    "aiLabel": "KI-generiert (AI generated)",
+                    "aiLabelTitle": "KI-generierte Inhalte: Träger, Förderung, Öffnungszeiten und Besuche sind fiktive, mit KI erzeugte Demodaten.",
                     "loadError": "Die Demodaten konnten nicht geladen werden.",
                     "clearSelection": "Auswahl aufheben",
                     "showAll": "Alle {{count}} anzeigen",

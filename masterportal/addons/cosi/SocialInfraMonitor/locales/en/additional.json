@@ -4,7 +4,9 @@
             "cosi": {
                 "socialInfraMonitor": {
                     "description": "Prototype: where does funding go, when are facilities open and how many people do they reach? Demo area Hamm, Horn, Eilbek, Wandsbek and Rothenburgsort.",
-                    "demoNote": "Fictional demo data – location, name and type come from Hamburg open data; operators, funding, opening hours and visits are invented.",
+                    "demoNote": "Fictional demo data – location, name and type come from Hamburg open data; operators, funding, opening hours and visits are fictional and AI-generated.",
+                    "aiLabel": "AI generated",
+                    "aiLabelTitle": "AI-generated content: operators, funding, opening hours and visits are fictional demo data created with AI.",
                     "loadError": "The demo data could not be loaded.",
                     "clearSelection": "Clear selection",
                     "showAll": "Show all {{count}}",

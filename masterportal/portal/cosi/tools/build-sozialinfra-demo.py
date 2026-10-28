@@ -78,7 +78,7 @@ TIMEOUT = 120
 SEED = 2025
 FOERDERJAHR = "2025"
 DATENSTATUS = ("DEMO – Lage, Name und Angebotstyp: Open Data FHH; Träger, Förderung, "
-               "Öffnungszeiten und Besuche: fiktiv")
+               "Öffnungszeiten und Besuche: fiktiv, KI-generiert")
 
 STADTTEILE = ["Hamm", "Horn", "Eilbek", "Wandsbek", "Rothenburgsort"]
 BEZIRKSAMT = {

@@ -7,6 +7,8 @@
  * @property {String} districtsUrl - Stadtteil outlines with the demo statistics.
  * @property {String} menuSide - Menu the tool lives in; used to hand over to the Erreichbarkeitsanalyse.
  * @property {String} accessibilityAnalysisType - Menu type of the Erreichbarkeitsanalyse.
+ * @property {String} aiLabelUrl - EU "AI generated" label, shown in the panel and on the map while the
+ *     tool is open, because Träger, funding, opening hours and visits are synthetic.
  */
 const state = {
     id: "socialInfraMonitor",
@@ -24,7 +26,8 @@ const state = {
     },
     districtsUrl: "./assets/demo-sozialinfra-stadtteilgrenzen.geojson",
     menuSide: "secondaryMenu",
-    accessibilityAnalysisType: "accessibilityAnalysis"
+    accessibilityAnalysisType: "accessibilityAnalysis",
+    aiLabelUrl: "./assets/ai-labels/label-ai-generated-black.svg"
 };
 
 export default state;

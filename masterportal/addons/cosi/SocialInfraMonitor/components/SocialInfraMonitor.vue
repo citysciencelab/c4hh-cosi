@@ -1,6 +1,7 @@
 <script>
 import {mapActions, mapGetters} from "vuex";
 import {buffer, createEmpty, extend} from "ol/extent.js";
+import Control from "ol/control/Control.js";
 import Overlay from "ol/Overlay.js";
 import {unByKey} from "ol/Observable.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
@@ -65,7 +66,7 @@ export default {
         };
     },
     computed: {
-        ...mapGetters("Modules/SocialInfraMonitor", ["layerIds", "districtsUrl", "menuSide", "accessibilityAnalysisType"]),
+        ...mapGetters("Modules/SocialInfraMonitor", ["layerIds", "districtsUrl", "menuSide", "accessibilityAnalysisType", "aiLabelUrl"]),
         ...mapGetters(["layerConfigById"]),
         funded () {
             return this.sites.filter(site => FUNDED_KEYS.includes(site.kategorie));
@@ -151,6 +152,38 @@ export default {
             this.tooltipElement = element;
             this.tooltip = new Overlay({element, offset: [14, 0], positioning: "center-left", stopEvent: false});
             this.map.addOverlay(this.tooltip);
+            this.aiBadge = this.createAiBadge();
+        },
+
+        /**
+         * The EU "AI generated" label as a map control, so every screenshot of
+         * the prototype's map carries it, not only the panel.
+         * @returns {module:ol/control/Control} The control, not yet on the map.
+         */
+        createAiBadge () {
+            const element = document.createElement("div"),
+                  image = document.createElement("img");
+
+            element.className = "sim-ai-badge ol-unselectable";
+            image.src = this.aiLabelUrl;
+            image.alt = this.$t(T + "aiLabel");
+            image.title = this.$t(T + "aiLabelTitle");
+            element.appendChild(image);
+            return new Control({element});
+        },
+
+        /**
+         * The map canvas spans the whole window and the menus sit on top of it,
+         * so the badge follows the right edge of the main menu to stay in the
+         * visible part of the map, also when the menu is resized or collapsed.
+         * @returns {void}
+         */
+        positionAiBadge () {
+            const menu = document.getElementById("mp-menu-mainMenu"),
+                  viewport = this.map.getViewport().getBoundingClientRect(),
+                  edge = menu && menu.offsetWidth > 0 ? menu.getBoundingClientRect().right : viewport.left;
+
+            this.aiBadge.element.style.left = `${Math.max(edge - viewport.left, 0) + 8}px`;
         },
 
         async loadData () {
@@ -205,6 +238,14 @@ export default {
                     this.map.on("pointermove", this.onPointerMove)
                 ];
             }
+            if (this.aiBadge && !this.aiBadge.getMap()) {
+                this.map.addControl(this.aiBadge);
+                this.badgeObserver = new ResizeObserver(() => this.positionAiBadge());
+                [document.getElementById("mp-menu-mainMenu"), this.map.getViewport()]
+                    .filter(Boolean)
+                    .forEach(element => this.badgeObserver.observe(element));
+                this.positionAiBadge();
+            }
             this.hideTreeLayers();
         },
 
@@ -215,6 +256,11 @@ export default {
             this.districtLayer?.setVisible(false);
             unByKey(this.listeners || []);
             this.listeners = null;
+            if (this.aiBadge?.getMap()) {
+                this.map.removeControl(this.aiBadge);
+            }
+            this.badgeObserver?.disconnect();
+            this.badgeObserver = null;
             this.restoreTreeLayers();
         },
 
@@ -453,7 +499,13 @@ export default {
             class="sim-demo-note small mb-3"
             role="note"
         >
-            <i class="bi bi-cone-striped me-2" />{{ $t("additional:modules.tools.cosi.socialInfraMonitor.demoNote") }}
+            <img
+                :src="aiLabelUrl"
+                :alt="$t('additional:modules.tools.cosi.socialInfraMonitor.aiLabel')"
+                :title="$t('additional:modules.tools.cosi.socialInfraMonitor.aiLabelTitle')"
+                class="sim-ai-label"
+            >
+            <span>{{ $t("additional:modules.tools.cosi.socialInfraMonitor.demoNote") }}</span>
         </div>
         <hr class="my-3 mx-0 text-black-50">
         <TabBar
@@ -514,10 +566,19 @@ export default {
     // Shared by the tab components; namespaced to the tool.
     #social-infra-monitor {
         .sim-demo-note {
+            display: flex;
+            align-items: center;
+            gap: 10px;
             padding: 6px 10px;
             border-left: 3px solid #3C5F94;
             background: rgba(60, 95, 148, 0.06);
             color: #52514e;
+        }
+        // The EU artwork keeps generous clear space around the pill (about half
+        // the image height), so the image is sized up rather than cropped.
+        .sim-ai-label {
+            flex: none;
+            height: 44px;
         }
         .sim-section-title {
             margin: 0 0 8px;
@@ -583,6 +644,17 @@ export default {
             margin: 0;
             font-size: 16px;
             font-weight: 600;
+        }
+    }
+    // Top left of the visible map, under the layer-menu toggle (left is set by
+    // positionAiBadge); the bottom edge of the map runs under COSI's footer bar.
+    .sim-ai-badge {
+        position: absolute;
+        top: 64px;
+        left: 8px;
+        img {
+            display: block;
+            height: 48px;
         }
     }
     .sim-map-tooltip {
