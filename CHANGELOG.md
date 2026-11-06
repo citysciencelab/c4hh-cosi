@@ -4,6 +4,14 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
+## 2026-11-06 v3.28.1
+
+### Fixed
+- Issue \#1667: Respect map rotation when displaying user moving direction.
+- Draw: Fixed an issue where the drawn features would not appear on prints from the print module.
+
+---
+
 ## 2026-11-04 v3.28.0
 
 ### Added

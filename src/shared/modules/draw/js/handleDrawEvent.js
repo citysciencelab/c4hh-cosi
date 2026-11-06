@@ -179,7 +179,8 @@ export default function handleDrawEvent (event) {
             ...event.feature.get("masterportal_attributes"),
             fromDrawTool: true,
             styleId: selectedDrawType === "doubleCircle" ? idCounter + 2 : idCounter + 1,
-            drawState
+            drawState,
+            isVisible: true
         };
 
     if (selectedDrawType === "square" && currentLayout.squareMethod === "defined") {
