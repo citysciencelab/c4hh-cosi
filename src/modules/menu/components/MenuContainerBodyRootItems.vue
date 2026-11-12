@@ -70,11 +70,13 @@ export default {
                 if (isPiniaModule(item.type)) {
                     const piniaStore = getPiniaModuleStore(item.type)();
 
-                    // merge config item with the module's menu metadata from the Pinia store
                     return {
                         name: piniaStore.name,
                         icon: piniaStore.icon,
                         description: piniaStore.description,
+                        supportedMapModes: piniaStore.supportedMapModes,
+                        supportedDevices: piniaStore.supportedDevices,
+                        supportedTreeTypes: piniaStore.supportedTreeTypes,
                         ...item,
                         type: item.type
                     };
@@ -90,6 +92,9 @@ export default {
                         name: stateProperties.name,
                         icon: stateProperties.icon,
                         description: stateProperties.description,
+                        supportedMapModes: stateProperties.supportedMapModes,
+                        supportedDevices: stateProperties.supportedDevices,
+                        supportedTreeTypes: stateProperties.supportedTreeTypes,
                         ...item,
                         type: item.type
                     };

@@ -36,7 +36,10 @@ describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
                         TestModule: {
                             icon: "bi-state",
                             name: "stateName",
-                            description: "stateDescription"
+                            description: "stateDescription",
+                            supportedMapModes: ["3D"],
+                            supportedDevices: ["Desktop"],
+                            supportedTreeTypes: ["custom"]
                         }
                     })
                 }
@@ -176,5 +179,8 @@ describe("src/modules/menu/MenuContainerBodyRootItems.vue", () => {
         const properties = wrapper.vm.chooseProperties({type: "testModule"});
 
         expect(properties.name).to.equal("stateName");
+        expect(properties.supportedMapModes).to.deep.equal(["3D"]);
+        expect(properties.supportedDevices).to.deep.equal(["Desktop"]);
+        expect(properties.supportedTreeTypes).to.deep.equal(["custom"]);
     });
 });
