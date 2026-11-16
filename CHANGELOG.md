@@ -5,7 +5,7 @@
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
 
-## 2026-11-06 v3.28.2
+## 2026-11-16 v3.28.2
 
 ### Fixed
 - Menu: Modules are not shown in menu unless their supported modes match the current map mode.
