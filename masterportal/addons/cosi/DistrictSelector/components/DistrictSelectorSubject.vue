@@ -142,7 +142,7 @@ export default {
         exportFeature (card) {
             const feature = wktParser.decodeFeature(card?.subjectFeatureWKT);
 
-            downloadJsonToFile(featuresToGeoJsonCollection([feature]), "Gebiet für Fachdaten.geojson");
+            downloadJsonToFile(featuresToGeoJsonCollection([feature], false, "EPSG:25832", "EPSG:4326"), "Gebiet für Fachdaten.geojson");
         },
 
         /**

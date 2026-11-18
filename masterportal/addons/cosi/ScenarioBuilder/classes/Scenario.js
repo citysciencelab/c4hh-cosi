@@ -435,7 +435,8 @@ export default class Scenario {
      */
     exportScenarioFeatures () {
         const geojson = featuresToGeoJsonCollection(
-            this.simulatedFeatures.map(scenarioFeature => scenarioFeature.feature)
+            this.simulatedFeatures.map(scenarioFeature => scenarioFeature.feature),
+            false, "EPSG:25832", "EPSG:4326"
         );
 
         downloadJsonToFile(geojson, this.name + "_Simulierte_Einrichtungen.json");
@@ -448,7 +449,8 @@ export default class Scenario {
      */
     exportScenarioNeighborhoods () {
         const geojson = featuresToGeoJsonCollection(
-            this.neighborhoods.map(scenarioFeature => scenarioFeature.feature)
+            this.neighborhoods.map(scenarioFeature => scenarioFeature.feature),
+            false, "EPSG:25832", "EPSG:4326"
         );
 
         downloadJsonToFile(geojson, this.name + "_Simulierte_Wohnquartiere.json");
@@ -463,7 +465,8 @@ export default class Scenario {
             [
                 ...this.getAllFeatures().map(item => item.feature),
                 ...this.getNeighborhoods().map(item => item.feature)
-            ]
+            ],
+            false, "EPSG:25832", "EPSG:4326"
         );
 
         downloadJsonToFile(geojson, this.name + "_Szenario.json");

@@ -29,7 +29,7 @@ export default {
             return {
                 ...item,
                 objects: item.objects.map(obj => {
-                    return featureToGeoJson(obj.feature);
+                    return featureToGeoJson(obj.feature, false, "EPSG:25832", "EPSG:4326");
                 })
             };
         },

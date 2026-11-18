@@ -154,7 +154,7 @@ export default {
                 }
             }
 
-            return geoJsonCollectionToFeatures(featureCollection).map(feature => markRaw(feature));
+            return geoJsonCollectionToFeatures(featureCollection, "EPSG:4326", "EPSG:25832").map(feature => markRaw(feature));
         },
 
         /**
@@ -171,7 +171,7 @@ export default {
                 }
             }
 
-            return geoJsonCollectionToFeatures(featureCollection);
+            return geoJsonCollectionToFeatures(featureCollection, "EPSG:4326", "EPSG:25832");
         },
 
         /**

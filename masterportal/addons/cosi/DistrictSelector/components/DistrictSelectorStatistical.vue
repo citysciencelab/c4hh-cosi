@@ -368,7 +368,7 @@ export default {
          * @returns {void}
          */
         exportFeature (val) {
-            downloadJsonToFile(featuresToGeoJsonCollection(wktParser.decodeFeatures(val?.features)), val?.districtLevelLabel + ".geojson");
+            downloadJsonToFile(featuresToGeoJsonCollection(wktParser.decodeFeatures(val?.features), false, "EPSG:25832", "EPSG:4326"), val?.districtLevelLabel + ".geojson");
         },
 
         /**

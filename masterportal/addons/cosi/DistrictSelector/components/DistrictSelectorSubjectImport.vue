@@ -2,7 +2,7 @@
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
-import {geoJsonToFeature} from "@shared/js/utils/convertGeoJSONToFeature.js";
+import {geoJsonCollectionToFeatures} from "@shared/js/utils/convertGeoJSONToFeature.js";
 import {uniqueId} from "@shared/js/utils/uniqueId";
 
 export default {
@@ -101,7 +101,12 @@ export default {
             const geojsonFeature = JSON.parse(content);
 
             try {
-                const olFeatures = geoJsonToFeature(geojsonFeature);
+                // readFeatures semantics (Feature or FeatureCollection -> array), WGS84 input as before 3.28
+                const olFeatures = geoJsonCollectionToFeatures(geojsonFeature, "EPSG:4326", "EPSG:25832");
+
+                if (!Array.isArray(olFeatures)) {
+                    throw new Error("not a GeoJSON object");
+                }
 
                 this.$emit("set-imported-feature", olFeatures);
                 this.isFormatValid = true;

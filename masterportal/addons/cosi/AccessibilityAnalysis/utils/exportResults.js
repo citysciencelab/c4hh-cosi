@@ -13,7 +13,7 @@ import {filterAllFeatures} from "../../utils/layer/filterAllFeatures";
  */
 export function exportAsGeoJson (mapLayer, projectionCode) {
     const features = mapLayer.getLayerSource().getFeatures(),
-        featureCollection = featuresToGeoJsonCollection(mapLayer.getLayerSource().getFeatures(), false, projectionCode),
+        featureCollection = featuresToGeoJsonCollection(mapLayer.getLayerSource().getFeatures(), false, projectionCode, "EPSG:4326"),
         startIndex = featureCollection.features.length === 3 ? 0 : 1;
 
     if (!featureCollection.features.length) {
