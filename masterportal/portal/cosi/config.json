@@ -1046,7 +1046,7 @@
                 "type": "reportingTool"
               },
               {
-                "type": "draw_old",
+                "type": "draw",
                 "enableAttributesSelector": true,
                 "iconList": [
                   {
