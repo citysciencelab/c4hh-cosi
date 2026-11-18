@@ -15,7 +15,7 @@ name: cosi-valhalla
 services:
   valhalla:
     image: ${VALHALLA_IMAGE:-ghcr.io/gis-ops/docker-valhalla/valhalla:latest}
-    container_name: cosi-valhalla
+    container_name: ${COSI_CONTAINER_PREFIX:-cosi}-valhalla
     ports:
       # AccessibilityAnalysis talks to this on http://localhost:8002 (see §3).
       - "${VALHALLA_PORT:-8002}:8002"
@@ -71,7 +71,7 @@ services:
   # car/bike/foot routing always works; transit needs a current HVV_GTFS_URL.
   gtfs-fetch:
     image: python:3.12-slim-bookworm
-    container_name: cosi-gtfs-fetch
+    container_name: ${COSI_CONTAINER_PREFIX:-cosi}-gtfs-fetch
     working_dir: /work
     volumes:
       # Whole valhalla/ dir → scripts/, hamburg.poly, and the gtfs_feeds output

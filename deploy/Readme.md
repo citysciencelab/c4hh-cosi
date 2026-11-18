@@ -101,6 +101,34 @@ Persistence: Valhalla tiles live in the named volume `valhalla_tiles`, so they
 survive redeploys (no rebuild). `gtfs_feeds/` is re-fetched on a clean redeploy
 (cheap) unless tiles are already cached, in which case Valhalla reuses them.
 
+### Beta instance (branch `beta`)
+
+The beta portal (prototypes and our own extensions, see the root Readme →
+*Branches*) is a complete second stack, including its own Valhalla, deployed with
+the steps above and these differences:
+
+1. **New → Compose**, this repo, **branch `beta`**, compose path `docker-compose.yml`.
+2. **Environment** tab, in addition to what you need from `.env.example`:
+
+   ```
+   COSI_CONTAINER_PREFIX=cosi-beta      # container names + image tag, so nothing
+                                        # collides with another COSI stack on the host
+   PORTAL_PORT=8091                     # any free host port (Traefik owns 8080)
+   VALHALLA_PORT=127.0.0.1:8092         # keep Valhalla off the public interface; the
+                                        # portal reaches it over the stack network
+   ```
+
+   `BUILD_TRANSIT=True` (the default) needs **~6 GB RAM** for the first tile
+   build, see *Resource needs*.
+3. **Domains** tab: the beta hostname (e.g. `beta.cosi.care4.hamburg`), Service
+   `portal`, Container Port `80`, HTTPS on. DNS A record → the Dokploy server.
+4. Turn on **Autodeploy** (GitHub webhook) so every push to `beta` redeploys.
+
+The first deploy builds the beta's own Valhalla tiles in its own volume
+(minutes to tens of minutes). If the host runs another COSI stack that uses the
+hand-wired "Method 2" Traefik labels, rename the `cosi-portal-*` router names in
+one of them; the Domains-tab setup doesn't have that problem.
+
 ## Resource needs
 
 | Phase | Needs |
