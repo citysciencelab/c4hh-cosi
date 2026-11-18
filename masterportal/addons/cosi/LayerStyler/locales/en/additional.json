@@ -1,0 +1,10 @@
+{
+    "modules": {
+        "cosi": {
+            "layerStyler": {
+                "title": "Styling (new)",
+                "description": "Colour any visible vector layer: one colour, classes of a number or categories — with a legend."
+            }
+        }
+    }
+}

@@ -393,6 +393,9 @@
                 "type": "layerFilter"
               },
               {
+                "type": "layerStyler"
+              },
+              {
                 "type": "filter",
                 "name": "Daten filtern",
                 "icon": "bi-funnel-fill",

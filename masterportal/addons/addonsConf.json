@@ -197,6 +197,10 @@
     "path":"cosi/LayerFilter",
     "type": "tool"
   },
+  "layerStyler": {
+    "path":"cosi/LayerStyler",
+    "type": "tool"
+  },
   "areaSelector": {
     "path":"cosi/AreaSelector",
     "type": "tool"

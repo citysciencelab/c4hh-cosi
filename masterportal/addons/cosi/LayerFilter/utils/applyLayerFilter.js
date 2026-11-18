@@ -18,13 +18,14 @@
  * The OL objects live in a module-level registry (not in Vuex): the store only keeps
  * the plain filter specs.
  */
-import Style, {createDefaultStyle} from "ol/style/Style.js";
+import Style from "ol/style/Style.js";
 import Fill from "ol/style/Fill.js";
 import Stroke from "ol/style/Stroke.js";
 import CircleStyle from "ol/style/Circle.js";
 import Cluster from "ol/source/Cluster.js";
 import {buildPredicate} from "./filterSpec.js";
 import {buildSpatialTest} from "./spatialFilter.js";
+import {resetStyleStacks, setFilterStyle} from "../../utils/layer/styleStack.js";
 
 /** Pale grey for non-matching features (c4hh-app DIM_STYLE). */
 export const DIM_STYLE = new Style({
@@ -161,9 +162,6 @@ export function applyLayerFilter (layer, spec, missMode = "dim", spatial = null)
 
     if (!entry) {
         entry = {kind, layer, refUnlisten: new Map()};
-        if (kind === "canvas") {
-            entry.originalStyle = layer.getLayer().getStyle();
-        }
         if (kind === "webgl") {
             entry.allFeatures = featureSource(layer).getFeatures().slice();
         }
@@ -218,10 +216,6 @@ export function applyLayerFilter (layer, spec, missMode = "dim", spatial = null)
     });
 
     if (kind === "canvas") {
-        const orig = entry.originalStyle,
-            staticFn = orig ? () => orig : createDefaultStyle,
-            origFn = typeof orig === "function" ? orig : staticFn;
-
         // The masterportalapi caches the style of every POINT it draws on the feature
         // itself (createStyle → feature.setStyle), and a feature style beats the layer
         // style. Non-matches lose that cache, or they would keep their full look.
@@ -230,11 +224,12 @@ export function applyLayerFilter (layer, spec, missMode = "dim", spatial = null)
                 f.setStyle(null);
             }
         });
-        layer.getLayer().setStyle((feature, resolution) => {
+        // the base is the LayerStyler's style if there is one, else the original
+        setFilterStyle(layer, baseFn => (feature, resolution) => {
             const v = verdict(feature);
 
             if (v === "keep") {
-                return origFn(feature, resolution);
+                return baseFn(feature, resolution);
             }
             return v === "dim" ? DIM_STYLE : undefined;
         });
@@ -306,7 +301,7 @@ export function clearLayerFilter (layer) {
     entry.unlisten?.();
     entry.refUnlisten.forEach(unlisten => unlisten());
     if (entry.kind === "canvas") {
-        layer.getLayer().setStyle(entry.originalStyle);
+        setFilterStyle(layer, null);
     }
     else if (entry.kind === "cluster") {
         featureSource(layer).getFeatures().forEach(f => f.set("hideInClustering", false, true));
@@ -378,4 +373,5 @@ export function onFeaturesChanged (layer, callback, wait = 300, geometryChanges 
  */
 export function resetRegistry () {
     registry.clear();
+    resetStyleStacks();
 }
