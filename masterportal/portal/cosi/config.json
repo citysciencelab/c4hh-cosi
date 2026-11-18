@@ -390,6 +390,9 @@
                 "name": "DIPAS Projekte"
               },
               {
+                "type": "layerFilter"
+              },
+              {
                 "type": "filter",
                 "name": "Daten filtern",
                 "icon": "bi-funnel-fill",

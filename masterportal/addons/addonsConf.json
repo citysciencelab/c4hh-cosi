@@ -193,6 +193,10 @@
     "path":"cosi/PolygonStyler",
     "type": "tool"
   },
+  "layerFilter": {
+    "path":"cosi/LayerFilter",
+    "type": "tool"
+  },
   "areaSelector": {
     "path":"cosi/AreaSelector",
     "type": "tool"
