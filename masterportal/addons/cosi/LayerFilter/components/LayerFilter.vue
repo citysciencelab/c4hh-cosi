@@ -7,8 +7,9 @@ import {
 } from "../utils/filterSpec.js";
 import {
     applyLayerFilter, canDim, clearLayerFilter, getAllFeatures, isFilterableLayer,
-    onFeaturesChanged, setUpdateHandler
+    onFeaturesChanged, setLayerResolver, setUpdateHandler
 } from "../utils/applyLayerFilter.js";
+import {isPolygonal, newClause, spatialSentence} from "../utils/spatialFilter.js";
 
 /** Attributes that are bookkeeping, not data. */
 const HIDDEN_ATTRS = new Set([
@@ -18,8 +19,21 @@ const HIDDEN_ATTRS = new Set([
 ]);
 /** How many features are looked at to collect the attribute names. */
 const ATTR_SAMPLE = 300;
+/** How many features are looked at to tell whether a layer has areas. */
+const POLY_SAMPLE = 50;
 /** Debounce of the map update while dragging a slider (ms). */
 const APPLY_WAIT = 120;
+/** Layers whose technical name is not meant for people. */
+const DISPLAY_NAMES = {importDrawLayer: "Gezeichnete Flächen"};
+
+/**
+ * The name shown for a layer.
+ * @param {Object} layer The layer wrapper.
+ * @returns {String} The name.
+ */
+function displayName (layer) {
+    return DISPLAY_NAMES[layer.get("id")] ?? layer.get("name") ?? layer.get("id");
+}
 
 /**
  * LayerFilter — filter ANY visible vector layer by its attributes (port of the
@@ -35,6 +49,8 @@ export default {
             layerId: null,
             spec: null,
             missMode: "dim",
+            spatial: {combine: "and", refs: []},
+            refCounts: {},
             featuresVersion: 0,
             lastCount: null,
             applyTimer: null
@@ -62,28 +78,20 @@ export default {
         attrOptions () {
 
             this.featuresVersion;
-            if (!this.layer) {
-                return [];
-            }
-            const keys = new Set(),
-                  features = getAllFeatures(this.layer).slice(0, ATTR_SAMPLE),
-                  ignored = new Set((globalThis.Config?.ignoredKeys ?? []).map(k => String(k).toUpperCase()));
+            return this.layer ? this.attrOptionsOf(this.layer) : [];
+        },
+        /** Visible layers with areas that can serve as reference (not the filtered one). */
+        refCandidates () {
 
-            features.forEach(f => {
-                const geomName = f.getGeometryName(),
-                      props = f.getProperties();
+            this.featuresVersion;
+            return this.layers.filter(l => {
+                const layer = l.id !== this.layerId && layerCollection.getLayerById(l.id);
 
-                Object.keys(props).forEach(k => {
-                    const v = props[k];
-
-                    if (k !== geomName && !HIDDEN_ATTRS.has(k) && !ignored.has(k.toUpperCase()) && !k.startsWith("_") && (v === null || typeof v !== "object" || Array.isArray(v))) {
-                        keys.add(k);
-                    }
-                });
+                return layer && getAllFeatures(layer).slice(0, POLY_SAMPLE).some(f => isPolygonal(f.getGeometry()));
             });
-            return [...keys]
-                .map(k => ({key: k, label: this.labelOf(k)}))
-                .sort((a, b) => a.label.localeCompare(b.label, "de"));
+        },
+        spatialActive () {
+            return this.spatial.refs.some(r => r.refLayerId);
         },
         dimPossible () {
             return this.layer ? canDim(this.layer) : true;
@@ -95,7 +103,11 @@ export default {
             return this.layerId ? this.filters[this.layerId] : null;
         },
         sentence () {
-            return this.spec ? filterSpecSentence(this.spec, this.labelOf) : "";
+            const where = spatialSentence(this.spatial, id => this.layerName(id), (spec, id) => filterSpecSentence(spec, a => this.labelOf(a, id))),
+                  // the untouched starting condition is not worth a note when the spatial part filters
+                  attr = this.spec && (!where || buildPredicate(this.spec)) ? filterSpecSentence(this.spec, this.labelOf) : "";
+
+            return [attr, where].filter(Boolean).join(" — ");
         },
         chips () {
             return Object.entries(this.filters).map(([id, f]) => ({
@@ -124,6 +136,7 @@ export default {
 
                 this.spec = stored ? JSON.parse(JSON.stringify(stored.spec)) : {items: [newCondition(null)]};
                 this.missMode = stored?.missMode ?? "dim";
+                this.spatial = stored?.spatial ? JSON.parse(JSON.stringify(stored.spatial)) : {combine: "and", refs: []};
                 this.lastCount = stored ? {matched: stored.matched, total: stored.total} : null;
                 if (this.layer) {
                     this.unlisten = onFeaturesChanged(this.layer, () => {
@@ -141,11 +154,22 @@ export default {
         },
         missMode () {
             this.scheduleApply(0);
+        },
+        spatial: {
+            deep: true,
+            handler () {
+                this.scheduleApply();
+            }
         }
     },
     created () {
+        setLayerResolver(id => layerCollection.getLayerById(id));
         // filters re-applied after a reload (also while the tool is closed) update their count
-        setUpdateHandler((layerId, {matched, total}) => {
+        setUpdateHandler((layerId, {matched, total, refCounts}) => {
+            if (layerId === this.layerId) {
+                this.refCounts = refCounts;
+                this.lastCount = {matched, total};
+            }
             if (this.$store.state.Modules.LayerFilter.filters[layerId]) {
                 this.$store.commit("Modules/LayerFilter/setFilterEntry", {layerId, entry: {matched, total}});
             }
@@ -163,7 +187,7 @@ export default {
         refreshLayers () {
             this.layers = layerCollection.getLayers()
                 .filter(l => l.get("visibility") === true && isFilterableLayer(l))
-                .map(l => ({id: l.get("id"), name: l.get("name")}))
+                .map(l => ({id: l.get("id"), name: displayName(l)}))
                 .sort((a, b) => String(a.name).localeCompare(String(b.name), "de"));
             if (this.layerId && !this.layers.some(l => l.id === this.layerId)) {
                 this.layerId = null;
@@ -172,13 +196,89 @@ export default {
                 this.layerId = this.layers[0].id;
             }
         },
-        labelOf (attr) {
-            const label = this.attrLabels[attr];
+        labelOf (attr, layerId) {
+            const gfi = layerId ? layerCollection.getLayerById(layerId)?.get("gfiAttributes") : null,
+                  labels = gfi && typeof gfi === "object" ? gfi : this.attrLabels,
+                  label = labels[attr];
 
             return typeof label === "string" && label ? label : attr;
         },
         statsFor (attr) {
             return getAttrStats(this.propsList, attr);
+        },
+        layerName (id) {
+            const layer = layerCollection.getLayerById(id);
+
+            return layer ? displayName(layer) : id;
+        },
+        /**
+         * Attribute names of a layer (sampled), with display names, sorted.
+         * @param {Object} layer Masterportal layer.
+         * @returns {Object[]} {key, label}
+         */
+        attrOptionsOf (layer) {
+            const keys = new Set(),
+                  features = getAllFeatures(layer).slice(0, ATTR_SAMPLE),
+                  ignored = new Set((globalThis.Config?.ignoredKeys ?? []).map(k => String(k).toUpperCase())),
+                  layerId = layer.get("id");
+
+            features.forEach(f => {
+                const geomName = f.getGeometryName(),
+                      props = f.getProperties();
+
+                Object.keys(props).forEach(k => {
+                    const v = props[k];
+
+                    if (k !== geomName && !HIDDEN_ATTRS.has(k) && !ignored.has(k.toUpperCase()) && !k.startsWith("_") && (v === null || typeof v !== "object" || Array.isArray(v))) {
+                        keys.add(k);
+                    }
+                });
+            });
+            return [...keys]
+                .map(k => ({key: k, label: this.labelOf(k, layerId)}))
+                .sort((a, b) => a.label.localeCompare(b.label, "de"));
+        },
+        refAttrOptions (refLayerId) {
+            const layer = refLayerId && layerCollection.getLayerById(refLayerId);
+
+            return layer ? this.attrOptionsOf(layer) : [];
+        },
+        refStats (refLayerId, attr) {
+            const layer = layerCollection.getLayerById(refLayerId);
+
+            if (!layer) {
+                return {type: "empty"};
+            }
+            // one stable props list per reference layer and features version (the stats are memoised per list)
+            const cache = this.refPropsCache ?? (this.refPropsCache = new Map()),
+                  hit = cache.get(refLayerId);
+
+            if (hit?.version !== this.featuresVersion) {
+                cache.set(refLayerId, {version: this.featuresVersion, list: getAllFeatures(layer).map(f => f.getProperties())});
+            }
+            return getAttrStats(cache.get(refLayerId).list, attr);
+        },
+        refCondition (clause) {
+            return clause.refFilter?.items?.[0] ?? null;
+        },
+        onRefAttrChange (clause, attr) {
+            if (!attr) {
+                clause.refFilter = null;
+                return;
+            }
+            const cond = {...newCondition(null), attr, ...seedCondition(this.refStats(clause.refLayerId, attr))};
+
+            clause.refFilter = {items: [cond]};
+        },
+        addClause () {
+            this.spatial.refs.push(newClause());
+        },
+        removeClause (i) {
+            this.spatial.refs.splice(i, 1);
+        },
+        onRefLayerChange (clause, id) {
+            clause.refLayerId = id || null;
+            clause.refFilter = null;
         },
         scheduleApply (wait = APPLY_WAIT) {
             clearTimeout(this.applyTimer);
@@ -188,21 +288,24 @@ export default {
             if (!this.layer || !this.spec) {
                 return;
             }
-            const {matched, total} = applyLayerFilter(this.layer, this.spec, this.effectiveMissMode);
+            const {matched, total, refCounts} = applyLayerFilter(this.layer, this.spec, this.effectiveMissMode, this.spatial),
+                  restricts = Boolean(buildPredicate(this.spec)) || this.spatialActive;
 
+            this.refCounts = refCounts;
             // a filter that keeps everything (e.g. a freshly picked full range) is no filter
-            if (buildPredicate(this.spec) && matched === total) {
+            if (restricts && matched === total) {
                 clearLayerFilter(this.layer);
             }
-            if (buildPredicate(this.spec) && matched < total) {
+            if (restricts && matched < total) {
                 this.setFilterEntry({
                     layerId: this.layerId,
                     entry: {
                         spec: JSON.parse(JSON.stringify(this.spec)),
                         missMode: this.missMode,
+                        spatial: JSON.parse(JSON.stringify(this.spatial)),
                         matched,
                         total,
-                        layerName: this.layer.get("name")
+                        layerName: displayName(this.layer)
                     }
                 });
             }
@@ -258,6 +361,7 @@ export default {
             }
             this.removeFilterEntry(this.layerId);
             this.spec = {items: [newCondition(null)]};
+            this.spatial = {combine: "and", refs: []};
         },
         clearChip (id) {
             const layer = layerCollection.getLayerById(id);
@@ -268,6 +372,7 @@ export default {
             this.removeFilterEntry(id);
             if (id === this.layerId) {
                 this.spec = {items: [newCondition(null)]};
+                this.spatial = {combine: "and", refs: []};
             }
         },
         selectChip (id) {
@@ -574,6 +679,149 @@ export default {
                 >
                     Bei gruppierten (geclusterten) und WebGL-Layern werden nicht passende Objekte ausgeblendet.
                 </p>
+
+                <details
+                    class="border rounded p-2 mb-3 lf-spatial"
+                    :open="spatialActive || null"
+                >
+                    <summary class="fw-bold small">
+                        Räumlicher Filter{{ spatialActive ? " (aktiv)" : "" }}
+                    </summary>
+                    <p class="small text-muted mt-2 mb-2">
+                        Behält nur Objekte, die innerhalb (oder außerhalb) der Flächen eines anderen Layers liegen — Stadtteile, Bezirke oder selbst gezeichnete Flächen. Linien und Flächen zählen nach ihrem Mittelpunkt. Räumlich ausgeschlossene Objekte werden ausgeblendet.
+                    </p>
+                    <p
+                        v-if="!refCandidates.length"
+                        class="small text-muted mb-1"
+                    >
+                        Kein Flächen-Layer sichtbar. Schalte z. B. Stadtteile ein oder zeichne eine Fläche.
+                    </p>
+                    <template v-else>
+                        <div
+                            v-if="spatial.refs.length > 1"
+                            class="d-flex align-items-center gap-2 mb-2"
+                        >
+                            <span class="small">Verknüpfung</span>
+                            <div
+                                class="btn-group btn-group-sm lf-combine"
+                                role="group"
+                                aria-label="Verknüpfung der Referenzen"
+                            >
+                                <button
+                                    type="button"
+                                    :class="['btn', spatial.combine === 'and' ? 'btn-primary' : 'btn-outline-primary']"
+                                    title="Alle Bedingungen müssen zutreffen"
+                                    @click="spatial.combine = 'and'"
+                                >
+                                    UND
+                                </button>
+                                <button
+                                    type="button"
+                                    :class="['btn', spatial.combine === 'or' ? 'btn-primary' : 'btn-outline-primary']"
+                                    title="Eine Bedingung genügt"
+                                    @click="spatial.combine = 'or'"
+                                >
+                                    ODER
+                                </button>
+                            </div>
+                        </div>
+                        <div
+                            v-for="(clause, i) in spatial.refs"
+                            :key="i"
+                            class="border rounded p-2 mb-2 lf-clause"
+                        >
+                            <div class="d-flex gap-1 mb-2">
+                                <select
+                                    class="form-select form-select-sm lf-ref"
+                                    aria-label="Referenz-Flächen"
+                                    :value="clause.refLayerId ?? ''"
+                                    @change="onRefLayerChange(clause, $event.target.value)"
+                                >
+                                    <option value="">
+                                        — Flächen-Layer —
+                                    </option>
+                                    <option
+                                        v-for="l in refCandidates"
+                                        :key="l.id"
+                                        :value="l.id"
+                                    >
+                                        {{ l.name }}
+                                    </option>
+                                </select>
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-secondary"
+                                    :title="`Referenz ${i + 1} entfernen`"
+                                    :aria-label="`Referenz ${i + 1} entfernen`"
+                                    @click="removeClause(i)"
+                                >
+                                    <i class="bi-trash" />
+                                </button>
+                            </div>
+                            <template v-if="clause.refLayerId">
+                                <div
+                                    class="btn-group btn-group-sm mb-2 lf-mode"
+                                    role="group"
+                                    :aria-label="`Lage zu Referenz ${i + 1}`"
+                                >
+                                    <button
+                                        type="button"
+                                        :class="['btn', clause.mode !== 'outside' ? 'btn-primary' : 'btn-outline-primary']"
+                                        @click="clause.mode = 'within'"
+                                    >
+                                        nur innerhalb
+                                    </button>
+                                    <button
+                                        type="button"
+                                        :class="['btn', clause.mode === 'outside' ? 'btn-primary' : 'btn-outline-primary']"
+                                        @click="clause.mode = 'outside'"
+                                    >
+                                        nur außerhalb
+                                    </button>
+                                </div>
+                                <label class="form-label small mb-1 d-block">
+                                    Flächen eingrenzen (optional)
+                                    <select
+                                        class="form-select form-select-sm lf-ref-attr"
+                                        :value="refCondition(clause)?.attr ?? ''"
+                                        @change="onRefAttrChange(clause, $event.target.value)"
+                                    >
+                                        <option value="">
+                                            — alle Flächen —
+                                        </option>
+                                        <option
+                                            v-for="a in refAttrOptions(clause.refLayerId)"
+                                            :key="a.key"
+                                            :value="a.key"
+                                        >
+                                            {{ a.label }}
+                                        </option>
+                                    </select>
+                                </label>
+                                <FilterValueEditor
+                                    v-if="refCondition(clause)"
+                                    class="mt-1"
+                                    :cond="refCondition(clause)"
+                                    :stats="refStats(clause.refLayerId, refCondition(clause).attr)"
+                                    @update="patch => onValue(refCondition(clause), patch)"
+                                />
+                                <p
+                                    class="small text-muted mb-0 mt-1 lf-ref-count"
+                                    role="status"
+                                >
+                                    {{ refCounts[clause.refLayerId] === undefined ? "" : `${fmtNum(refCounts[clause.refLayerId])} ${refCounts[clause.refLayerId] === 1 ? "Fläche" : "Flächen"} als Referenz` }}
+                                </p>
+                            </template>
+                        </div>
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-outline-primary lf-add-ref"
+                            @click="addClause"
+                        >
+                            + Referenz
+                        </button>
+                    </template>
+                </details>
 
                 <p
                     class="mb-1 lf-count"
