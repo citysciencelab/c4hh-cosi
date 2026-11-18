@@ -69,30 +69,8 @@ export default {
                 {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.subtract"), value: "subtract"},
                 {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.multiply"), value: "multiply"},
                 {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.divide"), value: "divide"},
-                {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.dividePercent"), value: "dividePercent"},
-                {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.sumUpSelected"), value: "sumUpSelected"}
+                {title: this.$t("additional:modules.tools.cosi.dashboard.tableRowMenu.dividePercent"), value: "dividePercent"}
             ];
-        },
-
-        /**
-         * Whether the chosen operation works on the categories filtered into the table
-         * instead of on two explicitly picked categories.
-         * @returns {Boolean} True for selection based operations.
-         */
-        isSelectionOperation () {
-            return this.operation === "sumUpSelected";
-        },
-
-        /**
-         * Selection based operations need at least two filtered categories and a name,
-         * because there is no pair of categories to derive a label from.
-         * @returns {Boolean} True if the calculation cannot be started.
-         */
-        calculationDisabled () {
-            if (this.isSelectionOperation) {
-                return this._statsFeatureFilter.length < 2 || !this.calculationName;
-            }
-            return !this.category_A || !this.category_B;
         },
 
         /**
@@ -248,7 +226,6 @@ export default {
                 placeholder=""
             />
             <DropdownAutocomplete
-                v-if="!isSelectionOperation"
                 v-model="category_A"
                 :items="mapping"
                 item-title="value"
@@ -268,25 +245,18 @@ export default {
                 </div>
             </div>
             <DropdownAutocomplete
-                v-if="!isSelectionOperation"
                 v-model="category_B"
                 :items="mapping"
                 item-title="value"
                 :label="$t('additional:modules.tools.cosi.dashboard.category')"
             />
-            <p
-                v-else
-                class="text-muted small mb-0"
-            >
-                {{ $t('additional:modules.tools.cosi.dashboard.sumUpSelectedHint') }}
-            </p>
             <div class="d-flex justify-content-center">
                 <FlatButton
                     id="calculation-button"
                     customclass="mt-3 mb-2"
                     icon="bi bi-plus-circle"
                     :text="$t('additional:modules.tools.cosi.dashboard.tableRowMenu.calculate')"
-                    :disabled="calculationDisabled"
+                    :disabled="!category_A || !category_B"
                     :interaction="() => onStartCalculation()"
                 />
             </div>
