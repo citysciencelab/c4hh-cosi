@@ -6,6 +6,7 @@ import InputText from "@shared/modules/inputs/components/InputText.vue";
 
 /**
  * Draw Item Attributes
+ * @deprecated in 3.39.0 (November 2027)
  * @module modules/DrawItemAttributes
  * @vue-prop {Object} selectedFeature - The selected feature.
  * @vue-prop {Object} layer - The layer.

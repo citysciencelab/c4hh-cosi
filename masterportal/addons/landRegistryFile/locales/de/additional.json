@@ -1,0 +1,68 @@
+{
+    "modules": {
+        "landRegistryFile": {
+            "name": "Digitale Grundstücksakte",
+            "description": "Anzeige von grundstückbezogenen Vorgängen im Hoch-Tief-Bau und Wegerecht.",
+            "loadingSpinnerText": {
+                "general": "Daten werden geladen. Bitte warten..."
+            },
+            "tabs": {
+              "tabSearch": {
+                "label": "Suche",
+                "searchButtonLabel": "Suche",
+                "resetButtonLabel": "Zurücksetzen",
+                "searchModeSwitchLabel": "Suche auf Kartenausschnitt beschränken",
+                "searchModeInExtent": "Suche erfolgt im aktuellen Kartenausschnitt.",
+                "searchModeOverall": "Suche erfolgt in ganz Hamburg.",
+                "yearFromLabel": "Jahr von",
+                "yearToLabel": "Jahr bis",
+                "textSearchPlaceholder": "Freitextsuche",
+                "textSearchInfo": "Hinweise zur textlichen Suche",
+                "textSearchInfoModal": {
+                  "searchIn": "Es wird gesucht in folgenden Feldern:",
+                  "searchValidChars": "Sie können folgende Sonderzeichen verwenden:"
+                },
+                "unsubmittedSearchWarning": "Ihre aktuellen Suchkriterien haben noch keine Auswirkungen auf die Ergebnisse. Bitte klicken Sie auf 'Suche', um die Ergebnisse zu aktualisieren.",
+                "errors": {
+                  "errorYearDigit": "Bitte bei '{{fieldname}}' ein Zahl mit 4 Ziffern eingeben.",
+                  "errorYearBoth": "Geben Sie 'Von' und 'Bis' an, um nach Jahrgang zu suchen.",
+                  "errorYearOrder": "'Bis' muss größer oder gleich 'Von' sein.",
+                  "errorInvalidChars": "Der Text enthält folgende ungültige Zeichen: {{invalidChars}}",
+                  "overallSearchNeedsFilter": "Für eine Suche in ganz Hamburg ist ein zusätzlicher Filter erforderlich.",
+                  "overallSearchOptionNeedsFilter": "Bei der Auswahl von '{{selectedOption}}' ist für eine Suche in ganz Hamburg ein zusätzlicher Filter erforderlich."
+                }
+              },
+              "tabResults": {
+                "label": "Ergebnisse",
+                "backToSearchButtonLabel": "Zurück zur Suche",
+                "showMoreFieldsLabel": "Mehr Felder anzeigen",
+                "actionsHeader": "Aktionen",
+                "actionsShowPosition": "Kartenposition anzeigen",
+                "actionsShowDetails": "Details anzeigen",
+                "actionsOpenLink": "Akte in ELDORADO öffnen",
+                "noResultsMessage": "Keine Ergebnisse gefunden. Bitte ändern Sie Ihre Suchkriterien.",
+                "numberOfResults": "Anzahl der gefundenen Datensätze:",
+                "datasetsPerPageLabel": "Datensätze pro Seite"
+              },
+              "tabDetails": {
+                "label": "Details",
+                "backToSearchButtonLabel": "Zurück zur Suche",
+                "backToResultsButtonLabel": "Zurück zur Ergebnisliste",
+                "noDetailsMessage": "Keine Details gefunden. Bitte ändern Sie Ihre Suchkriterien.",
+                "buttonBack": "Vorherige Akte anzeigen",
+                "buttonForward": "Nächste Akte anzeigen"
+              },
+              "tabHelp": {
+                "label": "Hilfe",
+                "backToSearchButtonLabel": "Zurück zur Suche",
+                "openHelpButtonLabel": "Hilfe-Seite im Sharepoint öffnen",
+                "startTourButtonLabel": "Geführte Hilfe-Tour starten",
+                "noHelpConfigured": "Derzeit ist keine gesonderte Hilfe für die 'Digitale Grundstücksakte' definiert."
+              }
+            },
+            "errors": {
+              "oafError": "Fehler beim Abrufen notwendiger Daten für '{{oafParams.collection}}'. Bitte versuchen Sie es erneut."
+            }
+        }
+    }
+}

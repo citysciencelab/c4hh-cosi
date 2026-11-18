@@ -774,42 +774,32 @@ export default {
             };
         },
         /**
-         * Handles drawing add/edit by writing it to the content array and closing the open editor.
-         * @param {ol/feature[]} features - The array of drawn features.
+         * Handles drawing or writing feature add/edit by writing it to the content array and closing the open editor.
+         * @param {ol/feature[]} features - The array of drawn or writen features.
+         * @param {String} type - The type, draw or write.
          * @returns {void}
          */
-        handleDraw (features) {
+        handleDrawWrite (features, type) {
             if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
                 const editIndex = this.openContentEditor.index;
 
-                this.content.splice(editIndex, 1, {
-                    type: "draw",
-                    attrs: features
-                });
+                if (features.length) {
+                    this.content.splice(editIndex, 1, {
+                        type: type,
+                        attrs: features
+                    });
+                }
+                else {
+                    this.content.splice(editIndex, 1);
+                }
             }
-            else {
+            else if (features.length) {
                 this.content.push({
-                    type: "draw",
+                    type: type,
                     attrs: features
                 });
             }
 
-            this.closeContentEditor();
-        },
-        /**
-         * Saves Write content and closes the content editor.
-         * @param {Object[]} mapText - GeoJSON feature objects.
-         * @returns {void}
-         */
-        handleMapText (mapText) {
-            if (Number.isInteger(this.openContentEditor.index) && this.openContentEditor.index < this.content.length) {
-                const editIndex = this.openContentEditor.index;
-
-                this.content.splice(editIndex, 1, {type: "write", attrs: mapText});
-            }
-            else {
-                this.content.push({type: "write", attrs: mapText});
-            }
             this.closeContentEditor();
         },
         /**
@@ -1420,7 +1410,7 @@ export default {
                                 v-if="isEditingContentItem(index)"
                                 class="mt-2"
                                 :initial-content="element"
-                                @addDrawing="handleDraw"
+                                @addDrawing="handleDrawWrite"
                                 @click:close="closeContentEditor"
                             />
                             <div
@@ -1463,7 +1453,7 @@ export default {
                                 v-if="isEditingContentItem(index)"
                                 class="mt-2"
                                 :initial-content="element"
-                                @addMapText="handleMapText"
+                                @addMapText="handleDrawWrite"
                                 @click:close="closeContentEditor"
                             />
                             <div
@@ -1537,13 +1527,13 @@ export default {
                 class="mt-2"
                 :create-image-asset="createImageAsset"
                 :image-assets-by-id="imageAssetsById"
-                @addDrawing="handleDraw"
+                @addDrawing="handleDrawWrite"
                 @click:close="closeContentEditor"
             />
             <StoryCreatorAddWriteCard
                 v-else-if="isAddingContentType('write')"
                 class="mt-2"
-                @addMapText="handleMapText"
+                @addMapText="handleDrawWrite"
                 @click:close="closeContentEditor"
             />
         </AccordionItem>

@@ -7,13 +7,19 @@ import addonModules from "virtual:addon-modules";
 const allAddons = typeof VUE_ADDONS !== "undefined" ? VUE_ADDONS : {};
 
 export default {
-/**
- * Adds all addons based on config.js and addonsConf.json to the Vue Instance and store
- * @param {Object} app The app.
- * @param {String[]} config The array of addonKeys specified in config.js
- * @returns {void}
- */
+    app: null,
+    gfiThemePromises: {},
+
+
+    /**
+     * Adds all addons based on config.js and addonsConf.json to the Vue Instance and store
+     * @param {Object} app The app.
+     * @param {String[]} config The array of addonKeys specified in config.js
+     * @returns {void}
+     */
     loadAddons: async function (app, config) {
+        this.app = app;
+        this.gfiThemePromises = {};
         app.config.globalProperties.$gfiThemeAddons = [];
         app.config.globalProperties.$searchInterfaceAddons = [];
 
@@ -27,7 +33,8 @@ export default {
                             await this.loadControls(addonKey);
                         }
                         else if (addonConf.type === "gfiTheme") {
-                            await this.loadGfiThemes(addonKey, app);
+                            this.gfiThemePromises[addonKey] = this.loadGfiThemes(addonKey, app);
+                            await this.gfiThemePromises[addonKey];
                         }
                         else if (addonConf.type === "searchInterface") {
                             await this.loadSearchInterfaces(addonKey, app);
@@ -116,6 +123,29 @@ export default {
             store.registerModule(["Modules", addon.component.name], addon.store);
             moduleCollection[addonName] = addon.component;
         }
+    },
+
+    /**
+     * Loads the gfiTheme addons for the given themes, if they are not loaded yet, e.g. because they are missing in config.js.
+     * Silently ignores undefined or null theme values. Filters duplicates automatically via Set.
+     * @param {Array<String|Object>} [themes] The configured themes (string or object with 'name' key). Defaults to empty array if undefined.
+     * @returns {Promise<void>} Resolves when all matching addons are loaded.
+     * @throws {Error} If `this.app` is not initialized (loadAddons must be called first).
+     */
+    loadMissingGfiThemes: async function (themes) {
+        if (!this.app) {
+            throw new Error("GFI theme addons cannot be loaded: addons.loadAddons() must be called first to initialize the Vue app instance.");
+        }
+
+        const validThemes = themes || [],
+            themeNames = validThemes.map(theme => theme?.name ?? theme).filter(name => name),
+            missingKeys = Object.keys(allAddons).filter(key => allAddons[key]?.type === "gfiTheme" && !this.gfiThemePromises[key] && themeNames.includes(key));
+
+        await Promise.all(missingKeys.map(key => {
+            this.gfiThemePromises[key] = this.loadGfiThemes(key, this.app).catch(error => console.warn(`The gfi theme addon ${key} could not be loaded.`, error));
+
+            return this.gfiThemePromises[key];
+        }));
     },
 
     /**

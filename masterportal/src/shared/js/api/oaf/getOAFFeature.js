@@ -282,7 +282,7 @@ async function getUniqueValuesFromCollection (baseUrl, collection, limit, proper
  * @param {String} baseUrl The base url of the dataset.
  * @param {String} collection The collection name.
  * @param {String[]} propertiesToGetValuesFor List of properties to get the values for. If empty it returns all attributes.
- * @returns {Object} an object with property name as key and the unique values as object as value.
+ * @returns {Promise<Object>} an object with property name as key and the unique values as object as value.
  */
 async function getUniqueValuesByScheme (baseUrl, collection, propertiesToGetValuesFor) {
     if (typeof baseUrl !== "string" || typeof collection !== "string" || !Array.isArray(propertiesToGetValuesFor)) {

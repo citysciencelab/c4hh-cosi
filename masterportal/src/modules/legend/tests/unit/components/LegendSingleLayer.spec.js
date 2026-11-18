@@ -1,9 +1,10 @@
-import {createStore} from "vuex";
-import {shallowMount} from "@vue/test-utils";
+import axios from "axios";
 import LegendSingleLayerComponent from "@modules/legend/components/LegendSingleLayer.vue";
 import Legend from "@modules/legend/store/indexLegend.js";
+import {flushPromises, shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import sinon from "sinon";
+import {createStore} from "vuex";
 
 
 describe("src/modules/legend/components/LegendSingleLayer.vue", () => {
@@ -16,6 +17,9 @@ describe("src/modules/legend/components/LegendSingleLayer.vue", () => {
 
     beforeEach(() => {
         store = createStore({
+            getters: {
+                isModuleAvailable: () => () => false
+            },
             modules: {
                 Modules: {
                     namespaced: true,
@@ -470,6 +474,31 @@ describe("src/modules/legend/components/LegendSingleLayer.vue", () => {
             expect(wrapper.vm.filteredLegend).to.deep.equal([]);
         });
     });
+    describe("getLegendUrl", () => {
+        it("returns undefined and null unchanged", () => {
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {legendObj: {}}
+            });
+
+            expect(wrapper.vm.getLegendUrl(undefined)).to.be.undefined;
+            expect(wrapper.vm.getLegendUrl(null)).to.be.null;
+        });
+    });
+    describe("isFetchableUrl", () => {
+        it("returns true for urls and false for data urls, blob urls, svg strings and non strings", () => {
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {legendObj: {}}
+            });
+
+            expect(wrapper.vm.isFetchableUrl("https://legend.de/legend.png")).to.be.true;
+            expect(wrapper.vm.isFetchableUrl("data:image/png;base64,abc")).to.be.false;
+            expect(wrapper.vm.isFetchableUrl("blob:legend")).to.be.false;
+            expect(wrapper.vm.isFetchableUrl("  <svg></svg>")).to.be.false;
+            expect(wrapper.vm.isFetchableUrl(undefined)).to.be.false;
+        });
+    });
     describe("scaleImg", () => {
         it("updates the image width based on the given imageScale and natural", () => {
             const propsData = {
@@ -514,6 +543,260 @@ describe("src/modules/legend/components/LegendSingleLayer.vue", () => {
             wrapper.vm.scaleImg(evt, legendPart);
 
             expect(evt.target.width).to.equal(50);
+        });
+    });
+
+    describe("load images by axios", () => {
+        const legendUrl = "https://legend.de/wms?SERVICE=WMS&REQUEST=GetLegendGraphic&LAYER=layer";
+        let axiosStub;
+
+        beforeEach(() => {
+            store = createStore({
+                getters: {
+                    isModuleAvailable: () => moduleType => moduleType === "login"
+                },
+                modules: {
+                    Modules: {
+                        namespaced: true,
+                        modules: {
+                            namespaced: true,
+                            Legend: Legend
+                        }
+                    }
+                }
+            });
+            axiosStub = sinon.stub(axios, "get").resolves({data: new Blob(["image"])});
+            sinon.stub(URL, "createObjectURL").returns("blob:legend");
+            sinon.stub(URL, "revokeObjectURL");
+        });
+
+        it("loads the legend image by axios and uses the object url, if login module is available", async () => {
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {
+                    legendObj: {
+                        name: "myLayer",
+                        legend: [legendUrl],
+                        position: 1
+                    }
+                }
+            });
+
+            await flushPromises();
+
+            expect(axiosStub.calledOnceWith(legendUrl + "&sld_version=1.1.0", {responseType: "blob"})).to.be.true;
+            expect(wrapper.find("img").attributes("src")).to.equal("blob:legend");
+        });
+
+        it("uses the original url and logs a warning, if loading fails", async () => {
+            const warnStub = sinon.stub(console, "warn");
+
+            axiosStub.rejects(new Error("401"));
+
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {
+                    legendObj: {
+                        name: "myLayer",
+                        legend: [{name: "foobar", graphic: legendUrl}],
+                        position: 1
+                    }
+                }
+            });
+
+            await flushPromises();
+
+            expect(wrapper.find("img").attributes("src")).to.equal(legendUrl);
+            expect(warnStub.calledOnce).to.be.true;
+        });
+
+        it("does not load data urls", async () => {
+            const dataUrl = "data:image/svg+xml;charset=utf-8,<svg></svg>";
+
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {
+                    legendObj: {
+                        name: "myLayer",
+                        legend: [{name: "foobar", graphic: dataUrl}],
+                        position: 1
+                    }
+                }
+            });
+
+            await flushPromises();
+
+            expect(axiosStub.notCalled).to.be.true;
+            expect(wrapper.find("img").attributes("src")).to.equal(dataUrl);
+        });
+
+        it("revokes the object urls on unmount", async () => {
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {
+                    legendObj: {
+                        name: "myLayer",
+                        legend: [legendUrl],
+                        position: 1
+                    }
+                }
+            });
+
+            await flushPromises();
+            wrapper.unmount();
+
+            expect(URL.revokeObjectURL.calledOnceWith("blob:legend")).to.be.true;
+        });
+
+        it("shows a spinner instead of the image while the image is loading", async () => {
+            let resolveImage = null;
+
+            axiosStub.returns(new Promise(resolve => {
+                resolveImage = resolve;
+            }));
+
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {
+                    legendObj: {
+                        name: "myLayer",
+                        legend: [legendUrl],
+                        position: 1
+                    }
+                }
+            });
+
+            await wrapper.vm.$nextTick();
+            expect(wrapper.findAllComponents({name: "SpinnerItem"})).to.have.lengthOf(1);
+            expect(wrapper.find("img").exists()).to.be.false;
+
+            resolveImage({data: new Blob(["image"])});
+            await flushPromises();
+
+            expect(wrapper.findComponent({name: "SpinnerItem"}).exists()).to.be.false;
+            expect(wrapper.find("img").attributes("src")).to.equal("blob:legend");
+        });
+
+        it("shows a spinner per loading image", async () => {
+            axiosStub.withArgs(legendUrl).returns(new Promise(() => {
+                // never resolves
+            }));
+
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {
+                    legendObj: {
+                        name: "myLayer",
+                        legend: [
+                            {name: "loading", graphic: legendUrl},
+                            {name: "loaded", graphic: "https://legend.de/loaded.png"}
+                        ],
+                        position: 1
+                    }
+                }
+            });
+
+            await flushPromises();
+
+            expect(wrapper.findAllComponents({name: "SpinnerItem"})).to.have.lengthOf(1);
+            expect(wrapper.findAll("img")).to.have.lengthOf(1);
+            expect(wrapper.find("img").attributes("src")).to.equal("blob:legend");
+        });
+
+        it("revokes the object urls, that are not part of a changed legend object", async () => {
+            const otherUrl = "https://legend.de/other.png";
+
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {
+                    legendObj: {
+                        name: "myLayer",
+                        legend: [legendUrl],
+                        position: 1
+                    }
+                }
+            });
+
+            await flushPromises();
+            await wrapper.setProps({legendObj: {name: "otherLayer", legend: [otherUrl], position: 1}});
+            await flushPromises();
+
+            expect(URL.revokeObjectURL.calledOnceWith("blob:legend")).to.be.true;
+            expect(Object.keys(wrapper.vm.imageSources)).to.deep.equal([otherUrl]);
+        });
+
+        it("keeps the object urls of all layer groups, if the selected layer changes", async () => {
+            const otherUrl = "https://legend.de/other.png";
+
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {
+                    legendObj: {
+                        name: "myLayer",
+                        legend: [[{name: "first", graphic: legendUrl}], [{name: "second", graphic: otherUrl}]],
+                        position: 1
+                    },
+                    selectedLayer: 0
+                }
+            });
+
+            await flushPromises();
+            await wrapper.setProps({selectedLayer: 1});
+            await flushPromises();
+
+            expect(URL.revokeObjectURL.notCalled).to.be.true;
+            expect(Object.keys(wrapper.vm.imageSources)).to.have.members([legendUrl, otherUrl]);
+        });
+
+        it("does not create an object url, if the image finishes loading after the legend object changed", async () => {
+            let resolveImage = null;
+
+            axiosStub.withArgs(legendUrl).returns(new Promise(resolve => {
+                resolveImage = resolve;
+            }));
+
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {
+                    legendObj: {
+                        name: "myLayer",
+                        legend: [{name: "foobar", graphic: legendUrl}],
+                        position: 1
+                    }
+                }
+            });
+
+            await wrapper.setProps({legendObj: {name: "otherLayer", legend: [], position: 1}});
+            resolveImage({data: new Blob(["image"])});
+            await flushPromises();
+
+            expect(URL.createObjectURL.notCalled).to.be.true;
+            expect(wrapper.vm.imageSources).to.deep.equal({});
+        });
+
+        it("does not create an object url, if the image finishes loading after unmount", async () => {
+            let resolveImage = null;
+
+            axiosStub.returns(new Promise(resolve => {
+                resolveImage = resolve;
+            }));
+
+            wrapper = shallowMount(LegendSingleLayerComponent, {
+                global: {plugins: [store]},
+                propsData: {
+                    legendObj: {
+                        name: "myLayer",
+                        legend: [legendUrl],
+                        position: 1
+                    }
+                }
+            });
+
+            wrapper.unmount();
+            resolveImage({data: new Blob(["image"])});
+            await flushPromises();
+
+            expect(URL.createObjectURL.notCalled).to.be.true;
         });
     });
 });

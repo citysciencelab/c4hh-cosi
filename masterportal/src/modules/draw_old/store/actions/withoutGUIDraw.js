@@ -10,7 +10,7 @@ import * as setters from "./settersDraw.js";
 
 /**
  * Resets and deactivates the Draw Tool.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} contect actions context object.
  * @param {String} cursor If a cursor has been added through the RemoteInterface, it gets removed.
  * @returns {void}
@@ -30,6 +30,7 @@ function cancelDrawWithoutGUI ({commit, dispatch}, cursor) {
  * Per default the geometries of the features are added individually.
  * If the given parameter "geomType" is set to "multiGeometry", features are clustered as multiGeometry features for each geometry type.
  *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object
  * @param {Object} payload payload object.
  * @param {String} payload.prmObject An Object which includes the parameters.
@@ -147,7 +148,7 @@ function downloadFeaturesWithoutGUI ({rootState}, payload) {
 }
 /**
  * Sends the generated GeoJSON to the RemoteInterface to communicate with an iFrame.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {String} geomType singleGeometry (default) or multiGeometry ("multiGeometry")
  * @returns {void}
@@ -167,7 +168,7 @@ function downloadViaRemoteInterface () {
 /**
  * Enable editing of already drawn features without GUI.
  * Used in the RemoteInterface.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @returns {void}
  */
@@ -178,6 +179,7 @@ function editFeaturesWithoutGUI ({dispatch}) {
  * Initializes the drawing functionality without GUI.
  * Used in the RemoteInterface.
  * NOTE: This method is not implemented for simultaneous usage of the GUI of the Draw Tool.
+ * @deprecated in 3.39.0 (November 2027)
  *
  * @param {Object} context actions context object.
  * @param {String} prmObject An Object which includes the parameters.
@@ -275,7 +277,7 @@ async function initializeWithoutGUI ({state, commit, dispatch, getters, rootStat
 /**
  * Find the correct id for the translation of the given drawType.
  * If the drawType is not "Circle", "LineString", "Point" or "Polygon", simply "draw" is returned.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {String} drawType Type of the draw interaction.
  * @returns {String} The translation key for the given draw interaction
  */

@@ -58,6 +58,27 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                     namespaced: true,
                     modules: {
                         namespaced: true,
+                        Draw: {
+                            namespaced: true,
+                            getters: {
+                                iconList: () => []
+                            },
+                            state: () => ({
+                                drawTypesGeometrie: [],
+                                drawTypesMain: [],
+                                drawTypesSymbols: [],
+                                buttonsDisabled: false,
+                                drawSymbolImgPath: "",
+                                selectedSymbol: null
+                            }),
+                            mutations: {
+                                setCircleOptions: sinon.stub(),
+                                addDrawTypeSymbol: sinon.stub(),
+                                incrementIdCounter: sinon.stub(),
+                                setLineLength: sinon.stub(),
+                                setSelectedSymbol: sinon.stub()
+                            }
+                        },
                         SimulationTool: {
                             namespaced: true,
                             actions: {},
@@ -110,6 +131,9 @@ describe("addons/SimulationTool/components/PlanningScenario/PlanningScenarioCrea
                 },
                 Maps: {
                     namespaced: true,
+                    getters: {
+                        projection: () => null
+                    },
                     actions: {
                         addInteraction: sinon.stub(),
                         removeInteraction: sinon.stub(),

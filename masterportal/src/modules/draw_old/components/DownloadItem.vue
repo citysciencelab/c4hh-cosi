@@ -5,6 +5,7 @@ import InputText from "@shared/modules/inputs/components/InputText.vue";
 
 /**
  * Draw Download Item
+ * @deprecated in 3.39.0 (November 2027)
  * @module modules/DownloadItem
  */
 export default {

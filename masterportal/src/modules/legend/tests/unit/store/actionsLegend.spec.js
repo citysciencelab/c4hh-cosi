@@ -160,7 +160,7 @@ describe("src/modules/legend/store/actionsLegend.js", () => {
         expect(commit.firstCall.args[1]).to.be.deep.equals(sorted);
     });
 
-    it("removeLegend should remove legend by id", () => {
+    it("removeLegend should remove legend by id", async () => {
         const state = {
                 legends: [{
                     id: "789",
@@ -197,10 +197,37 @@ describe("src/modules/legend/store/actionsLegend.js", () => {
                 }
             ];
 
-        removeLegend({state, commit}, payload);
+        await removeLegend({state, commit}, payload);
         expect(commit.calledOnce).to.be.true;
         expect(commit.firstCall.args[0]).to.be.equals("setLegends");
         expect(commit.firstCall.args[1]).to.be.deep.equals(legendsAfterRemove);
+    });
+
+    it("removeLegend should revoke removed blob URLs but retain URLs still in use", async () => {
+        const removedBlobUrl = "blob:removed-legend",
+            retainedBlobUrl = "blob:retained-legend",
+            state = {
+                legends: [{
+                    id: "123",
+                    legend: [{graphic: [removedBlobUrl, retainedBlobUrl]}]
+                }, {
+                    id: "456",
+                    legend: [retainedBlobUrl]
+                }],
+                layerInfoLegend: {}
+            },
+            revokeObjectURLStub = sinon.stub(URL, "revokeObjectURL");
+
+        commit = sinon.spy((mutation, legends) => {
+            if (mutation === "setLegends") {
+                state.legends = legends;
+            }
+        });
+
+        await removeLegend({state, commit}, "123");
+
+        expect(revokeObjectURLStub.calledOnceWithExactly(removedBlobUrl)).to.be.true;
+        revokeObjectURLStub.restore();
     });
 
     describe("toggleLayerInLegend", () => {

@@ -1,5 +1,8 @@
 <script>
-import Multiselect from "vue-multiselect";
+/**
+ * @import {StatisticDashboardMapGetters} from "../types/helpers.js"
+ */
+import DropdownAutocomplete from "@shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import {mapGetters, mapMutations} from "vuex";
 import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 import getOAFFeature from "@shared/js/api/oaf/getOAFFeature.js";
@@ -11,90 +14,24 @@ import {
 } from "ol/format/filter.js";
 import getFeature from "@shared/js/api/wfs/getFeature.js";
 import WFS from "ol/format/WFS.js";
-import sortBy from "@shared/js/utils/sortBy.js";
 import isObject from "@shared/js/utils/isObject.js";
 
 export default {
     name: "StatisticDashboardFilterRegions",
     components: {
-        Multiselect
-    },
-    props: {
-        regions: {
-            type: Array,
-            required: true
-        },
-        selectedLevel: {
-            type: Object,
-            required: false,
-            default: () => {
-                return {};
-            }
-        }
-    },
-    data () {
-        return {
-            openStates: {
-                regionFilterRef1: false
-            }
-        };
+        DropdownAutocomplete
     },
     computed: {
+        .../** @type {StatisticDashboardMapGetters} */ (mapGetters)("Modules/StatisticDashboard", {
+            "selectedLevel": "selectedLevel",
+            "regions": "flattenedRegions"
+        }),
         ...mapGetters("Maps", ["projection"])
     },
 
     methods: {
         ...mapMutations("Modules/StatisticDashboard", ["setSelectedRegions"]),
 
-        /**
-         * Toggles the open state of a multiselect component referenced by `refName`.
-         * If the dropdown is open, it will be closed (deactivated), otherwise it will be opened (activated).
-         * After opening, the search input inside the multiselect is focused.
-         *
-         * @param {string} refName - The reference name of the multiselect component.
-         * @returns {void}
-         */
-        toggle (refName) {
-            const multiselectRef = this.$refs[refName][0];
-
-            if (!multiselectRef) {
-                return;
-            }
-
-            if (this.openStates[refName]) {
-                multiselectRef.deactivate();
-            }
-            else {
-                multiselectRef.activate();
-                this.$nextTick(() => {
-                    const input = multiselectRef.$refs.search;
-
-                    if (input) {
-                        input.focus();
-                    }
-                });
-            }
-        },
-        /**
-         * Sets the open state of the multiselect referenced by `refName` to true.
-         * Called when the multiselect is opened.
-         *
-         * @param {string} refName - The reference name of the multiselect component.
-         * @returns {void}
-         */
-        onOpen (refName) {
-            this.openStates[refName] = true;
-        },
-        /**
-         * Sets the open state of the multiselect referenced by `refName` to false.
-         * Called when the multiselect is closed.
-         *
-         * @param {string} refName - The reference name of the multiselect component.
-         * @returns {void}
-         */
-        onClose (refName) {
-            this.openStates[refName] = false;
-        },
         /**
          * Checks whether the region has child.
          * @param {Object} region - The region to be checked.
@@ -105,22 +42,16 @@ export default {
         },
 
         /**
-         * Gets the regions sorted with the selected ones first.
-         * @param {Object[]} regions The regions array.
-         * @param {Object[]} selectedRegions The selected regions.
-         * @returns {Object[]} the regions sorted.
+         * Checks whether all values of the region are selected.
+         * @param {Object} region - The region to be checked.
+         * @returns {Boolean} True if the region has values and all of them are selected, otherwise false.
          */
-        getRegionsSorted (regions, selectedRegions) {
-            if (!regions?.length || !Array.isArray(selectedRegions)) {
-                return [];
-            }
-            const notSelectedRegions = sortBy(regions.filter(region => !selectedRegions.some(selectedRegion => selectedRegion.label === region.label)), "label");
-
-            if (this.containsAllTag(selectedRegions)) {
-                return [...selectedRegions, ...notSelectedRegions];
+        isAllSelected (region) {
+            if (!Array.isArray(region?.values) || !Array.isArray(region?.selectedValues) || !region.values.length) {
+                return false;
             }
 
-            return [...selectedRegions, {label: i18next.t("common:modules.statisticDashboard.button.all")}, ...notSelectedRegions];
+            return region.selectedValues.length === region.values.length;
         },
 
         /**
@@ -141,13 +72,20 @@ export default {
                 this.setSelectedValuesToRegion([], region.child);
             }
             else {
-                const uniqueValues = await this.getValuesFromLayer(this.selectedLevel.layerId, region, schemeRequest || this.requestScheme(region, this.containsAllTag(value)));
+                const childWasAllSelected = this.isAllSelected(region.child),
+                      uniqueValues = await this.getValuesFromLayer(this.selectedLevel.layerId, region, schemeRequest || this.requestScheme(region, this.isAllSelected(region)));
 
-                region.child.values = Object.keys(uniqueValues[region.child.attrName]).map(key => {
-                    return {label: key, value: key};
+                const childAttributeNames = Array.isArray(region.child.attrName) ? region.child.attrName : [region.child.attrName],
+                      childValues = [...new Set(childAttributeNames.flatMap(attributeName => Object.keys(uniqueValues[attributeName] || {})))];
+
+                region.child.values = childValues.map(key => {
+                    return {title: key, value: key};
                 });
 
-                if (region.child.selectedValues.length) {
+                if (childWasAllSelected) {
+                    this.setSelectedValuesToRegion(region.child.values.slice(), region.child);
+                }
+                else if (region.child.selectedValues.length) {
                     const udpatedSelectedValues = this.updatesRegionSelectedValues(region.child.selectedValues, region.child.values);
 
                     this.setSelectedValuesToRegion(udpatedSelectedValues, region.child);
@@ -158,54 +96,69 @@ export default {
 
         /**
          * Gets values from the layer. This function decides wether to get the values by oaf or wfs based on the given layerId.
-         * @param {String} layerId The layer id.
+         * @param {String|String[]} layerId The layer id or layer ids.
          * @param {Object} region The region object.
          * @param {Boolean} schemeRequest Flag to decide if the data for the given region field should be requested via scheme oaf scheme.
          * @returns {Object} the values unified.
          */
         async getValuesFromLayer (layerId, region, schemeRequest = false) {
-            const {url, collection, typ, featureType, featureNS} = rawLayerList.getLayerWhere({id: layerId});
-            let uniqueValues = {};
+            const layerIds = Array.isArray(layerId) ? layerId : [layerId],
+                  uniqueValues = {};
 
             region.child.loadingDataCounter++;
-            if (typ === "OAF") {
-                if (schemeRequest) {
-                    uniqueValues = await getOAFFeature.getUniqueValuesByScheme(url, collection, [region.child.attrName]);
-                }
-                else {
+            try {
+                for (const [index, currentLayerId] of layerIds.entries()) {
+                    const {url, collection, typ, featureType, featureNS} = rawLayerList.getLayerWhere({id: currentLayerId}),
+                          childAttributeName = Array.isArray(region.child.attrName) ? region.child.attrName[index] : region.child.attrName,
+                          regionAttributeName = Array.isArray(region.attrName) ? region.attrName[index] : region.attrName;
+                    let layerUniqueValues = {};
 
-                    const filter = this.getFilterOAF(region.attrName, this.containsAllTag(region.selectedValues) ? region.values : region.selectedValues),
-                          features = await getOAFFeature.getOAFFeatureGet(url, collection, {
-                              filter,
-                              filterCrs: this.selectedLevel.oafRequestCRS,
-                              crs: this.selectedLevel.oafRequestCRS,
-                              propertyNames: [region.child.attrName],
-                              datetime: this.selectedLevel.geomRequestParams?.datetime,
-                              limit: 10000,
-                              skipGeometry: true
-                          }),
-                          fetchedProperties = features.map(feature => feature?.properties);
+                    if (typ === "OAF") {
+                        if (schemeRequest) {
+                            layerUniqueValues = await getOAFFeature.getUniqueValuesByScheme(url, collection, [childAttributeName]);
+                        }
+                        else {
+                            const filter = this.getFilterOAF(regionAttributeName, region.selectedValues),
+                                  features = await getOAFFeature.getOAFFeatureGet(url, collection, {
+                                      filter,
+                                      filterCrs: this.selectedLevel.oafRequestCRS,
+                                      crs: this.selectedLevel.oafRequestCRS,
+                                      propertyNames: [childAttributeName],
+                                      datetime: this.selectedLevel.geomRequestParams?.datetime,
+                                      limit: 10000,
+                                      skipGeometry: true
+                                  }),
+                                  fetchedProperties = features.map(feature => feature?.properties);
 
-                    uniqueValues = getUniqueValuesFromOAF(fetchedProperties, [region.child.attrName], true);
+                            layerUniqueValues = getUniqueValuesFromOAF(fetchedProperties, [childAttributeName], true);
+                        }
+                    }
+                    else {
+                        const payload = {
+                                  featureTypes: [featureType],
+                                  featureNS: featureNS,
+                                  srsName: this.projection.getCode(),
+                                  propertyNames: [childAttributeName],
+                                  filter: this.getFilterWFS(regionAttributeName, region.selectedValues)
+                              },
+                              features = await getFeature.getFeaturePOST(url, payload, error => {
+                                  console.error(error);
+                              }),
+                              olFeatures = new WFS().readFeatures(features),
+                              attributesWithType = await FetchDataHandler.getAttributesWithType(url, [childAttributeName], featureType);
+
+                        layerUniqueValues = FetchDataHandler.getUniqueValuesFromFeatures(olFeatures, attributesWithType);
+                    }
+
+                    Object.entries(layerUniqueValues || {}).forEach(([attributeName, values]) => {
+                        uniqueValues[attributeName] = {...uniqueValues[attributeName], ...values};
+                    });
                 }
             }
-            else {
-                const payload = {
-                          featureTypes: [featureType],
-                          featureNS: featureNS,
-                          srsName: this.projection.getCode(),
-                          propertyNames: [region.child.attrName],
-                          filter: this.getFilterWFS(region.attrName, region.selectedValues)
-                      },
-                      features = await getFeature.getFeaturePOST(url, payload, error => {
-                          console.error(error);
-                      }),
-                      olFeatures = new WFS().readFeatures(features),
-                      attributesWithType = await FetchDataHandler.getAttributesWithType(url, [region.child.attrName], featureType);
-
-                uniqueValues = FetchDataHandler.getUniqueValuesFromFeatures(olFeatures, attributesWithType);
+            finally {
+                region.child.loadingDataCounter--;
             }
-            region.child.loadingDataCounter--;
+
             return uniqueValues;
         },
 
@@ -220,7 +173,7 @@ export default {
             const updatedSelectedValues = [];
 
             selectedValues.forEach(selectedValue => {
-                const stillExist = values.findIndex(value => value.label === selectedValue.label);
+                const stillExist = values.findIndex(value => value.title === selectedValue.title);
 
                 if (stillExist !== -1) {
                     updatedSelectedValues.push(selectedValue);
@@ -344,21 +297,11 @@ export default {
             for (let i = position; i < tmpRegions.length; i++) {
                 const nextRegion = tmpRegions[i];
 
-                if (nextRegion.selectedValues.length !== nextRegion.values.length
-                    && !this.containsAllTag(nextRegion.selectedValues)) {
+                if (nextRegion.selectedValues.length !== nextRegion.values.length) {
                     return false;
                 }
             }
             return true;
-        },
-
-        /**
-         * Checks if the given list contains the "all" tag.
-         * @param {Object[]} values The list.
-         * @returns {Boolean} true if all tag was found, false otherwise.
-         */
-        containsAllTag (values) {
-            return values.some(val => val.label === i18next.t("common:modules.statisticDashboard.button.all"));
         }
     }
 };
@@ -389,7 +332,7 @@ export default {
                     @click="selectAll(region)"
                 >
                     <i class="bi bi-toggles" />
-                    {{ $t("common:modules.statisticDashboard.button.all") }}
+                    {{ $t("common:modules.statisticDashboard.button.selectAllAreas") }}
                 </button>
                 <button
                     v-for="(value, idx) in region.values"
@@ -399,78 +342,33 @@ export default {
                     :class="toggleButtonActive(value, region.selectedValues)"
                     @click="updatesTopLevelRegionSelectedValues(value, region)"
                 >
-                    {{ value.label }}
+                    {{ value.title }}
                 </button>
             </div>
             <div
                 v-else
                 class="col-sm-12 mb-2"
             >
-                <label
-                    class="col-form-label-sm mb-1"
-                    :for="'region-filter-' + index"
-                >
-                    {{ region.name }}
-                </label>
-                <div
-                    role="button"
-                    tabindex="0"
-                    @click.stop="toggle('regionFilterRef' + index)"
-                    @mousedown.prevent
-                    @keydown.enter.stop.prevent="toggle('regionFilterRef' + index)"
-                    @keydown.space.stop.prevent="toggle('regionFilterRef' + index)"
-                >
-                    <Multiselect
-                        :id="'region-filter' + index"
-                        :ref="'regionFilterRef' + index"
-                        :model-value="region.selectedValues"
-                        :multiple="true"
-                        :options="getRegionsSorted(region.values, region.selectedValues)"
-                        :searchable="true"
-                        :close-on-select="false"
-                        :clear-on-select="false"
-                        :show-labels="false"
-                        :limit="3"
-                        :limit-text="count => count + ' ' + $t('common:modules.statisticDashboard.label.more')"
-                        :allow-empty="true"
-                        :placeholder="$t('common:modules.statisticDashboard.reference.placeholder')"
-                        :loading="region.loadingDataCounter > 0"
-                        :disabled="region.loadingDataCounter > 0"
-                        label="label"
-                        track-by="label"
-                        @open="onOpen('regionFilterRef' + index)"
-                        @close="onClose('regionFilterRef' + index)"
-                        @update:model-value="setSelectedValuesToRegion($event, region)"
-                    >
-                        <template #clear>
-                            <div class="multiselect__clear">
-                                <i class="bi bi-search" />
-                            </div>
-                        </template>
-                        <template #tag="{ option, remove }">
-                            <button
-                                class="multiselect__tag"
-                                :class="option"
-                                @click="remove(option)"
-                                @keypress="remove(option)"
-                            >
-                                {{ option.label }}
-                                <i class="bi bi-x" />
-                            </button>
-                        </template>
-                        <template #caret>
-                            <div
-                                class="multiselect__select"
-                            />
-                        </template>
-                    </Multiselect>
-                </div>
+                <DropdownAutocomplete
+                    :id="'region-filter' + index"
+                    :label="region.name ?? $t('common:modules.statisticDashboard.label.area')"
+                    :items="region.values"
+                    :placeholder="$t('common:modules.statisticDashboard.reference.placeholder')"
+                    multiple
+                    select-all
+                    :select-all-title="$t('common:modules.statisticDashboard.button.allAreas')"
+                    sortable
+                    selected-first
+                    :model-value="region.selectedValues"
+                    :v-loading="region.loadingDataCounter > 0"
+                    :disabled="region.loadingDataCounter > 0"
+                    return-object
+                    @update:model-value="setSelectedValuesToRegion($event, region)"
+                />
             </div>
         </div>
     </div>
 </template>
-
-<style src="vue-multiselect/dist/vue-multiselect.css"></style>
 
 <style lang="scss">
 .region-filter {
@@ -487,33 +385,6 @@ export default {
     .active-button {
         background: $dark_blue;
         color: $white;
-    }
-
-    .multiselect .multiselect__spinner:after, .multiselect__spinner:before {
-        position: absolute;
-        content: "";
-        top: 50%;
-        left: 50%;
-        margin: -8px 0 0 -8px;
-        width: 16px;
-        height: 16px;
-        border-radius: 100%;
-        border: 2px solid transparent;
-        border-top-color: $dark_grey;
-        box-shadow: 0 0 0 1px transparent;
-    }
-    .multiselect .multiselect__tag {
-        background: $light_blue;
-        padding: 4px 10px 4px 10px;
-        border-radius: 50px;
-        border: none;
-    }
-    .multiselect .multiselect__tag:hover {
-        background: $dark_blue;
-        color: $white;
-    }
-    .multiselect .multiselect__tag i::before {
-        vertical-align: middle;
     }
 }
 </style>

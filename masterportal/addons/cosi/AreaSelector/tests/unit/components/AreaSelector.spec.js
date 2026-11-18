@@ -12,7 +12,7 @@ import sinon from "sinon";
 import {Polygon} from "ol/geom";
 import ToGeom from "../../../../utils/setBBoxToGeom";
 import Feature from "ol/Feature";
-import ToGeoJson from "../../../../utils/features/convertToGeoJson";
+import ToGeoJson from "@shared/js/utils/convertFeatureToGeoJSON.js";
 
 // config.mocks.$t = key => key;
 

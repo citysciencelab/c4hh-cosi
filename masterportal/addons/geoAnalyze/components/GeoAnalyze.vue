@@ -16,6 +16,7 @@ import {requestAnalyze} from "../api/analyze";
 import SimpleGeometry from "ol/geom/SimpleGeometry";
 import VectorLayer from "ol/layer/Vector.js";
 import VectorSource from "ol/source/Vector.js";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 export default {
     name: "GeoAnalyze",
@@ -221,7 +222,7 @@ export default {
                     }
                     // open excel
                     else if (data?.file) {
-                        window.open(data.file);
+                        openSecuredPopup(data.file, "_blank");
                     }
                     // set the reponse
                     else if (data.length !== 0) {

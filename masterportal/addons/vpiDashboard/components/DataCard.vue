@@ -271,7 +271,7 @@ export default {
     gap: 1rem;
 }
 
-.card-text {
+.vpicard .card-text {
     font-family: "HamburgSans-Regular", sans-serif;
     font-style: normal;
     font-weight: 900;

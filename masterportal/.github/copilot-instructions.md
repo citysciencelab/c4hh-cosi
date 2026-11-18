@@ -126,6 +126,7 @@ Prefer the path aliases (`@appstore`, `@shared`, `@core`, `@modules`, `@plugins`
 - **Tests**: `**/*.spec.js` under `tests/unit/`. Use **chai** + **vitest** + **sinon**. Each function needs a positive and a negative test. See `.github/instructions/test-conventions.instructions.md` for setup patterns.
 - **Changelog**: Every user-visible or behavioral change needs an entry in `CHANGELOG.md` under `## Unreleased` (`Added`, `Changed`, `Deprecated`, `Removed`, or `Fixed`). Plain English only. Pure housekeeping (JSDoc, test additions, internal refactoring without behavior change) does not require an entry.
 - **Action tracking source**: When dispatching a Vuex or Pinia action whose payload should carry metadata allowing to identify the source dispatching it, wrap the payload with `addSourceToPayload(this, payload)` from `@shared/js/utils/addSourceToPayload.js` instead of setting `_source` manually. See `docs/Dev/Tutorials/tutorial.md` for an example.
+- **Changes without store state**: The `userTracking` addon only sees Vuex mutations and actions as well as pinia actions. If a user interaction changes no state (e.g. editing drawn features) and is being watched by a subscriber, dispatch an empty notification action named after the event in past tense (e.g. `featureStyleChanged`, `editActionPerformed` in the draw module) instead of a tracking-specific name. Guard setters that are called with unchanged values (commit only if the value differs), because the addon cannot tell whether a committed mutation changed anything.
 
 ---
 

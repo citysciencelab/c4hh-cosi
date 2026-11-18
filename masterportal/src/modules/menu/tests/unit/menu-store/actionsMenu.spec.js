@@ -124,9 +124,11 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
             expect(commit.calledOnce).to.be.true;
             expect(commit.firstCall.args[0]).to.equals("setCurrentComponent");
             expect(commit.firstCall.args[1]).to.deep.equals({type, side, props});
-            expect(dispatch.calledOnce).to.be.true;
-            expect(dispatch.firstCall.args[0]).to.equals("changeCurrentMouseMapInteractionsComponent");
-            expect(dispatch.firstCall.args[1]).to.deep.equals({type, side});
+            expect(dispatch.calledTwice).to.be.true;
+            expect(dispatch.firstCall.args[0]).to.equals("handleModulesConfiguredMultipleTimes");
+            expect(dispatch.firstCall.args[1]).to.deep.equals({type, props});
+            expect(dispatch.secondCall.args[0]).to.equals("changeCurrentMouseMapInteractionsComponent");
+            expect(dispatch.secondCall.args[1]).to.deep.equals({type, side});
         });
 
         it("should setCurrentComponentProps, if only props name changed", () => {
@@ -811,4 +813,129 @@ describe("src/modules/menu/menu-store/actionsMenu.js", () => {
             expect(commit.firstCall.args[1]).to.deep.equal({side: "secondaryMenu", width: s});
         });
     });
+
+    describe("handleModulesConfiguredMultipleTimes", () => {
+        it("type print 2 times with different names --> state is changed", () => {
+            const printModuleA = {
+                    type: "print",
+                    id: "printA",
+                    name: "printName_A"
+
+                },
+                printModuleB = {
+                    type: "print",
+                    id: "printB",
+                    name: "printName_B"
+
+                },
+                drawModule = {
+                    type: "draw",
+                    name: "drawName"
+
+                },
+                rootState = {
+                    Modules: {
+                        Print: {
+                            type: "print",
+                            name: "defaultPrintName"
+                        },
+                        Draw: {type: "draw",
+                            name: "defaultDrawName"}
+                    }
+                },
+                type = "print",
+                props = {name: "printName_A"};
+
+            rootGetters = {
+                configuredModules: [printModuleA, printModuleB, drawModule]
+            };
+            actions.handleModulesConfiguredMultipleTimes({rootGetters, rootState}, {type, props});
+
+            expect(rootState.Modules.Print).to.deep.equals({
+                type: "print",
+                id: "printA",
+                name: "printName_A"
+            });
+        });
+
+        it("type print 2 times with same names --> state not changed", () => {
+            const printModuleA = {
+                    type: "print",
+                    id: "printA",
+                    name: "printName_A"
+
+                },
+                printModuleB = {
+                    type: "print",
+                    id: "printB",
+                    name: "printName_A"
+
+                },
+                drawModule = {
+                    type: "draw",
+                    name: "drawName"
+
+                },
+                rootState = {
+                    Modules: {
+                        Print: {
+                            type: "print",
+                            name: "defaultPrintName"
+                        },
+                        Draw: {type: "draw",
+                            name: "defaultDrawName"}
+                    }
+                },
+                type = "print",
+                props = {name: "printName_A"};
+
+            rootGetters = {
+                configuredModules: [printModuleA, printModuleB, drawModule]
+            };
+            actions.handleModulesConfiguredMultipleTimes({rootGetters, rootState}, {type, props});
+
+            expect(rootState.Modules.Print).to.deep.equals({
+                type: "print",
+                name: "defaultPrintName"
+            });
+        });
+
+
+        it("type print 1 time --> state not changed", () => {
+            const printModuleA = {
+                    type: "print",
+                    id: "printA",
+                    name: "printName_A"
+
+                },
+                drawModule = {
+                    type: "draw",
+                    name: "drawName"
+
+                },
+                rootState = {
+                    Modules: {
+                        Print: {
+                            type: "print",
+                            name: "defaultPrintName"
+                        },
+                        Draw: {type: "draw",
+                            name: "defaultDrawName"}
+                    }
+                },
+                type = "print",
+                props = {name: "printName_A"};
+
+            rootGetters = {
+                configuredModules: [printModuleA, drawModule]
+            };
+            actions.handleModulesConfiguredMultipleTimes({rootGetters, rootState}, {type, props});
+
+            expect(rootState.Modules.Print).to.deep.equals({
+                type: "print",
+                name: "defaultPrintName"
+            });
+        });
+    });
+
 });

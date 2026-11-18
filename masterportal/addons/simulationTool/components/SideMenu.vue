@@ -140,6 +140,8 @@ export default {
 
 <style lang="scss" scoped>
     nav.simulation-tool-sidebar {
+        flex: 0 0 65px;
+        flex-shrink: 0;
         display: flex;
         flex-direction: column;
         width: 65px;

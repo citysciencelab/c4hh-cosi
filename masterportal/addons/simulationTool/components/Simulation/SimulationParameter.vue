@@ -39,7 +39,7 @@ export default {
         return {
             currentSimulationId: "",
             displayedInputLayers: [],
-            isLoading: true,
+            isLoading: false,
             oafLoadingStates: {},
             primaryTypeInputs: {},
             processDescriptions: [],
@@ -237,15 +237,6 @@ export default {
                 this.selectedOutputOptions = this.outputOptions;
                 this.isLoading = false;
             }
-        },
-
-        simulations: {
-            handler (newSimulations) {
-                if (newSimulations.length > 0 && !this.currentSimulationId) {
-                    this.currentSimulationId = newSimulations[0].id;
-                }
-            },
-            immediate: true
         }
     },
     mounted () {
@@ -362,7 +353,7 @@ export default {
                 return requestBody.inputs[inputKey][propertyKey];
             }
 
-            if (propertyKey === "") {
+            if (propertyKey === "" || propertyKey === inputKey) {
                 if (requestBody?.inputs?.[inputKey]?.enum) {
                     return {
                         enum: requestBody.inputs[inputKey].enum,
@@ -449,6 +440,11 @@ export default {
                 processed.default = property.schema.default ?? property.default;
                 processed.minimum = property.schema.minimum ?? property.minimum;
                 processed.maximum = property.schema.maximum ?? property.maximum;
+            }
+            else if (property.schema?.$ref === "https://geojson.org/schema/Polygon.json"
+                || property.schema?.oneOf?.find(item => item.$ref === "https://geojson.org/schema/Polygon.json")
+            ) {
+                processed.type = "polygon";
             }
             else {
                 processed.type = property.type || "string";
@@ -736,10 +732,31 @@ export default {
             }
 
             this.initializeProcessHandlers();
-            await this.fetchProcessDescriptions();
+            try {
+                await this.fetchProcessDescriptions();
+            }
+            catch (error) {
+                console.error("Failed to fetch process descriptions:", error);
+                this.addSingleAlert({
+                    title: "Error",
+                    content: "Failed to fetch process descriptions.",
+                    category: "error"
+                });
+                return;
+            }
             this.setupIgnoreProperties();
             this.createRequestBodies();
-            await this.loadRequiredOafInputs();
+            try {
+                await this.loadRequiredOafInputs();
+            }
+            catch (error) {
+                console.error("Failed to load required OAF inputs:", error);
+                this.addSingleAlert({
+                    title: "Error",
+                    content: "Failed to load required OAF inputs.",
+                    category: "error"
+                });
+            }
         },
 
         /**
@@ -747,6 +764,9 @@ export default {
          * @returns {Promise<void>}
          */
         async loadRequiredOafInputs () {
+            const dataProjection = this.simulation?.inputs?.target_crs?.source?.value || "EPSG:25832";
+            const featureProjection = mapCollection.getMap("2D").getView().getProjection();
+
             const requiredOafInputEntries = Object.entries(this.combinedInputs).filter(([inputKey, input]) => {
                 return this.simulation?.inputs?.[inputKey]?.required
                     && input.schema?.allOf?.some(schema => schema.format === "geojson-feature-collection");
@@ -761,7 +781,7 @@ export default {
 
                 if (existingLayer) {
                     const olFeatures = existingLayer.layer.getSource().getFeatures(),
-                          featureCollection = geoJson.writeFeaturesObject(olFeatures);
+                          featureCollection = geoJson.writeFeaturesObject(olFeatures, {dataProjection, featureProjection});
 
                     this.setRequestBodyInput(inputKey, "", featureCollection);
                     this.changeVisibility({
@@ -779,7 +799,7 @@ export default {
                     this.currentPlanningScenario.inputs[inputKey] = featureCollection;
                 }
 
-                const olFeatures = geoJson.readFeatures(featureCollection),
+                const olFeatures = geoJson.readFeatures(featureCollection, {dataProjection, featureProjection}),
                       layer = layerFactory.createLayer({
                           id: layerId,
                           name: input.title || layerId,
@@ -968,7 +988,7 @@ export default {
                 if (!this.requestBodies[index].inputs) {
                     this.requestBodies[index].inputs = {};
                 }
-                if (propertyKey === "") {
+                if (propertyKey === "" || propertyKey === inputKey) {
                     // top-level input
                     if (isEnum && this.requestBodies[index]?.inputs?.[inputKey]?.value !== undefined) {
                         // Only update value part of enum object
@@ -1281,7 +1301,7 @@ export default {
                         </AccordionItem>
                     </AccordionItem>
                 </div>
-                <template v-if="simulation?.showOutputSelection !== false">
+                <template v-if="simulation && simulation?.showOutputSelection !== false">
                     <h6 class="mt-2 mb-3">
                         {{ $t('additional:modules.tools.simulationTool.outputParam') }}
                     </h6>

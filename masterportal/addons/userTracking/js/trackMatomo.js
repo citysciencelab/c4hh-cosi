@@ -1,10 +1,14 @@
 import {checkClientCredibility} from "./checkClientCredibility";
 
-const unsentEventLimit = 5000;
-let hasBeenCheckedForCredibility = false;
+const deferredEvents = [],
+    unsentEventLimit = 5000;
+
+let hasBeenCheckedForCredibility = false,
+    hasUserNavigated = false;
 
 /**
  * Pushes a trackEvent call to the global Matomo queue (window._paq).
+ * The function calls itself iteratively to handle deferred events.
  * @param {Object} eventParams Object containing the Matomo event parameters.
  * @param {String} eventParams.category Category of the matomo event.
  * @param {String} eventParams.action Description of action of the matomo event.
@@ -33,6 +37,8 @@ export function trackMatomoEvent (eventParams) {
         });
         hasBeenCheckedForCredibility = true;
     }
+
+    deferredEvents.splice(0).forEach(trackMatomoEvent);
 
     let hasMissingParameters = false;
 
@@ -67,18 +73,36 @@ export function trackMatomoEvent (eventParams) {
 }
 
 /**
+ * Holds back a Matomo event until the next regular event is tracked, so that it does not count as user activity by itself.
+ * @param {Object} eventParams The event parameters, see trackMatomoEvent.
+ * @returns {void}
+ */
+export function trackMatomoEventDeferred (eventParams) {
+    deferredEvents.push(eventParams);
+}
+
+/**
  * Pushes a setCustomUrl and trackPageView call to the global Matomo queue (window._paq).
  * @param {Object} eventParams Object containing the Matomo event parameters.
  * @param {String} eventParams.url The custom URL representing the current view.
  * @param {String} eventParams.title The title of the page view.
  * @param {String} eventParams._source Name of the handler-function that triggers the request (used for debugging).
+ * @param {Boolean} isUserNavigation Is true if the event is triggered by a user interaction.
  * @returns {void}
  */
-export function trackMatomoPageView (eventParams) {
+export function trackMatomoPageView (eventParams, isUserNavigation = true) {
     const funcName = "trackMatomoPageView";
 
-    if (typeof Config === "undefined" || !Config.userTracking?.matomo) {
+    if (
+        typeof Config === "undefined"
+        || !Config.userTracking?.matomo
+        || (Config.userTracking.matomo.trackFirstNavigationOnly && hasUserNavigated)
+    ) {
         return;
+    }
+
+    if (!hasUserNavigated) {
+        hasUserNavigated = isUserNavigation;
     }
 
     if (!eventParams.title || !eventParams.url) {

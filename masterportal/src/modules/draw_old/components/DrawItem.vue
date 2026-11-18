@@ -11,6 +11,7 @@ import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 
 /**
  * DrawItem
+ * @deprecated in 3.39.0 (November 2027)
  * @module modules/DrawItem
  * @vue-data {String} mapElement - The hmtml-String for the map.
  * @vue-data {String} storePath - Path to the draw store.

@@ -4,6 +4,16 @@ import {setLikeFilterProperties} from "../js/buildFilter.js";
 import {createUserHelp, prepareLiterals, resetFieldValues} from "../js/literalFunctions.js";
 import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
 
+/**
+ * Reads a service attribute from an object or getter-based model.
+ * @param {Object} wfs The service definition.
+ * @param {String} key The attribute name.
+ * @returns {(string|Object|undefined)} The attribute value, or undefined if absent.
+ */
+function getServiceAttribute (wfs, key) {
+    return wfs[key] || (wfs.get ? wfs.get(key) : undefined);
+}
+
 const actions = {
     /**
      * Updates the currently set search instance based on the given id and prepares the tool for that instance.
@@ -31,8 +41,13 @@ const actions = {
                 : rawLayerList.getLayerWhere({id: layerId});
 
         if (wfs) {
-            const {selectSource} = currentInstance,
-                service = {url: wfs.url || (wfs.get ? wfs.get("url") : undefined), featureNS: wfs.featureNS || (wfs.get ? wfs.get("featureNS") : undefined), featurePrefix: wfs.featurePrefix || (wfs.get ? wfs.get("featurePrefix") : undefined)};
+            const {selectSource} = currentInstance;
+            const service = {
+                dataProjection: getServiceAttribute(wfs, "dataProjection"),
+                url: getServiceAttribute(wfs, "url"),
+                featureNS: getServiceAttribute(wfs, "featureNS"),
+                featurePrefix: getServiceAttribute(wfs, "featurePrefix")
+            };
 
             // NOTE: The extra object is sadly needed so that the object is reactive :(
             commit("setRequiredValues", {...prepareLiterals(currentInstance.literals)});

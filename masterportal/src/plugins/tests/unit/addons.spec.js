@@ -173,6 +173,43 @@ describe("src/plugins/addons.js", () => {
         });
     });
 
+    describe("loadMissingGfiThemes", () => {
+        let loadGfiThemesStub;
+
+        beforeEach(() => {
+            addons.app = mockApp;
+            addons.gfiThemePromises = {};
+            loadGfiThemesStub = sinon.stub(addons, "loadGfiThemes").resolves();
+        });
+
+        afterEach(() => {
+            addons.app = null;
+            addons.gfiThemePromises = {};
+        });
+
+        it("loads the matching gfiTheme addon only once", async () => {
+            await addons.loadMissingGfiThemes(["dataTable", {name: "dataTable"}]);
+            await addons.loadMissingGfiThemes(["dataTable"]);
+
+            expect(loadGfiThemesStub.calledOnce).to.be.true;
+            expect(loadGfiThemesStub.firstCall.args[0]).to.be.equals("dataTable");
+            expect(loadGfiThemesStub.firstCall.args[1]).to.be.equals(mockApp);
+        });
+
+        it("does not load an addon again, that was already loaded via config.js", async () => {
+            await addons.loadAddons(mockApp, ["dataTable"]);
+            await addons.loadMissingGfiThemes(["dataTable"]);
+
+            expect(loadGfiThemesStub.calledOnce).to.be.true;
+        });
+
+        it("loads nothing for unknown themes, addons of other types and undefined themes", async () => {
+            await addons.loadMissingGfiThemes(["default", "exampleControl", undefined, null]);
+
+            expect(loadGfiThemesStub.notCalled).to.be.true;
+        });
+    });
+
     describe("loadSearchInterfaces", () => {
         it("load addon type searchInterface", async () => {
             await addons.loadSearchInterfaces("SearchAddon", mockApp);

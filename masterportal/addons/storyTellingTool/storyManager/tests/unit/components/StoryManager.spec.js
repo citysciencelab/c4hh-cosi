@@ -139,6 +139,16 @@ describe("addons/storyManager/tests/unit/components/StoryManager.spec.js", () =>
             expect(wrapper.findAllComponents({name: "InfoCard"}).length).to.equal(2);
         });
 
+        it("should not find SpinnerItem component", () => {
+            expect(wrapper.findComponent({name: "SpinnerItem"}).exists()).to.be.false;
+        });
+
+        it("should find SpinnerItem component", async () => {
+            await wrapper.setData({isLoading: true});
+
+            expect(wrapper.findComponent({name: "SpinnerItem"}).exists()).to.be.true;
+        });
+
         it("should not find InfoText component", () => {
             expect(wrapper.findComponent({name: "InfoText"}).exists()).to.be.false;
         });

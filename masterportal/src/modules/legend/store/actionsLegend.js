@@ -1,7 +1,28 @@
+import {nextTick} from "vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import validator from "../js/validator.js";
 import legendDraw from "../js/legendDraw.js";
 import layerCollector from "../js/layerCollector.js";
+
+/**
+ * returns a set of collected blob URLs
+ * @param {*} value Value to be checked if it is a blob
+ * @param {Set<string>} blobUrls Set of collected blob URLs
+ * @returns {Set<string>} The collected blob URLs.
+ */
+function collectBlobUrls (value, blobUrls = new Set()) {
+    if (typeof value === "string" && value.startsWith("blob:")) {
+        blobUrls.add(value);
+    }
+    else if (Array.isArray(value)) {
+        value.forEach(item => collectBlobUrls(item, blobUrls));
+    }
+    else if (value && typeof value === "object") {
+        Object.values(value).forEach(item => collectBlobUrls(item, blobUrls));
+    }
+
+    return blobUrls;
+}
 
 const actions = {
     /**
@@ -70,12 +91,22 @@ const actions = {
      * @param {String} id Id of layer.
      * @returns {void}
      */
-    removeLegend ({state, commit}, id) {
+    async removeLegend ({state, commit}, id) {
+        const removedLegends = state.legends.filter(legendObj => legendObj.id === id);
         const legends = state.legends.filter((legendObj) => {
             return legendObj.id !== id;
         });
 
         commit("setLegends", legends);
+        await nextTick();
+
+        const retainedBlobUrls = collectBlobUrls([state.legends, state.layerInfoLegend]);
+
+        collectBlobUrls(removedLegends.map(legendObj => legendObj.legend)).forEach(blobUrl => {
+            if (!retainedBlobUrls.has(blobUrl)) {
+                URL.revokeObjectURL(blobUrl);
+            }
+        });
     },
 
     /**

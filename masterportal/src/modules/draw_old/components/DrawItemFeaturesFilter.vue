@@ -1,6 +1,7 @@
 <script>
 /**
  * Draw Download Item
+ * @deprecated in 3.39.0 (November 2027)
  * @module modules/DrawItemFeaturesFilter
  * @vue-prop {Array} filterList - List of filters.
  * @vue-prop {Array} features - List of Features.

@@ -1,6 +1,7 @@
 import {expect} from "chai";
 import FeatureHandler from "@modules/statisticDashboard/js/handleFeatures.js";
 import Feature from "ol/Feature.js";
+import {Text} from "ol/style.js";
 
 describe("src/modules/statisticDashboard/utils/handleFeatures.js", () => {
     beforeAll(() => {
@@ -104,7 +105,7 @@ describe("src/modules/statisticDashboard/utils/handleFeatures.js", () => {
                         "2018": 99
                     }
                 },
-                styleFunction = FeatureHandler.getStyleFunction(statisticData, colorScheme, "2018", "region", [0, 80, 100]);
+                styleFunction = FeatureHandler.getStyleFunction(statisticData, colorScheme, "2018", ["region"], [0, 80, 100]);
 
             expect(feature3.get("noValue")).to.be.undefined;
 
@@ -116,7 +117,233 @@ describe("src/modules/statisticDashboard/utils/handleFeatures.js", () => {
             expect(styleFunction(feature2).getFill()).to.be.deep.equals(fill1);
             expect(styleFunction(feature3).getFill()).to.be.deep.equals(fill2);
         });
+
+        it("should include text styling when showLabels is set to true", () => {
+            const feature = new Feature({
+                    region: "Cuxhaven"
+                }),
+                colorScheme = [[8, 81, 156, 0.9]],
+                statisticData = {
+                    "Cuxhaven": {
+                        "2018": 144
+                    }
+                },
+                styleFunctionWithLabels = FeatureHandler.getStyleFunction(
+                    statisticData,
+                    colorScheme,
+                    "2018",
+                    ["region"],
+                    [0],
+                    null,
+                    null,
+                    {showLabels: true}
+                ),
+                styledObject = styleFunctionWithLabels(feature);
+
+            expect(styledObject.getText()).to.be.an("object");
+            expect(styledObject.getText().getText()).to.equal("Cuxhaven\n2018: 144");
+        });
+
+        it("should not include text styling if showLabels is not set", () => {
+            const feature = new Feature({
+                    region: "Cuxhaven"
+                }),
+                colorScheme = [[8, 81, 156, 0.9]],
+                statisticData = {
+                    "Cuxhaven": {
+                        "2018": 144
+                    }
+                },
+                styleFunction = FeatureHandler.getStyleFunction(
+                    statisticData,
+                    colorScheme,
+                    "2018",
+                    ["region"],
+                    [0]
+                ),
+                styledObject = styleFunction(feature);
+
+            expect(styledObject.getText()).to.be.null;
+        });
+
+        it("should format the value in the label with the given formatValue function", () => {
+            const feature = new Feature({
+                    region: "Cuxhaven"
+                }),
+                colorScheme = [[8, 81, 156, 0.9]],
+                statisticData = {
+                    "Cuxhaven": {
+                        "2018": 144
+                    }
+                },
+                styleFunctionWithLabels = FeatureHandler.getStyleFunction(
+                    statisticData,
+                    colorScheme,
+                    "2018",
+                    ["region"],
+                    [0],
+                    null,
+                    null,
+                    {showLabels: true, formatValue: value => `${value} Personen`}
+                ),
+                styledObject = styleFunctionWithLabels(feature);
+
+            expect(styledObject.getText().getText()).to.equal("Cuxhaven\n2018: 144 Personen");
+        });
+
+        it("should return null if the feature has no value, even if showLabels is set to true", () => {
+            const feature = new Feature({
+                    region: "Bremen"
+                }),
+                colorScheme = [[8, 81, 156, 0.9]],
+                statisticData = {
+                    "Cuxhaven": {
+                        "2018": 144
+                    }
+                },
+                styleFunctionWithLabels = FeatureHandler.getStyleFunction(
+                    statisticData,
+                    colorScheme,
+                    "2018",
+                    ["region"],
+                    [0],
+                    null,
+                    null,
+                    {showLabels: true}
+                );
+
+            expect(styleFunctionWithLabels(feature)).to.be.null;
+        });
+
+        it("should keep the label of each feature if several features share the same color", () => {
+            const featureCuxhaven = new Feature({
+                    region: "Cuxhaven"
+                }),
+                featureStade = new Feature({
+                    region: "Stade"
+                }),
+                colorScheme = [[8, 81, 156, 0.9]],
+                statisticData = {
+                    "Cuxhaven": {
+                        "2018": 144
+                    },
+                    "Stade": {
+                        "2018": 150
+                    }
+                },
+                styleFunctionWithLabels = FeatureHandler.getStyleFunction(
+                    statisticData,
+                    colorScheme,
+                    "2018",
+                    ["region"],
+                    [0],
+                    null,
+                    null,
+                    {showLabels: true}
+                ),
+                styleCuxhaven = styleFunctionWithLabels(featureCuxhaven),
+                styleStade = styleFunctionWithLabels(featureStade);
+
+            expect(styleCuxhaven.getText().getText()).to.equal("Cuxhaven\n2018: 144");
+            expect(styleStade.getText().getText()).to.equal("Stade\n2018: 150");
+        });
+
+        it("should include text styling for the reference region", () => {
+            const feature = new Feature({
+                    region: "Cuxhaven"
+                }),
+                colorScheme = [[8, 81, 156, 0.9]],
+                statisticData = {
+                    "Cuxhaven": {
+                        "2018": 144
+                    }
+                },
+                styleFunctionWithLabels = FeatureHandler.getStyleFunction(
+                    statisticData,
+                    colorScheme,
+                    "2018",
+                    ["region"],
+                    [0],
+                    "Cuxhaven",
+                    [200, 200, 200, 1],
+                    {showLabels: true}
+                ),
+                styledObject = styleFunctionWithLabels(feature);
+
+            expect(styledObject.getText().getText()).to.equal("Cuxhaven\n2018: 144");
+        });
+
+        it("should return a style with the color of the matching class", () => {
+            const feature = new Feature({region: "Cuxhaven"}),
+                styleFunction = FeatureHandler.getStyleFunction(
+                    {"Cuxhaven": {"2018": 144}},
+                    [[8, 81, 156, 0.9]],
+                    "2018",
+                    ["region"],
+                    [0]
+                ),
+                style = styleFunction(feature);
+
+            expect(style.getFill().getColor()).to.deep.equal([8, 81, 156, 0.9]);
+            expect(style.getStroke().getColor()).to.deep.equal([166, 166, 166, 1]);
+        });
+
+        it("should reuse the same style for features of the same class", () => {
+            const styleFunction = FeatureHandler.getStyleFunction(
+                {
+                    "Cuxhaven": {"2018": 144},
+                    "Stade": {"2018": 150}
+                },
+                [[8, 81, 156, 0.9]],
+                "2018",
+                ["region"],
+                [0]
+            );
+
+            expect(styleFunction(new Feature({region: "Cuxhaven"})))
+                .to.equal(styleFunction(new Feature({region: "Stade"})));
+        });
+
+        it("should return a style with the reference color for the reference region", () => {
+            const feature = new Feature({region: "Cuxhaven"}),
+                styleFunction = FeatureHandler.getStyleFunction(
+                    {"Cuxhaven": {"2018": 144}},
+                    [[8, 81, 156, 0.9]],
+                    "2018",
+                    ["region"],
+                    [0],
+                    "Cuxhaven",
+                    [200, 200, 200, 1]
+                );
+
+            expect(styleFunction(feature).getFill().getColor()).to.deep.equal([200, 200, 200, 1]);
+        });
+
+        describe("createLabel", () => {
+            it("should return a text style with region, date and value", () => {
+                const label = FeatureHandler.createLabel("Cuxhaven", "2018", "144");
+
+                expect(label).to.be.instanceOf(Text);
+                expect(label.getText()).to.equal("Cuxhaven\n2018: 144");
+            });
+            it("should use the formatted value as given", () => {
+                const label = FeatureHandler.createLabel("Cuxhaven", "2018", "1.234,5");
+
+                expect(label.getText()).to.equal("Cuxhaven\n2018: 1.234,5");
+            });
+            it("should set font, padding and the colors of text and background", () => {
+                const label = FeatureHandler.createLabel("Cuxhaven", "2018", "144");
+
+                expect(label.getFont()).to.equal("11px sans-serif");
+                expect(label.getPadding()).to.deep.equal([4, 8, 4, 8]);
+                expect(label.getFill().getColor()).to.equal("#000000");
+                expect(label.getBackgroundFill().getColor()).to.equal("rgba(255, 255, 255, 0.5)");
+                expect(label.getBackgroundStroke().getColor()).to.equal("#cccccc");
+                expect(label.getBackgroundStroke().getWidth()).to.equal(1);
+            });
+        });
     });
+
     describe("filterFeaturesByKeyValue", () => {
         it("Must return empty array, when the given features are not correct", () => {
             const expected = [];

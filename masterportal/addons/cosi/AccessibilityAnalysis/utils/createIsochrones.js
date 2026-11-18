@@ -3,7 +3,8 @@ import {transformFeatures} from "../../utils/features/transform";
 import {union as turfUnion} from "@turf/union";
 import {featureCollection} from "@turf/helpers";
 import axios from "axios";
-import GeoJSON from "ol/format/GeoJSON";
+import {featureToGeoJson} from "@shared/js/utils/convertFeatureToGeoJSON.js";
+import {geoJsonCollectionToFeatures} from "@shared/js/utils/convertGeoJSONToFeature.js";
 
 let abortController;
 
@@ -161,8 +162,6 @@ async function createIsochronesPoints (args) {
         return [];
     }
     if (args.mergePolygons) {
-        const format = new GeoJSON();
-
         features = [];
 
         for (let i = 0; i < steps; i++) {
@@ -172,18 +171,18 @@ async function createIsochronesPoints (args) {
 
             layeredList = [].concat(...layeredList);
             // convert to a turf.js feature
-            layerUnion = format.writeFeatureObject(layeredList[0]);
+            layerUnion = featureToGeoJson(layeredList[0]);
 
             for (let j = 0; j < layeredList.length; j++) {
                 try {
-                    layerUnion = turfUnion(featureCollection([layerUnion, format.writeFeatureObject(layeredList[j])]));
+                    layerUnion = turfUnion(featureCollection([layerUnion, featureToGeoJson(layeredList[j])]));
                 }
                 catch (e) {
                     console.error(e); // turf chokes one some resulting geometries
                 }
             }
             // readGeometries
-            layerUnionFeatures = new GeoJSON().readFeatures(JSON.stringify(layerUnion));
+            layerUnionFeatures = geoJsonCollectionToFeatures(layerUnion);
 
             // TODO: get projections via arguments and/or store
             layerUnionFeatures = transformFeatures(layerUnionFeatures, "EPSG:4326", args.projectionCode);

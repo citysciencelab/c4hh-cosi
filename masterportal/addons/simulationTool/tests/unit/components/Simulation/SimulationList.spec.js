@@ -63,11 +63,5 @@ describe("addons/SimulationTool/components/Simulation/SimulationList.vue", () =>
 
             expect(wrapper.findComponent({name: "SectionHeader"}).exists()).to.be.true;
         });
-
-        it("should render FlatButton component", () => {
-            const wrapper = factory.getShallowMount();
-
-            expect(wrapper.findComponent({name: "FlatButton"}).exists()).to.be.true;
-        });
     });
 });

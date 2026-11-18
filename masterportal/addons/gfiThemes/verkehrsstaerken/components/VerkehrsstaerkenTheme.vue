@@ -5,6 +5,7 @@ import {createNewRowName, combineYearsData} from "../utils/helpers.js";
 import VerkehrsstaerkenThemeTable from "./VerkehrsstaerkenThemeTable.vue";
 import VerkehrsstaerkenThemeLineChart from "./VerkehrsstaerkenThemeLineChart.vue";
 import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 export default {
     name: "VerkehrsstaerkenTheme",
@@ -167,7 +168,7 @@ export default {
          */
         onClick (evt) {
             evt.stopPropagation();
-            window.open(this.downloadLink);
+            openSecuredPopup(this.downloadLink, "_blank");
         },
         /**
          * Expands table to fullscreen view, hides sorting elements, footer and layerPills to make space. Also enlarges the header row of the table on smaller screens.

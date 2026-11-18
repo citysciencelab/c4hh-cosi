@@ -6,6 +6,7 @@ import {getArea, getLength} from "ol/sphere.js";
 /**
  * returns the Feature to use as mouse label on change of circle or double circle
  * returns the Feature to use as mouse label on change of circle, double circle, line, area and square
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context context object for actions, getters and setters.
  *
  * @returns {module:ol/Overlay} the Feature to use as mouse label
@@ -69,6 +70,7 @@ function createTooltipOverlay ({state, getters, commit, dispatch}, projection) {
 
 /**
  * Updates the calculations for radius, area or length of a feature.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context context object for actions, getters and setters.
  * @param {Number} value value of radius or area.
  * @returns {module:ol/Overlay} the Feature to use as mouse label

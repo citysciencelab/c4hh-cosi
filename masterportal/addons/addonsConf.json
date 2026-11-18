@@ -281,5 +281,9 @@
   },
   "userTracking": {
     "type": "javascript"
+  },
+  "landRegistryFile": {
+    "path": "landRegistryFile",
+    "type": "tool"
   }
 }

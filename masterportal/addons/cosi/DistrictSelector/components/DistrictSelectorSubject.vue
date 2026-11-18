@@ -8,7 +8,7 @@ import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
 import {downloadJsonToFile} from "../../utils/download";
 import {fromCircle as polygonFromCircle} from "ol/geom/Polygon";
 import Feature from "ol/Feature";
-import {featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson";
+import {featuresToGeoJsonCollection} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";
@@ -142,7 +142,7 @@ export default {
         exportFeature (card) {
             const feature = wktParser.decodeFeature(card?.subjectFeatureWKT);
 
-            downloadJsonToFile(featuresToGeoJsonCollection([feature]), "Gebiet für Fachdaten.geojson");
+            downloadJsonToFile(featuresToGeoJsonCollection([feature], false, "EPSG:25832", "EPSG:4326"), "Gebiet für Fachdaten.geojson");
         },
 
         /**

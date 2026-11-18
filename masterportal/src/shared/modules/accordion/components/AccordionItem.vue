@@ -12,6 +12,11 @@
  * @vue-prop {Boolean} useIndentation - if true, keeps the default accordion button left padding.
  * @vue-prop {String} headingLevel - sets the heading level for the accordion title (e.g., h1, h2, h3).
  * @vue-prop {String} iconMarginEnd - sets the margin-end utility class for the icon (e.g., me-2, me-3).
+ * @vue-prop {String} subTitle - sets an optional subtitle to be displayed below the title.
+ * @vue-prop {String} subFontSize - defaults to font-size-base (1rem) and can be changed to use a different size for the subtitle.
+ * @vue-prop {String} badgeText - sets an optional text to be displayed in a badge right of the title/subtitle block.
+ * @vue-prop {Boolean} withBorder - if true, the accordion will have a border around it and a border between the title and the content.
+ * @vue-event {updateAccordionState} - emitted when the accordion state changes, passing a boolean indicating whether the accordion is open.
  */
 export default {
     name: "AccordionItem",
@@ -60,6 +65,27 @@ export default {
             type: String,
             required: false,
             default: "me-3"
+        },
+        subTitle: {
+            type: String,
+            required: false,
+            default: null
+        },
+        subFontSize: {
+            type: String,
+            required: false,
+            default: "font-size-base",
+            validator: value => ["font-size-base", "font-size-big", "font-size-small"].includes(value)
+        },
+        badgeText: {
+            type: String,
+            required: false,
+            default: null
+        },
+        withBorder: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     emits: ["updateAccordionState"],
@@ -75,20 +101,22 @@ export default {
     <div
         :id="`accordion-container-${id}`"
         class="accordion accordion-bg accordion-flush"
-        :class="[!colouredHeader? 'border-0' : 'pt-2']"
+        :class="[!colouredHeader && !withBorder ? 'border-0' : 'pt-2 pb-2', withBorder? 'border-1 border rounded-2' : '']"
     >
         <div
-            class="accordion-item border-0"
+            class="accordion-item"
         >
             <component
                 :is="headingLevel"
                 v-if="title"
                 :id="`flush-heading-${id}`"
                 class="accordion-header ms-0"
+                :class="[withBorder ? 'px-3' : '']"
             >
                 <button
                     :class="[
                         'accordion-button',
+                        badgeText ? 'has-badge' : '',
                         fontSize,
                         !isOpen? 'collapsed' : '',
                         colouredHeader ? 'rounded' : useIndentation ? '' : 'ps-0'
@@ -106,12 +134,28 @@ export default {
                         v-if="icon"
                         :class="[icon, iconMarginEnd || undefined]"
                     />
-                    {{ title }}
+                    <span class="d-block">
+                        <span class="d-block w-100">
+                            {{ title }}
+                        </span>
+                        <span
+                            v-if="subTitle"
+                            :class="[subFontSize, 'd-block', 'w-100']"
+                        >
+                            {{ subTitle }}
+                        </span>
+                    </span>
+                    <span
+                        v-if="badgeText"
+                        class="badge rounded-pill bg-mp-light-blue text-body mx-auto"
+                    >
+                        {{ badgeText }}
+                    </span>
                 </button>
             </component>
             <div
                 :id="`flush-collapse-${id}`"
-                :class="`accordion-collapse collapse ${isOpen ? 'show' : ''}`"
+                :class="['accordion-collapse', 'collapse', isOpen ? 'show' : '', withBorder ? 'p-3 border-top' : '']"
                 :aria-labelledby="`flush-heading-${id}`"
                 :data-bs-parent="`#accordion-container-${id}`"
             >
@@ -137,7 +181,12 @@ export default {
         .font-size-base {
             font-size: $font-size-base;
         }
-
+        .font-size-small {
+            font-size: $font_size_sm;
+        }
+        .accordion-button.has-badge::after {
+            margin-left: 0;
+        }
         [coloured=true] {
                 background-color: $light_blue;
         }

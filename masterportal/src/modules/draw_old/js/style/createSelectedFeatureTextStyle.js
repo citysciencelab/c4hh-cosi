@@ -2,6 +2,7 @@ import {Fill, Text, Stroke} from "ol/style.js";
 
 /**
  * Creates and returns a feature text style for selected feature.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {ol/Feature} feature The feature.
  * @returns {module:ol/style/Style/Text} text style for features.
  */

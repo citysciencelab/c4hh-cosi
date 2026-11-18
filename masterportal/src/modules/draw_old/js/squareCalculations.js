@@ -1,5 +1,6 @@
 /**
  * Helper Function to coordinate the calculation of a square.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} feature The square feature.
  * @param {module:ol/coordinate~Coordinate} squareCenter The center of the square to be calculated.
  * @param {Number} squareArea The area of the square to be calculated.

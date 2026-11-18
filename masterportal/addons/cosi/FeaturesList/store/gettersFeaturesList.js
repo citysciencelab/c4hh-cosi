@@ -99,8 +99,8 @@ export default {
     isFeatureActive: (state, {isFeatureDisabled}) => (feature, layer) => {
         let style = Array.isArray(feature.getStyle()) ? feature.getStyle()[0] : feature.getStyle();
 
-        if (typeof style === "undefined" || style === null && layer) {
-            style = layer.getStyleFunction()(feature);
+        if (typeof style === "function" || typeof style === "undefined" || style === null && layer) {
+            style = layer?.getStyleFunction()?.(feature);
             style = Array.isArray(style) ? style[0] : style;
         }
 

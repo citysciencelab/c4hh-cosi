@@ -22,9 +22,10 @@ describe("addons/heavyRain/projects/components/Projects.vue", () => {
      * Creates the store for the tests.
      * @param {String|null} wfstLayerId - The id of the WFS-T layer showing the saved projects.
      * @param {String} [currentView="main"] - The current view.
+     * @param {Boolean} [loggedIn=true] - True, if the user is logged in.
      * @returns {Object} the store.
      */
-    function createTestStore (wfstLayerId, currentView = "main") {
+    function createTestStore (wfstLayerId, currentView = "main", loggedIn = true) {
         return createStore({
             namespaced: true,
             actions: {
@@ -46,6 +47,18 @@ describe("addons/heavyRain/projects/components/Projects.vue", () => {
                     namespaced: true,
                     modules: {
                         namespaced: true,
+                        Login: {
+                            namespaced: true,
+                            state: {loggedIn},
+                            getters: {
+                                loggedIn: state => state.loggedIn
+                            },
+                            mutations: {
+                                setLoggedIn: (state, value) => {
+                                    state.loggedIn = value;
+                                }
+                            }
+                        },
                         Projects: {
                             namespaced: true,
                             getters: {
@@ -93,6 +106,47 @@ describe("addons/heavyRain/projects/components/Projects.vue", () => {
             const wrapper = shallowMount(Projects, {global: {plugins: [store]}});
 
             expect(wrapper.exists()).to.be.true;
+        });
+    });
+
+    describe("Login", () => {
+        it("should neither show the layer nor the content if the user is not logged in", () => {
+            const wrapper = shallowMount(Projects, {global: {plugins: [createTestStore("36016", "main", false)]}});
+
+            expect(addOrReplaceLayerSpy.notCalled).to.be.true;
+            expect(registerListenerSpy.notCalled).to.be.true;
+            expect(wrapper.find(".alert").exists()).to.be.true;
+            expect(wrapper.findComponent({name: "HrHeader"}).exists()).to.be.false;
+
+            wrapper.unmount();
+
+            expect(replaceByIdInLayerConfigSpy.notCalled).to.be.true;
+        });
+
+        it("should show the layer after the login", async () => {
+            const testStore = createTestStore("36016", "main", false),
+                wrapper = shallowMount(Projects, {global: {plugins: [testStore]}});
+
+            testStore.commit("Modules/Login/setLoggedIn", true);
+            await flushPromises();
+
+            expect(addOrReplaceLayerSpy.calledOnce).to.be.true;
+            expect(registerListenerSpy.calledOnce).to.be.true;
+            expect(wrapper.find(".alert").exists()).to.be.false;
+        });
+
+        it("should hide the layer and reset the current project after the logout", async () => {
+            const testStore = createTestStore("36016"),
+                wrapper = shallowMount(Projects, {global: {plugins: [testStore]}});
+
+            await flushPromises();
+            testStore.commit("Modules/Login/setLoggedIn", false);
+            await flushPromises();
+
+            expect(unregisterListenerSpy.calledOnce).to.be.true;
+            expect(replaceByIdInLayerConfigSpy.calledOnce).to.be.true;
+            expect(setCurrentProjectSpy.calledOnceWith(sinon.match.any, undefined)).to.be.true;
+            expect(wrapper.find(".alert").exists()).to.be.true;
         });
     });
 

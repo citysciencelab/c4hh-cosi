@@ -2,11 +2,13 @@
 import InputText from "../../../../../src/shared/modules/inputs/components/InputText.vue";
 import SliderItem from "../../../../../src/shared/modules/slider/components/SliderItem.vue";
 import SwitchInput from "../../../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
+import PolygonInput from "./PolygonInput.vue";
 
 export default {
     name: "DynamicInputByType",
     components: {
         InputText,
+        PolygonInput,
         SliderItem,
         SwitchInput
     },
@@ -92,7 +94,7 @@ export default {
         <template v-if="inputType === 'string'">
             <InputText
                 :id="id"
-                class="form-control mb-3"
+                class="mb-3"
                 :label="label"
                 :placeholder="placeholder"
                 :model-value="value"
@@ -152,6 +154,15 @@ export default {
                 :value="value"
                 :disabled
                 :interaction="($event) => $emit('update:value', Number($event.target.value))"
+            />
+        </template>
+        <template v-else-if="inputType === 'polygon'">
+            <PolygonInput
+                :id
+                :label
+                :value
+                :disabled
+                @update:value="$emit('update:value', $event)"
             />
         </template>
     </div>

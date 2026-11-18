@@ -2,14 +2,14 @@
   "modules": {
     "potentialDamagedBuilding": {
       "title": "Schadenpotenzial Gebäude",
-      "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "description": "Zur Ermittlung des Starkregenisikos eines Gebäudes müssen zusätzlich zur Gefahreneinschätzung vor Ort die potenziellen Schäden für das Gebäude berücksichtigt werden. Das Schadenspotenzial variiert je nach Nutzungsart, zum Beispiel Wohnen oder Industrie, da verschiedene Vermögenswerte und kritische Infrastrukturen vorhanden sind und sich auch das Risiko für Leib und Leben unterscheidet. Folgende Beispiele verdeutlichen dies:<br><br><ul><li> Ist ein Gebäude mit Wohnungen im Kellergeschoss von Überflutungen betroffen, ist eine Evakuierung aus dem Kellergeschoss wohlmöglich schwierig. Die im Haus befindlichen Möbel und Gegenstände können geschädigt werden. Zusätzlich können auch Schäden an der Bausubstanz entstehen. Wird hingegen ein Schuppen überflutet, entstehen in der Regel monetär und personell geringere Schäden.<br><br></li><li> Eine Kindertagesstätte, ein Krankenhaus, Altenheim oder andere Betreuungsstätte haben aufgrund des Aufenthalts vulnerabler Gruppen ein sehr hohes Schadenspotenzial. Die Menschen in diesen Einrichtungen benötigen in der Regel Hilfe bei der Evakuierung. In einem ersten Schritt wurde das Schadenspotenzial mithilfe der Daten zur ALKIS-Gebäudenutzungen qualitativ eingeschätzt. (Absatz und nächster Satz \"fett\":) Mit diesem Tool können die authorisierten Nutzer die Schadenspotenzialklassen durch vor Ort Kenntnisse anpassen. Dies kann zum Beispiel erforderlich werden, wenn die tatsächliche Nutzung des Gebäudes von der durch ALKIS zugeordneten Nutzung abweicht. Außerdem ist eine Änderung sinnvoll, wenn das Gebäude bereits über einen ausführlichen Objektschutz verfügt und potenziellen Schäden damit bereits vorgebeugt wurde. Die angepassten Schadenspotenzialklassen werden bei der nächsten Kartenaktualisierung der Risikoanalyse einbezogen.</li></ul>Die Zuordnung von Gebäude- und Flächennutzungen aus ALKIS zu den vier Schadenspotenzialklassen ist auf Seite 29/30 des <a target='_blank' href='https://hmdk.metaver.de/documents-ige-ng/igc_hh/e8111f0b-3739-4dbb-9ce0-e11d5c4c45a1/Leitfaden-Risikoanalyse.pdf'>Leitfadens</a> beschrieben.",
       "headline": {
          "buildingAttributes": "Gebäude - Attribute",
          "buildingOverview": "Übersicht",
          "updateData": "Änderungsvorschlag - ",
-         "adjustedDamagePotentialClass": "Angepasste Schadenpotenzialklasse",
+         "adjustedDamagePotentialClass": "Änderungsvorschlag Schadenspotenzialklasse",
          "lastUpdated": "Datum der Eingabe:",
-         "comment": "Kommentar",
+         "comment": "Kommentar zum Änderungsvorschlag",
          "potentialDamagedInformation": "Informationen zum Schadenpotenzial - ",
          "potentialDamagedClass": "Schadenpotenzialklasse",
          "buildingFunction": "Gebäudefunktion",
@@ -24,17 +24,21 @@
         "additionalBuildingFunction": "Neben der funktionalen Nutzung können weitere Nutzungen vorliegen, die in der Schadenpotenzialklassen-Zuordnung einbezogen werden.",
         "earthSurface": "Bei Objekten unter der Erdoberfläche ist dies entsprechend gekennzeichnet.",
         "buildingConstructionType": "Bezeichnung des Bauteils. Bei der Bezeichnung sind insbesondere Keller gesondert aufgeführt.",
-        "basementLevels": "Hier wird angegeben, ob und wie viele Untergeschosse vorliegen."
+        "basementLevels": "Hier wird angegeben, ob und wie viele Untergeschosse vorliegen.",
+        "adjustedDamagePotentialClassDes": " Ein Vorschlag zur Änderung der Schadenspotenzialklasse kann eingegeben, wenn durch Ortskenntnisse des Gebäudes und die Nutzung im Erd-/Kellergeschoss eine fundiertere Datenbasis vorliegt. Zum Beispiel könnten die folgenden Fälle zur Änderung der Schadenspotenzialklasse führen: \"Durch die Umsetzung von Objektschutzmaßnahmen konnte die Schadenspotenzialklasse von 4 auf 2 reduziert werden.\" oder \"Das Gebäude wird im Erdgeschoss nicht als Kita genutzt, sondern für Mietwohnungen. Durch die Nutzungskenntnisse wird die Schadenspotenzialklasse von 4 auf 3 entsprechend der Tabelle im <a target='_blank' href='https://hmdk.metaver.de/documents-ige-ng/igc_hh/e8111f0b-3739-4dbb-9ce0-e11d5c4c45a1/Leitfaden-Risikoanalyse.pdf'>Leitfaden</a> verringert eingestuft.\"",
+        "commentDes": "Bitte geben Sie für den Änderungsvorschlag der Schadenspotenzialklasse eine Erläuterung im Textfeld mit max. 255 Zeichen ein. Die Information kann kurz gehalten werden, wie zum Beispiel: \"Durch die Umsetzung von Objektschutzmaßnahmen konnte die Schadenspotenzialklasse von 4 auf 2 reduziert werden.\" oder \"Das Gebäude wird im Erdgeschoss nicht als Kita genutzt, sondern für Mietwohnungen. Durch die Nutzungskenntnisse wird die Schadenspotenzialklasse von 4 auf 3 entsprechend der Tabelle im <a target='_blank' href='https://hmdk.metaver.de/documents-ige-ng/igc_hh/e8111f0b-3739-4dbb-9ce0-e11d5c4c45a1/Leitfaden-Risikoanalyse.pdf'>Leitfaden</a> verringert eingestuft.\"",
+        "resetDes": "Hier kann die Schadenspotenzialklasse auf die gespeicherten Werte / Texte zurückgesetzt werden.  Auf ältere Werte zurückzusetzen ist nicht möglich. Wenn Sie Ihren Änderungsvorschlag speichern, überschreiben Sie den bisherigen Änderungsvorschlag. Dieser kann nicht wieder hergestellt werden."
       },
      "damagePotentialClass": "Schadenspotenzialklasse",
       "currentlyUsed": "aktuell verwendet",
       "updateDateLabel": "Aktualisierungsdatum",
       "lastUpdate": "letzte Aktualisierung",
-     "adjustedDamagePotentialClassHint": "Die letzte Eingabe der ortsspezifischer Werte pro Objekt oder Fläche.",
+      "adjustedDamagePotentialClassHint": "Die letzte Eingabe der ortsspezifischer Werte pro Objekt oder Fläche.",
       "lastUpdatedHint": "Die Anpassung wurde vorgenommen am: ",
       "commentHint": "Angabe der zuständigen Dienststelle mit ggf. weiteren Erläuterungen",
       "reset": "Zurücksetzen",
       "save": "Speichern",
+      "loginRequired": "Bitte melden Sie sich an, um das Schadenspotenzial der Gebäude zu sehen und zu bearbeiten.",
       "messages": {
         "invalid": "Bitte geben Sie eine Schadenspotenzialklasse von 1 bis 6 und einen Kommentar mit maximal 255 Zeichen ein.",
         "success": "Die Anpassung wurde gespeichert."

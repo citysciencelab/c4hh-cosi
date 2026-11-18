@@ -1,0 +1,68 @@
+{
+    "modules": {
+        "landRegistryFile": {
+            "name": "Digital Land Registry File",
+            "description": "Displays land-related processes in building and easement law.",
+            "loadingSpinnerText": {
+                "general": "Data is loading. Please wait..."
+            },
+            "tabs": {
+              "tabSearch": {
+                "label": "Search",
+                "searchButtonLabel": "Search",
+                "resetButtonLabel": "Reset",
+                "searchModeSwitchLabel": "Restrict search to map extent",
+                "searchModeInExtent": "Search will be restricted to map extent.",
+                "searchModeOverall": "Search will cover the entire city of Hamburg.",
+                "yearFromLabel": "Year from",
+                "yearToLabel": "Year to",
+                "textSearchPlaceholder": "Search text",
+                "textSearchInfo": "Information on the text search",
+                "textSearchInfoModal": {
+                  "searchIn": "Searches are performed in the following fields:",
+                  "searchValidChars": "You can use the following special characters:"
+                },
+                "unsubmittedSearchWarning": "Your current search criteria does not affect the results. Please click on 'Search' to update the results.",
+                "errors": {
+                  "errorYearDigit": "Please enter a number with 4 digits for '{{fieldname}}'.",
+                  "errorYearBoth": "Please enter both 'From' and 'To' to search by year.",
+                  "errorYearOrder": "'To' has to be bigger than or equal to 'From'.",
+                  "errorInvalidChars": "The text contains the following invalid characters: {{invalidChars}}",
+                  "overallSearchNeedsFilter": "An additional filter is required to search all of Hamburg.",
+                  "overallSearchOptionNeedsFilter": "When '{{selectedOption}}' is selected, an additional filter is required to search all of Hamburg."
+                }
+              },
+              "tabResults": {
+                "label": "Results",
+                "backToSearchButtonLabel": "Back to search",
+                "showMoreFieldsLabel": "Show more fields",
+                "actionsHeader": "Actions",
+                "actionsShowPosition": "Show map position",
+                "actionsShowDetails": "Show details",
+                "actionsOpenLink": "Open record in ELDORADO",
+                "noResultsMessage": "No results found. Please change your search criteria.",
+                "numberOfResults": "Number of records found:",
+                "datasetsPerPageLabel": "Records per page"
+              },
+              "tabDetails": {
+                "label": "Details",
+                "backToSearchButtonLabel": "Back to search",
+                "backToResultsButtonLabel": "Back to results list",
+                "noDetailsMessage": "No details found. Please change your search criteria.",
+                "buttonBack": "Show previous record",
+                "buttonForward": "Show next record"
+              },
+              "tabHelp": {
+                "label": "Help",
+                "backToSearchButtonLabel": "Back to search",
+                "openHelpButtonLabel": "Open help page in Sharepoint",
+                "startTourButtonLabel": "Start guided help tour",
+                "noHelpConfigured": "Currently no explicit help is configured for the 'Digital Land Registry File'."
+              }
+            },
+            "errors": {
+              "oafError": "Error retrieving necessary data for '{{oafParams.collection}}'. Please try again."
+            }
+        }
+    }
+}

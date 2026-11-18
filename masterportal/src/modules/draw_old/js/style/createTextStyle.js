@@ -2,7 +2,7 @@ import {Fill, Style, Text} from "ol/style.js";
 
 /**
  * Creates and returns a feature style for text.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {String[]} color The color of the drawn feature represented as an array.
  * @param {String} font The font of the text.
  * @param {String} fontSize The size of the font of the text.

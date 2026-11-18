@@ -12,6 +12,7 @@ import SpinnerItem from "../../../modules/spinner/components/SpinnerItem.vue";
  * @vue-prop {string[]} subText An Array of optional Subtexts to be shown below each button.
  * @vue-prop {boolean} isGroup is a display-Prop. When false, the buttons will be shown like a toggle between them, when false the buttons are separated more clearly.
  * @vue-prop {string} returnedButtonProperty overrides the button.name that is emitted on button selection, allowing for custom values.
+ * @vue-prop {boolean} fullWidth When true, the group fills the parent's width and the buttons share it equally.
  */
 export default {
     name: "ButtonGroup",
@@ -51,6 +52,11 @@ export default {
             type: String,
             required: false,
             default: "name"
+        },
+        fullWidth: {
+            type: Boolean,
+            required: false,
+            default: false
         }
     },
     data () {
@@ -107,7 +113,10 @@ export default {
 
 </script>
 <template>
-    <div class="switchRadioButtons mt-0">
+    <div
+        class="switchRadioButtons mt-0"
+        :class="{'full-width': fullWidth}"
+    >
         <div
             :class="isGroup ? 'btn-group' : 'non-group btn-toolbar d-flex align-items-center'"
             role="group"
@@ -203,6 +212,23 @@ export default {
         .btn {
             border-top-right-radius: 20px;
             border-bottom-right-radius: 20px;
+        }
+    }
+}
+
+.full-width {
+    width: 100%;
+
+    .btn-group {
+        display: flex;
+        width: 100%;
+    }
+
+    .button-wrapper {
+        flex: 1 1 0;
+
+        .btn {
+            width: 100%;
         }
     }
 }

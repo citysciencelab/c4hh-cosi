@@ -1,5 +1,6 @@
 <script>
 import {mapGetters} from "vuex";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 import ControlIcon from "../../components/ControlIcon.vue";
 
 /**
@@ -118,7 +119,7 @@ export default {
         toggleFullScreen () {
             // if portal is in an iframe, it can't be set to fullscreen - open new tab for better access
             if (this.newTabFromFrame && window.self !== window.top) {
-                window.open(this.url, "_blank");
+                openSecuredPopup(this.url, "_blank");
                 return;
             }
             if (this.active) {

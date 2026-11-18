@@ -1127,7 +1127,7 @@ export default {
     </div>
     <div
         :id="id"
-        class="btn-toolbar sticky-top bg-white"
+        class="btn-toolbar sticky-top bg-white d-flex flex-row justify-content-between w-100"
     >
         <div
             class="btn-group"
@@ -1226,29 +1226,31 @@ export default {
                     :interaction="() => resetAll()"
                 />
             </div>
+            <div class="btn-toolbar bg-white">
+                <FlatButton
+                    v-if="fullViewEnabled"
+                    id="table-view-full"
+                    aria-label="$t('common:shared.modules.table.reset')"
+                    :text="fullViewActivated ? $t('common:shared.modules.table.fullscreenViewActive') : $t('common:shared.modules.table.fullscreenView')"
+                    :title="fullViewActivated ? $t('common:shared.modules.table.fullscreenViewActiveToolTip') : $t('common:shared.modules.table.fullscreenViewToolTip') "
+                    :icon="'bi-fullscreen'"
+                    :class="fullViewActivated ? 'active-Fullview me-3 rounded-pill' : 'me-3 me-3 rounded-pill'"
+                    :interaction="() => fullView()"
+                />
+            </div>
+            <div class="d-flex justify-content-center align-items-center">
+                <button
+                    v-if="showTotal"
+                    class="btn btn-secondary align-items-center mb-3 total-button"
+                    :class="[showTotalData? 'active' : '']"
+                    :title="$t('common:shared.modules.table.totalTitle')"
+                    @click="toggleShowTotalData(showTotalData)"
+                    @keydown.enter="toggleShowTotalData(showTotalData)"
+                >
+                    <span class="btn-texts">&Sigma;</span>
+                </button>
+            </div>
         </div>
-        <div class="btn-toolbar bg-white">
-            <FlatButton
-                v-if="fullViewEnabled"
-                id="table-view-full"
-                aria-label="$t('common:shared.modules.table.reset')"
-                :text="fullViewActivated ? $t('common:shared.modules.table.fullscreenViewActive') : $t('common:shared.modules.table.fullscreenView')"
-                :title="fullViewActivated ? $t('common:shared.modules.table.fullscreenViewActiveToolTip') : $t('common:shared.modules.table.fullscreenViewToolTip') "
-                :icon="'bi-fullscreen'"
-                :class="fullViewActivated ? 'active-Fullview me-3 rounded-pill' : 'me-3 me-3 rounded-pill'"
-                :interaction="() => fullView()"
-            />
-        </div>
-        <button
-            v-if="showTotal"
-            class="btn btn-secondary align-items-center mb-3 total-button"
-            :class="[showTotalData? 'active' : '']"
-            :title="$t('common:shared.modules.table.totalTitle')"
-            @click="toggleShowTotalData(showTotalData)"
-            @keydown.enter="toggleShowTotalData(showTotalData)"
-        >
-            <span class="btn-texts">&Sigma;</span>
-        </button>
         <div
             v-if="downloadable"
             class="btn-group"

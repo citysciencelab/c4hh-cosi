@@ -1,7 +1,8 @@
-import {GeoJSON} from "ol/format";
 import Feature from "ol/Feature";
-import {Point, Polygon, MultiPoint, MultiPolygon, Geometry} from "ol/geom";
+import {featureToGeoJson} from "@shared/js/utils/convertFeatureToGeoJSON.js";
+import {geometryToGeoJson} from "@shared/js/utils/convertGeometryToGeoJSON.js";
 import isObject from "@shared/js/utils/isObject";
+import {Point, Polygon, MultiPoint, MultiPolygon, Geometry} from "ol/geom";
 
 /**
  * Serialize the state
@@ -92,17 +93,15 @@ function deepSerialize (state) {
  * @returns {Object} the serialized features
  */
 function serializeFeatures (val) {
-    const parser = new GeoJSON();
     let res;
 
     if (!Array.isArray(val)) {
         if (val instanceof Feature) {
-            res = parser.writeFeatureObject(val);
-
+            res = featureToGeoJson(val);
             res.properties.isOlFeature = true;
         }
         else if ([Point, MultiPoint, Polygon, MultiPolygon].includes(val?.constructor)) {
-            res = parser.writeGeometryObject(val);
+            res = geometryToGeoJson(val);
             res.isOlGeometry = val.getType();
         }
         else {
@@ -114,7 +113,7 @@ function serializeFeatures (val) {
 
         for (let i = 0; i < val.length; i++) {
             if (val[i] instanceof Feature) {
-                const geojson = parser.writeFeatureObject(val[i]);
+                const geojson = featureToGeoJson(val[i]);
 
                 geojson.properties.isOlFeature = true;
                 res.push(geojson);

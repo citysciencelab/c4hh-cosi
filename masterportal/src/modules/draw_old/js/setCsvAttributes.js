@@ -4,6 +4,7 @@ import Feature from "ol/Feature.js";
 
 /**
  * Sets the geometry of each feature as WKT and epsg to its attributes.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {ol/Feature[]} features - An array of features.
  * @param {String} code The EPSG-Code in which the features are coded.
  * @returns {ol/Feature[]|Boolean} The features incl. the wkt geometries. False if the given parameter is not an array.

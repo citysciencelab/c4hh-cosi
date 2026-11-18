@@ -43,7 +43,7 @@ export default {
             cardTwoSelectedItemList: [],
             cardTwoSelectedNumericalValueList: [],
             cardTwoType: "subjectData",
-            selectedYear: null,
+            selectedYear: undefined,
             yearItemList: []
         };
     },
@@ -111,12 +111,39 @@ export default {
             return this.cardOneType === "statisticalData" || this.cardTwoType === "statisticalData";
         }
     },
-    created () {
-        if (this.selectedStatFeatures[0]) {
-            this.yearItemList = getAvailableYears([this.selectedStatFeatures[0]]);
+    watch: {
+        /**
+         * Sets the selected year based on available years in the selected statistical features.
+         * @param {String[]} val - Array of available years.
+         * @returns {void}
+         */
+        yearItemList: {
+            handler (val) {
+                if (this.statisticalDataInCardTypes && val.length > 0 && typeof this.selectedYear === "undefined") {
+                    this.selectedStatFeatures.forEach(feature => {
+                        const properties = feature.getProperties ? feature.getProperties() : feature,
+                              years = [];
+
+                        for (const key of Object.keys(properties)) {
+                            if (key.startsWith("jahr_")) {
+                                const year = key.split("_")[1];
+
+                                years.push(Number(year));
+                            }
+                        }
+
+                        this.selectedYear = years.length > 0 ? String(Math.max(...years)) : null;
+                    });
+                }
+            },
+            immediate: true
         }
     },
-
+    created () {
+        if (this.selectedStatFeatures) {
+            this.yearItemList = getAvailableYears(this.selectedStatFeatures);
+        }
+    },
     methods: {
         /*
         * Swaps the parameters of the two selection cards.
@@ -245,10 +272,11 @@ export default {
     </div>
     <Dropdown-Autocomplete
         v-if="statisticalDataInCardTypes"
-        v-model="selectedYear"
+        :model-value="selectedYear"
         :items="yearItemList"
         :label="$t('additional:modules.tools.cosi.calculateRatio.yearsForStatisticalData')"
         class="mb-3"
+        @update:model-value="selectedYear = $event"
     />
     <FlatButton
         class="mx-auto mb-3"

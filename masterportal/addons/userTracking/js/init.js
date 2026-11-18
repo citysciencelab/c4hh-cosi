@@ -4,8 +4,14 @@ import {actionCallback} from "./actionCallback.js";
 import {configCommands} from "./configCommands.js";
 import {mutationCallback} from "./mutationCallback.js";
 import {piniaActionCallback} from "./piniaActionCallback.js";
-import {trackMatomoEvent, trackMatomoPageView} from "./trackMatomo.js";
-import {assembleSourceInfoForEvent, getBaseUrl, stripBodyParameterFromHref} from "./util.js";
+import {trackMatomoEvent, trackMatomoEventDeferred, trackMatomoPageView} from "./trackMatomo.js";
+import {
+    anonymizeSearchParams,
+    assembleSourceInfoForEvent,
+    getBaseUrl,
+    getLayerInformation,
+    stripBodyParameterFromHref
+} from "./util.js";
 
 /**
  * The Pinia store composables whose actions are observed for tracking.
@@ -101,10 +107,12 @@ export function initializeMatomo (config) {
 
     if (config.trackInitialView) {
         trackMatomoPageView({
-            url: `${getBaseUrl()}${decodeURI(window.location.search)}`,
+            url: `${getBaseUrl()}${anonymizeSearchParams(window.location.search, {maps: ["mode"]})}`,
             title: document.title
-        });
+        }, false);
     }
+
+    trackLayersFromUrlParams();
 
     const scriptElement = document.createElement("script");
 
@@ -115,6 +123,50 @@ export function initializeMatomo (config) {
     document.body.appendChild(scriptElement);
 
     return true;
+}
+
+/**
+ * Collects the layer ids given by the url params LAYERS, LAYERIDS, MAP/LAYERIDS, MDID and MAP/MDID from the store.
+ * @returns {String[]} The unique layer ids.
+ */
+export function getLayerIdsFromUrlParams () {
+    const layerIds = new Set(),
+        urlParam = store.getters.getUrlParamValue;
+
+    if (urlParam("LAYERS")) {
+        try {
+            JSON.parse(urlParam("LAYERS")).forEach(layer => {
+                if (layer?.id === undefined) {
+                    return;
+                }
+
+                layerIds.add(String(layer.id));
+            });
+        }
+        catch (error) {
+            console.warn("Failed to parse LAYERS param for tracking: ", error);
+        }
+    }
+
+    (urlParam("LAYERIDS") || urlParam("MAP/LAYERIDS"))?.split(",").forEach(id => {
+        if (!id) {
+            return;
+        }
+
+        layerIds.add(id);
+    });
+
+    const metadataIds = (urlParam("MDID") || urlParam("MAP/MDID"))?.split(",");
+
+    if (metadataIds) {
+        store.getters.allLayerConfigs?.forEach(layerConfig => {
+            if (layerConfig?.datasets?.some(dataset => metadataIds.includes(dataset.md_id))) {
+                layerIds.add(layerConfig.id);
+            }
+        });
+    }
+
+    return [...layerIds];
 }
 
 /**
@@ -168,4 +220,23 @@ export function initializeLinkTracking () {
             }
         }
     });
+}
+
+/**
+ * Queues a Matomo event "Added layer via query" for each layer given by the url params.
+ * Layers that are already visible by default (visibility: true in the config.json) are skipped.
+ * The events are sent with the next regular event, not on page load.
+ * @returns {void}
+ */
+export function trackLayersFromUrlParams () {
+    getLayerIdsFromUrlParams()
+        .filter(layerId => store.getters.layerConfigById(layerId)?.visibility !== true)
+        .forEach(layerId => {
+            trackMatomoEventDeferred({
+                category: "Layer",
+                action: "Added layer via query",
+                name: getLayerInformation(layerId, store),
+                _source: assembleSourceInfoForEvent("trackLayersFromUrlParams")
+            });
+        });
 }

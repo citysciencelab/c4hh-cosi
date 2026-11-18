@@ -142,6 +142,7 @@ export default {
                                   name: "",
                                   elements: []
                               };
+
                         let checkExtent = this.getIfInExtent(capability, currentExtent),
                             finalCapability = capability;
 
@@ -343,10 +344,11 @@ export default {
          * @returns {Boolean} true or false
          */
         getIfInExtent: function (capability, currentExtent) {
-            const layer = capability?.Capability?.Layer?.BoundingBox?.filter(bbox => {
+            const bboxes = capability?.Capability?.Layer?.BoundingBox || capability?.Capability?.Layer?.Layer[0]?.BoundingBox,
+                  layer = bboxes?.filter(bbox => {
                       return bbox?.crs && bbox?.crs.includes("EPSG") && crs.getProjection(bbox?.crs) !== undefined && Array.isArray(bbox?.extent) && bbox?.extent.length === 4;
                   }),
-                  layerEPSG4326Projection = layer.find((element) => element.crs === "EPSG:4326");
+                  layerEPSG4326Projection = layer?.find((element) => element.crs === "EPSG:4326");
             let layerExtent;
 
             // If there is no extent defined or the extent is not right defined, it will import the external wms layer(s).

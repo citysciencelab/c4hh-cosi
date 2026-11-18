@@ -48,6 +48,27 @@ describe("src/shared/modules/buttons/components/ButtonGroup.vue", () => {
 
             expect(wrapper.find(".non-group").exists()).to.be.true;
         });
+        it("should apply the full-width layout when enabled", () => {
+            const wrapper = shallowMount(ButtonGroup, {
+                propsData: {
+                    buttons,
+                    group: "buttongroup",
+                    fullWidth: true
+                }
+            });
+
+            expect(wrapper.find(".switchRadioButtons").classes()).to.include("full-width");
+        });
+        it("should not apply the full-width layout by default", () => {
+            const wrapper = shallowMount(ButtonGroup, {
+                propsData: {
+                    buttons,
+                    group: "buttongroup"
+                }
+            });
+
+            expect(wrapper.find(".switchRadioButtons").classes()).not.to.include("full-width");
+        });
         it("should render two buttons if two button names were given", () => {
             const wrapper = shallowMount(ButtonGroup, {
                 propsData: {

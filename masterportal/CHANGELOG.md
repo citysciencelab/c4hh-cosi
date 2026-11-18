@@ -4,6 +4,95 @@
 
 [Semantic versioning](https://semver.org/spec/v2.0.0.html) is used.
 
+
+## 2026-11-16 v3.28.2
+
+### Fixed
+- Menu: Modules are not shown in menu unless their supported modes match the current map mode.
+
+---
+
+## 2026-11-06 v3.28.1
+
+### Fixed
+- Issue \#1667: Respect map rotation when displaying user moving direction.
+- Draw: Fixed an issue where the drawn features would not appear on prints from the print module.
+
+---
+
+## 2026-11-04 v3.28.0
+
+### Added
+- Statistic Dashboard: The map view shows the values of the selected statistic on the map.
+  Labels and tooltips can be switched on and off.
+- CustomMenuElement: Added HTML sanitation with DOMPurify to prevent XSS vulnerabilities.
+- Draw: Added new draw module to replace draw_old (type="draw").
+- WMS-Layer: Added additional request parameter `sld` and `gfi_template`.
+- Utils: 
+    - 4 new functions to convert geoJson to feature and geometry.
+    - New function to safely open popups without XSS-risk, replacing and utilizing native window.open.
+- Shared Component: 
+    - Accordion: Add sub title and border style into accordion.
+    - DropdownSelect: Based on vuetify's VSelect. Similar to DropdownAutocomplete, but without the ability to enter a search text.
+    - DropdownAutocomplete: Based on vuetify`s VAutocomplete, it extends the usual select input with the ability to enter a search text and thus filter the shown values. As a consequence, vuetify is imported globally, but configuring custom vuetify instances is still supported.
+    - DropdownSelect/DropdownAutocomplete:
+        - Added the prop `sortable` to sort the entries and chips alphabetically in the current language. Items with `pinned: true` stay in front.
+        - Added the prop `selectedFirst` to additionally show the selected entries first.
+        - DropdownAutocomplete: Added the prop `selectAllTitle` to set the title of the "Select all" option.
+- SearchInterfaceTopicTree: Added parameter `foldersFirst` to control the order of the result categories.
+
+### Changed
+- The following packages have been updated:
+    - dependencies:
+        - @masterportal/masterportalapi: 2.64.0 to 2.66.0
+    - devDependencies:
+        - vitest: "^4.0.16" to "4.1.11"
+        - @vitest/ui: "^4.0.16" to "4.1.11"
+        - @vitest/web-worker: "^4.0.16" to "4.1.11"
+        - jsdom: "29.1.1" to "^30.1.2"
+        - dompurify: "^3.4.15" to "^3.4.17"
+- WMS-Time: Changed button name to avoid confusion.
+- LayerTree/LayerSelection: In portals with a configured login, secured layers can no longer be activated without being logged in. Instead, an alert asks the user to log in. The lock icon of secured layers is shown open when logged in and closed otherwise.
+- StatisticDashboard:
+    - The categories, statistics and region dropdowns are sorted alphabetically and show the selected entries first, which are sorted alphabetically as well. The chips of the selected entries, including the year dropdown, are shown in alphabetical order.
+    - A loading spinner is shown while the module code and the initial data are loaded, and an error message if the module cannot be loaded. Requests for multiple layers are now sent in parallel to speed up loading.
+- Changed Node.js support: Minimum supported versions are now Node.js **22.23.4** (LTS) and **24.22.1** (LTS). This update is required to address known security vulnerabilities in older Node.js versions.
+
+### Deprecated
+- WMTS: The `services.json` parameter `transparent` is deprecated and has no effect. Use `transparency` instead.
+- Draw: All functions and files of draw_old have been marked deprecated and are to be removed in November 2027.
+
+### Fixed
+- Issue \#1629: Fetch legendUrl with authorization header where needed.
+- Issue \#1646: Improved WMTS printing with raster reprojection for differing projections, correct opacity handling, more reliable raster fallbacks and rendering, and reduced 3D print payload sizes.
+- Issue \#1655, \#1663: It is now possible to configure modules with the same `type` multiple times. However, there are two restriction: the modules must have different names and they must be configured in the same menu (`mainMenu` or `secondaryMenu`). Only one of the modules configured multiple times can be open at a time; otherwise, the wrong content may be displayed.
+- Issue \#1664: Transform geometries returned by `wfsSearch` if their CRS differ from the portal CRS. Add new config parameter `dataProjection` for WFS configuration.
+- StatisticDashboard: 
+        - Reopening the module from the menu no longer leaves it stuck in the loading state without controls.
+        - The module is now cached when switching between menu entries, so it is no longer rebuilt and its data is no longer reloaded each time it is opened. The hover info on the map is removed while the module is closed.
+        - The "All areas" option of the region dropdowns is now a "Select all" entry above the list: selecting it checks all areas, and selecting all areas manually checks it as well.
+- Menu: Module caching (keep-alive) now also works for lazy loaded core modules, e.g. the StatisticDashboard is no longer rebuilt and its data reloaded each time it is opened.
+- Draw: Fixed an error when editing imported multi geometries (e.g. from KML files), which prevented the measurement tooltip from being positioned.
+- Legend: Legend images of secured services are now loaded with the auth token of the login module, so that no 401 error occurs.
+- GetFeatureInfo: A gfiTheme addon that is configured at a layer but missing in `Config.addons` of config.js is now loaded on demand instead of falling back to the default theme. This also applies to layers added via search.
+- AddWMS: If the root layer of a WMS capabilities has no `BoundingBox`, the bounding box of the first child layer is now used to check whether the service is within the portal extent. If no bounding box is found at all, the WMS is imported without an error.
+- Alerting: Html tags `ul` and `li` in `content` are no longer sanitized via DOMPurify.
+
+---
+
+## 2026-10-09 v3.27.1 (LTS)
+
+### Changed
+- The following packages have been updated:
+    -devDependencies:
+        - sass: "1.77.2" to "^1.105.1"
+    - dependencies:
+        - axios: ^1.19.0 to ^1.20.0
+        - mqtt: "^5.15.1" to "^5.16.0"
+- Security: Added a temporary override for `ip-address` (transitive dependency of `mqtt`) to enforce version `^10.7.3`, addressing reported vulnerabilities. The override will be removed once a secure version is resolved without it.
+
+---
+
 ## 2026-10-07 v3.27.0 (LTS)
 
 ### Added
@@ -17,6 +106,7 @@
 
 ### Changed
 - Issue \#1654: Relaxed the strict ISO8601 unit validation for WMS-Time layers to a console warning. This enables support for alternative time units.
+- StatisticDashboard: Renamed the "All" option to "All statistical data" in the statistics dropdown and to "All areas" in the region dropdowns. The "All" toggle button of the top level region filter is now labeled "Select all areas".
 - The following packages have been updated:
     - dependencies:
         - @masterportal/masterportalapi: 2.63.0 to 2.64.0 (This also raised ol to version 10.10.0)
@@ -52,7 +142,7 @@
 - Readme: Information and link to issues in opencode added.
 - Security: Updated SECURITY.md to direct vulnerability reports to a private email address instead of the public issue tracker, and added a corresponding note in the README.
 - Alerting: Added first-open alerts for modules via `config.js` (`alerting.moduleOpenAlerts`).
-- WFS-T: 
+- WFS-T:
     - Added a loading spinner while fetching features (disabling interactions). The selected layer can automatically activate in the layer tree and restore on exit. Configurable via `showLayerLoader` and `activateLayerInTree`.
     - Added new config `lockedFields` to disable the edit capability for specific fields via config.json.
 
@@ -111,7 +201,7 @@
         - @masterportal/masterportalapi: 2.62.0 to 2.63.0
     - devDependencies:
         - vite: 8.0.14 to 8.1.4
-- Tests: 
+- Tests:
     - Tests now fail on vue warnings.
     - Excluded barchart and piechart tests due to issues with the prePushHook.
 - ResizeHandle: Simplified component by removing multi-directional resize infrastructure to support menu width resizing only (left/right positions).
@@ -181,7 +271,7 @@
 - Issue \#1601: Improve attribute extraction in `getDescribeFeature` to handle mixed xml2json node shapes.
 - Issue \#1608: Fixed autoRefresh by reading source from OL Layer instead of cached layerSource to prevent stale source.
 - Issue \#1610: Menu/PortalFooter: Fixed navigation behavior for secondary GFI without a configured secondary menu and corrected footer layout offsets for small desktop breakpoints.
-- Issue \#1613: LayerSlider: Fixed layers not being hidden when moving the slider handle past them, causing previously active layers to remain visible. 
+- Issue \#1613: LayerSlider: Fixed layers not being hidden when moving the slider handle past them, causing previously active layers to remain visible.
 - Issue \#1614: MenuContainerBodyRoot: Horizontal separators in menu sections now only render when sections contain items.
 - Issue \#1619: GetFeatureInfo: Fixed case where GFI with iframe content did not reopen after being closed.
 - Issue \#1620: Adapted vite build to respect new created heads (clone with --branch).
@@ -230,9 +320,9 @@
   - Fixed WMS-Time layers not working with legacy URL parameters.
   - ZOOMTOFEATUREID: Features that are always at the top of the map are now displayed again.
   - Links to other config files have been corrected in the `urlParameter` documentation.
-- GFI: In the gfiTheme `Default`, line breaks have been optimised and the size of the content changes when the sidebar is resized.  
+- GFI: In the gfiTheme `Default`, line breaks have been optimised and the size of the content changes when the sidebar is resized.
 - Print: Fixed print layer sorting for grouped layers without zIndex.
-- SearchBar: 
+- SearchBar:
     - Added a checkbox to select all subcategories when opening a folder.
     - Fixed duplicated results with URL Parameter `QUERY`.
 - WMS-Time: Activating time comparison placed the second WMS-Time layer at the top of the layerTree, causing it to cover other layers. The fix places the comparison layer directly above the original layer.

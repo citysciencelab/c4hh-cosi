@@ -2,6 +2,7 @@ import Feature from "ol/Feature.js";
 
 /**
  * Sets the attributes of each feature as requested by the converting function.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {ol/Feature[]} features - An array of features.
  * @returns {ol/Feature[]|Boolean} The features incl. the necessary attributes. False if the given parameter is not an array.
  */

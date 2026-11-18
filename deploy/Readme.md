@@ -33,7 +33,7 @@ regardless of where Valhalla actually runs.
 |------|---------|
 | `../docker-compose.yml` | Root orchestration: `portal` + `valhalla` (via `include`) |
 | `../.env.example` | Stack config — portal (`PORTAL_PORT`, `VALHALLA_URL`, registry overrides) **and** the Valhalla routing knobs used when `valhalla/.env` is absent |
-| `Dockerfile` | Multi-stage portal image (Node 24.15.0 build → nginx runtime) |
+| `Dockerfile` | Multi-stage portal image (Node 24.22.3 build → nginx runtime) |
 | `nginx.conf` | Serves the SPA + registries, reverse-proxies `/valhalla/`, caching proxy for the Hamburg upstreams |
 | `docker-entrypoint.d/40-cosi-runtime-config.sh` | Startup hook: runtime config injection |
 | `warm-hh-cache.py` | Pre-warms the Hamburg upstream cache (see *Hamburg API outages*) |
@@ -206,12 +206,12 @@ docker build -f deploy/Dockerfile -t cosi-portal:<tag> .   # context = repo root
 
 The build is **heavy** (full layered npm install of Masterportal + COSI addon,
 then a Vite production build). Suggested tagging: by Masterportal+COSI version,
-e.g. `cosi-portal:mp3.27.0-cosi1.2.0`, plus `:latest`. If/when we host a fork
+e.g. `cosi-portal:mp3.28.2-cosi1.2.0`, plus `:latest`. If/when we host a fork
 (BACKLOG §2.5), publish to GHCR (`ghcr.io/<org>/cosi-portal`) from CI so servers
 pull a prebuilt image instead of building on the box.
 
 `ARG MASTERCODE_VERSION_FOLDER` names the `mastercode/<version>` asset folder;
-left empty (the default) the build stamps a fresh `3_27_0_<UTC timestamp>` into
+left empty (the default) the build stamps a fresh `3_28_2_<UTC timestamp>` into
 it. That name must stay unique per build — nginx serves `/mastercode/` as
 `immutable` for 30 days, so it is the only cache key there is. With a constant
 name a browser keeps the previous `masterportal.js` and pairs it with newly

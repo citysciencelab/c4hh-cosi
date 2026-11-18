@@ -6,7 +6,7 @@ import {
     featureCollection as turfFeatureCollection
 } from "@turf/helpers";
 import {buffer as turfBuffer} from "@turf/buffer";
-import GeoJSON from "ol/format/GeoJSON";
+import {geoJsonCollectionToFeatures} from "@shared/js/utils/convertGeoJSONToFeature.js";
 import {transformFeatures} from "../../utils/features/transform";
 import {styleIsochroneFeatures} from "../utils/styleIsochroneFeatures.js";
 import {simplify} from "../../utils/geometry/simplify";
@@ -128,7 +128,7 @@ export default {
                 return turfBuffer(lineString, dist);
             }));
 
-        bufferFeatures = new GeoJSON().readFeatures(buffer);
+        bufferFeatures = geoJsonCollectionToFeatures(buffer);
         bufferFeatures = transformFeatures(bufferFeatures, "EPSG:4326", this.projectionCode);
         bufferFeatures.forEach((feature, i) => {
             feature.set("featureType", featureType);

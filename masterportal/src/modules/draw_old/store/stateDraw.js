@@ -4,6 +4,7 @@ const symbol = {
         value: "simple_point"
     },
     /**
+     * @deprecated in 3.39.0 (November 2027)
      * @property {String} description The description that should be shown in the button in the menu.
      * @property {Boolean} hasMouseMapInteractions Indicating that we have Map interactions.
      * @property {String[]} supportedDevices Devices on which the module is displayed.

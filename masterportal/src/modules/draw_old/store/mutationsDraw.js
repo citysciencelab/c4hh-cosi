@@ -7,11 +7,13 @@ const mutations = {
      * For example, given a state object {key: value}, an object
      * {setKey:   (state, payload) => *   state[key] = payload * }
      * will be returned.
+    * @deprecated in 3.39.0 (November 2027)
      */
     ...generateSimpleMutations(initialState),
 
     /**
      * Set SquareSide.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {String} payload the side of the square
      * @returns {void}
@@ -21,6 +23,7 @@ const mutations = {
     },
     /**
      * Set download string to the given data.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {String} payload the data to set
      * @returns {void}
@@ -30,6 +33,7 @@ const mutations = {
     },
     /**
      * Toggles download enabled.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @returns {void}
      */
@@ -38,6 +42,7 @@ const mutations = {
     },
     /**
      * Sets the download features.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {Object[]} payload the data to set
      * @returns {void}
@@ -47,6 +52,7 @@ const mutations = {
     },
     /**
      * Sets the download file.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {String} payload the data to set
      * @returns {void}
@@ -56,6 +62,7 @@ const mutations = {
     },
     /**
      * Sets the download filename.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {String} payload the data to set
      * @returns {void}
@@ -65,6 +72,7 @@ const mutations = {
     },
     /**
      * Sets the download file Url.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {String} payload the data to set
      * @returns {void}
@@ -74,6 +82,7 @@ const mutations = {
     },
     /**
      * Sets the download file.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {String} payload the data to set
      * @returns {void}
@@ -83,6 +92,7 @@ const mutations = {
     },
     /**
      * Sets the download selected Format.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {String} payload the data to set
      * @returns {void}
@@ -92,6 +102,7 @@ const mutations = {
     },
     /**
      * Adds a symbol to the iconList.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {Object} payload the data to add
      * @returns {void}
@@ -101,6 +112,7 @@ const mutations = {
     },
     /**
      * Sets the Symbol Settings.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {Object} styleSettings the data to set
      * @returns {void}
@@ -112,6 +124,7 @@ const mutations = {
 
     /**
      * Sets the Area Settings.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {Object} styleSettings the data to set
      * @returns {void}
@@ -127,6 +140,7 @@ const mutations = {
     },
     /**
      * Sets the Circle Settings.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {Object} styleSettings the data to set
      * @returns {void}
@@ -145,6 +159,7 @@ const mutations = {
     },
     /**
      * Sets the Curve Settings.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {Object} styleSettings the data to set
      * @returns {void}
@@ -158,6 +173,7 @@ const mutations = {
     },
     /**
      * Sets the Line Settings.
+    * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {Object} styleSettings the data to set
      * @returns {void}
@@ -173,6 +189,7 @@ const mutations = {
     },
     /**
      * Sets the Square Settings.
+        * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state the state of draw-module
      * @param {Object} styleSettings the data to set
      * @returns {void}
@@ -191,6 +208,7 @@ const mutations = {
 
     /**
     * Sets the Layer drawn with.
+    * @deprecated in 3.39.0 (November 2027)
     * @param {Object} state the state of draw-module
     * @param {Object[]} keyList the data to set
     * @returns {void}

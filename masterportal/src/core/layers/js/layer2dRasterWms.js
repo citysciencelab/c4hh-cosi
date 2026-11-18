@@ -2,6 +2,7 @@
 import {wms} from "@masterportal/masterportalapi/src/index.js";
 import store from "@appstore/index.js";
 import Layer2dRaster from "./layer2dRaster.js";
+import utilsUrl from "@modules/login/js/utilsUrl.js";
 
 /**
  * Creates a 2d raster wms (Web Map Service) layer.
@@ -76,6 +77,12 @@ Layer2dRasterWms.prototype.getRawLayerAttributes = function (attributes) {
     if (attributes.styles !== undefined) {
         rawLayerAttributes.STYLES = attributes.styles;
     }
+    if (attributes.sld !== undefined) {
+        rawLayerAttributes.SLD = attributes.sld;
+    }
+    if (attributes.gfiTemplate !== undefined) {
+        rawLayerAttributes.GFI_TEMPLATE = attributes.gfiTemplate;
+    }
 
     return rawLayerAttributes;
 };
@@ -119,9 +126,10 @@ Layer2dRasterWms.prototype.getOptions = function (attributes) {
 /**
 * If the parameter "legendURL" is empty, it is set to GetLegendGraphic.
 * If it is set to 'ignore' no legend is set.
-* @return {void}
+* For protected layers and login setups, legend images are requested via fetch to allow auth headers/cookies.
+* @return {Promise<Array|Boolean>}
 */
-Layer2dRasterWms.prototype.createLegend = function () {
+Layer2dRasterWms.prototype.createLegend = async function () {
     const version = this.get("version");
     let legend = this.inspectLegendUrl();
 
@@ -150,6 +158,28 @@ Layer2dRasterWms.prototype.createLegend = function () {
         else if (legend === false) {
             legend = false;
         }
+    }
+
+    const isUserLoggedInAndAvailable = store.getters.isModuleAvailable("login") && store.getters["Modules/Login/loggedIn"];
+    const interceptorUrlRegex = Config?.login?.interceptorUrlRegex;
+    const legendMatchesLoginInterceptor = Array.isArray(legend)
+        && Boolean(interceptorUrlRegex)
+        && legend.some(legendUrl => utilsUrl.shouldAddToken(legendUrl, interceptorUrlRegex));
+
+    if (isUserLoggedInAndAvailable && legendMatchesLoginInterceptor && Array.isArray(legend)) {
+        legend = await Promise.all(legend.map(async legendUrl => {
+            try {
+                const response = await fetch(legendUrl, {credentials: "include"});
+
+                if (!response.ok) {
+                    return legendUrl;
+                }
+                return URL.createObjectURL(await response.blob());
+            }
+            catch {
+                return legendUrl;
+            }
+        }));
     }
 
     return legend;

@@ -281,7 +281,7 @@ export default {
 
             const jsonFeatures = ConvertFeature.openlayersToGeoJson(this.annotations);
 
-            this.$emit("addMapText", jsonFeatures);
+            this.$emit("addMapText", jsonFeatures, "write");
 
             this.stopDrawing();
             this.activeAnnotation = null;

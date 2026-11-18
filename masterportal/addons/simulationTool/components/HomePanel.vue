@@ -84,10 +84,6 @@ export default {
                 :text="$t('additional:modules.tools.simulationTool.freeSimulation')"
                 :interaction="() => setMode('simulationParameter')"
             />
-            <FlatButton
-                :text="$t('additional:modules.tools.simulationTool.selectSimulationArea')"
-                disabled
-            />
         </div>
     </div>
 </template>

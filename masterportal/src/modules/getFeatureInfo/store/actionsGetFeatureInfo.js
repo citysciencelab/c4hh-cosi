@@ -4,6 +4,7 @@ import {getWmsFeaturesByMimeType} from "@shared/js/utils/getWmsFeaturesByMimeTyp
 import {getVisibleWmsLayersAtResolution} from "../js/getLayers.js";
 import store from "@appstore/index.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
+import addons from "@plugins/addons.js";
 import changeCase from "@shared/js/utils/changeCase.js";
 import get3DHighlightColor from "@shared/js/utils/get3DHighlightColor.js";
 import applyTileStyle from "@shared/js/utils/applyTileStyle.js";
@@ -88,7 +89,7 @@ export default {
      * @param {Object} param.commit the commit
      * @param {Object} param.dispatch the dispatch
      * @param {Object} param.rootGetters the rootGetters
-     * @returns {void}
+     * @returns {Promise<void>}
      */
     collectGfiFeatures ({getters, commit, dispatch, rootGetters}) {
         const clickCoordinate = rootGetters["Maps/clickCoordinate"],
@@ -156,7 +157,7 @@ export default {
 
                 return fulfilled.map(({value}) => value);
             })
-            .then(gfiFeatures => {
+            .then(async gfiFeatures => {
                 const clickPixel = rootGetters["Maps/clickPixel"],
                     mode = rootGetters["Maps/mode"];
                 let allGfiFeatures = gfiFeaturesAtPixel(clickPixel, clickCoordinate, mode).concat(...gfiFeatures);
@@ -176,8 +177,10 @@ export default {
                 if (mode === "3D") {
                     allGfiFeatures = allGfiFeatures.reverse();
                 }
-                // only commit if features found
                 if (allGfiFeatures.length > 0) {
+                    await addons.loadMissingGfiThemes(
+                        [...new Set(allGfiFeatures.map(feature => feature.getTheme?.()))]
+                    );
                     commit("setGfiFeatures", allGfiFeatures);
                 }
                 else {

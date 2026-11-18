@@ -1,4 +1,4 @@
-import {featureToGeoJson} from "../../utils/features/convertToGeoJson";
+import {featureToGeoJson} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import {downloadJsonToFile} from "../../utils/download";
 
 /**
@@ -11,7 +11,7 @@ export function exportFeatureAsGeoJSON (feature, filename) {
         console.error("utils/features/exportAsGeoJSON: The second parameter must be a string, but got " + typeof filename);
     }
 
-    const geoJsonFeature = featureToGeoJson(feature);
+    const geoJsonFeature = featureToGeoJson(feature, false, "EPSG:25832", "EPSG:4326");
 
     downloadJsonToFile(geoJsonFeature, filename + ".geojson");
 }

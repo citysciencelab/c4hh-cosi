@@ -56,6 +56,11 @@ export default {
             type: String,
             default: null,
             required: false
+        },
+        labelClassArray: {
+            type: Array,
+            default: null,
+            required: false
         }
     },
     emits: ["click"],
@@ -66,6 +71,14 @@ export default {
         handleClick (event) {
             this.$emit("click", event);
             this.interaction(event);
+        },
+        /**
+         * Sets focus to the button element.
+         * @public
+         * @returns {void}
+         */
+        focus () {
+            this.$refs.button?.focus();
         }
     }
 };
@@ -77,7 +90,8 @@ export default {
     >
         <button
             :id="id"
-            tabindex="0"
+            ref="button"
+            :tabindex="disabled ? -1 : 0"
             class="btn d-flex align-items-center justify-items-center mb-auto"
             type="button"
             :title="aria"
@@ -94,6 +108,7 @@ export default {
         <label
             v-if="label"
             class="text-center btn-label"
+            :class="labelClassArray"
             :for="id"
             :aria-label="label"
         >
@@ -111,6 +126,9 @@ export default {
 
 .btn-wrapper > .btn-label {
     font-size: 0.9rem;
+}
+.btn-wrapper > .btn-label-smaller {
+    font-size: 0.8rem;
 }
 
  .btn {

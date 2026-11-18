@@ -13,6 +13,34 @@ const navTabLegacyExcludedFiles = [
     "src/modules/layerPills/components/LayerPills.vue"
 ];
 
+const noWindowOpen = {
+    meta: {
+        type: "suggestion",
+        docs: {
+            description: "Warn when window.open is used instead of openSecuredPopup."
+        },
+        schema: [],
+        messages: {
+            useSecuredPopup: "Use openSecuredPopup from @shared/js/utils/openSecuredPopup.js instead of window.open."
+        }
+    },
+    create: (context) => ({
+        MemberExpression: (node) => {
+            const isWindowOpen = node.object.type === "Identifier"
+                && node.object.name === "window"
+                && ((node.computed && node.property.type === "Literal" && node.property.value === "open")
+                    || (!node.computed && node.property.name === "open"));
+
+            if (isWindowOpen) {
+                context.report({
+                    node,
+                    messageId: "useSecuredPopup"
+                });
+            }
+        }
+    })
+};
+
 export default [
     js.configs.recommended,
     ...pluginVue.configs["flat/recommended"],
@@ -39,7 +67,12 @@ export default [
         },
         plugins: {
             "vuejs-accessibility": pluginVuejsAccessibility,
-            "@stylistic": stylistic
+            "@stylistic": stylistic,
+            local: {
+                rules: {
+                    "no-window-open": noWindowOpen
+                }
+            }
         },
         rules: {
             // Possible Problems - These rules relate to possible logic errors in code:
@@ -102,6 +135,7 @@ export default [
             "no-param-reassign": "error",
             "no-proto": "error",
             "no-restricted-properties": "error",
+            "local/no-window-open": "warn",
             "no-return-assign": "error",
             "no-return-await": "error",
             "no-script-url": "error",
@@ -437,6 +471,15 @@ export default [
         files: ["src/shared/modules/accordion/components/AccordionItem.vue"],
         rules: {
             "vue/no-restricted-syntax": "off"
+        }
+    },
+    {
+        files: [
+            "src/shared/js/utils/openSecuredPopup.js",
+            "src/shared/js/utils/tests/unit/openSecuredPopup.spec.js"
+        ],
+        rules: {
+            "local/no-window-open": "off"
         }
     },
     {

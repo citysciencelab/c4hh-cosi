@@ -1,5 +1,6 @@
 import Feature from "ol/Feature.js";
-import {GeoJSON} from "ol/format";
+import {geoJsonToFeature} from "@shared/js/utils/convertGeoJSONToFeature.js";
+import {geoJsonToGeometry} from "@shared/js/utils/convertGeoJSONToGeometry";
 import Icon from "ol/style/Icon";
 import Point from "ol/geom/Point";
 import Style from "ol/style/Style.js";
@@ -124,21 +125,19 @@ export default {
      * @returns {ol/Feature|ol/Feature[]} the parsed features
      */
     parseFeatures (val) {
-        const parser = new GeoJSON();
-
         if (!Array.isArray(val)) {
             if (val?.constructor === Object && val?.properties?.isOlFeature) {
-                return parser.readFeature(val);
+                return geoJsonToFeature(val);
             }
             if (val?.constructor === Object && val?.isOlGeometry) {
-                return parser.readGeometry(val);
+                return geoJsonToGeometry(val);
             }
             return val;
         }
 
         return val.map(el => {
             if (el?.constructor === Object && el?.properties?.isOlFeature) {
-                return parser.readFeature(el);
+                return geoJsonToFeature(el);
             }
             return el;
         });

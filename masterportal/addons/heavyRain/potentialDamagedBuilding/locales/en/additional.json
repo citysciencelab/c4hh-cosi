@@ -2,14 +2,14 @@
   "modules": {
     "potentialDamagedBuilding": {
       "title": "Potential damaged buildings",
-      "description": "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.",
+      "description": "To determine the heavy rainfall risk of a building, the potential damage to the building must be considered in addition to the hazard assessment carried out on site. The damage potential varies depending on the type of use, such as residential or industrial use, as different assets and critical infrastructure may be present, and the risk to human life and health also differs. The following examples illustrate this: <ul><li>If a building with residential units in the basement is affected by flooding, evacuation from the basement may be difficult. Furniture and other belongings inside the building may be damaged. In addition, the building structure itself may also be affected. If, on the other hand, a shed is flooded, the resulting financial and personal impacts are generally lower.</li><li>A daycare center, hospital, nursing home, or other care facility has a very high damage potential due to the presence of vulnerable groups. People in these facilities generally require assistance during evacuation. As a first step, the damage potential was qualitatively assessed using data on building use from ALKIS.</li></ul>The assignment of building and land uses from ALKIS to the four damage potential classes is described on pages 29–30 of the <a target='_blank' href='https://hmdk.metaver.de/documents-ige-ng/igc_hh/e8111f0b-3739-4dbb-9ce0-e11d5c4c45a1/Leitfaden-Risikoanalyse.pdf'>guideline</a>.",
       "headline": {
          "buildingAttributes": "Building attributes",
          "buildingOverview": "Overview",
          "updateData": "Change proposal - ",
-         "adjustedDamagePotentialClass": "adjusted damage potential class",
+         "adjustedDamagePotentialClass": "proposed adjusted damage potential class",
          "lastUpdated": "Date of entry:",
-         "comment": "Comment",
+         "comment": "Comments on the proposed amendment",
          "potentialDamagedInformation": "Information on the potential for damage - ",
          "potentialDamagedClass": "Potential damage class",
          "buildingFunction": "Building function",
@@ -24,7 +24,10 @@
         "additionalBuildingFunction": "In addition to functional use, there may be other uses that are taken into account in the damage potential class assignment.",
         "earthSurface": "For objects located below ground level, this is indicated accordingly.",
         "buildingConstructionType": "Description of the building component. In the description, basements are listed separately.",
-        "basementLevels": "This section indicates whether there are any basement levels and, if so, how many."
+        "basementLevels": "This section indicates whether there are any basement levels and, if so, how many.",
+        "adjustedDamagePotentialClassDes": "A suggestion for changing the damage potential class can be entered if more reliable information is available based on local knowledge of the building and its use on the ground/basement floor. For example, the following cases could lead to a change in the damage potential class: \"The implementation of structural protection measures made it possible to reduce the damage potential class from 4 to 2.\" or \"The ground floor of the building is not used as a daycare center, but as rental apartments. Based on this information about the building's use, the damage potential class is reduced from 4 to 3 in accordance with the table in the <a target='_blank' href='https://hmdk.metaver.de/documents-ige-ng/igc_hh/e8111f0b-3739-4dbb-9ce0-e11d5c4c45a1/Leitfaden-Risikoanalyse.pdf'>guideline</a>.\"",
+        "commentDes": "Please provide an explanation for the proposed change to the damage potential class in the text field, with a maximum of 255 characters. The information can be brief, for example: \"The implementation of structural protection measures made it possible to reduce the damage potential class from 4 to 2.\" or \"The ground floor of the building is not used as a daycare center, but as rental apartments. Based on this information about the building's use, the damage potential class is reduced from 4 to 3 in accordance with the table in the <a target='_blank' href='https://hmdk.metaver.de/documents-ige-ng/igc_hh/e8111f0b-3739-4dbb-9ce0-e11d5c4c45a1/Leitfaden-Risikoanalyse.pdf'>guideline</a>.\"",
+        "resetDes": "The damage potential class can be reset to the saved values/texts here."
       },
       "damagePotentialClass": "Damage Potential Class",
       "currentlyUsed": "currently used",
@@ -35,6 +38,7 @@
       "commentHint": "Indication of the responsible department, with additional explanations if necessary",
       "reset": "Reset",
       "save": "Save",
+      "loginRequired": "Please log in to see and edit the damage potential of the buildings.",
       "messages": {
         "invalid": "Please enter a damage potential class from 1 to 6 and a comment with a maximum of 255 characters.",
         "success": "The adjustment has been saved."

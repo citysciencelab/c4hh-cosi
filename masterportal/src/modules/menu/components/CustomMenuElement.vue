@@ -2,6 +2,7 @@
 import {mapGetters} from "vuex";
 import axios from "axios";
 import visibilityChecker from "@shared/js/utils/visibilityChecker.js";
+import DOMPurify from "dompurify";
 
 /**
  * This module can display HTML from config.json or an external file.
@@ -33,13 +34,16 @@ export default {
     },
     data: () => {
         return {
-            htmlContentFromPath: null
+            htmlContentFromPath: null,
+            minContentLength: 3
         };
     },
     computed: {
         ...mapGetters("Menu", ["currentComponent"]),
         htmlContent () {
-            return this.currentComponent(this.side).props.htmlContent;
+            const raw = this.currentComponent(this.side)?.props?.htmlContent;
+
+            return raw ? DOMPurify.sanitize(raw) : "";
         },
         pathToContent () {
             return this.currentComponent(this.side).props.pathToContent;
@@ -57,34 +61,22 @@ export default {
                 supportedMapModes: this.supportedMapModes,
                 supportedDevices: this.supportedDevices
             });
+        },
+        hasValidPathToContent () {
+            return this.pathToContent?.length > this.minContentLength;
+        }
+    },
+    watch: {
+        pathToContent: {
+            handler () {
+                if (this.hasValidPathToContent) {
+                    this.readHTMLFromPath();
+                }
+            },
+            immediate: true
         }
     },
     methods: {
-        /**
-         * Validates the value of htmlContent.
-         * @returns {Boolean} true, if it is valid
-         */
-        validateHTMLContent () {
-            let valid = false;
-
-            if (this.htmlContent !== undefined && this.htmlContent.length > 3) {
-                valid = true;
-            }
-            return valid;
-        },
-        /**
-         * Validates value of pathToContent and if it is valid the file is read.
-         * @returns {Boolean} true, if it is valid
-         */
-        validateHTMLFromPath () {
-            let valid = false;
-
-            if (this.pathToContent !== undefined && this.pathToContent.length > 3) {
-                valid = true;
-                this.readHTMLFromPath();
-            }
-            return valid;
-        },
         /**
          * Reads content of file configured by pathToContent.
          * @returns {void}
@@ -99,6 +91,8 @@ export default {
                 else {
                     this.htmlContentFromPath = data;
                 }
+
+                this.htmlContentFromPath = DOMPurify.sanitize(this.htmlContentFromPath);
             })
                 .catch(error => {
                     console.error("Failed to load content for CustomMenuElement with pathToContent", this.pathToContent, error);
@@ -115,11 +109,11 @@ export default {
         class="custom-menu-element"
     >
         <div
-            v-if="validateHTMLContent()"
+            v-if="htmlContent.length > minContentLength"
             v-html="htmlContent"
         />
         <div
-            v-else-if="validateHTMLFromPath()"
+            v-else-if="hasValidPathToContent"
             v-html="htmlContentFromPath"
         />
     </div>

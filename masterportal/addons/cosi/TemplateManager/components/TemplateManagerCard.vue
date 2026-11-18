@@ -1,11 +1,11 @@
 <script>
 import {mapGetters, mapMutations} from "vuex";
-import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
+import BaseCard from "@shared/modules/cards/components/BaseCard.vue";
 
 export default {
     name: "TemplateManagerCard",
     components: {
-        CustomCard
+        BaseCard
     },
     props: {
         title: {
@@ -71,7 +71,7 @@ export default {
     <div
         class="col col-md-12"
     >
-        <CustomCard
+        <BaseCard
             hoverable
             :status="activeTemplate ? 'active' : ''"
             :selected="selectedTemplate"
@@ -126,7 +126,7 @@ export default {
                     </div>
                 </div>
             </div>
-        </CustomCard>
+        </BaseCard>
     </div>
 </template>
 <style lang="scss" scoped>

@@ -2,7 +2,14 @@ import {generateSimpleMutations} from "../../../src/shared/js/utils/generators.j
 import state from "./state.js";
 
 const mutations = {
-    ...generateSimpleMutations(state)
+    ...generateSimpleMutations(state),
+
+    setPlanningScenarioCurrentLayout (moduleState, options) {
+        moduleState.planningScenarioCurrentLayout = {
+            ...moduleState.planningScenarioCurrentLayout,
+            ...options
+        };
+    }
 };
 
 export default mutations;

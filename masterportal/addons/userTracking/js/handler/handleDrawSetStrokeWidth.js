@@ -13,6 +13,6 @@ export function handleDrawSetStrokeWidth ({isOuter, version}) {
 
     trackDrawToolEventDebounced(
         `Changed${isOuter ? " outer " : " "}stroke width`,
-        {funcName, version}
+        {funcName, debounceKey: `${funcName}-${isOuter ? "outer" : "inner"}`, version}
     );
 }

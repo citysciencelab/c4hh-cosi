@@ -4,6 +4,7 @@ import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {formatDateTime} from "../../utils/dateHelpers";
 import SelectableList from "../SelectableList.vue";
 import GeoMarkerForm from "../GeoMarkerForm.vue";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 export default {
     name: "TabListContent",
@@ -181,7 +182,7 @@ export default {
                       ? `${vcObliqueLink}?lang=de&groundPosition=${transformedCoordinates[0]},${transformedCoordinates[1]}&distance=250#`
                       : vcObliqueLink;
 
-            window.open(useUrl, "_blank");
+            openSecuredPopup(useUrl, "_blank");
         },
         centerVisibleMap (coord = null) {
             let coordinates = coord;

@@ -1,0 +1,13 @@
+// Unscoped: Vuetify teleports the menu out of the component tree.
+.mp-dropdown-menu {
+    .v-list-item:hover {
+        background-color: $secondary;
+        color: white;
+    }
+    .v-list-item__overlay {
+        background-color: unset;
+    }
+    .v-list-item--active {
+        background-color: $light_blue;
+    }
+}

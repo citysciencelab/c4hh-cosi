@@ -11,7 +11,6 @@ export default {
         FlatButton,
         InputText
     },
-    emits: ["changeLegendView"],
     data () {
         return {
             setColorPaletteDebounced: debounce(this.setColorPalette, 300),
@@ -272,17 +271,6 @@ export default {
             <label for="color-palette">
                 {{ $t('common:modules.statisticDashboard.legend.opacity') }}
             </label>
-        </div>
-        <div class="d-flex justify-content-center">
-            <FlatButton
-                id="back-to-dashboard"
-                :aria-label="$t('common:modules.statisticDashboard.button.done')"
-                :text="$t('common:modules.statisticDashboard.button.done')"
-                :icon="'bi bi-check-lg'"
-                :class="''"
-                :interaction="() => $emit('changeLegendView')"
-                :disabled="!areStepValuesAscending"
-            />
         </div>
         <div
             v-if="classificationMode === 'custom'"

@@ -1,5 +1,6 @@
 /**
  * Listener for changes in tree.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Store} store the store
  * @param {Function} handler the handler to call after changes as function(layerConfigs)
  * @returns {void}

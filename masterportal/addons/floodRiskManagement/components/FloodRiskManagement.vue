@@ -10,6 +10,7 @@ import SpinnerItem from "../../../src/shared/modules/spinner/components/SpinnerI
 import SwitchInput from "../../../src/shared/modules/checkboxes/components/SwitchInput.vue";
 import thousandsSeparator from "../../../src/shared/js/utils/thousandsSeparator.js";
 import layerProvider from "../js/getVisibleLayer.js";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 export default {
     name: "FloodRiskManagement",
@@ -252,7 +253,7 @@ export default {
             if (typeof url !== "string" || url === "") {
                 return;
             }
-            window.open(url, "_blank");
+            openSecuredPopup(url, "_blank");
             this.setPrintUrl("");
         },
 

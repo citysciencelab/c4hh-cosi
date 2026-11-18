@@ -57,13 +57,11 @@ loadConfigJs.then(() => {
     app.use(store);
     store.$app = app;
 
-    if (Config.vuetifyFolder) {
-        instantiateVuetify().then(vuetify => {
-            if (vuetify) {
-                app.use(vuetify);
-            }
-        });
-    }
+    instantiateVuetify().then(vuetify => {
+        if (vuetify) {
+            app.use(vuetify);
+        }
+    });
 
     initLanguage(Config.portalLanguage || {}, Config.portalLocales)
         .then(() => {

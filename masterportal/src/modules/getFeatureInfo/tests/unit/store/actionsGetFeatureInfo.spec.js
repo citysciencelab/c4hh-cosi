@@ -4,6 +4,7 @@ import axios from "axios";
 import VectorSource from "ol/source/Vector.js";
 import actions from "@modules/getFeatureInfo/store/actionsGetFeatureInfo.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
+import addons from "@plugins/addons.js";
 
 describe("src/modules/getFeatureInfo/store/actionsGetFeatureInfo.js", () => {
     let getters,
@@ -70,10 +71,18 @@ describe("src/modules/getFeatureInfo/store/actionsGetFeatureInfo.js", () => {
         getters = {
             type: "getFeatureInfo"
         };
+
+        addons.app = {};
+        addons.gfiThemePromises = {};
     });
 
     afterEach(() => {
         consoleWarnSpy.restore();
+        if (addons.loadMissingGfiThemes.restore) {
+            addons.loadMissingGfiThemes.restore();
+        }
+        addons.app = null;
+        addons.gfiThemePromises = {};
     });
 
     describe("test 3D Highlighting", () => {
@@ -309,6 +318,26 @@ describe("src/modules/getFeatureInfo/store/actionsGetFeatureInfo.js", () => {
 
             expect(setMenuExpandedCall).to.not.be.undefined;
             expect(setMenuExpandedCall.args[1]).to.equal(true);
+        });
+
+        it("loads missing gfi themes of the features before committing them", async () => {
+            let committedBeforeLoad;
+            const loadMissingGfiThemesStub = sinon.stub(addons, "loadMissingGfiThemes").callsFake(() => {
+                committedBeforeLoad = commit.getCalls().some(call => call.args[0] === "setGfiFeatures");
+                return Promise.resolve();
+            });
+
+            gfiFeaturesAtPixelStub.returns([
+                {getLayerId: () => "layer1", getTheme: () => "trinkwasser"},
+                {getLayerId: () => "layer2", getTheme: () => ({name: "dataTable"})}
+            ]);
+
+            await actions.collectGfiFeatures({getters, commit, dispatch, rootGetters});
+
+            expect(loadMissingGfiThemesStub.calledOnce).to.be.true;
+            expect(loadMissingGfiThemesStub.firstCall.args[0]).to.be.deep.equals(["trinkwasser", {name: "dataTable"}]);
+            expect(committedBeforeLoad).to.be.false;
+            expect(commit.calledWith("setGfiFeatures")).to.be.true;
         });
 
         it("switches to previous component but does not close menu if it was expanded before", async () => {

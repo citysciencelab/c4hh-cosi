@@ -34,6 +34,12 @@
     vertical-align: middle;
 }
 
+// Masterportal theme colors: generate text-mp-*, bg-mp-*, border-mp-*, btn-mp-* etc. without touching Bootstrap's own colors
+$theme-colors: map-merge($theme-colors, (
+    "mp-secondary": $secondary,
+    "mp-light-blue": $light_blue
+));
+
 @import "bootstrap/scss/maps";
 
 // 4. Include any optional Bootstrap CSS as needed

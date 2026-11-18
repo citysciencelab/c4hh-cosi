@@ -2,6 +2,7 @@
  * Utility functions for exporting GFI data in various formats
  */
 
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 import {translateKeyIfPossible} from "./translationUtils.js";
 
 /**
@@ -329,7 +330,7 @@ export function exportToDOC ({layerResults, fileName, setIsLoading, translations
  */
 export function exportToPDF ({layerResults, fileName, setIsLoading, translations}) {
     setIsLoading(true);
-    const printWindow = window.open("", "PRINT", "height=600,width=800");
+    const printWindow = openSecuredPopup("", "PRINT", "height=600,width=800");
     let htmlContent = "";
 
     if (!printWindow) {

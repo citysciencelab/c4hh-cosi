@@ -1,4 +1,4 @@
-import {featuresToGeoJsonCollection, featureToGeoJson} from "../../utils/features/convertToGeoJson";
+import {featureToGeoJson, featuresToGeoJsonCollection} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import {downloadJsonToFile} from "../../utils/download";
 import store from "../../../../src/app-store";
 import {generateColorScale} from "../../utils/colorScale.js";
@@ -30,7 +30,7 @@ export function exportAsGeoJson (index) {
     const projectionCode = getPortalCrs(),
         total = this.dataSets[index].results.find(res => res.scope === "Gesamt"),
         average = this.results.find(res => res.scope === "Durchschnitt"),
-        featureCollection = featuresToGeoJsonCollection(this.selectedFeatures, false, projectionCode),
+        featureCollection = featuresToGeoJsonCollection(this.selectedFeatures, false, projectionCode, "EPSG:4326"),
         values = this.results.map(x => {
             return x.coverage;
         }),
@@ -66,7 +66,7 @@ export function exportAsGeoJson (index) {
             const layerFeatures = this.layerList.find(layer => layer.get("name") === field.id).getSource().getFeatures();
 
             for (const feature of layerFeatures) {
-                const featureGeoJson = featureToGeoJson(feature);
+                const featureGeoJson = featureToGeoJson(feature, false, "EPSG:25832", "EPSG:4326");
 
                 featureGeoJson.properties = {};
                 featureCollection.features.push(featureGeoJson);

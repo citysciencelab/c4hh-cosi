@@ -113,6 +113,18 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
                 Modules: {
                     namespaced: true,
                     modules: {
+                        Login: {
+                            namespaced: true,
+                            state: {loggedIn: true},
+                            getters: {
+                                loggedIn: state => state.loggedIn
+                            },
+                            mutations: {
+                                setLoggedIn: (state, value) => {
+                                    state.loggedIn = value;
+                                }
+                            }
+                        },
                         PotentialDamagedBuilding: {
                             namespaced: true,
                             getters: {
@@ -231,6 +243,57 @@ describe("addons/heavyRain/potentialDamagedBuilding/components/PotentialDamagedB
         });
     });
 
+
+    describe("login", () => {
+        it("should neither show the layers nor the content if the user is not logged in", () => {
+            wrapper.unmount();
+            replaceByIdInLayerConfig.resetHistory();
+            store.commit("Modules/Login/setLoggedIn", false);
+
+            wrapper = shallowMount(PotentialDamagedBuilding, {global: {plugins: [store]}});
+
+            expect(replaceByIdInLayerConfig.notCalled).to.be.true;
+            expect(wrapper.find(".alert").exists()).to.be.true;
+            expect(wrapper.findComponent({name: "ButtonGroup"}).exists()).to.be.false;
+        });
+
+        it("should ignore clicks on the map if the user is not logged in", () => {
+            const fetchFeature = sinon.stub(wrapper.vm, "fetchFeature");
+
+            store.commit("Modules/Login/setLoggedIn", false);
+            wrapper.vm.$options.watch.clickCoordinate.handler.call(wrapper.vm, [10, 20]);
+
+            expect(placingPointMarker.notCalled).to.be.true;
+            expect(fetchFeature.notCalled).to.be.true;
+        });
+
+        it("should show the selected layer after the login", async () => {
+            wrapper.unmount();
+            store.commit("Modules/Login/setLoggedIn", false);
+            wrapper = shallowMount(PotentialDamagedBuilding, {global: {plugins: [store]}});
+            replaceByIdInLayerConfig.resetHistory();
+
+            store.commit("Modules/Login/setLoggedIn", true);
+            await wrapper.vm.$nextTick();
+
+            expect(replaceByIdInLayerConfig.callCount).to.equal(2);
+            expect(replaceByIdInLayerConfig.firstCall.args[1].layerConfigs[0].layer.visibility).to.be.true;
+            expect(wrapper.find(".alert").exists()).to.be.false;
+        });
+
+        it("should hide the selected layer and reset the building and the marker after the logout", async () => {
+            replaceByIdInLayerConfig.resetHistory();
+
+            store.commit("Modules/Login/setLoggedIn", false);
+            await wrapper.vm.$nextTick();
+
+            expect(replaceByIdInLayerConfig.calledOnce).to.be.true;
+            expect(replaceByIdInLayerConfig.firstCall.args[1].layerConfigs[0].layer.visibility).to.be.false;
+            expect(wrapper.vm.selectedFeature).to.be.undefined;
+            expect(removePointMarker.calledOnce).to.be.true;
+            expect(wrapper.find(".alert").exists()).to.be.true;
+        });
+    });
 
     describe("lifecycle and watcher", () => {
         it("should toggle layer visibility on mount", () => {

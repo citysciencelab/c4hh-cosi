@@ -1,7 +1,62 @@
 import {expect} from "chai";
+import axios from "axios";
+import sinon from "sinon";
 import requestsModule from "@modules/wfsSearch/js/requests.js";
 
 describe("src/modules/wfsSearch/js/requests.js", () => {
+    describe("searchFeatures", () => {
+        let store, currentInstance, service;
+
+        beforeEach(() => {
+            currentInstance = {literals: [], requestConfig: {layerId: "testLayer"}};
+            store = {
+                getters: {
+                    "Maps/projectionCode": "EPSG:4326",
+                    "Modules/WfsSearch/currentInstance": currentInstance,
+                    allLayerConfigs: []
+                },
+                dispatch: sinon.spy()
+            };
+            service = {url: "https://getwfs.de", typeName: "testFeature", dataProjection: "EPSG:3857"};
+            sinon.stub(axios, "get").resolves({
+                status: 200,
+                statusText: "OK",
+                data: `<wfs:FeatureCollection xmlns:wfs="http://www.opengis.net/wfs"
+                    xmlns:gml="http://www.opengis.net/gml" xmlns:test="http://example.com/test">
+                    <gml:featureMember>
+                        <test:testFeature gml:id="testFeature.1">
+                            <test:geometry>
+                                <gml:Point srsName="EPSG:3857">
+                                    <gml:pos>1113194.9079327357 0</gml:pos>
+                                </gml:Point>
+                            </test:geometry>
+                        </test:testFeature>
+                    </gml:featureMember>
+                </wfs:FeatureCollection>`
+            });
+        });
+
+        it("should transform geometries from the configured data projection to the portal CRS", async () => {
+            const features = await requestsModule.searchFeatures(store, currentInstance, service),
+                coordinates = features[0].getGeometry().getCoordinates();
+
+            expect(features).to.have.lengthOf(1);
+            expect(coordinates[0]).to.be.closeTo(10, 0.000001);
+            expect(coordinates[1]).to.be.closeTo(0, 0.000001);
+            expect(store.dispatch.called).to.be.false;
+        });
+
+        it("should keep portal coordinates unchanged when no data projection is configured", async () => {
+            delete service.dataProjection;
+            store.getters["Maps/projectionCode"] = "EPSG:3857";
+
+            const features = await requestsModule.searchFeatures(store, currentInstance, service);
+
+            expect(features).to.have.lengthOf(1);
+            expect(features[0].getGeometry().getCoordinates()).to.deep.equal([1113194.9079327357, 0, 0]);
+        });
+    });
+
     describe("createUrl", () => {
         it("createUrl should respect questionmark in given url", () => {
             const url = "https://mapservice.regensburg.de/cgi-bin/mapserv?map=wfs.map",

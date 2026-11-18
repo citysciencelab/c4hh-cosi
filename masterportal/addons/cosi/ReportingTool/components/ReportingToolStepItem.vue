@@ -2,7 +2,7 @@
 import AddCardButton from "../../shared/modules/cards/components/AddCardButton.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import Badges from "../../shared/modules/badges/components/Badges.vue";
-import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
+import BaseCard from "@shared/modules/cards/components/BaseCard.vue";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import ReportingToolStepItemSettings from "./ReportingToolStepItemSettings.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
@@ -16,7 +16,7 @@ export default {
         AddCardButton,
         AlertMessage,
         Badges,
-        CustomCard,
+        BaseCard,
         DropdownAutocomplete,
         ReportingToolStepItemSettings,
         IconButton,
@@ -334,7 +334,7 @@ export default {
                     />
                 </div>
             </div>
-            <CustomCard
+            <BaseCard
                 class="mb-3 d-flex flex-nowrap"
                 :class="[cards.length > 1 ? 'col col-10' : 'col col-11']"
                 :icon="card.icon"
@@ -413,7 +413,7 @@ export default {
                         @input="setCardValue($event, card)"
                     />
                 </div>
-            </CustomCard>
+            </BaseCard>
         </div>
     </div>
     <AddCardButton
