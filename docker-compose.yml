@@ -30,8 +30,10 @@ services:
     build:
       context: .
       dockerfile: deploy/Dockerfile
-    image: cosi-portal:latest
-    container_name: cosi-portal
+    # Names default to the production ones; a second stack on the same Docker host
+    # (e.g. the beta instance) sets COSI_CONTAINER_PREFIX so nothing collides.
+    image: ${COSI_CONTAINER_PREFIX:-cosi}-portal:latest
+    container_name: ${COSI_CONTAINER_PREFIX:-cosi}-portal
     ports:
       - "${PORTAL_PORT:-8080}:80"
     environment:

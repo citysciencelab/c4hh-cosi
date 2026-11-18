@@ -28,6 +28,29 @@ cosi/
 > vendored from, and how to pull newer versions, are documented under
 > [Upstream updates](#addons-fork--upstream-updates) and [`provenance/README.md`](./provenance/README.md).
 
+## Branches: `main` and `beta`
+
+- **`main`** is the official COSI state: the upstream release tags (subtree merges), our
+  self-hosting infrastructure (Valhalla, registries, Hamburg API cache, deploy) and bug fixes.
+  Production (cosi.citysciencelab.hamburg) runs `main`.
+- **`beta`** is `main` plus our prototypes, our own extensions and experiments: the
+  "Förderung & Öffnungszeiten" prototype, the Sozialmonitoring statistics, the combined facility
+  layers (Jugendorte/Familienorte), the derived-indicator workflow (Dashboard → Versorgungsanalyse)
+  and the mpaddon ("Externes Backend"). It is deployed separately, see
+  [`deploy/Readme.md` → Beta instance](./deploy/Readme.md#beta-instance-branch-beta).
+
+Rules:
+
+1. **Changes flow `main` → `beta` only.** After every upstream sync or fix on `main`:
+   `git switch beta && git merge main`. Never merge `beta` into `main` as a whole.
+2. **A feature that may graduate** gets its own branch off `main`; merge it into `beta` to try
+   it, and once it is ready merge the *same* feature branch into `main`.
+3. **Throwaway experiments** can be committed straight to `beta`.
+4. The features listed above were moved off `main` by revert commits ("Move … to beta", merged
+   as 33cedf71). To promote one of them to `main`, revert its "Move … to beta" commit on `main`.
+   `beta` recorded that merge with `git merge -s ours`, so merging `main` into `beta` never
+   removes them there.
+
 ## Local environment setup
 
 ### 1. Node / npm
