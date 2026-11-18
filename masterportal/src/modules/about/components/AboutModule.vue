@@ -2,6 +2,7 @@
 import {mapActions as mapPiniaActions, mapState} from "pinia";
 import {mapActions, mapGetters} from "vuex";
 import {useAboutStore} from "../store/aboutStore.js";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 import LightButton from "@shared/modules/buttons/components/LightButton.vue";
 
 /**
@@ -74,14 +75,14 @@ export default {
          * @returns {void}
          */
         openDataPrivacyLink () {
-            window.open(this.privacyStatementUrl, "_blank");
+            openSecuredPopup(this.privacyStatementUrl, "_blank");
         },
         /**
          * Opens the accessibility statement URL in a new tab.
          * @returns {void}
          */
         openAccessibilityLink () {
-            window.open(this.accessibilityUrl, "_blank");
+            openSecuredPopup(this.accessibilityUrl, "_blank");
         },
         /**
          * Opens the contact module in the same menu where the about module is in.

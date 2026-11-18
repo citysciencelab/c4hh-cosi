@@ -1,3 +1,4 @@
+import {convertColor} from "@shared/js/utils/convertColor.js";
 import {GeoJSON, GPX, KML} from "ol/format.js";
 import Circle from "ol/geom/Circle.js";
 import Polygon from "ol/geom/Polygon.js";
@@ -7,17 +8,18 @@ import Stroke from "ol/style/Stroke.js";
 import Icon from "ol/style/Icon.js";
 import CircleStyle from "ol/style/Circle.js";
 import Text from "ol/style/Text.js";
-import {createDrawStyle} from "../../draw_old/js/style/createDrawStyle.js";
+import {createDrawStyle} from "../../draw/js/createDrawStyle.js";
+import buildStyleFromDrawState from "@shared/modules/draw/js/buildStyleFromDrawState.js";
 import isObject from "@shared/js/utils/isObject.js";
 import {createEmpty as createEmptyExtent, extend} from "ol/extent.js";
 import {uniqueId} from "@shared/js/utils/uniqueId.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import {treeSubjectsKey} from "@shared/js/utils/constants.js";
 import {supportedFiletypes} from "../utils/supportedFiletypes.js";
-import {getIconUrl} from "@shared/js/utils/convertFeaturesToKml.js";
-import * as constants from "@modules/draw_old/store/constantsDraw.js";
+import convertCrsToEpsg from "@shared/js/utils/convertCrsToEpsg.js";
 
 const defaultFont = "16px Arial",
+    gpxDrawStateNamespace = "https://masterportal.org/gpx",
     supportedFormats = {
         kml: new KML({
             extractStyles: true,
@@ -42,9 +44,33 @@ const defaultFont = "16px Arial",
                 zIndex: 0
             })]
         }),
-        gpx: new GPX(),
+        gpx: new GPX({readExtensions: readGpxExtensions}),
         geojson: new GeoJSON()
     };
+
+/**
+ * Reads the draw state from a Masterportal GPX extension.
+ * @param {ol/Feature} feature The feature being read.
+ * @param {Element|null} extensionsNode The GPX extensions node.
+ * @returns {void}
+ */
+function readGpxExtensions (feature, extensionsNode) {
+    if (!extensionsNode) {
+        return;
+    }
+
+    const drawStateNode = extensionsNode.getElementsByTagNameNS(gpxDrawStateNamespace, "drawState")[0];
+
+    if (!drawStateNode) {
+        return;
+    }
+
+    const drawState = parseDrawState(drawStateNode.textContent);
+
+    if (drawState) {
+        feature.set("drawState", drawState);
+    }
+}
 
 /**
  * Strips the file extension and replaces non-alphanumeric characters (except hyphens) with hyphens.
@@ -116,25 +142,45 @@ function removeBadTags (rawSource) {
 }
 
 /**
- * Find all complete URLs with 'tools/draw/circle_' and check them. Incorrect urls are replaced by correct urls.
+ * Mapping of legacy color names used in circle SVG filenames to KML color strings (aabbggrr format).
+ * Used to preserve the original color when replacing colored circle SVGs with circle_white.svg.
+ */
+const legacyColorToKmlHex = {
+    blue: "ffb87e37",
+    black: "ff000000",
+    green: "ff4aaf4d",
+    grey: "ff999999",
+    orange: "ff007fff",
+    red: "ff1c1ae4",
+    yellow: "ff33ffff"
+};
+
+/**
+ * Find all complete URLs with 'tools/draw/circle_' and check them.
+ * Replaces colored circle SVG URLs with circle_white.svg and injects a KML color tag
+ * into the IconStyle to preserve the original color.
  * @param {string} rawSource - KML source as string.
- * @returns {string} KML source with correct urls to symnbols.
+ * @returns {string} KML source with corrected circle URLs and color tags.
  */
 function checkAndReplaceSymbolUrls (rawSource) {
     let result = rawSource;
     const urlMatches = result.match(/<href>([^<]*tools\/draw\/circle_[^<]*)<\/href>/g);
 
     if (urlMatches) {
+        const whiteCircleUrl = `${window.location.origin}${MASTERPORTAL_ASSETS_PATH}/tools/draw/circle_white.svg`;
+
         urlMatches.forEach((match) => {
-            const url = match.replace(/<\/?href>/g, "");
+            const url = match.replace(/<\/?href>/g, ""),
+                colorMatch = url.match(/circle_([^.]+)\.svg/),
+                colorName = colorMatch ? colorMatch[1] : null,
+                kmlColor = colorName && colorName !== "white" ? legacyColorToKmlHex[colorName] : null,
+                iconTagPattern = new RegExp("<Icon>\\s*<href>" + url.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "</href>\\s*</Icon>"),
+                colorTag = kmlColor ? `<color>${kmlColor}</color>` : "",
+                replacement = `${colorTag}<Icon><href>${whiteCircleUrl}</href></Icon>`;
 
             if (!url.includes(MASTERPORTAL_ASSETS_PATH) || !url.includes(window.location.origin)) {
-                const color = url.match(/circle_([^.]+)\.svg/)[1],
-                    value = constants.colorOptions.find(entry => entry.color === color)?.value,
-                    correctedUrl = getIconUrl(value);
-
-                result = result.replace(url, correctedUrl);
-                console.warn("replaced wrong symbol url during import", url, " -> ", correctedUrl);
+                result = result.replace(iconTagPattern, replacement);
+                console.warn("replaced legacy symbol url during import", url, " -> ", whiteCircleUrl);
             }
         });
     }
@@ -210,6 +256,29 @@ function getParsedCustomAttributes (feature) {
         }
     });
     return attributes;
+}
+
+/**
+ * Parses a draw state serialized into a KML ExtendedData value.
+ * @param {*} value The KML value to parse.
+ * @returns {Object|null} The parsed draw state, or null when unavailable.
+ */
+function parseDrawState (value) {
+    if (isObject(value)) {
+        return value;
+    }
+    if (typeof value !== "string" || value.trim() === "") {
+        return null;
+    }
+
+    try {
+        const parsedValue = JSON.parse(value);
+
+        return isObject(parsedValue) ? parsedValue : null;
+    }
+    catch {
+        return null;
+    }
 }
 
 export default {
@@ -338,7 +407,14 @@ export default {
             Object.keys(feature.getProperties()).forEach((key) => {
                 if (["isOuterCircle", "drawState", "fromDrawTool", "invisibleStyle", "styleId", "source", "attributes", "isVisible", "isGeoCircle", "geoCircleCenter", "geoCircleRadius", "isSquare", "squareCoords"].indexOf(key) >= 0) {
 
-                    if (key !== "attributes" && key !== "drawState" && key !== "invisibleStyle" && key !== "masterportal_attributes") {
+                    if (format instanceof KML && key === "drawState") {
+                        const drawState = parseDrawState(feature.get(key));
+
+                        if (drawState) {
+                            masterportal_attributes[key] = drawState;
+                        }
+                    }
+                    else if (key !== "attributes" && key !== "invisibleStyle" && key !== "masterportal_attributes") {
                         // transform "true" or "false" from KML to Boolean
                         let valueToSetForMasterportal = feature.get(key);
 
@@ -419,22 +495,7 @@ export default {
                 }
 
                 geometries.forEach(geometry => {
-                    let mappedCrsPropName = crsPropName;
-
-                    if ((crsPropName === "urn:ogc:def:crs:EPSG:6.6:4326") ||
-                       (crsPropName === "urn:ogc:def:crs:OGC:1.3:CRS84") ||
-                       (crsPropName === "urn:ogc:def:crs:OGC:1.3:CRS:84") ||
-                       (crsPropName === "urn:ogc:def:crs:OGC:2:84") ||
-                       (crsPropName === "urn:x-ogc:def:crs:EPSG:4326")) {
-                        mappedCrsPropName = "EPSG:4326";
-                    }
-                    else if ((crsPropName === "EPSG:102100") ||
-                        (crsPropName === "EPSG:102113") ||
-                        (crsPropName === "EPSG:900913") ||
-                        (crsPropName === "urn:ogc:def:crs:EPSG:6.18:3:3857")) {
-                        mappedCrsPropName = "EPSG:3857";
-                    }
-                    geometry.transform(mappedCrsPropName, rootGetters["Maps/projectionCode"]);
+                    geometry.transform(convertCrsToEpsg(crsPropName), rootGetters["Maps/projectionCode"]);
                     feature.set("source", fileName);
                 });
             }
@@ -488,9 +549,9 @@ export default {
             format = getFormat(fileName, state.selectedFiletype, supportedFormats),
             fileDataProjection = getCrsPropertyName(datasrc.raw);
 
-        let
-            alertingMessage,
-            features;
+        let alertingMessage,
+            features,
+            mappedDataProjection = fileDataProjection;
 
         if (format === false) {
             const fileNameSplit = fileName.split("."),
@@ -505,9 +566,11 @@ export default {
             return;
         }
 
+        mappedDataProjection = convertCrsToEpsg(fileDataProjection);
+
         try {
             features = format.readFeatures(datasrc.raw, {
-                dataProjection: fileDataProjection,
+                dataProjection: mappedDataProjection,
                 featureProjection: rootGetters["Maps/projectionCode"]
             });
         }
@@ -537,7 +600,13 @@ export default {
                 customStyles = state.customAttributeStyles[fileName];
             let style;
 
-            if (!drawState && !customStyles) {
+            if (drawState) {
+                style = buildStyleFromDrawState(drawState);
+
+                return style ? style.clone() : new Style();
+            }
+
+            if (!drawState && !customStyles && !feature.get("fill")) {
                 const defaultColor = [226, 26, 28, 0.9],
                     defaultFillColor = [228, 26, 28, 0.5],
                     defaultPointSize = 16,
@@ -599,81 +668,22 @@ export default {
                 return style.clone();
             }
 
-            if (drawState?.drawType.geometry === "Point") {
-                if (drawState.text) {
-                    style = new Style({
-                        image: new CircleStyle({
-                        }),
-                        text: new Text({
-                            text: drawState.text,
-                            font: drawState.fontSize + "px " + (drawState.font || "Arial,sans-serif"),
-                            fill: new Fill({
-                                color: drawState.color
-                            }),
-                            textAlign: drawState.textAlign || "left",
-                            textBaseline: drawState.textBaseline || "bottom"
-                        })
-                    });
-                }
-                else if (drawState?.symbol.value !== "simple_point") {
-                    style = new Style({
-                        image: new Icon({
-                            crossOrigin: "anonymous",
-                            src: drawState.symbol.value.indexOf("/") > 0 ? drawState.symbol.value : drawState.imgPath + drawState.symbol.value,
-                            scale: drawState.symbol.scale
-                        })
-                    });
-                }
-                else {
-                    style = createDrawStyle(drawState?.color, drawState?.color, drawState?.drawType.geometry, drawState?.pointSize, 1, drawState?.zIndex);
-                }
-            }
-            else if (drawState?.drawType.geometry === "LineString" || drawState?.drawType.geometry === "MultiLineString") {
+            if (!drawState && !customStyles && feature.get("fill")) {
+                const fillColor = feature.get("fill");
+                const fillOpacity = feature.get("fill-opacity") ?? 0.5;
+                const rgbFill = convertColor(fillColor, "rgb");
+                const colorWithOpacity = [...rgbFill, fillOpacity];
+                const strokeColor = [100, 100, 100, 0.8];
+
                 style = new Style({
-                    stroke: new Stroke({
-                        color: drawState.colorContour,
-                        width: drawState.strokeWidth
-                    })
+                    stroke: new Stroke({color: strokeColor, width: 1}),
+                    fill: new Fill({color: colorWithOpacity})
                 });
+
+                return style.clone();
             }
-            else if (drawState?.drawType.geometry === "Polygon" || drawState?.drawType.geometry === "MultiPolygon") {
-                style = new Style({
-                    stroke: new Stroke({
-                        color: drawState.colorContour,
-                        width: drawState.strokeWidth
-                    }),
-                    fill: new Fill({
-                        color: drawState.color
-                    })
-                });
-            }
-            else if (drawState?.drawType.geometry === "Circle") {
-                style = new Style({
-                    stroke: new Stroke({
-                        color: drawState.colorContour,
-                        width: drawState.strokeWidth
-                    }),
-                    fill: new Fill({
-                        color: drawState.color
-                    }),
-                    circleRadius: drawState.circleRadius,
-                    circleOuterRadius: drawState.circleOuterRadius,
-                    colorContour: drawState.colorContour,
-                    outerColorContour: drawState.outerColorContour
-                });
-            }
-            else if (drawState?.drawType.geometry === "Square") {
-                style = new Style({
-                    stroke: new Stroke({
-                        color: drawState.colorContour,
-                        width: drawState.strokeWidth
-                    }),
-                    fill: new Fill({
-                        color: drawState.color
-                    })
-                });
-            }
-            else if (!drawState && customStyles) {
+
+            if (!drawState && customStyles) {
                 const geometryType = feature ? feature.getGeometry().getType() : "cesium",
                     featureAttribute = feature.get(customStyles[0].attribute),
                     featureColor = customStyles.find(attribute => {
@@ -793,9 +803,7 @@ export default {
                     circleRadius = parseFloat(feature.get("masterportal_attributes").geoCircleRadius);
 
                 feature.setGeometry(new Circle(circleCenter, circleRadius));
-
-                // Transformation here is necessary because all other geometries have already been transformed within "format.readFeatures(..."
-                feature.getGeometry().transform(fileDataProjection, rootGetters["Maps/projectionCode"]);
+                feature.getGeometry().transform(mappedDataProjection, rootGetters["Maps/projectionCode"]);
             }
             if (feature.get("masterportal_attributes").isSquare) {
                 const coords = feature.get("masterportal_attributes").squareCoords;
@@ -878,7 +886,8 @@ export default {
                     showInLayerTree: true,
                     typ: "VECTORBASE",
                     type: "layer",
-                    visibility: true
+                    visibility: true,
+                    isDynamic: true
                 },
                 parentKey: treeSubjectsKey
             }, {root: true});
@@ -910,7 +919,12 @@ export default {
         const menuSide = ["mainMenu", "secondaryMenu"].includes(state.openDrawMenuSide) ? state.openDrawMenuSide : "secondaryMenu",
             menuExpanded = "Menu/expanded";
 
-        dispatch("Menu/changeCurrentComponent", {type: "draw_old", side: menuSide, props: {name: i18next.t("common:modules.draw_old.name")}}, {root: true});
+        if (rootGetters.isModuleAvailable("draw")) {
+            dispatch("Menu/changeCurrentComponent", {type: "draw", side: menuSide, props: {name: i18next.t("common:modules.draw.name")}}, {root: true});
+        }
+        else if (rootGetters.isModuleAvailable("draw_old")) {
+            dispatch("Menu/changeCurrentComponent", {type: "draw_old", side: menuSide, props: {name: i18next.t("common:modules.draw_old.name")}}, {root: true});
+        }
 
         if (!rootGetters[menuExpanded](menuSide)) {
             dispatch("Menu/toggleMenu", menuSide, {root: true});

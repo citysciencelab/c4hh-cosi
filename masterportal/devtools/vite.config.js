@@ -4,6 +4,7 @@
 /* eslint-disable func-style */
 import {defineConfig} from "vite";
 import vue from "@vitejs/plugin-vue";
+import vuetify from "vite-plugin-vuetify";
 import path from "path";
 import glob from "fast-glob";
 import fs from "fs";
@@ -114,6 +115,7 @@ export default defineConfig(({mode}) => {
         plugins: [
             vmShimPlugin(),
             vue(),
+            vuetify({autoImport: true}),
             nodePolyfills({
                 exclude: ["fs", "vm"]
             }),
@@ -240,7 +242,14 @@ export default defineConfig(({mode}) => {
             devSourcemap: false,
             preprocessorOptions: {
                 scss: {
-                    additionalData: "@import \"@/assets/css/global.scss\";"
+                    additionalData: "@import \"@/assets/css/global.scss\";",
+                    quietDeps: true,
+                    silenceDeprecations: [
+                        "import",
+                        "global-builtin",
+                        "color-functions",
+                        "if-function"
+                    ]
                 }
             }
         },

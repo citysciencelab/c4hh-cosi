@@ -660,6 +660,56 @@ describe("src/modules/addWMS/components/AddWMS.vue", () => {
 
             expect(wrapper.vm.getIfInExtent(capability2, currentExtent)).to.be.true;
         });
+
+        it("if no bbox found in layer then use bbox from first child layer", () => {
+            capability = {
+                Capability: {
+                    Layer: {
+                        Layer: [
+                            {
+                                "BoundingBox": [
+                                    {
+                                        "crs": "EPSG:25832",
+                                        "extent": [
+                                            302907.887193,
+                                            5435104.982326,
+                                            389523.673913,
+                                            5508222.768538
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                }
+            };
+            currentExtent = [
+                205000,
+                5009000,
+                730000,
+                6075800
+            ];
+
+            expect(wrapper.vm.getIfInExtent(capability, currentExtent)).to.be.true;
+        });
+
+        it("if no bbox found in layer and first child layer, return true", () => {
+            capability = {
+                Capability: {
+                    Layer: {
+                        Layer: []
+                    }
+                }
+            };
+            currentExtent = [
+                205000,
+                5009000,
+                730000,
+                6075800
+            ];
+
+            expect(wrapper.vm.getIfInExtent(capability, currentExtent)).to.be.true;
+        });
     });
 
     describe("getReversedData", () => {

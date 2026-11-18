@@ -47,7 +47,7 @@ describe("src/modules/wfsSearch/store/actionsWfsSearch.js", () => {
             rootGetters = {
                 restServiceById: id => id === 456 ? {url, featureType: typeName} : {}
             };
-            service = {url, featureNS: undefined, featurePrefix: undefined};
+            service = {dataProjection: undefined, url, featureNS: undefined, featurePrefix: undefined};
         });
 
         it("should reset the module if the WFS is not given", () => {
@@ -73,6 +73,23 @@ describe("src/modules/wfsSearch/store/actionsWfsSearch.js", () => {
             expect(isObject(commit.firstCall.args[1])).to.be.true;
             expect(commit.secondCall.args).to.eql(["setUserHelp", userHelp]);
             expect(commit.thirdCall.args).to.eql(["setService", service]);
+        });
+        it("should copy the configured data projection from a service object", () => {
+            rootGetters.restServiceById = () => ({url, dataProjection: "EPSG:4647"});
+            service.dataProjection = "EPSG:4647";
+
+            actions.prepareModule({commit, dispatch, getters, rootGetters});
+
+            expect(commit.calledWith("setService", service)).to.be.true;
+        });
+        it("should read service attributes from a getter-based model", () => {
+            const attributes = {url, dataProjection: "EPSG:4647", featureNS: "namespace", featurePrefix: "prefix"};
+
+            rootGetters.restServiceById = () => ({get: key => attributes[key]});
+
+            actions.prepareModule({commit, dispatch, getters, rootGetters});
+
+            expect(commit.calledWith("setService", attributes)).to.be.true;
         });
         it("should prepare the module if the WFS is given while also dispatching 'retrieveData' if the parameter 'selectSource' is given in the currentInstance", () => {
             getters.currentInstance.selectSource = 122;

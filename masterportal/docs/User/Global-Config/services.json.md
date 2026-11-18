@@ -13,35 +13,38 @@ A layer based on the OGC's [Web Map Service](https://www.ogc.org/standard/wms/) 
 |----|--------|----|-------|-----------|-------|
 |capabilitiesUrl|no|String||Service's capabilities URL|`"https://geodienste.hamburg.de/HH_WMS_DOP10?VERSION=1.3.0&SERVICE=WMS&REQUEST=GetCapabilities"`|
 |cqlFilter|no|String||Set to the given CQL filter for requests with this layer.|`"feature_id = 1"`|
+|crs|yes|String||Layer's coordinate reference system. `"CRS"` is send as key in request.|`"EPSG:3857"`|
 |datasets|no|**[datasets](#wms_wfs_oaf_datasets)**/Boolean||Metadata specification. All metadata the layer data is referenced here. On clicking the "i" button in the layer tree, the information is retrieved by the CSW interface and shown to the user. For this, the **[rest-services.json](rest-services.json.md)** has to provide the URL of the metadata catalog resp. its CSW interface. The values *kategorie_opendata*, *kategorie_inspire*, and *kategorie_organisation* are used for layer categorization if the **[config.json](../Portal-Config/config.json.md)** has `tree.type` set to `"default"`. It is also possible to retrieve metadata with a getMetaData request, in this case there can also be additional informations displayed. To remove the "i" button altogether, explicitly set `"datasets": false`.||
 |featureCount|yes|String||Amount of features retrieved on GFI requests. Corresponds to the *GetFeatureInfo parameter "FEATURE_COUNT"*.|`"1"`|
 |fitCapabilitiesExtent|no|Boolean|false|When set to `true` and a `capabilitiesUrl` is specified in the configuration, the application will fit the map extent based on the bounding box information retrieved from the GetCapabilities document.|`true`|
 |format|yes|String||Image format of tiles requested via *GetMap*. Must match one of the service's formats listed in *Capability/Request/GetMap/Format*.|`"image/jpeg"`|
 |gfiAttributes|yes|String/**[gfiAttributes](#gfi-attributes)**||GFI attributes to be shown|`"ignore"`|
+|gfiTemplate|no|String||A deegree Vendor-Specific Parameter, `"GFI_TEMPLATE"` is send as key in request.|`"gfiTemplate"`|
 |gfiTheme|yes|String/Object||Display style of GFI information for this layer. Unless `"default"` is chosen, custom templates may be used to show GFI information in another format than the default table style.|`"default"`|
 |gfiTitleAttribute|no|String||Optional. Specifies which feature attribute should be used as the GFI title instead of the layer name. If the specified attribute is missing, empty, null, or undefined in a feature, the layer name is used as fallback. **Important:** The fallback to layer name also occurs if the attribute value is an empty string or zero (0 is treated as empty). See **[GFI Title Attribute](#gfi-title-attribute)** for detailed behavior and examples.|`"stationName"`|
 |gutter|no|String|`"0"`|Additionally loaded tile contents in border pixel width. Serves to avoid cut symbols on tile borders.|`"0"`|
 |id|yes|String||Arbitrary id. Special characters such as `"_"` can lead to problems in modules and should be avoided.|`"8"`|
 |infoFormat|no|String|"text/xml"|**[services.json](services.json.md)** value. WMS *GetFeatureInfo* response format. The formats: `"text/xml"`, `"text/html"`, `"application/json"` `"application/vnd.ogc.gml"` are supported. When using `"text/html"`, the service response is checked and will only be used when it contains a fully valid and filled HTML table. The default could be changed in **[config.json](../Portal-Config/config.json.md)**.|`"text/xml"`|
+|isSecured|no|Boolean|false|Displays whether the layer belongs to a secured service. (**[see below](#secured-wms-services)**)|false|
 |layerAttribution|no|String|`"nicht vorhanden"`|Additional layer information to be shown in the portal's control element *LayerAttribution*, if configured to appear. If `"nicht vorhanden"` (technical key meaning "not available") is chosen, no layer attribution is shown.|`"nicht vorhanden"`|
 |layers|yes|String||The service's layer name. Must match a name of the service's capabilities in *Layer/Layer/Name*.|`"1"`|
+|layerSequence|no|Number||Number to determine the sequence of layers in the layerTree and layerSelection. The layers are rendered in sequence based on the assigned value, e.g. layers with `layerSequence=1` will initially be on top, etc. Does not work for Baselayers.||
 |legendURL|yes|String/String[]||`"ignore"`: No image is retrieved, `""` (empty string): The service's *GetLegendGraphic* is called.|`"ignore"`|
 |legend|no|Boolean/String/String[]||Value of the **[services.json](services.json.md)** file. URL to be used to request a static legend image. Use a boolean value to dynamically generate the legend from a WMS request or the WFS styling respectively. Use a string to link an image or a PDF file. Use `"ignore"` or `false` for no legend.|`false`|
 |maxScale|yes|String||The layer is shown only up to this scale.|`"1000000"`|
 |minScale|yes|String||The layer is shown only down to this scale.|`"0"`|
 |name|yes|String||Arbitrary display name used in the layer tree.|`"Aerial View DOP 10"`|
+|preview|no|**[preview](#wms_wmts_vectortile_preview)**||Shows a preview of a baselayer in layer-selection and baselayer-switcher, even if not configured here. For WMS and WMTS layers, the image is fetched as a GetMap request. For VectorTile layers, an image is stored in the file system.||
 |singleTile|no|Boolean||`true`: Request map as a single tile of the current view. `false`: Build map from multiple smaller tiles.|`false`|
+|sld|no|String||A standard parameter in a GetMap request. If present, the `layers` and `styles` parameters are obsolete. The value is the path or URL to an external SLD XML file to be used for styling. `"SLD"` is send as key in request.|`filename.xml`|
+|styles|no|String||A standard parameter in a GetMap request. Contains styles in which layers are to be rendered.`"STYLES"` is send as key in request. |`"population"`|
 |tilesize|yes|String||Tile height and width in pixels. Used if `singleTile` is `false`.|`"512"`|
-|time|no|Boolean/**[time](#using-time-related-parameters-wms-t)**|false|If set to `true` or an object (**[time](#using-time-related-parameters-wms-t)**), the configured Layer is expected to be a WMS-T.|`false`|
+|time|no|Boolean/**[time](#using-time-related-parameters-wms-t)**|false|If set to `true` or an object (**[time](#using-time-related-parameters-wms-t)**), the configured Layer is expected to be a WMS-T. `"TIME"` is send as key in request.|`false`|
 |transparent|yes|Boolean||Whether the tile background should be transparent. Corresponds to the *GetMap* parameter *TRANSPARENT*.|`true`|
 |typ|yes|String||Service type; in this case, "WMS". (**[WMTS docs](#wmts-layer)**, **[WFS docs](#wfs-layer)**, **[SensorThings-API docs](#sensorlayer)**)|`"WMS"`|
 |url|yes|String||Service URL|`"https://geodienste.hamburg.de/HH_WMS_DOP10"`|
 |useProxy|no|Boolean|`false`|_Deprecated in the next major release. *[GDI-DE](https://www.gdi-de.org/en)* recommends setting CORS headers on the required services instead._ Only used for GFI requests. The request will contain the requested URL as path, with dots replaced by underscores.|`false`|
 |version|yes|String||Service version used for *GetMap* requests.|`"1.3.0"`|
-|isSecured|no|Boolean|false|Displays whether the layer belongs to a secured service. (**[see below](#secured-wms-services)**)|false|
-|layerSequence|no|Number||Number to determine the sequence of layers in the layerTree and layerSelection. The layers are rendered in sequence based on the assigned value, e.g. layers with `layerSequence=1` will initially be on top, etc. Does not work for Baselayers.||
-|crs|yes|String||Layer's coordinate reference system|`"EPSG:3857"`|
-|preview|no|**[preview](#wms_wmts_vectortile_preview)**||Shows a preview of a baselayer in layer-selection and baselayer-switcher, even if not configured here. For WMS and WMTS layers, the image is fetched as a GetMap request. For VectorTile layers, an image is stored in the file system.||
 
 ```json title="Example Configuration of a WMS Layer"
 {
@@ -248,7 +251,8 @@ WMTS layers can be added by:
 | style | no | String | "normal" | Name of the style. Must match the noted in the WMTS capabilities. | `"normal"` |
 | tileMatrixSet | yes | String |  | Matrix set required to call the WMTS service. Do not use when using `optionsFromCapabilities`, a fitting TileMatrixSet is injected then. Using both may lead to erroneous behaviour. | `"google3857"` |
 | tilesize | yes | String |  | Tile height and width in pixels. | `"512"` |
-| transparent | yes | Boolean |  | Whether the tile background should be transparent. Corresponds to the *GetMap* parameter *TRANSPARENT*. | `true` |
+| transparency | no | Number | `0` | Initial layer transparency, 0 to 100 (inclusive). | `0` |
+| transparent | no | Boolean |  | _Deprecated in the next major release. *Has no effect. Use transparency instead._ | `true` |
 | typ | yes | String |  | Service type; in this case, "WMTS". (**[WMTS docs](#wmts-layer)**, **[WFS docs](#wfs-layer)**, **[SensorThings-API docs](#sensorlayer)**) | `"WMS"` |
 | urls | yes | String[]/String |  | WMTS service URL. If only a single URL is given, it's internally transformed to an array. | `["https://maps1.wien.gv.at/basemap/geolandbasemap/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png", "https://maps2.wien.gv.at/basemap/geolandbasemap/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png", "https://maps3.wien.gv.at/basemap/geolandbasemap/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png", "https://maps4.wien.gv.at/basemap/geolandbasemap/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png", "https://maps.wien.gv.at/basemap/geolandbasemap/{Style}/{TileMatrixSet}/{TileMatrix}/{TileRow}/{TileCol}.png"]` |
 | version | yes | String |  | Service version used for *GetMap* requests. | `"1.0.0"` |
@@ -273,6 +277,7 @@ WMTS layers can be added by:
    "format": "image/png",
    "style": "normal",
    "transparent": false,
+   "transparency": 0,
    "tileSize": "256",
    "minScale": "0",
    "maxScale": "2500000",
@@ -333,7 +338,9 @@ A layer based on the OGC's [Web Feature Service](https://www.ogc.org/standard/wf
 |Name|Required|Type|Default|Description|Example|
 |----|--------|----|-------|-----------|-------|
 |capabilitiesUrl|no|String||Service's capabilities URL|`"https://geodienste.hamburg.de/HH_WFS_Verkehr_opendata?SERVICE=WFS&VERSION=1.1.0&REQUEST=GetCapabilities"`|
-|datasets|yes|**[datasets](#wms_wfs_oaf_datasets)**[]/Boolean||Metadata specification. All metadata of the layer data is referenced here. By clicking the "i" button in the layer tree, the information is retrieved by the CSW interface and shown to the user. For this, the **[rest-services.json](rest-services.json.md)** has to provide the URL of the metadata catalog resp. its CSW interface. The values *kategorie_opendata*, *kategorie_inspire*, and *kategorie_organisation* are used for layer categorization if the **[config.json](../Portal-Config/config.json.md)** has `tree.type` set to `"default"`. It is also possible to retrieve metadata with a getMetaData request, in this case there can also be additional informations displayed. It is also possible to retrieve metadata with a getMetaData request, in this case there can also be additional informations displayed. To remove the "i" button altogether, explicitly set `"datasets": false`.||
+|datasets|yes|**[datasets](#wms_wfs_oaf_datasets)**[]/Boolean||Metadata specification. All metadata of the layer data is referenced here. By clicking the "i" button in the layer tree, the information is retrieved by the CSW interface and shown to the user. For this, the **[rest-services.json](rest-services.json.md)** has to provide the URL of the metadata catalog resp. its CSW interface. The values *kategorie_opendata*, *kategorie_inspire*, and *kategorie_organisation* are used for layer categorization if the **[config.json](../Portal-Config/config.json.md)** has `tree.type` set to `"default"`. It is also possible to retrieve metadata with a getMetaData request, in this case there can also be additional informations displayed. It is also possible to retrieve metadata with a getMetaData request, in this case there can also be 
+additional informations displayed. To remove the "i" button altogether, explicitly set `"datasets": false`.||
+|dataProjection|no|string|configured portal CRS|Source CRS of geometries returned by `wfsSearch`. Set this when search results use a different CRS than the portal so their coordinates can be transformed correctly. Use the feature type’s default CRS, listed as DefaultSRS or DefaultCRS in the service’s GetCapabilities document. If the projection is not already available in the portal, add its definition to `namedProjections`in the **[config.json](../Portal-Config/config.json.md)**. This setting does not change the portal CRS or request a different CRS from the service.|-------|
 |featureNS|yes|String||Usually referenced in the WFS *GetCapabilities*' header. Used to resolve the namespace given in *FeatureType/Name*.|`"http://www.deegree.org/app"`|
 |featureType|yes|String||Feature type to load. Must match a value of *FeatureTypeList/FeatureType/Name* in the *GetCapabilities* response. Provide without namespace.|`"bab_vkl"`|
 |featurePrefix|no|String||Used to identify a *FeatureType* in the service.|
@@ -386,6 +393,7 @@ A layer based on the OGC's [Web Feature Service](https://www.ogc.org/standard/wf
           "anzahl_sus_primarstufe",
           "geom"
       ],
+      "dataProjection": "EPSG:4647",
       "datasets" : [
          {
             "md_id" : "2FC4BBED-350C-4380-B138-4222C28F56C6",

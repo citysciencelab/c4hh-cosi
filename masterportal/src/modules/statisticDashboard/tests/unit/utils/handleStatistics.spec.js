@@ -9,34 +9,6 @@ describe("src/modules/statisticDashboard/utils/handleStatistics.js", () => {
         });
     });
 
-    describe("hasOneGroup", () => {
-        it("should return true if at least one category group is present in the statistics.", () => {
-            const statisticsAttributes = {
-                "beschaeftigte": {
-                    "category": "CategoryOne",
-                    "categoryGroup": "group"
-                },
-                "bruttoinlandsprodukt_mio_jahressumme": {
-                    "category": "Bruttoinlandsprodukt"
-                }
-            };
-
-            expect(StatisticHandler.hasOneGroup(statisticsAttributes)).to.be.true;
-        });
-        it("should return false if no category group is present in the statistics.", () => {
-            const statisticsAttributes = {
-                "beschaeftigte": {
-                    "category": "Bevölkerungswachstum (18-30 Jährige)"
-                },
-                "bruttoinlandsprodukt_mio_jahressumme": {
-                    "category": "Bruttoinlandsprodukt"
-                }
-            };
-
-            expect(StatisticHandler.hasOneGroup(statisticsAttributes)).to.be.false;
-        });
-    });
-
     describe("getStatisticsByCategory", () => {
         it("should return all statistics of this given category. ", () => {
             const statisticsAttributes = {
@@ -88,34 +60,6 @@ describe("src/modules/statisticDashboard/utils/handleStatistics.js", () => {
         });
     });
 
-    describe("getGroupedCategories", () => {
-        it("should return all categories grouped", () => {
-            const statisticsAttributes = {
-                "statOne": {
-                    "category": "CategoryOne",
-                    "categoryGroup": "GroupOne"
-                },
-                "statTwo": {
-                    "category": "CategoryTwo",
-                    "categoryGroup": "GroupOne"
-                },
-                "statThree": {
-                    "category": "CategoryThree",
-                    "categoryGroup": "GroupTwo"
-                },
-                "statFour": {
-                    "category": "CategoryAdditional"
-                }
-            };
-
-            expect(StatisticHandler.getGroupedCategories(statisticsAttributes)).to.deep.equal([
-                {name: "GroupOne", categories: [{name: "CategoryOne"}, {name: "CategoryTwo"}]},
-                {name: "GroupTwo", categories: [{name: "CategoryThree"}]},
-                {name: "modules.statisticDashboard.filterInputs.additional", categories: [{name: "CategoryAdditional"}]}
-            ]);
-        });
-    });
-
     describe("getCategoriesFromStatisticAttributes", () => {
         it("should return the categories ungrouped", () => {
             const statisticsAttributes = {
@@ -141,32 +85,6 @@ describe("src/modules/statisticDashboard/utils/handleStatistics.js", () => {
                 {name: "CategoryTwo"},
                 {name: "CategoryThree"},
                 {name: "CategoryAdditional"}
-            ]);
-        });
-
-        it("should return the categories grouped", () => {
-            const statisticsAttributes = {
-                "statOne": {
-                    "category": "CategoryOne",
-                    "categoryGroup": "GroupOne"
-                },
-                "statTwo": {
-                    "category": "CategoryTwo",
-                    "categoryGroup": "GroupOne"
-                },
-                "statThree": {
-                    "category": "CategoryThree",
-                    "categoryGroup": "GroupTwo"
-                },
-                "statFour": {
-                    "category": "CategoryAdditional"
-                }
-            };
-
-            expect(StatisticHandler.getCategoriesFromStatisticAttributes(statisticsAttributes, true)).to.deep.equal([
-                {name: "GroupOne", categories: [{name: "CategoryOne"}, {name: "CategoryTwo"}]},
-                {name: "GroupTwo", categories: [{name: "CategoryThree"}]},
-                {name: "modules.statisticDashboard.filterInputs.additional", categories: [{name: "CategoryAdditional"}]}
             ]);
         });
 

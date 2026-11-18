@@ -5,6 +5,7 @@ const earthRadius = 6378137;
 
 /**
  * Helper Function to coordinate the calculation of a circle.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {(Event | Object)} event Event sent when drawing a feature on the map or a simple object.
  * @param {module:ol/coordinate~Coordinate} circleCenter The center of the circle to be calculated.
  * @param {Number} circleRadius The radius of the circle to be calculated.
@@ -41,7 +42,7 @@ function calculateCircle (event, circleCenter, circleRadius, map) {
 /**
  * Calculates new flat and extent latitude coordinates for the (circle-) feature.
  * These coordiantes are calculated on the basis of the circle diameter specified by the user.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {module:ol/coordinate~Coordinate} circleCenter The center of the circle to be calculated.
  * @param {Number} circleDiameter The diameter of the circle to be calculated.
  * @param {module:ol/Map} map Map object.

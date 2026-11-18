@@ -295,7 +295,12 @@
     },
     "draw": {
       "description": "Erstellen Sie wichtige Markierungen oder kennzeichnen Sie Flächen",
-      "name": "Zeichnen / Schreiben"
+      "name": "Zeichnen / Schreiben",
+      "drawSettings": {
+        "radius": "Radius",
+        "area": "Fläche",
+        "length": "Länge"
+      }
     },
     "draw_old": {
       "attributeSelect": {
@@ -674,6 +679,7 @@
       "externalSubjectLayer": "Externe Fachdaten",
       "selectAll": "Alle hinzufügen",
       "deselectAll": "Alle entfernen",
+      "loginRequired": "Folgende Themen sind geschützt und wurden nicht hinzugefügt: {{layerNames}}. Bitte melden Sie sich an, um sie anzuzeigen.",
       "selectedSubjectsCount_other": "Bitte wählen sie ein Thema aus",
       "addSelectedSubjectsToMap_one": "Ausgewähltes Thema der Karte hinzufügen",
       "addSelectedSubjectsToMap_other": "{{count}} ausgewählte Themen der Karte hinzufügen"
@@ -706,6 +712,7 @@
       "invisibleLayerNoScale": "Dieses Thema kann in diesem Maßstab nicht angezeigt werden",
       "invisibleLayerMinScale": "Der Layer ist ab dem Maßstab {{minScale}} sichtbar.",
       "invisibleLayerMaxScale": "Der Layer ist bis zum dem Maßstab {{maxScale}} sichtbar.",
+      "loginRequired": "Das Thema „{{layerName}}“ ist geschützt. Bitte melden Sie sich an, um es anzuzeigen.",
       "noCategory": "Ohne Kategorie",
       "rootLayerPath": "Im Ordner anzeigen"
     },
@@ -1317,6 +1324,7 @@
       "name": "Statistik Dashboard",
       "description": "Filtern Sie Statistiken nach Themenfeld und lassen sich zugehörige Tabellen und Diagramme anzeigen.",
       "headings": {
+        "dataSelection": "Datenauswahl",
         "mrhstatistics": "Zahlen, Daten, Fakten der MRH - Regionalstatistik",
         "mrhstatisticsTooltip": "Link zu den Metadaten",
         "addFilter": "Filter hinzufügen",
@@ -1325,22 +1333,52 @@
         "addArea": "Gebiete auswählen",
         "addTime": "Zeitraum auswählen"
       },
+      "dataSelectionExpanded": {
+        "level": "Ebene",
+        "title": "Statistik",
+        "categories": "Kategorien",
+        "indicators": "Statistik",
+        "selectedStatistics_one": "{{count}} Statistik ausgewählt",
+        "selectedStatistics_other": "{{count}} Statistiken ausgewählt",
+        "area": "Gebiet",
+        "timePeriod": "Zeitraum",
+        "showDifference": "Differenzen anzeigen",
+        "differenceDescription": "Werte mit einem ausgewählten Jahr oder Gebiet vergleichen und die Unterschiede anzeigen.",
+        "showData": "Daten anzeigen",
+        "specificsTitle": "Statistiken weiter aufschlüsseln",
+        "specificsSubtitle": "Erweiterte Auswahl",
+        "specificsHint": "Wählen Sie zusätzliche Angaben aus, z. B. nach Alter oder Geschlecht. Die verfügbaren Angaben unterscheiden sich je nach Statistik. Jedes Merkmal fügt die dafür verfügbaren Statistiken hinzu. Eine Kombination der Merkmale ist nicht möglich.",
+        "specificsTag_age": "Alter",
+        "specificsTag_gender": "Geschlecht",
+        "specificsAddedTag": "Hinzugefügte Statistiken - {{tag}}",
+        "specificsCount": "{{available}} Statistiken",
+        "specificsBadge": "aktiv",
+        "specificsEmpty": "Für die gewählten Statistiken gibt es keine weiteren Aufschlüsselungen.",
+        "showAll": "alle anzeigen",
+        "showLess": "weniger anzeigen"
+      },
       "infoText": "Hinweis: Bei vielen Gebieten wird zunächst nur ein Teil im Diagramm gezeigt. Über das untere Feld lassen sich weitere Gebiete hinzufügen.",
       "infoTextNoData": "Es wurden noch keine oder nicht alle notwendigen Filter hinzugefügt. Um statistische Daten in Tabellen und Diagrammen anzeigen zu lassen, müssen die Daten erst gefiltert werden.",
+      "loadingData": "Daten werden geladen ...",
+      "loadingError": "Das Statistik-Dashboard konnte nicht geladen werden. Bitte versuchen Sie es später erneut.",
+      "infoTextFilter": "Bitte wählen Sie alle Filter aus, um die Statistikdaten anzuzeigen.",
       "button": {
         "difference": "Differenz",
         "table": "Tabelle",
         "chart": "Diagramm",
+        "closeFilter": "Schließen",
         "add": "Filter hinzufügen",
         "edit": "Filter ändern",
         "arrowLeft": "Nach links blättern",
         "arrowRight": "Nach rechts blättern",
         "reset": "Alle entfernen",
+        "resetFilter": "Zurücksetzen",
         "filter": "Filter",
         "showMore": "weitere anzeigen...",
         "showLess": "weniger anzeigen...",
-        "done": "Fertig",
-        "all": "Alle",
+        "allStatistics": "Alle statistischen Daten",
+        "allAreas": "Alle Gebiete",
+        "selectAllAreas": "Alle Gebiete auswählen",
         "statistics": "Statistiken",
         "geographical": "Geografische Filter",
         "timeBased": "Zeitbezogene Filter"
@@ -1354,7 +1392,14 @@
         "districts": "Kreise",
         "more": "mehr",
         "time": "Zeitbezogene Filter",
-        "geographical": "Geografische Filter"
+        "geographical": "Geografische Filter",
+        "differenceMode": "Differenzmodus: ",
+        "area_one": "Gebiet",
+        "area_other": "Gebiete",
+        "year_one": "Jahr",
+        "year_other": "Jahre",
+        "statistic_one": "Statistik",
+        "statistic_other": "Statistiken"
       },
       "filterInputs": {
         "additional": "Sonstiges"
@@ -1368,7 +1413,13 @@
         "tagLabel": "Referenz",
         "year": "Referenzjahr {{value}}",
         "region": "Referenzgebiet {{value}}",
-        "difference": "Differenz"
+        "difference": "Differenz",
+        "active": "Differenzmodus aktiv"
+      },
+      "tabs": {
+        "table": "Tabelle",
+        "diagram": "Diagramm",
+        "map": "Karte"
       },
       "legend": {
         "under": "unter",
@@ -1376,10 +1427,13 @@
         "from": "Ab",
         "nodata": "Die Visualisierung der Daten von mehreren Statistiken auf der Karte steht nicht zur Verfügung.",
         "legend": "Kartenlegende",
-        "edit": "Bearbeiten",
+        "additionalInformation": "Zusätzliche Karteninformationen",
+        "numberOfClasses": "Anzahl der Klassen: {{count}}",
+        "showTooltips": "Tooltips auf der Karte anzeigen",
+        "showLabels": "Gebietsnamen, Jahr und Wert anzeigen",
         "editClassification": "Klasseneinteilung bearbeiten",
+        "edit": "Bearbeiten",
         "classification": "Klassifikation",
-        "numberOfClasses": "Anzahl der Klassen",
         "colorPalette": "Farbpalette",
         "betweenValues": "bis unter",
         "opacity": "Deckkraft",
@@ -1397,7 +1451,9 @@
       "totalHint": "Achtung: Die Summenfunktion unterscheidet nicht zwischen absoluten Zahlen, Prozenten, Mittelwerten oder relativen Größen (z.B. Einwohner pro Quadratmeter). Die Summen sind daher nicht immer interpretierbar. Bitte im Kontext der ausgewählten Statistik beachten. Fehlende Werte werden bei der Berechnung nicht berücksichtigt.",
       "filterHint": "Alle Felder müssen vollständig ausgefüllt sein, um die Filterergebnisse anzuzeigen.",
       "backToOverview": "Diagrammübersicht",
-      "backToStatisticDashboard": "Zurück zur Übersicht"
+      "downloadDiagram": "Diagramm herunterladen",
+      "backToStatisticDashboard": "Zurück zur Übersicht",
+      "carouselStatistics": "Statistik {{index}} von {{total}}"
     },
     "shadow": {
       "name": "Schatten",
@@ -1550,7 +1606,7 @@
       "timeSlider": {
         "buttons": {
           "backward": "Einen Zeitpunkt zurück",
-          "deactivateLayerSwiper": "Layer entfernen",
+          "deactivateLayerSwiper": "Vergleichen beenden",
           "forward": "Einen Zeitpunkt voran",
           "layerSwiper": "Zeitpunkte vergleichen",
           "play": "Ein automatisches Abspielen aller Zeitpunkte, ausgehend vom aktuell ausgewählten Zeitpunkt"
@@ -1605,12 +1661,39 @@
         }
       },
       "draw": {
+        "attributeSelect": {
+          "attributeDuplicatedKeyError": "Der Attribut-Schlüssel existiert bereits.",
+          "attributeKeyError": "Bitte einen Schlüssel für das Attribut angeben.",
+          "attributeValueError": "Bitte einen Wert für das Attribut angeben.",
+          "add": "Attribut hinzufügen",
+          "accept": "Übernehmen",
+          "remove": "Attribut löschen",
+          "clickHint": "Klicken Sie auf eine Zeichnung, um dessen Attribute zu bearbeiten.",
+          "noFeatureSelected": "Keine Zeichnung ausgewählt. Bitte wählen Sie eine Zeichnung aus.",
+          "input": {
+            "key": "Attributschlüssel",
+            "value": "Attributwert",
+            "newKey": "Neuer Schlüssel",
+            "newValue": "Neuer Wert"
+          }
+        },
         "drawEdit": {
           "delete": "Geometrie / Text löschen",
           "deleteAll": "Alles löschen",
           "modify": "Geometrie / Text bearbeiten",
+          "editAttributes": "Attribute erstellen und bearbeiten",
+          "hide": "Zeichnung ausblenden",
+          "download": "Herunterladen",
           "redo": "Wiederholen",
-          "undo": "Rückgängig machen"
+          "undo": "Rückgängig machen",
+          "chooseFeature": "Wählen Sie eine Geometrie oder einen Text zum Bearbeiten aus.",
+          "textAccept": "Übernehmen",
+          "textLabel": "Text",
+          "textPlaceholder": "Text eingeben"
+        },
+        "drawEditStyle": {
+          "iconScale": "Symbolgröße",
+          "pointSize": "Punktgröße"
         },
         "drawLayout": {
           "fillColor": "Füllfarbe",
@@ -1619,7 +1702,11 @@
           "outerCircle": "Äußerer Kreis:",
           "strokeColor": "Umrissfarbe",
           "strokeWidth": "Strichstärke",
-          "extrudedHeight": "Extrudierte Höhe"
+          "extrudedHeight": "Extrudierte Höhe",
+          "height": "Höhe",
+          "width": "Breite",
+          "area": "Fläche",
+          "length": "Länge"
         },
         "drawSettingsCircle": {
           "interactive": "Interaktiv",
@@ -1628,6 +1715,7 @@
             "outerRadius": "Äußerer Radius",
             "radius": "Radius"
           },
+          "radiusValidation" : "Der äußere Radius sollte größer sein als der innere Radius.",
           "settings": {
             "circle": "Einstellungen Kreis:",
             "doubleCircle": "Einstellungen Doppelkreis:"
@@ -1644,8 +1732,28 @@
           "point": "Punkt",
           "polygon": "Fläche",
           "rectangle": "Rechteck",
-          "symbols": "Symbole"
+          "symbols": "Symbole",
+          "writeText": "Text",
+          "square": "Quadrat"
+        },
+        "writeTextOptions": {
+          "font": "Schriftart",
+          "fontSize": "Schriftgröße"
+        },
+        "download": {
+          "geometryTypeNotSupported": "Polygon, Box, Quadrat und Kreis können im GPX-Format nicht heruntergeladen werden. Bitte wählen Sie ein anderes Format.",
+          "symbolsNotFullySupportedGPX": "Hinweis: Symbole werden im GPX-Format ohne ihre Darstellung (Icon, Farbe) exportiert.",
+          "enterFilename": "Bitte Dateiname angeben",
+          "filename": "Dateiname",
+          "format": "Format",
+          "headline": "Herunterladen",
+          "pleaseChoose": "Bitte Auswählen",
+          "saveDrawing": "Zeichnung speichern"
         }
+      },
+      "dropdown": {
+        "more": "(+{{count}} weitere)",
+        "selectAll": "Alle auswählen"
       },
       "graphicalSelect": {
         "alert": {

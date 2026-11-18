@@ -1,5 +1,6 @@
 /**
  * uses the given geometryType to select the matching entry of drawTypeOptions
+ * @deprecated in 3.39.0 (November 2027)
  * @param {String} geometryType the type of the geometry (e.g. "Point", "LineString", ...)
  * @param {Object[]} drawTypeOptions an array of object{geometry, ...} holding all possibilities
  * @returns {Object} the first drawTypeOption with a matching value for geometryType

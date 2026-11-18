@@ -1,6 +1,7 @@
 import {requestGfi} from "@shared/js/api/wmsGetFeatureInfo.js";
 import {interpretLinebreaks} from "./interpretLinebreaks.js";
 import {GeoJSON} from "ol/format.js";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 /**
  * returns a list of wms features for the given url and mimeType
@@ -17,10 +18,10 @@ import {GeoJSON} from "ol/format.js";
  * @param {Object} [windowState] Shared state to control popup opening per click.
  * @param {Boolean} [windowState.opened] Flag whether a popup was already opened for the current click.
  * @param {Object} [forcedGfiAsNewWindow] If given, used instead of layer.get("gfiAsNewWindow") - lets several layers of one click share the same popup config without mutating any layer.
- * @param {Function} [openWindow=window.open] Function used to open a popup window - injectable for testing.
+ * @param {Function} [openWindow=openSecuredPopup] Function used to open a popup window - injectable for testing.
  * @returns {Object[]}  a list of object{getTheme, getTitle, getAttributesToShow, getProperties, getGfiUrl} or an emtpy array
  */
-export function getWmsFeaturesByMimeType (layer, url, windowState = null, forcedGfiAsNewWindow = undefined, openWindow = window.open) {
+export function getWmsFeaturesByMimeType (layer, url, windowState = null, forcedGfiAsNewWindow = undefined, openWindow = openSecuredPopup) {
     const infoFormat = layer.get("infoFormat"),
         gfiAsNewWindow = forcedGfiAsNewWindow !== undefined ? forcedGfiAsNewWindow : layer.get("gfiAsNewWindow");
 

@@ -13,9 +13,11 @@
         "@modules/*": ["src/modules/*"],
         "@plugins/*": ["src/plugins/*"],
         "@devtools/*": ["devtools/*"],
-        "@masterportal/masterportalapi/*": ["node_modules/@masterportal/masterportalapi/*"]
+        "@masterportal/masterportalapi/*": ["node_modules/@masterportal/masterportalapi/*"],
+        // vuex 4.x "exports" lacks a "types" entry, so types don't resolve; remove once fixed upstream
+        "vuex": ["node_modules/vuex/types/index.d.ts"]
       }
     },
-    "exclude": ["node_modules", "dist"]
+    "exclude": ["**/node_modules", "dist", "jsdoc", "portalconfigs"]
   }
   

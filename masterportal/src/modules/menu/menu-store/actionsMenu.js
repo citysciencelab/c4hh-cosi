@@ -1,4 +1,5 @@
 import {nextTick} from "vue";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 import changeCase from "@shared/js/utils/changeCase.js";
 import {getPiniaModuleStore, isPiniaModule} from "../../modules-store/piniaModules.js";
 
@@ -55,10 +56,39 @@ export default {
 
         if (currentType !== type || currentType === "folder" && type === "folder" || currentType === "layerSelection" && type === "layerSelection") {
             commit("setCurrentComponent", {type, side, props});
+            dispatch("handleModulesConfiguredMultipleTimes", {type, props});
             dispatch("changeCurrentMouseMapInteractionsComponent", {type, side});
         }
         else if (props?.name !== currentProps?.name) {
             commit("setCurrentComponentProps", {side, props});
+        }
+    },
+
+    /**
+     * If there is more than one module of same type with different names, the configuration of the current active module is set to modules state.
+     * @param {Object} param store context
+     * @param {Object} param.rootGetters the rootGetters
+     * @param {Object} param.rootState the root state
+     * @param {String} type The component type.
+     * @param {String} props The props of the current component.
+     * @returns {void}
+     */
+    handleModulesConfiguredMultipleTimes ({rootGetters, rootState}, {type, props}) {
+        const modulesWithThisType = rootGetters.configuredModules.filter(module => module.type === type);
+
+        if (rootState.Modules[changeCase.upperFirst(type)] && modulesWithThisType.length > 1) {
+            const uniqueNames = new Set(modulesWithThisType.map(module => module.name));
+
+            if (uniqueNames.size === modulesWithThisType.length) {
+                const moduleConfig = rootGetters.configuredModules.find(module => module.type === type && module.name === props.name);
+                const newState = Object.assign({}, rootState.Modules[changeCase.upperFirst(type)], moduleConfig);
+
+                newState.name = props.name;
+                if (props.description) {
+                    newState.description = props.description;
+                }
+                rootState.Modules[changeCase.upperFirst(type)] = newState;
+            }
         }
     },
 
@@ -125,7 +155,7 @@ export default {
         if (type) {
             if (type === "customMenuElement") {
                 if (properties.openURL !== undefined) {
-                    window.open(properties.openURL);
+                    openSecuredPopup(properties.openURL, "_blank");
                 }
                 if (properties.execute !== undefined) {
                     dispatch(properties.execute.action, properties.execute.payload, {root: true});

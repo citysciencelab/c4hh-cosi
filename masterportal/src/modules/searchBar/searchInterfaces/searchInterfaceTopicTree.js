@@ -13,9 +13,10 @@ import layerTypes from "@core/layers/js/layerTypes.js";
  * @param {string[]} [resultEvents.onClick=["activateLayerInTopicTree"]] Actions that are fired when clicking on a result list item.
  * @param {string} [searchInterfaceId="topicTree"] The id of the service interface.
  * @param {string} [searchType=""] Decides whether the metadata or the name of a layer should be searched. Possible value: "metadata". If empty, name will be searched.
+ * @param {boolean} [foldersFirst=false] If set to true the searchresult category folder is listed before the category layer
  * @returns {void}
  */
-export default function SearchInterfaceTopicTree ({hitTemplate, resultEvents, searchInterfaceId, searchType, toolTip} = {}) {
+export default function SearchInterfaceTopicTree ({hitTemplate, resultEvents, searchInterfaceId, searchType, toolTip, foldersFirst = false} = {}) {
     const resultEventsDefault = {
             onClick: ["activateLayerInTopicTree"],
             buttons: ["showInTree", "showLayerInfo"]
@@ -33,6 +34,7 @@ export default function SearchInterfaceTopicTree ({hitTemplate, resultEvents, se
 
     this.searchType = searchType || "";
     this.toolTip = toolTip;
+    this.foldersFirst = foldersFirst;
 }
 
 SearchInterfaceTopicTree.prototype = Object.create(SearchInterface.prototype);
@@ -47,9 +49,10 @@ SearchInterfaceTopicTree.prototype.search = async function (searchInput) {
     this.searchState = "running";
     const searchInputRegExp = this.createRegExp(searchInput.trim()),
         foundLayers = this.searchInLayers(store.getters.allLayerConfigs, searchInputRegExp),
-        foundFolders = this.searchInFolders(store.getters.layerConfig, searchInputRegExp);
+        foundFolders = this.searchInFolders(store.getters.layerConfig, searchInputRegExp),
+        results = this.foldersFirst ? foundFolders.concat(foundLayers) : foundLayers.concat(foundFolders);
 
-    this.pushHitsToSearchResults(foundLayers.concat(foundFolders));
+    this.pushHitsToSearchResults(results);
 
     this.searchState = "finished";
     return this.searchResults;

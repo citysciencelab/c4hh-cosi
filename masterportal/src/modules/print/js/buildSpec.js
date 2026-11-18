@@ -22,7 +22,8 @@ import createStyle from "@masterportal/masterportalapi/src/vectorStyle/createSty
 import {getRulesForFeature} from "@masterportal/masterportalapi/src/vectorStyle/lib/getRuleForIndex.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import {uniqueId} from "@shared/js/utils/uniqueId.js";
-import {buildHeatmapPng} from "../utils/buildHeatmapPng.js";
+import {buildHeatmapPng} from "./buildHeatmapPng.js";
+import {buildWmtsImage} from "./buildWmtsImage.js";
 
 const BuildSpecModel = {
     defaults: {
@@ -267,7 +268,7 @@ const BuildSpecModel = {
                     returnLayer = this.buildTileWms(layer, dpi);
                 }
                 else if (source?.getLayer) {
-                    returnLayer = this.buildWmts(layer, source);
+                    returnLayer = await this.buildWmts(layer, source);
                 }
             }
             else if (layer instanceof WebGlTileLayer && source instanceof GeoTiffSource) {
@@ -321,12 +322,53 @@ const BuildSpecModel = {
     },
     /**
      * Builds the information needed for MapFish to print the given WMTS Layer.
+     * If the layer's projection does not match the map's projection, MapFish's native WMTS layer
+     * type cannot be used (it forwards the tile grid's own corner coordinates verbatim and does
+     * not reproject them), so a reprojected raster image is rendered instead via buildWmtsImage().
+     * Returns undefined (and warns, unless printing in 3D) if that also fails, or if the source
+     * is missing the "matrixSizes"/"scales" data MapFish needs for the native WMTS type.
+     * The layer opacity is already applied to this raster image, so the returned image layer uses
+     * an opacity of 1 to avoid applying it twice.
      *
      * @param {ol.layer.Tile} layer The WMTS Layer.
      * @param {ol.source.WMTS} source The source of the WMTS Layer.
-     * @returns {Object} Information about the WMTS Layer.
+     * @returns {Promise<Object>} Information about the WMTS Layer.
      */
-    buildWmts: (layer, source) => {
+    buildWmts: async function (layer, source) {
+        const is3d = store.state.Modules.Print.is3d,
+            sourceProjection = source.getProjection(),
+            mapProjection = store.getters["Maps/projection"];
+
+        if (sourceProjection && mapProjection && sourceProjection.getCode() !== mapProjection.getCode()) {
+            if (is3d) {
+                return undefined;
+            }
+
+            const extent = this.lastPrintedExtent || store.getters["Maps/extent"],
+                image = await buildWmtsImage(layer, source, extent, mapProjection);
+
+            if (image) {
+                return {
+                    type: "image",
+                    name: layer.get("name"),
+                    opacity: 1,
+                    imageFormat: "image/png",
+                    baseURL: image.baseURL,
+                    extent: image.extent
+                };
+            }
+
+            console.warn(`Printing the WMTS layer “${layer.get("name")}” is not supported because its projection (${sourceProjection.getCode()}) does not match the map projection (${mapProjection.getCode()}), and rendering as a raster image failed. The layer will be ignored.`);
+            return undefined;
+        }
+
+        if (!Array.isArray(source.matrixSizes) || !Array.isArray(source.scales) || source.matrixSizes.length === 0 || source.scales.length === 0) {
+            if (!is3d) {
+                console.warn(`Printing the WMTS layer “${layer.get("name")}” is not supported because the "matrixSizes"/"scales" information is missing. The layer will be ignored.`);
+            }
+            return undefined;
+        }
+
         const matrices = [],
             tileGrid = source.getTileGrid(),
             matrixIds = tileGrid.getMatrixIds(),
@@ -334,13 +376,16 @@ const BuildSpecModel = {
         let baseURL = source.getUrls()[0];
 
         for (let i = 0; i < matrixIds.length; i++) {
+            const topLeftCorner = origin_ ? origin_ : origins_[i],
+                tileSize = tileSize_ ? tileSize_ : tileSizes_[i];
+
             // The parameters "matrixSizes" and "scales" are not standard for a WMTS source and are added in the process of parsing the information of the layer
             matrices.push({
-                identifier: matrixIds[i],
-                matrixSize: source.matrixSizes[i],
-                topLeftCorner: origin_ ? origin_ : origins_[i],
-                scaleDenominator: source.scales[i],
-                tileSize: tileSize_ ? [tileSize_, tileSize_] : [tileSizes_[i], tileSizes_[i]]
+                identifier: String(matrixIds[i]),
+                matrixSize: source.matrixSizes[i].map(Number),
+                topLeftCorner: topLeftCorner.map(Number),
+                scaleDenominator: Number(source.scales[i]),
+                tileSize: [Number(tileSize), Number(tileSize)]
             });
         }
 
@@ -575,7 +620,7 @@ const BuildSpecModel = {
      * @param {ol.feature[]} features Array of features.
      * @param {Object[]} geojsonList Array of geojsons.
      * @param {ol.extent} extent  Extent uses to filter the feature by extent.
-     * @returns {Object} - style for mapfish print.
+     * @returns {Object|undefined} - style for mapfish print.
      */
     buildStyle: function (layer, features, geojsonList, extent) {
         const mapfishStyleObject = {
@@ -716,6 +761,10 @@ const BuildSpecModel = {
                 }
             });
         });
+        if (Object.keys(mapfishStyleObject).length < 2) {
+            // if no style rule is set, mapfish expects no style object at all to be set (instead of an object without rules)
+            return undefined;
+        }
         return mapfishStyleObject;
     },
     /**
@@ -734,8 +783,11 @@ const BuildSpecModel = {
                 styles = feature.getStyleFunction().call(this, feature);
             }
         }
-        else {
+        else if (typeof layer.getStyleFunction() === "function") {
             styles = layer.getStyleFunction().call(layer, feature);
+        }
+        else {
+            styles = [];
         }
 
         return !Array.isArray(styles) ? [styles] : styles;

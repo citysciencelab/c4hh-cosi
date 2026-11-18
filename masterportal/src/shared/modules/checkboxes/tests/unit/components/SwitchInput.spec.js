@@ -24,6 +24,16 @@ describe("src/shared/modules/checkboxes/components/SwitchInput.vue", () => {
         expect(input.exists()).to.be.true;
         expect(input.classes()).to.eql(["form-check-input"]);
         expect(input.attributes("aria-label")).to.equal(aria);
+        expect(wrapper.find("label").exists()).to.be.true;
+    });
+
+    it("should not render the built-in label when omitLabel is true", () => {
+        const wrapper = mount(SwitchInput, {
+            props: {id: "custom-label-switch", label: "Built-in label", aria: "Switch description", omitLabel: true}
+        });
+
+        expect(wrapper.find("input").exists()).to.be.true;
+        expect(wrapper.find("label").exists()).to.be.false;
     });
 
     it("should render a switch and trigger the given interaction on click", async () => {

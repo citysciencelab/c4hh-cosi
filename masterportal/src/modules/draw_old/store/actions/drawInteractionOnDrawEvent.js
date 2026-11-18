@@ -7,7 +7,7 @@ const errorBorder = "#E10019";
 /**
  * Creates a listener for the addfeature event of the source of the layer used for the Draw Tool.
  * NOTE: Should the zIndex only be counted up if the feature gets actually drawn?
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {String} drawInteraction Either an empty String or "Two" to identify for which drawInteraction this is used.
  * @returns {void}
@@ -34,6 +34,7 @@ export function drawInteractionOnDrawEvent ({state, commit, dispatch}, drawInter
 
 /**
  * Handles the draw event.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Object} event drawInteraction event
  * @returns {void}
@@ -152,6 +153,7 @@ export function handleDrawEvent ({state, commit, dispatch, rootState}, event) {
 
 /**
  * Returns a function to style feature.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} styleSettings settings for style
  * @param {Boolean} isOuterCircle if true, style is for isOuterCircle
  * @returns {Function} a function to style feature

@@ -1,5 +1,6 @@
 /**
  * Sets the length of the current drawType.
+ * @deprecated in 3.39.0 (November 2027)
  * @info the internal representation of length is always in meters
  * @param {Object} context actions context object.
  * @param {Number} length the length in meters
@@ -15,6 +16,7 @@ function setLength ({getters, commit}, length) {
 
 /**
  * Sets the area of the current drawType.
+ * @deprecated in 3.39.0 (November 2027)
  * @info the internal representation of area is always in meters
  * @param {Object} context actions context object.
  * @param {Number} area the area of the geometry in meters
@@ -30,6 +32,7 @@ function setArea ({getters, commit}, area) {
 
 /**
  * Sets the area of the current drawType.
+ * @deprecated in 3.39.0 (November 2027)
  * @info the internal representation of squareArea is always in meters
  * @param {Object} context actions context object.
  * @param {Number} area the area of the square in meters
@@ -45,6 +48,7 @@ function setSquareArea ({getters, commit}, area) {
 
 /**
  * Sets the method for drawing a square of the current drawType.
+ * @deprecated in 3.39.0 (November 2027)
  *
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the squareMethod.
@@ -61,6 +65,7 @@ function setSquareMethod ({getters, commit}, {target}) {
 }
 /**
  * sets the styleSettings for the current drawType
+ * @deprecated in 3.39.0 (November 2027)
  *
  * @param {Object} context the dipendencies
  * @param {Object} styleSettings the style to set
@@ -74,6 +79,7 @@ function setStyleSettings ({getters, commit}, styleSettings) {
 }
 /**
  * Starts the interactions when the tool becomes visible.
+ * @deprecated in 3.39.0 (November 2027)
  *
  * @param {Object} context actions context object.
  * @returns {void}
@@ -93,6 +99,7 @@ async function startInteractions ({state, commit, dispatch, rootState}) {
 }
 /**
  * Sets the inner radius for the circle of the current drawType.
+ * @deprecated in 3.39.0 (November 2027)
  * @info the internal representation of circleRadius is always in meters
  * @param {Object} context actions context object.
  * @param {Number} radius the radius of the inner circle in meters
@@ -108,6 +115,7 @@ function setCircleRadius ({getters, commit, dispatch}, radius) {
 }
 /**
  * Sets the method for drawing a circle of the current drawType.
+ * @deprecated in 3.39.0 (November 2027)
  *
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the circleMethod.
@@ -124,6 +132,7 @@ function setCircleMethod ({getters, commit}, {target}) {
 }
 /**
  * Sets the outer radius for the circle of the current drawType.
+ * @deprecated in 3.39.0 (November 2027)
  * @info the internal representation of circleOuterRadius is always in meters
  * @param {Object} context actions context object.
  * @param {Number} radius the radius of the inner circle in meters
@@ -139,7 +148,7 @@ function setCircleOuterRadius ({getters, commit, dispatch}, radius) {
 }
 /**
  * Sets the color of the current drawType.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the color.
  * @param {HTMLSelectElement} event.target The HTML select element for the color.
@@ -162,6 +171,7 @@ function setColor ({getters, commit, dispatch}, {target}) {
 }
 /**
  * Sets the color of the contours of the current drawType.
+ * @deprecated in 3.39.0 (November 2027)
  *
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the colorContour.
@@ -185,7 +195,7 @@ function setColorContour ({getters, commit, dispatch}, {target}) {
 }
 /**
  * Sets the outer color of the contours of the drawType drawDoubleCircle.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the colorContour.
  * @param {HTMLSelectElement} event.target The HTML select element for the colorContour.
@@ -208,7 +218,7 @@ function setOuterColorContour ({getters, commit, dispatch}, {target}) {
 }
 /**
  * Adds another symbol if it doesn't exist already.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Object} symbol The icon to add.
  * @returns {void}
@@ -224,7 +234,7 @@ function addSymbolIfNotExists ({state, commit}, symbol) {
 /**
  * Sets the drawType and triggers other methods to add the new interactions
  * to the map and remove the old one.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the drawType.
  * @param {HTMLSelectElement} event.target The HTML select element for the drawTypes.
@@ -240,7 +250,7 @@ function setDrawType ({commit, dispatch}, {target}) {
 }
 /**
  * Sets the font for the text of the current drawType.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the font.
  * @param {HTMLSelectElement} event.target The HTML select element for the font.
@@ -257,7 +267,7 @@ function setFont ({getters, commit, dispatch}, {target}) {
 }
 /**
  * Sets the font size for the text of the current drawType.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the fontSize.
  * @param {HTMLSelectElement} event.target The HTML select element for the fontSize.
@@ -274,7 +284,7 @@ function setFontSize ({getters, commit, dispatch}, {target}) {
 }
 /**
  * Sets the opacity of the current drawType.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the opacity.
  * @param {HTMLSelectElement} event.target The HTML select element for the opacity.
@@ -292,7 +302,7 @@ function setOpacity ({getters, commit, dispatch}, {target}) {
 }
 /**
  * Sets the opacity for the contours of the current drawType.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the opacityContour.
  * @param {HTMLSelectElement} event.target The HTML select element for the opacityContour.
@@ -310,7 +320,7 @@ function setOpacityContour ({getters, commit, dispatch}, {target}) {
 }
 /**
  * Sets the size of the point.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the pointSize.
  * @param {HTMLSelectElement} event.target The HTML select element for the pointSize.
@@ -324,7 +334,7 @@ function setPointSize ({commit, dispatch}, {target}) {
 }
 /**
  * Sets the strokwidth of the current drawType.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the strokewidth.
  * @param {HTMLSelectElement} event.target The HTML select element for the strokewidth.
@@ -341,7 +351,7 @@ function setStrokeWidth ({getters, commit, dispatch}, {target}) {
 }
 /**
  * Sets the symbol.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the symbol.
  * @param {HTMLSelectElement} event.target The HTML select element for the symbol.
@@ -357,6 +367,7 @@ function setSymbol ({state, commit, dispatch}, {target}) {
 }
 /**
  * Sets the text of the current drawType.
+ * @deprecated in 3.39.0 (November 2027)
  * Supports both direct string values via v-model and legacy event-based values.
  *
  * @param {Object} context actions context object.
@@ -381,6 +392,7 @@ function setText ({getters, commit, dispatch}, payload) {
 }
 /**
  * Sets the unit for the radius of the circle of the current drawType.
+ * @deprecated in 3.39.0 (November 2027)
  *
  * @param {Object} context actions context object.
  * @param {Event} event event fired by changing the input for the unit.

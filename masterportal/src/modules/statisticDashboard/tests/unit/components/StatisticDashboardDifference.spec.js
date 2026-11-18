@@ -3,9 +3,7 @@ import {expect} from "chai";
 import {createStore} from "vuex";
 import StatisticDashboardDifference from "@modules/statisticDashboard/components/StatisticDashboardDifference.vue";
 import indexStatisticDashboard from "@modules/statisticDashboard/store/indexStatisticDashboard.js";
-import Multiselect from "vue-multiselect";
-import {rawLayerList} from "@masterportal/masterportalapi/src/index.js";
-import getOAFFeature from "@shared/js/api/oaf/getOAFFeature.js";
+import DropdownAutocomplete from "@shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import sinon from "sinon";
 
 
@@ -43,7 +41,7 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardDifferenc
 
 
     describe("Component DOM", () => {
-        it("The title should exist", () => {
+        it("does not render a separate title", () => {
             const wrapper = shallowMount(StatisticDashboardDifference, {
                 propsData: propsData,
                 global: {
@@ -51,10 +49,10 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardDifferenc
                 }
             });
 
-            expect(wrapper.find("h4").exists()).to.be.true;
+            expect(wrapper.find("h4").exists()).to.be.false;
         });
 
-        it("should find switcher component", () => {
+        it("The date selection dropdown should exist", () => {
             const wrapper = shallowMount(StatisticDashboardDifference, {
                 propsData: propsData,
                 global: {
@@ -62,29 +60,7 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardDifferenc
                 }
             });
 
-            expect(wrapper.findComponent({name: "ButtonGroup"}).exists()).to.be.true;
-        });
-
-        it("The component multiselect should exist", () => {
-            const wrapper = shallowMount(StatisticDashboardDifference, {
-                propsData: propsData,
-                global: {
-                    plugins: [store]
-                }
-            });
-
-            expect(wrapper.findComponent(Multiselect).exists()).to.be.true;
-        });
-
-        it("should find a des element", () => {
-            const wrapper = shallowMount(StatisticDashboardDifference, {
-                propsData: propsData,
-                global: {
-                    plugins: [store]
-                }
-            });
-
-            expect(wrapper.find(".des").exists()).to.be.true;
+            expect(wrapper.findComponent(DropdownAutocomplete).exists()).to.be.true;
         });
     });
 
@@ -173,68 +149,6 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardDifferenc
                 wrapper.vm.selectedRegion = "Hamburg";
                 wrapper.vm.updateSelectedReferenceData("region");
                 expect(setSelectedReferenceDataStub.called).to.be.true;
-            });
-        });
-        describe("getRegionsOptionsForLastChild", () => {
-            it("should return an empty arry if flattenedRegions is empty", async () => {
-                const wrapper = shallowMount(StatisticDashboardDifference, {
-                    propsData: propsData,
-                    global: {
-                        plugins: [store]
-                    }
-                });
-
-                expect(await wrapper.vm.getRegionsOptionsForLastChild([])).to.be.an("array").that.is.empty;
-            });
-            it("should return the values of the last child if they are already present", async () => {
-                const wrapper = shallowMount(StatisticDashboardDifference, {
-                    propsData: propsData,
-                    global: {
-                        plugins: [store]
-                    }
-                });
-
-                sinon.stub(rawLayerList, "getLayerWhere");
-                await wrapper.vm.$nextTick();
-                expect(await wrapper.vm.getRegionsOptionsForLastChild([{values: ["foo"]}])).to.deep.equal(["foo"]);
-            });
-            it("should return an empty array if no layer is found", async () => {
-                const wrapper = shallowMount(StatisticDashboardDifference, {
-                    propsData: propsData,
-                    global: {
-                        plugins: [store]
-                    }
-                });
-
-                sinon.stub(rawLayerList, "getLayerWhere").returns(undefined);
-                await wrapper.vm.$nextTick();
-                expect(await wrapper.vm.getRegionsOptionsForLastChild([{}])).to.be.an("array").that.is.empty;
-            });
-            it("should return an empty array if no unique object for the last child is given", async () => {
-                const wrapper = shallowMount(StatisticDashboardDifference, {
-                    propsData: propsData,
-                    global: {
-                        plugins: [store]
-                    }
-                });
-
-                sinon.stub(rawLayerList, "getLayerWhere").returns({});
-                sinon.stub(getOAFFeature, "getUniqueValuesByScheme").resolves({});
-                await wrapper.vm.$nextTick();
-                expect(await wrapper.vm.getRegionsOptionsForLastChild([{}, {attrName: "foo"}])).to.be.an("array").that.is.empty;
-            });
-            it("should return the unique values for the last child", async () => {
-                const wrapper = shallowMount(StatisticDashboardDifference, {
-                    propsData: propsData,
-                    global: {
-                        plugins: [store]
-                    }
-                });
-
-                sinon.stub(rawLayerList, "getLayerWhere").returns({});
-                sinon.stub(getOAFFeature, "getUniqueValuesByScheme").resolves({foo: {bar: true, fob: true}});
-                await wrapper.vm.$nextTick();
-                expect(await wrapper.vm.getRegionsOptionsForLastChild([{}, {attrName: "foo"}])).to.deep.equal(["bar", "fob"]);
             });
         });
     });

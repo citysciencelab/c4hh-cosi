@@ -5,7 +5,7 @@ const getters = {
     ...generateSimpleGetters(initialState),
     /**
      * Returns a clone of the current drawTypeSettings
-     *
+     * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state Current state object of the store.
      * @returns {Object} The cloned current drawTypeSettings
      */
@@ -16,7 +16,7 @@ const getters = {
     },
     /**
      * If no features are present or the filename or the format is not set, the download is disabled.
-     *
+     * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state state Current state object of the store.
      * @returns {Boolean} Whether to activate or deactivate the Download Button.
      */
@@ -27,6 +27,7 @@ const getters = {
     },
     /**
      * Provides state for urlParams, returns only type, name and icon.
+     * @deprecated in 3.39.0 (November 2027)
      * @param {Object} state state of the app-store.
      * @returns {Object} state for urlParams
      */

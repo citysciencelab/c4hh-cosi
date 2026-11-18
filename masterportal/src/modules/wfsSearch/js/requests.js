@@ -157,7 +157,10 @@ function searchFeatures (store, {literals, requestConfig: {gazetteer = null, lay
             if (gazetteer) {
                 return parseGazetteerResponse(data, gazetteer.namespaces, gazetteer.memberSuffix);
             }
-            return new WFS({version: storedQueryId ? "2.0.0" : "1.1.0"}).readFeatures(data);
+            return new WFS({version: storedQueryId ? "2.0.0" : "1.1.0"}).readFeatures(data, {
+                dataProjection: service.dataProjection || store.getters["Maps/projectionCode"],
+                featureProjection: store.getters["Maps/projectionCode"]
+            });
         });
 }
 

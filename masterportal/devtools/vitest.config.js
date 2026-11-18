@@ -55,6 +55,7 @@ export default defineConfig(mode => mergeConfig(
                 "devtools/**/*.spec.js"
             ],
             exclude: [
+                "addons/cosi/**/*.spec.js",
                 // an G31: https://lgv-hamburg.atlassian.net/browse/G31DEV1-3566
                 "**/FilterGeneral.spec.js",
                 // defaults from vitest:
@@ -68,7 +69,7 @@ export default defineConfig(mode => mergeConfig(
             server: {
                 deps: {
                     // Vite will process inlined modules. This could be helpful to handle packages that ship .js in ESM format (that Node can't handle).
-                    inline: [/ol[/\\]/, /olcs[/\\]/, /@geoblocks[/\\]/, /cesium[/\\]/, /@cesium[/\\]/],
+                    inline: [/ol[/\\]/, /olcs[/\\]/, /@geoblocks[/\\]/, /cesium[/\\]/, /@cesium[/\\]/, /vuetify[/\\]/],
                     // External packages that should not be bundled during testing
                     external: []
                 }

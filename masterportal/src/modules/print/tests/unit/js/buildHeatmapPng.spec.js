@@ -1,8 +1,8 @@
 import {expect} from "chai";
 import sinon from "sinon";
-import {isCanvasEmpty, getBase64FromWebGLCanvas} from "@modules/print/utils/buildHeatmapPng.js";
+import {isCanvasEmpty, getBase64FromWebGLCanvas} from "@modules/print/js/buildHeatmapPng.js";
 
-describe("src/modules/print/utils/buildHeatmapPng.js", function () {
+describe("src/modules/print/js/buildHeatmapPng.js", function () {
     describe("isCanvasEmpty", function () {
         it("should return true if all pixels are empty", function () {
             const canvas = {width: 2, height: 1},

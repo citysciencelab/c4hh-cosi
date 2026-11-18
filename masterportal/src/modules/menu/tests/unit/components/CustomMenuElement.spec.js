@@ -141,4 +141,22 @@ describe("src/modules/menu/components/CustomMenuElement.vue", () => {
 
         expect(wrapper.find(".custom-menu-element").exists()).to.be.false;
     });
+
+    it("sanitizes htmlContent to remove unwanted tags", () => {
+        const dangerousHtml = "<div onclick=\"alert('XSS')\"><span>Safe Content</span><script>alert(\"XSS\")</script></div>";
+
+        currentComponentProps.htmlContent = dangerousHtml;
+        wrapper = mount(CustomMenuElement, {
+            global: {
+                plugins: [store]
+            },
+            propsData: {side}
+        });
+
+        const contentDiv = wrapper.find(".custom-menu-element div div");
+
+        expect(wrapper.findAll("script").length).to.be.equals(0);
+        expect(contentDiv.element.hasAttribute("onclick")).to.be.false;
+        expect(wrapper.find("span").text()).to.be.equals("Safe Content");
+    });
 });

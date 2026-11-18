@@ -2,6 +2,7 @@
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {mapActions, mapGetters} from "vuex";
 import {translateKeyWithPlausibilityCheck} from "@shared/js/utils/translateKeyWithPlausibilityCheck.js";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 export default {
     name: "LoginComponent",
@@ -67,10 +68,10 @@ export default {
             let timer = null;
 
             const params = "width=500,height=500,status=no,location=no,menubar=no," +
-                      `top=${window.screenY + (window.outerHeight - 500) / 2.5},` +
-                      `left=${window.screenX + (window.outerWidth - 500) / 2}`,
+                `top=${window.screenY + (window.outerHeight - 500) / 2.5},` +
+                `left=${window.screenX + (window.outerWidth - 500) / 2}`;
 
-                  loginPopup = window.open(await this.getAuthCodeUrl(), this.translate("common:modules.login.login"), params);
+            const loginPopup = openSecuredPopup(await this.getAuthCodeUrl(), this.translate("common:modules.login.login"), params);
 
             timer = setInterval(() => {
                 if (loginPopup.closed) {

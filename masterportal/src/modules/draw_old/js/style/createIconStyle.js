@@ -2,7 +2,7 @@ import {Icon, Style} from "ol/style.js";
 
 /**
  * Creates and returns a feature style for points with an icon.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {String[]} color The color of the drawn feature represented as an array.
  * @param {String} imgPath path to images from rootState.wfsImgPath.
  * @param {Number} pointSize The size of the point.

@@ -11,6 +11,7 @@ import initializePiniaStore from "@shared/js/utils/initializePiniaStore.js";
  * The MenuContainerBody component is responsible for rendering the body of the menu, which includes the navigation, the currently visible component, and any feature information. It manages the state of the menu, including which component is currently displayed and which components should be cached using Vue's keep-alive feature. The component also initializes modules based on the menu configuration.
  * @module modules/MenuContainerBody
  * @vue-prop {String} side - The side in which the menu component is being rendered.
+ * @vue-data {String[]} asyncKeepAliveComponentNames - Names of loaded async components that implement the keep-alive hooks.
  * @vue-computed {Object} menu - The menu configuration for the given menu.
  * @vue-computed {Object} currentComponent - Returns the currently visible component.
  */
@@ -29,6 +30,11 @@ export default {
             default: "mainMenu",
             validator: value => value === "mainMenu" || value === "secondaryMenu"
         }
+    },
+    data () {
+        return {
+            asyncKeepAliveComponentNames: []
+        };
     },
     computed: {
         ...mapGetters("Menu", [
@@ -66,21 +72,17 @@ export default {
          * Modules that are to be cached using Vue's keep-alive feature must implement
          * the keep-alive-specific lifecycle hooks "activated()" and "deactivated()".
          * Only if both hooks are found, the component is cached via keep-alive.
-         * See documentation: docs/Dev/vueComponents/ToolCaching.md
+         * Async components only expose their hooks after loading, see registerAsyncKeepAliveComponent.
+         * See documentation: docs/Dev/vueComponents/ModuleCaching.md
          *
          * @returns {Array} Returns a list of component names for keep-alive
          */
         keepAliveComponents () {
-            const
-                keepAliveComponents = Object.keys(this.componentMap).filter((type) => {
-                    return typeof this.componentMap[type]?.activated === "function"
-                        && typeof this.componentMap[type]?.deactivated === "function";
-                }),
-                componentNames = keepAliveComponents.map(type => this.componentMap[type].name);
+            const componentNames = Object.values(this.componentMap)
+                .filter(component => this.hasKeepAliveHooks(component))
+                .map(component => component.name);
 
-            componentNames.push("MenuComponentKeepAlivePlaceholder");
-
-            return componentNames;
+            return [...componentNames, ...this.asyncKeepAliveComponentNames, "MenuComponentKeepAlivePlaceholder"];
         },
         /**
          * The Vue keep-alive feature only works if a component is always included.
@@ -95,6 +97,14 @@ export default {
             }
 
             return this.currentComponent;
+        }
+    },
+    watch: {
+        currentComponent: {
+            handler (component) {
+                this.registerAsyncKeepAliveComponent(component);
+            },
+            immediate: true
         }
     },
     mounted () {
@@ -127,6 +137,39 @@ export default {
                     this.initializeModule({configPaths: [path], type: module.type});
                 }
             });
+        },
+
+        /**
+         * Checks whether a component implements the keep-alive hooks "activated()" and "deactivated()".
+         * @param {Object} component The component.
+         * @returns {Boolean} True, if both hooks are implemented.
+         */
+        hasKeepAliveHooks (component) {
+            return typeof component?.activated === "function" && typeof component?.deactivated === "function";
+        },
+
+        /**
+         * Waits for an async component (defineAsyncComponent) to load and registers its name for keep-alive,
+         * if the loaded component implements the keep-alive hooks.
+         * The loader returns the same promise that is used for rendering, so no additional request is made.
+         * @param {Object|String} component The component or the name of a special component like "root".
+         * @returns {Promise<void>} Resolves when the component has been checked.
+         */
+        async registerAsyncKeepAliveComponent (component) {
+            if (typeof component?.__asyncLoader !== "function") {
+                return;
+            }
+
+            try {
+                const loadedComponent = await component.__asyncLoader();
+
+                if (this.hasKeepAliveHooks(loadedComponent) && !this.asyncKeepAliveComponentNames.includes(loadedComponent.name)) {
+                    this.asyncKeepAliveComponentNames.push(loadedComponent.name);
+                }
+            }
+            catch (error) {
+                console.warn("The async component could not be loaded for keep-alive.", error);
+            }
         }
     }
 };

@@ -24,9 +24,11 @@ async function getUniqueValues (layerId, attributesToFilter) {
         response = await getOAFFeature.getUniqueValuesByScheme(rawLayer?.url, rawLayer?.collection, attributesToFilter);
         return response;
     }
-    response = await this.fetchAllDataForWFS(rawLayer?.url, rawLayer?.featureType, attributesToFilter.join(","));
+    [response, attributesWithType] = await Promise.all([
+        this.fetchAllDataForWFS(rawLayer?.url, rawLayer?.featureType, attributesToFilter.join(",")),
+        this.getAttributesWithType(rawLayer?.url, attributesToFilter, rawLayer?.featureType)
+    ]);
     features = new WFS().readFeatures(response);
-    attributesWithType = await this.getAttributesWithType(rawLayer?.url, attributesToFilter, rawLayer?.featureType);
 
     return this.getUniqueValuesFromFeatures(features, attributesWithType);
 }

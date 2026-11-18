@@ -2,15 +2,15 @@ import {shallowMount} from "@vue/test-utils";
 import {expect} from "chai";
 import {createStore} from "vuex";
 import StatisticDashboardFilterRegions from "@modules/statisticDashboard/components/StatisticDashboardFilterRegions.vue";
+import indexStatisticDashboard from "@modules/statisticDashboard/store/indexStatisticDashboard.js";
 import {Multiselect} from "vue-multiselect";
 import sinon from "sinon";
 
 
 describe("src/modules/statiscticDashboard/components/StatisticDashboardFilterRegions.vue", () => {
     const factory = {
-        createVuexStore: (initialState) => {
+        createVuexStore: () => {
             return createStore({
-                namespaced: true,
                 modules: {
                     Maps: {
                         namespaced: true,
@@ -29,12 +29,8 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardFilterReg
                         namespaced: true,
                         modules: {
                             StatisticDashboard: {
-                                state: {
-                                    ...initialState
-                                },
-                                mutations: {
-                                    setSelectedRegions: sinon.stub()
-                                }
+                                ...indexStatisticDashboard,
+                                state: structuredClone(indexStatisticDashboard.state)
                             }
                         }
                     }
@@ -166,70 +162,37 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardFilterReg
                 expect(wrapper.vm.hasRegionChild({})).to.be.false;
             });
         });
-        describe.skip("regionsSorted", () => {
-            it("should return an empty array", () => {
-                const store = factory.createVuexStore(),
-                    wrapper = shallowMount(StatisticDashboardFilterRegions, {
-                        propsData: {
-                            regions: []
-                        },
-                        global: {
-                            plugins: [store]
-                        }
-                    });
+        describe("isAllSelected", () => {
+            const values = [
+                {value: "Schwerin", title: "Schwerin"},
+                {value: "Anklam", title: "Anklam"}
+            ];
+            let wrapper;
 
-                expect(wrapper.vm.getRegionsSorted()).to.be.an("array").that.is.empty;
+            beforeEach(() => {
+                wrapper = shallowMount(StatisticDashboardFilterRegions, {
+                    global: {
+                        plugins: [factory.createVuexStore()]
+                    }
+                });
             });
-            it("should return the array with all regions as given", () => {
-                const regions = [
-                        {value: ["Harburg", "Lübeck", "Schwerin"], label: "Alle Gebiete"},
-                        {value: "Harburg", label: "Harburg"},
-                        {value: "Lübeck", label: "Lübeck"},
-                        {value: "Schwerin", label: "Schwerin"}
-                    ],
-                    expectedRegions = [
-                        {label: "modules.statisticDashboard.button.all"},
-                        {value: ["Harburg", "Lübeck", "Schwerin"], label: "Alle Gebiete"},
-                        {value: "Harburg", label: "Harburg"},
-                        {value: "Lübeck", label: "Lübeck"},
-                        {value: "Schwerin", label: "Schwerin"}
-                    ],
-                    store = factory.createVuexStore(),
-                    wrapper = shallowMount(StatisticDashboardFilterRegions, {
-                        propsData: {
-                            regions: []
-                        },
-                        global: {
-                            plugins: [store]
-                        }
-                    });
 
-                expect(wrapper.vm.getRegionsSorted(regions, [])).to.deep.equal(expectedRegions);
+            it("should return false for invalid regions", () => {
+                [undefined, null, "", [], {}].forEach(value => {
+                    expect(wrapper.vm.isAllSelected(value)).to.be.false;
+                });
             });
-            it("should return the array with the selected entries at first", () => {
-                const regions = [
-                        {value: "Harburg", label: "Harburg"},
-                        {value: "Lübeck", label: "Lübeck"},
-                        {value: "Schwerin", label: "Schwerin"},
-                        {value: ["Harburg", "Lübeck", "Schwerin"], label: "Alle Gebiete"}
-                    ],
-                    store = factory.createVuexStore(),
-                    wrapper = shallowMount(StatisticDashboardFilterRegions, {
-                        propsData: {
-                            regions: []
-                        },
-                        global: {
-                            plugins: [store]
-                        }
-                    });
 
-                expect(wrapper.vm.getRegionsSorted(regions, [{value: ["Harburg", "Lübeck", "Schwerin"], label: "Alle Gebiete"}])).to.deep.equal([
-                    {value: ["Harburg", "Lübeck", "Schwerin"], label: "Alle Gebiete"},
-                    {label: "modules.statisticDashboard.button.all"},
-                    {value: "Harburg", label: "Harburg"},
-                    {value: "Lübeck", label: "Lübeck"},
-                    {value: "Schwerin", label: "Schwerin"}
-                ]);
+            it("should return false if the region has no values", () => {
+                expect(wrapper.vm.isAllSelected({values: [], selectedValues: []})).to.be.false;
+            });
+
+            it("should return false if not all values are selected", () => {
+                expect(wrapper.vm.isAllSelected({values, selectedValues: [values[0]]})).to.be.false;
+            });
+
+            it("should return true if all values are selected", () => {
+                expect(wrapper.vm.isAllSelected({values, selectedValues: [...values]})).to.be.true;
             });
         });
         describe.skip("setSelectedValuesToRegion", () => {
@@ -297,11 +260,11 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardFilterReg
                             plugins: [store]
                         }
                     }),
-                    selectedValues = [{label: "Mordor"}, {label: "Manhatten"}],
-                    values = [{label: "Mordor"}],
+                    selectedValues = [{title: "Mordor"}, {title: "Manhatten"}],
+                    values = [{title: "Mordor"}],
                     newSelectedValues = wrapper.vm.updatesRegionSelectedValues(selectedValues, values);
 
-                expect(newSelectedValues).to.deep.equal([{label: "Mordor"}]);
+                expect(newSelectedValues).to.deep.equal([{title: "Mordor"}]);
 
             });
 
@@ -315,11 +278,11 @@ describe("src/modules/statiscticDashboard/components/StatisticDashboardFilterReg
                             plugins: [store]
                         }
                     }),
-                    selectedValues = [{label: "Mordor"}, {label: "Manhatten"}],
-                    values = [{label: "Mordor"}, {label: "Manhatten"}, {label: "Wilhelmsburg"}],
+                    selectedValues = [{title: "Mordor"}, {title: "Manhatten"}],
+                    values = [{title: "Mordor"}, {title: "Manhatten"}, {title: "Wilhelmsburg"}],
                     newSelectedValues = wrapper.vm.updatesRegionSelectedValues(selectedValues, values);
 
-                expect(newSelectedValues).to.deep.equal([{label: "Mordor"}, {label: "Manhatten"}]);
+                expect(newSelectedValues).to.deep.equal([{title: "Mordor"}, {title: "Manhatten"}]);
             });
 
             it("should remove all selected values", () => {

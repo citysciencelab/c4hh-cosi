@@ -4,6 +4,7 @@ import createStyleModule from "./style/createStyle.js";
 
 /**
  * Creates a draw interaction to draw features on the map.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} state actions context object.
  * @param {Object} styleSettings the settings of the current style
  * @returns {module:ol/interaction/Draw} draw interaction
@@ -31,6 +32,7 @@ function createDrawInteraction (state, styleSettings, app) {
 }
 /**
  * Creates a modify interaction and returns it.
+ * @deprecated in 3.39.0 (November 2027)
  * @param  {module:ol/layer/Vector} layer The layer in which the features are drawn.
  * @returns {module:ol/interaction/Modify} The modify interaction.
  */
@@ -41,6 +43,7 @@ function createModifyInteraction (layer) {
 }
 /**
  * Creates a modifyAttributes interaction and returns it.
+ * @deprecated in 3.39.0 (November 2027)
  * @param  {module:ol/layer/Vector} layer The layer in which the features are drawn.
  * @returns {module:ol/interaction/Modify} The modify interaction.
  */
@@ -51,6 +54,7 @@ function createModifyAttributesInteraction (layer) {
 }
 /**
  * Creates a select interaction (for deleting features) and returns it.
+ * @deprecated in 3.39.0 (November 2027)
  * @param {module:ol/layer/Vector} layer The layer in which the features are drawn.
  * @param {Number} [hitTolerance=0] - Hit-detection tolerance. Pixels inside the radius around the given position will be checked for features.
  * @returns {module:ol/interaction/Select} The select interaction.

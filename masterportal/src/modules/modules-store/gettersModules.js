@@ -1,4 +1,5 @@
 import {defineAsyncComponent} from "vue";
+import StatisticDashboardLoader from "../statisticDashboard/components/StatisticDashboardLoader.vue";
 
 const getters = {
     componentMap: () => {
@@ -41,7 +42,7 @@ const getters = {
             selectFeatures: defineAsyncComponent(() => import("../selectFeatures/components/SelectFeatures.vue")),
             shadow: defineAsyncComponent(() => import("../shadow/components/ShadowTool.vue")),
             shareView: defineAsyncComponent(() => import("../shareView/components/ShareView.vue")),
-            statisticDashboard: defineAsyncComponent(() => import("../statisticDashboard/components/StatisticDashboard.vue")),
+            statisticDashboard: StatisticDashboardLoader,
             styleVT: defineAsyncComponent(() => import("../styleVT/components/StyleVT.vue")),
             wfsSearch: defineAsyncComponent(() => import("../wfsSearch/components/WfsSearch.vue")),
             wfst: defineAsyncComponent(() => import("../wfst/components/WfsTransaction.vue")),

@@ -18,6 +18,9 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
         changeVisibilitySpy,
         isLayerTree,
         highlightLayerId,
+        loggedIn,
+        originalConfig,
+        addSingleAlertSpy,
         singleBaselayer,
         visibleBaselayerConfigs,
         baselayerHandlerSpy;
@@ -27,6 +30,10 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
         visibleBaselayerConfigs = [];
         isLayerTree = true;
         highlightLayerId = null;
+        loggedIn = false;
+        originalConfig = globalThis.Config;
+        globalThis.Config = {};
+        addSingleAlertSpy = sinon.spy();
         layer = {
             id: "1",
             name: "layer",
@@ -45,11 +52,23 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
         sinon.stub(layerTypes, "getLayerTypes3d").returns(["TERRAIN3D"]);
         store = createStore({
             modules: {
+                Alerting: {
+                    namespaced: true,
+                    actions: {
+                        addSingleAlert: addSingleAlertSpy
+                    }
+                },
                 Modules: {
                     namespaced: true,
                     modules: {
                         namespaced: true,
                         LayerCheckBox,
+                        Login: {
+                            namespaced: true,
+                            getters: {
+                                loggedIn: () => loggedIn
+                            }
+                        },
                         LayerSelection: {
                             namespaced: true,
                             mutations: {
@@ -73,6 +92,10 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
                 visibleBaselayerConfigs: () => visibleBaselayerConfigs
             }
         });
+    });
+
+    afterEach(() => {
+        globalThis.Config = originalConfig;
     });
 
     it("renders the layer given as property to the component", () => {
@@ -240,6 +263,23 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
 
     });
 
+    it("render the open lock icon, if the layer has the attribute isSecured=true and the user is logged in", () => {
+        propsData.conf.isSecured = true;
+        loggedIn = true;
+
+        wrapper = shallowMount(LayerCheckBox, {
+            global: {
+                plugins: [store]
+            },
+            propsData
+        });
+
+        const icons = wrapper.findAll("#layer-checkbox-" + propsData.conf.id + " > i");
+
+        expect(icons.some(icon => icon.classes().includes("bi-unlock-fill") && icon.classes().includes("pe-1"))).to.be.true;
+        expect(icons.some(icon => icon.classes().includes("bi-lock-fill"))).to.be.false;
+    });
+
     it("computed property isLayerVisible with visibility=false ", () => {
         wrapper = shallowMount(LayerCheckBox, {
             global: {
@@ -339,6 +379,55 @@ describe("src/modules/layerTree/components/LayerCheckBox.vue", () => {
 
         expect(replaceByIdInLayerConfigSpy.calledOnce).to.be.true;
         expect(replaceByIdInLayerConfigSpy.firstCall.args[1]).to.be.deep.equals(spyArg);
+    });
+
+    describe("secured layer", () => {
+        beforeEach(() => {
+            propsData.conf.isSecured = true;
+            globalThis.Config = {login: {oidcClientId: "portal"}};
+        });
+
+        it("should not show a secured layer and ask to log in, if the portal uses the login and the user is not logged in", async () => {
+            wrapper = shallowMount(LayerCheckBox, {global: {plugins: [store]}, propsData});
+
+            await wrapper.find("#layer-checkbox-" + propsData.conf.id).trigger("click");
+
+            expect(replaceByIdInLayerConfigSpy.notCalled).to.be.true;
+            expect(addSingleAlertSpy.calledOnce).to.be.true;
+            expect(addSingleAlertSpy.firstCall.args[1].category).to.equal("info");
+            expect(addSingleAlertSpy.firstCall.args[1].content).to.equal("common:modules.layerTree.loginRequired");
+        });
+
+        it("should show a secured layer, if the user is logged in", async () => {
+            loggedIn = true;
+            wrapper = shallowMount(LayerCheckBox, {global: {plugins: [store]}, propsData});
+
+            await wrapper.find("#layer-checkbox-" + propsData.conf.id).trigger("click");
+
+            expect(replaceByIdInLayerConfigSpy.calledOnce).to.be.true;
+            expect(addSingleAlertSpy.notCalled).to.be.true;
+        });
+
+        it("should show a secured layer, if the portal does not use the login", async () => {
+            globalThis.Config = {};
+            wrapper = shallowMount(LayerCheckBox, {global: {plugins: [store]}, propsData});
+
+            await wrapper.find("#layer-checkbox-" + propsData.conf.id).trigger("click");
+
+            expect(replaceByIdInLayerConfigSpy.calledOnce).to.be.true;
+            expect(addSingleAlertSpy.notCalled).to.be.true;
+        });
+
+        it("should hide a visible secured layer, even if the user is not logged in", async () => {
+            propsData.conf.visibility = true;
+            wrapper = shallowMount(LayerCheckBox, {global: {plugins: [store]}, propsData});
+
+            await wrapper.find("#layer-checkbox-" + propsData.conf.id).trigger("click");
+
+            expect(replaceByIdInLayerConfigSpy.calledOnce).to.be.true;
+            expect(replaceByIdInLayerConfigSpy.firstCall.args[1].layerConfigs[0].layer.visibility).to.be.false;
+            expect(addSingleAlertSpy.notCalled).to.be.true;
+        });
     });
 
     it("click on checkbox of layer with visibility true", async () => {

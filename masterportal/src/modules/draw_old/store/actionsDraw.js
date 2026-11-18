@@ -22,7 +22,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         ...actionsDownload,
         /**
          * Adds selected values from the state to the "drawState" of the given feature
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {ol/Feature} feature The OpenLayers feature to append to the current "drawState".
          * @returns {void}
          */
@@ -73,7 +73,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Adds an interaction to the current map instance.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {module:ol/interaction/Interaction} interaction interaction with the map.
          * @returns {void}
          */
@@ -82,7 +82,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Removes all features from the layer.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @returns {void}
          */
         clearLayer ({dispatch}) {
@@ -91,6 +91,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Clears the tooltip from the map.
+         * @deprecated in 3.39.0 (November 2027)
          *
          * @param {module:ol/Overlay} tooltip The tooltip to be removed.
          * @returns {void}
@@ -103,6 +104,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         /**
          * Returns the center point of a Line or Polygon or a point itself.
          * If a targetprojection is given, the values are transformed.
+         * @deprecated in 3.39.0 (November 2027)
          *
          * @param {Object} prm Parameter object.
          * @param {module:ol/Feature} prm.feature Line, Polygon or Point.
@@ -153,7 +155,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Creates a draw interaction to add to the map.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {Object} payload payload object.
          * @param {Boolean} payload.active Decides whether the draw interactions are active or not.
          * @param {Number} [payload.maxFeatures] Max amount of features to be added to the map.
@@ -185,7 +187,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Listener to change the entries for the next drawing.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {Object} payload payload object.
          * @param {Boolean} payload.isOuterCircle Determines if the outer circle of a doubleCircle is supposed to be drawn.
          * @param {String} payload.drawInteraction Either an empty String or "Two" to identify for which drawInteraction this is used.
@@ -265,7 +267,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Creates modify and select interaction.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {Boolean} active Active setting.
          * @returns {void}
          */
@@ -284,7 +286,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Creates modify attributes interaction listener.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @returns {void}
          */
         createModifyAttributesInteractionListener ({rootState, state, dispatch, commit, getters}) {
@@ -356,7 +358,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Creates a modify interaction and adds it to the map.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {Boolean} active Decides whether the modify interaction is active or not.
          * @returns {void}
          */
@@ -376,7 +378,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         /**
          * Listener to change the features through the modify interaction.
          * NOTE: For text only the position can be changed. This can be done by clicking at highlighted (on-hover) bottom-left corner of the text.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @returns {void}
          */
         createModifyInteractionListener ({rootState, state, dispatch, commit, getters}) {
@@ -438,7 +440,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Creates select interaction modify attributes listener.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @returns {void}
          */
         createSelectInteractionModifyAttributesListener ({state, commit, dispatch}) {
@@ -485,7 +487,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Listener to select (for modify) the features through ol select interaction
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @returns {void}
          */
         createSelectInteractionModifyListener ({state, commit, dispatch}) {
@@ -511,7 +513,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         /**
          * Creates a select interaction (for deleting features) and adds it to the map.
          * NOTE: Deletion of text can be done by clicking at the highlighted (on-hover) bottom-left corner of the text.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {Boolean} active Decides whether the select interaction is active or not.
          * @returns {void}
          */
@@ -525,6 +527,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Listener to select (for deletion) the features through the select interaction.
+         * @deprecated in 3.39.0 (November 2027)
          *
          * @returns {void}
          */
@@ -541,6 +544,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         /**
          * Deactivates all draw interactions of the map and add them to the state.
          * NOTE: This is mainly used with the RemoteInterface because otherwise not all interactions are removed.
+         * @deprecated in 3.39.0 (November 2027)
          *
          * @returns {void}
          */
@@ -557,6 +561,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         handleDrawEvent,
         /**
          * Activates or deactivates the given Interactions based on the given parameters.
+         * @deprecated in 3.39.0 (November 2027)
          *
          * @param {Object} payload payload object.
          * @param {String} payload.interaction name of the interaction to be manipulated.
@@ -596,7 +601,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Restores the last deleted element of the feature array of the layer.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @returns {void}
          */
         redoLastStep ({state, commit, dispatch}) {
@@ -616,7 +621,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Removes the given interaction from the current map instance.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {module:ol/interaction/Interaction} interaction interaction with the map.
          * @returns {void}
          */
@@ -625,7 +630,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Resets the Draw Tool.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @returns {void}
          */
         resetModule ({state, commit, dispatch, getters}) {
@@ -672,7 +677,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Saves the given feature as currentFeature and applies the styleSettings
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {ol/Feature} feature The OpenLayers feature to append to  current "drawState".
          * @returns {void}
          */
@@ -732,7 +737,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         ...setters,
         /**
          * Enables the given interaction and disables the others.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {String} interaction The interaction to be enabled.
          * @returns {void}
          */
@@ -774,7 +779,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Deletes the last element in the feature array of the layer.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @returns {void}
          */
         undoLastStep ({state, dispatch}) {
@@ -794,7 +799,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         /**
          * Creates and returns a unique ID.
          * If given, it starts with a prefix.
-         *
+         * @deprecated in 3.39.0 (November 2027)
          * @param {String} [prefix] Prefix for the ID.
          * @returns {String} A unique ID.
          */
@@ -806,6 +811,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Updates the selected feature during modify for circles
+         * @deprecated in 3.39.0 (November 2027)
          *
          * @param {Number} radius The radius of the circle.
          * @returns {void}
@@ -822,6 +828,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Updates the drawInteractions on the map and creates a new one.
+         * @deprecated in 3.39.0 (November 2027)
          *
          * @returns {void}
          */
@@ -851,6 +858,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Adds or removes one element from the redoArray.
+         * @deprecated in 3.39.0 (November 2027)
          *
          * @param {Object} payload payload object.
          * @param {Boolean} payload.remove Remove one feature from the array if true.
@@ -891,6 +899,7 @@ const initialState = JSON.parse(JSON.stringify(stateDraw)),
         },
         /**
          * Adds or removes one element from the undoArray.
+         * @deprecated in 3.39.0 (November 2027)
          *
          * @param {Object} payload payload object.
          * @param {Boolean} payload.remove Remove one feature from the array if true.

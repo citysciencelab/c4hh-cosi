@@ -18,6 +18,7 @@ import Cluster from "ol/source/Cluster.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import {Toast} from "bootstrap";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 import {hasUnfixedRules} from "../utils/hasUnfixedRules.js";
 import SnippetTag from "@modules/filter/components/SnippetTag.vue";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
@@ -577,7 +578,7 @@ export default {
          * @returns {void}
          */
         openLink (url) {
-            window.open(url);
+            openSecuredPopup(url, "_blank");
         },
 
         /**

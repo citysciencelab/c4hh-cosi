@@ -5,7 +5,7 @@ import {createTextStyle} from "./createTextStyle.js";
 
 /**
  * Creates and returns the styling for the draw interaction.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Object} state state object of the Draw Tool
  * @param {Object} state.drawType The type of the draw interaction. The first parameter represents the type unique identifier of the draw interaction as a String and the second parameter represents the geometry of the drawType as a String.
  * @param {Number} state.pointSize The size of the point.

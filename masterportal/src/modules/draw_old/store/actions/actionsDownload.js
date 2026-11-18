@@ -10,7 +10,7 @@ import {transformGeometry} from "@modules/draw_old/js/download/transformGeometry
 
 /**
  * Converts the features from OpenLayers Features to features in the chosen format.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {module:ol/format} format Format in which the features should be saved.
  * @returns {String} The features written in the chosen format as a String.
  */
@@ -64,7 +64,7 @@ async function convertFeatures ({state, dispatch, commit}, format) {
 }
 /**
  * Resets values to hide the UI for the Download and not cause side effects while doing so.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @returns {void}
  */
 function fileDownloaded ({state, commit}) {
@@ -107,7 +107,7 @@ async function prepareData ({state, commit, dispatch, rootGetters}) {
 /**
  * Prepares the download.
  * If the user is using Internet Explorer as a Browser a Blob is used, otherwise the download is accomplished through the href & download combo on an anchor tag.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @returns {void}
  */
 function prepareDownload ({state, commit, dispatch}) {
@@ -128,6 +128,7 @@ function prepareDownload ({state, commit, dispatch}) {
  * Action is dispatched when a feature is drawn, edited or deleted.
  * NOTE: When a feature is an instance of ol/Circle, it is converted to a ol/Polygon first.
  *
+ * @deprecated in 3.39.0 (November 2027)
  * @returns {void}
  */
 function setDownloadFeatures ({state, commit, dispatch, rootGetters}) {
@@ -179,7 +180,7 @@ function setDownloadFeatures ({state, commit, dispatch, rootGetters}) {
  * Commits the input of the user for the name of the file to the state.
  * If at least one feature is already drawn, the download is prepared.
  * If the user entered a name for a file and has chosen a format for the features, the download button is enabled.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Event} event Event fired by changing the input for the name of the file.
  * @param {HTMLInputElement} event.currentTarget The HTML input element for the name of the file.
  * @returns {void}
@@ -197,7 +198,7 @@ function setDownloadFileName ({commit, dispatch}, value) {
  * Commits the selection of the user for file format to the state.
  * If at least one feature is already drawn, they are converted to the chosen format and the download is prepared.
  * If the user entered a name for a file and has chosen a format for the features, the download button is enabled.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {Event} event Event fired by selecting a different element.
  * @param {String} value The selected option value from dropdown or pre selected value.
  * @returns {void}
@@ -213,6 +214,7 @@ async function setDownloadSelectedFormat ({commit, dispatch}, value) {
 }
 /**
  * Checks whether the user has added the suffix of the chosen format to the filename and if not, it is added.
+ * @deprecated in 3.39.0 (November 2027)
  *
  * @returns {String} Returns the filename including the suffix of the chosen format; returns and empty String if either the filename or the format has not been chosen yet.
  */

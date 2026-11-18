@@ -189,6 +189,26 @@ import {addSourceToPayload} from "@shared/js/utils/addSourceToPayload.js";
     ...
 ```
 
+### Notifying subscribers about changes without state
+
+The `userTracking` addon (and other store subscribers) only see committed mutations and dispatched actions. If an interaction changes no store state, the module can dispatch an action with an empty body that only serves as notification. Name it after the event in past tense, not after its consumer (e.g. `featureStyleChanged`):
+
+```js
+const actions = {
+    /**
+     * Does not change the state. Lets store subscribers observe style changes of features.
+     * @param {Object} context Vuex action context.
+     * @param {Object} payload The style change.
+     * @returns {void}
+     */
+    featureStyleChanged () {
+        // intentionally empty: only dispatched so that store subscribers are notified
+    }
+};
+```
+
+Subscribers cannot tell whether a mutation changed a value or set the same one. Thus, setters which are being observed by subscribers should therefore only commit if the value differs.
+
 ### Setting up the store/index file
 
 Open the file `modules/scaleSwitcher/store/indexScaleSwitcher.js`. Default export the previously created state, getters, mutations, and actions as an object. This represents a Vuex store, and is pluggable to another Vuex store as a module.

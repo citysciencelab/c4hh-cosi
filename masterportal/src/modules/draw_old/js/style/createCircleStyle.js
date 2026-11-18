@@ -2,7 +2,7 @@ import {Circle, Fill, Stroke, Style} from "ol/style.js";
 
 /**
  * Creates and returns a feature style for circles and double circles.
- *
+ * @deprecated in 3.39.0 (November 2027)
  * @param {String[]} color The color of the drawn feature represented as an array.
  * @param {String[]} colorContour The color of the contours of the drawn feature represented as an array.
  * @param {Number} strokeWidth Stroke width.
