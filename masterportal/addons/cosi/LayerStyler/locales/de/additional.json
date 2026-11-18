@@ -1,0 +1,10 @@
+{
+    "modules": {
+        "cosi": {
+            "layerStyler": {
+                "title": "Darstellung (neu)",
+                "description": "Jeden sichtbaren Vektorlayer einfärben: eine Farbe, nach Zahlenwert in Klassen oder nach Kategorie — mit Legende."
+            }
+        }
+    }
+}
