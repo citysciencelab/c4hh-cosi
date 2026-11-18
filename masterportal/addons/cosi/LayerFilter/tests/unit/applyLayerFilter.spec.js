@@ -5,8 +5,9 @@ import VectorSource from "ol/source/Vector.js";
 import VectorLayer from "ol/layer/Vector.js";
 import Cluster from "ol/source/Cluster.js";
 import Style from "ol/style/Style.js";
+import Polygon from "ol/geom/Polygon.js";
 import {
-    applyLayerFilter, clearLayerFilter, DIM_STYLE, getAllFeatures, isFiltered, resetRegistry
+    applyLayerFilter, clearLayerFilter, DIM_STYLE, getAllFeatures, isFiltered, resetRegistry, setLayerResolver
 } from "../../utils/applyLayerFilter.js";
 
 const spec = {items: [{kind: "condition", joiner: null, attr: "typ", type: "in", values: ["Kita"]}]},
@@ -43,7 +44,7 @@ describe("addons/cosi/LayerFilter/utils/applyLayerFilter", () => {
         const features = makeFeatures(),
             layer = fakeLayer({id: "a", typ: "WFS"}, new VectorSource({features}));
 
-        expect(applyLayerFilter(layer, spec, "dim")).to.deep.equal({matched: 2, total: 3});
+        expect(applyLayerFilter(layer, spec, "dim")).to.deep.equal({matched: 2, total: 3, refCounts: {}});
         const style = layer.getLayer().getStyle();
 
         expect(style(features[0])).to.equal(ORIGINAL);
@@ -84,18 +85,36 @@ describe("addons/cosi/LayerFilter/utils/applyLayerFilter", () => {
             source = new VectorSource({features}),
             layer = fakeLayer({id: "w", typ: "WFS", renderer: "webgl"}, source);
 
-        expect(applyLayerFilter(layer, spec, "dim")).to.deep.equal({matched: 2, total: 3});
+        expect(applyLayerFilter(layer, spec, "dim")).to.deep.equal({matched: 2, total: 3, refCounts: {}});
         expect(source.getFeatures().length).to.equal(2);
         expect(getAllFeatures(layer).length).to.equal(3);
         clearLayerFilter(layer);
         expect(source.getFeatures().length).to.equal(3);
     });
 
+    it("hides spatially excluded features and dims attribute non-matches", () => {
+        const features = makeFeatures(),
+            layer = fakeLayer({id: "s", typ: "WFS"}, new VectorSource({features})),
+            area = new Feature({geometry: new Polygon([[[-1, -1], [1.5, -1], [1.5, 1.5], [-1, 1.5], [-1, -1]]])}),
+            refLayer = fakeLayer({id: "area", typ: "VECTORBASE"}, new VectorSource({features: [area]}));
+
+        setLayerResolver(id => id === "area" ? refLayer : undefined);
+        // points at (0,0) Kita, (1,1) Kita, (2,2) Schule — the area covers the first two
+        const res = applyLayerFilter(layer, {items: [{kind: "condition", joiner: null, attr: "typ", type: "in", values: ["Schule"]}]}, "dim",
+                {combine: "and", refs: [{refLayerId: "area", mode: "within"}]}),
+            style = layer.getLayer().getStyle();
+
+        expect(res).to.deep.equal({matched: 0, total: 3, refCounts: {area: 1}});
+        expect(style(features[0])).to.equal(DIM_STYLE);
+        expect(style(features[2])).to.equal(undefined);
+        setLayerResolver(null);
+    });
+
     it("removes the filter when the spec restricts nothing", () => {
         const layer = fakeLayer({id: "n", typ: "WFS"}, new VectorSource({features: makeFeatures()}));
 
         applyLayerFilter(layer, spec);
-        expect(applyLayerFilter(layer, {items: []})).to.deep.equal({matched: 3, total: 3});
+        expect(applyLayerFilter(layer, {items: []})).to.deep.equal({matched: 3, total: 3, refCounts: {}});
         expect(isFiltered("n")).to.equal(false);
     });
 });

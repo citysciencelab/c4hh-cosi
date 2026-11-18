@@ -24,6 +24,7 @@ import Stroke from "ol/style/Stroke.js";
 import CircleStyle from "ol/style/Circle.js";
 import Cluster from "ol/source/Cluster.js";
 import {buildPredicate} from "./filterSpec.js";
+import {buildSpatialTest} from "./spatialFilter.js";
 
 /** Pale grey for non-matching features (c4hh-app DIM_STYLE). */
 export const DIM_STYLE = new Style({
@@ -34,7 +35,28 @@ export const DIM_STYLE = new Style({
 
 const SUPPORTED_TYPES = ["WFS", "OAF", "GEOJSON", "VECTORBASE", "SENSORTHINGS"],
     registry = new Map();
-let updateHandler = null;
+let updateHandler = null,
+    layerResolver = null;
+
+/**
+ * Registers how reference layers are found by id (layerCollection.getLayerById).
+ * @param {Function|null} fn (layerId) => Masterportal layer or undefined
+ * @returns {void}
+ */
+export function setLayerResolver (fn) {
+    layerResolver = fn;
+}
+
+/**
+ * The features of a reference layer, or null if the layer is not there.
+ * @param {String} layerId Layer id.
+ * @returns {module:ol/Feature[]|null} The features.
+ */
+function refFeatures (layerId) {
+    const layer = layerResolver?.(layerId);
+
+    return layer && typeof layer.getLayerSource === "function" ? getAllFeatures(layer) : null;
+}
 
 /**
  * Registers who hears about re-applied filters (the store keeps the counts).
@@ -112,28 +134,33 @@ export function canDim (layer) {
 }
 
 /**
- * Applies a filter spec. A spec that restricts nothing removes the filter.
+ * Applies a filter: the attribute spec and, optionally, the spatial spec. A filter
+ * that restricts nothing removes itself. Spatially excluded features are always
+ * hidden; attribute non-matches are dimmed or hidden (`missMode`), as in c4hh-app.
  * @param {Object} layer Masterportal layer.
- * @param {Object} spec Filter spec.
+ * @param {Object} spec Attribute filter spec.
  * @param {String} [missMode="dim"] "dim" or "hide".
- * @returns {{matched: Number, total: Number}} Match count over all features.
+ * @param {Object} [spatial] Spatial spec (see spatialFilter.js).
+ * @returns {{matched: Number, total: Number, refCounts: Object}} Match count over all
+ *     features and the number of reference areas per reference layer.
  */
-export function applyLayerFilter (layer, spec, missMode = "dim") {
+export function applyLayerFilter (layer, spec, missMode = "dim", spatial = null) {
     const predicate = buildPredicate(spec),
+        spatialTest = buildSpatialTest(spatial, refFeatures),
         id = layer.get("id");
 
-    if (!predicate) {
+    if (!predicate && !spatialTest) {
         clearLayerFilter(layer);
         const total = getAllFeatures(layer).length;
 
-        return {matched: total, total};
+        return {matched: total, total, refCounts: {}};
     }
 
     const kind = layerKind(layer);
     let entry = registry.get(id);
 
     if (!entry) {
-        entry = {kind, layer};
+        entry = {kind, layer, refUnlisten: new Map()};
         if (kind === "canvas") {
             entry.originalStyle = layer.getLayer().getStyle();
         }
@@ -143,36 +170,49 @@ export function applyLayerFilter (layer, spec, missMode = "dim") {
         registry.set(id, entry);
         // features loaded later (WFS reload, bbox strategy, import) get the filter too,
         // also while the tool is closed
-        entry.unlisten = onFeaturesChanged(layer, () => {
-            if (registry.get(id) === entry) {
-                updateHandler?.(id, applyLayerFilter(layer, entry.spec, entry.missMode));
-            }
-        });
+        entry.unlisten = onFeaturesChanged(layer, () => reapply(id, entry));
     }
     entry.spec = spec;
     entry.missMode = missMode;
+    entry.spatial = spatial;
+    syncReferenceListeners(id, entry, spatialTest ? Object.keys(spatialTest.counts) : []);
 
     const features = getAllFeatures(layer),
+        miss = missMode === "hide" ? "hide" : "dim",
         verdicts = new WeakMap();
 
     /**
      * The verdict of one feature, computed once per filter.
      * @param {module:ol/Feature} feature The feature.
-     * @returns {Boolean} True if it matches.
+     * @returns {String} "keep", "dim" or "hide".
      */
-    function test (feature) {
+    function verdict (feature) {
         let v = verdicts.get(feature);
 
         if (v === undefined) {
-            v = predicate(attr => feature.get(attr));
+            if (spatialTest && !spatialTest.test(feature)) {
+                v = "hide";
+            }
+            else {
+                v = !predicate || predicate(attr => feature.get(attr)) ? "keep" : miss;
+            }
             verdicts.set(feature, v);
         }
         return v;
     }
+
+    /**
+     * Whether a feature is drawn in full.
+     * @param {module:ol/Feature} feature The feature.
+     * @returns {Boolean} True if kept.
+     */
+    function keeps (feature) {
+        return verdict(feature) === "keep";
+    }
     let matched = 0;
 
     features.forEach(f => {
-        if (test(f)) {
+        if (keeps(f)) {
             matched++;
         }
     });
@@ -180,21 +220,27 @@ export function applyLayerFilter (layer, spec, missMode = "dim") {
     if (kind === "canvas") {
         const orig = entry.originalStyle,
             staticFn = orig ? () => orig : createDefaultStyle,
-            origFn = typeof orig === "function" ? orig : staticFn,
-            miss = missMode === "hide" ? undefined : DIM_STYLE;
+            origFn = typeof orig === "function" ? orig : staticFn;
 
         // The masterportalapi caches the style of every POINT it draws on the feature
         // itself (createStyle → feature.setStyle), and a feature style beats the layer
         // style. Non-matches lose that cache, or they would keep their full look.
         features.forEach(f => {
-            if (f.getStyle() && !test(f)) {
+            if (f.getStyle() && !keeps(f)) {
                 f.setStyle(null);
             }
         });
-        layer.getLayer().setStyle((feature, resolution) => test(feature) ? origFn(feature, resolution) : miss);
+        layer.getLayer().setStyle((feature, resolution) => {
+            const v = verdict(feature);
+
+            if (v === "keep") {
+                return origFn(feature, resolution);
+            }
+            return v === "dim" ? DIM_STYLE : undefined;
+        });
     }
     else if (kind === "cluster") {
-        features.forEach(f => f.set("hideInClustering", !test(f), true));
+        features.forEach(f => f.set("hideInClustering", !keeps(f), true));
         layer.getLayerSource().refresh();
     }
     else {
@@ -202,10 +248,46 @@ export function applyLayerFilter (layer, spec, missMode = "dim") {
 
         entry.mutating = true;
         source.clear(true);
-        source.addFeatures(features.filter(test));
+        source.addFeatures(features.filter(keeps));
         entry.mutating = false;
     }
-    return {matched, total: features.length};
+    return {matched, total: features.length, refCounts: spatialTest?.counts ?? {}};
+}
+
+/**
+ * Applies a registered filter again (after its layer or a reference changed).
+ * @param {String} id Layer id.
+ * @param {Object} entry Registry entry.
+ * @returns {void}
+ */
+function reapply (id, entry) {
+    if (registry.get(id) === entry) {
+        updateHandler?.(id, applyLayerFilter(entry.layer, entry.spec, entry.missMode, entry.spatial));
+    }
+}
+
+/**
+ * Listens to exactly the reference layers a filter uses: moving or redrawing a
+ * reference area re-applies the filter.
+ * @param {String} id Layer id of the filtered layer.
+ * @param {Object} entry Registry entry.
+ * @param {String[]} refIds Ids of the reference layers in use.
+ * @returns {void}
+ */
+function syncReferenceListeners (id, entry, refIds) {
+    entry.refUnlisten.forEach((unlisten, refId) => {
+        if (!refIds.includes(refId)) {
+            unlisten();
+            entry.refUnlisten.delete(refId);
+        }
+    });
+    refIds.forEach(refId => {
+        const refLayer = layerResolver?.(refId);
+
+        if (refLayer && !entry.refUnlisten.has(refId)) {
+            entry.refUnlisten.set(refId, onFeaturesChanged(refLayer, () => reapply(id, entry), 300, true));
+        }
+    });
 }
 
 /**
@@ -222,6 +304,7 @@ export function clearLayerFilter (layer) {
     }
     registry.delete(id);
     entry.unlisten?.();
+    entry.refUnlisten.forEach(unlisten => unlisten());
     if (entry.kind === "canvas") {
         layer.getLayer().setStyle(entry.originalStyle);
     }
@@ -244,9 +327,11 @@ export function clearLayerFilter (layer) {
  * @param {Object} layer Masterportal layer.
  * @param {Function} callback Called without arguments.
  * @param {Number} [wait=300] Debounce in ms.
+ * @param {Boolean} [geometryChanges=false] Also react to changed features (a moved or
+ *     redrawn reference area). Off for filtered layers: renderers write onto them.
  * @returns {Function} Unsubscribe.
  */
-export function onFeaturesChanged (layer, callback, wait = 300) {
+export function onFeaturesChanged (layer, callback, wait = 300, geometryChanges = false) {
     const source = featureSource(layer);
     let timer = null;
 
@@ -276,7 +361,7 @@ export function onFeaturesChanged (layer, callback, wait = 300) {
             }, wait);
         }
     }
-    const keys = ["featuresloadend", "addfeature", "removefeature"].map(type => {
+    const keys = ["featuresloadend", "addfeature", "removefeature", ...geometryChanges ? ["changefeature", "clear"] : []].map(type => {
         source.on(type, fire);
         return type;
     });
