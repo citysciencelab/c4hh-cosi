@@ -75,7 +75,7 @@
     "mainMenu": {
       "expanded": true,
       "title": {
-        "text": "CoSI",
+        "text": "CoSI Beta",
         "logo": "https://geodienste.hamburg.de/lgv-config/img/hh-logo.png",
         "link": "https://geoinfo.hamburg.de",
         "toolTip": "Landesbetrieb Geoinformation und Vermessung"
