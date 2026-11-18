@@ -233,10 +233,6 @@
     "path": "cosi/ScenarioBuilder",
     "type": "tool"
   },
-  "socialInfraMonitor": {
-    "path": "cosi/SocialInfraMonitor",
-    "type": "tool"
-  },
    "waterRiskCheckSearchBar": {
     "path": "waterRiskCheck/searchBar",
     "type": "tool"
@@ -271,13 +267,6 @@
     "storyManager": {
     "path": "storyTellingTool/storyManager",
     "type": "tool"
-  },
-  "mpaddon": {
-    "type": "tool"
-  },
-  "mpaddonGfi": {
-    "type": "gfiTheme",
-    "path": "mpaddon/gfiTheme"
   },
   "userTracking": {
     "type": "javascript"

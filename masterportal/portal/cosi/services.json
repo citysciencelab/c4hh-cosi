@@ -4925,7 +4925,7 @@
     "name": "XPlanung Bebauungspläne - Vektordarstellung",
     "url": "https://geodienste.hamburg.de/HH_WMS_Cache_PLIS_Geodaten",
     "typ": "WMS",
-    "layers": "vektordaten",
+    "layers": "xplan_bplan_vektor",
     "format": "image/png",
     "version": "1.3.0",
     "singleTile": false,
@@ -20207,31 +20207,14 @@
     "url": "https://api.hamburg.de/datasets/v1/betreuungsquote_kindertagesbetreuung",
     "collection": "betr_quoten_bezirke",
     "gfiAttributes": {
-      "jahr": "Jahr",
-      "jahr_date": {
-        "name": "Datum",
-        "condition": "contains",
-        "type": "date",
-        "format": "DD.MM.YYYY HH:mm:ss"
-      },
+      "jahr": "jahr",
+      "jahr_date": "Datum",
       "bezirk_id": "Bezirk Nummer",
       "bezirk_name": "Bezirk",
       "betr_quote_2_proz": "Regionale Betreuungsquote der 2-Jährigen (in %)",
       "betr_quote_unter3_proz": "Regionale Betreuungsquote der unter 3-Jährigen (in %)",
       "betr_quote_4_proz": "Regionale Betreuungsquote der 4-Jährigen (in %)",
-      "betr_quote_3_schuleintritt_proz": "Regionale Betreuungsquote der 3-Jährigen bis Schuleintritt (in %)",
-      "prio10_2_abs": "Prio10 Fälle 2-Jährige",
-      "prio10_2_proz": "Prio10 Fälle 2-Jährige (innerhalb der Altersgruppe in %)",
-      "prio10_unter3_abs": "Prio10 Fälle unter 3-Jährige",
-      "prio10_unter3_proz": "Prio10 Fälle unter 3-Jährige (innerhalb der Altersgruppe in %)",
-      "prio10_4_abs": "Prio10 Fälle 4-Jährige",
-      "prio10_4_proz": "Prio10 Fälle 4-Jährige (innerhalb der Altersgruppe in %)",
-      "egh_4_abs": "EGH Fälle 4-Jährige",
-      "egh_4_proz": "EGH Fälle 4-Jährige (innerhalb der Altersgruppe in %)",
-      "prio10_3_schuleintritt_abs": "Prio10 Fälle 3-Jährige bis Schuleintritt",
-      "prio10_3_schuleintritt_proz": "Prio10 Fälle 3-Jährige bis Schuleintritt (innerhalb der Altersgruppe in %)",
-      "egh_3_schuleintritt_abs": "EGH Fälle 3-Jährige bis Schuleintritt",
-      "egh_3_schuleintritt_proz": "EGH Fälle 3-Jährige bis Schuleintritt (innerhalb der Altersgruppe in %)"
+      "betr_quote_3_schuleintritt_proz": "Regionale Betreuungsquote der 3-Jährigen bis Schuleintritt (in %)"
     },
     "gfiTheme": "default",
     "datasets": [
@@ -20260,12 +20243,7 @@
     "collection": "betr_quoten_stadtteile",
     "gfiAttributes": {
       "jahr": "Jahr",
-      "jahr_date": {
-        "name": "Datum",
-        "condition": "contains",
-        "type": "date",
-        "format": "DD.MM.YYYY"
-      },
+      "jahr_date": "Datum",
       "stadtteil_id": "Stadtteil Nummer",
       "stadtteil_name": "Stadtteil",
       "bezirk_id": "Bezirk Nummer",
@@ -20273,19 +20251,7 @@
       "betr_quote_2_proz": "Regionale Betreuungsquote der 2-Jährigen (in %)",
       "betr_quote_unter3_proz": "Regionale Betreuungsquote der unter 3-Jährigen (in %)",
       "betr_quote_4_proz": "Regionale Betreuungsquote der 4-Jährigen (in %)",
-      "betr_quote_3_schuleintritt_proz": "Regionale Betreuungsquote der 3-Jährigen bis Schuleintritt (in %)",
-      "prio10_2_abs": "Prio10 Fälle 2-Jährige",
-      "prio10_2_proz": "Prio10 Fälle 2-Jährige (innerhalb der Altersgruppe in %)",
-      "prio10_unter3_abs": "Prio10 Fälle unter 3-Jährige",
-      "prio10_unter3_proz": "Prio10 Fälle unter 3-Jährige (innerhalb der Altersgruppe in %)",
-      "prio10_4_abs": "Prio10 Fälle 4-Jährige",
-      "prio10_4_proz": "Prio10 Fälle 4-Jährige (innerhalb der Altersgruppe in %)",
-      "egh_4_abs": "EGH Fälle 4-Jährige",
-      "egh_4_proz": "EGH Fälle 4-Jährige (innerhalb der Altersgruppe in %)",
-      "prio10_3_schuleintritt_abs": "Prio10 Fälle 3-Jährige bis Schuleintritt",
-      "prio10_3_schuleintritt_proz": "Prio10 Fälle 3-Jährige bis Schuleintritt (innerhalb der Altersgruppe in %)",
-      "egh_3_schuleintritt_abs": "EGH Fälle 3-Jährige bis Schuleintritt",
-      "egh_3_schuleintritt_proz": "EGH Fälle 3-Jährige bis Schuleintritt (innerhalb der Altersgruppe in %)"
+      "betr_quote_3_schuleintritt_proz": "Regionale Betreuungsquote der 3-Jährigen bis Schuleintritt (in %)"
     },
     "gfiTheme": "default",
     "datasets": [
@@ -22271,211 +22237,5 @@
         "kategorie_organisation": "Behörde für Arbeit, Gesundheit, Soziales, Familie und Integration (Sozialbehörde)"
       }
     ]
-  },
-  {
-    "id": "cosi_jugendorte",
-    "name": "Jugendorte (kombiniert)",
-    "url": "./assets/jugendorte.geojson",
-    "typ": "GeoJSON",
-    "gfiAttributes": {
-      "einrichtung": "Einrichtung",
-      "angebotstyp": "Angebotstyp",
-      "weitere_angebotstypen": "Weitere Angebote am Standort",
-      "traeger": "Träger",
-      "adresse": "Adresse",
-      "ort": "Ort",
-      "link": "Internet",
-      "internet": "Internet"
-    },
-    "gfiTheme": "default",
-    "layerAttribution": "Kombinierter Datensatz aus mehreren WFS der FHH (siehe tools/build-combined-layer.py)",
-    "legendURL": "",
-    "datasets": []
-  },
-  {
-    "id": "cosi_familienorte",
-    "name": "Familienorte (kombiniert)",
-    "url": "./assets/familienorte.geojson",
-    "typ": "GeoJSON",
-    "gfiAttributes": {
-      "einrichtung": "Einrichtung",
-      "angebotstyp": "Angebotstyp",
-      "kategorie_2": "Unterkategorie",
-      "weitere_angebotstypen": "Weitere Angebote am Standort",
-      "traeger": "Träger",
-      "adresse": "Adresse",
-      "ort": "Ort",
-      "link": "Internet"
-    },
-    "gfiTheme": "default",
-    "layerAttribution": "Kombinierter Datensatz aus mehreren WFS der FHH (siehe tools/build-combined-layer.py)",
-    "legendURL": "",
-    "datasets": []
-  },
-  {
-    "id": "cosi_sozialmonitoring_stadtteile",
-    "name": "Sozialmonitoring – Kennzahlen je Stadtteil (abgeleitet)",
-    "url": "./assets/sozialmonitoring-stadtteile.geojson",
-    "typ": "GeoJSON",
-    "gfiAttributes": {
-      "stadtteil": "Stadtteil",
-      "jahr": "Jahr",
-      "sm_statusindex_score": "Statusindex (Score 1–4, bevölkerungsgewichtet)",
-      "sm_dynamikindex_score": "Dynamikindex (Score −1–1, bevölkerungsgewichtet)",
-      "sm_anteil_niedrig_proz": "Anteil Bevölkerung in Gebieten mit niedrigem/sehr niedrigem Status (in %)",
-      "sm_bev_niedrig": "Bevölkerung in Gebieten mit niedrigem/sehr niedrigem Status",
-      "sm_bev_gesamt": "Vom Sozialmonitoring erfasste Bevölkerung",
-      "sm_gebiete_anz": "Statistische Gebiete",
-      "sm_gebiete_niedrig_anz": "Statistische Gebiete mit niedrigem/sehr niedrigem Status"
-    },
-    "gfiTheme": "default",
-    "layerAttribution": "Abgeleitet aus dem Sozialmonitoring der FHH (siehe tools/build-sozialmonitoring-stats.py)",
-    "legendURL": "",
-    "datasets": []
-  },
-  {
-    "id": "cosi_demo_sozialinfra_jugend",
-    "name": "Kinder & Jugend – geförderte Standorte (Demo, fiktiv)",
-    "url": "./assets/demo-sozialinfra-jugend.geojson",
-    "typ": "GeoJSON",
-    "gfiAttributes": {
-      "einrichtung": "Einrichtung",
-      "angebotstyp": "Angebotstyp",
-      "weitere_angebote": "Weitere Angebote am Standort",
-      "adresse": "Adresse",
-      "ort": "Ort",
-      "stadtteil": "Stadtteil",
-      "traeger": "Träger (fiktiv)",
-      "rolle": "Rolle im Träger-Verbund",
-      "standorte_anz": "Standorte des Trägers",
-      "zahlungsadresse": "Zahlungsadresse (Träger-Sitz)",
-      "foerderung_traeger_eur": "Förderung des Trägers gesamt (€/Jahr, fiktiv)",
-      "foerderung_standort_eur": "davon an diesem Standort eingesetzt (€/Jahr, fiktiv)",
-      "foerderprogramme": "Förderprogramme",
-      "foerdergeber": "Fördergeber",
-      "foerderjahr": "Förderjahr",
-      "besuche_woche": "Ø Besuche pro Woche (fiktiv)",
-      "oeffnungszeiten_text": "Öffnungszeiten (fiktiv)",
-      "oeffnungsstunden_woche": "Öffnungsstunden pro Woche",
-      "datenstatus": "Datenstatus"
-    },
-    "gfiTheme": "default",
-    "layerAttribution": "<img src=\"./assets/ai-labels/label-ai-generated-black.svg\" alt=\"KI-generiert (AI generated)\" height=\"44\"><br>Fiktive Demodaten für den Prototyp „Förderung &amp; Öffnungszeiten“: Lage, Name und Angebotstyp stammen aus Open Data der FHH; Träger, Förderung, Öffnungszeiten und Besuche sind fiktiv und KI-generiert (siehe tools/build-sozialinfra-demo.py).",
-    "legendURL": "",
-    "datasets": []
-  },
-  {
-    "id": "cosi_demo_sozialinfra_familie",
-    "name": "Familie – geförderte Standorte (Demo, fiktiv)",
-    "url": "./assets/demo-sozialinfra-familie.geojson",
-    "typ": "GeoJSON",
-    "gfiAttributes": {
-      "einrichtung": "Einrichtung",
-      "angebotstyp": "Angebotstyp",
-      "weitere_angebote": "Weitere Angebote am Standort",
-      "adresse": "Adresse",
-      "ort": "Ort",
-      "stadtteil": "Stadtteil",
-      "traeger": "Träger (fiktiv)",
-      "rolle": "Rolle im Träger-Verbund",
-      "standorte_anz": "Standorte des Trägers",
-      "zahlungsadresse": "Zahlungsadresse (Träger-Sitz)",
-      "foerderung_traeger_eur": "Förderung des Trägers gesamt (€/Jahr, fiktiv)",
-      "foerderung_standort_eur": "davon an diesem Standort eingesetzt (€/Jahr, fiktiv)",
-      "foerderprogramme": "Förderprogramme",
-      "foerdergeber": "Fördergeber",
-      "foerderjahr": "Förderjahr",
-      "besuche_woche": "Ø Besuche pro Woche (fiktiv)",
-      "oeffnungszeiten_text": "Öffnungszeiten (fiktiv)",
-      "oeffnungsstunden_woche": "Öffnungsstunden pro Woche",
-      "datenstatus": "Datenstatus"
-    },
-    "gfiTheme": "default",
-    "layerAttribution": "<img src=\"./assets/ai-labels/label-ai-generated-black.svg\" alt=\"KI-generiert (AI generated)\" height=\"44\"><br>Fiktive Demodaten für den Prototyp „Förderung &amp; Öffnungszeiten“: Lage, Name und Angebotstyp stammen aus Open Data der FHH; Träger, Förderung, Öffnungszeiten und Besuche sind fiktiv und KI-generiert (siehe tools/build-sozialinfra-demo.py).",
-    "legendURL": "",
-    "datasets": []
-  },
-  {
-    "id": "cosi_demo_sozialinfra_kitas",
-    "name": "Kitas – Öffnungszeiten (Demo, fiktiv)",
-    "url": "./assets/demo-sozialinfra-kitas.geojson",
-    "typ": "GeoJSON",
-    "gfiAttributes": {
-      "einrichtung": "Einrichtung",
-      "adresse": "Adresse",
-      "ort": "Ort",
-      "stadtteil": "Stadtteil",
-      "betreute_kinder": "Betreute Kinder",
-      "oeffnungszeiten_text": "Öffnungszeiten (fiktiv)",
-      "oeffnungsstunden_woche": "Öffnungsstunden pro Woche",
-      "datenstatus": "Datenstatus"
-    },
-    "gfiTheme": "default",
-    "layerAttribution": "<img src=\"./assets/ai-labels/label-ai-generated-black.svg\" alt=\"KI-generiert (AI generated)\" height=\"44\"><br>Fiktive Demodaten für den Prototyp „Förderung &amp; Öffnungszeiten“: Lage, Name und Angebotstyp stammen aus Open Data der FHH; Träger, Förderung, Öffnungszeiten und Besuche sind fiktiv und KI-generiert (siehe tools/build-sozialinfra-demo.py).",
-    "legendURL": "",
-    "datasets": []
-  },
-  {
-    "id": "cosi_demo_sozialinfra_schulen",
-    "name": "Schulen – Öffnungszeiten (Demo, fiktiv)",
-    "url": "./assets/demo-sozialinfra-schulen.geojson",
-    "typ": "GeoJSON",
-    "gfiAttributes": {
-      "einrichtung": "Schule",
-      "angebotstyp": "Schulform",
-      "traegerschaft": "Trägerschaft",
-      "adresse": "Adresse",
-      "ort": "Ort",
-      "stadtteil": "Stadtteil",
-      "schueler": "Schülerzahl",
-      "ganztagsform": "Ganztagsform",
-      "oeffnungszeiten_text": "Öffnungszeiten (fiktiv)",
-      "oeffnungsstunden_woche": "Öffnungsstunden pro Woche",
-      "datenstatus": "Datenstatus"
-    },
-    "gfiTheme": "default",
-    "layerAttribution": "<img src=\"./assets/ai-labels/label-ai-generated-black.svg\" alt=\"KI-generiert (AI generated)\" height=\"44\"><br>Fiktive Demodaten für den Prototyp „Förderung &amp; Öffnungszeiten“: Lage, Name und Angebotstyp stammen aus Open Data der FHH; Träger, Förderung, Öffnungszeiten und Besuche sind fiktiv und KI-generiert (siehe tools/build-sozialinfra-demo.py).",
-    "legendURL": "",
-    "datasets": []
-  },
-  {
-    "id": "cosi_demo_sozialinfra_traegernetz",
-    "name": "Träger-Verbünde: Hauptsitz → Standort (Demo, fiktiv)",
-    "url": "./assets/demo-sozialinfra-traegernetz.geojson",
-    "typ": "GeoJSON",
-    "gfiAttributes": {
-      "traeger": "Träger (fiktiv)",
-      "von": "Hauptsitz (Zahlungsadresse)",
-      "nach": "Standort",
-      "foerderung_standort_eur": "Am Standort eingesetzte Förderung (€/Jahr, fiktiv)",
-      "datenstatus": "Datenstatus"
-    },
-    "gfiTheme": "default",
-    "layerAttribution": "<img src=\"./assets/ai-labels/label-ai-generated-black.svg\" alt=\"KI-generiert (AI generated)\" height=\"44\"><br>Fiktive Demodaten für den Prototyp „Förderung &amp; Öffnungszeiten“: Lage, Name und Angebotstyp stammen aus Open Data der FHH; Träger, Förderung, Öffnungszeiten und Besuche sind fiktiv und KI-generiert (siehe tools/build-sozialinfra-demo.py).",
-    "legendURL": "",
-    "datasets": []
-  },
-  {
-    "id": "cosi_demo_sozialinfra_stadtteile",
-    "name": "Förderung & Angebote je Stadtteil (Demo, fiktiv)",
-    "url": "./assets/demo-sozialinfra-stadtteile.geojson",
-    "typ": "GeoJSON",
-    "gfiAttributes": {
-      "stadtteil": "Stadtteil",
-      "jahr": "Jahr",
-      "demo_foerd_zahladresse_eur": "Förderung nach Zahlungsadresse (€, fiktiv)",
-      "demo_foerd_wirkungsort_eur": "Förderung nach Wirkungsort (€, fiktiv)",
-      "demo_foerd_saldo_eur": "Saldo Wirkungsort − Zahlungsadresse (€, fiktiv)",
-      "demo_foerd_je_u18_eur": "Förderung (Wirkungsort) je Einwohner/in unter 18 (€, fiktiv)",
-      "demo_standorte_anz": "Geförderte Standorte",
-      "demo_traeger_sitz_anz": "Träger mit Sitz im Stadtteil",
-      "demo_besuche_woche": "Ø Besuche pro Woche (fiktiv)",
-      "demo_oeffnungsstunden_woche": "Öffnungsstunden pro Woche (fiktiv)",
-      "demo_standorte_abend_we_anz": "Standorte mit Abend- oder Wochenendöffnung (fiktiv)"
-    },
-    "gfiTheme": "default",
-    "layerAttribution": "<img src=\"./assets/ai-labels/label-ai-generated-black.svg\" alt=\"KI-generiert (AI generated)\" height=\"44\"><br>Fiktive Demodaten für den Prototyp „Förderung &amp; Öffnungszeiten“: Lage, Name und Angebotstyp stammen aus Open Data der FHH; Träger, Förderung, Öffnungszeiten und Besuche sind fiktiv und KI-generiert (siehe tools/build-sozialinfra-demo.py).",
-    "legendURL": "",
-    "datasets": []
   }
 ]
