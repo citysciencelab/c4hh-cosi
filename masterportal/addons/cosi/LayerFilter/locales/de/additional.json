@@ -1,0 +1,10 @@
+{
+  "modules": {
+    "cosi": {
+      "layerFilter": {
+        "title": "Filter (neu)",
+        "description": "Jeden Fachdaten-Layer nach seinen Attributen filtern"
+      }
+    }
+  }
+}
