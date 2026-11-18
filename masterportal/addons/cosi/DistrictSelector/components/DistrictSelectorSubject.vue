@@ -8,7 +8,7 @@ import DrawTypes from "@shared/modules/draw/components/DrawTypes.vue";
 import {downloadJsonToFile} from "../../utils/download";
 import {fromCircle as polygonFromCircle} from "ol/geom/Polygon";
 import Feature from "ol/Feature";
-import {featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson";
+import {featuresToGeoJsonCollection} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import {geometryToGeoJson} from "../../utils/geometry/convertToGeoJson";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";

@@ -5,9 +5,6 @@ import HelpPanel from "./HelpSection/HelpPanel.vue";
 import HomePanel from "./HomePanel.vue";
 import {mapGetters, mapActions, mapMutations} from "vuex";
 import mutations from "../store/mutations.js";
-// import EnsembleDetails from "./Ensemble/EnsembleDetails.vue";
-// import EnsembleCreation from "./Ensemble/EnsembleCreation.vue";
-// import EnsembleList from "./Ensemble/EnsembleList.vue";
 import JobDetails from "./Job/JobDetails.vue";
 import JobExecution from "./Job/JobExecution.vue";
 import JobList from "./Job/JobList.vue";
@@ -30,9 +27,6 @@ const MIN_WIDTH_PERCENT = 40;
 export default {
     name: "SimulationTool",
     components: {
-        // EnsembleDetails,
-        // EnsembleCreation,
-        // EnsembleList,
         HomePanel,
         HelpPanel,
         JobDetails,
@@ -52,12 +46,12 @@ export default {
     },
     mounted: async function () {
         await this.checkLoggedIn();
-        if (this.shouldSaveSimulations) {
-            await this.restorePlanningScenariosFromIndexedDb();
-        }
         this.maximizeDrawer();
         this.fetchProcesses();
         this.fetchJobs();
+        if (this.shouldSaveSimulations) {
+            await this.restorePlanningScenariosFromIndexedDb();
+        }
         // this.fetchEnsembles();
         // this.fetchProviders();
     },
@@ -251,16 +245,6 @@ export default {
             <JobDetails
                 v-if="mode === 'job-details'"
             />
-            <!--<EnsembleList
-                v-if="mode === 'ensemble-list'"
-                :ensembles="ensembles"
-            />
-            <EnsembleCreation
-                v-if="mode === 'ensemble-creation'"
-            />
-            <EnsembleDetails
-                v-if="mode === 'ensemble-details'"
-            /> -->
             <TutorialPanel
                 v-if="mode === 'tutorial-panel'"
             />
@@ -274,10 +258,47 @@ export default {
         overflow: hidden;
         display: flex;
         flex: 1;
+        min-width: 0;
+        container-type: inline-size;
 
         .content {
+            position: relative;
+            min-width: 0;
             flex: 1 1 0;
-            padding: 1rem;
+            padding: 1rem 0 1rem 1rem;
+        }
+
+        .content::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 32px;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .2s ease;
+
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            mask-image: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, .3) 45%,
+                rgba(0, 0, 0, .75) 80%,
+                rgba(0, 0, 0, 1) 100%
+            );
+            -webkit-mask-image: linear-gradient(
+                to right,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, .3) 45%,
+                rgba(0, 0, 0, .75) 80%,
+                rgba(0, 0, 0, 1) 100%
+            );
+        }
+
+        .content.has-horizontal-overflow::after {
+            opacity: 1;
         }
     }
 </style>

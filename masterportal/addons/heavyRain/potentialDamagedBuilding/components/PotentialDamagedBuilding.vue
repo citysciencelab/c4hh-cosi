@@ -37,6 +37,7 @@ export default {
     computed: {
         ...mapGetters("Modules/PotentialDamagedBuilding", ["itemList"]),
         ...mapGetters("Maps", ["clickCoordinate", "resolution", "projection"]),
+        ...mapGetters("Modules/Login", ["loggedIn"]),
 
         /**
          * Returns the GFI attributes of the selected item's WMS layer.
@@ -113,15 +114,38 @@ export default {
          */
         clickCoordinate: {
             handler (coordinate) {
+                // the secured services can only be requested by a logged in user
+                if (!this.loggedIn) {
+                    return;
+                }
                 this.placingPointMarker(coordinate);
                 this.fetchFeature(this.selectedItem, coordinate, this.resolution, this.projection);
             },
             deep: true
+        },
+
+        /**
+         * Shows the selected layer after the login and hides it after the logout, as the secured services can only be requested by a logged in user.
+         * The selected building and the marker are reset after the logout, so that their content is not shown anymore.
+         * @param {Boolean} value true, if the user is logged in.
+         * @returns {void}
+         */
+        loggedIn (value) {
+            if (value) {
+                this.toggleLayerVisibility(this.itemList);
+                return;
+            }
+
+            this.hideSelectedItem(this.selectedItem);
+            this.selectedFeature = undefined;
+            this.removePointMarker();
         }
     },
 
     mounted () {
-        this.toggleLayerVisibility(this.itemList);
+        if (this.loggedIn) {
+            this.toggleLayerVisibility(this.itemList);
+        }
     },
 
     unmounted () {
@@ -329,350 +353,360 @@ export default {
 
 <template lang="html">
     <div>
-        <p>
-            {{ $t("additional:modules.potentialDamagedBuilding.description") }}
-        </p>
-        <h5 class="mt-3">
-            {{ $t("additional:modules.potentialDamagedBuilding.headline.buildingAttributes") }}
-        </h5>
-        <ButtonGroup
-            class="mt-3"
-            :buttons="itemNameList"
-            group="building_attributes"
-            :selected-value="selectedItem?.name"
-            @set-selected-button="updateSelectedItem($event, itemList)"
-        />
-        <HrSnackbar
-            v-if="!invalid"
-            :model-value="showSnackbar"
-            :message="snackbarMessage"
-            :color="snackbarColor"
-            @update:model-value="val => showSnackbar = val"
-        />
-        <template v-if="selectedFeature">
-            <h5 class="mt-5">
-                {{ $t("additional:modules.potentialDamagedBuilding.headline.buildingOverview") }}
+        <div
+            v-if="!loggedIn"
+            class="alert alert-info d-flex align-items-center gap-2"
+            role="alert"
+        >
+            <i class="bi bi-lock-fill" />
+            {{ $t('additional:modules.potentialDamagedBuilding.loginRequired') }}
+        </div>
+        <template v-else>
+            <p>
+                {{ $t("additional:modules.potentialDamagedBuilding.description") }}
+            </p>
+            <h5 class="mt-3">
+                {{ $t("additional:modules.potentialDamagedBuilding.headline.buildingAttributes") }}
             </h5>
-            <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
-                <div class="col">
-                    <div class="overview-card rounded p-3 text-center h-100 d-flex flex-column align-items-center justify-content-center">
-                        <span class="value fs-4 d-block text-truncate-custom">{{ lastUpdatedDamageClass }}</span>
-                        <span class="box-label d-block lh-sm mb-1">{{ $t("additional:modules.potentialDamagedBuilding.damagePotentialClass") }}</span>
-                        <span class="comment d-block small">{{ $t("additional:modules.potentialDamagedBuilding.currentlyUsed") }}</span>
-                        <button
-                            type="button"
-                            class="btn btn-link p-0 text-dark border-0"
-                            tabindex="0"
-                            data-bs-toggle="popover"
-                            data-bs-placement="bottom"
-                            data-bs-trigger="focus"
-                            :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.damagePotentialClass')"
-                        >
-                            <i class="bi bi-info-circle" />
-                        </button>
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="overview-card rounded p-3 text-center h-100 d-flex flex-column align-items-center justify-content-center">
-                        <span class="value fs-5 d-block text-truncate-custom">{{ lastUpdatedDate }}</span>
-                        <span class="box-label d-block lh-sm mb-1">{{ $t("additional:modules.potentialDamagedBuilding.updateDateLabel") }}</span>
-                        <span class="comment d-block small">{{ $t("additional:modules.potentialDamagedBuilding.lastUpdate") }}</span>
-                        <button
-                            type="button"
-                            class="btn btn-link p-0 text-dark border-0"
-                            tabindex="0"
-                            data-bs-toggle="popover"
-                            data-bs-placement="bottom"
-                            data-bs-trigger="focus"
-                            :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.updateDate')"
-                        >
-                            <i class="bi bi-info-circle" />
-                        </button>
-                    </div>
-                </div>
-            </div>
-            <h5 class="headline mt-5 mb-3">
-                <i class="bi bi-pencil-fill me-3" />
-                {{ $t("additional:modules.potentialDamagedBuilding.headline.updateData") }} {{ selectedItem.name }}
-            </h5>
-            <div class="d-flex gap-1 align-items-center card-hint">
-                <span class="mt-1">
-                    {{ $t("additional:modules.potentialDamagedBuilding.lastUpdatedHint") }}
-                </span>
-                <span class="ms-2">
-                    {{ formattedAdjustmentDate }}
-                </span>
-            </div>
-            <div class="row g-3 mt-2">
-                <div class="col-12 col-md-5">
-                    <div class="card shadow p-2 h-100">
-                        <div class="card-body">
-                            <h6 class="headline card-title">
-                                {{ $t("additional:modules.potentialDamagedBuilding.headline.adjustedDamagePotentialClass") }}
-                            </h6>
-                            <span class="card-hint">
-                                {{ $t("additional:modules.potentialDamagedBuilding.adjustedDamagePotentialClassHint") }}
-                            </span>
-                            <InputText
-                                id="adjusted-potential-damaged-class"
-                                v-model="adjustedDamageClass"
-                                class="mt-3"
-                                :class="!isDamageClassValid && invalid ? 'invalid': ''"
-                                :label="$t('additional:modules.potentialDamagedBuilding.damagePotentialClass')"
-                                :max="6"
-                                :min="1"
-                                :placeholder="$t('additional:modules.potentialDamagedBuilding.damagePotentialClass')"
-                                :type="'number'"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-12 col-md-7">
-                    <div class="card shadow p-2 h-100">
-                        <div class="card-body">
-                            <h6 class="headline card-title">
-                                {{ $t("additional:modules.potentialDamagedBuilding.headline.comment") }}
-                            </h6>
-                            <span class="card-hint">
-                                {{ $t("additional:modules.potentialDamagedBuilding.commentHint") }}
-                            </span>
-                            <InputText
-                                id="comment-text"
-                                v-model="comment"
-                                class="mt-3"
-                                :class="!isCommentValid && invalid ? 'invalid': ''"
-                                html-type="textarea"
-                                max-length="255"
-                                :label="$t('additional:modules.potentialDamagedBuilding.headline.comment')"
-                                :placeholder="$t('additional:modules.potentialDamagedBuilding.headline.comment')"
-                            />
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <ButtonGroup
+                class="mt-3"
+                :buttons="itemNameList"
+                group="building_attributes"
+                :selected-value="selectedItem?.name"
+                @set-selected-button="updateSelectedItem($event, itemList)"
+            />
             <HrSnackbar
+                v-if="!invalid"
                 :model-value="showSnackbar"
                 :message="snackbarMessage"
                 :color="snackbarColor"
                 @update:model-value="val => showSnackbar = val"
             />
-            <div class="d-flex justify-content-between align-items-center mt-4">
-                <FlatButton
-                    id="reset"
-                    icon="bi bi-arrow-counterclockwise"
-                    :secondary="true"
-                    :aria-label="$t('additional:modules.potentialDamagedBuilding.reset')"
-                    :text="$t('additional:modules.potentialDamagedBuilding.reset')"
-                    @click="setDataFromFeature(selectedFeature)"
+            <template v-if="selectedFeature">
+                <h5 class="mt-5">
+                    {{ $t("additional:modules.potentialDamagedBuilding.headline.buildingOverview") }}
+                </h5>
+                <div class="row row-cols-1 row-cols-md-2 g-4 justify-content-center">
+                    <div class="col">
+                        <div class="overview-card rounded p-3 text-center h-100 d-flex flex-column align-items-center justify-content-center">
+                            <span class="value fs-4 d-block text-truncate-custom">{{ lastUpdatedDamageClass }}</span>
+                            <span class="box-label d-block lh-sm mb-1">{{ $t("additional:modules.potentialDamagedBuilding.damagePotentialClass") }}</span>
+                            <span class="comment d-block small">{{ $t("additional:modules.potentialDamagedBuilding.currentlyUsed") }}</span>
+                            <button
+                                type="button"
+                                class="btn btn-link p-0 text-dark border-0"
+                                tabindex="0"
+                                data-bs-toggle="popover"
+                                data-bs-placement="bottom"
+                                data-bs-trigger="focus"
+                                :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.damagePotentialClass')"
+                            >
+                                <i class="bi bi-info-circle" />
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="overview-card rounded p-3 text-center h-100 d-flex flex-column align-items-center justify-content-center">
+                            <span class="value fs-5 d-block text-truncate-custom">{{ lastUpdatedDate }}</span>
+                            <span class="box-label d-block lh-sm mb-1">{{ $t("additional:modules.potentialDamagedBuilding.updateDateLabel") }}</span>
+                            <span class="comment d-block small">{{ $t("additional:modules.potentialDamagedBuilding.lastUpdate") }}</span>
+                            <button
+                                type="button"
+                                class="btn btn-link p-0 text-dark border-0"
+                                tabindex="0"
+                                data-bs-toggle="popover"
+                                data-bs-placement="bottom"
+                                data-bs-trigger="focus"
+                                :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.updateDate')"
+                            >
+                                <i class="bi bi-info-circle" />
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <h5 class="headline mt-5 mb-3">
+                    <i class="bi bi-pencil-fill me-3" />
+                    {{ $t("additional:modules.potentialDamagedBuilding.headline.updateData") }} {{ selectedItem.name }}
+                </h5>
+                <div class="d-flex gap-1 align-items-center card-hint">
+                    <span class="mt-1">
+                        {{ $t("additional:modules.potentialDamagedBuilding.lastUpdatedHint") }}
+                    </span>
+                    <span class="ms-2">
+                        {{ formattedAdjustmentDate }}
+                    </span>
+                </div>
+                <div class="row g-3 mt-2">
+                    <div class="col-12 col-md-5">
+                        <div class="card shadow p-2 h-100">
+                            <div class="card-body">
+                                <h6 class="headline card-title">
+                                    {{ $t("additional:modules.potentialDamagedBuilding.headline.adjustedDamagePotentialClass") }}
+                                </h6>
+                                <span class="card-hint">
+                                    {{ $t("additional:modules.potentialDamagedBuilding.adjustedDamagePotentialClassHint") }}
+                                </span>
+                                <InputText
+                                    id="adjusted-potential-damaged-class"
+                                    v-model="adjustedDamageClass"
+                                    class="mt-3"
+                                    :class="!isDamageClassValid && invalid ? 'invalid': ''"
+                                    :label="$t('additional:modules.potentialDamagedBuilding.damagePotentialClass')"
+                                    :max="6"
+                                    :min="1"
+                                    :placeholder="$t('additional:modules.potentialDamagedBuilding.damagePotentialClass')"
+                                    :type="'number'"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-7">
+                        <div class="card shadow p-2 h-100">
+                            <div class="card-body">
+                                <h6 class="headline card-title">
+                                    {{ $t("additional:modules.potentialDamagedBuilding.headline.comment") }}
+                                </h6>
+                                <span class="card-hint">
+                                    {{ $t("additional:modules.potentialDamagedBuilding.commentHint") }}
+                                </span>
+                                <InputText
+                                    id="comment-text"
+                                    v-model="comment"
+                                    class="mt-3"
+                                    :class="!isCommentValid && invalid ? 'invalid': ''"
+                                    html-type="textarea"
+                                    max-length="255"
+                                    :label="$t('additional:modules.potentialDamagedBuilding.headline.comment')"
+                                    :placeholder="$t('additional:modules.potentialDamagedBuilding.headline.comment')"
+                                />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <HrSnackbar
+                    :model-value="showSnackbar"
+                    :message="snackbarMessage"
+                    :color="snackbarColor"
+                    @update:model-value="val => showSnackbar = val"
                 />
-                <FlatButton
-                    id="save"
-                    icon="bi bi-save"
-                    :aria-label="$t('additional:modules.potentialDamagedBuilding.save')"
-                    :text="$t('additional:modules.potentialDamagedBuilding.save')"
-                    @click="onSave"
-                />
-            </div>
-            <h5 class="headline mt-5 mb-3">
-                <i class="bi bi-file-text me-3" />
-                {{ $t("additional:modules.potentialDamagedBuilding.headline.potentialDamagedInformation") }} {{ selectedItem.name }}
-            </h5>
-            <div class="mb-4">
-                <div class="d-flex align-items-center mb-2">
-                    <h6 class="headline-group mb-0">
-                        {{ $t("additional:modules.potentialDamagedBuilding.headline.potentialDamagedClass") }}
-                    </h6>
-                    <button
-                        type="button"
-                        class="btn btn-link p-0 text-dark border-0"
-                        tabindex="0"
-                        data-bs-toggle="popover"
-                        data-bs-placement="bottom"
-                        data-bs-trigger="focus"
-                        :data-bs-content="$t('additional:modules.potentialDamagedBuilding.description')"
-                    >
-                        <i class="ms-2 bi bi-info-circle" />
-                    </button>
+                <div class="d-flex justify-content-between align-items-center mt-4">
+                    <FlatButton
+                        id="reset"
+                        icon="bi bi-arrow-counterclockwise"
+                        :secondary="true"
+                        :aria-label="$t('additional:modules.potentialDamagedBuilding.reset')"
+                        :text="$t('additional:modules.potentialDamagedBuilding.reset')"
+                        @click="setDataFromFeature(selectedFeature)"
+                    />
+                    <FlatButton
+                        id="save"
+                        icon="bi bi-save"
+                        :aria-label="$t('additional:modules.potentialDamagedBuilding.save')"
+                        :text="$t('additional:modules.potentialDamagedBuilding.save')"
+                        @click="onSave"
+                    />
                 </div>
-                <div class="row g-0 mb-1 ms-4">
-                    <div class="col-4 col-md-8 box-label">
-                        {{ gfiAttributes.sk_aktuell }}
-                    </div>
-                    <div class="col text-muted">
-                        {{ lastUpdatedDamageClass }}
-                    </div>
-                </div>
-                <div class="row g-0 mb-1 ms-4">
-                    <div class="col-4 col-md-8 box-label">
-                        {{ gfiAttributes.sk_aktdatum?.name }}
-                    </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("sk_aktdatum") }}
-                    </div>
-                </div>
-                <div class="row g-0 mb-1 ms-4">
-                    <div class="col-4 col-md-8 box-label">
-                        {{ gfiAttributes.sk_basis }}
-                    </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("sk_basis") }}
-                    </div>
-                </div>
-                <div class="row g-0 mb-1 ms-4">
-                    <div class="col-4 col-md-8 box-label">
-                        {{ gfiAttributes.sk_angepasst }}
-                    </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("sk_angepasst") }}
-                    </div>
-                </div>
-                <div class="row g-0 mb-1 ms-4">
-                    <div class="col-4 col-md-8 box-label">
-                        {{ gfiAttributes.sk_anpdatum?.name }}
-                    </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("sk_anpdatum") }}
-                    </div>
-                </div>
-                <div class="row g-0 mb-1 ms-4">
-                    <div class="col-4 col-md-8 box-label">
-                        {{ gfiAttributes.kommentar }}
-                    </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("kommentar") }}
-                    </div>
-                </div>
-            </div>
-            <div class="mb-4">
-                <div class="d-flex align-items-center mb-2">
-                    <h6 class="headline-group mb-0">
-                        {{ $t("additional:modules.potentialDamagedBuilding.headline.buildingFunction") }}
-                    </h6>
-                    <button
-                        type="button"
-                        class="btn btn-link p-0 text-dark border-0"
-                        tabindex="0"
-                        data-bs-toggle="popover"
-                        data-bs-placement="bottom"
-                        data-bs-trigger="focus"
-                        :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.buildingKey')"
-                    >
-                        <i class="ms-2 bi bi-info-circle" />
-                    </button>
-                </div>
-                <div class="row g-0 mb-1 ms-4">
-                    <div class="col-4 col-md-8 box-label">
-                        {{ gfiAttributes.gfk }}
-                    </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("gfk") }}
-                    </div>
-                </div>
-                <div class="row g-0 ms-4">
-                    <div class="col-4 col-md-8 box-label">
-                        {{ gfiAttributes.bezgfk }}
-                    </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("bezgfk") }}
-                    </div>
-                </div>
-            </div>
-            <div class="mb-4">
-                <div class="d-flex align-items-center mb-2">
-                    <h6 class="headline-group mb-0">
-                        {{ $t("additional:modules.potentialDamagedBuilding.headline.additionalBuildingFunction") }}
-                    </h6>
-                    <button
-                        type="button"
-                        class="btn btn-link p-0 text-dark border-0"
-                        tabindex="0"
-                        data-bs-toggle="popover"
-                        data-bs-placement="bottom"
-                        data-bs-trigger="focus"
-                        :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.additionalBuildingFunction')"
-                    >
-                        <i class="ms-2 bi bi-info-circle" />
-                    </button>
-                </div>
-                <div class="row g-0 mb-1 ms-4">
-                    <div class="col-4 col-md-8 box-label">
-                        {{ gfiAttributes.wgf }}
-                    </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("wgf") }}
-                    </div>
-                </div>
-                <div class="row g-0 ms-4">
-                    <div class="col-4 col-md-8 box-label">
-                        {{ gfiAttributes.bezwgf }}
-                    </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("bezwgf") }}
-                    </div>
-                </div>
-            </div>
-            <div class="mb-4">
-                <h6 class="headline-group mb-2">
-                    {{ $t("additional:modules.potentialDamagedBuilding.headline.additionalInformation") }}
-                </h6>
-                <div class="row g-0 mb-1 ms-4">
-                    <div class="col-4 col-md-8 d-flex align-items-center">
-                        <span class="box-label">{{ gfiAttributes.bezofl }}</span>
+                <h5 class="headline mt-5 mb-3">
+                    <i class="bi bi-file-text me-3" />
+                    {{ $t("additional:modules.potentialDamagedBuilding.headline.potentialDamagedInformation") }} {{ selectedItem.name }}
+                </h5>
+                <div class="mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <h6 class="headline-group mb-0">
+                            {{ $t("additional:modules.potentialDamagedBuilding.headline.potentialDamagedClass") }}
+                        </h6>
                         <button
                             type="button"
-                            class="btn btn-link p-0 text-dark border-0 lh-1"
+                            class="btn btn-link p-0 text-dark border-0"
                             tabindex="0"
                             data-bs-toggle="popover"
                             data-bs-placement="bottom"
                             data-bs-trigger="focus"
-                            :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.earthSurface')"
+                            :data-bs-content="$t('additional:modules.potentialDamagedBuilding.description')"
                         >
                             <i class="ms-2 bi bi-info-circle" />
                         </button>
                     </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("bezofl") }}
+                    <div class="row g-0 mb-1 ms-4">
+                        <div class="col-4 col-md-8 box-label">
+                            {{ gfiAttributes.sk_aktuell }}
+                        </div>
+                        <div class="col text-muted">
+                            {{ lastUpdatedDamageClass }}
+                        </div>
+                    </div>
+                    <div class="row g-0 mb-1 ms-4">
+                        <div class="col-4 col-md-8 box-label">
+                            {{ gfiAttributes.sk_aktdatum?.name }}
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("sk_aktdatum") }}
+                        </div>
+                    </div>
+                    <div class="row g-0 mb-1 ms-4">
+                        <div class="col-4 col-md-8 box-label">
+                            {{ gfiAttributes.sk_basis }}
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("sk_basis") }}
+                        </div>
+                    </div>
+                    <div class="row g-0 mb-1 ms-4">
+                        <div class="col-4 col-md-8 box-label">
+                            {{ gfiAttributes.sk_angepasst }}
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("sk_angepasst") }}
+                        </div>
+                    </div>
+                    <div class="row g-0 mb-1 ms-4">
+                        <div class="col-4 col-md-8 box-label">
+                            {{ gfiAttributes.sk_anpdatum?.name }}
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("sk_anpdatum") }}
+                        </div>
+                    </div>
+                    <div class="row g-0 mb-1 ms-4">
+                        <div class="col-4 col-md-8 box-label">
+                            {{ gfiAttributes.kommentar }}
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("kommentar") }}
+                        </div>
                     </div>
                 </div>
-                <div class="row g-0 ms-4">
-                    <div class="col-4 col-md-8 d-flex align-items-center">
-                        <span class="box-label"> {{ gfiAttributes.bezbat }} </span>
+                <div class="mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <h6 class="headline-group mb-0">
+                            {{ $t("additional:modules.potentialDamagedBuilding.headline.buildingFunction") }}
+                        </h6>
                         <button
                             type="button"
-                            class="btn btn-link p-0 text-dark border-0 lh-1"
+                            class="btn btn-link p-0 text-dark border-0"
                             tabindex="0"
                             data-bs-toggle="popover"
                             data-bs-placement="bottom"
                             data-bs-trigger="focus"
-                            :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.buildingConstructionType')"
+                            :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.buildingKey')"
                         >
                             <i class="ms-2 bi bi-info-circle" />
                         </button>
                     </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("bezbat") }}
+                    <div class="row g-0 mb-1 ms-4">
+                        <div class="col-4 col-md-8 box-label">
+                            {{ gfiAttributes.gfk }}
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("gfk") }}
+                        </div>
+                    </div>
+                    <div class="row g-0 ms-4">
+                        <div class="col-4 col-md-8 box-label">
+                            {{ gfiAttributes.bezgfk }}
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("bezgfk") }}
+                        </div>
                     </div>
                 </div>
-                <div class="row g-0 ms-4">
-                    <div class="col-4 col-md-8 d-flex align-items-center">
-                        <span class="box-label"> {{ gfiAttributes.check_ug }} </span>
+                <div class="mb-4">
+                    <div class="d-flex align-items-center mb-2">
+                        <h6 class="headline-group mb-0">
+                            {{ $t("additional:modules.potentialDamagedBuilding.headline.additionalBuildingFunction") }}
+                        </h6>
                         <button
                             type="button"
-                            class="btn btn-link p-0 text-dark border-0 lh-1"
+                            class="btn btn-link p-0 text-dark border-0"
                             tabindex="0"
                             data-bs-toggle="popover"
                             data-bs-placement="bottom"
                             data-bs-trigger="focus"
-                            :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.basementLevels')"
+                            :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.additionalBuildingFunction')"
                         >
                             <i class="ms-2 bi bi-info-circle" />
                         </button>
                     </div>
-                    <div class="col text-muted">
-                        {{ selectedFeature.get("check_ug") }}
+                    <div class="row g-0 mb-1 ms-4">
+                        <div class="col-4 col-md-8 box-label">
+                            {{ gfiAttributes.wgf }}
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("wgf") }}
+                        </div>
+                    </div>
+                    <div class="row g-0 ms-4">
+                        <div class="col-4 col-md-8 box-label">
+                            {{ gfiAttributes.bezwgf }}
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("bezwgf") }}
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div class="mb-4">
+                    <h6 class="headline-group mb-2">
+                        {{ $t("additional:modules.potentialDamagedBuilding.headline.additionalInformation") }}
+                    </h6>
+                    <div class="row g-0 mb-1 ms-4">
+                        <div class="col-4 col-md-8 d-flex align-items-center">
+                            <span class="box-label">{{ gfiAttributes.bezofl }}</span>
+                            <button
+                                type="button"
+                                class="btn btn-link p-0 text-dark border-0 lh-1"
+                                tabindex="0"
+                                data-bs-toggle="popover"
+                                data-bs-placement="bottom"
+                                data-bs-trigger="focus"
+                                :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.earthSurface')"
+                            >
+                                <i class="ms-2 bi bi-info-circle" />
+                            </button>
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("bezofl") }}
+                        </div>
+                    </div>
+                    <div class="row g-0 ms-4">
+                        <div class="col-4 col-md-8 d-flex align-items-center">
+                            <span class="box-label"> {{ gfiAttributes.bezbat }} </span>
+                            <button
+                                type="button"
+                                class="btn btn-link p-0 text-dark border-0 lh-1"
+                                tabindex="0"
+                                data-bs-toggle="popover"
+                                data-bs-placement="bottom"
+                                data-bs-trigger="focus"
+                                :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.buildingConstructionType')"
+                            >
+                                <i class="ms-2 bi bi-info-circle" />
+                            </button>
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("bezbat") }}
+                        </div>
+                    </div>
+                    <div class="row g-0 ms-4">
+                        <div class="col-4 col-md-8 d-flex align-items-center">
+                            <span class="box-label"> {{ gfiAttributes.check_ug }} </span>
+                            <button
+                                type="button"
+                                class="btn btn-link p-0 text-dark border-0 lh-1"
+                                tabindex="0"
+                                data-bs-toggle="popover"
+                                data-bs-placement="bottom"
+                                data-bs-trigger="focus"
+                                :data-bs-content="$t('additional:modules.potentialDamagedBuilding.popover.basementLevels')"
+                            >
+                                <i class="ms-2 bi bi-info-circle" />
+                            </button>
+                        </div>
+                        <div class="col text-muted">
+                            {{ selectedFeature.get("check_ug") }}
+                        </div>
+                    </div>
+                </div>
+            </template>
         </template>
     </div>
 </template>
@@ -695,15 +729,14 @@ export default {
         font-size: clamp(1.2rem, 4vw, 2rem);
         color: $secondary;
     }
-    .comment {
-        font-size: $font_size_sm;
-        color: $dark_grey;
-        font-size: clamp(0.85rem, 3vw, 1rem);
-    }
     span:not(.value) {
         font-size: clamp(0.8rem, 2vw, 1rem);
         line-height: 1.2;
     }
+}
+.comment {
+    font-size: $font_size_sm;
+    color: $dark_grey;
 }
 .headline {
     color: $secondary;

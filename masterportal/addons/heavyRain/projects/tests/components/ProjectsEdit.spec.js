@@ -124,14 +124,6 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
 
             expect(wrapper.findComponent({name: "HrFooter"}).exists()).to.be.true;
         });
-
-        it("should render HrSnackbar component", async () => {
-            const wrapper = shallowMount(ProjectsEdit, {global: {plugins: [store]}});
-
-            wrapper.setData({"showSnackbar": true});
-
-            expect(wrapper.findComponent({name: "HrSnackbar"}).exists()).to.be.true;
-        });
     });
 
     describe("Edited project", () => {
@@ -184,8 +176,7 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
             wrapper.vm.loadFile({target: {files: [createFile("plan.pdf", 1024 * 1024 + 1)]}});
 
             expect(wrapper.vm.file).to.be.undefined;
-            expect(wrapper.vm.showSnackbar).to.be.true;
-            expect(wrapper.vm.snackbarColor).to.equal("error");
+            expect(wrapper.emitted("showSnackbarMessage").at(-1)[1]).to.equal("error");
         });
 
         it("should reject a file with a type which is not allowed", () => {
@@ -194,7 +185,7 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
             wrapper.vm.loadFile({dataTransfer: {files: [createFile("programm.exe", 10)]}});
 
             expect(wrapper.vm.file).to.be.undefined;
-            expect(wrapper.vm.showSnackbar).to.be.true;
+            expect(wrapper.emitted("showSnackbarMessage").at(-1)[1]).to.equal("error");
         });
 
         it("should do nothing if no file was chosen", () => {
@@ -337,7 +328,7 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
 
             expect(wrapper.vm.invalid).to.be.false;
             expect(sendTransactionStub.notCalled).to.be.true;
-            expect(wrapper.vm.showSnackbar).to.be.true;
+            expect(wrapper.emitted("showSnackbarMessage").at(-1)[1]).to.equal("error");
             expect(setCurrentViewSpy.notCalled).to.be.true;
         });
 
@@ -471,7 +462,7 @@ describe("addons/heavyRain/projects/components/ProjectsEdit.vue", () => {
 
             expect(getLayerByIdSpy.notCalled).to.be.true;
             expect(wrapper.vm.isSaving).to.be.false;
-            expect(wrapper.vm.showSnackbar).to.be.true;
+            expect(wrapper.emitted("showSnackbarMessage").at(-1)[1]).to.equal("error");
             expect(setCurrentViewSpy.notCalled).to.be.true;
         });
     });

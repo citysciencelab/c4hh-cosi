@@ -2,7 +2,7 @@ import ScenarioFeature from "./ScenarioFeature";
 import ScenarioNeighborhood from "./ScenarioNeighborhood";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import Feature from "ol/Feature";
-import {featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson";
+import {featuresToGeoJsonCollection} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import {downloadJsonToFile} from "../../utils/download";
 
 /**

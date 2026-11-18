@@ -29,6 +29,7 @@ const Config = {
             siteId: "1",
             trackerUrl: "https://your-matomo-instance.example.com/matomo.php",
             trackerScriptUrl: "https://your-matomo-instance.example.com/matomo.js",
+            trackFirstNavigationOnly: true,
             trackInitialView: true,
             privacy: [
                 "noCookies",
@@ -65,6 +66,7 @@ const Config = {
 | `siteId` | `String` | yes | The site ID assigned to this portal in the Matomo instance. |
 | `trackerScriptUrl` | `String` | yes | The URL of the Matomo JavaScript library (e.g. `matomo.js`). |
 | `trackerUrl` | `String` | yes | The URL of the Matomo tracking endpoint (e.g. `matomo.php`). |
+| `trackFirstNavigationOnly` | `Boolean` | no | If `true`, only the first user navigation will be tracked as a page view. Defaults to `false`. |
 | `trackInitialView` | `Boolean` | no | If `true`, a page view event is tracked immediately on initialization. Defaults to `false`. |
 
 ## Privacy Settings

@@ -38,9 +38,10 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
      * @param {Object[]} [options.informationType=[]] - The information types with their colors.
      * @param {Object} [options.currentRequirement={}] - The current requirement.
      * @param {String} [options.currentView="main"] - The current view.
+     * @param {Boolean} [options.loggedIn=true] - True, if the user is logged in.
      * @returns {Object} the store.
      */
-    function createTestStore ({wfstLayerId = "36013", informationType = [], currentRequirement = {}, currentView = "main"} = {}) {
+    function createTestStore ({wfstLayerId = "36013", informationType = [], currentRequirement = {geometry: {getExtent: () => []}}, currentView = "main", loggedIn = true} = {}) {
         return createStore({
             namespaced: true,
             actions: {
@@ -62,6 +63,18 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
                     namespaced: true,
                     modules: {
                         namespaced: true,
+                        Login: {
+                            namespaced: true,
+                            state: {loggedIn},
+                            getters: {
+                                loggedIn: state => state.loggedIn
+                            },
+                            mutations: {
+                                setLoggedIn: (state, value) => {
+                                    state.loggedIn = value;
+                                }
+                            }
+                        },
                         UpdateRequirements: {
                             namespaced: true,
                             getters: {
@@ -96,6 +109,48 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
 
     afterEach(() => {
         sinon.restore();
+    });
+
+    describe("Login", () => {
+        it("should neither show the layer nor the content if the user is not logged in", () => {
+            const wrapper = shallowMount(UpdateRequirements, {global: {plugins: [createTestStore({loggedIn: false})]}});
+
+            expect(addOrReplaceLayerSpy.notCalled).to.be.true;
+            expect(registerListenerSpy.notCalled).to.be.true;
+            expect(wrapper.find(".alert").exists()).to.be.true;
+            expect(wrapper.findComponent({name: "HrHeader"}).exists()).to.be.false;
+
+            wrapper.unmount();
+
+            expect(replaceByIdInLayerConfigSpy.notCalled).to.be.true;
+        });
+
+        it("should show the layer after the login", async () => {
+            const testStore = createTestStore({loggedIn: false}),
+                wrapper = shallowMount(UpdateRequirements, {global: {plugins: [testStore]}});
+
+            testStore.commit("Modules/Login/setLoggedIn", true);
+            await flushPromises();
+
+            expect(addOrReplaceLayerSpy.calledOnce).to.be.true;
+            expect(registerListenerSpy.calledOnce).to.be.true;
+            expect(wrapper.find(".alert").exists()).to.be.false;
+        });
+
+        it("should hide the layer and reset the current report after the logout", async () => {
+            const testStore = createTestStore(),
+                wrapper = shallowMount(UpdateRequirements, {global: {plugins: [testStore]}});
+
+            await flushPromises();
+            testStore.commit("Modules/Login/setLoggedIn", false);
+            await flushPromises();
+
+            expect(unregisterListenerSpy.calledOnce).to.be.true;
+            expect(replaceByIdInLayerConfigSpy.calledOnce).to.be.true;
+            expect(setCurrentRequirementSpy.calledOnceWith(sinon.match.any, undefined)).to.be.true;
+            expect(setCurrentViewSpy.calledOnceWith(sinon.match.any, "main")).to.be.true;
+            expect(wrapper.find(".alert").exists()).to.be.true;
+        });
     });
 
     describe("Lifecycle Hooks", () => {
@@ -200,14 +255,14 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
 
     describe("Computed Properties", () => {
         it("should get the source of the saved image of the current report", () => {
-            const currentRequirement = {formValues: {name: "Meldung A", image: "data:image/png;base64,iVBOR"}},
+            const currentRequirement = {formValues: {name: "Meldung A", image: "data:image/png;base64,iVBOR"}, geometry: {getExtent: () => []}},
                 wrapper = shallowMount(UpdateRequirements, {global: {plugins: [createTestStore({currentRequirement})]}});
 
             expect(wrapper.vm.imageSrc).to.equal("data:image/png;base64,iVBOR");
         });
 
         it("should get no image source if the report has no image", () => {
-            const currentRequirement = {formValues: {name: "Meldung A", image: ""}},
+            const currentRequirement = {formValues: {name: "Meldung A", image: ""}, geometry: {getExtent: () => []}},
                 wrapper = shallowMount(UpdateRequirements, {global: {plugins: [createTestStore({currentRequirement})]}});
 
             expect(wrapper.vm.imageSrc).to.be.undefined;
@@ -223,6 +278,9 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
             const currentRequirement = {
                     formValues: {
                         informationType: "Aktualisierungsbedarf SRGK"
+                    },
+                    geometry: {
+                        getExtent: () => []
                     }
                 },
                 wrapper = shallowMount(UpdateRequirements, {global: {plugins: [createTestStore({informationType: informationTypes, currentRequirement})]}});
@@ -266,8 +324,6 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
                     name: "Meldung A"
                 });
                 expect(setCurrentRequirementSpy.firstCall.args[1].geometry.getCoordinates()).to.deep.equal(feature.getGeometry().getCoordinates());
-                expect(placingPointMarkerSpy.calledOnce).to.be.true;
-                expect(placingPointMarkerSpy.firstCall.args[1]).to.deep.equal([565000, 5935000]);
             });
 
             it("should not set a requirement if no feature was clicked", () => {
@@ -276,7 +332,6 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
                 wrapper.vm.onMapClick({pixel: [0, 0], map: {forEachFeatureAtPixel: () => undefined}});
 
                 expect(setCurrentRequirementSpy.notCalled).to.be.true;
-                expect(placingPointMarkerSpy.notCalled).to.be.true;
             });
 
             it("should not set a requirement in the create-new view", () => {
@@ -285,7 +340,6 @@ describe("addons/heavyRain/updateRequirements/components/updateRequirements.vue"
                 wrapper.vm.onMapClick(evt);
 
                 expect(setCurrentRequirementSpy.notCalled).to.be.true;
-                expect(placingPointMarkerSpy.notCalled).to.be.true;
             });
         });
 

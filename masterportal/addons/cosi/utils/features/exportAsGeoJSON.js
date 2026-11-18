@@ -1,4 +1,4 @@
-import {featureToGeoJson} from "../../utils/features/convertToGeoJson";
+import {featureToGeoJson} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import {downloadJsonToFile} from "../../utils/download";
 
 /**

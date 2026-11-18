@@ -8,6 +8,7 @@ import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import InfoCard from "../../shared/card/components/InfoCard.vue";
 import InfoText from "../../shared/card/components/InfoText.vue";
 import {mapGetters, mapMutations, mapActions} from "vuex";
+import SpinnerItem from "@shared/modules/spinner/components/SpinnerItem.vue";
 import StoryCreator from "../../storyCreator/components/StoryCreator.vue";
 import Toast from "../../shared/toasts/components/ToastsElement.vue";
 
@@ -20,6 +21,7 @@ export default {
         FlatButton,
         InfoCard,
         InfoText,
+        SpinnerItem,
         StoryCreator,
         Toast
     },
@@ -30,7 +32,8 @@ export default {
             showImportWarning3D: false,
             showLeaveToolModal: false,
             pendingNavigation: null,
-            savedStoryIndex: null
+            savedStoryIndex: null,
+            isLoading: false
         };
     },
     computed: {
@@ -325,6 +328,8 @@ export default {
                 return;
             }
 
+            this.isLoading = true;
+
             const stories = await Promise.all(
                 files.map(async (filename) => {
                     const file = `${storyPath}/${filename}.zip`;
@@ -365,6 +370,8 @@ export default {
                 ...stories.filter(Boolean),
                 ...this.storyList
             ]);
+
+            this.isLoading = false;
         },
         /**
          * Handles selected import file.
@@ -515,8 +522,15 @@ export default {
                     @closed="showImportWarning3D = false"
                 />
             </div>
+            <div class="d-flex justify-content-center">
+                <SpinnerItem
+                    v-if="isLoading"
+                    custom-class="spinner"
+                    class="ms-3"
+                />
+            </div>
             <InfoText
-                v-if="!storyList?.length"
+                v-if="!storyList?.length && !isLoading"
                 class="mb-4"
                 :text="$t('additional:modules.storyManager.emptyStory')"
             />

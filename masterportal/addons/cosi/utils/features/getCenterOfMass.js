@@ -1,6 +1,6 @@
 import {centerOfMass} from "@turf/center-of-mass";
 import Feature from "ol/Feature";
-import {GeoJSON} from "ol/format";
+import {featureToGeoJson} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import isObject from "@shared/js/utils/isObject.js";
 
 /**
@@ -19,12 +19,7 @@ export function getCenterOfMass (feature, sourceCrs = "EPSG:25832", targetCrs = 
         console.error("utils/features/getCenterOfMass: The second and the third parameter must both be a string, but got " + typeof sourceCrs + " and " + typeof targetCrs);
         return false;
     }
-    const
-        parser = new GeoJSON({
-            dataProjection: targetCrs,
-            featureProjection: sourceCrs
-        }),
-        geojson = parser.writeFeatureObject(feature),
+    const geojson = featureToGeoJson(feature, false, sourceCrs, targetCrs),
         centroidFeature = centerOfMass(geojson);
 
     return centroidFeature?.geometry.coordinates;

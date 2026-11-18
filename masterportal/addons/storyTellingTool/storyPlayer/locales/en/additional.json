@@ -3,7 +3,7 @@
         "storyPlayer": {
             "name": "Story Player",
             "close": "Close",
-            "description": "Please insert a description.",
+            "description": " Playback of stories, including chapter-by-chapter navigation using the map.",
             "tableOfContents": "Table of Contents",
             "goToPrevStep": "Go to the previous chapter",
             "goToNextStep": "Go to the next chapter",

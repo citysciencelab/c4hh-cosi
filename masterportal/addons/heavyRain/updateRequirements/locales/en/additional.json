@@ -19,11 +19,13 @@
         "uploadOptional": "Upload image (optional)",
         "removeImage": "Delete image",
         "imagePreview": "Preview of the image",
+        "maxImageSize": "Maximum image size: {{maxSize}} MB",
         "pleaseSelect": "Please select",
         "lastUpdate": "Last update",
         "createdAt": "Created on: ",
         "createdBy": "Created by: "
       },
+      "loginRequired": "Please log in to see and edit the reports.",
       "messages": {
         "invalid": "The input fields for name, initiator and contact person can not be left blank.",
         "missingGeometry": "Please draw the affected area as a polygon on the map first.",

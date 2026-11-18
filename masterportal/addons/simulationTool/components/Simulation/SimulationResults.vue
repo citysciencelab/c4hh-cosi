@@ -53,6 +53,7 @@ export default {
     computed: {
         ...mapGetters("Modules/SimulationTool", [
             "onJobStatusChange",
+            "onResultsAvailable",
             "planningScenarios",
             "simulations",
             "simulationIdForResults"
@@ -207,8 +208,7 @@ export default {
     },
     watch: {
         /**
-         * Watches for changes in the job status and updates the job status tags, start times, finished times, progress values and outputs.
-         * Also calls showFeatures to display the features on the map.
+         * Watches for changes in the job status and updates the job status tags, start times, finished times and progress values.
          * @param {Object} jobs - The jobs object.
          */
         onJobStatusChange: {
@@ -219,7 +219,16 @@ export default {
                 this.startTimes = jobsArr.map(job => job.jobStatus?.started).filter(time => time);
                 this.finishedTimes = jobsArr.map(job => job.jobStatus?.finished).filter(time => time);
                 this.progressValues = jobsArr.map(job => job.jobStatus?.progress).filter(progress => Number.isFinite(progress));
+            },
+            immediate: true
+        },
 
+        /**
+         * Updates visible outputs and map features when job results become available.
+         */
+        onResultsAvailable: {
+            handler () {
+                const jobsArr = Object.values(this.jobs || {});
                 const allOutputs = Object.keys(jobsArr[0]?.jobResults || {});
 
                 this.outputs = this.getVisibleOutputs(allOutputs);
@@ -372,6 +381,7 @@ export default {
                           name: this.currentSimulation?.name || layerId,
                           typ: layerType,
                           url,
+                          legendURL,
                           loadingStrategy: "bbox",
                           dontInitStyle: true
                       }
@@ -379,6 +389,7 @@ export default {
                           typ: layerType,
                           id: layerId,
                           name: this.currentSimulation?.name || layerId,
+                          legendURL,
                           dontInitStyle: true
                       };
 
@@ -408,7 +419,7 @@ export default {
                     typ: layerType,
                     visibility: true,
                     showInLayerTree: true,
-                    transparency: 40,
+                    transparency: 10,
                     legendURL
                 },
                 parentKey: "subjectlayer"
@@ -1063,13 +1074,13 @@ export default {
                 <div
                     class="d-flex justify-content-between button"
                 >
-                    <FlatButton
+                    <!-- <FlatButton
                         id="back"
                         :icon="'bi bi-gear'"
                         :aria-label="$t('additional:modules.tools.simulationTool.showProperties')"
                         :text="$t('additional:modules.tools.simulationTool.showProperties')"
                         @click="() => setMode('simulationParameter')"
-                    />
+                    /> -->
                     <FlatButton
                         id="delete-simulation"
                         secondary

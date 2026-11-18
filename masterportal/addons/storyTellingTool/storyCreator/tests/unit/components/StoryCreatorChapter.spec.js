@@ -550,7 +550,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             });
         });
 
-        describe("handleDraw", () => {
+        describe("handleDrawWrite", () => {
             it("should add features when editor index points to add position", async () => {
                 const features = [{title: "feature1"}, {title: "feature2"}],
                     createDrawObjectStub = sinon.stub(wrapper.vm, "createDrawObject");
@@ -563,7 +563,7 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                     content: []
                 });
 
-                await wrapper.vm.handleDraw(features);
+                await wrapper.vm.handleDrawWrite(features, "draw");
 
                 expect(wrapper.vm.openContentEditor).to.deep.equal({
                     type: "",
@@ -578,24 +578,35 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 expect(createDrawObjectStub.called).to.be.true;
             });
 
-            it("should edit existing features when editor index points to an existing item", async () => {
-                const features = [{title: "feature1"}, {title: "feature2"}],
-                    createDrawObjectStub = sinon.stub(wrapper.vm, "createDrawObject");
+            it("should edit existing write content when editor index points to an existing item", async () => {
+                const mapText = [{
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [10, 20]
+                    },
+                    properties: {},
+                    style: {
+                        fillColor: [255, 255, 255, 1],
+                        strokeColor: [0, 0, 0, 1],
+                        strokeWidth: 1
+                    }
+                }];
 
                 await wrapper.setData({
                     openContentEditor: {
-                        type: "draw",
+                        type: "write",
                         index: 0
                     },
                     content: [
                         {
-                            type: "draw",
-                            attrs: [{title: "feature1"}, {title: "feature2"}]
+                            type: "write",
+                            attrs: [{type: "Feature", geometry: {type: "Point"}}]
                         }
                     ]
                 });
 
-                await wrapper.vm.handleDraw(features);
+                wrapper.vm.handleDrawWrite(mapText, "write");
 
                 expect(wrapper.vm.openContentEditor).to.deep.equal({
                     type: "",
@@ -603,11 +614,10 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
                 });
                 expect(wrapper.vm.content).to.deep.equal([
                     {
-                        type: "draw",
-                        attrs: [{title: "feature1"}, {title: "feature2"}]
+                        type: "write",
+                        attrs: mapText
                     }
                 ]);
-                expect(createDrawObjectStub.called).to.be.true;
             });
         });
 
@@ -887,86 +897,6 @@ describe("addons/storyCreator/components/StoryCreatorChapter.vue", () => {
             });
         });
 
-        describe("handleMapText", () => {
-            it("should add write content when editor index points to add position", async () => {
-                const mapText = [{
-                    type: "Feature",
-                    geometry: {
-                        type: "Point",
-                        coordinates: [10, 20]
-                    },
-                    properties: {},
-                    style: {
-                        fillColor: [255, 255, 255, 1],
-                        strokeColor: [0, 0, 0, 1],
-                        strokeWidth: 1
-                    }
-                }];
-
-                await wrapper.setData({
-                    openContentEditor: {
-                        type: "write",
-                        index: 0
-                    },
-                    content: []
-                });
-
-                wrapper.vm.handleMapText(mapText);
-
-                expect(wrapper.vm.openContentEditor).to.deep.equal({
-                    type: "",
-                    index: null
-                });
-                expect(wrapper.vm.content).to.deep.equal([
-                    {
-                        type: "write",
-                        attrs: mapText
-                    }
-                ]);
-            });
-
-            it("should edit existing write content when editor index points to an existing item", async () => {
-                const mapText = [{
-                    type: "Feature",
-                    geometry: {
-                        type: "Point",
-                        coordinates: [10, 20]
-                    },
-                    properties: {},
-                    style: {
-                        fillColor: [255, 255, 255, 1],
-                        strokeColor: [0, 0, 0, 1],
-                        strokeWidth: 1
-                    }
-                }];
-
-                await wrapper.setData({
-                    openContentEditor: {
-                        type: "write",
-                        index: 0
-                    },
-                    content: [
-                        {
-                            type: "write",
-                            attrs: [{type: "Feature", geometry: {type: "Point"}}]
-                        }
-                    ]
-                });
-
-                wrapper.vm.handleMapText(mapText);
-
-                expect(wrapper.vm.openContentEditor).to.deep.equal({
-                    type: "",
-                    index: null
-                });
-                expect(wrapper.vm.content).to.deep.equal([
-                    {
-                        type: "write",
-                        attrs: mapText
-                    }
-                ]);
-            });
-        });
         describe("loadChapterData", () => {
             it("should load draw and write content", async () => {
                 const drawFeatures = [{type: "draw"}],

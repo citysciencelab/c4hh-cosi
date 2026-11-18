@@ -11,6 +11,7 @@ import {pointerMove} from "ol/events/condition";
 import {Select} from "ol/interaction";
 import TagGroup from "../../shared/modules/tags/components/TagGroup.vue";
 import {VExpansionPanels, VExpansionPanel, VExpansionPanelTitle, VExpansionPanelText} from "vuetify/components/VExpansionPanel";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 export default {
     name: "DipasProjectsContributions",
@@ -402,7 +403,7 @@ export default {
          */
         handleLinkClick (url) {
             if (url) {
-                window.open(url, "_blank", "noopener,noreferrer");
+                openSecuredPopup(url, "_blank", "noopener,noreferrer");
             }
         },
 

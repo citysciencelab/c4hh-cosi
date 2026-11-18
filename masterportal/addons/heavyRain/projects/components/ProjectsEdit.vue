@@ -6,7 +6,6 @@ import {getDownloadFileName, hasAllowedExtension} from "../../shared/js/fileData
 import {getGeometryCenter} from "../../shared/js/getGeometryCenter.js";
 import HrDraw from "../../shared/components/HrDraw.vue";
 import HrFooter from "../../shared/components/HrFooter.vue";
-import HrSnackbar from "../../shared/components/HrSnackbar.vue";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 import layerCollection from "@core/layers/js/layerCollection.js";
@@ -21,11 +20,11 @@ export default {
         FileUpload,
         HrDraw,
         HrFooter,
-        HrSnackbar,
         IconButton,
         InputText,
         Multiselect
     },
+    emits: ["showSnackbarMessage"],
     data () {
         return {
             chosenCriteria: [],
@@ -43,9 +42,6 @@ export default {
             isSaving: false,
             projectName: "",
             protectedAreas: "",
-            showSnackbar: false,
-            snackbarColor: "error",
-            snackbarMessage: "",
             source: "",
             startDate: ""
         };
@@ -69,6 +65,14 @@ export default {
          */
         displayedFileName () {
             return getDownloadFileName(this.file, this.fileName, this.projectName);
+        },
+
+        /**
+         * Gets the maximum file size in megabytes.
+         * @returns {Number} the maximum file size in MB.
+         */
+        maxFileSizeInMB () {
+            return this.maxFileSize / (1024 * 1024);
         },
 
         /**
@@ -147,6 +151,7 @@ export default {
     },
     unmounted () {
         setWfstFeatureVisibility(this.wfstLayerId, this.currentProject?.id, true);
+        this.setCurrentView("main");
     },
     methods: {
         ...mapActions("Maps", ["placingPointMarker"]),
@@ -205,7 +210,7 @@ export default {
             if (file.size > this.maxFileSize) {
                 this.showErrorMessage(this.$t("additional:modules.projects.messages.fileTooLarge", {
                     fileName: file.name,
-                    maxSize: this.maxFileSize / (1024 * 1024)
+                    maxSize: this.maxFileSizeInMB
                 }));
                 return;
             }
@@ -275,14 +280,12 @@ export default {
         },
 
         /**
-         * Shows the given message in the snackbar of the form.
+         * Shows the given message as error in the snackbar of the parent component.
          * @param {String} message the message to display.
          * @returns {void}
          */
         showErrorMessage (message) {
-            this.snackbarMessage = message;
-            this.snackbarColor = "error";
-            this.showSnackbar = true;
+            this.$emit("showSnackbarMessage", message, "error");
         }
     }
 };
@@ -449,6 +452,9 @@ export default {
                 <h5 class="mb-2">
                     {{ $t('additional:modules.projects.labels.fileUpload') }}
                 </h5>
+                <p class="small text-muted mb-2">
+                    {{ $t('additional:modules.projects.labels.maxFileSize', {maxSize: maxFileSizeInMB}) }}
+                </p>
                 <div
                     v-if="typeof file !== 'undefined'"
                     class="d-flex align-items-center gap-3 mb-2"
@@ -476,12 +482,6 @@ export default {
                 />
             </div>
         </div>
-        <HrSnackbar
-            :model-value="showSnackbar"
-            :message="snackbarMessage"
-            :color="snackbarColor"
-            @update:model-value="val => showSnackbar = val"
-        />
         <HrFooter
             :cancel-text="$t('additional:modules.projects.cancelButtonLabel')"
             :save-text="$t('additional:modules.projects.saveButtonLabel')"

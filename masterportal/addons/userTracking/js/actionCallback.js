@@ -1,3 +1,4 @@
+import {drawVersion2026} from "./constants.js";
 import {handleActivateActionforSearchBar} from "./handler/handleActivateActionforSearchBar.js";
 import {handleAddImportedFilename} from "./handler/handleAddImportedFilename.js";
 import {handleAddLayerToLayerConfig} from "./handler/handleAddLayerToLayerConfig.js";
@@ -12,6 +13,8 @@ import {handleCreatePrintJob} from "./handler/handleCreatePrintJob.js";
 import {handleDoRequestForSdpDownload} from "./handler/handleDoRequestForSdpDownload.js";
 import {handleDrawClearLayer} from "./handler/handleDrawClearLayer.js";
 import {handleDrawClickDownload} from "./handler/handleDrawClickDownload.js";
+import {handleDrawEditAction} from "./handler/handleDrawEditAction.js";
+import {handleDrawEditFeatureStyle} from "./handler/handleDrawEditFeatureStyle.js";
 import {handleDrawInteractionOld} from "./handler/handleDrawInteractionOld.js";
 import {handleDrawRedoAndUndo} from "./handler/handleDrawRedoAndUndo.js";
 import {handleDrawSetCircleRadius} from "./handler/handleDrawSetCircleRadius.js";
@@ -90,6 +93,12 @@ export function actionCallback (action, store) {
                 break;
             case "Modules/CoordToolkit/positionClicked":
                 handlePositionClickedForCoordToolkit();
+                break;
+            case "Modules/Draw/editActionPerformed":
+                handleDrawEditAction(action.payload, drawVersion2026);
+                break;
+            case "Modules/Draw/featureStyleChanged":
+                handleDrawEditFeatureStyle(action.payload, drawVersion2026);
                 break;
             case "Modules/Draw_old/clearLayer":
                 handleDrawClearLayer();

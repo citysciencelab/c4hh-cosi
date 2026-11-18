@@ -3,7 +3,7 @@
         "storyPlayer": {
             "name": "Story Wiedergabe",
             "close": "schließen",
-            "description": "Bitte eine Beschreibung einfügen.",
+            "description": " Wiedergabe von Stories inklusive kapitelweiser Kartensteuerung.",
             "tableOfContents": "Inhaltsverzeichnis",
             "goToPrevStep": "Zum vorherigen Kapitel gehen",
             "goToNextStep": "Zum nächsten Kapitel gehen",

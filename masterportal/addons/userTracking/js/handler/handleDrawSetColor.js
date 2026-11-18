@@ -14,6 +14,6 @@ export function handleDrawSetColor ({isOuter, type, version}) {
 
     trackDrawToolEventDebounced(
         `Changed${isOuter ? " outer " : " "}${type}-color`,
-        {funcName, version}
+        {funcName, debounceKey: `${funcName}-${isOuter ? "outer" : "inner"}-${type}`, version}
     );
 }

@@ -4,6 +4,7 @@ import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vu
 import {mapGetters} from "vuex";
 import {uniqueId} from "@shared/js/utils/uniqueId";
 import {VSkeletonLoader} from "vuetify/components/VSkeletonLoader";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup";
 
 export default {
     name: "ToolInfo",
@@ -62,7 +63,7 @@ export default {
          */
         openLink () {
             if (this.url) {
-                return window.open(this.getUrl(), "_blank");
+                return openSecuredPopup(this.getUrl(), "_blank");
             }
 
             return null;

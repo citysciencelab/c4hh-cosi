@@ -19,11 +19,13 @@
         "uploadOptional": "Bild hochladen (optional)",
         "removeImage": "Bild löschen",
         "imagePreview": "Vorschau des Bildes",
+        "maxImageSize": "Maximale Bildgröße: {{maxSize}} MB",
         "pleaseSelect": "Bitte wählen",
         "lastUpdate": "letzte Aktualisierung",
         "createdAt": "erstellt am: ",
         "createdBy": "Initiator: "
       },
+      "loginRequired": "Bitte melden Sie sich an, um die Meldungen zu sehen und zu bearbeiten.",
       "messages": {
         "invalid": "Die Eingabefelder für Name, Initiator und Ansprechpartner dürfen nicht leer sein.",
         "missingGeometry": "Bitte zeichnen Sie zunächst das betroffene Gebiet als Fläche auf der Karte ein.",

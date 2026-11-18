@@ -6,9 +6,11 @@ import {vi} from "vitest";
 import SimulationParameter from "../../../../components/Simulation/SimulationParameter.vue";
 import sinon from "sinon";
 import axios from "axios";
+import crs from "@masterportal/masterportalapi/src/crs.js";
 import getOAFFeature from "../../../../../../src/shared/js/api/oaf/getOAFFeature.js";
 import layerCollection from "@core/layers/js/layerCollection.js";
 import layerFactory from "@core/layers/js/layerFactory.js";
+import mapCollection from "@core/maps/js/mapCollection.js";
 
 const {deserializeHelperMock} = vi.hoisted(() => ({
     deserializeHelperMock: vi.fn()
@@ -1223,6 +1225,10 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
         });
 
         describe("loadRequiredOafInputs", () => {
+            beforeEach(() => {
+                crs.registerProjections();
+            });
+
             it("should pass fetched FeatureCollection payload to setRequestBodyInput", async () => {
                 const wrapper = factory.getShallowMount(),
                     setRequestBodyInputSpy = sinon.spy(wrapper.vm, "setRequestBodyInput"),
@@ -1249,6 +1255,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                         }
                     ];
 
+                sinon.stub(mapCollection, "getMap").returns({getView: () => ({getProjection: () => "EPSG:3857"})});
                 wrapper.vm.addLayerToLayerConfig = sinon.stub();
                 wrapper.vm.changeVisibility = sinon.stub();
                 Object.defineProperty(wrapper.vm, "simulation", {
@@ -1309,6 +1316,7 @@ describe("addons/SimulationTool/components/Simulation/SimulationParameter.vue", 
                     getOAFFeatureGetSpy = sinon.spy(getOAFFeature, "getOAFFeatureGet"),
                     setRequestBodyInputSpy = sinon.spy(wrapper.vm, "setRequestBodyInput");
 
+                sinon.stub(mapCollection, "getMap").returns({getView: () => ({getProjection: () => "EPSG:3857"})});
                 wrapper.vm.addLayerToLayerConfig = sinon.stub();
                 wrapper.vm.changeVisibility = sinon.stub();
                 Object.defineProperty(wrapper.vm, "simulation", {

@@ -1,6 +1,7 @@
 import {buffer as turfBuffer} from "@turf/buffer";
-import GeoJSON from "ol/format/GeoJSON";
 import GeometryCollection from "ol/geom/GeometryCollection";
+import {geoJsonToGeometry} from "@shared/js/utils/convertGeoJSONToGeometry";
+import {geometryToGeoJson} from "@shared/js/utils/convertGeometryToGeoJSON.js";
 
 const defaultCRS = {
     utm32: "EPSG:25832",
@@ -21,7 +22,6 @@ export default function getBoundingGeometry (features, bufferValue = 0, portalCr
     }
 
     const bufferVal = parseFloat(bufferValue),
-        parser = new GeoJSON(),
         geometries = features
             .map(feature => feature
                 .clone() // clone the feature as to not destruct the original layer
@@ -29,11 +29,10 @@ export default function getBoundingGeometry (features, bufferValue = 0, portalCr
                 .transform(portalCrs, defaultCRS.wgs84) // transform to lat/lon
             ),
         geometryCollection = new GeometryCollection(geometries),
-        geoJson = parser.writeGeometryObject(geometryCollection),
+        geoJson = geometryToGeoJson(geometryCollection, false, defaultCRS.wgs84, defaultCRS.wgs84),
         bufferedGeoJson = turfBuffer(geoJson, bufferVal, {units: "meters"}),
         bufferedGeometries = bufferedGeoJson.features
-            .map(feature => parser
-                .readGeometry(feature.geometry)
+            .map(feature => geoJsonToGeometry(feature.geometry)
                 .transform(defaultCRS.wgs84, portalCrs) // retransform to portal CRS
             );
 

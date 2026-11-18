@@ -1,4 +1,4 @@
-import {featuresToGeoJsonCollection, featureToGeoJson} from "../../utils/features/convertToGeoJson";
+import {featureToGeoJson, featuresToGeoJsonCollection} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import {downloadJsonToFile} from "../../utils/download";
 import {Point} from "ol/geom.js";
 import Feature from "ol/Feature.js";

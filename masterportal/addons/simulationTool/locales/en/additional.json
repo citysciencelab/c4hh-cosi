@@ -17,6 +17,8 @@
           "back": "back",
           "buildings": "buildings",
           "cancel": "Cancel",
+          "drawPolygon": "Draw polygon",
+          "noPolygonDrawn": "No polygon drawn",
           "chart-bar": "Bar",
           "chart-line": "Line",
           "chart-radar": "Radar",

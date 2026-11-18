@@ -25,6 +25,7 @@ import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.
 import {unionFeatures} from "../js/unionFeatures.js";
 import getters from "../store/gettersValuationPrint.js";
 import mutations from "../store/mutationsValuationPrint.js";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 export default {
     name: "ValuationPrint",
@@ -721,7 +722,7 @@ export default {
             }
             urlList.forEach(url => {
                 if (url?.link) {
-                    window.open(url.link);
+                    openSecuredPopup(url.link, "_blank");
                 }
             });
         },

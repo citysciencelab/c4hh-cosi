@@ -1,5 +1,6 @@
 <script>
 import {mapGetters, mapActions} from "vuex";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 import dayjs from "dayjs";
 
 export default {
@@ -52,7 +53,7 @@ export default {
          * @returns {void}
          */
         onClick (link) {
-            window.open(link, "_blank");
+            openSecuredPopup(link, "_blank");
         },
         /**
          * Center the visible map on the geometry of a feature

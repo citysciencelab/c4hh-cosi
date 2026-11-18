@@ -18,6 +18,8 @@
           "back": "Zurück",
           "buildings": "Gebäude",
           "cancel": "Abbrechen",
+          "drawPolygon": "Polygon zeichnen",
+          "noPolygonDrawn": "Kein Polygon gezeichnet",
           "chart-bar": "Balken",
           "chart-line": "Linien",
           "chart-radar": "Radar",

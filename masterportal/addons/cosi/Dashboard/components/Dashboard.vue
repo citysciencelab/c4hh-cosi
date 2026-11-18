@@ -36,6 +36,7 @@ import {VDataTableVirtual} from "vuetify/components/VDataTable";
 import {VIcon} from "vuetify/components/VIcon";
 import {VMain} from "vuetify/components/VMain";
 import {VTooltip} from "vuetify/components/VTooltip";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 export default {
     // eslint-disable-next-line vue/multi-word-component-names
@@ -548,7 +549,7 @@ export default {
             const datasetConfig = rawLayerList.getLayerWhere({id: item.layerId})?.datasets[0];
 
             if (typeof datasetConfig !== "undefined") {
-                window.open(datasetConfig.show_doc_url + datasetConfig.md_id);
+                openSecuredPopup(datasetConfig.show_doc_url + datasetConfig.md_id, "_blank");
             }
             else {
                 console.warn("No metadata info found for layer ID:", item.layerId);

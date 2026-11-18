@@ -32,6 +32,7 @@
  * @property {Object[]} landuseRoadDrawIcons - The draw icons for roads.
  * @property {Object[]} landuseRoadDrawTypesMain - The main draw types for roads.
  * @property {number} onJobStatusChange - Counter for job status changes, used to trigger updates.
+ * @property {number} onResultsAvailable - Counter for result availability changes, used to trigger rendering.
  * @property {Object|null} process the current process
  * @property {Array.<Object>} processes a list of processes
  * @property {boolean} processesLoading flag indicating if processes are loading
@@ -80,6 +81,7 @@ const state = {
     landuseRoadDrawTypesMain: ["line"],
     mode: "home-panel",
     onJobStatusChange: 0,
+    onResultsAvailable: 0,
     planningScenarios: [],
     planningScenarioCurrentLayout: {
         fillColor: [0, 0, 0],

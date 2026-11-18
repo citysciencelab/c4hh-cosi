@@ -2,7 +2,7 @@
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import BarchartItemAnnotated from "../../components/BarchartItemAnnotated.vue";
 import Badges from "../../shared/modules/badges/components/Badges.vue";
-import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
+import BaseCard from "@shared/modules/cards/components/BaseCard.vue";
 import deepAssign from "@shared/js/utils/deepAssign";
 import DistrictFinderFilterSpinner from "./DistrictFinderFilterSpinner.vue";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
@@ -17,7 +17,7 @@ export default {
         AlertMessage,
         BarchartItemAnnotated,
         Badges,
-        CustomCard,
+        BaseCard,
         DistrictFinderFilterSpinner,
         DropdownAutocomplete,
         InputText,
@@ -661,7 +661,7 @@ export default {
 
 <template lang="html">
     <div class="filter-card">
-        <CustomCard
+        <BaseCard
             class="mb-3 d-flex flex-nowrap"
             :closeable="true"
             @click:close="deleteCard"
@@ -837,7 +837,7 @@ export default {
                     {{ $t("additional:modules.tools.cosi.districtFinder.warnings.noDataset") }}
                 </v-snackbar>
             </div>
-        </CustomCard>
+        </BaseCard>
         <DistrictFinderFilterSpinner
             v-if="isLoading"
             class="loading-overlay"

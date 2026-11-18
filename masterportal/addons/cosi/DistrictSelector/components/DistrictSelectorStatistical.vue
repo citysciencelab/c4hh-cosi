@@ -2,13 +2,13 @@
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import {calculateExtent} from "../../utils/features/calculateExtent.js";
 import Card from "../../shared/modules/cards/components/Card.vue";
-import {geoJsonToFeature} from "../../utils/features/convertFromGeoJson.js";
+import {geoJsonToFeature} from "@shared/js/utils/convertGeoJSONToFeature.js";
 import {union as turfUnion} from "@turf/union";
 import DistrictSelectorFilter from "./DistrictSelectorFilter.vue";
 import DistrictSelectorStatisticalAdditionalLayer from "./DistrictSelectorStatisticalAdditionalLayer.vue";
 import {downloadJsonToFile} from "../../utils/download";
 import {DragBox, Select} from "ol/interaction";
-import {featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson";
+import {featuresToGeoJsonCollection} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import {Fill, Stroke, Style} from "ol/style.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
 import getBoundingGeometry from "../../utils/getBoundingGeometry.js";

@@ -2,7 +2,7 @@
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import Card from "../../shared/modules/cards/components/Card.vue";
 import {downloadJsonToFile} from "../../utils/download";
-import {featureToGeoJson} from "../../utils/features/convertToGeoJson";
+import {featureToGeoJson} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import IconButton from "@shared/modules/buttons/components/IconButton.vue";
 import {mapGetters} from "vuex";
 

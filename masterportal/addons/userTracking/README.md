@@ -31,6 +31,7 @@ The following user interactions are tracked as Matomo events automatically.
 |--------|------|---------|---------------|
 | `Added layer via layertree and turned it on` | Layer name and ID | A layer was turned on via the layer tree ("Themen hinzufügen"). | v3.26.0 - v3.26.0 |
 | `Added layer via layertree` | Layer name and ID | A layer was turned on via the layer tree ("Themen hinzufügen"). | v3.27.0 |
+| `Added layer via query` | Layer name and ID | A layer was added via the url params `LAYERS`, `LAYERIDS`, `MAP/LAYERIDS`, `MDID` or `MAP/MDID` (one event per layer, sent together with the first other tracked event, not on page load; layers with `visibility: true` in the config.json are not tracked). | v3.28.0 |
 | `Added layer via search` | Layer name and ID | A layer was added through the search results. | v3.26.0 |
 | `Changed layer-visibility via {source}` | Layer name and ID | A layer's visibility checkbox was toggled (e.g. from the layer tree or layer selection). The value field is `1` (visible) or `0` (hidden). | v3.26.0 - v3.26.0 |
 | `Turned layer-visibility on/off via {source}` | Layer name and ID | A layer's visibility checkbox was toggled (e.g. from the layer tree or layer selection). | v3.27.0 |
@@ -88,7 +89,7 @@ The following user interactions are tracked as Matomo events automatically.
 
 ##### Draw
 
-Draw tool interactions are also tracked under the `Tool` category, but are listed separately here since both the legacy Draw tool and the new Draw tool (2026) are covered. The `Name` field reflects which version was used: `Draw (Old)` for the legacy tool, `Draw ({version})` (e.g. `Draw (2026)`) for the new tool. Rows marked "legacy tool only" are not yet wired up for the new Draw tool.
+Draw tool interactions are also tracked under the `Tool` category, but are listed separately here since both the legacy Draw tool and the new Draw tool (2026) are covered. The `Name` field reflects which version was used: `Draw (Old)` for the legacy tool, `Draw ({version})` (e.g. `Draw (2026)`) for the new tool. Rows with the name `Draw (Old)` apply to the legacy tool only; rows with the name `Draw ({version})` apply to the new tool. How the new tool reports its interactions is described in [Notes on the new Draw tool](#notes-on-the-new-draw-tool).
 
 | Action | Name | Trigger | From - Until |
 |--------|------|---------|---------------|
@@ -114,6 +115,23 @@ Draw tool interactions are also tracked under the `Tool` category, but are liste
 | `Changed stroke width` / `Changed outer stroke width` | `Draw (Old)` / `Draw ({version})` | The stroke width was changed (debounced, 500 ms). | v3.27.0 |
 | `Changed text` | `Draw (Old)` / `Draw ({version})` | The text of a text drawing was changed (debounced, 500 ms). | v3.26.0 |
 | `Changed visibility to: on/off` | `Draw (Old)` / `Draw ({version})` | The draw layer's visibility was toggled. | v3.26.0 |
+| `Cleared draw layer` | `Draw ({version})` | The "delete all" button was pressed and all drawn features were removed. | v3.28.0 |
+| `Deleted drawn feature` | `Draw ({version})` | A single drawn feature was deleted while the delete interaction was active. | v3.28.0 |
+| `Pressed Undo-Button` / `Pressed Redo-Button` | `Draw ({version})` | The undo or redo button was pressed. | v3.28.0 |
+| `Pressed Download-Button` | `Draw ({version})` | A file with the drawn features was downloaded. | v3.28.0 |
+| `Changed download format to: {format}` | `Draw ({version})` | The download format was changed. Selecting "none" is not tracked. | v3.28.0 |
+| `Changed draw type to: {drawType}` / `Changed draw type main to: {drawType}` | `Draw ({version})` | A draw type or a main draw type (e.g. pen, text, geometries, symbols) was selected. Empty values (reset of the selection) are not tracked. | v3.28.0 |
+| `Changed interaction to: {interaction}` | `Draw ({version})` | An interaction (`draw`, `delete`, `modify`, `editAttributes` or `download`) was activated. | v3.28.0 |
+| `Changed {property} of drawn feature` | `Draw ({version})` | A style property of an already drawn feature was changed in the "modify" mode (debounced, 500 ms). `{property}` is one of `fill-color`, `stroke-color`, `stroke width`, `fill transparency`, `stroke transparency`, `font`, `font size`, `text`, `point size` or `icon scale`. | v3.28.0 |
+
+###### Notes on the new Draw tool
+
+- **Store-based events**: Settings made before drawing (colors, stroke width, circle options, draw type, interaction, ...) are tracked via mutations of the `Modules/Draw` store. The Draw module only commits these mutations if a value actually changes, so identical values are not tracked again.
+- **Ignored mutation**: `Modules/Draw/applyDrawTypeStyle` is committed by the module itself when the draw type changes (restoring the style of this draw type) and is intentionally not tracked.
+- **Actions without state change**: Edits of existing drawings do not change the store. The Draw tool therefore dispatches two actions that only serve as notification and leave the state untouched:
+    - `Modules/Draw/featureStyleChanged` with the payload `{key, value}` for style changes of a drawn feature.
+    - `Modules/Draw/editActionPerformed` with the payload `{action, format}`, where `action` is one of `undo`, `redo`, `deleteAll`, `deleteFeature`, `setDownloadFormat` or `downloadFile` (`format` is only set for the two download actions). Other toolbar buttons are tracked via the `setSelectedInteraction` mutation.
+- **Debouncing**: Events for colors and stroke widths are debounced separately for fill/stroke and inner/outer, so changing several of them at once does not cancel events.
 
 #### Link
 

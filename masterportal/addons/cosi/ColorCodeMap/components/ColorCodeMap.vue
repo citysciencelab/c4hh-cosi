@@ -8,6 +8,7 @@ import ColorCodeLegend from "./ColorCodeLegend.vue";
 import {generateColorScale} from "../../utils/colorScale.js";
 import groupMapping from "../../utils/groupMapping";
 import {mapDistrictNames} from "../../DistrictSelector/utils/prepareDistrictLevels";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup";
 
 export default {
     name: "ColorCodeMap",
@@ -230,7 +231,7 @@ export default {
          * @returns {Void} Function returns nothing.
          */
         showInfo () {
-            window.open(this.readmeUrl[this.currentLocale], "_blank");
+            openSecuredPopup(this.readmeUrl[this.currentLocale], "_blank");
         },
         /**
          * @description Filters the feature data sets and pass them to the prepareGraphData() for graph visualization.
@@ -269,7 +270,7 @@ export default {
 
         openMetadata () {
             this.metadataUrls.forEach(url => {
-                window.open(url);
+                openSecuredPopup(url, "_blank");
             });
         }
     }

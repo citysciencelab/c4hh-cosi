@@ -3,9 +3,11 @@ import {handleClearRedoForFeatureForMeasure} from "./handler/handleClearRedoForF
 import {handleDrawInteraction} from "./handler/handleDrawInteraction.js";
 import {handleDrawSetCircleRadius} from "./handler/handleDrawSetCircleRadius.js";
 import {handleDrawSetColor} from "./handler/handleDrawSetColor.js";
+import {handleDrawSetDrawType} from "./handler/handleDrawSetDrawType.js";
 import {handleDrawSetFillTransparency} from "./handler/handleDrawSetFillTransparency.js";
 import {handleDrawSetFontName} from "./handler/handleDrawSetFontName.js";
 import {handleDrawSetFontSize} from "./handler/handleDrawSetFontSize.js";
+import {handleDrawSetInteraction} from "./handler/handleDrawSetInteraction.js";
 import {handleDrawSetShapeMethod} from "./handler/handleDrawSetShapeMethod.js";
 import {handleDrawSetStrokeWidth} from "./handler/handleDrawSetStrokeWidth.js";
 import {handleDrawSetText} from "./handler/handleDrawSetText.js";
@@ -82,6 +84,10 @@ export function mutationCallback (mutation) {
                     });
                 }
 
+                if (mutation.payload.squareUnit !== undefined) {
+                    handleDrawSetUnit(mutation.payload.squareUnit, drawVersion2026);
+                }
+
                 if (mutation.payload.strokeColor !== undefined) {
                     handleDrawSetColor({
                         isOuter: false,
@@ -144,19 +150,21 @@ export function mutationCallback (mutation) {
                 else if (mutation.payload === "hide") {
                     handleDrawSetVisibility(false, drawVersion2026);
                 }
+                else {
+                    handleDrawSetInteraction(mutation.payload, drawVersion2026);
+                }
 
-                // to-be-added: handleDrawSetInteraction
-                // options + main draw-tools
-                // debounce for text
                 break;
             case "Modules/Draw/setSelectedDrawType":
-                // to-be-added: handleDrawSetDrawType
-                // note: called multiple times
-                //  -> combine with "setSelectedDrawTypeMain" to track it once
-                //  or store previous non-empty value
+                if (mutation.payload) {
+                    handleDrawSetDrawType(mutation.payload, false, drawVersion2026);
+                }
+
                 break;
             case "Modules/Draw/setSelectedDrawTypeMain":
-                // to-be-added: handleDrawSetDrawType
+                if (mutation.payload) {
+                    handleDrawSetDrawType(mutation.payload, true, drawVersion2026);
+                }
                 break;
             case "Modules/Measure/clearRedoForFeature":
                 handleClearRedoForFeatureForMeasure();

@@ -2,7 +2,7 @@
 import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vue";
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import FileUpload from "@shared/modules/inputs/components/FileUpload.vue";
-import {GeoJSON} from "ol/format.js";
+import {geoJsonToFeature} from "@shared/js/utils/convertGeoJSONToFeature.js";
 import {uniqueId} from "@shared/js/utils/uniqueId";
 
 export default {
@@ -98,14 +98,10 @@ export default {
                 return;
             }
 
-            const geojsonFeature = JSON.parse(content),
-                  geoJsonParser = new GeoJSON({
-                      dataProjection: "EPSG:4326",
-                      featureProjection: "EPSG:25832"
-                  });
+            const geojsonFeature = JSON.parse(content);
 
             try {
-                const olFeatures = geoJsonParser.readFeatures(geojsonFeature);
+                const olFeatures = geoJsonToFeature(geojsonFeature);
 
                 this.$emit("set-imported-feature", olFeatures);
                 this.isFormatValid = true;

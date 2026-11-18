@@ -1,8 +1,8 @@
 import {simplify as turfSimplify} from "@turf/simplify";
 import {polygon, multiPolygon} from "@turf/helpers";
-import GeoJSON from "ol/format/GeoJSON";
+import {geoJsonToGeometry} from "@shared/js/utils/convertGeoJSONToGeometry";
+import isObject from "@shared/js/utils/isObject";
 import SimpleGeometry from "ol/geom/SimpleGeometry";
-import isObject from "../../../../src/shared/js/utils/isObject";
 
 /**
  * Takes a geometry and returns a simplified version.
@@ -39,9 +39,8 @@ function simplify (geometry, tolerance = 1) {
         return false;
     }
 
-    const parser = new GeoJSON(),
-        simplifiedFeature = turfSimplify(geojson, {tolerance}),
-        simplifiedGeometry = parser.readGeometry(simplifiedFeature.geometry);
+    const simplifiedFeature = turfSimplify(geojson, {tolerance}),
+        simplifiedGeometry = geoJsonToGeometry(simplifiedFeature.geometry);
 
     return simplifiedGeometry;
 }

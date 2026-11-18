@@ -20,6 +20,7 @@ import {startPrintProcess} from "../../shared/js/mapfishUtils/startPrintProcess.
 import MapfishDialog from "../../shared/js/mapfishUtils/mapfishDialog.js";
 import ModalItem from "@shared/modules/modals/components/ModalItem.vue";
 import WaterRiskCheckSearchBar from "../searchBar/components/WaterRiskCheckSearchBar.vue";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 export default {
     name: "WaterRiskCheck",
@@ -1052,7 +1053,7 @@ export default {
          * @returns {void}
          */
         openWindow (val) {
-            window.open(val, "_blank");
+            openSecuredPopup(val, "_blank");
         }
     }
 

@@ -2,7 +2,7 @@ import axios from "axios";
 import sanitizeConfiguredUrl from "./sanitizeConfiguredUrl.js";
 
 /**
- * @import {ProcessDescription} from "../types/ogcApi.processes.js"
+ * @import {ProcessDescription, StatusInfo} from "../types/ogcApi.processes.js"
  */
 
 /**
@@ -174,25 +174,30 @@ export default class OgcApiProcess {
      * @throws {Error} If an error occurs during execution or if the job fails.
     */
     async pollJobStatusAndGetResults (accessToken, jobID, pollingInterval = 1000, onProgressUpdate = null) {
-        try {
-            let jobStatus = await this.getJobStatus(jobID, accessToken);
+        /** @type StatusInfo|undefined*/
+        let jobStatus;
 
-            onProgressUpdate?.({...jobStatus});
-
-            while (jobStatus?.status === "running" || jobStatus?.status === "accepted") {
-                await new Promise(resolve => setTimeout(resolve, pollingInterval));
+        while (!jobStatus || jobStatus.status === "running" || jobStatus.status === "accepted") {
+            try {
                 jobStatus = await this.getJobStatus(jobID, accessToken);
                 onProgressUpdate?.({...jobStatus});
             }
-
-            if (jobStatus?.status !== "successful") {
-                console.warn(`Job failed with status: ${jobStatus?.status}`);
+            catch {
+                console.warn("Error fetching job status, continuing polling ...");
             }
+            await new Promise(resolve => setTimeout(resolve, pollingInterval));
+        }
 
+        if (jobStatus?.status !== "successful") {
+            console.warn(`Job failed with status: ${jobStatus?.status}`);
+            return undefined;
+        }
+
+        try {
             return await this.getJobResults(jobID, accessToken);
         }
         catch (error) {
-            console.warn("Error polling job status and getting results:", error);
+            console.warn("Error fetching result:", error);
             throw error;
         }
     }

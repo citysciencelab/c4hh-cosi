@@ -1,11 +1,10 @@
 import Circle from "ol/geom/Circle.js";
 import {Fill, Stroke, Style, Text, RegularShape} from "ol/style.js";
+import {featureToGeoJson} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import {fromCircle} from "ol/geom/Polygon";
+import {geoJsonToFeature} from "@shared/js/utils/convertGeoJSONToFeature.js";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
-import {GeoJSON} from "ol/format.js";
 import Point from "ol/geom/Point.js";
-
-const geoJsonParser = new GeoJSON();
 
 /**
  * Converts OpenLayers features to StoryCreator GeoJSON features.
@@ -20,7 +19,7 @@ function openlayersToGeoJson (features) {
             feature.setGeometry(fromCircle(feature.getGeometry(), 64));
         }
 
-        const geojsonFeature = geoJsonParser.writeFeatureObject(feature);
+        const geojsonFeature = featureToGeoJson(feature);
 
         geojsonFeature.style = openlayersStyleToGeoJson(feature.getStyle());
         geoJsonFeatures.push(geojsonFeature);
@@ -38,7 +37,7 @@ function geoJsonToOpenlayers (features) {
     const olFeatures = [];
 
     features.forEach(feature => {
-        const olFeature = geoJsonParser.readFeature(feature);
+        const olFeature = geoJsonToFeature(feature);
 
         if (feature.style) {
             olFeature.setStyle(geoJsonStyleToOpenlayers(feature.style, olFeature));

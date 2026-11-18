@@ -1,7 +1,8 @@
 import {union as turfUnion} from "@turf/union";
 import {intersect as turfIntersect} from "@turf/intersect";
 import {featureCollection} from "@turf/helpers";
-import {GeoJSON} from "ol/format";
+import {featureToGeoJson, featuresToGeoJsonCollection} from "@shared/js/utils/convertFeatureToGeoJSON.js";
+import {geoJsonToFeature} from "@shared/js/utils/convertGeoJSONToFeature.js";
 import {getCenter, intersects} from "ol/extent";
 
 /**
@@ -101,11 +102,7 @@ export function getContainingDistrictForExtent (districtLevel, extent, returnsFe
  * @returns {module:ol/Feature | GeoJSONFeatureCollection} the feature or GeoJSON
  */
 export function union (features, resetProperties = false, returnsFeature = false, sourceCrs = "EPSG:25832", targetCrs = "EPSG:4326") {
-    const parser = new GeoJSON({
-            dataProjection: targetCrs,
-            featureProjection: sourceCrs
-        }),
-        geojson = parser.writeFeaturesObject(features);
+    const geojson = featureToGeoJson(features, false, sourceCrs, targetCrs);
     let unionFeature = geojson.features[0];
 
     // join features
@@ -125,7 +122,7 @@ export function union (features, resetProperties = false, returnsFeature = false
     }
     // parse to OL feature
     if (returnsFeature) {
-        unionFeature = parser.readFeature(unionFeature);
+        unionFeature = geoJsonToFeature(unionFeature, sourceCrs, targetCrs);
     }
 
     return unionFeature;
@@ -141,11 +138,7 @@ export function union (features, resetProperties = false, returnsFeature = false
  * @returns {module:ol/Feature | GeoJSONFeatureCollection} the feature or GeoJSON
  */
 export function intersect (features, resetProperties = false, returnsFeature = false, sourceCrs = "EPSG:25832", targetCrs = "EPSG:4326") {
-    const parser = new GeoJSON({
-            dataProjection: targetCrs,
-            featureProjection: sourceCrs
-        }),
-        geojson = parser.writeFeaturesObject(features);
+    const geojson = featuresToGeoJsonCollection(features, false, sourceCrs, targetCrs);
     let intersectionFeature = geojson.features[0];
 
     // intersect features
@@ -160,7 +153,7 @@ export function intersect (features, resetProperties = false, returnsFeature = f
         }
         // parse to OL feature
         if (returnsFeature) {
-            intersectionFeature = parser.readFeature(intersectionFeature);
+            intersectionFeature = geoJsonToFeature(intersectionFeature, sourceCrs, targetCrs);
         }
     }
 

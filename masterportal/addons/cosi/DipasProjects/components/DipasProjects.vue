@@ -2,7 +2,7 @@
 import axios from "axios";
 import {markRaw} from "vue";
 import Card from "../../shared/modules/cards/components/Card.vue";
-import {geoJsonCollectionToFeatures} from "../../utils/features/convertFromGeoJson";
+import {geoJsonCollectionToFeatures} from "@shared/js/utils/convertGeoJSONToFeature.js";
 import dayjs from "dayjs";
 import DipasContributions from "./DipasProjectsContributions.vue";
 import {exportFeatureAsGeoJSON} from "../../utils/features/exportAsGeoJSON";
@@ -13,6 +13,7 @@ import {mapGetters, mapMutations, mapActions} from "vuex";
 import mutations from "../store/mutationsDipasProjects";
 import {Point} from "ol/geom";
 import ToolInfo from "../../shared/modules/toolInfo/components/ToolInfo.vue";
+import {openSecuredPopup} from "@shared/js/utils/openSecuredPopup.js";
 
 export default {
     name: "DipasProjects",
@@ -311,7 +312,7 @@ export default {
          */
         handleLinkClick (url) {
             if (url) {
-                window.open(url, "_blank", "noopener,noreferrer");
+                openSecuredPopup(url, "_blank", "noopener,noreferrer");
             }
         },
         /**

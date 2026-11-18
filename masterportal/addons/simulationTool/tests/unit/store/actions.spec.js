@@ -205,7 +205,8 @@ describe("addons/SimulationTool/store/actions", () => {
 
     describe("pollAndAssignSimulationJobsResults", () => {
         it("positive: polls jobs and assigns normalized results", async () => {
-            const dispatch = sinon.spy(),
+            const commit = sinon.spy(),
+                dispatch = sinon.spy(),
                 getters = {shouldSaveSimulations: false},
                 rootGetters = {"Modules/Login/accessToken": "token"},
                 jobs = [{jobStatus: {status: "accepted"}}],
@@ -230,7 +231,7 @@ describe("addons/SimulationTool/store/actions", () => {
                 );
 
             await pollAndAssignSimulationJobsResults(
-                {dispatch, getters, rootGetters},
+                {commit, dispatch, getters, rootGetters},
                 {jobs, jobIds, processConfigs, simulationConfig}
             );
 

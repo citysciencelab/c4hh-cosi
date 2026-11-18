@@ -192,7 +192,7 @@ export default {
             this.currentModifyInteraction = null;
             this.setSelectedDrawType("");
             this.setSelectedDrawTypeMain("");
-            this.$emit("addDrawing", jsonFeatures);
+            this.$emit("addDrawing", jsonFeatures, "draw");
         },
 
         /**

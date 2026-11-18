@@ -1,12 +1,12 @@
 <script>
-import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
+import BaseCard from "@shared/modules/cards/components/BaseCard.vue";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import InputText from "@shared/modules/inputs/components/InputText.vue";
 
 export default {
     name: "CalculateRatioSelectionCard",
     components: {
-        CustomCard,
+        BaseCard,
         DropdownAutocomplete,
         InputText
     },
@@ -79,7 +79,7 @@ export default {
 </script>
 
 <template lang="html">
-    <CustomCard>
+    <BaseCard>
         <div class="d-flex flex-row mt-3 me-3">
             <div class="dropdown align-self-start mt-2 me-3">
                 <button
@@ -210,7 +210,7 @@ export default {
                 </template>
             </div>
         </div>
-    </CustomCard>
+    </BaseCard>
 </template>
 
 <style lang="scss" scoped>

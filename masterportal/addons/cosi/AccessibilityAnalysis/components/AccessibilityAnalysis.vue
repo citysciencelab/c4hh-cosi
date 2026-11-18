@@ -6,7 +6,7 @@ import AccordionItem from "@shared/modules/accordion/components/AccordionItem.vu
 import AlertMessage from "../../shared/modules/alerts/components/AlertMessage.vue";
 import {Dropdown} from "bootstrap";
 import ButtonGroup from "../../components/ButtonGroup.vue";
-import CustomCard from "../../shared/modules/cards/components/CustomCard.vue";
+import BaseCard from "@shared/modules/cards/components/BaseCard.vue";
 import {union} from "@turf/union";
 import {featureCollection as turfFeatureCollection} from "@turf/helpers";
 import {VExpandTransition} from "vuetify/components/transitions";
@@ -16,9 +16,9 @@ import deepEqual from "fast-deep-equal";
 import differenceJs from "@shared/js/utils/differenceJS";
 import DropdownAutocomplete from "../../shared/modules/dropdown/components/DropdownAutocomplete.vue";
 import Feature from "ol/Feature";
-import {featureToGeoJson, featuresToGeoJsonCollection} from "../../utils/features/convertToGeoJson";
+import {featureToGeoJson, featuresToGeoJsonCollection} from "@shared/js/utils/convertFeatureToGeoJSON.js";
 import FlatButton from "@shared/modules/buttons/components/FlatButton.vue";
-import {geoJsonCollectionToFeatures} from "../../utils/features/convertFromGeoJson";
+import {geoJsonCollectionToFeatures} from "@shared/js/utils/convertGeoJSONToFeature.js";
 import {getLayerSource} from "../../utils/layer/getLayerSource";
 import getters from "../store/gettersAccessibilityAnalysis";
 import html2canvas from "html2canvas";
@@ -68,7 +68,7 @@ export default {
         LabeledSlider,
         ResultManagement,
         SimpleCard,
-        CustomCard,
+        BaseCard,
         SwitchInput,
         TabBar,
         ToolInfo,
@@ -459,7 +459,7 @@ export default {
     },
     methods: {
         ...mapActions(["replaceByIdInLayerConfig"]),
-        ...mapActions("Maps", ["addInteraction", "removeInteraction", "zoomToExtent", "clickCoordinate"]),
+        ...mapActions("Maps", ["addInteraction", "removeInteraction", "zoomToExtent"]),
         ...mapMutations("Modules/AccessibilityAnalysis", Object.keys(mutations)),
         ...mapActions("Modules/AccessibilityAnalysis", ["getIsochrones"]),
         ...mapMutations("Modules/DistrictSelector", ["setBoundingGeometry"]),
@@ -1628,7 +1628,7 @@ export default {
                             v-slot="{toggle, selectedClass}"
                             :value="true"
                         >
-                            <CustomCard
+                            <BaseCard
                                 hoverable
                                 :class="selectedClass"
                                 role="button"
@@ -1641,13 +1641,13 @@ export default {
                                         {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.mergePolygonsInfo') }}
                                     </div>
                                 </div>
-                            </CustomCard>
+                            </BaseCard>
                         </v-item>
                         <v-item
                             v-slot="{toggle, selectedClass}"
                             :value="false"
                         >
-                            <CustomCard
+                            <BaseCard
                                 hoverable
                                 :class="selectedClass"
                                 role="button"
@@ -1660,7 +1660,7 @@ export default {
                                         {{ $t('additional:modules.tools.cosi.accessibilityAnalysis.visualizationOptions.dontMergePolygonsInfo') }}
                                     </div>
                                 </div>
-                            </CustomCard>
+                            </BaseCard>
                         </v-item>
                     </v-item-group>
                 </AccordionItem>

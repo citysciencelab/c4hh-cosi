@@ -1,9 +1,10 @@
-import {WFS, GeoJSON} from "ol/format.js";
+import {WFS} from "ol/format.js";
 import rawLayerList from "@masterportal/masterportalapi/src/rawLayerList";
 import wfsRequest from "@shared/js/api/wfs/getFeature";
 import oafRequest from "@shared/js/api/oaf/getOAFFeature";
 import {transformExtent} from "ol/proj";
 import axios from "axios";
+import {geoJsonToFeature} from "@shared/js/utils/convertGeoJSONToFeature.js";
 
 /**
  * Converts the passed bbox to a string and adds the name of the SRS to the bbox.
@@ -99,18 +100,13 @@ export async function getFeatures (layerId, opts = {}) {
         features = oafRequest.readAllOAFToGeoJSON(response);
     }
     else if (layer.typ === "GeoJSON") {
-        const geoJsonReader = new GeoJSON();
-
         response = await axios.get(layer.url)
             .then(res => res.data)
             .catch(error => {
                 console.error(error);
             });
 
-        features = geoJsonReader.readFeatures(response, {
-            dataProjection: "EPSG:4326",
-            featureProjection: opts.srsName || "EPSG:25832"
-        });
+        features = geoJsonToFeature(response, false, opts.srsName || "EPSG:25832", "EPSG:4326");
     }
     else {
         console.error(`utils/features/getFeatures: layer with the passed layerId (${layerId}) if not of type "WFS", "GeoJSON", or "OAF".`);

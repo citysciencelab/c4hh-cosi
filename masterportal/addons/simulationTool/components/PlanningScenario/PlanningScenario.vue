@@ -29,7 +29,7 @@ export default {
 </script>
 
 <template>
-    <div>
+    <div class="overflow-auto">
         <PlanningScenarioOverview
             v-if="currentPlanningComponent === ''"
             @open-create-scenario="setCurrentPlanningComponent('create')"

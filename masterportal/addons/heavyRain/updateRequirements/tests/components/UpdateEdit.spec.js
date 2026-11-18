@@ -112,14 +112,6 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
 
             expect(wrapper.findComponent({name: "HrFooter"}).exists()).to.be.true;
         });
-
-        it("should render HrSnackbar component", async () => {
-            const wrapper = shallowMount(UpdateEdit, {global: {plugins: [store]}});
-
-            await wrapper.setData({showSnackbar: true});
-
-            expect(wrapper.findComponent({name: "HrSnackbar"}).exists()).to.be.true;
-        });
     });
 
     describe("Computed Properties", () => {
@@ -196,7 +188,7 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
 
             expect(wrapper.vm.invalid).to.be.false;
             expect(sendTransactionStub.notCalled).to.be.true;
-            expect(wrapper.vm.showSnackbar).to.be.true;
+            expect(wrapper.emitted("showSnackbarMessage").at(-1)[1]).to.equal("error");
             expect(wrapper.emitted("click:save")).to.be.undefined;
         });
 
@@ -294,7 +286,7 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
 
             expect(getLayerByIdSpy.notCalled).to.be.true;
             expect(wrapper.vm.isSaving).to.be.false;
-            expect(wrapper.vm.showSnackbar).to.be.true;
+            expect(wrapper.emitted("showSnackbarMessage").at(-1)[1]).to.equal("error");
             expect(wrapper.emitted("click:save")).to.be.undefined;
         });
     });
@@ -365,8 +357,7 @@ describe("addons/heavyRain/updateRequirements/components/UpdateEdit.vue", () => 
 
             expect(wrapper.vm.image).to.be.undefined;
             expect(wrapper.vm.imageName).to.be.undefined;
-            expect(wrapper.vm.showSnackbar).to.be.true;
-            expect(wrapper.vm.snackbarColor).to.equal("error");
+            expect(wrapper.emitted("showSnackbarMessage").at(-1)[1]).to.equal("error");
         });
 
         it("should load an image of 1 MB", async () => {

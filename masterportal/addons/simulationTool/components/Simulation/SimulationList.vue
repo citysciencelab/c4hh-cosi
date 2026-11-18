@@ -1,5 +1,5 @@
 <script>
-import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
+// import FlatButton from "../../../../src/shared/modules/buttons/components/FlatButton.vue";
 import isObject from "../../../../src/shared/js/utils/isObject.js";
 import layerCollection from "../../../../src/core/layers/js/layerCollection.js";
 import {mapActions, mapGetters, mapMutations} from "vuex";
@@ -10,7 +10,7 @@ import SimulationResults from "./SimulationResults.vue";
 export default {
     name: "SimulationList",
     components: {
-        FlatButton,
+        // FlatButton,
         SectionHeader,
         SimulationResults
     },
@@ -238,7 +238,7 @@ export default {
         >
             {{ $t('additional:modules.tools.simulationTool.noJobs') }}
         </div>
-        <div class="row d-flex">
+        <!-- <div class="row d-flex">
             <div class="col col-6 create-scenario">
                 <FlatButton
                     class="pe-2 mt-4"
@@ -248,7 +248,7 @@ export default {
                     :text="$t('additional:modules.tools.simulationTool.planningScenarioCreate')"
                 />
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 
