@@ -33,7 +33,7 @@ regardless of where Valhalla actually runs.
 |------|---------|
 | `../docker-compose.yml` | Root orchestration: `portal` + `valhalla` (via `include`) |
 | `../.env.example` | Stack config — portal (`PORTAL_PORT`, `VALHALLA_URL`, registry overrides) **and** the Valhalla routing knobs used when `valhalla/.env` is absent |
-| `Dockerfile` | Multi-stage portal image (Node 24.15.0 build → nginx runtime) |
+| `Dockerfile` | Multi-stage portal image (Node 24.22.3 build → nginx runtime) |
 | `nginx.conf` | Serves the SPA + registries, reverse-proxies `/valhalla/`, caching proxy for the Hamburg upstreams |
 | `docker-entrypoint.d/40-cosi-runtime-config.sh` | Startup hook: runtime config injection |
 | `warm-hh-cache.py` | Pre-warms the Hamburg upstream cache (see *Hamburg API outages*) |

@@ -9,13 +9,13 @@ Repo layout:
 ```
 cosi/
 ├─ BACKLOG.md                 # working plan / task backlog
-├─ .nvmrc                     # Node version pin (24.15.0)
+├─ .nvmrc                     # Node version pin (24.22.3)
 ├─ docker-compose.yml         # full-stack deploy: portal + valhalla (BACKLOG §8)
 ├─ deploy/                    # portal Dockerfile, nginx, entrypoint, CSL bootstrap
 ├─ valhalla/                  # self-hosted routing service (Docker; BACKLOG §2)
 ├─ provenance/                # git-history backups of the vendored trees (see its README)
-└─ masterportal/              # VENDORED Masterportal v3.23.0 — plain tracked files, self-contained
-   ├─ .nvmrc                  # Node version pin (24.15.0)
+└─ masterportal/              # VENDORED Masterportal v3.28.2 — plain tracked files, self-contained
+   ├─ .nvmrc                  # Node version pin (24.22.3)
    ├─ addons/                 # agency addons (incl. our COSI addon, addons/cosi v1.2.0)
    └─ portal/
       ├─ cosi/                # the COSI portalconfig
@@ -32,22 +32,27 @@ cosi/
 
 ### 1. Node / npm
 
-Use **Node 24.15.0** (matches CI). Both `.nvmrc` files pin this version:
+Use **Node 24.22.3** (upstream CI uses 24.22.1; we pin the latest patch of the same LTS line).
+Both `.nvmrc` files pin this version:
 
 ```bash
 cd masterportal
 nvm install   # first time only — installs the version from .nvmrc
-nvm use       # selects Node 24.15.0
-node -v       # v24.15.0
-npm -v        # 11.12.1  (bundled with Node 24.15.0)
+nvm use       # selects Node 24.22.3
+node -v       # v24.22.3
+npm -v        # 11.19.1  (bundled with Node 24.22.3)
 ```
 
-> **Why this exact version matters.** `.npmrc` sets `engine-strict=true`, and the transitive
-> dependency `@masterportal/masterportalapi@2.62.0` requires **`node ^24.11.1`** and
-> **`npm ^11.6.2`** — stricter than the `package.json` `engines` range (`>=24 <25`). Node
-> **24.11.0 / npm 11.6.1 fail the install** with `EBADENGINE` (they are one patch below the
-> minimum). Node 24.15.0 ships an npm new enough (11.12.1) to satisfy both. If you manage Node
-> some other way, just make sure `node >= 24.11.1` **and** `npm >= 11.6.2`.
+> **Why this exact version matters.** `.npmrc` sets `engine-strict=true`, and since
+> Masterportal 3.28 the `package.json` `engines` field requires **`node >=24.22.1 <25`**
+> (or `>=22.23.4 <23`) — upstream raised it to address Node security issues. Any older Node
+> fails `npm install` with `EBADENGINE` (that's what happened earlier with 24.11.0, when
+> masterportalapi needed `^24.11.1`). If you manage Node some other way, just make sure
+> `node >= 24.22.1`.
+>
+> npm 11.19 (bundled with 24.22.x) no longer runs install scripts that aren't approved via
+> `allowScripts` and prints an `install-scripts` warning listing them (canvas, esbuild,
+> core-js, @parcel/watcher). The production build doesn't need any of them.
 
 ### 2. Install dependencies (layered)
 
@@ -111,7 +116,7 @@ docker compose up -d --build              # or: ./deploy/bootstrap-csl.sh (does 
 > doesn't exist, so create it once (idempotent — it just sits empty if you're not
 > running Traefik). `deploy/bootstrap-csl.sh` does this automatically.
 
-The portal image is a multi-stage build (Node 24.15.0 build → nginx runtime) that
+The portal image is a multi-stage build (Node 24.22.3 build → nginx runtime) that
 reproduces the layered install below and runs the Vite production build. nginx
 serves the SPA + our self-hosted registries (BACKLOG §6) and reverse-proxies
 `/valhalla/` to the routing container, so the portal calls routing **same-origin**.
@@ -164,9 +169,9 @@ patches/bundle from the side checkout so they stay in sync — see `provenance/R
 
 | Tool | Version |
 |------|---------|
-| Node | 24.15.0 |
-| npm  | 11.12.1 |
-| Masterportal | 3.23.0 |
+| Node | 24.22.3 |
+| npm  | 11.19.1 |
+| Masterportal | 3.28.2 |
 | COSI addon | 1.2.0 |
 | Vite dev server | serves on https://localhost:9001/ |
 

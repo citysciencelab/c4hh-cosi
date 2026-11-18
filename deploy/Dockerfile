@@ -1,6 +1,6 @@
 # Multi-stage build for the self-hosted COSI portal (BACKLOG §8).
 #
-#   build stage  — Node 24.15.0, reproduces the layered install from BACKLOG §1
+#   build stage  — Node 24.22.3, reproduces the layered install from BACKLOG §1
 #                  (masterportal → addons --ignore-scripts → cosi) then runs the
 #                  Vite production build of the `portal/cosi` portal.
 #   runtime stage — nginx serving the static `dist/`, with a startup hook that
@@ -14,7 +14,7 @@
 # ---------------------------------------------------------------------------
 # Stage 1 — build the portal
 # ---------------------------------------------------------------------------
-FROM node:24.15.0-bookworm AS build
+FROM node:24.22.3-bookworm AS build
 
 # The Vite build derives the mastercode/<version> folder name from git; with no
 # .git in the build context it falls back to a long timestamped name. We set a
@@ -31,7 +31,10 @@ WORKDIR /app
 COPY masterportal/ ./masterportal/
 
 # Layered install (mirrors Readme "Install dependencies (layered)" / BACKLOG §1).
-# engine-strict in .npmrc is satisfied because the base image is the pinned 24.15.0.
+# engine-strict in .npmrc is satisfied because the base image is the pinned 24.22.3
+# (masterportal 3.28 requires node >=24.22.1). Its npm 11.19 skips install scripts not
+# covered by `allowScripts` (canvas, esbuild, core-js, @parcel/watcher) and logs a
+# warning; none of them is needed for the production build.
 WORKDIR /app/masterportal
 RUN npm install --no-audit --no-fund
 
