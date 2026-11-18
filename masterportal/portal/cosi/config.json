@@ -330,9 +330,6 @@
                 "icon": "bi-map"
               },
               {
-                "type": "mpaddon"
-              },
-              {
                 "type": "polygonStyler"
               },
               {

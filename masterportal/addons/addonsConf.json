@@ -268,13 +268,6 @@
     "path": "storyTellingTool/storyManager",
     "type": "tool"
   },
-  "mpaddon": {
-    "type": "tool"
-  },
-  "mpaddonGfi": {
-    "type": "gfiTheme",
-    "path": "mpaddon/gfiTheme"
-  },
   "userTracking": {
     "type": "javascript"
   },
