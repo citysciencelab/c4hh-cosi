@@ -1,621 +1,130 @@
-# COSI Self-Hosting Backlog
+# Backlog
 
-Goal: deploy our own version of **COSI** (Cockpit Städtische Infrastrukturen) as a genuine
-open-source project, independent of the staging/production instances administered by the
-Hamburg agency for geodata (LGV), whose access ends as the research project at the
-CityScienceLab winds down.
+Open work on the self-hosted COSI, grouped by topic. How the stack works and how to
+develop on it is in the [Readme](./Readme.md); this file is only about what is still
+to do and what we know is broken.
 
-This document is the working plan. It records what was discovered about the architecture,
-what has to change, and the concrete tasks — so we can resume without re-investigating.
+Status: `[ ]` open · `[~]` in progress · `[?]` needs a decision. The branch in brackets
+says where the work belongs (see Readme → *Branches*). Done items are removed; their
+story is in the git history (the original self-hosting plan of June 2026 is in this
+file's history up to 2026-11-19).
 
-Status legend: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` needs decision/input
+## Where we stand (2026-11-19)
 
----
+- COSI runs completely on our own infrastructure: Masterportal 3.28.2 with the COSI
+  addon 1.2.0, our own layer registries, self-hosted Valhalla routing (car, bike, foot,
+  public transport from the HVV timetable) and a caching proxy in front of Hamburg's
+  services. Production: https://cosi.citysciencelab.hamburg/cosi/ (`main`).
+- All Hamburg data we use is public (statistics, district geometries, Fachdaten, the
+  population WPS); nothing needs FHHNET access.
+- Upstream releases are merged as subtree merges; our fixes in the vendored code
+  survive them.
+- `beta` carries our own tools and prototypes: "Filter (neu)", "Darstellung (neu)",
+  the new draw tool, "Förderung & Öffnungszeiten", Sozialmonitoring statistics,
+  combined facility layers, the derived-indicator workflow, the mpaddon.
 
-## 0. Architecture recap (so we don't re-derive it)
+## Known bugs and limitations
 
-- Repo layout:
-  - `masterportal/` — upstream **Masterportal** framework, **v3.23.0**
-    (git remote: `bitbucket.org/geowerkstatt-hamburg/masterportal.git`).
-  - `masterportal/addons/addons/` — separate nested git repo of LGV addons
-    (`bitbucket.org/geowerkstatt-hamburg/addons.git`).
-  - `masterportal/addons/addons/cosi/` — the COSI addon, **version 1.2.0**. It is *not*
-    one tool but ~18 sub-tools (DistrictSelector, AccessibilityAnalysis, Dashboard,
-    ChartGenerator, FeaturesList, ColorCodeMap, AreaSelector, ReportingTool, etc.).
-- Addon registration: each sub-tool is registered in
-  `masterportal/addons/addons/addonsConf.json` (e.g. `accessibilityAnalysis` →
-  `cosi/AccessibilityAnalysis`, `districtSelector` → `cosi/DistrictSelector`, ...).
-- **The COSI portalconfig does not exist in this repo.** The portals under
-  `masterportal/portal/` (`master`, `auto`, `basic`) are the *stock Masterportal examples* —
-  none load any COSI tool (see `portal/master/config.js` `addons: [...]`). The real COSI
-  portalconfig lived in a separate `portalconfigs` repo administered by the agency
-  (still referenced in `masterportal/package.json` scripts: `... && cd portalconfigs && ...`).
-  **We must author the COSI portalconfig ourselves.**
-- A portal is configured by two files:
-  - `config.js` — build/runtime config: `addons` array (which addons to load),
-    `layerConf` (services.json URL), `restConf` (rest-services.json URL),
-    `styleConf`, projections, etc.
-  - `config.json` — UI config: menu structure + per-tool config blocks
-    (this is where DistrictSelector `districtLevels`, AccessibilityAnalysis params, etc. live).
-- External dependencies, all currently pointing at Hamburg infrastructure
-  (from `portal/master/config.js`) — **all reachable publicly today (HTTP 200), but
-  access may change**:
-  - `layerConf` = `https://geodienste.hamburg.de/services-internet.json`
-  - `restConf`  = `https://geodienste.hamburg.de/lgv-config/rest-services-internet.json`
-  - `styleConf` = `https://geodienste.hamburg.de/lgv-config/style_v3.json`
-- Hidden service dependencies inside COSI:
-  - **Routing/Isochrones** — OpenRouteService (ORS). `AccessibilityAnalysis` resolves
-    `baseUrl = restServiceById("bkg_ors").url + "/v2/"`
-    (`AccessibilityAnalysis.vue:409`), fallback service `csl_ors`
-    (`store/stateAccessibilityAnalysis.js:58-59`). → **migrate to self-hosted Valhalla**.
-  - **WPS population** — `wpsServiceId: "1001"`, process `einwohner_ermitteln.fmw`
-    (`stateAccessibilityAnalysis.js:60-61`), counts residents inside an isochrone.
-    Also referenced by DistrictSelector. **Decision: keep as-is — believed to be a public
-    Hamburg WPS.** Verify; if it dies, the "residents within isochrone" feature is a
-    nice-to-have we can disable.
-  - **Statistical-data WFS** — DistrictSelector `districtLevels[].stats.layerIds` point at
-    Hamburg UDP regionalstatistik WFS layers. **Decision: stats stay available over WFS**
-    (and Hamburg's UDP is migrating WFS → **OGC API Features** over the next years; we
-    should plan for that). Stats likely need a **name mapping** between district geometry
-    names and statistical-data attribute names (see `districtNamesMap` and
-    `stats.keyOfAttrName` in the DistrictSelector config).
+- [ ] **Printing and the PDF report always fail** (`main`). The print tool uses
+      `printAppId: "cosi-dev-vite"`, the ReportingTool the app `cosiImage`; neither exists
+      on Hamburg's public Mapfish print server (only on their internal one), so every job
+      returns 500. On top, the ReportingTool ignores the error and then aborts the whole
+      PDF (`ReportingTool.vue` ~1092/1134/1188). Options: run our own Mapfish Print with
+      COSI templates, or switch to a public app and accept a different layout. Either way
+      the error handling should report the failure instead of crashing.
+- [ ] **Accessibility analysis ignores SensorThings layers** (`main`), e.g. "Elektro
+      Ladestandorte" (18106): the layer type whitelist in `AccessibilityAnalysis.vue`
+      (~634) only has WFS/OAF/GeoJSON. Fix known: add `SensorThings`, use
+      `getLayerSource()` in the `featuresloadend` listener (~781). Note that SensorThings
+      layers only load stations in the visible extent.
+- [ ] **Supply analysis (Versorgungsanalyse) takes only one facility layer** (`main`):
+      `coverageFunction()` in `CalculateRatio` compares a single layer name. Today we work
+      around it with combined GeoJSON layers (`tools/build-combined-layer.py`, `beta`).
+      Real multi-layer support would sum the matches of several layers per district.
+- [ ] **Layers without `loadingStrategy: "all"` give view-dependent results** in the
+      supply analysis (e.g. Parkraum 23866, 203 283 features, loads only the visible
+      extent). Decide per layer: load all, or warn in the tool.
+- [ ] **Scenario objects are invisible to the analyses** (`main`, upstream). The 3.x
+      ScenarioBuilder places planning objects as points in its own layer; supply
+      analysis, accessibility analysis and the feature list don't read that layer, and
+      moved existing objects drop out of their source layer. The residential simulation
+      (new inhabitants from a reference area) existed only in COSI 2.x. Watch upstream;
+      our own planning work goes into the planning twin (see below).
+- [ ] **Pre-existing console errors** (not regressions, also upstream): Dashboard
+      `mounted` "reading 'style'"; html2canvas "Tainted canvas" after an isochrone; after a
+      Hamburg 5xx a bogus `describeFeatureType` request with `version=undefined`.
+- [ ] **4 ESLint errors in `addons/cosi`** (upstream code, auto-fixable). Fix them on a
+      branch off `main` so `npx eslint addons/cosi` is clean.
 
----
+## Operations
 
-## 1. Local environment / Node (low risk)
+- [ ] **HVV timetable expires every timetable period.** When public-transport isochrones
+      stop working, set the new `HVV_GTFS_URL` (Transparenzportal) and rebuild the tiles
+      once (`FORCE_REBUILD=True`). Worth automating: a check that warns before the feed's
+      end date.
+- [ ] **Hamburg's OAF services are unreliable at night** (api.hamburg.de maintenance,
+      roughly 22–05 h: 500s and timeouts). The caching proxy covers everything seen once;
+      warm the cache before presentations (`deploy/warm-hh-cache.py`).
+- [ ] **Wider routing extract.** Valhalla is built from the Hamburg city-state extract;
+      HVV trips into the surrounding area are cut off. A wider extract needs more RAM and
+      disk (see `valhalla/Readme.md`); measure on the production host before switching.
+- [ ] **Prebuilt images.** The portal image is built on the server (≥ 4 GB RAM, several
+      minutes). Publish it from CI (e.g. GHCR) and pull on deploy.
+- [?] **Beta domain**: `beta.cosi.care4.hamburg` or `betacosi.care4.hamburg`.
 
-Context: `.npmrc` has `engine-strict=true`. Engines (root + addons `package.json`):
-`node >=22.19.0 <23 || >=24 <25`, `npm >=10.9.3 <12`. CI image: `node:24.15.0`.
-Current local: `node v24.11.0`, `npm 11.6.1` — **both already satisfy the range**, so the
-earlier "node versions not correct" pain was probably a different/older Node selected at the
-time. `node_modules` are not installed anywhere yet.
+## Self-hosting leftovers
 
-- [x] Add a Node pin so the env is reproducible: created `.nvmrc` (value `24.15.0`, matching CI)
-      at `masterportal/` **and** repo root; `nvm use` documented in `Readme.md`.
-      **Correction:** local v24.11.0/npm 11.6.1 do *not* satisfy — under `engine-strict` the
-      transitive dep `@masterportal/masterportalapi@2.62.0` needs `node ^24.11.1`/`npm ^11.6.2`,
-      so install fails `EBADENGINE` until on 24.15.0 (npm 11.12.1). This was the real "node" pain.
-- [x] Install in the correct order:
-      1. `cd masterportal && npm install` (839 pkgs, clean).
-      2. `cd masterportal/addons && npm install` — **addons are at `addons/`, not `addons/addons/`.**
-         Its `postinstall` aborted at `cd shared/js/mapfishUtils` because this partial checkout
-         had flattened that dir to `mapfishUtils/` — **now fixed in the addons fork** (§2.5:
-         restored to `shared/js/mapfishUtils/`, matching upstream + all the imports that use it).
-         We still install with the lighter `npm install --ignore-scripts` then `cd cosi &&
-         npm install` (~200 pkgs) to skip building addons we don't use. cosi v1.2.0 installs clean.
-- [x] Sanity boot the stock example portal: `cd masterportal && npm start`
-      (runs `vite`; `prestart` generates a dev cert). **Verified:** serves on
-      `https://localhost:9001/` (HTTP 200), Vite logs the COSI tools in `provided addons:`.
-- [x] Document the exact working Node/npm versions and steps in the root `Readme.md`. **Done.**
+- [ ] **66 layer ids in `config.json` are not in the public catalogue** (FHHNET-only or
+      removed by Hamburg), e.g. 1170, 1171, 180, 19138–19153. `build-registries.py` lists
+      them. Remove them from the layer tree or replace them with public equivalents.
+- [ ] **Self-host `style_v3.json`** (and its icons) instead of loading Hamburg's public
+      copy; today it is only cached by the proxy.
+- [?] **Long-term home of the statistics**: keep reading Hamburg's public OAF services
+      (current state, cached) or import them into our own store.
+- [ ] Optional hedge: snapshot the statistics we use, in case Hamburg's access changes.
+- [?] **Upstream contributions**: there is no process for sending our fixes back to the
+      Geowerkstatt Hamburg yet. Until there is, fixes stay local and are carried along
+      by the upstream merges. Candidates: the Valhalla isochrone backend, the CRS fix
+      for the 3.28 GeoJSON utils (76fe5faf), the CalculateRatio and SensorThings fixes.
+- [ ] **Upstream check at each sync**: whether upstream fixed the CRS handling of the
+      GeoJSON utils (G31DEV1-4357) — expect conflicts in those ten files — and whether
+      the ScenarioBuilder gained polygons, inhabitants or analysis support.
 
----
+## Filter (neu) and Darstellung (neu) (`beta`)
 
-## 2. Self-host Valhalla routing service
+Ports of the filter and style tools of the c4hh-app. Both work on any visible vector
+layer, share one style stack (`addons/cosi/utils/layer/styleStack.js`) and run on
+canvas, clustered and WebGL layers.
 
-Replace ORS with our own Valhalla, runnable locally **and** auto-deployable on the CSL server
-(docker-compose + scripts, automatic OSM download + tile building).
+- [ ] **Save and share**: include filters and styles in SaveSession and in shared links.
+- [ ] **Labels**: an attribute as text on the features (position, size, halo).
+- [ ] **Hatching and symbol shapes** for areas and points (c4hh-app STIL-2/3).
+- [ ] **Replace the old tools**: once the new ones cover them, remove "Daten filtern" and
+      "Flächen stylen" from the beta menu.
 
-- [x] Create `valhalla/` with `docker-compose.yml` using the community Valhalla image
-      (`ghcr.io/gis-ops/docker-valhalla/valhalla`, overridable via `VALHALLA_IMAGE`).
-      Config is `.env`-driven (`valhalla/.env.example`); `docker compose config` validates.
-- [x] Configure automatic OSM extract download (Germany) from Geofabrik (`OSM_EXTRACT_URL`,
-      Hamburg extract documented as the lighter local option) and **automatic tile building**
-      on first `up`. Tiles persist in the named volume `valhalla_tiles` (restarts skip the
-      build); `scripts/refresh.sh` forces a rebuild when the extract/GTFS changes.
-- [x] Download HVV GTFS data and build the public-transport mode: `scripts/fetch-gtfs.sh`
-      pulls + unzips the HVV feed (`HVV_GTFS_URL`, latest from the Hamburg Transparenzportal)
-      into `gtfs_feeds/hvv/`; compose builds it with `build_transit`/`build_admins`/`build_time_zones`.
-- [x] **Public-transport (multimodal) tiles — WORKING (2026-06-26).** `BUILD_TRANSIT=True`
-      builds an HVV transit graph and multimodal isochrones are live: a 45-min multimodal
-      isochrone from Hauptbahnhof covers **13.6×** the walking area, `transit_available` is true,
-      `version` 3.5.1. Getting there took unwinding three separate problems — recorded so we don't
-      re-derive them:
-      1. **Stale feed.** Updated `HVV_GTFS_URL` to the current **Apr–Dec 2026** feed (the old
-         `.env.example` URL was a May 2025 feed whose service calendar has expired → no transit today).
-      2. **OOM in `valhalla_ingest_transit`.** Docker Desktop's VM defaulted to **3.9 GB**; raised to
-         **8 GB** (`MemoryMiB: 8192` in `~/.docker/desktop/settings-store.json`). **CSL note: transit
-         build needs ≥~6 GB RAM.**
-      3. **The real blocker — `std::bad_array_new_length` in `valhalla_build_tiles -s enhance`,
-         "Adding N transit tiles to the local graph".** *Not* a Valhalla version bug (reproduces
-         identically on 3.4.0/3.5.0/3.5.1) and *not* OOM. Root cause: the HVV GTFS covers the whole
-         metropolitan region (stops at lat 51.5–54.9), but our OSM extract is **Hamburg-city only**, so
-         ~60 % of stops have **no road to connect to** → `"Could not find connection point for
-         in/egress"` → abort. Fix = make the feed fit the extract, via two reproducible preprocessing
-         steps now wired into `scripts/fetch-gtfs.sh`:
-         - **`scripts/trim-gtfs.py`** clips the service calendar to a current window (`GTFS_TRIM_DAYS`,
-           default 14) — ~18× fewer departures → build is fast and small (the 9-month feed is also why
-           it was slow/heavy).
-         - **`scripts/filter-gtfs-poly.py`** filters stops to the OSM extract's exact Geofabrik
-           **`hamburg.poly`** boundary (`GTFS_BOUNDARY_POLY`) — point-in-polygon, so every kept stop is
-           inside the road graph (a rectangular bbox can't match the irregular extract; that was
-           whack-a-mole). Result: 17,603 → ~5,100 stops, all connectable.
-         The build then completes on the default **3.5.1** image; the finalized tile tar (105 MB incl.
-         transit) is reused on restart. **Coverage note:** transit is **Hamburg-city only** (suburban
-         S-Bahn to Pinneberg/Norderstedt/Stade etc. is dropped with the out-of-extract stops). For full
-         HVV coverage, use a regional/Germany OSM extract and set `GTFS_BOUNDARY_POLY=` (empty) — heavier
-         build (see §8/CSL). → see the next item, which is the wanted target.
-- [x] **WANTED (user, 2026-06-26): full HVV transit coverage — do NOT crop to the Hamburg boundary.**
-      **Configured 2026-06-26.** Hamburg is a metropolitan area tightly interconnected with its
-      hinterland, so the public-transport mode should include **all HVV stations**, not just the city.
-      The full-coverage path is now wired and documented; the actual heavy build is server-side (below).
-      - **OSM extract** — `.env.example` now carries the full HVV-coverage block as a ready-to-uncomment
-        option: (a) the user-requested states (all Geofabrik `europe/germany/<state>-latest.osm.pbf`,
-        space-separated in `OSM_EXTRACT_URL` → multi-`tile_urls`): **Hamburg, Schleswig-Holstein,
-        Mecklenburg-Vorpommern, Niedersachsen, Brandenburg, Sachsen-Anhalt, Berlin, Bremen, Hessen**,
-        or (b) `germany-latest.osm.pbf` (simpler, similar cost). Default stays Hamburg for local dev.
-      - **`GTFS_BOUNDARY_POLY=`** (empty) keeps all ~17.6k stops. **Bug found + fixed:** `fetch-gtfs.sh`
-        used `${GTFS_BOUNDARY_POLY:-hamburg.poly}` (`:-`), so an *explicitly empty* value silently fell
-        back to `hamburg.poly` and would have cropped to Hamburg anyway — defeating this whole task.
-        Changed to `${GTFS_BOUNDARY_POLY-hamburg.poly}` (`-`): empty now genuinely disables the filter,
-        unset still defaults to Hamburg. So the backlog's earlier "no code change" note was wrong — a
-        one-char script fix was needed. `GTFS_TRIM_DAYS` still applies (independent; kept).
-      - **Resource reality:** this is a **server-side (CSL) build**, not the laptop — multi-state OSM +
-        full transit graph needs a lot of RAM/disk/time (Valhalla enhance can be memory-heavy; the laptop
-        only has an 8 GB Docker VM / ~21 GB free disk, already tight for Hamburg-city transit). Readme
-        resource table + "Full HVV coverage" section updated. **Not built here** — size and run it as part
-        of §8/§9 (CSL specs). Committed changes are purely config/docs/script (`.env.example`, Readme,
-        `scripts/fetch-gtfs.sh`); `.env` is gitignored so the operator opts in on the server.
-- [x] Expose Valhalla on a stable URL (local: `http://localhost:8002`, `VALHALLA_PORT`).
-      Compose healthcheck polls `/status` (generous `start_period` covers the long initial build).
-- [x] One-command bootstrap: `valhalla/bootstrap.sh` (creates `.env`, fetches GTFS, pulls,
-      starts, waits for `/status`). `valhalla/Readme.md` documents resource needs (RAM/CPU/disk
-      table: Hamburg vs Germany), refresh flow, and CSL-server deployment.
-- [x] Isochrone capabilities decided (see `valhalla/Readme.md`): **time-based** is the
-      requirement and is what AccessibilityAnalysis uses; Valhalla `/isochrone` also supports
-      **distance-based** contours on the same service for free — usage decision deferred to
-      the §3 code change (open question in §9). No service-side change needed.
+## Planning twin (`beta`, after the MVP)
 
----
+A separate small backend service will manage planning cases (Planfälle) for the whole
+city: planned and demolished buildings, facilities and transit lines as an overlay on
+the current state, with a year and a maturity level per change. COSI reads them. Work
+in COSI starts once the service's MVP exists.
 
-## 2.5 Track the agency's COSI as a fork (foundation for §3/§8)
+- [ ] **Login**: an optional login with the C4HH Keycloak (Masterportal's OIDC login,
+      PKCE); COSI stays fully usable without it.
+- [ ] **Read planning cases as layers**: plan state per layer as OGC API Features, with
+      the year as the standard `datetime` parameter and the planning case as an extra
+      parameter (Masterportal OAF layers support both without custom code).
+- [ ] **Planning case tool**: choose planning case and year, switch all affected layers
+      and statistics, compare current state and plan.
+- [ ] **Statistics with plan**: a per-district, per-year balance (dwellings, inhabitants,
+      commercial floor space) in the long table format of the district statistics, so
+      dashboard and supply analysis compute with the plan without code changes.
 
-We will keep developing on top of COSI while the agency keeps shipping new versions. To pull
-their updates **without redoing our changes** (Valhalla migration etc.), our edits must live as a
-small, additive, *tracked* diff on top of a pinned upstream base — so an upstream bump is a
-`rebase`, not a rewrite. Before this, `masterportal/addons/` was an untracked, gitignored partial
-checkout with no git association at all, which made automated updates impossible.
+## Other tools
 
-- [x] Make `masterportal/addons/` its **own standalone git repo** (a fork). It stays invisible to
-      both parents (`masterportal/.gitignore` ignores `addons/*`; root ignores `/masterportal/`),
-      so it carries its own history without interfering. `upstream` remote =
-      `bitbucket.org/geowerkstatt-hamburg/addons.git`; our branch = **`cosi-selfhost`**.
-- [x] **Pin the base:** `cosi-selfhost` is rooted at upstream `dev` commit **`f148b81e`**
-      (2026-06-16; = v3.23.0 + unreleased work incl. `planParken`), tagged **`upstream-base`**.
-      All upstream tags fetched (through `v3.23.0`).
-- [x] **Corrected one partial-checkout artifact** so the base is pristine: `mapfishUtils/` was
-      flattened locally; restored to upstream's `shared/js/mapfishUtils/` (the path used by
-      `cosi/ReportingTool`, `valuationPrint`, `waterRiskCheck` imports and the addons
-      `postinstall`). Working tree now matches `f148b81e` byte-for-byte → zero standing diff,
-      so future rebases only touch lines we actually change. This also resolved the §1 breakage.
-- [ ] **Create our hosted fork** (`origin`): make a fork on GitHub/Bitbucket, then
-      `git remote add origin <url> && git push -u origin cosi-selfhost --tags`. (Outward-facing —
-      do when ready to publish/back up.)
-- [ ] **Automate the update** (the "update without redoing Valhalla" goal): a scheduled job that
-      `git fetch upstream --tags`, attempts the rebase onto the newest tag, runs the
-      AccessibilityAnalysis tests, and opens a PR if it applies cleanly (flags us only when our
-      seam genuinely collides). See update procedure in the root `Readme.md`.
-- [ ] **Consider upstreaming** the config-selectable Valhalla backend to the agency — if accepted,
-      zero maintenance for us. Raise alongside the portalconfig request.
-
-Update procedure (manual, today): `cd masterportal/addons && git fetch upstream --tags &&
-git rebase <new-tag>`, resolve only true collisions, then refresh deps.
-
----
-
-## 3. Adapt AccessibilityAnalysis to Valhalla (code change)
-
-This is a real rewrite, not a URL swap — ORS and Valhalla isochrone APIs differ.
-**Do this on the `cosi-selfhost` branch as additive, isolated changes (§2.5):** the import chain
-is `actionsAccessibilityAnalysis.js → createIsochrones.js → requestIsochrones.js` (single default
-export — the one chokepoint). Add a new Valhalla request module + a thin config-driven dispatcher
-in `requestIsochrones.js`; normalize Valhalla's response inside it so `createIsochrones.js`,
-`styleIsochroneFeatures.js`, and the `.vue` stay untouched. That keeps upstream rebases clean.
-
-Files:
-- `cosi/AccessibilityAnalysis/utils/requestIsochrones.js` — builds/sends the request.
-- `cosi/AccessibilityAnalysis/utils/createIsochrones.js` — orchestrates ranges/chunking
-  (ranges in **seconds** for time; chunks of 5; reverses features for render order).
-- `cosi/AccessibilityAnalysis/components/AccessibilityAnalysis.vue:409` — builds `baseUrl`
-  as `restServiceById(serviceId).url + "/v2/"` (the `/v2/` is ORS-specific).
-- `cosi/AccessibilityAnalysis/store/stateAccessibilityAnalysis.js` —
-  `serviceId: "bkg_ors"`, `fallbackServiceId: "csl_ors"`, `transportType: "driving-car"`,
-  profiles `driving-car|cycling-regular|foot-walking|wheelchair`.
-
-API differences to handle:
-- Endpoint: ORS `POST {base}/v2/isochrones/{profile}/geojson` vs Valhalla `POST {base}/isochrone`.
-- Body: ORS `{locations:[[lon,lat],...], range_type, range:[secs...]}` (multi-location,
-  up to 5) vs Valhalla `{locations:[{lat,lon}], costing, contours:[{time:<min>}|{distance:<km>}],
-  polygons:true, denoise, generalize}` — **Valhalla isochrone takes a single location per call**,
-  so the existing chunk-of-5 batching must become one-request-per-coordinate (mind performance
-  + the existing `batchSize`/`splitIntoChunks` logic).
-- Units: ORS time range in **seconds**; Valhalla `time` in **minutes** (and distance in km).
-- Profile mapping: `driving-car→auto`, `cycling-regular→bicycle`, `foot-walking→pedestrian`,
-  `wheelchair→pedestrian` (+ wheelchair options) — confirm against our Valhalla config.
-- Auth: remove the hardcoded ORS API key path
-  (`requestIsochrones.js:31-33`, key `5b3ce359...`) — Valhalla (self-hosted) needs none.
-- Response: both return GeoJSON FeatureCollections but property shapes differ
-  (`value`/`contour` metadata). Normalize so downstream
-  (`styleIsochroneFeatures.js`, feature `value`/`mode`/`unit` props, the 3-step
-  `range/3, range*2/3, range` rendering) keeps working.
-- [x] **Implementation shape decided & built** (commit `758aa3ce` on `cosi-selfhost`):
-      service-type-aware, ORS stays the default/fallback. New `utils/requestIsochronesValhalla.js`
-      (single-origin requests, profile→costing map, s/m→min/km contours, response normalized to
-      the ORS feature shape `{group_index, value, center}` ascending by value); a 3-line dispatch
-      guard at the top of `requestIsochrones.js` (`serviceType === "valhalla"`, ORS body untouched);
-      `serviceType` threaded through `createIsochrones.js` + the `methodsAnalysis` call; the `.vue`
-      builds a backend-aware `baseUrl` (Valhalla `<url>/isochrone`, ORS `<url>/v2/isochrones`).
-- [x] **Switch via config:** new `state.isochroneBackend` (default `"ors"`). To use Valhalla, set
-      `isochroneBackend: "valhalla"` in the COSI `config.json` and point `serviceId` at the Valhalla
-      rest-service id. ORS remains the fallback. (No hardcoded change to `serviceId` itself.)
-- [x] **Unit tests:** new `test/unit/service/requestIsochronesValhalla.spec.js` (7 tests, vitest)
-      covers conversions, request shape, response normalization/ordering, multi-origin grouping,
-      and error handling. (The pre-existing `requestIsochrones`/`createIsochrones` specs are all
-      `it.skip` — they hit live services — so nothing to update there.)
-- [x] **Integration-test against a live local Valhalla** once tiles are built (§2) — verify the
-      real response shape matches the fixtures and the units/profile mapping are correct.
-      **Done 2026-06-25** against a live local Valhalla (Hamburg extract, `gis-ops` image
-      v3.5.1, tiles built, `BUILD_TRANSIT=False`). Sent the exact body the code builds to
-      `POST http://localhost:8002/isochrone` for every profile mapping: `pedestrian`
-      (foot-walking/wheelchair), `auto` (driving-car), `bicycle` (cycling-regular) — all HTTP 200.
-      Response contract matches `normalizeCollection` exactly: `FeatureCollection` of `Polygon`
-      features each carrying `properties.contour` in **minutes** (e.g. 15/10/5 → `fromContour` →
-      900/600/300 s, sorted ascending). Distance contours echo **km** (2/1 → 2000/1000 m). The 7
-      `requestIsochronesValhalla` unit tests still pass (`npm test`, via `devtools/vitest.config.js`).
-- [x] **Refine `wheelchair`**: was mapped to bare `pedestrian`; now also sends
-      `costing_options: {pedestrian: {type: "wheelchair"}}` (Valhalla's pedestrian costing exposes a
-      `type:"wheelchair"` that avoids steps + honours `wheelchair=*` access tags — the closest thing to
-      first-class wheelchair costing Valhalla has). **Done 2026-06-26**: new `toValhallaCostingOptions()`
-      in `utils/requestIsochronesValhalla.js`, only emitted for the `wheelchair` profile (others get
-      Valhalla defaults). Covered by 2 new unit tests.
-- [x] Add the **`valhalla` rest-service entry** that `serviceId` points at — **already done in §6**
-      (`portal/cosi/rest-services.json`: `{id:"valhalla", url:"http://localhost:8002", typ:"Valhalla"}`,
-      → `/valhalla` in the §8 nginx deploy). Verified present 2026-06-26; nothing more to do.
-- [x] **WANTED (user, 2026-06-26): more detailed / higher-resolution isochrones.** **Done 2026-06-26.**
-      Implemented the two resolution levers as `accessibilityAnalysis` config (no rebuild needed); the
-      band-count lever was deliberately deferred (see below). All in the Valhalla request built by
-      `utils/requestIsochronesValhalla.js` / `createIsochrones.js`:
-      - **`generalize`** (metres) — **DONE**: now sent from config (`null`/omitted = Valhalla default;
-        `0` = max fidelity). Threaded through a new `isochroneOptions` arg
-        (`methodsAnalysis` → `getIsochrones` action → `createIsochrones` → `requestIsochrones` →
-        `requestIsochronesValhalla`). Deployed config sets **`generalize: 30`** for smoother/finer outlines.
-      - **`denoise`** (0–1) — **DONE**: no longer hard-coded `1`; defaults to `1` in code (keeps backward
-        compat) but is config-overridable. Deployed config sets **`denoise: 0.3`** to keep small reachable
-        pockets (more realistic, busier shapes).
-      - Config shape: `accessibilityAnalysis.valhallaIsochroneOptions = {generalize, denoise}` (state default
-        `{generalize: null, denoise: 1}` = no behaviour change; the COSI `config.json` block sets `{30, 0.3}`).
-        Valhalla-only — the ORS path ignores `isochroneOptions`. Covered by 3 new unit tests (defaults,
-        explicit values, `generalize: 0` vs `null`).
-      - **Contour bands — DEFERRED (not done), on purpose.** The fixed **3** bands are *structurally* baked
-        in, not just a literal: `styleIsochroneFeatures.js` uses `% 3`/`% 4` modular arithmetic (the `%4`
-        path detects the travel-time-index "traffic flow" 4th band), `getDistances`/`getSteps` build exactly
-        3 (+1) steps, and `steps.length` drives feature grouping in both `createIsochrones.js` and
-        `AccessibilityAnalysis.vue` plus the legend + `isochroneColors`. Making band count configurable means
-        rewriting all of that coherently — a much bigger, riskier change than the outline levers, and the
-        per-request cost is real (Valhalla isochrone is single-origin, so each extra band × each origin = one
-        more call). Left as a standalone follow-up; the two levers above already deliver the "more detailed /
-        higher-resolution" outlines the user asked for.
-      - **CORS note (done 2026-06-26):** isochrone POSTs now use `Content-Type: text/plain` to skip the
-        browser preflight (Valhalla returns 405 on `OPTIONS`); the §8 nginx same-origin `/valhalla`
-        proxy removes the cross-origin question entirely.
-
----
-
-## 4. COSI portalconfig — OBTAINED (now: get it running)
-
-**We have the real portalconfig** (received 2026-06-25, lives at `masterportal/portal/cosi/`):
-`config.js` (2.3 KB), `config.json` (240 KB — full menu + per-tool config blocks), plus
-`assets/mapping.json`, `assets/templates/`, `resources/`, `index.html`/`index.php`/`urm.php`.
-It lists all 21 COSI addons we have (`config.js` `addons: [...]`), and the tool blocks are
-present (`accessibilityAnalysis`, `districtSelector`, `dashboard`, `reportingTool`, …).
-
-**Key finding — this is the INTERNAL (fhhnet) config, not the public one:**
-- `config.js` points the registries at Hamburg's **internal admin network**:
-  `layerConf = …/services-fhhnet.json`, `restConf = …/lgv-config/rest-services-fhhnet.json`
-  (`styleConf = …/style_v3.json`). The two `*-fhhnet.json` URLs **return 404 from the public
-  internet** (verified 2026-06-25); the public `*-internet.json` equivalents return **200**.
-- Routing still uses `bkg_ors` (×3); no `valhalla`/`isochroneBackend` yet (that's our §3 add).
-- It is currently **untracked** (masterportal ignores `portal/*`; root ignores `/masterportal/`) —
-  same situation the addons were in before §2.5.
-
-### Recommended next-session sequence (do in order)
-
-- [x] **1. Track the pristine config first, before editing anything.** Done 2026-06-25:
-      `masterportal/portal/cosi/` is now its own **standalone git repo** (mirrors the §2.5 addons
-      approach), invisible to both parents (`masterportal/.gitignore` ignores `portal/cosi`; root
-      ignores `/masterportal/`). The as-received config is committed **byte-for-byte** (13 files,
-      no edits) on branch **`cosi-selfhost`** and tagged **`fhhnet-original`** — the untouched
-      baseline to diff every self-hosting edit against. Unlike addons there is **no upstream git
-      repo** (the agency handed us files, not a repo), so there is no fork/rebase story here — the
-      tag is purely a pristine-snapshot anchor; future edits land as commits on `cosi-selfhost`.
-- [x] **2. Boot as-is** — Done 2026-06-25. `npm start` (Vite v8, `https://localhost:9001`) serves
-      the portal at `https://localhost:9001/portal/cosi/`. Baseline confirmed at HTTP level:
-      `index.html` / `config.js` / `config.json` (240 KB) / `assets/mapping.json` all **200**
-      (config parses, addon wiring resolves), and Vite's "provided addons" log lists every COSI
-      addon. The two fhhnet registries 404 as expected (`services-fhhnet.json`,
-      `rest-services-fhhnet.json`), while `style_v3.json` **200** and both `-internet.json`
-      variants **200** (so step 3's flip is viable). Also confirms **step 5**: all 21 `config.js`
-      `addons[]` keys resolve in `addons/addonsConf.json`. *Visual render of the Vue tool panels
-      not yet eyeballed in a browser (no headless browser installed) — open the URL to confirm.*
-- [x] **3. Flip the registries to the public variants** — Done 2026-06-25 (config.js commit
-      `ec2f52e` on `cosi-selfhost`). `services-fhhnet.json` → `services-internet.json`,
-      `rest-services-fhhnet.json` → `rest-services-internet.json` (styleConf already public; ORS
-      kept). **The portal now bootstraps and renders** — the white screen is gone. Note: the
-      fhhnet 404s weren't just empty layers, they were **fatal to app bootstrap** (404 HTML broke
-      `JSON.parse`, blank screen), so this flip is what makes the portal render at all, not polish.
-- [x] **4. Catalogue what loads vs. fails** — Done 2026-06-25. Verified live in-browser against the
-      public registries. **What works:** app shell + COSI tools render, public `services-internet.json`
-      (6553 layers) / `rest-services-internet.json` (47 entries) / `style_v3.json` all load. Gaps:
-      - **Basemap CORS (FIXED here):** the visible Geobasiskarten WMS (`33780`, present in the public
-        registry) failed with a credentialed-CORS block + tile-load storm + one `AxiosError 400`,
-        because `overwriteWmsLoadfunction:true` loads tiles via a credentialed fetch while geodienste
-        returns `ACAO:*`. **Set `overwriteWmsLoadfunction:false`** (commit `82080e2`) → basemap renders,
-        CORS/400 gone. *Forward-looking:* §8's nginx same-origin setup makes this moot in prod.
-      - **FHHNET-only catalog/background layers missing** (harmless "not found" warnings, just absent
-        from the catalog): subject layers `1170`/`1171` (Potenzialflächendatenbank PAUL–FHHNET),
-        `8133`/`34444`/`34667`/`34668` (Orthophotos Straße–FHHNET), background candidates `8`, `22993`.
-        → **§6**: omit these from our curated `services.json`. (Not core COSI machinery.)
-      - **Statistische Gebiete** geometry/stats not public (user-confirmed) → **§5**: drop that level
-        entirely, keep only Stadtteile + Bezirke.
-      - Cosmetic only: a `legendURL` deprecation warning and empty-`StyleId` warnings — defer.
-      - **WPS `1001` + statistical WFS** reachability not yet exercised (no tool run that hits them) →
-        **§7** still open.
-- [x] **5. Verify addon discovery** — Done 2026-06-25 (alongside step 2). Vite resolves the
-      `addons/` path (startup "provided addons" log) and all 21 `config.js` `addons[]` keys match
-      entries in `addons/addonsConf.json`.
-- [x] **Later (after baseline):** wire our Valhalla backend (§3) into this config's
-      `accessibilityAnalysis` block — add `isochroneBackend: "valhalla"` and point `serviceId`
-      at the Valhalla rest-service (needs the §6 rest-service entry + a live local Valhalla, §2).
-      **Done 2026-06-25** (`cosi-selfhost` config repo). The COSI `accessibilityAnalysis` tool block
-      now sets `"isochroneBackend": "valhalla"` + `"serviceId": "valhalla"` (the §6 rest-service id).
-      The separate stock Masterportal `routing` addon block is **left on `bkg_ors`** — different
-      addon, outside §3 scope. Verified live end-to-end (see §3 integration-test entry). Local
-      Valhalla stood up via `valhalla/bootstrap.sh` (Docker Desktop daemon started first; `.env`
-      set to the Hamburg extract + `BUILD_TRANSIT=False` for a fast local build).
-
----
-
-## 5. District levels: Stadtteile + Bezirke only (drop Statistische Gebiete)
-
-Fully config-driven via DistrictSelector `districtLevels[]`
-(see `cosi/DistrictSelector/doc/config.json.md`). We lose access to Statistische Gebiete data,
-so configure only Stadtteile and Bezirke.
-
-- [x] In the COSI `config.json`, define `districtSelector.districtLevels` with **Stadtteile**
-      and **Bezirke** entries only; omit the Statistische Gebiete entry entirely. Done 2026-06-25:
-      the as-received config had **four** levels (Statistische Gebiete `27773`, Stadtteile `28201`,
-      Bezirke `28028`, Hamburg/FHH `28150`). Removed **Statistische Gebiete** only (not public —
-      §4 catalogue). Also fixed the now-dangling `districtFinder.selectedLevelId`
-      (`27773` → `28201`/Stadtteile) and removed the orphaned `27773` geometry layer from
-      `Themenconfig`. JSON re-validates; no leftover refs to `27773`. **Hamburg/FHH (`28150`) is
-      KEPT** (user wants the whole-city aggregate) — note its stats layers `31270`/`34898`
-      public-reachability is still unverified (cf. §7).
-- [x] For each level set: `layerId` (geometry WFS layer), `label`, `keyOfAttrName`,
-      and `stats.{layerIds, keyOfAttrName, metadataUrls}` (statistical-data layers + the
-      attribute-name keys). Add `duplicateDistrictNames` where a name exists at two levels
-      (e.g. *Eimsbüttel* is both a Stadtteil and a Bezirk — name given at the higher level).
-      Already fully configured in the as-received config and retained unchanged: Stadtteile
-      (`keyOfAttrName: stadtteil_name`, 7 stats layers) and Bezirke (`bezirk_name`, 7 stats
-      layers, `duplicateDistrictNames: [Eimsbüttel, Wandsbek, Bergedorf, Harburg]`).
-- [x] **Name mapping** (user-confirmed this is needed): set `districtNamesMap` /
-      `stats.keyOfAttrName` so geometry district names match the statistical-data attribute
-      names (cf. the doc's `Steinwerder`→`Steinwerder/Kl. Grasbrook` examples). Already present
-      on the retained Stadtteile level (`Steinwerder`, `Waltershof`, `St.Pauli`, `Moorburg`,
-      `Neuland`, … maps) — retained unchanged.
-- [x] Confirm the geometry layer IDs (Stadtteile `28201`, Bezirke `28028`) and statistical-data
-      layer IDs (Stadtteile `31240`/`34505`/`34896`/`34503`/`35041`/`35046`/`35047`; Bezirke
-      `31271`/`34504`/`34897`/`34502`/`35050`/`35051`/`35042`) in our own `services.json`.
-      **Done 2026-06-25** alongside §6 — all present in the generated `services.json` (the generator
-      derives the keep-list straight from these `config.json` references, so they are kept by
-      construction; spot-checked `28201`/`28028`/`28150`/`31240`/`31271`/`31270` present).
-
----
-
-## 6. Self-host the service registries (services.json / rest-services.json)
-
-Stop depending on `geodienste.hamburg.de` config endpoints; host our own, referencing only
-the layers/services we actually keep.
-
-> **Reality check (§7 probe, 2026-06-25):** the *district/statistical* layers are now `typ: OAF`
-> (served from `https://api.hamburg.de/datasets/v1/…`), but the wider Fachdaten catalogue is still
-> mixed (of 451 kept: 262 WMS, 153 WFS, 30 OAF, 5 WCS, 1 SensorThings). Either way we copy each
-> entry **verbatim** from `services-internet.json` regardless of type. The data endpoints stay
-> external (api.hamburg.de / geodienste.hamburg.de); we self-host only the *registry JSON* so we
-> control the layer list and the registry URLs.
-
-- [x] Create our own `services.json` (layer definitions). **Done 2026-06-25 via an automated
-      pruning generator** (`portal/cosi/tools/build-registries.py`) rather than hand-curation, so it
-      never drifts from `config.json`. It walks every layer id referenced in `config.json` (layer
-      tree + tool blocks: `districtSelector.layerId`/`stats.layerIds`, `districtFinder.selectedLevelId`,
-      `additionalInfoLayers`), keeps only those present in the public upstream, and copies entries
-      **verbatim**. Result: **451 layers** (from 6551 upstream) — `services.json` 849 KB raw / 68 KB
-      gz (was 7.6 MB / 486 KB). The **64 referenced-but-not-public** ids are dropped + reported
-      (incl. the §4 FHHNET-only set `1170`/`1171`/`8133`/`34444`/`34667`/`34668`/`8`/`22993`).
-      *Follow-up:* those 64 should also be pruned from `config.json`'s layer tree so they stop
-      appearing as broken catalogue entries (the generator prints the list).
-- [x] Create our own `rest-services.json`. **Done 2026-06-25.** Kept the **full** public set (47
-      entries — it is only ~10 KB, and addon code references ids not visible in `config.json`, e.g.
-      the WPS `1001` population service which has no literal reference) **plus a `valhalla`** entry
-      (`id: valhalla`, `url` default `http://localhost:8002`, → `/valhalla` in the §8 nginx deploy)
-      for AccessibilityAnalysis. 48 entries total.
-- [x] Point `config.js` `layerConf`/`restConf` at our hosted copies. **Done 2026-06-25:**
-      `layerConf: "./services.json"`, `restConf: "./rest-services.json"` (served alongside the
-      portal). Verified booting: portal page + both registries serve HTTP 200 at
-      `https://localhost:9001/portal/cosi/`; served `services.json` = 451 layers, `rest-services.json`
-      contains `valhalla`. (`styleConf` left on the public `style_v3.json` — out of §6 scope.)
-- [x] ~~**OGC API Features migration (forward-looking):**~~ **Resolved 2026-06-25 — already done on
-      Hamburg's side.** The public registry is 100 % OAF; Masterportal/COSI already supports the
-      `OAF` layer type natively (the entries we boot against use it). No WFS layers remain to
-      migrate; nothing to track.
-
----
-
-## 7. Verify retained Hamburg dependencies
-
-- [x] Confirm the **WPS** `einwohner_ermitteln.fmw` (id `1001`) is genuinely public and stays
-      reachable without LGV/fhhnet access. **PUBLIC — verified 2026-06-25.** `GetCapabilities` on
-      `https://geodienste.hamburg.de/HH_WPS` returns HTTP 200 and lists `einwohner_ermitteln.fmw`
-      as a published process (alongside `ReverseGeocoder.fmw`, `schulwegrouting_wps.fmw`, …). No
-      need to stub the residents-in-isochrone feature; keep WPS `1001` in the §6 rest-services.
-- [x] Confirm **statistical-data** layers (population etc. for Stadtteile/Bezirke) remain
-      accessible to us. **ALL PUBLIC — verified 2026-06-25.** All 16 retained stats layers return
-      HTTP 200 with real GeoJSON via the public registry. **KEY FINDING: the district + statistical
-      layers (and the geometry layers) are now `typ: OAF` (OGC API Features), not WFS** — the
-      migration §6 called "forward-looking" has *already happened for these layers*. They are
-      addressed as `https://api.hamburg.de/datasets/v1/{dataset}/collections/{collection}/items`
-      (Accept: `application/geo+json`). (NB the *wider* Fachdaten catalogue is still mixed — of the
-      451 layers we keep, 262 are WMS, 153 WFS, 30 OAF, 5 WCS, 1 SensorThings — so "all OAF" is true
-      only for the district/stats family, not the whole registry.) Counts sanity-check out: Stadtteile geom 104, Bezirke 7,
-      Landesgrenze 1; regionalstatistik Stadtteile 1188 rows / Bezirke 84 / HH-gesamt 12.
-      **Caveat for §6: dataset↔layer is NOT 1:1** — some endpoints serve multiple collections
-      (e.g. `kind_nicht_deutscher_fam_sprache` → both `_stadtteile` and `_bezirke`;
-      `regionalstatistische_daten_bezirke` → both `_bezirke` and `_hh_gesamt`;
-      `bevoelkerungsprognosen` → 3 collections). Attribute keys + name mappings already captured
-      in the retained `districtSelector` config (§5). Full per-layer (id → url/collection) table
-      dumped during the probe.
-- [ ] Snapshot/export the statistical data we need now, as a hedge against access ending
-      before self-hosting is ready. *(Optional — all sources confirmed live & public above.)*
-
----
-
-## 8. Dockerize & orchestrate the full COSI deployment
-
-The biggest deployment gap: §2 containerizes **only Valhalla**. The actual COSI
-portal (Masterportal framework + COSI addon, built into a static SPA) and the
-self-hosted config registries (§6) have no container story, and nothing ties the
-pieces together. We want a reproducible, one-command full-stack deploy that runs
-the same locally and on the CSL server.
-
-Target topology (single `docker compose up` at the repo root):
-- **`portal`** — multi-stage image: build stage runs the Masterportal/COSI
-  production build; runtime stage is nginx serving the static `dist/`.
-- **`valhalla`** — the routing service from §2 (fold its compose into the root
-  orchestration via `include:` / `extends`, keeping `valhalla/` self-contained).
-- nginx also serves our self-hosted `services.json` / `rest-services.json` /
-  `style.json` (§6) and **reverse-proxies `/valhalla/` → `valhalla:8002`** so the
-  portal calls routing same-origin (avoids CORS + mixed-content; gives a stable
-  URL independent of where Valhalla runs).
-- WPS / statistical WFS stay **external** (Hamburg) for now (§7) — not containerized.
-
-**Done 2026-06-26.** Full stack lives at the repo root: `docker-compose.yml`
-(portal + valhalla via `include`), `.dockerignore`, `.env.example`, and `deploy/`
-(`Dockerfile`, `nginx.conf`, `docker-entrypoint.d/40-cosi-runtime-config.sh`,
-`bootstrap-csl.sh`, `Readme.md`). All built + tested end-to-end with a live local
-Valhalla (see per-task notes). Tested: `docker compose config` merges cleanly
-(portal+valhalla on one network, `depends_on` service_started); portal image
-builds (115 MB nginx runtime); portal serves `/cosi/{index.html,config.js,
-config.json,services.json,rest-services.json}` + version-pinned `/mastercode/`;
-runtime injection sets the served valhalla url; the same-origin `/valhalla/` proxy
-returns real Valhalla `/status` **and** a real `POST /valhalla/isochrone` (200,
-3-contour FeatureCollection) — the exact call AccessibilityAnalysis makes.
-
-Tasks:
-- [x] Add a **`.dockerignore`** and a multi-stage **`Dockerfile`** for the portal.
-      Build stage: Node `24.15.0`, reproduces the layered install from §1. **Key
-      correction to the planned recipe:** `addons/ npm install --ignore-scripts`
-      then `cosi/ npm install` is **not enough** — the Vite production build bundles
-      **every** addon in `addonsConf.json`, so each addon with its own
-      `node_modules` imports must be installed (e.g. `vpiDashboard` →
-      `vue-slider-component`, else `UNRESOLVED_IMPORT`). The Dockerfile installs the
-      full addon-deps list from the addons `postinstall` (sdpDownload, vcOblique,
-      valuationPrint, waterRiskCheck, simulationTool, shared/js/mapfishUtils,
-      vpiDashboard, gfiThemes/combinedGfi, cosi, storyTellingTool/story{Creator,
-      Manager}) as individual `npm install`s — skipping the root postinstall/prepare
-      (its `husky install` needs a `.git`, absent in the build context). Build runs
-      `vite build --mode production` + `rm -rf dist/portal`. Runtime stage: nginx
-      serving `dist/` (portal at `/cosi/`, assets at `/mastercode/<ver>/`).
-      `ARG MASTERCODE_VERSION_FOLDER=3_23_0` pins the asset folder so the build is
-      deterministic without git. **No longer depends on §4** — the real `portal/cosi`
-      portalconfig is in hand.
-- [x] **Runtime config injection:** `deploy/docker-entrypoint.d/40-cosi-runtime-config.sh`
-      runs on container start (nginx:alpine runs `/docker-entrypoint.d/*.sh`),
-      patching the **served** config from env: `VALHALLA_URL` (default `/valhalla`)
-      → `rest-services.json` valhalla entry (via `jq`); `LAYER_CONF`/`REST_CONF`/
-      `STYLE_CONF` → `config.js` (via `sed`). All optional/defaulted → no-rebuild
-      reconfig, lean-runtime. (Bug found+fixed in test: `jq`'s `mktemp` output was
-      `0600`/root → nginx 403; the script now `chmod 644`s it.)
-- [x] Author the **nginx config** (`deploy/nginx.conf`): serves the SPA
-      (`try_files` fallback; Masterportal uses query-string state, not path
-      routing), serves the §6 registries (`no-store` so injection always takes),
-      gzip + `immutable` 30-day cache on `/mastercode/`, `/` → `/cosi/`, and
-      reverse-proxies `/valhalla/<p>` → `valhalla:8002/<p>`. Uses Docker's embedded
-      resolver (`127.0.0.11`) + a variable upstream so nginx **starts even if
-      Valhalla is down** (routing 502s until it's up). Validated with `nginx -t`.
-- [x] Create the **root `docker-compose.yml`** orchestrating `portal` + `valhalla`
-      via `include` (Valhalla stays self-contained; its `valhalla/.env` is kept in
-      effect via include `env_file`). Shared default network, portal healthcheck,
-      `restart: unless-stopped`, `depends_on: valhalla (service_started)` — NOT
-      `healthy`, so the portal serves immediately while Valhalla's first-run tile
-      build (long) proceeds. *Note:* the stack uses its own `cosi_valhalla_tiles`
-      volume, separate from a standalone `cd valhalla` run's volume (and both name
-      the container `cosi-valhalla`, so run one or the other).
-- [x] Keep a clear **dev vs prod** split: dev = Vite (`npm start`), prod = built
-      image. Documented in the root `Readme.md` (new "Deployment (Docker)" section)
-      and in full in `deploy/Readme.md` (dev/prod table).
-- [x] **Image build/publish:** documented in `deploy/Readme.md` — build context is
-      the repo root, tag by Masterportal+COSI version
-      (`cosi-portal:mp3.23.0-cosi1.2.0` + `:latest`), publish to GHCR from CI once
-      the hosted fork (§2.5) exists so servers pull instead of building. Build is
-      heavy (full layered npm install + Vite build) — flagged.
-- [x] **CSL server bootstrap:** `deploy/bootstrap-csl.sh` — one command: checks
-      Docker/Compose, seeds `.env` + `valhalla/.env` from examples, `docker compose
-      up -d --build`, waits for the portal. TLS termination (Caddy/Traefik/nginx +
-      Let's Encrypt in front, kept outside the app compose) + resource notes
-      (Valhalla build dominates — links §2 table) documented in `deploy/Readme.md`.
-
----
-
-## 9. Open questions / decisions
-
-- [?] Where do the statistical data ultimately live long-term — keep consuming Hamburg's
-      public WFS/OGC API, or import into our own store/service?
-- [?] Distance-based isochrones needed, or time-based only? (affects §2/§3).
-- [?] Target CSL server specs for Valhalla tile building (RAM/disk) and deployment method
-      (plain docker-compose vs. orchestrated).
-- [x] How much of the original portalconfig can we recover? **Recovered the full internal
-      (fhhnet) portalconfig on 2026-06-25** (see §4). Open follow-up: get a public-reachable
-      build by repointing registries to `-internet.json` and self-hosting the rest (§6).
-
----
-
-## Next session — suggested first steps
-
-Done so far: §1 (env), §2 (Valhalla service), §2.5 (addons fork/tracking), §3 (Valhalla
-isochrone backend), the **portalconfig is in hand** (§4), and **§4 is now running publicly**:
-the COSI portal **boots and renders against public Hamburg infra** (registries flipped to
-`-internet.json`, basemap fixed via `overwriteWmsLoadfunction:false`). Tracked on the
-`cosi-selfhost` repo as 2 small diffs on top of the `fhhnet-original` baseline.
-
-Remaining for a complete self-host:
-1. ~~§4 steps 1–5: track pristine config, boot baseline, flip registries, catalogue gaps, verify
-   addons.~~ **All done 2026-06-25** (see §4).
-2. ~~**§5 — District levels:** Stadtteile + Bezirke (+ Hamburg, user-requested).~~ **Done
-   2026-06-25** — dropped Statistische Gebiete only.
-3. ~~**§7 — Verify retained Hamburg deps.**~~ **Done 2026-06-25** — WPS `1001` + all 16 stats
-   layers + geometry confirmed **public**. Finding: the district/stats layers are now **OAF** (the
-   WFS→OAF migration already happened for them; wider catalogue still mixed WMS/WFS). Optional
-   data-snapshot hedge left open.
-4. ~~**§6 — Self-host registries.**~~ **Done 2026-06-25.** Automated generator
-   (`portal/cosi/tools/build-registries.py`) prunes 6551→451 layers from `config.json`'s refs and
-   writes `services.json` + `rest-services.json` (full rest set + `valhalla`); `config.js` repointed
-   to `./services.json` / `./rest-services.json`; portal boots against them. §5 verify checkbox
-   closed. *Leftover:* prune the 64 FHHNET-only ids from `config.json`'s layer tree (generator lists
-   them); optionally self-host `style_v3.json` too.
-5. ~~**§4 "Later" / §3 wiring:** stand up local Valhalla (§2) and flip `accessibilityAnalysis` to
-   it — set `isochroneBackend: "valhalla"` + `serviceId: "valhalla"` in `config.json`.~~ **Done
-   2026-06-25.** Local Valhalla up (Hamburg tiles, `gis-ops` image), config flipped on
-   `cosi-selfhost`, integration-tested live across all profiles + the 7 unit tests. ORS stays the
-   fallback (`fallbackServiceId: "csl_ors"`).
-6. ~~**§8 — Dockerize the whole stack.**~~ **Done 2026-06-26.** Root `docker-compose.yml`
-   (portal + valhalla via `include`) + `deploy/` (multi-stage Dockerfile Node 24.15.0 build →
-   nginx runtime, nginx serving §6 registries + same-origin `/valhalla/` proxy, runtime config
-   injection, CSL bootstrap script). Built + tested end-to-end against a live local Valhalla
-   (portal serves, injection works, isochrone POST proxied 200). See §8.
-
-Remaining (smaller follow-ups, none blocking a working self-host):
-- §2.5: create the hosted fork (`origin`) + automate the upstream-rebase PR job.
-- §6 leftover: prune the 64 FHHNET-only ids from `config.json`'s layer tree (generator lists
-  them); optionally self-host `style_v3.json`.
-- §7: optional statistical-data snapshot hedge.
-- §3: contour-band-count lever (deferred — structural change; see §3).
-- §8 ops: actually run the full multi-state/Germany Valhalla build on the CSL server (§2 path
-  is wired) and stand up TLS for a public hostname.
+- [?] **simulationTool** (noise and wind, Urban Model Platform): ships in the vendored
+      tree but is not configured. Needs a UMP account and the OIDC login; the backend
+      was not reachable from outside in the last test (2026-10-08).
+- [ ] **"Förderung & Öffnungszeiten" prototype** (`beta`): fictitious data, marked
+      "AI GENERATED". The handover to the accessibility analysis sets the start point, but
+      the user still has to start the calculation.

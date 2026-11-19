@@ -76,8 +76,7 @@ services:
     healthcheck:
       # Traefik will NOT create a route for a service whose healthcheck is
       # FAILING, so this must pass for the domain to work. /cosi/config.js is the
-      # runtime-injected config the SPA loads first (also bootstrap-csl.sh's
-      # readiness probe), so it's a good "portal is really serving" signal.
+      # runtime-injected config the SPA loads first, so it's a good "portal is really serving" signal.
       test: ["CMD-SHELL", "wget -qO /dev/null http://127.0.0.1/cosi/config.js || exit 1"]
       interval: 30s
       timeout: 5s

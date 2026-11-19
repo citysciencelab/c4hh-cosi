@@ -2,8 +2,8 @@
 
 Reproducible, one-command deployment of the whole COSI stack — the **portal**
 (Masterportal + COSI addon, built to a static SPA) plus the self-hosted
-**Valhalla** routing service — that runs the same locally and on the CSL server
-(BACKLOG §8).
+**Valhalla** routing service. It runs the same on a laptop, on a plain Docker
+host behind a reverse proxy (production) and on Dokploy (beta).
 
 ```
                          ┌─────────────────────────────────────────┐
@@ -16,10 +16,10 @@ Reproducible, one-command deployment of the whole COSI stack — the **portal**
                          └────────────────────────────────────────│─┘
                                                                    ▼
                          ┌─────────────────────────────────────────┐
-                         │  valhalla  (routing, :8002)  — BACKLOG §2 │
+                         │  valhalla  (routing, :8002)              │
                          └─────────────────────────────────────────┘
 
-  WPS (population) + statistical / OAF data stay EXTERNAL at Hamburg (BACKLOG §7),
+  WPS (population) + statistical / OAF data stay EXTERNAL at Hamburg,
   but flow through the portal's caching proxy so outages serve stale copies.
 ```
 
@@ -37,15 +37,14 @@ regardless of where Valhalla actually runs.
 | `nginx.conf` | Serves the SPA + registries, reverse-proxies `/valhalla/`, caching proxy for the Hamburg upstreams |
 | `docker-entrypoint.d/40-cosi-runtime-config.sh` | Startup hook: runtime config injection |
 | `warm-hh-cache.py` | Pre-warms the Hamburg upstream cache (see *Hamburg API outages*) |
-| `bootstrap-csl.sh` | One-command bring-up (CSL server or any Docker host) |
 
 ## Quick start (prod / staging — built image)
 
 ```bash
 # from the repo root
 cp .env.example .env                       # optional: set PORTAL_PORT, routing knobs
-docker network create dokploy-network      # once (see note); bootstrap-csl.sh does it for you
-docker compose up -d --build               # or: ./deploy/bootstrap-csl.sh
+docker network create dokploy-network      # once per host (see note)
+docker compose up -d --build
 ```
 
 > The `portal` service joins the external `dokploy-network` (so Dokploy's Traefik
@@ -62,6 +61,33 @@ is up immediately, routing starts working once Valhalla is ready
 > by the `gtfs-fetch` init container before the tile build; if its URL has
 > expired the stack still comes up with car/bike/foot routing (see *Transit*
 > below). `valhalla/.env`, if you create one, overrides the routing defaults.
+
+## Plain Docker host behind a reverse proxy (production)
+
+Production runs exactly like the quick start, on a server whose web panel (Plesk)
+terminates TLS and forwards the public hostname to the portal:
+
+1. Clone the repo, `cp .env.example .env`, set `PORTAL_PORT` to a free port (e.g.
+   `8080`), `docker network create dokploy-network`, `docker compose up -d --build`.
+2. In the reverse proxy, forward `https://<your-host>/` to
+   `http://127.0.0.1:<PORTAL_PORT>/`. COSI is served under `/cosi/`.
+3. **The proxy must send `X-Forwarded-Proto`.** nginx rewrites the Hamburg service
+   URLs in the served config to its own host (see *Hamburg API outages*) and takes
+   the scheme from that header. Without it the page is https but the data URLs are
+   http, and the browser blocks them as mixed content (empty map, no districts).
+   For nginx-based proxies (Plesk: *Apache & nginx Settings → Additional nginx
+   directives*): `proxy_set_header X-Forwarded-Proto $scheme;`
+4. Give the proxy a long read timeout (≥ 120 s) for the first, uncached requests
+   to the Hamburg services, or warm the cache (see below).
+
+**Updating:**
+
+```bash
+git pull && docker compose up -d --build
+```
+
+Don't run `docker compose down -v`: the volumes hold the Valhalla tiles (rebuilding
+them takes long) and the Hamburg data cache.
 
 ## Deploy on Dokploy (git → click deploy)
 
@@ -80,8 +106,7 @@ that (self-contained, no host-side pre-steps):
 4. **Domains** tab → add your domain → **Service: `portal`, Container Port: `80`,
    HTTPS on**. Dokploy injects the Traefik router/host/cert labels; the compose
    already attaches `portal` to `dokploy-network` and sets
-   `traefik.docker.network=dokploy-network` so Traefik can reach it. (This is how
-   the working `mp.care4.hamburg` deploy is wired.)
+   `traefik.docker.network=dokploy-network` so Traefik can reach it.
 5. **Deploy.** First build: the portal image (`npm` install + Vite build, heavy —
    see *Resource needs*) and Valhalla's first tile build run once. **Redeploy**
    after adding/changing the domain — Traefik labels only apply on redeploy.
@@ -206,7 +231,7 @@ published, and there is nothing to warm about them.
 
 | | Dev | Prod / staging |
 |---|---|---|
-| Portal | Vite dev server — `cd masterportal && npm start`, https://localhost:9001/portal/cosi/ (Readme §3) | Built image behind nginx — `docker compose up`, http://localhost:8080/cosi/ |
+| Portal | Vite dev server — `cd masterportal && npm start`, https://localhost:9001/portal/cosi/ (root Readme → *Development*) | Built image behind nginx — `docker compose up`, http://localhost:8080/cosi/ |
 | Rebuild on change | hot-reload | rebuild image (`docker compose build portal`) |
 | Routing | local Valhalla on `http://localhost:8002` (rest-services.json) | same-origin `/valhalla/` proxy (injected at start) |
 
@@ -234,9 +259,9 @@ docker build -f deploy/Dockerfile -t cosi-portal:<tag> .   # context = repo root
 
 The build is **heavy** (full layered npm install of Masterportal + COSI addon,
 then a Vite production build). Suggested tagging: by Masterportal+COSI version,
-e.g. `cosi-portal:mp3.28.2-cosi1.2.0`, plus `:latest`. If/when we host a fork
-(BACKLOG §2.5), publish to GHCR (`ghcr.io/<org>/cosi-portal`) from CI so servers
-pull a prebuilt image instead of building on the box.
+e.g. `cosi-portal:mp3.28.2-cosi1.2.0`, plus `:latest`. On small hosts, consider
+publishing the image from CI (e.g. to GHCR) so servers pull a prebuilt image
+instead of building on the box.
 
 `ARG MASTERCODE_VERSION_FOLDER` names the `mastercode/<version>` asset folder;
 left empty (the default) the build stamps a fresh `3_28_2_<UTC timestamp>` into
@@ -250,10 +275,11 @@ to reproduce a specific build's asset paths.
 
 ## TLS / public hostname
 
-`bootstrap-csl.sh` brings up plain **HTTP** on `PORTAL_PORT`. For a public
-hostname, terminate TLS in front of the `portal` service with a reverse proxy:
+The stack serves plain **HTTP** on `PORTAL_PORT`. For a public hostname,
+terminate TLS in front of the `portal` service with a reverse proxy (and send
+`X-Forwarded-Proto`, see *Plain Docker host* above):
 
-- **Caddy** (simplest — automatic Let's Encrypt): `reverse_proxy localhost:8080`.
+- **Caddy** (simplest — automatic Let's Encrypt, sends `X-Forwarded-Proto` by itself): `reverse_proxy localhost:8080`.
 - **Traefik** / **nginx + certbot**: proxy `cosi.example.org` → `portal:80`.
 
 Keep the TLS proxy outside this compose (or add it as another service) so cert
