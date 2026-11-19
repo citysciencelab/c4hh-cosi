@@ -39,6 +39,8 @@ services:
     environment:
       # Same-origin routing through this stack's nginx (see deploy/nginx.conf).
       - VALHALLA_URL=${VALHALLA_URL:-/valhalla}
+      # Planungszwilling (beta): origin of the planungszwilling_* OAF layers, see deploy/Readme.md
+      - PLANUNGSZWILLING_URL=${PLANUNGSZWILLING_URL:-}
       # Optional registry/style overrides (blank = keep the built-in values).
       - LAYER_CONF=${LAYER_CONF:-}
       - REST_CONF=${REST_CONF:-}

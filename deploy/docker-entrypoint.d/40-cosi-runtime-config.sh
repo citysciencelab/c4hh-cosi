@@ -11,6 +11,10 @@
 #   LAYER_CONF    override config.js layerConf (services.json)   (default: keep build)
 #   REST_CONF     override config.js restConf (rest-services.json)(default: keep build)
 #   STYLE_CONF    override config.js styleConf                    (default: keep build)
+#   PLANUNGSZWILLING_URL  base url of the Planungszwilling (e.g. https://pz.example), no
+#                 trailing slash. Replaces the origin of every `planungszwilling_*` layer in
+#                 services.json; the path (/oaf/p/<planfall>/<stichtag>) stays. Unset: layers
+#                 keep the placeholder origin and stay empty.
 #
 # Idempotent: each run rewrites from the current value, so restarts are safe.
 set -eu
@@ -34,6 +38,27 @@ if [ -f "$REST" ]; then
     else
         rm -f "$tmp"
         log "WARNING: could not patch $REST (left unchanged)"
+    fi
+fi
+
+# --- services.json: point the planungszwilling_* layers at PLANUNGSZWILLING_URL
+SERVICES="$PORTAL_DIR/services.json"
+if [ -f "$SERVICES" ]; then
+    if [ -n "${PLANUNGSZWILLING_URL:-}" ]; then
+        tmp="$(mktemp)"
+        # replace whatever origin is there (placeholder or an earlier value) -> idempotent
+        if jq --arg pz "${PLANUNGSZWILLING_URL%/}" \
+            '(.[] | select(.id | startswith("planungszwilling_")) | .url) |= ($pz + sub("^https?://[^/]+"; ""))' \
+            "$SERVICES" > "$tmp"; then
+            mv "$tmp" "$SERVICES"
+            chmod 644 "$SERVICES"
+            log "services.json: planungszwilling layers -> ${PLANUNGSZWILLING_URL%/}"
+        else
+            rm -f "$tmp"
+            log "WARNING: could not patch $SERVICES for PLANUNGSZWILLING_URL (left unchanged)"
+        fi
+    elif jq -e 'any(.[]; .id | startswith("planungszwilling_"))' "$SERVICES" >/dev/null 2>&1; then
+        log "PLANUNGSZWILLING_URL not set: planungszwilling layers stay empty"
     fi
 fi
 

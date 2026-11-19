@@ -204,5 +204,118 @@
     "layerAttribution": "<img src=\"./assets/ai-labels/label-ai-generated-black.svg\" alt=\"KI-generiert (AI generated)\" height=\"44\"><br>Fiktive Demodaten für den Prototyp „Förderung &amp; Öffnungszeiten“: Lage, Name und Angebotstyp stammen aus Open Data der FHH; Träger, Förderung, Öffnungszeiten und Besuche sind fiktiv und KI-generiert (siehe tools/build-sozialinfra-demo.py).",
     "legendURL": "",
     "datasets": []
+  },
+  {
+    "id": "planungszwilling_wohnbau",
+    "name": "Wohnungsbau – Planungsstand 2029 (Demo)",
+    "url": "https://planungszwilling.invalid/oaf/p/demo-sicht/2029",
+    "collection": "wohnbau",
+    "typ": "OAF",
+    "crs": "http://www.opengis.net/def/crs/EPSG/0/25832",
+    "limit": 1000,
+    "bbox": [
+      461000,
+      5916000,
+      588000,
+      5981000
+    ],
+    "gfiAttributes": {
+      "name": "Name",
+      "we": "Wohneinheiten",
+      "nutzung": "Nutzung",
+      "bgf_wohnen": "BGF Wohnen (m²)",
+      "bgf_gewerbe": "BGF Gewerbe (m²)",
+      "pf_status": "Planungsstatus",
+      "pf_reifegrad": "Reifegrad",
+      "pf_wirksam_ab": "wirksam ab",
+      "pf_vorhaben": "Vorhaben",
+      "pf_abschnitt": "Bauabschnitt"
+    },
+    "gfiTheme": "default",
+    "layerAttribution": "Planungszwilling (Beta): Planfall „Demo-Sicht Quartier“, Stichtag 31.12.2029. Erfundene Demo-Daten.",
+    "legendURL": "",
+    "datasets": false
+  },
+  {
+    "id": "planungszwilling_kitas",
+    "name": "Kitas – Planungsstand 2029 (Demo)",
+    "url": "https://planungszwilling.invalid/oaf/p/demo-sicht/2029",
+    "collection": "kitas",
+    "typ": "OAF",
+    "crs": "http://www.opengis.net/def/crs/EPSG/0/25832",
+    "limit": 1000,
+    "bbox": [
+      461000,
+      5916000,
+      588000,
+      5981000
+    ],
+    "gfiAttributes": {
+      "name": "Name",
+      "traeger": "Träger",
+      "plaetze_krippe": "Plätze Krippe",
+      "plaetze_elementar": "Plätze Elementar",
+      "pf_status": "Planungsstatus",
+      "pf_reifegrad": "Reifegrad",
+      "pf_wirksam_ab": "wirksam ab",
+      "pf_vorhaben": "Vorhaben",
+      "pf_abschnitt": "Bauabschnitt"
+    },
+    "gfiTheme": "default",
+    "layerAttribution": "Planungszwilling (Beta): Planfall „Demo-Sicht Quartier“, Stichtag 31.12.2029. Erfundene Demo-Daten.",
+    "legendURL": "",
+    "datasets": false
+  },
+  {
+    "id": "planungszwilling_oepnv_halte",
+    "name": "ÖPNV-Halte – Planungsstand 2029 (Demo)",
+    "url": "https://planungszwilling.invalid/oaf/p/demo-sicht/2029",
+    "collection": "oepnv_halte",
+    "typ": "OAF",
+    "crs": "http://www.opengis.net/def/crs/EPSG/0/25832",
+    "limit": 1000,
+    "bbox": [
+      461000,
+      5916000,
+      588000,
+      5981000
+    ],
+    "gfiAttributes": {
+      "name": "Name",
+      "linie": "Linie",
+      "modus": "Verkehrsmittel",
+      "pf_status": "Planungsstatus",
+      "pf_reifegrad": "Reifegrad",
+      "pf_wirksam_ab": "wirksam ab",
+      "pf_vorhaben": "Vorhaben",
+      "pf_abschnitt": "Bauabschnitt"
+    },
+    "gfiTheme": "default",
+    "layerAttribution": "Planungszwilling (Beta): Planfall „Demo-Sicht Quartier“, Stichtag 31.12.2029. Erfundene Demo-Daten.",
+    "legendURL": "",
+    "datasets": false
+  },
+  {
+    "id": "planungszwilling_gebaeude",
+    "name": "Gebäude – Planungsstand 2029 (Demo)",
+    "url": "https://planungszwilling.invalid/oaf/p/demo-sicht/2029",
+    "collection": "gebaeude",
+    "typ": "OAF",
+    "crs": "http://www.opengis.net/def/crs/EPSG/0/25832",
+    "limit": 1000,
+    "gfiAttributes": {
+      "bezeichnung": "Bezeichnung",
+      "we": "Wohneinheiten",
+      "bgf_gewerbe": "BGF Gewerbe (m²)",
+      "pf_status": "Planungsstatus",
+      "pf_reifegrad": "Reifegrad",
+      "pf_wirksam_ab": "wirksam ab",
+      "pf_vorhaben": "Vorhaben",
+      "pf_abschnitt": "Bauabschnitt"
+    },
+    "gfiTheme": "default",
+    "layerAttribution": "Planungszwilling (Beta): Planfall „Demo-Sicht Quartier“, Stichtag 31.12.2029. Erfundene Demo-Daten.",
+    "legendURL": "",
+    "datasets": false
   }
 ]

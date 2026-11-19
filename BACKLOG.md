@@ -111,9 +111,15 @@ in COSI starts once the service's MVP exists.
 
 - [ ] **Login**: an optional login with the C4HH Keycloak (Masterportal's OIDC login,
       PKCE); COSI stays fully usable without it.
-- [ ] **Read planning cases as layers**: plan state per layer as OGC API Features, with
-      the year as the standard `datetime` parameter and the planning case as an extra
-      parameter (Masterportal OAF layers support both without custom code).
+- [x] **Read planning cases as layers** (first step, `feature/planungszwilling`): four OAF
+      layers in the folder „Planungszwilling (Beta, Demo-Daten)" read the demo planning case
+      at 31.12.2029. The Planungszwilling (repo `c4hh-twin4planning`) puts planning case and
+      date in the **path** (`/oaf/p/{planfall}/{stichtag}`), not in `datetime`, because many
+      OAF clients drop extra query parameters; switching means swapping the layer `url`. It
+      answers in EPSG:25832 (`crs`/`bbox-crs`), so the layers are plain Masterportal OAF
+      layers. Origin per deploy via `PLANUNGSZWILLING_URL`; the Planungszwilling must allow
+      the portal origin in `CORS_ORIGINS`. Styling is still generic (no colour per
+      `pf_status`).
 - [ ] **Planning case tool**: choose planning case and year, switch all affected layers
       and statistics, compare current state and plan.
 - [ ] **Statistics with plan**: a per-district, per-year balance (dwellings, inhabitants,

@@ -1324,6 +1324,54 @@
           "type": "folder",
           "elements": [
             {
+              "name": "Planungszwilling (Beta, Demo-Daten)",
+              "type": "folder",
+              "elements": [
+                {
+                  "id": "planungszwilling_wohnbau",
+                  "name": "Wohnungsbau – Planungsstand 2029",
+                  "styleId": "orange-polygon-soft",
+                  "mouseHoverField": [
+                    "name",
+                    "pf_status"
+                  ],
+                  "loadingStrategy": "all"
+                },
+                {
+                  "id": "planungszwilling_kitas",
+                  "name": "Kitas – Planungsstand 2029",
+                  "styleId": "753",
+                  "isFacility": true,
+                  "alwaysOnTop": true,
+                  "searchField": "name",
+                  "mouseHoverField": [
+                    "name",
+                    "pf_status"
+                  ],
+                  "loadingStrategy": "all"
+                },
+                {
+                  "id": "planungszwilling_oepnv_halte",
+                  "name": "ÖPNV-Halte – Planungsstand 2029",
+                  "styleId": "purple-point",
+                  "mouseHoverField": [
+                    "name",
+                    "pf_status"
+                  ],
+                  "loadingStrategy": "all"
+                },
+                {
+                  "id": "planungszwilling_gebaeude",
+                  "name": "Gebäude – Planungsstand 2029",
+                  "styleId": "blue-polygon-soft",
+                  "mouseHoverField": [
+                    "bezeichnung",
+                    "pf_status"
+                  ]
+                }
+              ]
+            },
+            {
               "name": "Demo: Förderung & Öffnungszeiten (fiktive Daten)",
               "type": "folder",
               "elements": [

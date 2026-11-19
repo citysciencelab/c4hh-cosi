@@ -247,6 +247,7 @@ defaults). Set them in the root `.env` / compose `environment:`:
 | Env var | Default | Effect |
 |---------|---------|--------|
 | `VALHALLA_URL` | `/valhalla` | `rest-services.json` `valhalla` entry → this URL (same-origin proxy by default) |
+| `PLANUNGSZWILLING_URL` | *(empty)* | origin of the `planungszwilling_*` OAF layers in `services.json` (beta). The Planungszwilling has to allow this portal's origin in `CORS_ORIGINS` |
 | `LAYER_CONF` | *(keep build)* | `config.js` `layerConf` (services.json URL) |
 | `REST_CONF` | *(keep build)* | `config.js` `restConf` (rest-services.json URL) |
 | `STYLE_CONF` | *(keep build)* | `config.js` `styleConf` |
