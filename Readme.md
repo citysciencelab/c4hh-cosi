@@ -197,7 +197,7 @@ here and are carried along by the upstream merges.
 - **`beta`** is `main` plus our prototypes and own extensions: the "Förderung &
   Öffnungszeiten" prototype, the Sozialmonitoring statistics, the combined facility layers
   (Jugendorte/Familienorte), the derived-indicator workflow (Dashboard → Versorgungsanalyse),
-  the new tools "Filter (neu)" and "Darstellung (neu)", the new draw tool and the mpaddon
+  the new tools "Filter (neu)" and "Darstellung (neu)" and the mpaddon
   ("Externes Backend"). It runs as a separate instance, see
   [`deploy/Readme.md` → Beta instance](./deploy/Readme.md#beta-instance-branch-beta).
 
