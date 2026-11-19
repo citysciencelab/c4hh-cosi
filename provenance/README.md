@@ -1,5 +1,10 @@
 # Provenance — upstream history of the vendored `masterportal/`
 
+> **Historical.** This describes how the repo was flattened (at Masterportal 3.23.0).
+> Since then the upstream histories are part of this repo and updates are plain
+> subtree merges — see the root [Readme → Updating the Masterportal upstream](../Readme.md#updating-the-masterportal-upstream).
+> You only need the artifacts below to recover pre-flattening commit history.
+
 `masterportal/` used to be three separate git checkouts nested inside this repo
 (each with its own `.git`). To make this repo **self-contained** (one clone →
 build → run, no external fetches), that tree was flattened into plain tracked
@@ -48,4 +53,4 @@ git -C /tmp/addons fetch ../path/to/provenance/addons-cosi-selfhost.bundle cosi-
 git -C masterportal/addons am ../../provenance/addons-cosi-selfhost-patches/*.patch
 ```
 
-## Syncing a newer upstream masterportal/addons — see ../Readme.md ("Updating upstream").
+## Syncing a newer upstream masterportal/addons — see ../Readme.md ("Updating the Masterportal upstream").

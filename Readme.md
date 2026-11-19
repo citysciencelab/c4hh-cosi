@@ -1,201 +1,282 @@
 # COSI — self-hosted
 
-Self-hosted, open-source deployment of **COSI** (Cockpit Städtische Infrastrukturen), a
-[Masterportal](https://www.masterportal.org/)-based urban-planning portal. Background, goals
-and the full task list live in [`BACKLOG.md`](./BACKLOG.md).
+**COSI** (*Cockpit Städtische Infrastrukturen*) is a web GIS for planning social
+infrastructure in Hamburg — schools, day-care centres, youth and family services.
+Planners select districts, compare statistics over time (dashboard), calculate
+supply ratios (facilities per resident), draw catchment areas (isochrones) and
+sketch planning scenarios.
 
-Repo layout:
+COSI is a set of tools (an *addon*) for the [Masterportal](https://www.masterportal.org/),
+the open-source map framework of the City of Hamburg. This repository packages
+everything needed to **run COSI on your own server**: the Masterportal with the COSI
+addon, the COSI portal configuration, a self-hosted routing service (Valhalla) and a
+Docker deployment.
+
+| Instance | Branch | URL |
+|----------|--------|-----|
+| Production | `main` | https://cosi.citysciencelab.hamburg/cosi/ |
+| Beta (prototypes) | `beta` | separate server, see [Branches](#branches-main-and-beta) |
+
+Data comes live from Hamburg's public services (`api.hamburg.de`, `geodienste.hamburg.de`);
+nothing has to be imported to get started.
+
+**Contents:** [Quick start](#quick-start) · [Repository layout](#repository-layout) ·
+[Development](#development) · [Where to change what](#where-to-change-what) ·
+[Contributing](#contributing) · [Branches](#branches-main-and-beta) ·
+[Deployment](#deployment) · [Updating upstream](#updating-the-masterportal-upstream) ·
+[Versions](#versions) · [License](#license)
+
+## Quick start
+
+**Run it** (needs only Docker, ≥ 8 GB RAM for the first build):
+
+```bash
+git clone git@github.com:citysciencelab/c4hh-cosi.git && cd c4hh-cosi
+docker network create dokploy-network   # once per host, see deploy/Readme.md
+docker compose up -d --build
+```
+
+Open http://localhost:8080/cosi/. The portal is ready after the image build (several
+minutes). Isochrones work once Valhalla has built its routing tiles on the first start
+(roughly 10–30 minutes, `docker compose logs -f valhalla`).
+
+**Develop** (needs Node 24.22.3 via [nvm](https://github.com/nvm-sh/nvm)):
+
+```bash
+cd masterportal
+nvm install && nvm use
+npm install
+(cd addons && npm install --ignore-scripts) && (cd addons/cosi && npm install)
+npm start
+```
+
+Open https://localhost:9001/portal/cosi/ and accept the self-signed certificate.
+
+## Repository layout
 
 ```
-cosi/
-├─ BACKLOG.md                 # working plan / task backlog
-├─ .nvmrc                     # Node version pin (24.22.3)
-├─ docker-compose.yml         # full-stack deploy: portal + valhalla (BACKLOG §8)
-├─ deploy/                    # portal Dockerfile, nginx, entrypoint, CSL bootstrap
-├─ valhalla/                  # self-hosted routing service (Docker; BACKLOG §2)
-├─ provenance/                # git-history backups of the vendored trees (see its README)
-└─ masterportal/              # VENDORED Masterportal v3.28.2 — plain tracked files, self-contained
-   ├─ .nvmrc                  # Node version pin (24.22.3)
-   ├─ addons/                 # agency addons (incl. our COSI addon, addons/cosi v1.2.0)
-   └─ portal/
-      ├─ cosi/                # the COSI portalconfig
-      └─ {master,auto,basic}/ # stock example portals
+c4hh-cosi/
+├─ docker-compose.yml       # the full stack: portal + Valhalla routing
+├─ .env.example             # stack settings (ports, routing extract, GTFS feed)
+├─ deploy/                  # portal image (Dockerfile), nginx config, cache warmer — see deploy/Readme.md
+├─ valhalla/                # self-hosted routing service — see valhalla/Readme.md
+├─ provenance/              # history backups from before the repo was flattened (rarely needed)
+├─ BACKLOG.md               # open work, known bugs and limitations
+├─ LICENSE                  # MIT
+└─ masterportal/            # the Masterportal, vendored as plain files (no submodules)
+   ├─ src/                  # Masterportal core (upstream code)
+   ├─ addons/               # upstream addons repo …
+   │  └─ cosi/              # … including the COSI addon: one folder per tool
+   └─ portal/cosi/          # the COSI portal: config.json, config.js, registries, data
+      ├─ assets/            # our own GeoJSON data (derived statistics, combined layers)
+      └─ tools/             # Python generators for registries and data (see below)
 ```
 
-> **Self-contained.** `masterportal/` is vendored directly into this repo (no nested git
-> checkouts, no submodules): one clone has everything needed to build and run. `node_modules`
-> is **not** tracked — run the install steps below after cloning. The upstream sources we
-> vendored from, and how to pull newer versions, are documented under
-> [Upstream updates](#addons-fork--upstream-updates) and [`provenance/README.md`](./provenance/README.md).
+`masterportal/` is a complete copy of the upstream code, kept in this repository on
+purpose: one clone builds and runs, and our local fixes live next to the code they fix.
+Upstream releases are merged in with git (see
+[Updating upstream](#updating-the-masterportal-upstream)). `node_modules` is not tracked.
+
+## Development
+
+### Prerequisites
+
+- **Node 24.22.3** (any `>=24.22.1 <25` works). Both `.nvmrc` files pin it; `.npmrc` sets
+  `engine-strict`, so an older Node fails `npm install` with `EBADENGINE`.
+- **Python 3** (standard library only) for the generators in `masterportal/portal/cosi/tools/`.
+- **Docker** if you want isochrones locally (Valhalla) or to test the production image.
+
+> **nvm silently uses the wrong Node?** If `npm_config_prefix` is set in your shell
+> (common with a global npm prefix), nvm refuses to switch and you stay on the system
+> Node. Run `unset npm_config_prefix` before `nvm use`.
+
+### Install
+
+Dependencies are installed in three layers. The addons' `postinstall` would install every
+addon of the upstream repo, so it is skipped and only the COSI addon is installed:
+
+```bash
+cd masterportal
+npm install                                   # Masterportal core
+cd addons && npm install --ignore-scripts     # shared addon dependencies
+cd cosi && npm install                        # the COSI addon
+```
+
+npm 11 prints an `install-scripts` warning (canvas, esbuild, core-js, @parcel/watcher);
+the build does not need those scripts.
+
+### Run
+
+```bash
+cd masterportal && npm start     # Vite dev server with hot reload
+```
+
+| URL | What |
+|-----|------|
+| https://localhost:9001/portal/cosi/ | COSI |
+| https://localhost:9001/portal/master/ | stock Masterportal example (handy to tell core bugs from COSI bugs) |
+
+Everything except isochrones works without further setup. For isochrones, run Valhalla
+locally (`cd valhalla && ./bootstrap.sh`, details in [`valhalla/Readme.md`](./valhalla/Readme.md));
+the dev config expects it at `http://localhost:8002`.
+
+### Test, lint, build
+
+```bash
+cd masterportal
+npx eslint addons/cosi/<Tool>             # lint what you touched (the whole repo: npm run lint)
+npm test                                  # core unit tests (vitest)
+node node_modules/.bin/vite build --config devtools/vite.config.js --mode production
+                                          # production build → masterportal/dist/
+```
+
+**COSI unit tests:** the upstream vitest config excludes `addons/cosi/**`. To run them, use a
+copy of the config without that line:
+
+```bash
+sed 's#^\(\s*\)"addons/cosi/\*\*/\*\.spec\.js",#\1// cosi tests on#' \
+    devtools/vitest.config.js > devtools/vitest.cosi.config.js
+npx vitest run --config devtools/vitest.cosi.config.js addons/cosi/<Tool>
+rm devtools/vitest.cosi.config.js         # don't commit it
+```
+
+Many older COSI specs are marked `.skip` upstream; the ones of the tools we wrote
+(e.g. `LayerFilter`, `LayerStyler`) all run.
+
+**Checking the production build in a browser:** serve the build output with any static
+server, e.g. `cd masterportal/dist && python3 -m http.server 8123`, then open
+http://localhost:8123/cosi/. This is closer to production than the dev server and also
+works for headless browser tests (the Vite dev server does not render headless).
+
+## Where to change what
+
+| I want to … | Change |
+|-------------|--------|
+| fix or extend a COSI tool | `masterportal/addons/cosi/<Tool>/` (Vue components, `store/`, `utils/`, `tests/unit/`) |
+| add a new tool | a new folder in `addons/cosi/`, an entry in `masterportal/addons/addonsConf.json`, the name in the `addons` list of `portal/cosi/config.js` and a menu entry in `portal/cosi/config.json` |
+| change menus, tools, the layer tree | `masterportal/portal/cosi/config.json` ([Masterportal config docs](./masterportal/docs/User/Portal-Config/config.json.md)) |
+| add or remove a layer | add it to `config.json`, then regenerate the layer registry: `python3 portal/cosi/tools/build-registries.py` (writes `services.json` / `rest-services.json`) |
+| add our own layer or statistics (not in Hamburg's catalogue) | data into `portal/cosi/assets/`, the service entry into `portal/cosi/tools/local-services.json`, then `build-registries.py`. Statistics also need an entry in the `districtSelector` config and in `portal/cosi/assets/mapping.json` |
+| change the deployment | `deploy/` and `docker-compose.yml` ([`deploy/Readme.md`](./deploy/Readme.md)) |
+| change routing | `valhalla/` and the `valhalla` entry in `portal/cosi/rest-services.json` |
+| change Masterportal core code | `masterportal/src/` — possible, but it is a local divergence from upstream: keep it small and say so in the commit message |
+
+Generated files (`services.json`, `rest-services.json`, `assets/*.geojson`) are committed,
+so a deploy needs no generator run. Re-run the generator whenever you change its input,
+and commit both.
+
+## Contributing
+
+0. **Pick something:** open work, known bugs and their known fixes are listed in
+   [`BACKLOG.md`](./BACKLOG.md).
+1. **Branch off the right base** (see [Branches](#branches-main-and-beta)): fixes and
+   infrastructure off `main`, prototypes and new features off `beta`. Name it after the
+   topic, e.g. `fix/dashboard-sum`, `feature/layer-styler`.
+2. **Keep upstream code recognisable.** Prefer changes in `addons/cosi/` and
+   `portal/cosi/` over changes in `masterportal/src/`. Don't reformat or reorganise upstream
+   files; that makes every upstream merge harder.
+3. **Before you push:** lint is clean, the unit tests of the tools you touched pass, the
+   production build succeeds, and you clicked through the change in a browser. If you
+   changed `config.json`, re-run `build-registries.py`.
+4. **Commit messages** describe what changed and why, first line ≤ 72 characters. Mention
+   when a commit touches upstream code.
+5. **Pull request** on GitHub against the branch you started from. Describe how you tested.
+
+The project's own code (portal config, deploy, routing, our tools) is documented in
+English; UI texts are German (with English translations in each tool's `locales/`).
+
+Changes to the upstream Masterportal or COSI addon are not sent back to the Geowerkstatt
+Hamburg automatically; there is no contribution process for that yet. Fixes therefore stay
+here and are carried along by the upstream merges.
 
 ## Branches: `main` and `beta`
 
-- **`main`** is the official COSI state: the upstream release tags (subtree merges), our
-  self-hosting infrastructure (Valhalla, registries, Hamburg API cache, deploy) and bug fixes.
-  Production (cosi.citysciencelab.hamburg) runs `main`.
-- **`beta`** is `main` plus our prototypes, our own extensions and experiments: the
-  "Förderung & Öffnungszeiten" prototype, the Sozialmonitoring statistics, the combined facility
-  layers (Jugendorte/Familienorte), the derived-indicator workflow (Dashboard → Versorgungsanalyse)
-  and the mpaddon ("Externes Backend"). It is deployed separately, see
+- **`main`** is the official COSI state: the upstream releases, our self-hosting
+  infrastructure (Valhalla, registries, Hamburg API cache, deploy) and bug fixes.
+  Production runs `main`.
+- **`beta`** is `main` plus our prototypes and own extensions: the "Förderung &
+  Öffnungszeiten" prototype, the Sozialmonitoring statistics, the combined facility layers
+  (Jugendorte/Familienorte), the derived-indicator workflow (Dashboard → Versorgungsanalyse),
+  the new tools "Filter (neu)" and "Darstellung (neu)", the new draw tool and the mpaddon
+  ("Externes Backend"). It runs as a separate instance, see
   [`deploy/Readme.md` → Beta instance](./deploy/Readme.md#beta-instance-branch-beta).
 
 Rules:
 
-1. **Changes flow `main` → `beta` only.** After every upstream sync or fix on `main`:
+1. **Changes flow `main` → `beta` only.** After every fix or upstream merge on `main`:
    `git switch beta && git merge main`. Never merge `beta` into `main` as a whole.
-2. **A feature that may graduate** gets its own branch off `main`; merge it into `beta` to try
-   it, and once it is ready merge the *same* feature branch into `main`.
-3. **Throwaway experiments** can be committed straight to `beta`.
-4. The features listed above were moved off `main` by revert commits ("Move … to beta", merged
-   as 33cedf71). To promote one of them to `main`, revert its "Move … to beta" commit on `main`.
-   `beta` recorded that merge with `git merge -s ours`, so merging `main` into `beta` never
-   removes them there.
+2. **A feature that may graduate** to production gets its own branch; merge it into `beta`
+   to try it, and once it is ready merge the *same* feature branch into `main`.
+3. **Throwaway experiments** may be committed straight to `beta`.
+4. Some features were moved off `main` by revert commits ("Move … to beta", merged as
+   33cedf71). To promote one of them, revert its "Move … to beta" commit on `main`. `beta`
+   recorded that merge with `git merge -s ours`, so merging `main` into `beta` never removes
+   them there.
 
-## Local environment setup
+## Deployment
 
-### 1. Node / npm
+The whole stack is one `docker compose up`: an nginx container with the built portal, plus
+Valhalla. nginx also proxies and caches Hamburg's services, so the portal keeps working
+during their frequent outages.
 
-Use **Node 24.22.3** (upstream CI uses 24.22.1; we pin the latest patch of the same LTS line).
-Both `.nvmrc` files pin this version:
+[`deploy/Readme.md`](./deploy/Readme.md) covers:
 
-```bash
-cd masterportal
-nvm install   # first time only — installs the version from .nvmrc
-nvm use       # selects Node 24.22.3
-node -v       # v24.22.3
-npm -v        # 11.19.1  (bundled with Node 24.22.3)
-```
+- a plain Docker host behind a reverse proxy (how production runs) and Dokploy (how beta runs)
+- configuration via environment variables, resource needs, TLS
+- the HVV timetable for public-transport isochrones, which has to be updated each
+  timetable period
+- warming the cache before a presentation
 
-> **Why this exact version matters.** `.npmrc` sets `engine-strict=true`, and since
-> Masterportal 3.28 the `package.json` `engines` field requires **`node >=24.22.1 <25`**
-> (or `>=22.23.4 <23`) — upstream raised it to address Node security issues. Any older Node
-> fails `npm install` with `EBADENGINE` (that's what happened earlier with 24.11.0, when
-> masterportalapi needed `^24.11.1`). If you manage Node some other way, just make sure
-> `node >= 24.22.1`.
->
-> npm 11.19 (bundled with 24.22.x) no longer runs install scripts that aren't approved via
-> `allowScripts` and prints an `install-scripts` warning listing them (canvas, esbuild,
-> core-js, @parcel/watcher). The production build doesn't need any of them.
+**Updating an instance:** `git pull && docker compose up -d --build`. Never use
+`docker compose down -v` — the volumes hold the routing tiles and the data cache.
 
-### 2. Install dependencies (layered)
+## Updating the Masterportal upstream
 
-```bash
-# a) Masterportal framework
-cd masterportal
-npm install
+`masterportal/` contains two upstream repositories whose history is part of this repo, so
+an upstream release is a normal git merge into a subdirectory:
 
-# b) Addons (incl. COSI). We install only the addons we actually use, skipping the recursive
-#    `postinstall` (it tries to build every addon's sub-deps; we don't need most of them):
-cd addons
-npm install --ignore-scripts        # top-level addon deps, skip the heavy recursive postinstall
-cd cosi && npm install && cd ..     # the COSI addon (~200 packages) — the one we need
-
-# Other addons used by the stock examples can be installed the same way if needed, e.g.:
-#   for d in sdpDownload vcOblique valuationPrint waterRiskCheck simulationTool \
-#            vpiDashboard gfiThemes/combinedGfi storyTellingTool/storyCreator \
-#            storyTellingTool/storyManager; do (cd "$d" && npm install); done
-```
-
-### 3. Sanity-boot the stock portal
-
-Confirms the toolchain works before we author the COSI portal (BACKLOG §4):
+| Directory | Upstream | Remote |
+|-----------|----------|--------|
+| `masterportal/` | [geowerkstatt-hamburg/masterportal](https://bitbucket.org/geowerkstatt-hamburg/masterportal) | fetch the bitbucket URL directly (the `upstream-mp` mirror on opencode.de lags behind) |
+| `masterportal/addons/` | [geowerkstatt-hamburg/addons](https://bitbucket.org/geowerkstatt-hamburg/addons) | `upstream` |
 
 ```bash
-cd masterportal
-npm start            # runs `prestart` (generates a self-signed dev cert) then `vite`
+git switch -c sync/upstream-<version> main
+
+# Both repos use the same tag names: fetch them into separate namespaces.
+git fetch --no-tags upstream '+refs/tags/v<version>:refs/up-addons/v<version>'
+git fetch --no-tags https://bitbucket.org/geowerkstatt-hamburg/masterportal.git \
+    '+refs/tags/v<version>:refs/up-core/v<version>'
+
+git merge -X subtree=masterportal/addons refs/up-addons/v<version>
+git merge -X subtree=masterportal refs/up-core/v<version>
 ```
 
-Then open **https://localhost:9001/** (accept the self-signed cert). The stock example portals
-are at `https://localhost:9001/portal/master/`. On boot, Vite logs a `provided addons: [...]`
-list that already includes the COSI tools (`districtSelector`, `accessibilityAnalysis`,
-`dashboard`, `colorCodeMap`, `featuresList`, …), confirming the COSI addon is discovered.
+Conflicts are usually limited to version numbers, `CHANGELOG.md`, `package-lock.json` and
+`publiccode.yml` (take upstream's version), plus the few files we changed locally. Then:
 
-> Note: the stock portals do **not** load any COSI tool yet — there is no COSI portalconfig in
-> this repo. Authoring `portal/cosi/` is tracked in BACKLOG §4.
+1. Check `engines` in `masterportal/package.json`. If the Node version changed, update both
+   `.nvmrc` files and the `FROM` line in `deploy/Dockerfile`.
+2. Reinstall, lint, run the tests, build, and click through the main COSI tools (district
+   selection, dashboard, supply analysis, isochrones).
+3. Merge into `main`, then `main` into `beta`.
 
-## Deployment (Docker) — dev vs prod
+Local fixes in the vendored code merge like any other change and are kept.
+[`provenance/README.md`](./provenance/README.md) describes the older history from before
+this setup; you don't need it for syncing.
 
-Two ways to run the portal; pick by what you're doing.
+## Versions
 
-**Dev — Vite dev server** (fast hot-reload, for working on the code/config):
-
-```bash
-cd masterportal && npm start          # https://localhost:9001/portal/cosi/
-```
-
-**Prod / staging — full stack in Docker** (the built SPA behind nginx + the
-self-hosted Valhalla routing service, one command — BACKLOG §8):
-
-```bash
-cp .env.example .env                      # optional: PORTAL_PORT, etc.
-cp valhalla/.env.example valhalla/.env    # optional: tune routing (BACKLOG §2)
-docker network create dokploy-network     # once; harmless off-Dokploy (see note)
-docker compose up -d --build              # or: ./deploy/bootstrap-csl.sh (does this for you)
-# → http://localhost:8080/cosi/
-```
-
-> The portal attaches to `dokploy-network` so Dokploy's Traefik can route the
-> public domain to it. That network is created by Dokploy; outside Dokploy it
-> doesn't exist, so create it once (idempotent — it just sits empty if you're not
-> running Traefik). `deploy/bootstrap-csl.sh` does this automatically.
-
-The portal image is a multi-stage build (Node 24.22.3 build → nginx runtime) that
-reproduces the layered install below and runs the Vite production build. nginx
-serves the SPA + our self-hosted registries (BACKLOG §6) and reverse-proxies
-`/valhalla/` to the routing container, so the portal calls routing **same-origin**.
-The **first** start also builds Valhalla's tiles (slow, resource-heavy — see
-[`valhalla/Readme.md`](./valhalla/Readme.md)). Full details, runtime config
-injection, image publishing and TLS: [`deploy/Readme.md`](./deploy/Readme.md).
-
-## Addons fork & upstream updates
-
-`masterportal/` is **vendored** — plain tracked files, no nested git repos. What we vendored,
-pinned to which upstream commits, is in [`provenance/README.md`](./provenance/README.md):
-
-| Tree | Upstream | Pinned at |
-|------|----------|-----------|
-| `masterportal/` core | `bitbucket.org/geowerkstatt-hamburg/masterportal` `dev` | `205a13ac0e` (v3.23.0 + 51) |
-| `masterportal/addons/` | `bitbucket.org/geowerkstatt-hamburg/addons` | `f148b81e` base + our 4 `cosi-selfhost` commits |
-| `masterportal/portal/cosi/` | authored here | — |
-
-Our COSI changes are deliberately **additive and isolated** (the COSI addon lives in
-`addons/cosi`; the portalconfig in `portal/cosi`; the only edit to core is `.nvmrc`). That
-isolation is what keeps upstream syncs cheap — see BACKLOG §3/§10.
-
-### Updating upstream
-
-Vendoring means upstream is pulled in a **side checkout**, tested locally, then the verified
-files are folded back into this repo (test-gated — never sync untested upstream straight in):
-
-```bash
-# 1. Side checkout — get the new upstream and replay our isolated changes onto it.
-git clone https://bitbucket.org/geowerkstatt-hamburg/masterportal.git /tmp/mp-next
-cd /tmp/mp-next && git checkout <new-tag-or-commit>   # e.g. a future v3.24.0
-git clone https://bitbucket.org/geowerkstatt-hamburg/addons.git addons
-cd addons && git checkout <new-addons-base>
-git am "$OLDPWD"/../<this-repo>/provenance/addons-cosi-selfhost-patches/*.patch   # our 4 commits
-cd .. && cp -r <this-repo>/masterportal/portal/cosi portal/cosi                   # our portalconfig
-
-# 2. Build + run + TEST in the side checkout (see "Local environment setup" above).
-npm install && (cd addons && npm install --ignore-scripts) && (cd addons/cosi && npm install)
-npm start    # verify the COSI portal still works against the new upstream
-
-# 3. Only once verified: fold the source back into THIS repo (node_modules/.git excluded),
-#    then commit and refresh provenance (new pinned SHAs + regenerated patches).
-rsync -a --delete --exclude node_modules --exclude .git /tmp/mp-next/ <this-repo>/masterportal/
-```
-
-If our addon commits needed conflict resolution during `git am`, regenerate the provenance
-patches/bundle from the side checkout so they stay in sync — see `provenance/README.md`.
-
-## Verified working versions
-
-| Tool | Version |
-|------|---------|
-| Node | 24.22.3 |
-| npm  | 11.19.1 |
+| Component | Version |
+|-----------|---------|
 | Masterportal | 3.28.2 |
 | COSI addon | 1.2.0 |
-| Vite dev server | serves on https://localhost:9001/ |
+| Node / npm | 24.22.3 / 11.19.1 |
 
-_Last verified: 2026-06-18._
+## License
+
+This repository is published under the [MIT license](./LICENSE). The vendored
+Masterportal and the COSI addon are published by the City of Hamburg, also under the MIT
+license ([`masterportal/License.txt`](./masterportal/License.txt)). Map data and statistics
+belong to their providers (Freie und Hansestadt Hamburg, LGV; HVV; OpenStreetMap
+contributors) and are subject to their terms.
