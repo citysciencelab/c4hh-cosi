@@ -1,0 +1,10 @@
+{
+    "modules": {
+        "cosi": {
+            "planningTwin": {
+                "title": "Planungszwilling (Beta)",
+                "description": "Planungsstände und Varianten des Planungszwillings ansehen: Zeitleiste der geplanten Änderungen, Stichtag für die Karte, Bilanz der Wohneinheiten."
+            }
+        }
+    }
+}

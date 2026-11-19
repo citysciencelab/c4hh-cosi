@@ -201,6 +201,10 @@
     "path":"cosi/LayerStyler",
     "type": "tool"
   },
+  "planningTwin": {
+    "path":"cosi/PlanningTwin",
+    "type": "tool"
+  },
   "areaSelector": {
     "path":"cosi/AreaSelector",
     "type": "tool"

@@ -1042,6 +1042,11 @@
             "description": "Tools für die Planung und Simulation von Szenarien",
             "elements": [
               {
+                "type": "planningTwin",
+                "name": "Planungszwilling (Beta)",
+                "icon": "bi-calendar-range"
+              },
+              {
                 "type": "scenarioBuilder",
                 "name": "Szenarien planen",
                 "icon": "bi-boxes"

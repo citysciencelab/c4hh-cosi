@@ -1,0 +1,10 @@
+{
+    "modules": {
+        "cosi": {
+            "planningTwin": {
+                "title": "Planning twin (beta)",
+                "description": "Browse the planning cases of the planning twin: timeline of planned changes, reference date for the map, dwelling balance."
+            }
+        }
+    }
+}

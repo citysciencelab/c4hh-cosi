@@ -120,8 +120,24 @@ in COSI starts once the service's MVP exists.
       layers. Origin per deploy via `PLANUNGSZWILLING_URL`; the Planungszwilling must allow
       the portal origin in `CORS_ORIGINS`. Styling is still generic (no colour per
       `pf_status`).
-- [ ] **Planning case tool**: choose planning case and year, switch all affected layers
-      and statistics, compare current state and plan.
+- [~] **Planning case tool** „Planungszwilling (Beta)" (`addons/cosi/PlanningTwin`, menu
+      Simulation): read-only first step done. It lists the planning cases and their parts
+      with thresholds, shows a timeline of all planned changes (project phases, one row per
+      collection, ▲ neu / ● geändert / ✕ entfällt, hollow = below the threshold) and the
+      yearly dwelling balance. Date slider and „Entfallene zeigen" switch the view of all
+      `planungszwilling_*` layers; they are drawn by `pf_status`. Clicking a change jumps to
+      its date and zooms to it. The base url comes from the layers' url, there is no own
+      setting. Open:
+  - [ ] statistics with plan (below) and comparison current state ↔ plan
+  - [ ] login + submitting ScenarioBuilder scenarios as a variant / proposal. Needs on the
+        Planungszwilling: CORS for POST with Bearer, a Keycloak client for COSI; the
+        batch api takes CRS84 only
+  - [ ] the planning style is set when the tool has been opened; a layer switched on
+        before that shows the Masterportal default style
+  - [ ] reifegrad threshold per request (e.g. in the path) would let users pick their own
+        level of trust instead of creating a variant — to discuss with the service
+  - [ ] the twin's collections still use demo/fixture sources; supply and accessibility
+        analysis only make sense with the same Hamburg sources as COSI
 - [ ] **Statistics with plan**: a per-district, per-year balance (dwellings, inhabitants,
       commercial floor space) in the long table format of the district statistics, so
       dashboard and supply analysis compute with the plan without code changes.
